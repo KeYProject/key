@@ -49,7 +49,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.swt.SWT;
@@ -118,6 +117,7 @@ import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithResult;
+import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.internal.ContextMenuHelper;
 
@@ -216,7 +216,7 @@ public class TestUtilsUtil {
             try {
                JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
                IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(project.getFullPath())};
-               entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
+               entries = ArrayUtil.addAll(entries, JDTUtil.getDefaultJRELibrary());
                page.init(javaProject, project.getFullPath(), entries, false);
                page.configureJavaProject(null);
             }
@@ -247,50 +247,7 @@ public class TestUtilsUtil {
     * @throws InterruptedException Occurred Exception.
     */
    public static IJavaProject createJavaProject(String name) throws CoreException, InterruptedException {
-      IProject project = createProject(name);
-      final IFolder bin = project.getFolder("bin");
-      if (!bin.exists()) {
-         bin.create(true, true, null);
-      }
-      final IFolder src = project.getFolder("src");
-      if (!src.exists()) {
-         src.create(true, true, null);
-      }
-      final IJavaProject javaProject = JavaCore.create(project); 
-      IRunnableWithException run = new AbstractRunnableWithException() {
-         @Override
-         public void run() {
-            try {
-               JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
-               IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(src.getFullPath())};
-               entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
-               page.init(javaProject, bin.getFullPath(), entries, false);
-               page.configureJavaProject(null);
-            }
-            catch (Exception e) {
-               setException(e);
-            }
-         }
-      };
-      Display.getDefault().syncExec(run);
-      if (run.getException() instanceof CoreException) {
-         throw (CoreException)run.getException();
-      }
-      else if (run.getException() instanceof InterruptedException) {
-         throw (InterruptedException)run.getException();
-      }
-      else if (run.getException() != null) {
-         throw new CoreException(new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(run.getException()));
-      }
-      return javaProject;
-   }
-   
-   /**
-    * Returns the default JRE library entries.
-    * @return The default JRE library entries.
-    */
-   public static IClasspathEntry[] getDefaultJRELibrary() {
-       return PreferenceConstants.getDefaultJRELibrary();
+      return JDTUtil.createJavaProject(name);
    }
 
    /**

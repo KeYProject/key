@@ -332,7 +332,7 @@ public class JDTUtilTest extends TestCase {
         // Create initial java project
         IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testAddClasspathEntry");
         IFolder src = javaProject.getProject().getFolder("src");
-        IClasspathEntry[] defaultEntries = TestUtilsUtil.getDefaultJRELibrary();
+        IClasspathEntry[] defaultEntries = JDTUtil.getDefaultJRELibrary();
         IClasspathEntry[] entries = javaProject.getRawClasspath();
         assertEquals(1 + defaultEntries.length, entries.length);
         assertEquals(src.getFullPath(), entries[0].getPath());
