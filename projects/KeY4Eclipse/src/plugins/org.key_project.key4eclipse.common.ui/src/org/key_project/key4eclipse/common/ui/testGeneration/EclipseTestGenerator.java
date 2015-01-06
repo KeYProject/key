@@ -53,9 +53,14 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
    private static final String LIB_FOLDER_README_NAME = "Readme.txt";
 
    /**
-    * Name of the log file.
+    * Name of the log folder.
     */
-   private static final String LOG_FILE_NAME = "Log.txt";
+   private static final String LOG_FOLDER_NAME = "log";
+
+   /**
+    * Extension of log files.
+    */
+   private static final String LOG_FILE_EXTENSION = ".txt";
 
    /**
     * The {@link IFile} which provides the proof file to generate test cases for.
@@ -108,10 +113,6 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
                                        final Collection<SMTSolver> problemSolvers, 
                                        final TestGenerationLog log, 
                                        final Proof originalProof) throws Exception {
-      final TestCaseGenerator tg = new TestCaseGenerator(originalProof);
-      tg.setJUnit(true);
-      tg.setLogger(log);
-      tg.initFileName();
       // Create test project
       IProject sourceProject = proofFile.getProject();
       IJavaProject testProject = JDTUtil.createJavaProject(sourceProject.getName() + TEST_PROJECT_SUFFIX, sourceProject);
@@ -120,6 +121,11 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       if (sourceContainer == null) {
          throw new IllegalStateException("The Java project '" + testProject.getProject().getName() + "' has no source folder.");
       }
+      // Create test generator
+      final TestCaseGenerator tg = new TestCaseGenerator(originalProof, true);
+      tg.setJUnit(true);
+      tg.setLogger(log);
+      tg.setFileName(JDTUtil.ensureValidJavaTypeName(ResourceUtil.getFileNameWithoutExtension(proofFile), testProject));
       // Create library folder
       IFolder libFolder = ResourceUtil.createFolder(testProject.getProject(), LIB_FOLDER_NAME);
       IFile readmeFile = libFolder.getFile(LIB_FOLDER_README_NAME);
@@ -129,13 +135,14 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       StringBuffer testSb = tg.createTestCaseCotent(problemSolvers);
       ResourceUtil.createFile(testFile, new ByteArrayInputStream(testSb.toString().getBytes()), null);
       // Create RFL file (needs to be done after the test file is created)
-      if (tg.isUseRFL()) {
+      if (tg.isUseRFL() && !tg.isRflAsInternalClass()) {
          StringBuffer rflSb = tg.createRFLFileContent();
          IFile rflFile = sourceContainer.getFile(new Path("RFL.java"));
          ResourceUtil.createFile(rflFile, new ByteArrayInputStream(rflSb.toString().getBytes()), null);
       }
       // Update log
-      IFile logFile = testProject.getProject().getFile(LOG_FILE_NAME);
+      IFolder logFolder = ResourceUtil.createFolder(testProject.getProject(), LOG_FOLDER_NAME);
+      IFile logFile = logFolder.getFile(tg.getFileName() + LOG_FILE_EXTENSION);
       ResourceUtil.createFile(logFile, new ByteArrayInputStream(log.toString().getBytes()), null);
    }
 

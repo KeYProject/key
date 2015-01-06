@@ -27,6 +27,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -39,6 +40,7 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaConventions;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
@@ -47,6 +49,7 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.internal.corext.util.CodeFormatterUtil;
+import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.eclipse.jdt.internal.corext.util.JavaModelUtil;
 import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
 import org.eclipse.jdt.internal.ui.util.CoreUtility;
@@ -1003,5 +1006,35 @@ public class JDTUtil {
     */
    public static void buildInBackground(IProject project) {
       CoreUtility.startBuildInBackground(project.getProject());
+   }
+
+   /**
+    * Ensures that the given name is a valid Java type name by replacing
+    * all invalid characters with {@code '_'}.
+    * @param name The name to validate.
+    * @param project The {@link IJavaProject} in which the name will be used.
+    * @return The validated name.
+    */
+   public static String ensureValidJavaTypeName(String name, IJavaProject project) {
+      if (name != null) {
+         StringBuffer sb = new StringBuffer();
+         char[] characters = name.toCharArray();
+         for (int i = 0; i < characters.length; i++) {
+            String nameToValidate = sb.toString() + characters[i];
+            IStatus status = project != null ?
+                             JavaConventionsUtil.validateJavaTypeName(nameToValidate, project) :
+                             JavaConventions.validateJavaTypeName(nameToValidate, JavaCore.VERSION_1_3, JavaCore.VERSION_1_3);;
+            if (status.isOK()) {
+               sb.append(characters[i]);
+            }
+            else {
+               sb.append("_");
+            }
+         }
+         return sb.toString();
+      }
+      else {
+         return null;
+      }
    }
 }

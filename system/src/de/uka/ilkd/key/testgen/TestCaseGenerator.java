@@ -82,8 +82,9 @@ public class TestCaseGenerator {
 		        && m.getHeaps().size() > 0 && m.getTypes() != null;
 	}
 
+	private final boolean rflAsInternalClass;
 	protected boolean useRFL;
-	protected ReflectionClassCreator rflCreator;
+   protected ReflectionClassCreator rflCreator;
 	private final String dontCopy;
 	protected final String modDir;
 	protected final String directory;
@@ -162,8 +163,14 @@ public class TestCaseGenerator {
 		        + "   quit" + NEW_LINE 
 		        + "fi" + NEW_LINE;
 	}
+
 	public TestCaseGenerator(Proof proof) {
+	   this(proof, false);
+	}
+
+	public TestCaseGenerator(Proof proof, boolean rflAsInternalClass) {
 		super();
+		this.rflAsInternalClass = rflAsInternalClass; 
 		final TestGenerationSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE
 		        .getTestGenerationSettings();
 		services = proof.getServices();
@@ -459,7 +466,7 @@ public class TestCaseGenerator {
 	 * @return The content of the RFL file.
 	 */
 	public StringBuffer createRFLFileContent() {
-	   return rflCreator.createClass();
+	   return rflCreator.createClass(rflAsInternalClass);
 	}
 
 	protected void createOpenJMLShellScript() throws IOException {
@@ -642,6 +649,9 @@ public class TestCaseGenerator {
 	         }
 	      }
 	      
+	      if (rflAsInternalClass) {
+	         testSuite.append(createRFLFileContent());
+	      }
 	      
 	      testSuite.append(NEW_LINE + "}");
 	      return testSuite;
@@ -1089,5 +1099,13 @@ public class TestCaseGenerator {
    
    public String getFileName() {
       return fileName;
+   }
+   
+   public void setFileName(String fileName) {
+      this.fileName = fileName;
+   }
+   
+   public boolean isRflAsInternalClass() {
+      return rflAsInternalClass;
    }
 }
