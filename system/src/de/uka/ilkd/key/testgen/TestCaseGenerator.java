@@ -44,6 +44,11 @@ import de.uka.ilkd.key.testgen.oracle.OracleTermCall;
  */
 public class TestCaseGenerator {
    /**
+    * The Java source file extension with a leading dot.
+    */
+   public static final String JAVA_FILE_EXTENSION_WITH_DOT = ".java";
+   
+   /**
     * Constant for the line break which is used by the operating system.
     * <p>
     * <b>Do not use {@code \n}!</b>
@@ -96,7 +101,7 @@ public class TestCaseGenerator {
 	private String compileWithOpenJML = "#!/bin/bash" + NEW_LINE + NEW_LINE
 	        + "if [ -e \"openjml.jar\" ]" + NEW_LINE
 	        + "then" + NEW_LINE
-	        + "   java -jar openjml.jar -cp \".\" -rac *.java" + NEW_LINE
+	        + "   java -jar openjml.jar -cp \".\" -rac *" + JAVA_FILE_EXTENSION_WITH_DOT + NEW_LINE
 	        + "else" + NEW_LINE
 	        + "   echo \"openjml.jar not found!\"" + NEW_LINE
 	        + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"" + NEW_LINE
@@ -109,7 +114,7 @@ public class TestCaseGenerator {
 		        + "then" + NEW_LINE 
 		        + "   if [ -e \""+objenesisPath+File.separator+OBJENESIS_NAME+"\" ]" + NEW_LINE
 		        + "   then" + NEW_LINE
-		        + "      java -jar "+openJMLPath+File.separator+"openjml.jar -cp \"."+objenesisPath+File.separator+OBJENESIS_NAME+"\" -rac *.java" + NEW_LINE
+		        + "      java -jar "+openJMLPath+File.separator+"openjml.jar -cp \"."+objenesisPath+File.separator+OBJENESIS_NAME+"\" -rac *" + JAVA_FILE_EXTENSION_WITH_DOT + NEW_LINE
 		        + "   else" + NEW_LINE
 		        + "      echo \"objenesis-2.1.jar not found!\"" + NEW_LINE
 		        + "   fi" + NEW_LINE
@@ -133,7 +138,7 @@ public class TestCaseGenerator {
 		        + "     if [ -e \""+objenesisPath+File.separator+OBJENESIS_NAME+"\" ]" + NEW_LINE
 		        + "     then" + NEW_LINE
 		        + "        if [ \"$1\" = \"\" ] ; then" + NEW_LINE
-		        + "           echo \"Provide the test driver as an argument (without .java postfix). For example:\"" + NEW_LINE
+		        + "           echo \"Provide the test driver as an argument (without " + JAVA_FILE_EXTENSION_WITH_DOT + " postfix). For example:\"" + NEW_LINE
 		        + "           echo \"  executeWithOpenJML.sh TestGeneric0 \"" + NEW_LINE
 		        + "           echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\"" + NEW_LINE
 		        + "           echo \"current directory.\"" + NEW_LINE
@@ -436,7 +441,7 @@ public class TestCaseGenerator {
 	protected void createDummyClasses() throws IOException {
 		for (final Sort s : sortDummyClass.keySet()) {
 			final StringBuffer sb = sortDummyClass.get(s);
-			final String file = getDummyClassNameFor(s) + ".java";
+			final String file = getDummyClassNameFor(s) + JAVA_FILE_EXTENSION_WITH_DOT;
 			writeToFile(file, sb);
 		}
 	}
@@ -446,14 +451,14 @@ public class TestCaseGenerator {
     * @throws IOException 
      */
 	protected void writeRFLFile() throws IOException{
-		writeToFile(ReflectionClassCreator.NAME_OF_CLASS + ".java", createRFLFileConent());
+		writeToFile(ReflectionClassCreator.NAME_OF_CLASS + JAVA_FILE_EXTENSION_WITH_DOT, createRFLFileContent());
 	}
 	
 	/**
 	 * Used by the Eclipse integration to creat the content of the RFL file.
 	 * @return The content of the RFL file.
 	 */
-	public StringBuffer createRFLFileConent() {
+	public StringBuffer createRFLFileContent() {
 	   return rflCreator.createClass();
 	}
 
@@ -507,13 +512,13 @@ public class TestCaseGenerator {
 		testCase.append("}" + NEW_LINE + "}");
 		logger.writeln("Writing test file to:" + directory + modDir
 		        + File.separator + fileName);
-		writeToFile(fileName + ".java", testCase);
+		writeToFile(fileName + JAVA_FILE_EXTENSION_WITH_DOT, testCase);
 		exportCodeUnderTest();
 		createDummyClasses();
 		try{
 			if(useRFL)writeRFLFile();
 		}catch(Exception ex){
-			logger.writeln("Error: The file RFL.java is either not generated or it has an error.");
+			logger.writeln("Error: The file RFL" + JAVA_FILE_EXTENSION_WITH_DOT + " is either not generated or it has an error.");
 		}
 		createOpenJMLShellScript();
 		TestCaseGenerator.fileCounter++;
@@ -544,28 +549,31 @@ public class TestCaseGenerator {
 		return info.getPostCondition();
 	}
 	public String generateJUnitTestSuite(Collection<SMTSolver> problemSolvers) throws IOException {
-		
-		fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
-		String mut = getMUTCall(); 
-		if (mut == null) {
-			mut = "<method under test> //Manually write a call to the method under test, because KeY could not determine it automatically.";
-		} else {
-			fileName += "_" + MUTName;
-		}
-		StringBuffer testSuite = createRFLFileConent();
-		writeToFile(fileName + ".java", testSuite);
+	   initFileName();
+		StringBuffer testSuite = createTestCaseCotent(problemSolvers);
+		writeToFile(fileName + JAVA_FILE_EXTENSION_WITH_DOT, testSuite);
 		logger.writeln("Writing test file to:" + directory + modDir
-		        + File.separator + fileName + ".java");
+		        + File.separator + fileName + JAVA_FILE_EXTENSION_WITH_DOT);
 		exportCodeUnderTest();
 		createDummyClasses();
 		try{
 			if(useRFL)writeRFLFile();
 		}catch(Exception ex){
-			logger.writeln("Error: The file RFL.java is either not generated or it has an error.");
+			logger.writeln("Error: The file RFL" + JAVA_FILE_EXTENSION_WITH_DOT + " is either not generated or it has an error.");
 		}
 		createOpenJMLShellScript();
 		TestCaseGenerator.fileCounter++;
 		return testSuite.toString();
+	}
+	
+	public void initFileName() {
+      fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
+      String mut = getMUTCall(); 
+      if (mut == null) {
+         mut = "<method under test> //Manually write a call to the method under test, because KeY could not determine it automatically.";
+      } else {
+         fileName += "_" + MUTName;
+      }
 	}
 	
 	public StringBuffer createTestCaseCotent(Collection<SMTSolver> problemSolvers) { // TODO: Include package definition (same as type containing the proof obligation)
@@ -1067,11 +1075,19 @@ public class TestCaseGenerator {
          bw.close();
       }
       // create a temporary file
-      // File logFile=new File("TestGeneric"+fileCounter+".java");
+      // File logFile=new File("TestGeneric"+fileCounter+JAVA_FILE_EXTENSION_WITH_DOT);
       // BufferedWriter writer = new BufferedWriter(new
       // FileWriter(logFile));
       // writer.write (sb.toString());
       // Close writer
       // writer.close();
 	}
+	
+   public boolean isUseRFL() {
+      return useRFL;
+   }
+   
+   public String getFileName() {
+      return fileName;
+   }
 }

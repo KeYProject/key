@@ -11,9 +11,14 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
@@ -48,6 +53,11 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
    private static final String LIB_FOLDER_README_NAME = "Readme.txt";
 
    /**
+    * Name of the log file.
+    */
+   private static final String LOG_FILE_NAME = "Log.txt";
+
+   /**
     * The {@link IFile} which provides the proof file to generate test cases for.
     */
    private final IFile proofFile;
@@ -69,13 +79,39 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
     * {@inheritDoc}
     */
    @Override
-   protected void generateFiles(SolverLauncher launcher, 
-                                Collection<SMTSolver> problemSolvers, 
-                                TestGenerationLog log, 
-                                Proof originalProof) throws Exception {
+   protected void generateFiles(final SolverLauncher launcher, 
+                                final Collection<SMTSolver> problemSolvers, 
+                                final TestGenerationLog log, 
+                                final Proof originalProof) throws Exception {
+      ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
+         @Override
+         public void run(IProgressMonitor monitor) throws CoreException {
+            try {
+               generateEclipseFiles(launcher, problemSolvers, log, originalProof);
+            }
+            catch (Exception e) {
+               throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
+            }
+         }
+      }, null);
+   }
+
+   /**
+    * Generates all eclipse files.
+    * @param launcher The {@link SolverLauncher}.
+    * @param problemSolvers The {@link SMTSolver}s.
+    * @param log The {@link TestGenerationLog}.
+    * @param originalProof The original {@link Proof}.
+    * @throws Exception Occurred Exception.
+    */
+   protected void generateEclipseFiles(final SolverLauncher launcher, 
+                                       final Collection<SMTSolver> problemSolvers, 
+                                       final TestGenerationLog log, 
+                                       final Proof originalProof) throws Exception {
       final TestCaseGenerator tg = new TestCaseGenerator(originalProof);
       tg.setJUnit(true);
       tg.setLogger(log);
+      tg.initFileName();
       // Create test project
       IProject sourceProject = proofFile.getProject();
       IJavaProject testProject = JDTUtil.createJavaProject(sourceProject.getName() + TEST_PROJECT_SUFFIX, sourceProject);
@@ -88,14 +124,19 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       IFolder libFolder = ResourceUtil.createFolder(testProject.getProject(), LIB_FOLDER_NAME);
       IFile readmeFile = libFolder.getFile(LIB_FOLDER_README_NAME);
       ResourceUtil.createFile(readmeFile, createLibFolderReadmeContent(), null);
-      // Create RFL file
-      StringBuffer rflSb = tg.createRFLFileConent();
-      IFile rflFile = sourceContainer.getFile(new Path("RFL.java"));
-      ResourceUtil.createFile(rflFile, new ByteArrayInputStream(rflSb.toString().getBytes()), null);
       // Create test file
-      IFile testFile = sourceContainer.getFile(new Path("Test.java"));
+      IFile testFile = sourceContainer.getFile(new Path(tg.getFileName() + TestCaseGenerator.JAVA_FILE_EXTENSION_WITH_DOT));
       StringBuffer testSb = tg.createTestCaseCotent(problemSolvers);
       ResourceUtil.createFile(testFile, new ByteArrayInputStream(testSb.toString().getBytes()), null);
+      // Create RFL file (needs to be done after the test file is created)
+      if (tg.isUseRFL()) {
+         StringBuffer rflSb = tg.createRFLFileContent();
+         IFile rflFile = sourceContainer.getFile(new Path("RFL.java"));
+         ResourceUtil.createFile(rflFile, new ByteArrayInputStream(rflSb.toString().getBytes()), null);
+      }
+      // Update log
+      IFile logFile = testProject.getProject().getFile(LOG_FILE_NAME);
+      ResourceUtil.createFile(logFile, new ByteArrayInputStream(log.toString().getBytes()), null);
    }
 
    /**

@@ -10,8 +10,8 @@ import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.util.eclipse.ResourceUtil;
 
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.smt.testgen.MemoryTestGenerationLog;
 import de.uka.ilkd.key.smt.testgen.StopRequest;
-import de.uka.ilkd.key.smt.testgen.TestGenerationLog;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomUserInterface;
 
@@ -47,32 +47,14 @@ public class GenerateTestsJob extends Job {
                                    KeYResourceProperties.getKeYBootClassPathLocation(proofFile.getProject()));
          Proof proof = env.getLoadedProof();
          
+         MemoryTestGenerationLog log = new MemoryTestGenerationLog();
          testGenerator = new EclipseTestGenerator(proofFile, env.getMediator(), proof);
          testGenerator.generateTestCases(new StopRequest() {
             @Override
             public boolean shouldStop() {
                return monitor.isCanceled();
             }
-         }, new TestGenerationLog() {
-            @Override
-            public void writeln(String text) {
-               System.out.println(text);
-            }
-            
-            @Override
-            public void writeException(Throwable t) {
-               t.printStackTrace();
-            }
-            
-            @Override
-            public void write(String text) {
-               System.out.println(text);
-            }
-            
-            @Override
-            public void testGenerationCompleted() {
-            }
-         });
+         }, log);
          return Status.OK_STATUS;
       }
       catch (Exception e) {
