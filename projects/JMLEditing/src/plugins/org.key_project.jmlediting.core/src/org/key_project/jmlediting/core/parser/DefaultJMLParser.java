@@ -12,6 +12,7 @@ import org.key_project.jmlediting.core.parser.internal.ParserUtils;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
+import org.key_project.jmlediting.core.utilities.CommentRange;
 
 /**
  * The default implementation for an JML Parser with respect to the keywords
@@ -43,6 +44,14 @@ public class DefaultJMLParser implements IJMLParser {
    }
 
    @Override
+   public IASTNode parse(final String text, final CommentRange range)
+         throws ParserException {
+      // End offset is inclusive, but parse takes an exclusive context
+      return this.parse(text, range.getContentBeginOffset(),
+            range.getContentEndOffset() + 1);
+   }
+
+   @Override
    public IASTNode parse(final String text, final int start, final int end)
          throws ParserException {
       ParserUtils.validatePositions(text, start, end);
@@ -63,7 +72,7 @@ public class DefaultJMLParser implements IJMLParser {
             keywordNode = ParserUtils.parseKeyword(text, position,
 
             end, JMLProfileHelper.filterKeywords(this.profile,
-                        IToplevelKeyword.class), this.profile);
+                  IToplevelKeyword.class), this.profile);
          }
          catch (final ParserException e) {
             keywordNode = e.getErrorNode();
@@ -80,6 +89,8 @@ public class DefaultJMLParser implements IJMLParser {
                try {
                   nextPosition = LexicalHelper.findNextWhitespace(text,
                         textStart, end);
+                  nextPosition = position = skipWhiteSpacesOrAt(text,
+                        nextPosition, end, false);
                }
                catch (final ParserException e2) {
                   // No whitespace anymore, so take rest of the text

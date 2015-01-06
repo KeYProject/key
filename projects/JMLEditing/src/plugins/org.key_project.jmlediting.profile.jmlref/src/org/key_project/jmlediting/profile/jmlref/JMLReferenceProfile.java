@@ -36,41 +36,69 @@ import org.key_project.jmlediting.profile.jmlref.visibility.SpecPublicKeyword;
  * @author Moritz Lichter
  *
  */
-public abstract class JMLReferenceProfile implements IJMLProfile {
+public class JMLReferenceProfile implements IJMLProfile {
 
    /**
-    * A set containing all supported keywords
+    * A set containing all supported keywords.
     */
-   protected final Set<IKeyword> SUPPORTED_KEYWORDS;
+   private final Set<IKeyword> supportedKeywords;
 
    /**
     * Creates a new profile instance with the given supported keyword.
-    * 
+    *
     * @param lang
+    *           the keyword locale for AE/BE
     */
    public JMLReferenceProfile(final KeywordLocale lang) {
-      final Set<IKeyword> supportedKeywords = new HashSet<IKeyword>(
-            Arrays.asList(new EnsuresKeyword(), new AssignableKeyword(),
-                  new AccessibleKeyword(), new RequiresKeyword(),
-                  new BehaviorKeyword(lang), new ExceptionalBehaviorKeyword(
-                        lang), new NormalBehaviorKeyword(lang),
-                  new AlsoKeyword(), new HelperKeyword(), new PureKeyword(),
-                  new PrivateKeyword(), new ProtectedKeyword(),
-                  new PublicKeyword(), new SpecProtectedKeyword(),
-                  new SpecPublicKeyword(), new EverythingKeyword(),
-                  new NothingKeyword(), new NotSpecifiedKeyword()));
+      this.supportedKeywords = new HashSet<IKeyword>(Arrays.asList(
+            new EnsuresKeyword(), new AssignableKeyword(),
+            new AccessibleKeyword(), new RequiresKeyword(),
+            new BehaviorKeyword(lang), new ExceptionalBehaviorKeyword(lang),
+            new NormalBehaviorKeyword(lang), new AlsoKeyword(),
+            new HelperKeyword(), new PureKeyword(), new PrivateKeyword(),
+            new ProtectedKeyword(), new PublicKeyword(),
+            new SpecProtectedKeyword(), new SpecPublicKeyword(),
+            new EverythingKeyword(), new NothingKeyword(),
+            new NotSpecifiedKeyword()));
 
-      this.SUPPORTED_KEYWORDS = supportedKeywords;
+   }
+
+   /**
+    * Creates a {@link JMLReferenceProfile} without a restriction to American
+    * oder British English.
+    */
+   public JMLReferenceProfile() {
+      this(KeywordLocale.BOTH);
+   }
+
+   @Override
+   public String getName() {
+      return "JML Reference";
+   }
+
+   @Override
+   public String getIdentifier() {
+      return "org.key_project.jmlediting.profile.jmlref";
    }
 
    @Override
    public final Set<IKeyword> getSupportedKeywords() {
-      return Collections.unmodifiableSet(this.SUPPORTED_KEYWORDS);
+      return Collections.unmodifiableSet(this.supportedKeywords);
    }
 
    @Override
    public IJMLParser createParser() {
       return new DefaultJMLParser(this);
+   }
+
+   /**
+    * Returns the modifiable version of the keyword set to allow subclasses to
+    * modify them.
+    *
+    * @return the modifiable keyword set
+    */
+   protected final Set<IKeyword> getSupportedKeywordsInternal() {
+      return this.supportedKeywords;
    }
 
 }

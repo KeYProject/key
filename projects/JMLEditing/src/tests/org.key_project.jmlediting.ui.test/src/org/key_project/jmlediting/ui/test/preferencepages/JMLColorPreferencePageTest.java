@@ -134,7 +134,7 @@ public class JMLColorPreferencePageTest {
       assertEquals("Not the right JML-Color was set.", testColor,
             JMLUiPreferencesHelper.getWorkspaceJMLColor());
       bot.button("Restore Defaults").click();
-      bot.button("OK").click();
+      bot.button("Apply").click();
       assertEquals("Restore Default JML Color did not work.",
             JMLUiPreferencesHelper.getDefaultJMLColor(),
             JMLUiPreferencesHelper.getWorkspaceJMLColor());

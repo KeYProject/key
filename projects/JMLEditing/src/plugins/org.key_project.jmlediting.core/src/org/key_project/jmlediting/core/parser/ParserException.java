@@ -179,7 +179,7 @@ public class ParserException extends Exception {
       }
 
       return super.getMessage() + " at " + error.getErrorOffset() + "\n"
-      + this.formatString(error.getErrorOffset());
+            + this.formatString(error.getErrorOffset());
    }
 
    /**
@@ -188,7 +188,14 @@ public class ParserException extends Exception {
     * @return the error offset
     */
    public int getErrorOffset() {
-      return this.causedError.getErrorOffset();
+      ParserError error;
+      if (this.causedError != null) {
+         error = this.causedError;
+      }
+      else {
+         error = this.allErrors.get(this.allErrors.size() - 1);
+      }
+      return error.getErrorOffset();
    }
 
    /**

@@ -57,9 +57,7 @@ public class JMLTextHover implements IJavaEditorTextHover {
          // Parse the text
          // End index of comment is inclusive, but input end for parser
          // exclusive
-         result = parser.parse(textViewer.getDocument().get(),
-               comment.getContentBeginOffset(),
-               comment.getContentEndOffset() + 1);
+         result = parser.parse(textViewer.getDocument().get(), comment);
 
       }
       catch (final ParserException e) {

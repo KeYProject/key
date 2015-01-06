@@ -16,9 +16,23 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.IStoreRef
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefKeywordContentParser;
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
 
+/**
+ * A keyword, which contains storage references as content.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public abstract class StoreRefContainerKeyword extends
 AbstractGenericSpecificationKeyword {
 
+   /**
+    * Creates a new {@link StoreRefContainerKeyword}.
+    *
+    * @param keyword
+    *           the keyword
+    * @param keywords
+    *           optional other keywords
+    */
    public StoreRefContainerKeyword(final String keyword,
          final String... keywords) {
       super(keyword, keywords);
@@ -30,6 +44,7 @@ AbstractGenericSpecificationKeyword {
    }
 
    @Override
+   @SuppressWarnings("restriction")
    public List<ICompletionProposal> createAutoProposals(final IASTNode node,
          final JavaContentAssistInvocationContext context) {
 

@@ -11,6 +11,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.utils.Position;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -85,9 +86,10 @@ public class JMLCommentHighlightingTest {
    private final RGB specialWordRGB = new RGB(127, 0, 85);
    private final RGB defaultTextRGB = new RGB(0, 0, 0);
    private final RGB string = new RGB(42, 0, 255);
-   private final RGB chararcter = new RGB(42, 0, 255);
+   private final RGB character = new RGB(42, 0, 255);
    private final RGB jmlComment = JMLUiPreferencesHelper.getDefaultJMLColor();
 
+   private static IFolder testFolder;
    /*
     * Initialize a new Project and load the template class from data/template
     * with all kinds of Comments to test AutoCompletion in and open it.
@@ -97,13 +99,11 @@ public class JMLCommentHighlightingTest {
       final IJavaProject project = TestUtilsUtil
             .createJavaProject(PROJECT_NAME);
       final IFolder srcFolder = project.getProject().getFolder("src");
-      final IFolder testFolder = TestUtilsUtil.createFolder(srcFolder,
+      testFolder = TestUtilsUtil.createFolder(srcFolder,
             PACKAGE_NAME);
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
             "data/template", testFolder);
-      bot.tree().getTreeItem(PROJECT_NAME).select().expand().getNode("src")
-            .select().expand().getNode(PACKAGE_NAME).select().expand()
-            .getNode(CLASS_NAME + ".java").select().doubleClick();
+
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(),
             TestUtils.findReferenceProfile());
    }
@@ -113,8 +113,31 @@ public class JMLCommentHighlightingTest {
     * for Testing
     */
    @Before
-   public void initEditor() {
+   public void initEditor() throws CoreException {
+
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
+            "data/template", testFolder);
+      bot.tree().getTreeItem(PROJECT_NAME).select().expand().getNode("src")
+      .select().expand().getNode(PACKAGE_NAME).select().expand()
+      .getNode(CLASS_NAME + ".java").select().doubleClick();
       this.editor = bot.activeEditor().toTextEditor();
+      /*
+       * final JavaColorManager manager = new JavaColorManager(); this.string =
+       * manager.getColor(IJavaColorConstants.JAVA_STRING).getRGB();
+       * this.character = manager.getColor(IJavaColorConstants.JAVA_STRING)
+       * .getRGB(); this.defaultTextRGB =
+       * manager.getColor(IJavaColorConstants.JAVA_DEFAULT) .getRGB();
+       * this.javaCommentRGB = manager.getColor(
+       * IJavaColorConstants.JAVA_MULTI_LINE_COMMENT).getRGB(); this.javaDocRGB
+       * = manager.getColor(IJavaColorConstants.JAVADOC_DEFAULT) .getRGB();
+       */
+
+   }
+
+   @After
+   public void closeEditor() {
+      this.editor.close();
+      bot.sleep(200);
    }
 
    /*
@@ -128,94 +151,58 @@ public class JMLCommentHighlightingTest {
 
    @Test
    public void JMLSingleLineTest() {
-      final StyleRange[] textColors = this.editor.getStyles(
-            PosJMLCommentSingle.line, PosJMLCommentSingle.column, 30);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JMLCommentColor",
-               r.foreground.getRGB(), this.jmlComment);
-      }
+      this.checkColors(PosJMLCommentSingle.line, PosJMLCommentSingle.column,
+            30, this.jmlComment, "Color did not Match JMLCommentColor");
    }
 
    @Test
    public void JMLMultiLineTest() {
-      final StyleRange[] textColors = this.editor.getStyles(
-            PosJMLCommentMulti.line, PosJMLCommentMulti.column, 39);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JMLCommentColor",
-               r.foreground.getRGB(), this.jmlComment);
-      }
+      this.checkColors(PosJMLCommentMulti.line, PosJMLCommentMulti.column, 33,
+            this.jmlComment, "Color did not Match JMLCommentColor");
    }
 
    @Test
    public void JavaSingleLineTest() {
-      final StyleRange[] textColors = this.editor.getStyles(
-            PosJCommentSingle.line, PosJCommentSingle.column, 27);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JavaCommentColor",
-               r.foreground.getRGB(), this.javaCommentRGB);
-      }
+      this.checkColors(PosJCommentSingle.line, PosJCommentSingle.column, 27,
+            this.javaCommentRGB, "Color did not Match JavaCommentColor");
    }
 
    @Test
    public void JavaMultiLineTest() {
-      final StyleRange[] textColors = this.editor.getStyles(
-            PosJCommentMulti.line, PosJCommentMulti.column, 51);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JavaCommentColor",
-               r.foreground.getRGB(), this.javaCommentRGB);
-      }
+      this.checkColors(PosJCommentMulti.line, PosJCommentMulti.column, 49,
+            this.javaCommentRGB, "Color did not Match JavaCommentColor");
    }
 
    @Test
    public void JavaDocTest() {
-      final StyleRange[] textColors = this.editor.getStyles(
-            PosJDocComment.line, PosJDocComment.column, 49);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JavaDocColor",
-               r.foreground.getRGB(), this.javaDocRGB);
-      }
+      this.checkColors(PosJDocComment.line, PosJDocComment.column, 45,
+            this.javaDocRGB, "Color did not Match JavaDocColor");
    }
 
    @Test
    public void StringTest() {
-      final StyleRange[] textColors = this.editor.getStyles(PosInString.line,
-            PosInString.column, 21);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match String Color",
-               r.foreground.getRGB(), this.string);
-      }
+      this.checkColors(PosInString.line, PosInString.column, 21, this.string,
+            "Color did not Match String Color");
    }
 
    @Test
    public void JavaCodeTest() {
-      final StyleRange[] textColors = this.editor.getStyles(PosInMethod.line,
-            PosInMethod.column, 7);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match default Color",
-               r.foreground.getRGB(), this.defaultTextRGB);
-      }
+      this.checkColors(PosInMethod.line, PosInMethod.column, 7,
+            this.defaultTextRGB, "Color did not Match default Color");
    }
 
    @Test
    public void CharTest() {
-      final StyleRange[] textColors = this.editor.getStyles(PosInChar.line,
-            PosInChar.column, 3);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match CharColor", r.foreground.getRGB(),
-               this.chararcter);
-      }
+      this.checkColors(PosInChar.line, PosInChar.column, 3, this.character,
+            "Color did not Match CharColor");
    }
 
    @Test
    public void changeJMLMLineToJavaMLineTest() {
       this.removeText(new Position(PosJMLCommentMulti.line,
             PosJMLCommentMulti.column + 2), 1);
-      final StyleRange[] textColors = this.editor.getStyles(
-            PosJMLCommentMulti.line, PosJMLCommentMulti.column, 38);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JavaCommentColor",
-               r.foreground.getRGB(), this.javaCommentRGB);
-      }
+      this.checkColors(PosJMLCommentMulti.line, PosJMLCommentMulti.column, 33,
+            this.javaCommentRGB, "Color did not Match JavaCommentColor");
       this.editor.insertText(PosJMLCommentMulti.line,
             PosJMLCommentMulti.column + 2, "@");
    }
@@ -224,12 +211,8 @@ public class JMLCommentHighlightingTest {
    public void changeJavaMLineToJMLMLineTest() {
       this.editor.insertText(PosJCommentMulti.line,
             PosJCommentMulti.column + 2, "@");
-      final StyleRange[] textColors = this.editor.getStyles(
-            PosJCommentMulti.line, PosJCommentMulti.column, 52);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JMLCommentColor",
-               r.foreground.getRGB(), this.jmlComment);
-      }
+      this.checkColors(PosJCommentMulti.line, PosJCommentMulti.column, 50,
+            this.jmlComment, "Color did not Match JMLCommentColor");
       this.removeText(new Position(PosJCommentMulti.line,
             PosJCommentMulti.column + 2), 1);
    }
@@ -238,12 +221,8 @@ public class JMLCommentHighlightingTest {
    public void changeJMLSLineToJavaSLineTest() {
       this.removeText(new Position(PosJMLCommentSingle.line,
             PosJMLCommentSingle.column + 2), 1);
-      final StyleRange[] textColors = this.editor.getStyles(
-            PosJMLCommentSingle.line, PosJMLCommentSingle.column, 29);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JavaCommentColor",
-               r.foreground.getRGB(), this.javaCommentRGB);
-      }
+      this.checkColors(PosJMLCommentSingle.line, PosJMLCommentSingle.column,
+            29, this.javaCommentRGB, "Color did not Match JavaCommentColor");
       this.editor.insertText(PosJMLCommentSingle.line,
             PosJMLCommentSingle.column + 2, "@");
    }
@@ -252,13 +231,8 @@ public class JMLCommentHighlightingTest {
    public void changeJavaSLineToJMLSLineTest() {
       this.editor.insertText(PosJCommentSingle.line,
             PosJCommentSingle.column + 2, "@");
-      final StyleRange[] textColors = this.editor.getStyles(
-            JMLCommentHighlightingTest.PosJCommentSingle.line,
-            JMLCommentHighlightingTest.PosJCommentSingle.column, 28);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JMLCommentColor",
-               r.foreground.getRGB(), this.jmlComment);
-      }
+      this.checkColors(PosJCommentSingle.line, PosJCommentSingle.column, 28,
+            this.jmlComment, "Color did not Match JMLCommentColor");
       this.removeText(new Position(PosJCommentSingle.line,
             PosJCommentSingle.column + 2), 1);
    }
@@ -269,12 +243,8 @@ public class JMLCommentHighlightingTest {
             PosJDocComment.column + 2), 1);
       this.editor.insertText(PosJDocComment.line, PosJDocComment.column + 2,
             "@");
-      final StyleRange[] textColors = this.editor.getStyles(
-            PosJDocComment.line, PosJDocComment.column, 39);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JMLCommentColor",
-               r.foreground.getRGB(), this.jmlComment);
-      }
+      this.checkColors(PosJDocComment.line, PosJDocComment.column, 45,
+            this.jmlComment, "Color did not Match JMLCommentColor");
       this.removeText(new Position(PosJDocComment.line,
             PosJDocComment.column + 2), 1);
       this.editor.insertText(PosJDocComment.line, PosJDocComment.column + 2,
@@ -287,12 +257,8 @@ public class JMLCommentHighlightingTest {
             PosJMLCommentMulti.column + 2), 1);
       this.editor.insertText(PosJMLCommentMulti.line,
             PosJMLCommentMulti.column + 2, "*");
-      final StyleRange[] textColors = this.editor.getStyles(
-            PosJMLCommentMulti.line, PosJMLCommentMulti.column, 39);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JavaDocColor",
-               r.foreground.getRGB(), this.javaDocRGB);
-      }
+      this.checkColors(PosJMLCommentMulti.line, PosJMLCommentMulti.column, 33,
+            this.javaDocRGB, "Color did not Match JavaDocColor");
       this.removeText(new Position(PosJMLCommentMulti.line,
             PosJMLCommentMulti.column + 2), 1);
       this.editor.insertText(PosJMLCommentMulti.line,
@@ -303,12 +269,8 @@ public class JMLCommentHighlightingTest {
    public void changeJavaMLineToJavaDocTest() {
       this.editor.insertText(PosJCommentMulti.line,
             PosJCommentMulti.column + 2, "*");
-      final StyleRange[] textColors = this.editor.getStyles(
-            PosJCommentMulti.line, PosJCommentMulti.column, 52);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JavaDocColor",
-               r.foreground.getRGB(), this.javaDocRGB);
-      }
+      this.checkColors(PosJCommentMulti.line, PosJCommentMulti.column, 29,
+            this.javaDocRGB, "Color did not Match JavaDocColor");
       this.removeText(new Position(PosJCommentMulti.line,
             PosJCommentMulti.column + 2), 1);
    }
@@ -317,43 +279,26 @@ public class JMLCommentHighlightingTest {
    public void changeJavaDocToJavaMLineTest() {
       this.removeText(new Position(PosJDocComment.line,
             PosJDocComment.column + 2), 1);
-      final StyleRange[] textColors = this.editor.getStyles(
-            PosJDocComment.line, PosJDocComment.column, 48);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JavaCommentColor",
-               r.foreground.getRGB(), this.javaCommentRGB);
-      }
+      this.checkColors(PosJDocComment.line, PosJDocComment.column, 44,
+            this.javaCommentRGB, "Color did not Match JavaCommentColor");
       this.editor.insertText(PosJDocComment.line, PosJDocComment.column + 2,
             "*");
    }
 
    @Test
    public void keyWordTestBeforeChanges() {
-      StyleRange[] textColors = this.editor.getStyles(PublicJavaComment.line,
-            PublicJavaComment.column + 2, 6);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JavaCommentColor",
-               r.foreground.getRGB(), this.javaCommentRGB);
-      }
-      textColors = this.editor.getStyles(PublicJavaDoc.line,
-            PublicJavaDoc.column + 2, 6);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JavaDocColor",
-               r.foreground.getRGB(), this.javaDocRGB);
-      }
-      textColors = this.editor.getStyles(PublicJML.line, PublicJML.column + 2,
-            6);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JMLCommentColor",
-               r.foreground.getRGB(), this.jmlComment);
-      }
-      textColors = this.editor.getStyles(PublicKeyword.line,
-            PublicKeyword.column, 6);
-      for (final StyleRange r : textColors) {
-         assertEquals(
-               "Color did not Match color for the \"public\" Java Keyword",
-               r.foreground.getRGB(), this.specialWordRGB);
-      }
+      this.checkColors(PublicJavaComment.line, PublicJavaComment.column + 2, 6,
+            this.javaCommentRGB, "Color did not Match JavaCommentColor");
+
+      this.checkColors(PublicJavaDoc.line, PublicJavaDoc.column + 3, 6,
+            this.javaDocRGB, "Color did not Match JavaDocColor");
+
+      this.checkColors(PublicJML.line, PublicJML.column + 3, 6,
+            this.jmlComment, "Color did not Match JMLCommentColor");
+
+      this.checkColors(PublicKeyword.line, PublicKeyword.column, 6,
+            this.specialWordRGB,
+            "Color did not Match color for the \"public\" Java Keyword");
    }
 
    @Test
@@ -361,43 +306,52 @@ public class JMLCommentHighlightingTest {
 
       this.editor.insertText(PublicJavaComment.line,
             PublicJavaComment.column + 2, "@");
-      StyleRange[] textColors = this.editor.getStyles(PublicJavaComment.line,
-            PublicJavaComment.column + 2, 6);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JMLColor", r.foreground.getRGB(),
-               this.jmlComment);
-      }
+      this.checkColors(PublicJavaComment.line, PublicJavaComment.column + 3, 6,
+            this.jmlComment, "Color did not Match JMLColor");
       this.removeText(new Position(PublicJavaComment.line,
             PublicJavaComment.column + 2), 1);
 
       this.removeText(
             new Position(PublicJavaDoc.line, PublicJavaDoc.column + 2), 1);
       this.editor.insertText(PublicJavaDoc.line, PublicJavaDoc.column + 2, "@");
-      textColors = this.editor.getStyles(PublicJavaDoc.line,
-            PublicJavaDoc.column + 3, 6);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JMLColor", r.foreground.getRGB(),
-               this.jmlComment);
-      }
+      this.checkColors(PublicJavaDoc.line, PublicJavaDoc.column + 3, 6,
+            this.jmlComment, "Color did not Match JMLColor");
       this.removeText(
             new Position(PublicJavaDoc.line, PublicJavaDoc.column + 2), 1);
       this.editor.insertText(PublicJavaDoc.line, PublicJavaDoc.column + 2, "*");
 
       this.removeText(new Position(PublicJML.line, PublicJML.column + 2), 1);
-      textColors = this.editor.getStyles(PublicJML.line, PublicJML.column + 2,
-            6);
-      for (final StyleRange r : textColors) {
-         assertEquals("Color did not Match JavaCommentColor",
-               r.foreground.getRGB(), this.javaCommentRGB);
-      }
+      this.checkColors(PublicJML.line, PublicJML.column + 2, 6,
+            this.javaCommentRGB, "Color did not Match JavaCommentColor");
       this.editor.insertText(PublicJML.line, PublicJML.column + 2, "@");
 
-      textColors = this.editor.getStyles(PublicKeyword.line,
-            PublicKeyword.column, 6);
+      this.checkColors(PublicKeyword.line, PublicKeyword.column, 6,
+            this.specialWordRGB,
+            "Color did not Match color for the \"public\" Java Keyword");
+   }
+
+   /**
+    * This Method matches the Textcolor of a given piece of code
+    *
+    * @param line
+    *           The line from where to start matching
+    * @param column
+    *           the column from where to start matching
+    * @param length
+    *           the length of text that should be matched
+    * @param color
+    *           the color the text should be
+    * @return true if the text starting at line,column with length length has
+    *         the given color, else false
+    */
+   private void checkColors(final int line, final int column, final int length,
+         final RGB color, final String message) {
+      final StyleRange[] textColors = this.editor.getStyles(line, column,
+            length);
       for (final StyleRange r : textColors) {
-         assertEquals(
-               "Color did not Match color for the \"public\" Java Keyword",
-               r.foreground.getRGB(), this.specialWordRGB);
+         assertEquals(message + " at " + r.start + " with length " + r.length,
+               color, r.foreground.getRGB());
+
       }
    }
 

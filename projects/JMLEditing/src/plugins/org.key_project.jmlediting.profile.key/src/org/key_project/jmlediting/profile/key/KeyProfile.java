@@ -20,12 +20,12 @@ public class KeyProfile extends JMLReferenceProfile {
    public KeyProfile() {
       super(KeywordLocale.AMERICAN);
       // Add strictly keywords
-      this.SUPPORTED_KEYWORDS.add(new StrictlyPureKeyword());
-      this.SUPPORTED_KEYWORDS.add(new StrictlyNothingKeyword());
+      this.getSupportedKeywordsInternal().add(new StrictlyPureKeyword());
+      this.getSupportedKeywordsInternal().add(new StrictlyNothingKeyword());
       // Disable informal descriptions in Assignable/Accessible keywords
-      replace(this.SUPPORTED_KEYWORDS, AssignableKeyword.class,
+      replace(this.getSupportedKeywordsInternal(), AssignableKeyword.class,
             new KeyAssignableKeyword());
-      replace(this.SUPPORTED_KEYWORDS, AccessibleKeyword.class,
+      replace(this.getSupportedKeywordsInternal(), AccessibleKeyword.class,
             new KeyAccessibleKeyword());
    }
 

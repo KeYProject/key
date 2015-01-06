@@ -24,7 +24,7 @@ import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 public class StoreRefParser implements ParseFunction {
 
    /**
-    * The {@link ParseFunction} which is used to parse the text
+    * The {@link ParseFunction} which is used to parse the text.
     */
    private final ParseFunction mainParser;
 
@@ -69,7 +69,7 @@ public class StoreRefParser implements ParseFunction {
       /*
        * spec-array-ref-expr ::= spec-expression <br> | spec-expression ..
        * spec-expression <br> | *
-       * 
+       *
        * Need to try the second case before the first case because otherwise we
        * will never parse it
        */
@@ -87,7 +87,7 @@ public class StoreRefParser implements ParseFunction {
                   seq(constant("["), specArrayRefExpression, constant("]"))));
       /*
        * store-ref-name ::= ident | super | this
-       * 
+       *
        * Approximates and does not check for keywords, because they are treated
        * as identifiers
        */
@@ -100,7 +100,7 @@ public class StoreRefParser implements ParseFunction {
             list(storeRefNameSuffix));
 
       // Make lexInformalDesc context free
-      final ParseFunction informalDescr = allowWhitespaces(lexInformalDescr);
+      final ParseFunction informalDescr = allowWhitespaces(lexInformalDescr());
 
       /*
        * store-ref ::= store-ref-expression <br> | informal-description <br>

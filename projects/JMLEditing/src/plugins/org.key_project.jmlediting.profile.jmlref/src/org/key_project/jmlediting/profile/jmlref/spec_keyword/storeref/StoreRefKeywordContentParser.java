@@ -22,7 +22,7 @@ public class StoreRefKeywordContentParser implements IKeywordParser {
     */
    private StoreRefParser parser;
    /**
-    * Stores whether informal descriptions are allowed as storage locations
+    * Stores whether informal descriptions are allowed as storage locations.
     */
    private final boolean allowInformalDescription;
 

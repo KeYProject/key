@@ -1,15 +1,18 @@
 package org.key_project.jmlediting.profile.jmlref.visibility;
 
+/**
+ * The protected keyword.
+ * 
+ * @author Moritz Lichter
+ *
+ */
 public class ProtectedKeyword extends JavaVisiblityKeyword {
 
+   /**
+    * Creates a new protected keyword instance.
+    */
    public ProtectedKeyword() {
       super("protected");
-   }
-
-   @Override
-   public String getDescription() {
-      // TODO Auto-generated method stub
-      return null;
    }
 
 }
