@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.InfFlowMethodContractTacletBuilder;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +58,7 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -78,6 +78,7 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.InfFlowMethodContractTacletBuilder;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
@@ -87,6 +88,10 @@ import de.uka.ilkd.key.util.Pair;
  * Implements the rule which inserts operation contracts for a method call.
  */
 public final class UseOperationContractRule implements BuiltInRule {
+    /**
+     * Hint to refactor the final pre term.
+     */
+    public static final String FINAL_PRE_TERM_HINT = "finalPreTerm";
 
     public static final UseOperationContractRule INSTANCE
                                             = new UseOperationContractRule();
@@ -333,6 +338,16 @@ public final class UseOperationContractRule implements BuiltInRule {
 	                          TB.getBaseHeap(), anonHeap);
     }
 
+    /**
+     * Construct a free postcondition for the given method,
+     * i.e., a postcondition that is always true as guaranteed by the Java language
+     * and is not required to be checked by the callee.
+     * For constructors, it states that the self term is created and not null in the poststate
+     * and it has not been created in the prestate.
+     * For regular methods, it states that the return value is in range,
+     * meaning created or null for reference types, inInt(), etc., for integer types,
+     * and for location sets containing only locations that belong to created objects.
+     */
     private static Term getFreePost(List<LocationVariable> heapContext, IProgramMethod pm,
 	    		     	    KeYJavaType kjt,
 	    		     	    Term resultTerm,
@@ -646,6 +661,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     public ImmutableList<Goal> apply(Goal goal,
 	    			     Services services,
 	    			     RuleApp ruleApp) {
+       final TermLabelState termLabelState = new TermLabelState();
 	//get instantiation
 	final Instantiation inst
 		= instantiate(ruleApp.posInOccurrence().subTerm(), services);
@@ -867,10 +883,11 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                                     reachableState}));
         }
 
+        finalPreTerm = TermLabelManager.refactorTerm(termLabelState, services, null, finalPreTerm, this, preGoal, FINAL_PRE_TERM_HINT, null);
         preGoal.changeFormula(new SequentFormula(finalPreTerm),
                               ruleApp.posInOccurrence());
 
-        TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, preGoal, null);
+        TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this, preGoal, null, null);
 
         //create "Post" branch
 	final StatementBlock resultAssign;
@@ -888,11 +905,11 @@ public final class UseOperationContractRule implements BuiltInRule {
                                          tb.prog(inst.mod,
                                                  postJavaBlock,
                                                  inst.progPost.sub(0),
-                                                 TermLabelManager.instantiateLabels(
+                                                 TermLabelManager.instantiateLabels(termLabelState,
                                                          services, ruleApp.posInOccurrence(), this,
                                                          postGoal, "PostModality", null, inst.mod,
                                                          new ImmutableArray<Term>(inst.progPost.sub(0)),
-                                                         null, postJavaBlock)
+                                                         null, postJavaBlock, inst.progPost.getLabels())
                                                  ),
                                          null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon),
@@ -913,13 +930,13 @@ public final class UseOperationContractRule implements BuiltInRule {
         JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
         final Term originalExcPost = tb.apply(anonUpdate,
                                               tb.prog(inst.mod, excJavaBlock, inst.progPost.sub(0),
-                                                      TermLabelManager.instantiateLabels(services,
+                                                      TermLabelManager.instantiateLabels(termLabelState, services, 
                                                               ruleApp.posInOccurrence(), this,
                                                               excPostGoal, "ExceptionalPostModality",
                                                               null, inst.mod,
                                                               new ImmutableArray<Term>(
                                                                       inst.progPost.sub(0)),
-                                                              null, excJavaBlock)), null);
+                                                              null, excJavaBlock, inst.progPost.getLabels())), null);
         final Term excPost = globalDefs==null? originalExcPost: tb.apply(globalDefs, originalExcPost);
         excPostGoal.addFormula(new SequentFormula(wellFormedAnon),
                 	       true,
@@ -941,7 +958,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         	                   ruleApp.posInOccurrence());
         }
 
-        TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, nullGoal, null);
+        TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this, nullGoal, null, null);
 
 
 

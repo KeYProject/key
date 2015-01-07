@@ -28,8 +28,6 @@ import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
 import de.uka.ilkd.key.gui.TacletMatchCompletionDialog;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
@@ -64,10 +62,9 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
@@ -96,8 +93,6 @@ public class KeYMediator {
      */
     private KeYSelectionModel keySelectionModel;
 
-    private KeYExceptionHandler defaultExceptionHandler;
-
     private boolean minimizeInteraction; // minimize user interaction
 
     private TacletFilter filterForInteractiveProving;
@@ -112,7 +107,7 @@ public class KeYMediator {
     /**
      * An optional used {@link AutoSaver}.
      */
-    private AutoSaver autoSaver;
+    private AutoSaver autoSaver = AutoSaver.getDefaultInstance();
 
     
     /**
@@ -133,7 +128,6 @@ public class KeYMediator {
      */
     public KeYMediator(UserInterface ui) {
 	this.ui             = ui;
-	this.autoSaver = AutoSaver.getDefaultInstance();
 
 	notationInfo        = new NotationInfo();
 	proofListener       = new KeYMediatorProofListener();
@@ -142,8 +136,6 @@ public class KeYMediator {
 	interactiveProver   = new InteractiveProver(this);
 
 	addAutoModeListener(proofListener);
-
-	defaultExceptionHandler = new KeYRecoderExcHandler();
 
 	// There may be other interruption listeners, but the interaction
 	// engine listens by default.
@@ -156,15 +148,6 @@ public class KeYMediator {
      */
     public NotationInfo getNotationInfo() {
 	return notationInfo;
-    }
-
-    public KeYExceptionHandler getExceptionHandler(){
-       Proof selectedProof = getSelectedProof();
-	if(selectedProof != null && !selectedProof.isDisposed()){
-	    return selectedProof.getServices().getExceptionHandler();
-	}else{
-	    return defaultExceptionHandler;
-	}
     }
 
     /** returns the variable namespace
@@ -250,6 +233,10 @@ public class KeYMediator {
 
     public void setMinimizeInteraction(boolean b) {
        minimizeInteraction = b;
+    }
+    
+    public void setAutoSave(int interval) {
+        autoSaver = interval>0 ? new AutoSaver(interval, true): null;
     }
 
     public boolean ensureProofLoaded() {
@@ -850,15 +837,11 @@ public class KeYMediator {
    class KeYMediatorProofTreeListener extends ProofTreeAdapter {
        private boolean pruningInProcess;
 
+       @Override
        public void proofClosed(ProofTreeEvent e) {
            Proof p = e.getSource();
            assert p.name().equals(getSelectedProof().name());
            assert p.closed();
-           if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave()
-                   && !p.name().toString().endsWith(".proof")) {
-               assert ui.getMediator().getSelectedProof().name().equals(p.name());
-               ui.saveProof(p, ".proof");
-           }
            KeYMediator.this.notify(new ProofClosedNotificationEvent(e.getSource()));
        }
 
@@ -866,6 +849,7 @@ public class KeYMediator {
            pruningInProcess = true;
        }
 
+       @Override
        public void proofPruned(final ProofTreeEvent e) {
            SwingUtilities.invokeLater(new Runnable() {
                public void run () {
@@ -876,6 +860,7 @@ public class KeYMediator {
            pruningInProcess = false;
        }
 
+       @Override
        public void proofGoalsAdded(ProofTreeEvent e) {
            ImmutableList<Goal> newGoals = e.getGoals();
            // Check for a closed goal ...
@@ -885,6 +870,7 @@ public class KeYMediator {
            }
        }
 
+       @Override
        public void proofStructureChanged(ProofTreeEvent e) {
            if (isInAutoMode() || pruningInProcess) return;
            Proof p = e.getSource();
@@ -954,9 +940,12 @@ public class KeYMediator {
         });
     }
 
-    /*
+    /**
      * Disable certain actions until a proof is loaded.
+     * This is a workaround for a broken proof macro menu in the GUI.
+     * Remove this method as soon as another solution can be found.
      */
+    @Deprecated
     public void enableWhenProofLoaded(final javax.swing.AbstractButton a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {

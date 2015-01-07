@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.util.Pair;
 
@@ -108,12 +109,17 @@ public class JoinIfThenElse extends JoinRule {
                         tb.imp(appl1, appl2),
                         tb.imp(appl2, appl1));
                   
+                  final ProofEnvironment sideProofEnv =
+                        SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(
+                              services.getProof(),                            // Parent Proof
+                              false);                                         // useSimplifyTermProfile
+                  
                   ApplyStrategyInfo proofResult = SideProofUtil.startSideProof(
                         services.getProof(),                                  // Parent proof
+                        sideProofEnv,                                         // Proof environment
                         Sequent.createSequent(                                // Sequent to prove
                               Semisequent.EMPTY_SEMISEQUENT,
-                              new Semisequent(new SequentFormula(toProve))), 
-                        false);                                               // useSimplifyTermProfile
+                              new Semisequent(new SequentFormula(toProve))));  
                   
                   proofClosed = proofResult.getProof().closed();
                   

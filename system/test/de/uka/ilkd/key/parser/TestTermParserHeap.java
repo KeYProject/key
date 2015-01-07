@@ -33,6 +33,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         parseDecls("\\programVariables {int i;}");
         parseDecls("\\programVariables {testTermParserHeap.A a;}");
         parseDecls("\\programVariables {testTermParserHeap.A1 a1;}");
+        parseDecls("\\programVariables {testTermParserHeap.A[] array;}");
     }
 
     @Override
@@ -48,10 +49,20 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         return tf.createTerm(op, params);
     }
 
+    public void testAllFieldsSelector() throws IOException {
+        comparePrettySyntaxAgainstVerboseSyntax("a.*", "allFields(a)");
+    }
+
     public void testLocationSets() throws IOException {
-        comparePrettySyntaxAgainstVerboseSyntax(
-                "{(a, testTermParserHeap.A::$f)}",
-                "singleton(a,testTermParserHeap.A::$f)");
+        String pp = "{(a, testTermParserHeap.A::$f)}";
+        String verbose = "singleton(a,testTermParserHeap.A::$f)";
+        comparePrettySyntaxAgainstVerboseSyntax(pp, verbose);
+
+        comparePrettySyntaxAgainstVerboseSyntax("{}", "empty");
+
+        pp = "{(a, testTermParserHeap.A::$f), (a, testTermParserHeap.A::$f), (a, testTermParserHeap.A::$f)}";
+        Term expected = parseTerm("union(union(singleton(a,testTermParserHeap.A::$f),singleton(a,testTermParserHeap.A::$f)),singleton(a,testTermParserHeap.A::$f))");
+        verifyParsing(expected, pp);
     }
 
     public void testParsePrettyPrintedSelect() throws IOException {
@@ -69,11 +80,11 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     public void testBracketHeapUpdate() throws IOException {
-        String complicatedHeapPretty = "heap[a.f := 4][create(a)][memset(empty, 1)][anon(allLocs, heap)]";
+        String complicatedHeapPretty = "heap[a.f := 4][create(a)][memset({}, 1)][anon(allLocs, heap)]";
         String complicatedHeapVerbose = "anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)";
         comparePrettySyntaxAgainstVerboseSyntax(complicatedHeapPretty, complicatedHeapVerbose);
 
-        String prettySyntax = "a.f@h[anon(empty, h2)]";
+        String prettySyntax = "a.f@h[anon({}, h2)]";
         String verboseSyntax = "int::select(anon(h, empty, h2), a, testTermParserHeap.A::$f)";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
 
@@ -194,7 +205,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     }
 
-    public void testQueries() throws Exception {
+    public void testQueryBasic() throws Exception {
         comparePrettySyntaxAgainstVerboseSyntax("a.query(i)", "testTermParserHeap.A::query(heap, a, i)");
         comparePrettySyntaxAgainstVerboseSyntax("a.query(i)@h", "testTermParserHeap.A::query(h, a, i)");
         comparePrettySyntaxAgainstVerboseSyntax("a.query(a.f)@h", "testTermParserHeap.A::query(h, a, "
@@ -218,25 +229,54 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
         comparePrettySyntaxAgainstVerboseSyntax("(a.next@heap).getNext()@h", "testTermParserHeap.A::getNext(h, "
                 + "testTermParserHeap.A::select(heap, a, testTermParserHeap.A::$next))");
+
+        // test a query whose argument is an array variable
+        comparePrettySyntaxAgainstVerboseSyntax("a1.arrayQuery(array)",
+                "testTermParserHeap.A::arrayQuery(heap,a1,array)");
+
+        // test a query on an array element
+        comparePrettySyntaxAgainstVerboseSyntax("array[i].arrayQuery(array)",
+                "testTermParserHeap.A::arrayQuery(heap,testTermParserHeap.A::select(heap,array,arr(i)),array)");
     }
 
-    public void testQueriesInheritance() throws Exception {
-        compareStringRepresentationAgainstTermRepresentation("a.query(i)",
-                parseTerm("testTermParserHeap.A::query(heap, a, i)"),
+    public void testQueryInheritance() throws Exception {
+        comparePrettySyntaxAgainstVerboseSyntax("a.query(i)",
+                "testTermParserHeap.A::query(heap, a, i)",
                 "a.(testTermParserHeap.A::query)(i)");
 
-        compareStringRepresentationAgainstTermRepresentation("a1.query(i)",
-                parseTerm("testTermParserHeap.A::query(heap, a1, i)"),
+        // test public query defined in superclass, which is not overridden
+        comparePrettySyntaxAgainstVerboseSyntax("a1.query(i)",
+                "testTermParserHeap.A::query(heap, a1, i)",
                 "a1.(testTermParserHeap.A::query)(i)");
 
-        compareStringRepresentationAgainstTermRepresentation("a1.queryRedefined()",
-                parseTerm("testTermParserHeap.A1::queryRedefined(heap, a1)"),
+        // test redefined (private) query
+        comparePrettySyntaxAgainstVerboseSyntax("a1.queryRedefined()",
+                "testTermParserHeap.A1::queryRedefined(heap, a1)",
                 "a1.(testTermParserHeap.A1::queryRedefined)()");
 
-//        compareStringRepresentationAgainstTermRepresentation("a1.(testTermParserHeap.A::queryRedefined)()",
-//                parseTerm("testTermParserHeap.A::queryRedefined(heap, a1)"));
-//        compareStringRepresentationAgainstTermRepresentation("a1.queryOverridden()",
-//                parseTerm("testTermParserHeap.A::queryOverridden(heap, a1)"));
+        // test redefined (private) query - explicitly reference query from superclass
+        comparePrettySyntaxAgainstVerboseSyntax("a1.(testTermParserHeap.A::queryRedefined)()",
+                "testTermParserHeap.A::queryRedefined(heap, a1)");
+
+        // test overridden (public) query
+        comparePrettySyntaxAgainstVerboseSyntax("a1.queryOverridden()",
+                "testTermParserHeap.A::queryOverridden(heap, a1)");
+
+        // test whether toString() query inherited from java.lang.Object gets parsed correctly
+        comparePrettySyntaxAgainstVerboseSyntax("a1.toString()@h",
+                "java.lang.Object::toString(h, a1)");
+
+        // test overridden query with explicitly specified classname
+        comparePrettySyntaxAgainstVerboseSyntax("a1.(testTermParserHeap.A1::queryOverridden)()",
+                "testTermParserHeap.A1::queryOverridden(heap,a1)");
+
+        // test overridden query with explicitly specified classname in combination with a non-standard heap
+        comparePrettySyntaxAgainstVerboseSyntax("a1.(testTermParserHeap.A1::queryOverridden)()@h",
+                "testTermParserHeap.A1::queryOverridden(h,a1)");
+
+        // test an overridden query with several arguments
+        comparePrettySyntaxAgainstVerboseSyntax("a1.queryOverriddenWithArguments(i,a,a1)@h",
+                "testTermParserHeap.A::queryOverriddenWithArguments(h,a1,i,a,a1)");
     }
 
     /*
@@ -249,7 +289,9 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
         // static method access
         comparePrettySyntaxAgainstVerboseSyntax("testTermParserHeap.A.staticMethod()",
-                "testTermParserHeap.A::staticMethod(heap)");
+                "testTermParserHeap.A::staticMethod(heap)",
+                "a.staticMethod()",
+                "a1.staticMethod()");
 
         // static array access
         comparePrettySyntaxAgainstVerboseSyntax("testTermParserHeap.A.staticArray[0]",
@@ -299,56 +341,6 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         Term t = parseTerm(s);
         String printedSyntax = printTerm(t);
         assertEqualsIgnoreWhitespaces(s, printedSyntax);
-    }
-
-    /**
-     * Takes two different String representations for the same term and checks
-     * whether they result in the same {@link Term} after parsing. Subsequently,
-     * the {@link Term} is printed back to a {@link String} and compared with
-     * the first argument. The first argument is expected to be in
-     * pretty-syntax.
-     *
-     * @param prettySyntax {@link Term} representation in pretty-syntax.
-     * @param verboseSyntax {@link Term} in verbose syntax.
-     * @throws IOException
-     */
-    private void comparePrettySyntaxAgainstVerboseSyntax(String prettySyntax, String verboseSyntax,
-            String... optionalStringRepresentations) throws IOException {
-        Term expectedParseResult = parseTerm(verboseSyntax);
-        compareStringRepresentationAgainstTermRepresentation(prettySyntax, expectedParseResult, optionalStringRepresentations);
-    }
-
-    /**
-     * Takes a {@link String} and a {@link Term} and checks whether they can be
-     * transformed into each other by the operations parsing and printing.
-     *
-     * @param expectedPrettySyntax Expected result after pretty-printing
-     * {@code expectedParseResult}.
-     * @param expectedParseResult Expected result after parsing
-     * {@code expectedPrettySyntax}.
-     * @param optionalStringRepresentations Optionally, additional String
-     * representations will be tested for correct parsing.
-     * @throws IOException
-     */
-    private void compareStringRepresentationAgainstTermRepresentation(String expectedPrettySyntax, Term expectedParseResult,
-            String... optionalStringRepresentations) throws IOException {
-        Term parsedPrettySyntax = parseTerm(expectedPrettySyntax);
-        assertEquals(expectedParseResult, parsedPrettySyntax);
-
-        String printedSyntax = printTerm(expectedParseResult);
-        // compare the string representations, but remove whitespaces
-        assertEqualsIgnoreWhitespaces(expectedPrettySyntax, printedSyntax);
-
-        // parse printed term again and see if result is still the same
-        Term parsedPrintedSyntax = parseTerm(printedSyntax);
-        assertEquals(expectedParseResult, parsedPrintedSyntax);
-
-        /*
-         * Optionally, further string representations of the same term will be parsed here.
-         */
-        for (int i = 0; i < optionalStringRepresentations.length; i++) {
-            assertEquals(expectedParseResult, parseTerm(optionalStringRepresentations[i]));
-        }
     }
 
 }

@@ -28,7 +28,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -292,7 +291,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    @Override
    public ProblemInitializer createProblemInitializer(Profile profile) {
       ProblemInitializer pi = new ProblemInitializer(this,
-            new Services(profile, mediator.getExceptionHandler()),
+            new Services(profile),
             this);
       return pi;
    }
@@ -334,20 +333,11 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                file.getParent() : new File(Main.getFileNameOnStartUp()).getParent();
        file = (defaultName != null) ? new File(recDir, defaultName): file;
 
-       final String proofSubDir = ProofSaver.PROOF_SUBDIRECTORY;
-       final boolean proofFolderActive = ProofIndependentSettings.DEFAULT_INSTANCE
-                                .getGeneralSettings().storesInDefaultProofFolder();
        String poDir =
                file.getParent().endsWith("src") ?
                        new File(file.getParent()).getParent()
                        : file.getParent();
-       String proofDir =
-               (!proofFolderActive || file.getParent().endsWith(proofSubDir)) ?
-               file.getParent() : file.getParent().concat(proofSubDir);
-       final File dir = new File(proofDir);
-       if (proofFolderActive && !dir.exists() && fileExtension.equals(".proof")) {
-           dir.mkdir();
-       }
+       String proofDir = file.getParent();
        file = new File(fileExtension.equals(".key") ? poDir : proofDir, file.getName());
        ProofSaver saver = new ProofSaver(proof, file.getAbsolutePath(), Main.INTERNAL_VERSION);
        try {
