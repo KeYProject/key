@@ -46,8 +46,10 @@ import de.uka.ilkd.key.util.Pair;
 public class JoinIfThenElse extends JoinRule {
    
    public static final JoinIfThenElse INSTANCE = new JoinIfThenElse();
+   
    private static final String DISPLAY_NAME = "JoinByIfThenElse";
    private static final Name RULE_NAME = new Name(DISPLAY_NAME);
+   private static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
 
    @Override
    protected Pair<Term, Term> joinStates(
@@ -88,21 +90,34 @@ public class JoinIfThenElse extends JoinRule {
             
             // Check if location v is set to different value in both states.
             try {
-               Term predicateTerm = tb.func(new Function(new Name("P"), Sort.FORMULA, v.sort()), tb.var(v));
-               Term appl1 = tb.apply(joinedState.first, predicateTerm);
-               Term appl2 = tb.apply(state.first, predicateTerm);
-               Term toProve = tb.and(
-                     tb.imp(appl1, appl2),
-                     tb.imp(appl2, appl1));
+               // Easy check: Term equality
+               boolean proofClosed = rightSide1.equalsModRenaming(rightSide2);
                
-               ApplyStrategyInfo proofResult = SideProofUtil.startSideProof(
-                     services.getProof(),                                  // Parent proof
-                     Sequent.createSequent(                                // Sequent to proof
-                           Semisequent.EMPTY_SEMISEQUENT,
-                           new Semisequent(new SequentFormula(toProve))), 
-                     false);                                               // useSimplifyTermProfile
-               
-               boolean proofClosed = proofResult.getProof().closed();
+               // We skip the check for equal valuation of this variable if
+               // the depth threshold is exceeded by one of the right sides.
+               // Experiments show a very big time overhead from a depth of
+               // about 8-10 on, or sometimes even earlier.
+               if (rightSide1.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING &&
+                   rightSide2.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING &&
+                   !proofClosed) {
+                  
+                  Term predicateTerm = tb.func(new Function(new Name("P"), Sort.FORMULA, v.sort()), tb.var(v));
+                  Term appl1 = tb.apply(joinedState.first, predicateTerm);
+                  Term appl2 = tb.apply(state.first, predicateTerm);
+                  Term toProve = tb.and(
+                        tb.imp(appl1, appl2),
+                        tb.imp(appl2, appl1));
+                  
+                  ApplyStrategyInfo proofResult = SideProofUtil.startSideProof(
+                        services.getProof(),                                  // Parent proof
+                        Sequent.createSequent(                                // Sequent to prove
+                              Semisequent.EMPTY_SEMISEQUENT,
+                              new Semisequent(new SequentFormula(toProve))), 
+                        false);                                               // useSimplifyTermProfile
+                  
+                  proofClosed = proofResult.getProof().closed();
+                  
+               }
                
                if (proofClosed) {
                   
@@ -118,7 +133,7 @@ public class JoinIfThenElse extends JoinRule {
                   newElementaryUpdates = newElementaryUpdates.prepend(
                         tb.elementary(
                               v,
-                              tb.ife(joinedState.second, rightSide1, rightSide2)));
+                              tb.ife(state.second, rightSide2, rightSide1)));
                   
                }
             }
@@ -128,10 +143,13 @@ public class JoinIfThenElse extends JoinRule {
                // precision and soundness, only a more complicated
                // resulting sequence.
                
+               System.out.println("[INFO] Join If-Then-Else: Side proof failed.");
+               System.out.println(e.toString());
+               
                newElementaryUpdates = newElementaryUpdates.prepend(
                      tb.elementary(
                            v,
-                           tb.ife(joinedState.second, rightSide1, rightSide2)));
+                           tb.ife(state.second, rightSide2, rightSide1)));
             }
          }
          

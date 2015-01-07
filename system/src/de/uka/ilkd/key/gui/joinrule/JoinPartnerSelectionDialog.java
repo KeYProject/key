@@ -57,12 +57,12 @@ import de.uka.ilkd.key.util.Pair;
 public class JoinPartnerSelectionDialog extends JDialog {
    private static final long serialVersionUID = -1460097562546341922L;
    
-   /** The tooltipo hint for the checkbox. */
+   /** The tooltip hint for the checkbox. */
    private static final String CB_SELECT_CANDIDATE_HINT =
          "Select to add shown state as a join partner.";
    /** The initial size of this dialog. */
    private static final Dimension INITIAL_SIZE =
-         new Dimension(500, 300);
+         new Dimension(750, 450);
    /** The font for the JEditorPanes. Should
     *  resemble the standard font of KeY for proofs etc. */
    private static final Font TXT_AREA_FONT =
