@@ -161,7 +161,8 @@ public class ExecutionValue extends AbstractExecutionValue {
                                            Integer.valueOf(lengthValue.getValueString()) :
                                            Integer.valueOf(SymbolicExecutionUtil.formatTerm(lengthValue.getValue(), services, false, true));
                               for (int i = 0; i < length; i++) {
-                                 ExecutionVariable childI = new ExecutionVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, i, lengthValue, getVariable().getAdditionalCondition());
+                                 Term indexTerm = services.getTermBuilder().zTerm(i);
+                                 ExecutionVariable childI = new ExecutionVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, indexTerm, lengthValue, getVariable().getAdditionalCondition());
                                  children.add(childI);
                               }
                            }

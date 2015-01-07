@@ -25,4 +25,8 @@ public class ProofInputException extends Exception {
         super(s);
     }
 
+    public ProofInputException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }

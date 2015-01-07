@@ -36,7 +36,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDebugNode<IExecutionTermination> {
+public class KeYTermination extends AbstractSEDTermination implements IKeYTerminationNode<IExecutionTermination> {
    /**
     * The {@link IExecutionTermination} to represent by this debug node.
     */

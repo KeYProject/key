@@ -52,6 +52,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
@@ -364,14 +365,15 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
          Term termForSideProof = replacer.replace(condition);
          //start side proof
          Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
+         final ProofEnvironment sideProofEnv = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), false); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
          Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, pio, toProof);
          info = SideProofUtil.startSideProof(proof, 
+                                             sideProofEnv,
                                              sequent, 
                                              StrategyProperties.METHOD_CONTRACT,
                                              StrategyProperties.LOOP_INVARIANT,
                                              StrategyProperties.QUERY_ON,
-                                             StrategyProperties.SPLITTING_DELAYED,
-                                             false);
+                                             StrategyProperties.SPLITTING_DELAYED);
          return info.getProof().closed();
       }
       catch (ProofInputException e) {

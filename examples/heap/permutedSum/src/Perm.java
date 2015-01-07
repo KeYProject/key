@@ -48,7 +48,7 @@ class Perm {
     @ ensures \result == (pIdx < a.length);
     @ strictly_pure helper
     @*/
-  boolean hasNext();
+  native boolean hasNext(); // Declared method as native to model unknown behavior
 
   /*@ normal_behavior
     @ requires pIdx < a.length;
@@ -56,6 +56,6 @@ class Perm {
     @ ensures pIdx == \old(pIdx)+1;
     @ assignable pIdx;
     @*/
-  int next();
+  native int next(); // Declared method as native to model unknown behavior
 
 }

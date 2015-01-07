@@ -1,8 +1,14 @@
 package de.uka.ilkd.key.symbolic_execution;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -32,6 +38,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -248,7 +255,9 @@ public abstract class AbstractUpdateExtractor {
             final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
             ProgramVariable var = (ProgramVariable)eu.lhs();
             if (!SymbolicExecutionUtil.isHeap(var, heapLDT)) {
-               if (!isImplicitProgramVariable(var) && !objectsToIgnore.contains(getServices().getTermBuilder().var(var))) {
+               if (!isImplicitProgramVariable(var) && 
+                   !objectsToIgnore.contains(getServices().getTermBuilder().var(var)) &&
+                   !hasFreeVariables(updateTerm)) {
                   locationsToFill.add(new ExtractLocationParameter(var, true));
                }
                if (SymbolicExecutionUtil.hasReferenceSort(getServices(), updateTerm.sub(0))) {
@@ -297,14 +306,17 @@ public abstract class AbstractUpdateExtractor {
          if (heapLDT.getSortOfSelect(selectArgument.op()) != null) {
             ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, selectArgument.sub(2));
             if (var != null) {
-               if (!isImplicitProgramVariable(var)) {
+               if (!isImplicitProgramVariable(var) && 
+                   !hasFreeVariables(selectArgument.sub(2))) {
                   locationsToFill.add(new ExtractLocationParameter(var, selectArgument.sub(1)));
                }
             }
             else {
-               int arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, selectArgument.sub(2));
-               if (arrayIndex >= 0) {
-                  locationsToFill.add(new ExtractLocationParameter(arrayIndex, selectArgument.sub(1)));
+               Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, selectArgument.sub(2));
+               if (arrayIndex != null) {
+                  if (!hasFreeVariables(arrayIndex)) {
+                     locationsToFill.add(new ExtractLocationParameter(arrayIndex, selectArgument.sub(1)));
+                  }
                }
                else {
                   throw new ProofInputException("Unsupported select statement \"" + term + "\".");
@@ -313,7 +325,8 @@ public abstract class AbstractUpdateExtractor {
          }
          else if (selectArgument.op() instanceof IProgramVariable) {
             ProgramVariable var = (ProgramVariable)selectArgument.op();
-            if (!isImplicitProgramVariable(var)) {
+            if (!isImplicitProgramVariable(var) && 
+                !hasFreeVariables(selectArgument)) {
                locationsToFill.add(new ExtractLocationParameter(var, false));
             }
          }
@@ -328,7 +341,7 @@ public abstract class AbstractUpdateExtractor {
          // Add select value term to result
          ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, term.sub(2));
          if (var != null) {
-            if (!isImplicitProgramVariable(var)) {
+            if (!isImplicitProgramVariable(var) && !hasFreeVariables(term.sub(2))) {
                if (var.isStatic()) {
                   locationsToFill.add(new ExtractLocationParameter(var, true));
                }
@@ -338,8 +351,8 @@ public abstract class AbstractUpdateExtractor {
             }
          }
          else {
-            int arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
-            if (arrayIndex >= 0) {
+            Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
+            if (arrayIndex != null && !hasFreeVariables(arrayIndex)) {
                locationsToFill.add(new ExtractLocationParameter(arrayIndex, term.sub(1)));
             }
             else {
@@ -375,7 +388,16 @@ public abstract class AbstractUpdateExtractor {
          }
       }
    }
-   
+
+   /**
+    * Checks if the given {@link Term} has free variables.
+    * @param term The {@link Term} to check.
+    * @return {@code true} has free variables, {@code false} does not have free variables.
+    */
+   protected boolean hasFreeVariables(Term term) {
+      return term != null && !term.freeVars().isEmpty();
+   }
+
    /**
     * Computes for each location (value/association of an object) used in the 
     * given {@link Sequent} the {@link Term}s which allows to compute the object 
@@ -426,7 +448,8 @@ public abstract class AbstractUpdateExtractor {
          ProgramVariable var = (ProgramVariable)term.op();
          if (!SymbolicExecutionUtil.isHeap(var, heapLDT) && 
              !isImplicitProgramVariable(var) && 
-             !objectsToIgnore.contains(term)) {
+             !objectsToIgnore.contains(term) &&
+             !hasFreeVariables(term)) {
             toFill.add(new ExtractLocationParameter(var, true));
          }
       }
@@ -438,7 +461,8 @@ public abstract class AbstractUpdateExtractor {
                 !SymbolicExecutionUtil.isSkolemConstant(selectTerm)) {
                ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, term.sub(2));
                if (var != null) {
-                  if (!isImplicitProgramVariable(var)) {
+                  if (!isImplicitProgramVariable(var) &&
+                      !hasFreeVariables(term.sub(2))) {
                      if (var.isStatic()) {
                         toFill.add(new ExtractLocationParameter(var, true));
                      }
@@ -451,8 +475,8 @@ public abstract class AbstractUpdateExtractor {
                   }
                }
                else {
-                  int arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
-                  if (arrayIndex >= 0) {
+                  Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
+                  if (arrayIndex != null && !hasFreeVariables(arrayIndex)) {
                      if (selectTerm.op() instanceof ProgramVariable) {
                         toFill.add(new ExtractLocationParameter((ProgramVariable)selectTerm.op(), true));
                      }
@@ -465,7 +489,8 @@ public abstract class AbstractUpdateExtractor {
             }
          }
          else if (heapLDT.getLength() == term.op()) {
-            if (!objectsToIgnore.contains(term.sub(0))) {
+            if (!objectsToIgnore.contains(term.sub(0)) &&
+                !hasFreeVariables(term)) {
                ProgramVariable var = getServices().getJavaInfo().getArrayLength();
                toFill.add(new ExtractLocationParameter(var, term.sub(0)));
             }
@@ -548,9 +573,9 @@ public abstract class AbstractUpdateExtractor {
       private final ProgramVariable programVariable;
       
       /**
-       * The array index or {@code -1} if a {@link ProgramVariable} is used instead.
+       * The array index or {@code null} if a {@link ProgramVariable} is used instead.
        */
-      private final int arrayIndex;
+      private final Term arrayIndex;
       
       /**
        * An optional parent object represented as {@link Term}. If it is {@code null} an {@link IProgramVariable} of the state is represented.
@@ -615,7 +640,7 @@ public abstract class AbstractUpdateExtractor {
          this.programVariable = programVariable;
          this.parentTerm = parentTerm;
          this.preVariable = createLocationVariable("Pre" + preVariableIndex++, parentTerm != null ? parentTerm.sort() : programVariable.sort());
-         this.arrayIndex = -1;
+         this.arrayIndex = null;
          this.stateMember = stateMember;
       }
       
@@ -625,7 +650,7 @@ public abstract class AbstractUpdateExtractor {
        * @param parentTerm The parent object represented as {@link Term}.
        * @throws ProofInputException Occurred Exception.
        */
-      public ExtractLocationParameter(int arrayIndex, 
+      public ExtractLocationParameter(Term arrayIndex, 
                                       Term parentTerm) throws ProofInputException {
          assert parentTerm != null;
          this.programVariable = null;
@@ -659,14 +684,14 @@ public abstract class AbstractUpdateExtractor {
        * @return {@code true} is array index, {@code false} is {@link ProgramVariable}. 
        */
       public boolean isArrayIndex() {
-         return arrayIndex >= 0;
+         return arrayIndex != null;
       }
       
       /**
        * Returns the array index.
        * @return The array index.
        */
-      public int getArrayIndex() {
+      public Term getArrayIndex() {
          return arrayIndex;
       }
 
@@ -696,8 +721,7 @@ public abstract class AbstractUpdateExtractor {
       public Term createPreValueTerm() {
          if (parentTerm != null) {
             if (isArrayIndex()) {
-               Term idx = getServices().getTermBuilder().zTerm("" + arrayIndex);
-               return getServices().getTermBuilder().dotArr(parentTerm, idx);
+               return getServices().getTermBuilder().dotArr(parentTerm, arrayIndex);
             }
             else {
                if (getServices().getJavaInfo().getArrayLength() == programVariable) {
@@ -790,7 +814,7 @@ public abstract class AbstractUpdateExtractor {
       public boolean equals(Object obj) {
          if (obj instanceof ExtractLocationParameter) {
             ExtractLocationParameter other = (ExtractLocationParameter)obj;
-            return arrayIndex == other.arrayIndex &&
+            return JavaUtil.equals(arrayIndex, other.arrayIndex) &&
                    stateMember == other.stateMember &&
                    JavaUtil.equals(parentTerm, other.parentTerm) &&
                    JavaUtil.equals(programVariable, other.programVariable);
@@ -806,7 +830,7 @@ public abstract class AbstractUpdateExtractor {
       @Override
       public int hashCode() {
          int result = 17;
-         result = 31 * result + arrayIndex;
+         result = 31 * result + (arrayIndex != null ? arrayIndex.hashCode() : 0);
          result = 31 * result + (stateMember ? 1 : 0);
          result = 31 * result + (parentTerm != null ? parentTerm.hashCode() : 0);
          result = 31 * result + (programVariable != null ? programVariable.hashCode() : 0);
@@ -863,40 +887,336 @@ public abstract class AbstractUpdateExtractor {
          additionalUpdates = additionalUpdates.append(evp.createPreUpdate());
       }
       ImmutableList<Term> newUpdates = ImmutableSLList.<Term>nil().append(getServices().getTermBuilder().parallel(additionalUpdates));
+      final ProofEnvironment sideProofEnv = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, modalityPio, layoutCondition, layoutTerm, newUpdates, false);
       // Instantiate and run proof
       ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
+                                                                          sideProofEnv,
                                                                           sequent, 
                                                                           StrategyProperties.METHOD_CONTRACT,
                                                                           StrategyProperties.LOOP_INVARIANT,
                                                                           StrategyProperties.QUERY_ON,
-                                                                          StrategyProperties.SPLITTING_NORMAL,
-                                                                          true);
+                                                                          StrategyProperties.SPLITTING_NORMAL);
       try {
-         // Extract values and objects from result predicate and store them in variable value pairs
-         Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();
-         int goalCount = info.getProof().openGoals().size();
+         @SuppressWarnings("unchecked")
+         Map<Term, Set<Goal>>[] paramValueMap = new Map[locations.size()];
+         // Group equal values as precondition of computeValueConditions(...)
          for (Goal goal : info.getProof().openGoals()) {
             Term resultTerm = SideProofUtil.extractOperatorTerm(goal, layoutTerm.op());
-            Term condition = goalCount == 1 ? null : SymbolicExecutionUtil.computePathCondition(goal.node(), true);
+            int i = 0;
             for (ExtractLocationParameter param : locations) {
-               ExecutionVariableValuePair pair;
+               Map<Term, Set<Goal>> valueMap = paramValueMap[i];
+               if (valueMap == null) {
+                  valueMap = new LinkedHashMap<Term, Set<Goal>>();
+                  paramValueMap[i] = valueMap;
+               }
                Term value = resultTerm.sub(param.getValueTermIndexInStatePredicate());
                value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value, getServices());
+               Set<Goal> valueList = valueMap.get(value);
+               if (valueList == null) {
+                  valueList = new LinkedHashSet<Goal>();
+                  valueMap.put(value, valueList);
+               }
+               valueList.add(goal);
+               i++;
+            }
+         }
+         // Compute values including conditions
+         Map<Node, Term> branchConditionCache = new HashMap<Node, Term>();
+         Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();
+         int i = 0;
+         for (ExtractLocationParameter param : locations) {
+            for (Entry<Term, Set<Goal>> valueEntry : paramValueMap[i].entrySet()) {
+               Map<Goal, Term> conditionsMap = computeValueConditions(valueEntry.getValue(), branchConditionCache);
                if (param.isArrayIndex()) {
-                  pair = new ExecutionVariableValuePair(param.getArrayIndex(), param.getParentTerm(), value, condition, param.isStateMember());
+                  for (Goal goal : valueEntry.getValue()) {
+                     ExecutionVariableValuePair pair = new ExecutionVariableValuePair(param.getArrayIndex(), param.getParentTerm(), valueEntry.getKey(), conditionsMap.get(goal), param.isStateMember(), goal.node());
+                     pairs.add(pair);
+                  }
                }
                else {
-                  pair = new ExecutionVariableValuePair(param.getProgramVariable(), param.getParentTerm(), value, condition, param.isStateMember());
+                  for (Goal goal : valueEntry.getValue()) {
+                     ExecutionVariableValuePair pair = new ExecutionVariableValuePair(param.getProgramVariable(), param.getParentTerm(), valueEntry.getKey(), conditionsMap.get(goal), param.isStateMember(), goal.node());
+                     pairs.add(pair);
+                  }
                }
-               pairs.add(pair);
             }
+            i++;
          }
          return pairs;
       }
       finally {
          SideProofUtil.disposeOrStore("Layout computation on node " + node.serialNr() + " with layout term " + ProofSaver.printAnything(layoutTerm, getServices()) + ".", info);
       }
+   }
+   
+   /**
+    * This method computes for all given {@link Goal}s representing the same 
+    * value their path conditions. A computed path condition will consists only
+    * of the branch conditions which contribute to the value. Branch conditions
+    * of splits which does not contribute to the value are ignored.
+    * <p>
+    * The implemented algorithm works as follows:
+    * <ol>
+    *    <li>
+    *       The given {@link Goal}s have to be all {@link Goal}s of the side 
+    *       proof providing the same value. This means that other branches/goals 
+    *       of the side proof result in different branches.
+    *    </li>
+    *    <li>
+    *       A backward iteration on the parent {@link Node}s starting at the 
+    *       {@link Goal}s is performed until the first parent with at least
+    *       two open children has been found.
+    *       The iteration is only performed on one
+    *       goal (or the {@link Node} it stops last) at a time. The iteration
+    *       is always performed on the {@link Node} with the highest serial
+    *       number to ensure that different {@link Goal} will meet at their
+    *       common parents.
+    *    </li>
+    *    <li>
+    *       When the iteration of all children of a {@link Node} has met,
+    *       the branch conditions are computed if the split contributes to
+    *       the value. 
+    *       A split contributes to a value if at least one branch is not
+    *       reached by backward iteration meaning that its {@link Goal}s
+    *       provide different values.
+    *    </li>
+    *    <li>The backward iteration ends when the root is reached.</li>
+    *    <li>
+    *       Finally, for each {@link Goal} is the path condition computed.
+    *       The path condition is the conjunction over all found branch 
+    *       conditions contributing to the value.
+    *    </li>
+    * </ol>
+    * @param valueGoals All {@link Goal}s of the side proof which provide the same value (result).
+    * @param branchConditionCache A cache of already computed branch conditions.
+    * @return A {@link Map} which contains for each {@link Goal} the computed path condition consisting of only required splits.
+    * @throws ProofInputException Occurred Exception
+    */
+   protected Map<Goal, Term> computeValueConditions(Set<Goal> valueGoals, 
+                                                    Map<Node, Term> branchConditionCache) throws ProofInputException {
+      Comparator<NodeGoal> comparator = new Comparator<NodeGoal>() {
+         @Override
+         public int compare(NodeGoal o1, NodeGoal o2) {
+            return o2.getSerialNr() - o1.getSerialNr(); // Descending order
+         }
+      };
+      // Initialize condition for each goal with true
+      Set<Node> untriedRealGoals = new HashSet<Node>();
+      Map<Goal, Set<Term>> goalConditions = new HashMap<Goal, Set<Term>>();
+      List<NodeGoal> sortedBranchLeafs = new LinkedList<NodeGoal>();
+      for (Goal goal : valueGoals) {
+         JavaUtil.binaryInsert(sortedBranchLeafs, new NodeGoal(goal), comparator);
+         goalConditions.put(goal, new LinkedHashSet<Term>());
+         untriedRealGoals.add(goal.node());
+      }
+      // Compute branch conditions
+      List<NodeGoal> waitingBranchLeafs = new LinkedList<NodeGoal>();
+      Map<Node, List<NodeGoal>> splitMap = new HashMap<Node, List<NodeGoal>>();
+      while (!sortedBranchLeafs.isEmpty()) {
+         // Go back to parent with at least two open goals on maximum outer leaf
+         NodeGoal maximumOuterLeaf = sortedBranchLeafs.remove(0); // List is sorted in descending order
+         NodeGoal childGoal = iterateBackOnParents(maximumOuterLeaf, !untriedRealGoals.remove(maximumOuterLeaf.getCurrentNode()));
+         if (childGoal != null) { // Root is not reached
+            waitingBranchLeafs.add(childGoal);
+            List<NodeGoal> childGoals = splitMap.get(childGoal.getParent());
+            if (childGoals == null) {
+               childGoals = new LinkedList<NodeGoal>();
+               splitMap.put(childGoal.getParent(), childGoals);
+            }
+            childGoals.add(childGoal);
+            // Check if parent is reached on all child nodes
+            if (isParentReachedOnAllChildGoals(childGoal.getParent(), sortedBranchLeafs)) {
+               // Check if the split contributes to the path condition which is the case if at least one branch is not present (because it has a different value)
+               if (childGoals.size() != childGoal.getParent().childrenCount()) {
+                  // Add branch condition to conditions of all child goals
+                  for (NodeGoal nodeGoal : childGoals) {
+                     Term branchCondition = computeBranchCondition(nodeGoal.getCurrentNode(), branchConditionCache);
+                     for (Goal goal : nodeGoal.getStartingGoals()) {
+                        Set<Term> conditions = goalConditions.get(goal);
+                        conditions.add(branchCondition);
+                     }
+                  }
+               }
+               // Add waiting NodeGoals to working list
+               for (NodeGoal nodeGoal : childGoals) {
+                  waitingBranchLeafs.remove(nodeGoal);
+                  JavaUtil.binaryInsert(sortedBranchLeafs, nodeGoal, comparator);
+               }
+            }
+         }
+      }
+      // Compute final condition (redundant path conditions are avoided)
+      Map<Goal, Term> pathConditionsMap = new LinkedHashMap<Goal, Term>();
+      for (Entry<Goal, Set<Term>> entry : goalConditions.entrySet()) {
+         Term pathCondition = getServices().getTermBuilder().and(entry.getValue());
+         pathConditionsMap.put(entry.getKey(), pathCondition);
+      }
+      return pathConditionsMap;
+   }
+
+   /**
+    * Checks if parent backward iteration on all given {@link NodeGoal} has
+    * reached the given {@link Node}.
+    * @param currentNode The current {@link Node} to check.
+    * @param branchLeafs The {@link NodeGoal} on which backward iteration was performed.
+    * @return {@code true} All {@link NodeGoal}s have passed the given {@link Node}, {@code false} if at least one {@link NodeGoal} has not passed the given {@link Node}.
+    */
+   protected boolean isParentReachedOnAllChildGoals(Node currentNode, List<NodeGoal> branchLeafs) {
+      if (!branchLeafs.isEmpty()) {
+         return branchLeafs.get(0).getSerialNr() <= currentNode.serialNr();
+      }
+      else {
+         return true;
+      }
+   }
+
+   /**
+    * Performs a backward iteration on the parents starting at the given
+    * {@link NodeGoal} until the first parent with at least two open
+    * branches has been found.
+    * @param nodeToStartAt The {@link NodeGoal} to start parent backward iteration at.
+    * @param force {@code true} first parent is not checked, {@code false} also first parent is checked.
+    * @return The first found parent with at least two open child branches or {@code null} if the root has been reached.
+    */
+   protected NodeGoal iterateBackOnParents(NodeGoal nodeToStartAt, boolean force) {
+      // Go back to parent with at least two open branches
+      Node child = force ? nodeToStartAt.getParent() : nodeToStartAt.getCurrentNode();
+      Node parent = child.parent();
+      while (parent != null && countOpenChildren(parent) == 1) {
+         child = parent;
+         parent = child.parent();
+      }
+      // Store result
+      if (parent != null) {
+         return new NodeGoal(child, nodeToStartAt.getStartingGoals());
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Counts the number of open child {@link Node}s.
+    * @param node The {@link Node} to count its open children.
+    * @return The number of open child {@link Node}s.
+    */
+   protected int countOpenChildren(Node node) {
+      int openChildCount = 0;
+      for (int i = 0; i < node.childrenCount(); i++) {
+         Node child = node.child(i);
+         if (!child.isClosed()) {
+            openChildCount++;
+         }
+      }
+      return openChildCount;
+   }
+   
+   /**
+    * Utility class used by {@link AbstractUpdateExtractor#computeValueConditions(Set, Map)}.
+    * Instances of this class store the current {@link Node} and the {@link Goal}s at which backward iteration on parents has started.
+    * @author Martin Hentschel
+    */
+   protected static class NodeGoal {
+      /**
+       * The current {@link Node}.
+       */
+      private final Node currentNode;
+      
+      /**
+       * The {@link Goal}s at which backward iteration has started.
+       */
+      private final ImmutableList<Goal> startingGoals;
+
+      /**
+       * Constructor.
+       * @param goal The current {@link Goal} to start backward iteration at.
+       */
+      public NodeGoal(Goal goal) {
+         this(goal.node(), ImmutableSLList.<Goal>nil().prepend(goal));
+      }
+
+      /**
+       * A reached child node during backward iteration.
+       * @param currentNode The current {@link Node}.
+       * @param startingGoals The {@link Goal}s at which backward iteration has started.
+       */
+      public NodeGoal(Node currentNode, ImmutableList<Goal> startingGoals) {
+         this.currentNode = currentNode;
+         this.startingGoals = startingGoals;
+      }
+
+      /**
+       * Returns the current {@link Node}.
+       * @return The current {@link Node}.
+       */
+      public Node getCurrentNode() {
+         return currentNode;
+      }
+      
+      /**
+       * Returns the parent of {@link #getCurrentNode()}.
+       * @return The parent of {@link #getCurrentNode()}.
+       */
+      public Node getParent() {
+         return currentNode.parent();
+      }
+
+      /**
+       * Returns the serial number of {@link #getCurrentNode()}.
+       * @return The serial number of {@link #getCurrentNode()}.
+       */
+      public int getSerialNr() {
+         return currentNode.serialNr();
+      }
+
+      /**
+       * Returns the {@link Goal}s at which backward iteration has started.
+       * @return The {@link Goal}s at which backward iteration has started.
+       */
+      public ImmutableList<Goal> getStartingGoals() {
+         return startingGoals;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String toString() {
+         StringBuffer sb = new StringBuffer();
+         sb.append(currentNode.serialNr());
+         sb.append(" starting from goals ");
+         boolean afterFirst = false;
+         for (Goal goal : startingGoals) {
+            if (afterFirst) {
+               sb.append(", ");
+            }
+            else {
+               afterFirst = true;
+            }
+            sb.append(goal.node().serialNr());
+         }
+         return sb.toString();
+      }
+   }
+   
+   /**
+    * Computes the branch condition if not already present in the cache
+    * and stores it in the cache. If the condition is already present in the 
+    * cache it is returned from it.
+    * @param node The {@link Node} to compute its branch condition.
+    * @param branchConditionCache The cache of already computed branch conditions.
+    * @return The computed branch condition.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected Term computeBranchCondition(Node node, 
+                                         Map<Node, Term> branchConditionCache) throws ProofInputException {
+      Term result = branchConditionCache.get(node);
+      if (result == null) {
+         result = SymbolicExecutionUtil.computeBranchCondition(node, true);
+         branchConditionCache.put(node, result);
+      }
+      return result;
    }
    
    /**
@@ -919,9 +1239,9 @@ public abstract class AbstractUpdateExtractor {
       private final ProgramVariable programVariable;
 
       /**
-       * The array index or {@code -1} if a {@link ProgramVariable} is used instead.
+       * The array index or {@code null} if a {@link ProgramVariable} is used instead.
        */
-      private final int arrayIndex;
+      private final Term arrayIndex;
       
       /**
        * An optional parent object or {@code null} if it is a value/association of the state.
@@ -942,6 +1262,11 @@ public abstract class AbstractUpdateExtractor {
        * An optional condition under which the value is valid.
        */
       private final Term condition;
+      
+      /**
+       * The {@link Node} on which this result is based on.
+       */
+      private final Node goalNode;
 
       /**
        * Constructor.
@@ -955,15 +1280,17 @@ public abstract class AbstractUpdateExtractor {
                                         Term parent, 
                                         Term value, 
                                         Term condition,
-                                        boolean stateMember) {
+                                        boolean stateMember,
+                                        Node goalNode) {
          assert programVariable != null;
          assert value != null;
          this.programVariable = programVariable;
          this.parent = parent;
          this.value = value;
          this.condition = condition;
-         this.arrayIndex = -1;
+         this.arrayIndex = null;
          this.stateMember = stateMember;
+         this.goalNode = goalNode;
       }
 
       /**
@@ -974,11 +1301,12 @@ public abstract class AbstractUpdateExtractor {
        * @param condition An optional condition under which the value is valid.
        * @param stateMember Defines if this location should explicitly be shown on the state.
        */
-      public ExecutionVariableValuePair(int arrayIndex, 
+      public ExecutionVariableValuePair(Term arrayIndex, 
                                         Term parent, 
                                         Term value, 
                                         Term condition,
-                                        boolean stateMember) {
+                                        boolean stateMember,
+                                        Node goalNode) {
          assert parent != null;
          assert value != null;
          this.programVariable = null;
@@ -987,6 +1315,7 @@ public abstract class AbstractUpdateExtractor {
          this.value = value;
          this.condition = condition;
          this.stateMember = stateMember;
+         this.goalNode = goalNode;
       }
 
       /**
@@ -1018,14 +1347,14 @@ public abstract class AbstractUpdateExtractor {
        * @return {@code true} is array index, {@code false} is {@link ProgramVariable}. 
        */
       public boolean isArrayIndex() {
-         return arrayIndex >= 0;
+         return arrayIndex != null;
       }
 
       /**
        * Returns the array index.
        * @return The array index.
        */
-      public int getArrayIndex() {
+      public Term getArrayIndex() {
          return arrayIndex;
       }
 
@@ -1046,16 +1375,25 @@ public abstract class AbstractUpdateExtractor {
       }
 
       /**
+       * Returns the {@link Node} on which this result is based on.
+       * @return The {@link Node} on which this result is based on.
+       */
+      public Node getGoalNode() {
+         return goalNode;
+      }
+
+      /**
        * {@inheritDoc}
        */
       @Override
       public boolean equals(Object obj) {
          if (obj instanceof ExecutionVariableValuePair) {
             ExecutionVariableValuePair other = (ExecutionVariableValuePair)obj;
-            return isArrayIndex() ? getArrayIndex() == other.getArrayIndex() : getProgramVariable().equals(other.getProgramVariable()) &&
+            return isArrayIndex() ? getArrayIndex().equals(other.getArrayIndex()) : getProgramVariable().equals(other.getProgramVariable()) &&
                    getParent() != null ? getParent().equals(other.getParent()) : other.getParent() == null &&
                    getCondition() != null ? getCondition().equals(other.getCondition()) : other.getCondition() == null &&
-                   getValue().equals(other.getValue());
+                   getValue().equals(other.getValue()) &&
+                   getGoalNode().equals(other.getGoalNode());
          }
          else {
             return false;
@@ -1068,10 +1406,11 @@ public abstract class AbstractUpdateExtractor {
       @Override
       public int hashCode() {
          int result = 17;
-         result = 31 * result + (isArrayIndex() ? getArrayIndex() : getProgramVariable().hashCode());
+         result = 31 * result + (isArrayIndex() ? getArrayIndex().hashCode() : getProgramVariable().hashCode());
          result = 31 * result + (getParent() != null ? getParent().hashCode() : 0);
          result = 31 * result + (getCondition() != null ? getCondition().hashCode() : 0);
          result = 31 * result + getValue().hashCode();
+         result = 31 * result + getGoalNode().hashCode();
          return result;
       }
 
@@ -1083,12 +1422,14 @@ public abstract class AbstractUpdateExtractor {
          if (isArrayIndex()) {
             return "[" + getArrayIndex() + "]" +
                    (getParent() != null ? " of " + getParent() : "") +
-                   " is " + getValue() + (getCondition() != null ? " under condition " + getCondition() : "");
+                   " is " + getValue() + (getCondition() != null ? " under condition " + getCondition() : "") +
+                   " at goal " + goalNode.serialNr();
          }
          else {
             return getProgramVariable() +
                    (getParent() != null ? " of " + getParent() : "") +
-                   " is " + getValue() + (getCondition() != null ? " under condition " + getCondition() : "");
+                   " is " + getValue() + (getCondition() != null ? " under condition " + getCondition() : "") +
+                   " at goal " + goalNode.serialNr();
          }
       }
    }

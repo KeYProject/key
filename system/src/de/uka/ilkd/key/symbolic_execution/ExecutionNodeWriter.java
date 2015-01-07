@@ -109,7 +109,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String ATTRIBUTE_BRANCH_VERIFIED = "branchVerified";
 
    /**
-    * Attribute name to store {@link IExecutionVariable#getArrayIndex()}.
+    * Attribute name to store {@link IExecutionVariable#getArrayIndexString()}.
     */
    public static final String ATTRIBUTE_ARRAY_INDEX = "arrayIndex";
 
@@ -1015,7 +1015,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
    protected void appendVariable(int level, IExecutionVariable variable, boolean saveConstraints, String tagName, StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, variable.getName());
-      attributeValues.put(ATTRIBUTE_ARRAY_INDEX, variable.getArrayIndex() + "");
+      attributeValues.put(ATTRIBUTE_ARRAY_INDEX, variable.getArrayIndexString());
       attributeValues.put(ATTRIBUTE_IS_ARRAY_INDEX, variable.isArrayIndex() + "");
       appendStartTag(level, tagName, attributeValues, sb);
       appendValues(level + 1, variable, saveConstraints, sb);

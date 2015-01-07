@@ -66,6 +66,12 @@
             id="org.key_project.keyide.ui.commands.applyrule"
             name="Apply Rule">
       </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Generate test cases for open goals"
+            id="org.key_project.keyide.ui.commands.generateTestCases"
+            name="Generate test cases">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
@@ -84,6 +90,10 @@
       <image
             commandId="org.key_project.keyide.ui.commands.applyrule"
             icon="icons/interactiveAppLogo16.png">
+      </image>
+      <image
+            commandId="org.key_project.keyide.ui.commands.generateTestCases"
+            icon="icons/testGeneration.png">
       </image>
    </extension>
    <extension
@@ -171,6 +181,22 @@
             class="org.key_project.keyide.ui.handlers.BreakpointToggleHandler"
             commandId="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand">
       </handler>
+      <handler
+            class="org.key_project.keyide.ui.handlers.GenerateTestCasesHandler"
+            commandId="org.key_project.keyide.ui.commands.generateTestCases">
+         <enabledWhen>
+            <with
+                  variable="activeEditor">
+               <and>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.isNotAutoMode"
+                        value="true">
+                  </test>
+               </and>
+            </with>
+         </enabledWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -218,6 +244,22 @@
                        id="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand"
                        label="Stop at Breakpoints"
                        style="toggle">
+                    <visibleWhen
+                          checkEnabled="false">
+                       <with
+                             variable="activeEditorId">
+                          <equals
+                                value="org.key_project.keyide.ui.editor">
+                          </equals>
+                       </with>
+                    </visibleWhen>
+                 </command>
+                 <command
+                       commandId="org.key_project.keyide.ui.commands.generateTestCases"
+                       icon="icons/testGeneration.png"
+                       id="org.key_project.keyide.ui.commands.generateTestCasesCommand"
+                       label="Generate test cases"
+                       tooltip="Generate test cases for open goals">
                     <visibleWhen
                           checkEnabled="false">
                        <with

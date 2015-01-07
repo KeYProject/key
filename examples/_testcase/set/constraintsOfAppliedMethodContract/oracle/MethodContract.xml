@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+   <variable name="heapAtPre" isArrayIndex="false">
       <value name="heapAtPre {true}" typeString="Heap" valueString="heapAtPre" isValueAnObject="false" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
@@ -9,7 +9,7 @@
       <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
       <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
       <constraint name="not(equals(self,null))"/>
-      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+      <variable name="exc" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
@@ -18,30 +18,30 @@
          <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
          <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
          <constraint name="not(equals(self,null))"/>
-         <variable name="self" arrayIndex="-1" isArrayIndex="false">
+         <variable name="self" isArrayIndex="false">
             <value name="self {true}" typeString="MethodContract" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                <constraint name="not(equals(self,null))"/>
-               <variable name="h1" arrayIndex="-1" isArrayIndex="false">
+               <variable name="h1" isArrayIndex="false">
                   <value name="h1 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <variable name="h2" arrayIndex="-1" isArrayIndex="false">
+               <variable name="h2" isArrayIndex="false">
                   <value name="h2 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <variable name="l" arrayIndex="-1" isArrayIndex="false">
+               <variable name="l" isArrayIndex="false">
                   <value name="l {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$l)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
             </value>
          </variable>
-         <variable name="m" arrayIndex="-1" isArrayIndex="false">
+         <variable name="m" isArrayIndex="false">
             <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+         <variable name="exc" isArrayIndex="false">
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
@@ -51,35 +51,35 @@
             <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
             <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
             <constraint name="not(equals(self,null))"/>
-            <variable name="self" arrayIndex="-1" isArrayIndex="false">
+            <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="MethodContract" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                   <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                   <constraint name="not(equals(self,null))"/>
-                  <variable name="h1" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="h1" isArrayIndex="false">
                      <value name="h1 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="h2" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="h2" isArrayIndex="false">
                      <value name="h2 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="l" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="l" isArrayIndex="false">
                      <value name="l {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$l)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
             </variable>
-            <variable name="m" arrayIndex="-1" isArrayIndex="false">
+            <variable name="m" isArrayIndex="false">
                <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   <constraint name="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(gt(m,Z(0(1(#)))),TRUE,FALSE))),equals(x,TRUE))"/>
                </value>
             </variable>
-            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+            <variable name="exc" isArrayIndex="false">
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="x" arrayIndex="-1" isArrayIndex="false">
+            <variable name="x" isArrayIndex="false">
                <value name="x {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
@@ -89,31 +89,31 @@
                <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                <constraint name="not(equals(self,null))"/>
-               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+               <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="MethodContract" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                      <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                      <constraint name="not(equals(self,null))"/>
-                     <variable name="h1" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="h1" isArrayIndex="false">
                         <value name="h1 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="h2" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="h2" isArrayIndex="false">
                         <value name="h2 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="l" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="l" isArrayIndex="false">
                         <value name="l {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$l)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
-               <variable name="m" arrayIndex="-1" isArrayIndex="false">
+               <variable name="m" isArrayIndex="false">
                   <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      <constraint name="geq(m,Z(1(1(#))))"/>
                   </value>
                </variable>
-               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <variable name="exc" isArrayIndex="false">
                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
@@ -131,39 +131,39 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                   <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                   <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                   <constraint name="not(equals(self,null))"/>
-                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="MethodContract" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                         <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                         <constraint name="not(equals(self,null))"/>
-                        <variable name="h1" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="h1" isArrayIndex="false">
                            <value name="h1 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="h2" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="h2" isArrayIndex="false">
                            <value name="h2 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="l" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="l" isArrayIndex="false">
                            <value name="l {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$l)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </variable>
-                  <variable name="m" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="m" isArrayIndex="false">
                      <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         <constraint name="geq(m,Z(1(1(#))))"/>
                      </value>
                   </variable>
-                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="exc" isArrayIndex="false">
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="var" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="var" isArrayIndex="false">
                      <value name="var {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="var_1" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="var_1" isArrayIndex="false">
                      <value name="var_1 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
@@ -175,50 +175,50 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                      <constraint name="wellFormed(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;)"/>
                      <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(var)(int::select(heap,self,MethodContract::$h1))),elem-update(var_1)(int::select(heap,self,MethodContract::$h2))),update-application(elem-update(heapBefore_mod)(heap),and(equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod),update-application(elem-update(heap)(heapAfter_mod),and(and(equals(exc_0,null),inInt(result)),and(and(exists{k:int}(and(inInt(k),equals(javaAddInt(javaMulInt(var_1,k),result),var))),java.lang.Object::&lt;inv&gt;(heap,self)),equals(exc_0,null)))))))"/>
                      <constraint name="not(equals(self,null))"/>
-                     <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="self" isArrayIndex="false">
                         <value name="self {true}" typeString="MethodContract" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                            <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                            <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(var)(int::select(heap,self,MethodContract::$h1))),elem-update(var_1)(int::select(heap,self,MethodContract::$h2))),update-application(elem-update(heapBefore_mod)(heap),and(equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod),update-application(elem-update(heap)(heapAfter_mod),and(and(equals(exc_0,null),inInt(result)),and(and(exists{k:int}(and(inInt(k),equals(javaAddInt(javaMulInt(var_1,k),result),var))),java.lang.Object::&lt;inv&gt;(heap,self)),equals(exc_0,null)))))))"/>
                            <constraint name="not(equals(self,null))"/>
-                           <variable name="h1" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="h1" isArrayIndex="false">
                               <value name="h1 {true}" typeString="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <variable name="h2" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="h2" isArrayIndex="false">
                               <value name="h2 {true}" typeString="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <variable name="l" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="l" isArrayIndex="false">
                               <value name="l {true}" typeString="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$l)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
                      </variable>
-                     <variable name="m" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="m" isArrayIndex="false">
                         <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            <constraint name="geq(m,Z(1(1(#))))"/>
                         </value>
                      </variable>
-                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="exc" isArrayIndex="false">
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="var" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="var" isArrayIndex="false">
                         <value name="var {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(var)(int::select(heap,self,MethodContract::$h1))),elem-update(var_1)(int::select(heap,self,MethodContract::$h2))),update-application(elem-update(heapBefore_mod)(heap),and(equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod),update-application(elem-update(heap)(heapAfter_mod),and(and(equals(exc_0,null),inInt(result)),and(and(exists{k:int}(and(inInt(k),equals(javaAddInt(javaMulInt(var_1,k),result),var))),java.lang.Object::&lt;inv&gt;(heap,self)),equals(exc_0,null)))))))"/>
                         </value>
                      </variable>
-                     <variable name="var_1" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="var_1" isArrayIndex="false">
                         <value name="var_1 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(var)(int::select(heap,self,MethodContract::$h1))),elem-update(var_1)(int::select(heap,self,MethodContract::$h2))),update-application(elem-update(heapBefore_mod)(heap),and(equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod),update-application(elem-update(heap)(heapAfter_mod),and(and(equals(exc_0,null),inInt(result)),and(and(exists{k:int}(and(inInt(k),equals(javaAddInt(javaMulInt(var_1,k),result),var))),java.lang.Object::&lt;inv&gt;(heap,self)),equals(exc_0,null)))))))"/>
                         </value>
                      </variable>
-                     <variable name="heapBefore_mod" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="heapBefore_mod" isArrayIndex="false">
                         <value name="heapBefore_mod {true}" typeString="Heap" valueString="heapBefore_mod" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="heap" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="heap" isArrayIndex="false">
                         <value name="heap {true}" typeString="Heap" valueString="heapAfter_mod" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
@@ -232,33 +232,33 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                         <constraint name="equals(exc_0,null)"/>
                         <constraint name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
                         <constraint name="not(equals(self,null))"/>
-                        <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="self" isArrayIndex="false">
                            <value name="self {true}" typeString="MethodContract" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                               <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                               <constraint name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
                               <constraint name="not(equals(self,null))"/>
-                              <variable name="h1" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="h1" isArrayIndex="false">
                                  <value name="h1 {true}" typeString="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <variable name="h2" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="h2" isArrayIndex="false">
                                  <value name="h2 {true}" typeString="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <variable name="l" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="l" isArrayIndex="false">
                                  <value name="l {true}" typeString="int" valueString="result" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     <constraint name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
                                  </value>
                               </variable>
                            </value>
                         </variable>
-                        <variable name="m" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="m" isArrayIndex="false">
                            <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               <constraint name="geq(m,Z(1(1(#))))"/>
                            </value>
                         </variable>
-                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="exc" isArrayIndex="false">
                            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
@@ -272,43 +272,43 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                            <constraint name="equals(exc_0,null)"/>
                            <constraint name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
                            <constraint name="not(equals(self,null))"/>
-                           <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="exc" isArrayIndex="false">
                               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </termination>
-                        <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                        <callStateVariable name="self" isArrayIndex="false">
                            <value name="self {true}" typeString="MethodContract" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                               <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                               <constraint name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
                               <constraint name="not(equals(self,null))"/>
-                              <variable name="h1" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="h1" isArrayIndex="false">
                                  <value name="h1 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     <constraint name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
                                  </value>
                               </variable>
-                              <variable name="h2" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="h2" isArrayIndex="false">
                                  <value name="h2 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     <constraint name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
                                  </value>
                               </variable>
-                              <variable name="l" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="l" isArrayIndex="false">
                                  <value name="l {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$l)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
                         </callStateVariable>
-                        <callStateVariable name="m" arrayIndex="-1" isArrayIndex="false">
+                        <callStateVariable name="m" isArrayIndex="false">
                            <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               <constraint name="geq(m,Z(1(1(#))))"/>
                            </value>
                         </callStateVariable>
-                        <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <callStateVariable name="exc" isArrayIndex="false">
                            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </callStateVariable>
-                        <callStateVariable name="heapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                        <callStateVariable name="heapBefore_magic" isArrayIndex="false">
                            <value name="heapBefore_magic {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               <constraint name="wellFormed(heap)"/>
                               <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
@@ -316,7 +316,7 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                               <constraint name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
                            </value>
                         </callStateVariable>
-                        <callStateVariable name="savedHeapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                        <callStateVariable name="savedHeapBefore_magic" isArrayIndex="false">
                            <value name="savedHeapBefore_magic {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </callStateVariable>
@@ -332,35 +332,35 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
             <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
             <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
             <constraint name="not(equals(self,null))"/>
-            <variable name="self" arrayIndex="-1" isArrayIndex="false">
+            <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="MethodContract" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                   <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                   <constraint name="not(equals(self,null))"/>
-                  <variable name="h1" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="h1" isArrayIndex="false">
                      <value name="h1 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="h2" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="h2" isArrayIndex="false">
                      <value name="h2 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="l" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="l" isArrayIndex="false">
                      <value name="l {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$l)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
             </variable>
-            <variable name="m" arrayIndex="-1" isArrayIndex="false">
+            <variable name="m" isArrayIndex="false">
                <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   <constraint name="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(gt(m,Z(0(1(#)))),TRUE,FALSE))),equals(x,FALSE))"/>
                </value>
             </variable>
-            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+            <variable name="exc" isArrayIndex="false">
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="x" arrayIndex="-1" isArrayIndex="false">
+            <variable name="x" isArrayIndex="false">
                <value name="x {true}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
@@ -370,31 +370,31 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                <constraint name="not(equals(self,null))"/>
-               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+               <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="MethodContract" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                      <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                      <constraint name="not(equals(self,null))"/>
-                     <variable name="h1" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="h1" isArrayIndex="false">
                         <value name="h1 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="h2" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="h2" isArrayIndex="false">
                         <value name="h2 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="l" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="l" isArrayIndex="false">
                         <value name="l {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$l)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
-               <variable name="m" arrayIndex="-1" isArrayIndex="false">
+               <variable name="m" isArrayIndex="false">
                   <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      <constraint name="leq(m,Z(0(1(#))))"/>
                   </value>
                </variable>
-               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <variable name="exc" isArrayIndex="false">
                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
@@ -404,31 +404,31 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                   <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                   <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                   <constraint name="not(equals(self,null))"/>
-                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="MethodContract" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                         <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                         <constraint name="not(equals(self,null))"/>
-                        <variable name="h1" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="h1" isArrayIndex="false">
                            <value name="h1 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="h2" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="h2" isArrayIndex="false">
                            <value name="h2 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="l" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="l" isArrayIndex="false">
                            <value name="l {true}" typeString="int" valueString="Z(6(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </variable>
-                  <variable name="m" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="m" isArrayIndex="false">
                      <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         <constraint name="leq(m,Z(0(1(#))))"/>
                      </value>
                   </variable>
-                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="exc" isArrayIndex="false">
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
@@ -438,46 +438,46 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                      <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                      <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                      <constraint name="not(equals(self,null))"/>
-                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="exc" isArrayIndex="false">
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </termination>
-                  <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="MethodContract" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                         <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                         <constraint name="not(equals(self,null))"/>
-                        <variable name="h1" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="h1" isArrayIndex="false">
                            <value name="h1 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="h2" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="h2" isArrayIndex="false">
                            <value name="h2 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="l" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="l" isArrayIndex="false">
                            <value name="l {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$l)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </callStateVariable>
-                  <callStateVariable name="m" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="m" isArrayIndex="false">
                      <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         <constraint name="leq(m,Z(0(1(#))))"/>
                      </value>
                   </callStateVariable>
-                  <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="exc" isArrayIndex="false">
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </callStateVariable>
-                  <callStateVariable name="heapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="heapBefore_magic" isArrayIndex="false">
                      <value name="heapBefore_magic {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         <constraint name="wellFormed(heap)"/>
                         <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                      </value>
                   </callStateVariable>
-                  <callStateVariable name="savedHeapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="savedHeapBefore_magic" isArrayIndex="false">
                      <value name="savedHeapBefore_magic {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </callStateVariable>

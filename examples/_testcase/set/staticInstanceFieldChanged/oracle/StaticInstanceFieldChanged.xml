@@ -1,162 +1,162 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+   <variable name="heapAtPre" isArrayIndex="false">
       <value name="heapAtPre {true}" typeString="Heap" valueString="heapAtPre" isValueAnObject="false" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
    <methodCall name="&lt;call self.magic()&gt;" pathCondition="true" pathConditionChanged="false">
-      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+      <variable name="exc" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
       <statement name="nextInstance.dvalue=new DirectValue ();" pathCondition="true" pathConditionChanged="false">
-         <variable name="self" arrayIndex="-1" isArrayIndex="false">
+         <variable name="self" isArrayIndex="false">
             <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+         <variable name="exc" isArrayIndex="false">
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
          <branchCondition name="equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)" pathCondition="equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)" pathConditionChanged="true" branchCondition="equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <variable name="self" arrayIndex="-1" isArrayIndex="false">
+            <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+            <variable name="exc" isArrayIndex="false">
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="n" arrayIndex="-1" isArrayIndex="false">
+            <variable name="n" isArrayIndex="false">
                <value name="n {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="x" arrayIndex="-1" isArrayIndex="false">
+            <variable name="x" isArrayIndex="false">
                <value name="x {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call self.magic()&gt;&gt;" pathCondition="equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)" pathConditionChanged="false" methodReturnCondition="equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)">
-               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+               <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <variable name="exc" isArrayIndex="false">
                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <variable name="n" arrayIndex="-1" isArrayIndex="false">
+               <variable name="n" isArrayIndex="false">
                   <value name="n {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <variable name="n_2" arrayIndex="-1" isArrayIndex="false">
+               <variable name="n_2" isArrayIndex="false">
                   <value name="n_2 {true}" typeString="java.lang.NullPointerException" valueString="n_5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="exc" isArrayIndex="false">
                      <value name="exc {true}" typeString="java.lang.NullPointerException" valueString="n_5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </termination>
-               <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+               <callStateVariable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   </value>
                </callStateVariable>
-               <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <callStateVariable name="exc" isArrayIndex="false">
                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </callStateVariable>
-               <callStateVariable name="heapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+               <callStateVariable name="heapBefore_magic" isArrayIndex="false">
                   <value name="heapBefore_magic {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </callStateVariable>
-               <callStateVariable name="savedHeapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+               <callStateVariable name="savedHeapBefore_magic" isArrayIndex="false">
                   <value name="savedHeapBefore_magic {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </callStateVariable>
             </exceptionalMethodReturn>
          </branchCondition>
          <branchCondition name="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" pathCondition="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" pathConditionChanged="true" branchCondition="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <variable name="self" arrayIndex="-1" isArrayIndex="false">
+            <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+            <variable name="exc" isArrayIndex="false">
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="n" arrayIndex="-1" isArrayIndex="false">
+            <variable name="n" isArrayIndex="false">
                <value name="n {true}" typeString="StaticInstanceFieldChanged.NextValue" valueString="StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                  <variable name="dvalue" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="dvalue" isArrayIndex="false">
                      <value name="dvalue {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                      </value>
                   </variable>
                </value>
             </variable>
-            <variable name="x" arrayIndex="-1" isArrayIndex="false">
+            <variable name="x" isArrayIndex="false">
                <value name="x {true}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <methodCall name="&lt;call DirectValue()&gt;" pathCondition="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" pathConditionChanged="false">
-               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+               <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <variable name="exc" isArrayIndex="false">
                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <variable name="n_1" arrayIndex="-1" isArrayIndex="false">
+               <variable name="n_1" isArrayIndex="false">
                   <value name="n_1 {true}" typeString="StaticInstanceFieldChanged.NextValue" valueString="StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                     <variable name="dvalue" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="dvalue" isArrayIndex="false">
                         <value name="dvalue {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
-               <variable name="d_1" arrayIndex="-1" isArrayIndex="false">
+               <variable name="d_1" isArrayIndex="false">
                   <value name="d_1 {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="d_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                     <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="value" isArrayIndex="false">
                         <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
                <methodReturn name="&lt;return of DirectValue&gt;" signature="&lt;return of DirectValue()&gt;" pathCondition="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of DirectValue&gt;" signatureIncludingReturnValue="&lt;return of DirectValue()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
-                  <variable name="d_1" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="d_1" isArrayIndex="false">
                      <value name="d_1 {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="d_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="value" isArrayIndex="false">
                            <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </variable>
-                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="exc" isArrayIndex="false">
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="n_1" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="n_1" isArrayIndex="false">
                      <value name="n_1 {true}" typeString="StaticInstanceFieldChanged.NextValue" valueString="StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                        <variable name="dvalue" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="dvalue" isArrayIndex="false">
                            <value name="dvalue {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </variable>
                   <statement name="nextInstance.dvalue.value=24;" pathCondition="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" pathConditionChanged="false">
-                     <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="self" isArrayIndex="false">
                         <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="exc" isArrayIndex="false">
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="StaticInstanceFieldChanged::nextInstance" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="StaticInstanceFieldChanged::nextInstance" isArrayIndex="false">
                         <value name="StaticInstanceFieldChanged::nextInstance {true}" typeString="StaticInstanceFieldChanged.NextValue" valueString="StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                           <variable name="dvalue" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="dvalue" isArrayIndex="false">
                               <value name="dvalue {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="d_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                 <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="value" isArrayIndex="false">
                                     <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
@@ -165,19 +165,19 @@
                         </value>
                      </variable>
                      <statement name="instance.value=42;" pathCondition="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" pathConditionChanged="false">
-                        <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="self" isArrayIndex="false">
                            <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="exc" isArrayIndex="false">
                            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="StaticInstanceFieldChanged::nextInstance" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="StaticInstanceFieldChanged::nextInstance" isArrayIndex="false">
                            <value name="StaticInstanceFieldChanged::nextInstance {true}" typeString="StaticInstanceFieldChanged.NextValue" valueString="StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                              <variable name="dvalue" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="dvalue" isArrayIndex="false">
                                  <value name="dvalue {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="d_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                    <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                    <variable name="value" isArrayIndex="false">
                                        <value name="value {true}" typeString="int" valueString="Z(4(2(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
@@ -186,19 +186,19 @@
                            </value>
                         </variable>
                         <branchCondition name="not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null))" pathCondition="and(not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null)),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))" pathConditionChanged="true" branchCondition="not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                           <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="self" isArrayIndex="false">
                               <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="exc" isArrayIndex="false">
                               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <variable name="StaticInstanceFieldChanged::nextInstance" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="StaticInstanceFieldChanged::nextInstance" isArrayIndex="false">
                               <value name="StaticInstanceFieldChanged::nextInstance {true}" typeString="StaticInstanceFieldChanged.NextValue" valueString="StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                 <variable name="dvalue" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="dvalue" isArrayIndex="false">
                                     <value name="dvalue {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="d_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                       <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                       <variable name="value" isArrayIndex="false">
                                           <value name="value {not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),d_3))}" typeString="int" valueString="Z(4(2(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),d_3))">
                                           </value>
                                        </variable>
@@ -206,36 +206,36 @@
                                  </variable>
                               </value>
                            </variable>
-                           <variable name="d_5" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="d_5" isArrayIndex="false">
                               <value name="d_5 {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                 <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="value" isArrayIndex="false">
                                     <value name="value {true}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
                            </variable>
                            <statement name="return instance.value+nextInstance.dvalue.value;" pathCondition="and(not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null)),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))" pathConditionChanged="false">
-                              <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="self" isArrayIndex="false">
                                  <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="exc" isArrayIndex="false">
                                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <variable name="StaticInstanceFieldChanged::instance" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="StaticInstanceFieldChanged::instance" isArrayIndex="false">
                                  <value name="StaticInstanceFieldChanged::instance {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                    <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                    <variable name="value" isArrayIndex="false">
                                        <value name="value {true}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                  </value>
                               </variable>
-                              <variable name="StaticInstanceFieldChanged::nextInstance" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="StaticInstanceFieldChanged::nextInstance" isArrayIndex="false">
                                  <value name="StaticInstanceFieldChanged::nextInstance {true}" typeString="StaticInstanceFieldChanged.NextValue" valueString="StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                    <variable name="dvalue" arrayIndex="-1" isArrayIndex="false">
+                                    <variable name="dvalue" isArrayIndex="false">
                                        <value name="dvalue {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="d_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                          <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                          <variable name="value" isArrayIndex="false">
                                              <value name="value {not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),d_3))}" typeString="int" valueString="Z(4(2(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),d_3))">
                                              </value>
                                           </variable>
@@ -246,27 +246,27 @@
                               <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of self.magic()&gt;" pathCondition="and(not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null)),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(6(6(#))) as result of magic&gt;" signatureIncludingReturnValue="&lt;return Z(6(6(#))) as result of self.magic()&gt;" isReturnValueComputed="true" methodReturnCondition="and(not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null)),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))">
                                  <methodReturnValue name="Z(6(6(#)))" returnValueString="Z(6(6(#)))" hasCondition="false">
                                  </methodReturnValue>
-                                 <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="self" isArrayIndex="false">
                                     <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
-                                 <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="exc" isArrayIndex="false">
                                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
-                                 <variable name="StaticInstanceFieldChanged::instance" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="StaticInstanceFieldChanged::instance" isArrayIndex="false">
                                     <value name="StaticInstanceFieldChanged::instance {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                       <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                       <variable name="value" isArrayIndex="false">
                                           <value name="value {true}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                     </value>
                                  </variable>
-                                 <variable name="StaticInstanceFieldChanged::nextInstance" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="StaticInstanceFieldChanged::nextInstance" isArrayIndex="false">
                                     <value name="StaticInstanceFieldChanged::nextInstance {true}" typeString="StaticInstanceFieldChanged.NextValue" valueString="StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                       <variable name="dvalue" arrayIndex="-1" isArrayIndex="false">
+                                       <variable name="dvalue" isArrayIndex="false">
                                           <value name="dvalue {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="d_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                             <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                             <variable name="value" isArrayIndex="false">
                                                 <value name="value {not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),d_3))}" typeString="int" valueString="Z(4(2(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),d_3))">
                                                 </value>
                                              </variable>
@@ -275,23 +275,23 @@
                                     </value>
                                  </variable>
                                  <termination name="&lt;end&gt;" pathCondition="and(not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null)),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
-                                    <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                    <variable name="exc" isArrayIndex="false">
                                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
-                                    <variable name="StaticInstanceFieldChanged::instance" arrayIndex="-1" isArrayIndex="false">
+                                    <variable name="StaticInstanceFieldChanged::instance" isArrayIndex="false">
                                        <value name="StaticInstanceFieldChanged::instance {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                          <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                          <variable name="value" isArrayIndex="false">
                                              <value name="value {true}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                              </value>
                                           </variable>
                                        </value>
                                     </variable>
-                                    <variable name="StaticInstanceFieldChanged::nextInstance" arrayIndex="-1" isArrayIndex="false">
+                                    <variable name="StaticInstanceFieldChanged::nextInstance" isArrayIndex="false">
                                        <value name="StaticInstanceFieldChanged::nextInstance {true}" typeString="StaticInstanceFieldChanged.NextValue" valueString="StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                          <variable name="dvalue" arrayIndex="-1" isArrayIndex="false">
+                                          <variable name="dvalue" isArrayIndex="false">
                                              <value name="dvalue {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="d_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                                <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                <variable name="value" isArrayIndex="false">
                                                    <value name="value {not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),d_3))}" typeString="int" valueString="Z(4(2(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),d_3))">
                                                    </value>
                                                 </variable>
@@ -300,19 +300,19 @@
                                        </value>
                                     </variable>
                                  </termination>
-                                 <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                                 <callStateVariable name="self" isArrayIndex="false">
                                     <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </callStateVariable>
-                                 <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                 <callStateVariable name="exc" isArrayIndex="false">
                                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </callStateVariable>
-                                 <callStateVariable name="heapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                                 <callStateVariable name="heapBefore_magic" isArrayIndex="false">
                                     <value name="heapBefore_magic {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </callStateVariable>
-                                 <callStateVariable name="savedHeapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                                 <callStateVariable name="savedHeapBefore_magic" isArrayIndex="false">
                                     <value name="savedHeapBefore_magic {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </callStateVariable>
@@ -320,19 +320,19 @@
                            </statement>
                         </branchCondition>
                         <branchCondition name="equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null)" pathCondition="and(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))" pathConditionChanged="true" branchCondition="equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-                           <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="self" isArrayIndex="false">
                               <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="exc" isArrayIndex="false">
                               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <variable name="StaticInstanceFieldChanged::nextInstance" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="StaticInstanceFieldChanged::nextInstance" isArrayIndex="false">
                               <value name="StaticInstanceFieldChanged::nextInstance {true}" typeString="StaticInstanceFieldChanged.NextValue" valueString="StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                 <variable name="dvalue" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="dvalue" isArrayIndex="false">
                                     <value name="dvalue {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="d_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                       <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                       <variable name="value" isArrayIndex="false">
                                           <value name="value {true}" typeString="int" valueString="Z(4(2(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
@@ -340,24 +340,24 @@
                                  </variable>
                               </value>
                            </variable>
-                           <variable name="d_5" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="d_5" isArrayIndex="false">
                               <value name="d_5 {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call self.magic()&gt;&gt;" pathCondition="and(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))" pathConditionChanged="false" methodReturnCondition="and(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))">
-                              <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="self" isArrayIndex="false">
                                  <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="exc" isArrayIndex="false">
                                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <variable name="StaticInstanceFieldChanged::nextInstance" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="StaticInstanceFieldChanged::nextInstance" isArrayIndex="false">
                                  <value name="StaticInstanceFieldChanged::nextInstance {true}" typeString="StaticInstanceFieldChanged.NextValue" valueString="StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                    <variable name="dvalue" arrayIndex="-1" isArrayIndex="false">
+                                    <variable name="dvalue" isArrayIndex="false">
                                        <value name="dvalue {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="d_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                          <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                          <variable name="value" isArrayIndex="false">
                                              <value name="value {true}" typeString="int" valueString="Z(4(2(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                              </value>
                                           </variable>
@@ -365,16 +365,16 @@
                                     </variable>
                                  </value>
                               </variable>
-                              <variable name="n_7" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="n_7" isArrayIndex="false">
                                  <value name="n_7 {true}" typeString="java.lang.NullPointerException" valueString="n_10" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                                 <variable name="StaticInstanceFieldChanged::nextInstance" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="StaticInstanceFieldChanged::nextInstance" isArrayIndex="false">
                                     <value name="StaticInstanceFieldChanged::nextInstance {true}" typeString="StaticInstanceFieldChanged.NextValue" valueString="StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                       <variable name="dvalue" arrayIndex="-1" isArrayIndex="false">
+                                       <variable name="dvalue" isArrayIndex="false">
                                           <value name="dvalue {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="d_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                             <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                             <variable name="value" isArrayIndex="false">
                                                 <value name="value {true}" typeString="int" valueString="Z(4(2(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                 </value>
                                              </variable>
@@ -382,24 +382,24 @@
                                        </variable>
                                     </value>
                                  </variable>
-                                 <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="exc" isArrayIndex="false">
                                     <value name="exc {true}" typeString="java.lang.NullPointerException" valueString="n_10" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </termination>
-                              <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                              <callStateVariable name="self" isArrayIndex="false">
                                  <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  </value>
                               </callStateVariable>
-                              <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                              <callStateVariable name="exc" isArrayIndex="false">
                                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </callStateVariable>
-                              <callStateVariable name="heapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                              <callStateVariable name="heapBefore_magic" isArrayIndex="false">
                                  <value name="heapBefore_magic {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </callStateVariable>
-                              <callStateVariable name="savedHeapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                              <callStateVariable name="savedHeapBefore_magic" isArrayIndex="false">
                                  <value name="savedHeapBefore_magic {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </callStateVariable>
@@ -407,31 +407,31 @@
                         </branchCondition>
                      </statement>
                   </statement>
-                  <callStateVariable name="d_1" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="d_1" isArrayIndex="false">
                      <value name="d_1 {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="d_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="value" isArrayIndex="false">
                            <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </callStateVariable>
-                  <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="exc" isArrayIndex="false">
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </callStateVariable>
-                  <callStateVariable name="n_1" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="n_1" isArrayIndex="false">
                      <value name="n_1 {true}" typeString="StaticInstanceFieldChanged.NextValue" valueString="StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                        <variable name="dvalue" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="dvalue" isArrayIndex="false">
                            <value name="dvalue {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </callStateVariable>
-                  <callStateVariable name="heapBefore_&lt;init&gt;" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="heapBefore_&lt;init&gt;" isArrayIndex="false">
                      <value name="heapBefore_&lt;init&gt; {true}" typeString="Heap" valueString="store(store(create(heap,d_3),d_3,java.lang.Object::&lt;initialized&gt;,FALSE),d_3,StaticInstanceFieldChanged.DirectValue::$value,Z(0(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </callStateVariable>
-                  <callStateVariable name="savedHeapBefore_&lt;init&gt;" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="savedHeapBefore_&lt;init&gt;" isArrayIndex="false">
                      <value name="savedHeapBefore_&lt;init&gt; {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </callStateVariable>

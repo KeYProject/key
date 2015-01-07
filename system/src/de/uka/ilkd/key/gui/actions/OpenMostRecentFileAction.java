@@ -20,7 +20,6 @@ import java.io.File;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 
 /**
  * Loads the last opened file
@@ -48,7 +47,7 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
             if (recentFile != null) {
                 File file = new File(recentFile);
                 KeYFileChooser fileChooser =
-                        GuiUtilities.getFileChooser("Select file to load proof or problem");
+                        KeYFileChooser.getFileChooser("Select file to load proof or problem");
                 fileChooser.selectFile(file);
                 mainWindow.loadProblem(file);
             }
