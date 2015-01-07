@@ -9,6 +9,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -72,6 +73,12 @@ public class JMLColorPreferencePageTest {
       bot.sleep(100);
       this.navigateToJMLColorSettings();
       this.setCommentColorButton();
+   }
+
+   @AfterClass
+   public static void resetColor() {
+      JMLUiPreferencesHelper.setDefaultJMLColor(JMLUiPreferencesHelper
+            .getDefaultJMLColor());
    }
 
    /*
@@ -147,5 +154,7 @@ public class JMLColorPreferencePageTest {
       this.openGlobalJMLColorSettings();
       this.checkColor(JMLUiPreferencesHelper.getWorkspaceJMLColor());
       this.checkColor(testColor);
+
+      bot.button("OK").click();
    }
 }

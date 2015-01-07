@@ -40,6 +40,7 @@ public class ParseErrorMarkerTest {
 
    @Test
    public void checkErrorMarkers() {
+      // Make a change and wait to make eclipse compile and report errors
       openEditor.typeText(0, 0, " ");
       openEditor.save();
       bot.sleep(5000);
