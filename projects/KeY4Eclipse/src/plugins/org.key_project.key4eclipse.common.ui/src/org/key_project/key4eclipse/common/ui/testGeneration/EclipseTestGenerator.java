@@ -66,21 +66,29 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
    public static final String LOG_FILE_EXTENSION_WITH_DOT = ".txt";
 
    /**
-    * The {@link IFile} which provides the proof file to generate test cases for.
+    * The {@link IProject} which provides the source files to generate test cases for.
     */
-   private final IFile proofFile;
+   private final IProject sourceProject;
+   
+   /**
+    * The name of the test file to generate without file extension.
+    */
+   private final String testFileName;
 
    /**
     * Constructor.
-    * @param proofFile The {@link IFile} which provides the proof file to generate test cases for.
+    * @param sourceProject The {@link IProject} which provides the source files to generate test cases for.
+    * @param testFileName The name of the test file to generate without file extension.
     * @param mediator The {@link KeYMediator} to use.
     * @param originalProof The {@link Proof} to generate test cases for.
     */
-   public EclipseTestGenerator(IFile proofFile, 
+   public EclipseTestGenerator(IProject sourceProject, 
+                               String testFileName,
                                KeYMediator mediator, 
                                Proof originalProof) {
       super(mediator, originalProof);
-      this.proofFile = proofFile;
+      this.sourceProject = sourceProject;
+      this.testFileName = testFileName;
    }
 
    /**
@@ -118,7 +126,6 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
                                        final TestGenerationLog log, 
                                        final Proof originalProof) throws Exception {
       // Create test project
-      IProject sourceProject = proofFile.getProject();
       IJavaProject testProject = JDTUtil.createJavaProject(sourceProject.getName() + TEST_PROJECT_SUFFIX, sourceProject);
       List<IPackageFragmentRoot> sourceResources = JDTUtil.getSourcePackageFragmentRoots(testProject);
       IContainer sourceContainer = findFirstSourceContainer(sourceResources);
@@ -130,7 +137,7 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       originalProof.getProofIndependentSettings().getTestGenerationSettings().setUseJunit(true);
       final TestCaseGenerator tg = new TestCaseGenerator(originalProof, true);
       tg.setLogger(log);
-      tg.setFileName(JDTUtil.ensureValidJavaTypeName(ResourceUtil.getFileNameWithoutExtension(proofFile), testProject));
+      tg.setFileName(JDTUtil.ensureValidJavaTypeName(testFileName, testProject));
       // Create library folder
       IFolder libFolder = ResourceUtil.createFolder(testProject.getProject(), LIB_FOLDER_NAME);
       IFile readmeFile = libFolder.getFile(LIB_FOLDER_README_NAME);

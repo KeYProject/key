@@ -4,7 +4,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.graphics.Image;
-import org.key_project.key4eclipse.common.ui.testGeneration.GenerateTestsJob;
+import org.key_project.key4eclipse.common.ui.testGeneration.ProofFileGenerateTestsJob;
 import org.key_project.key4eclipse.common.ui.util.KeYImages;
 
 /**
@@ -58,6 +58,6 @@ public class GenerateTestCasesResolution extends AbstractProofMarkerResolution {
     */
    @Override
    protected void run(IMarker marker, IFile proofFile) throws Exception {
-      new GenerateTestsJob(proofFile).schedule();
+      new ProofFileGenerateTestsJob(proofFile).schedule();
    }
 }

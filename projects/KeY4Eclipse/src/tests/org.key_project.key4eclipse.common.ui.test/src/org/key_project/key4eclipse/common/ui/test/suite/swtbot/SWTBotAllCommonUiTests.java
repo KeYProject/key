@@ -15,8 +15,9 @@ package org.key_project.key4eclipse.common.ui.test.suite.swtbot;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotGenerateTestsJobTest;
 import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotKeYExampleNewWizardTest;
+import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotProofFileGenerateTestsJobTest;
+import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotProofGenerateTestsJobTest;
 import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotStarterTest;
 import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotTacletOptionsPreferencePageTest;
 
@@ -26,8 +27,9 @@ import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotTacletOp
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-   SWTBotGenerateTestsJobTest.class,
    SWTBotKeYExampleNewWizardTest.class,
+   SWTBotProofFileGenerateTestsJobTest.class,
+   SWTBotProofGenerateTestsJobTest.class,
    SWTBotStarterTest.class,
    SWTBotTacletOptionsPreferencePageTest.class
 })
