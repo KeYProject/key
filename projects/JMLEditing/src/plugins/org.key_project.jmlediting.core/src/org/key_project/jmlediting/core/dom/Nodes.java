@@ -17,6 +17,11 @@ public final class Nodes {
       return new ASTNode(startOffset, endOffset, type, Arrays.asList(children));
    }
 
+   public static IASTNode createNode(final int startOffset,
+         final int endOffset, final int type, final List<IASTNode> children) {
+      return new ASTNode(startOffset, endOffset, type, children);
+   }
+
    public static IASTNode createNode(final int type, final IASTNode... children) {
       return createNode(type, Arrays.asList(children));
    }
@@ -68,6 +73,11 @@ public final class Nodes {
       return createNode(NodeTypes.ERROR_NODE, content);
    }
 
+   public static IASTNode createErrorNode(final int start, final int end,
+         final IASTNode... content) {
+      return createNode(start, end, NodeTypes.ERROR_NODE, content);
+   }
+
    public static IASTNode createErrorNode(final int position) {
       return createNode(position, position, NodeTypes.ERROR_NODE);
    }
@@ -100,15 +110,27 @@ public final class Nodes {
 
          @Override
          public IASTNode selectChild(final List<IASTNode> children) {
-            for (final IASTNode node : children) {
-               if (node.getStartOffset() <= position
-                     && position < node.getEndOffset()) {
-                  return node;
-               }
-            }
-            return null;
+            return selectChildWithPosition(children, position);
          }
       });
+   }
+
+   public static IASTNode selectChildWithPosition(final IASTNode node,
+         final int offset) {
+      if (!node.containsOffset(offset)) {
+         return null;
+      }
+      return selectChildWithPosition(node.getChildren(), offset);
+   }
+
+   private static IASTNode selectChildWithPosition(
+         final List<IASTNode> children, final int offset) {
+      for (final IASTNode node : children) {
+         if (node.containsOffset(offset)) {
+            return node;
+         }
+      }
+      return null;
    }
 
    public static List<IKeywordNode> getAllKeywords(final IASTNode node) {

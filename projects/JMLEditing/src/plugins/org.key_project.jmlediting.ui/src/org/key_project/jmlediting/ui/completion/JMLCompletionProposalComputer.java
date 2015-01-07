@@ -34,7 +34,7 @@ import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
  * @author Thomas Glaser
  */
 public class JMLCompletionProposalComputer implements
-      IJavaCompletionProposalComputer {
+IJavaCompletionProposalComputer {
 
    private static Image img = null;
 
@@ -45,7 +45,7 @@ public class JMLCompletionProposalComputer implements
       try {
          return new Image(Display.getCurrent(), new ImageLoader().load(new URL(
                "platform:/plugin/org.key_project.jmlediting.ui/icons/jml.png")
-               .openStream())[0]);
+         .openStream())[0]);
       }
       catch (final IOException ioe) {
          return null;
@@ -98,12 +98,23 @@ public class JMLCompletionProposalComputer implements
 
          }
          catch (final ParserException e) {
-            System.out.println("parserException: " + e.getMessage());
             parseResult = e.getErrorNode();
+            // System.out.println("errorNode: " + parseResult);
+
+            // System.out.println(context.getInvocationOffset());
+            // final List<IKeywordNode> list =
+            // Nodes.getAllKeywords(parseResult);
+            // for (final IKeywordNode iKeywordNode : list) {
+            // System.out.println("keyword: " + iKeywordNode);
+            // System.out.println("children: "
+            // + iKeywordNode.getChildren().size());
+            // }
          }
 
+         // System.out.println(parseResult);
          final IKeyword activeKeyword = Nodes.getKeywordNode(parseResult,
                context.getInvocationOffset());
+         // System.out.println("activeKeyword: " + activeKeyword);
          if (activeKeyword != null) {
             result.addAll(activeKeyword.createAutoProposals(parseResult,
                   javaContext));
