@@ -186,9 +186,11 @@ public abstract class AbstractTestGenerator {
     * Removes all generated proofs.
     */
    public void dispose() {
-      for (final Proof p : proofs) {
-         mediator.getUI().removeProof(p);
-         p.dispose();
+      if (proofs != null) {
+         for (final Proof p : proofs) {
+            mediator.getUI().removeProof(p);
+            p.dispose();
+         }
       }
    }
 

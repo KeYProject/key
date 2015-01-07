@@ -1861,4 +1861,28 @@ public class TestUtilsUtil {
          assertEquals(expected, actual);
       }
    }
+
+   /**
+    * Waits until the given {@link IProject} exists and is open.
+    * @param bot The {@link SWTBot} to use.
+    * @param project The {@link IProject} to wait for.
+    */
+   public static void waitForProject(SWTBot bot, final IProject project) {
+      assertNotNull(project);
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return project.exists() && project.isOpen();
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "Timed out waiting for " + project + " to exist and to be open.";
+         }
+      });
+   }
 }

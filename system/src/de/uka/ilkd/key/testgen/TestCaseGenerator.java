@@ -71,7 +71,7 @@ public class TestCaseGenerator {
 	public static final String TAB = "   ";
 	private Services services;
 	static int fileCounter = 0;
-	boolean junitFormat;
+	private final boolean junitFormat;
 	private static final String DONT_COPY = "aux"; // Classes of the Java
 	                                               // environment needed by KeY
 	                                               // can be placed in this
@@ -1048,10 +1048,6 @@ public class TestCaseGenerator {
 	protected boolean isPrimitiveType(String type) {
 		return isNumericType(type) || type.equals("boolean")
 		        || type.equals("char");
-	}
-
-	public void setJUnit(boolean junit) {
-		junitFormat = junit;
 	}
 
 	public void setLogger(TestGenerationLog logger) {

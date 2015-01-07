@@ -48,22 +48,22 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
    /**
     * The folder which provides required libraries.
     */
-   private static final String LIB_FOLDER_NAME = "libs";
+   public static final String LIB_FOLDER_NAME = "libs";
 
    /**
     * Name of the readme file which explains which libraries are needed.
     */
-   private static final String LIB_FOLDER_README_NAME = "Readme.txt";
+   public static final String LIB_FOLDER_README_NAME = "Readme.txt";
 
    /**
     * Name of the log folder.
     */
-   private static final String LOG_FOLDER_NAME = "log";
+   public static final String LOG_FOLDER_NAME = "log";
 
    /**
     * Extension of log files.
     */
-   private static final String LOG_FILE_EXTENSION = ".txt";
+   public static final String LOG_FILE_EXTENSION_WITH_DOT = ".txt";
 
    /**
     * The {@link IFile} which provides the proof file to generate test cases for.
@@ -98,6 +98,7 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
                generateEclipseFiles(launcher, problemSolvers, log, originalProof);
             }
             catch (Exception e) {
+               LogUtil.getLogger().logError(e);              
                throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
             }
          }
@@ -125,8 +126,9 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
          throw new IllegalStateException("The Java project '" + testProject.getProject().getName() + "' has no source folder.");
       }
       // Create test generator
+      originalProof.getProofIndependentSettings().getTestGenerationSettings().setRFL(true);
+      originalProof.getProofIndependentSettings().getTestGenerationSettings().setUseJunit(true);
       final TestCaseGenerator tg = new TestCaseGenerator(originalProof, true);
-      tg.setJUnit(true);
       tg.setLogger(log);
       tg.setFileName(JDTUtil.ensureValidJavaTypeName(ResourceUtil.getFileNameWithoutExtension(proofFile), testProject));
       // Create library folder
@@ -145,7 +147,7 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       }
       // Update log
       IFolder logFolder = ResourceUtil.createFolder(testProject.getProject(), LOG_FOLDER_NAME);
-      IFile logFile = logFolder.getFile(tg.getFileName() + LOG_FILE_EXTENSION);
+      IFile logFile = logFolder.getFile(tg.getFileName() + LOG_FILE_EXTENSION_WITH_DOT);
       ResourceUtil.createFile(logFile, new ByteArrayInputStream(log.toString().getBytes()), null);
       // Select and open generated test file
       Display.getDefault().asyncExec(new Runnable() {
@@ -184,7 +186,7 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
     * Creates the readme content.
     * @return The readme content.
     */
-   protected InputStream createLibFolderReadmeContent() {
+   public static InputStream createLibFolderReadmeContent() {
       String text = "Add the following libraries to the Java Build Path of this project: " + StringUtil.NEW_LINE +
                     "- Objenesis 2.1" + StringUtil.NEW_LINE +
                     "  http://objenesis.org/download.html" + StringUtil.NEW_LINE +
