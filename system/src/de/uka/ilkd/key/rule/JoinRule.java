@@ -46,6 +46,11 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
+//TODO: There is a problem with the Java program variables that
+//      are declared inside a program; say there is a stmt "int x;",
+//      then KeY introduces different constants x_1, x_2, ... in
+//      the different branches. This leads to problems, e.g. in the
+//      Path Condition construction in the ITE-Method.
 //TODO: So far, the rule shall not be applied automatically,
 //      since symbolic execution could be disturbed. In order
 //      to prevent this, it is only applicable for *interactive*
