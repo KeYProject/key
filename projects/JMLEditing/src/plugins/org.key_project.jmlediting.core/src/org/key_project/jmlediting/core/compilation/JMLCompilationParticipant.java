@@ -3,9 +3,11 @@ package org.key_project.jmlediting.core.compilation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.compiler.BuildContext;
 import org.eclipse.jdt.core.compiler.CategorizedProblem;
 import org.eclipse.jdt.core.compiler.CompilationParticipant;
 import org.eclipse.jdt.core.compiler.IProblem;
@@ -42,6 +44,12 @@ public class JMLCompilationParticipant extends CompilationParticipant {
 
    @Override
    public void reconcile(final ReconcileContext context) {
+      /*
+       * In this method parse errors are reported as annotations. This method is
+       * called for a source file when it changes (not as often as reconciling
+       * for highlighting) but not as error markers, as this is done in Eclipse
+       * too.
+       */
       // We need a profile to do anything
       if (!JMLPreferencesHelper.isAnyProfileAvailable()) {
          return;
@@ -89,5 +97,37 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          logger.logError("Unexpected exception when reconciling JML", e);
       }
 
+   }
+
+   @Override
+   public void buildStarting(final BuildContext[] files, final boolean isBatch) {
+      /*
+       * Here the errors are reported as error markers which appear in the
+       * problems list.
+       */
+      if (isBatch) {
+         return;
+      }
+      for (final BuildContext context : files) {
+         final IFile res = context.getFile();
+         final String source = new String(context.getContents());
+         // Remove all JML Error markers from the file
+         ParseErrorMarkerUpdater.removeErrorMarkers(res);
+         // Detect all comments in the file and then parse it
+         final CommentLocator locator = new CommentLocator(source);
+         for (final CommentRange jmlComment : locator.findJMLCommentRanges()) {
+            final IJMLParser parser = JMLPreferencesHelper
+                  .getProjectActiveJMLProfile(res.getProject()).createParser();
+            try {
+               parser.parse(source, jmlComment);
+               // Throw away the result, here only a parse exception is
+               // interesting
+            }
+            catch (final ParserException e) {
+               // Add error markers for all parser exceptions
+               ParseErrorMarkerUpdater.createErrorMarkers(res, source, e);
+            }
+         }
+      }
    }
 }

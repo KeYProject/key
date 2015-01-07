@@ -34,8 +34,9 @@
          point="org.eclipse.jdt.core.compilationParticipant">
       <compilationParticipant
             class="org.key_project.jmlediting.core.compilation.JMLCompilationParticipant"
+            createsProblems="true"
             id="org.key_project.jmlediting.core.compilationParticipant2"
-            modifiesEnvironment="false">
+            modifiesEnvironment="true">
       </compilationParticipant>
    </extension>
 </plugin>

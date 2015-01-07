@@ -23,7 +23,7 @@ import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
  *
  */
 public abstract class StoreRefContainerKeyword extends
-AbstractGenericSpecificationKeyword {
+      AbstractGenericSpecificationKeyword {
 
    /**
     * Creates a new {@link StoreRefContainerKeyword}.
@@ -82,6 +82,7 @@ AbstractGenericSpecificationKeyword {
             }
          }
       }
+
       catch (final JavaModelException e) {
          // TODO Auto-generated catch block
          e.printStackTrace();
