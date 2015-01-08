@@ -69,7 +69,7 @@ public class StoreRefParser implements ParseFunction {
       /*
        * spec-array-ref-expr ::= spec-expression <br> | spec-expression ..
        * spec-expression <br> | *
-       * 
+       *
        * Need to try the second case before the first case because otherwise we
        * will never parse it
        */
@@ -87,7 +87,7 @@ public class StoreRefParser implements ParseFunction {
                   seq(constant("["), specArrayRefExpression, constant("]"))));
       /*
        * store-ref-name ::= ident | super | this
-       * 
+       *
        * Approximates and does not check for keywords, because they are treated
        * as identifiers
        */
@@ -97,7 +97,7 @@ public class StoreRefParser implements ParseFunction {
        * store-ref-expression ::= store-ref-name [ store-ref-name-suffix ] ...
        */
       final ParseFunction storeRefExpr = seq(STORE_REF_EXPR, storeRefName,
-            list(storeRefNameSuffix));
+            listErrorRecovery(storeRefNameSuffix));
 
       // Make lexInformalDesc context free
       final ParseFunction informalDescr = allowWhitespaces(lexInformalDescr());

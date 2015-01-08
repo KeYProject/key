@@ -96,6 +96,7 @@ public abstract class StoreRefContainerKeyword extends
          System.out.println(content);
          final IASTNode exprInOffset = Nodes.selectChildWithPosition(content,
                context.getInvocationOffset() - 1);
+         // TODO checl exprInOffset == null
          final List<IASTNode> list = exprInOffset.getChildren();
          result.addAll(new Proposer(context).propose(cu, list));
       }

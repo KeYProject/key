@@ -66,6 +66,21 @@ public final class ParserBuilder {
       };
    }
 
+   public static ParseFunction listErrorRecovery(final ParseFunction function) {
+      if (function == null) {
+         throw new IllegalArgumentException("Provide a non null function");
+      }
+      return new ParseFunction() {
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            return ParserUtils.parseListErrorRecovery(text, start, end,
+                  function);
+         }
+      };
+   }
+
    /**
     * Does the same as {@link ParserBuilder#list(ParseFunction)} but ensures
     * that at least a single element is contained in the list. If no element
@@ -206,8 +221,11 @@ public final class ParserBuilder {
                         e.getErrorNode().getEndOffset(), e.getErrorNode()));
                }
                else {
-                  throw new ParserException(e, Nodes.createErrorNode(sepStart,
-                        sepStart + 1));
+                  throw new ParserException(e, Nodes.createErrorNode(
+                        sepStart,
+                        sepStart + 1,
+                        Nodes.createString(sepStart, sepStart + 1,
+                              Character.toString(sep))));
                }
             }
          }

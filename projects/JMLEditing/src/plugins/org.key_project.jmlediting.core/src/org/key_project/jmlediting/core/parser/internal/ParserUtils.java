@@ -43,6 +43,30 @@ public class ParserUtils {
       return nodes;
    }
 
+   private static List<IASTNode> parseListErrorRecoveryImpl(final String text,
+         final int start, final int end, final ParseFunction function,
+         final List<IASTNode> nodes) {
+
+      int startPosition = start;
+      while (true) {
+         try {
+            final IASTNode listNode = function.parse(text, startPosition, end);
+            nodes.add(listNode);
+            startPosition = listNode.getEndOffset();
+         }
+         catch (final ParserException e) {
+            if (e.getErrorNode() != null) {
+               nodes.add(e.getErrorNode());
+               startPosition = e.getErrorNode().getEndOffset();
+            }
+            else {
+               break;
+            }
+         }
+      }
+      return nodes;
+   }
+
    public static IASTNode parseSeparatedList(final String text,
          final int start, final int end, final char sep,
          final ParseFunction function) {
@@ -91,6 +115,19 @@ public class ParserUtils {
       }
    }
 
+   public static IASTNode parseListErrorRecovery(final String text,
+         final int start, final int end, final ParseFunction function)
+         throws ParserException {
+      final List<IASTNode> nodes = parseListErrorRecoveryImpl(text, start, end,
+            function, new ArrayList<IASTNode>());
+      if (nodes.isEmpty()) {
+         return Nodes.createNode(start, start, NodeTypes.LIST);
+      }
+      else {
+         return Nodes.createNode(NodeTypes.LIST, nodes);
+      }
+   }
+
    public static IASTNode parseNonEmptyList(final String text, final int start,
          final int end, final ParseFunction function,
          final String missingExceptionText) throws ParserException {
@@ -119,15 +156,27 @@ public class ParserUtils {
          final int end, final ParseFunction... alternatives)
          throws ParserException {
       ParserException exception = null;
+      IASTNode firstErrorNode = null;
       for (final ParseFunction function : alternatives) {
          try {
             return function.parse(text, start, end);
          }
          catch (final ParserException e) {
-            exception = e;
+            if (exception == null) {
+               exception = e;
+            }
+            if (e.getErrorNode() != null) {
+               firstErrorNode = e.getErrorNode();
+               exception = e;
+            }
          }
       }
-      throw exception;
+      if (firstErrorNode == null) {
+         throw exception;
+      }
+      else {
+         throw new ParserException(exception, firstErrorNode);
+      }
    }
 
    /**

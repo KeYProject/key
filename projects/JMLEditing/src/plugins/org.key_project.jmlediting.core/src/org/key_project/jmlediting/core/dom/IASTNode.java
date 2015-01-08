@@ -28,6 +28,14 @@ public interface IASTNode {
     */
    int getEndOffset();
 
+   /**
+    * Returns true if the given offset is covered by this node, so if it is in
+    * between to start and end offset.
+    * 
+    * @param offset
+    *           the offset to check
+    * @return whether the offset is between start and end node
+    */
    boolean containsOffset(int offset);
 
    /**
