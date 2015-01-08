@@ -59,6 +59,8 @@ import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
 import de.uka.ilkd.key.util.Pair;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * an instance serves as representation of a Java model underlying a DL
@@ -88,7 +90,7 @@ public final class JavaInfo {
     protected KeYJavaType[] commonTypes = new KeYJavaType[3];
 
     //some caches for the getKeYJavaType methods.
-    private HashMap<Sort, KeYJavaType> sort2KJTCache = null;
+    private HashMap<Sort, List<KeYJavaType>> sort2KJTCache = null;
     private HashMap<Type, KeYJavaType> type2KJTCache = null;
     private HashMap<String, KeYJavaType> name2KJTCache = null;
 
@@ -434,40 +436,52 @@ public final class JavaInfo {
             return kjt.equals(visibleTo);
     }
 
+    /**
+     * returns a KeYJavaType having the given sort
+     */
+    public KeYJavaType getKeYJavaType(Sort sort) {
+        List<KeYJavaType> l = lookupSort2KJTCache(sort);
+        if (l != null && l.size() > 0) {
+            // Return first KeYJavaType found for sort.
+            return l.get(0);
+        }
+
+        // sort not found in sort2KJTCache
+        Name n = sort.name();
+        PrimitiveType pt = PrimitiveType.getPrimitiveTypeByLDT(n);
+        if (pt != null) {
+            return getPrimitiveKeYJavaType(pt);
+        }
+
+        // sort not found
+        return null;
+    }
+
     private void updateSort2KJTCache() {
         if (sort2KJTCache == null || kpmi.rec2key().size() > sortCachedSize) {
             sortCachedSize = kpmi.rec2key().size();
-            sort2KJTCache = new LinkedHashMap<Sort, KeYJavaType>();
+            sort2KJTCache = new HashMap<Sort, List<KeYJavaType>>();
             for (final Object o : kpmi.allElements()) {
                 if (o instanceof KeYJavaType) {
                     final KeYJavaType oKJT = (KeYJavaType) o;
-                    if (sort2KJTCache.containsKey(oKJT.getSort())) {
-                        sort2KJTCache.remove(oKJT.getSort()); //XXX
+                    Sort s = oKJT.getSort();
+                    List<KeYJavaType> l = sort2KJTCache.get(s);
+                    if (l == null) {
+                        l = new LinkedList<KeYJavaType>();
+                        sort2KJTCache.put(s, l);
                     }
-                    sort2KJTCache.put((oKJT).getSort(), oKJT);
+                    if (!l.contains(oKJT)) {
+                        l.add(oKJT);
+                    }
                 }
             }
         }
     }
 
-    /**
-     * returns a KeYJavaType having the given sort
-     */
-     public KeYJavaType getKeYJavaType(Sort sort) {
-         updateSort2KJTCache();
-	 
-	 // lookup for primitive ldts
-	 KeYJavaType result = sort2KJTCache.get(sort);
-	 if(result == null) {
-	     Name n = sort.name();
-	     PrimitiveType pt = PrimitiveType.getPrimitiveTypeByLDT(n);
-	     if(pt != null) {
-	         return getPrimitiveKeYJavaType(pt);
-	     }
-	 }
-    return result;
-     }
-
+    public List<KeYJavaType> lookupSort2KJTCache(Sort sort) {
+        updateSort2KJTCache();
+        return sort2KJTCache.get(sort);
+    }
 
     /**
      * returns the KeYJavaType belonging to the given Type t
