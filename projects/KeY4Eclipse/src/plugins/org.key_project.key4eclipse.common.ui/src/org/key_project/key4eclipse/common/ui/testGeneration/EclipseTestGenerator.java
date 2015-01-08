@@ -23,6 +23,7 @@ import org.eclipse.ui.PartInitException;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.eclipse.swt.dialog.TextFieldMessageDialog;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
 
@@ -89,6 +90,23 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       super(mediator, originalProof);
       this.sourceProject = sourceProject;
       this.testFileName = testFileName;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void informAboutNoTestResults(final SolverLauncher launcher, 
+                                           final Collection<SMTSolver> problemSolvers, 
+                                           final TestGenerationLog log, 
+                                           final Proof originalProof) {
+      super.informAboutNoTestResults(launcher, problemSolvers, log, originalProof);
+      Display.getDefault().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+            TextFieldMessageDialog.openError(WorkbenchUtil.getActiveShell(), "Test Generation Log", "No tests generated.", log.toString());
+         }
+      });
    }
 
    /**

@@ -345,6 +345,7 @@ public abstract class AbstractTestGenerator {
             generateFiles(launcher, problemSolvers, log, originalProof);
          } else {
             log.writeln("No test data was generated.");
+            informAboutNoTestResults(launcher, problemSolvers, log, originalProof);
          }
          log.testGenerationCompleted();
       }
@@ -352,7 +353,7 @@ public abstract class AbstractTestGenerator {
          log.writeException(e);
       }
    }
-   
+
    protected void generateFiles(SolverLauncher launcher, Collection<SMTSolver> problemSolvers, TestGenerationLog log, Proof originalProof) throws Exception {
       final TestCaseGenerator tg = new TestCaseGenerator(originalProof);
       tg.setLogger(log);
@@ -362,6 +363,12 @@ public abstract class AbstractTestGenerator {
       } else {
          log.writeln("Compile and run the file with openjml!");
       }
+   }
+
+   /**
+    * This method is used in the Eclipse world to show a dialog with the log.
+    */
+   protected void informAboutNoTestResults(SolverLauncher launcher, Collection<SMTSolver> problemSolvers, TestGenerationLog log, Proof originalProof) {
    }
 
    public Collection<SMTSolver> filterSolverResultsAndShowSolverStatistics(Collection<SMTSolver> problemSolvers, TestGenerationLog log) {
