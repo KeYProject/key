@@ -566,6 +566,42 @@ public final class JavaInfo {
         return getProgramMethod(classType, methodName, signature.toImmutableList(), context);
     }
     
+    private IProgramMethod getProgramMethodFromPartialSignature(KeYJavaType classType,
+            String methodName,
+            List<List<KeYJavaType>> signature,
+            ImmutableList<KeYJavaType> partialSignature,
+            KeYJavaType context) {
+        if (signature.isEmpty()) {
+            return getProgramMethod(classType, methodName, partialSignature, context);
+        } else {
+            List<KeYJavaType> types = signature.get(0);
+            assert !types.isEmpty();
+            for (KeYJavaType t : types) {
+                IProgramMethod programMethod = getProgramMethodFromPartialSignature(classType, methodName, signature.subList(1, signature.size()), partialSignature.append(t), context);
+                if (programMethod != null) {
+                    return programMethod;
+                }
+            }
+        }
+        return null;
+    }
+
+    /*
+     * Takes for each signature entry a list of types for all of which
+     * a corresponding IProgramMethod is looked up. Several types must
+     * be considered if for one sort several KeYJavaTypes must be considered.
+     * This is the case for sort int in KeY, which has the following as possible
+     * corresponding KeYJavaTypes:
+     * char, byte, short, int, long
+     */
+    public IProgramMethod getProgramMethod(KeYJavaType classType,
+            String methodName,
+            List<List<KeYJavaType>> signature,
+            KeYJavaType context) {
+        ImmutableList<KeYJavaType> partialSignature = ImmutableSLList.nil();
+        return getProgramMethodFromPartialSignature(classType, methodName, signature, partialSignature, context);
+    }
+
     /**
      * returns the program method defined in the KeYJavaType of the program
      * variable clv, with the name m, and the KeYJavaTypes of the given array
@@ -637,9 +673,9 @@ public final class JavaInfo {
             Term[] args,
             String className,
             boolean traverseHierarchy) {
-        ImmutableList<KeYJavaType> argList = ImmutableSLList.<KeYJavaType>nil();
+        List<List<KeYJavaType>> argList = new LinkedList<List<KeYJavaType>>();
         for (Term arg : args) {
-            argList = argList.append(getKeYJavaType(arg.sort()));
+            argList.add(lookupSort2KJTCache(arg.sort()));
         }
 
         IProgramMethod pm = null;
