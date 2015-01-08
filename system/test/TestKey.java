@@ -52,7 +52,7 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.parser.TestParallelParsing.class,
         de.uka.ilkd.key.parser.TestTermParser.class,
         de.uka.ilkd.key.parser.TestTermParserHeap.class,
-        de.uka.ilkd.key.parser.TestTermParserSequence.class,
+        de.uka.ilkd.key.parser.TestTermParserSorts.class,
         de.uka.ilkd.key.parser.TestJMLParserAssociativity.class,
         de.uka.ilkd.key.parser.TestTacletParser.class,
     };

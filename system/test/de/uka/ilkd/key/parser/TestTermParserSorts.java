@@ -8,19 +8,20 @@ import org.antlr.runtime.RecognitionException;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class TestTermParserSequence extends AbstractTestTermParser {
+public class TestTermParserSorts extends AbstractTestTermParser {
 
-    public TestTermParserSequence() {
-        super(TestTermParserSequence.class.getSimpleName());
+    public TestTermParserSorts() {
+        super(TestTermParserSorts.class.getSimpleName());
     }
 
     @Override
     public void setUp() throws RecognitionException {
         parseDecls("\\programVariables {Seq s;}");
         parseDecls("\\programVariables {int i;}");
+        parseDecls("\\programVariables {testTermParserSorts.IntegerMethods a;}");
     }
 
-    public void testParsePrettySyntax() throws Exception {
+    public void testParseSequencePrettySyntax() throws Exception {
         /*
          * Test any::seqGet(s,i)
          */
@@ -43,6 +44,17 @@ public class TestTermParserSequence extends AbstractTestTermParser {
 
         // test parsing of pretty-printed seqLen
         comparePrettySyntaxAgainstVerboseSyntax("s.length", "seqLen(s)");
+    }
+
+    public void testParseIntegerArgs() throws Exception {
+//        System.out.println(parseTerm("a.queryByte(0)"));
+//        System.out.println(parseTerm("a.queryChar(0)"));
+//        System.out.println(parseTerm("a.queryShort(0)"));
+//        System.out.println(parseTerm("a.queryInt(0)"));
+//        System.out.println(parseTerm("a.queryLong(0)"));
+//        System.out.println(parseTerm("a.queryMixed(0,0,0,0,0)"));
+//        System.out.println(parseTerm("a.queryMixedStatic(0,0,0,0,0)"));
+//        System.out.println(parseTerm("testTermParserSorts.IntegerMethods.queryMixedStatic(0,0,0,0,0)"));
     }
 
 }

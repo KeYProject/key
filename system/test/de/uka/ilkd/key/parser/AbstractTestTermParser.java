@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import static de.uka.ilkd.key.parser.TestTermParserHeap.javaPath;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -37,6 +36,12 @@ public abstract class AbstractTestTermParser extends TestCase {
     protected final TermBuilder tb;
     protected final NamespaceSet nss;
     protected final Services services;
+    
+    static final String javaPath = System.getProperty("key.home")
+            + File.separator + "examples"
+            + File.separator + "_testcase"
+            + File.separator + "termParser"
+            + File.separator + "parserTest.key";
 
     AbstractTestTermParser(String name) {
         super(name);
@@ -65,7 +70,7 @@ public abstract class AbstractTestTermParser extends TestCase {
         new Recoder2KeY(services, nss).parseSpecialClasses();
         return new KeYParserF(ParserMode.DECLARATION,
                 new KeYLexerF(s,
-                        "No file. Call of parser from parser/TestTermParser.java"),
+                        "No file. Call of parser from " + this.getClass().getSimpleName()),
                 services, nss);
     }
 
@@ -79,7 +84,7 @@ public abstract class AbstractTestTermParser extends TestCase {
             new Recoder2KeY(TacletForTests.services(),
                     nss).parseSpecialClasses();
             KeYLexerF lexer = new KeYLexerF(s,
-                    "No file. Call of parser from parser/TestTermParser.java");
+                    "No file. Call of parser from " + this.getClass().getSimpleName());
             return new KeYParserF(ParserMode.PROBLEM,
                     lexer,
                     new ParserConfig(services, nss),

@@ -15,12 +15,6 @@ import org.antlr.runtime.RecognitionException;
  */
 public class TestTermParserHeap extends AbstractTestTermParser {
 
-    static final String javaPath = System.getProperty("key.home")
-            + File.separator + "examples"
-            + File.separator + "_testcase"
-            + File.separator + "termParser"
-            + File.separator + "parserTest.key";
-
     public TestTermParserHeap() {
         super(TestTermParserHeap.class.getSimpleName());
     }
