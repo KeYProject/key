@@ -11,6 +11,7 @@ import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserBuilder;
+import org.key_project.jmlediting.core.parser.ParserError;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
@@ -43,28 +44,88 @@ public class ParserUtils {
       return nodes;
    }
 
-   private static List<IASTNode> parseListErrorRecoveryImpl(final String text,
-         final int start, final int end, final ParseFunction function,
-         final List<IASTNode> nodes) {
-
+   /**
+    * Tries to parse as much consecutive applications of functions and places
+    * the parsed nodes in the given list. If function fails and provides an
+    * error recovery node, this node is also included and the parse error
+    * returned in the list.
+    *
+    * @param text
+    *           the text to parse
+    * @param start
+    *           start index
+    * @param end
+    *           end index
+    * @param function
+    *           the parser function
+    * @param nodes
+    *           a list of nodes to put all parsed node in
+    * @return a list of all {@link ParserError} found while parsing, if no error
+    *         was found, the method returns null
+    */
+   private static List<ParserError> parseListErrorRecoveryImpl(
+         final String text, final int start, final int end,
+         final ParseFunction function, final List<IASTNode> nodes) {
       int startPosition = start;
+      List<ParserError> errors = null;
+
       while (true) {
          try {
+            // Parse a new list entry and put in in the list
             final IASTNode listNode = function.parse(text, startPosition, end);
             nodes.add(listNode);
             startPosition = listNode.getEndOffset();
          }
          catch (final ParserException e) {
+            // Unable to parse, check whether error recovery is available
             if (e.getErrorNode() != null) {
+               // Include in nodes, but collect errors
                nodes.add(e.getErrorNode());
                startPosition = e.getErrorNode().getEndOffset();
+               if (errors == null) {
+                  errors = new ArrayList<ParserError>();
+               }
+               errors.addAll(e.getAllErrors());
             }
             else {
+               // Unable, stop parsing
                break;
             }
          }
       }
-      return nodes;
+      return errors;
+
+   }
+
+   public static IASTNode parseListErrorRecovery(final String text,
+         final int start, final int end, final ParseFunction function)
+         throws ParserException {
+      final List<IASTNode> nodes = new ArrayList<IASTNode>();
+      final List<ParserError> errors = parseListErrorRecoveryImpl(text, start,
+            end, function, nodes);
+      IASTNode listNode;
+      if (nodes.isEmpty()) {
+         listNode = Nodes.createNode(start, start, NodeTypes.LIST);
+      }
+      else {
+         listNode = Nodes.createNode(NodeTypes.LIST, nodes);
+      }
+      if (errors != null) {
+         throw new ParserException(errors.get(0), errors.subList(1,
+               errors.size()), text, listNode, null);
+      }
+      return listNode;
+   }
+
+   public static IASTNode parseNonEmptyListErrorRecovery(final String text,
+         final int start, final int end, final ParseFunction function,
+         final String missingExceptionText) throws ParserException {
+      final IASTNode listNode = parseList(missingExceptionText, start, end,
+            function);
+      if (listNode.getChildren().size() == 0) {
+         throw new ParserException(missingExceptionText, text, start);
+      }
+      return listNode;
    }
 
    public static IASTNode parseSeparatedList(final String text,
@@ -107,19 +168,6 @@ public class ParserUtils {
    public static IASTNode parseList(final String text, final int start,
          final int end, final ParseFunction function) {
       final List<IASTNode> nodes = parseListImpl(text, start, end, function);
-      if (nodes.isEmpty()) {
-         return Nodes.createNode(start, start, NodeTypes.LIST);
-      }
-      else {
-         return Nodes.createNode(NodeTypes.LIST, nodes);
-      }
-   }
-
-   public static IASTNode parseListErrorRecovery(final String text,
-         final int start, final int end, final ParseFunction function)
-         throws ParserException {
-      final List<IASTNode> nodes = parseListErrorRecoveryImpl(text, start, end,
-            function, new ArrayList<IASTNode>());
       if (nodes.isEmpty()) {
          return Nodes.createNode(start, start, NodeTypes.LIST);
       }

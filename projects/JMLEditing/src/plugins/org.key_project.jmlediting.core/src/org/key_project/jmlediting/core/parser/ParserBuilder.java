@@ -66,6 +66,32 @@ public final class ParserBuilder {
       };
    }
 
+   /**
+    * Creates a {@link ParseFunction} which is able to parse a list of items
+    * which are parsed by the given function. That means that the generated
+    * ParseFunction tries to parse using the given ParseFunction as often as
+    * possible. If no parse is possible, an empty list is returned.<br>
+    * The returned node is of type {@link NodeTypes#LIST} and contains the
+    * parsed nodes.<br>
+    * This function contains a certain type of error recovery which is important
+    * to note: If an application of function fails but provides an error
+    * recovery node, this node is added to the list. If any error node is in the
+    * list, the created function returns not normally but throws an exception.<br>
+    * This behavior makes the created function differ from the function created
+    * by {@link #list(ParseFunction)}: If list can parse three items and the
+    * fourth not, list returns these three node and the forth may be covered by
+    * a following function. But if the parse function for the list items
+    * provides an error recovery for the forth item, listErrorRecovery will fail
+    * and provide an error recovery node with these four items. <br>
+    * So make sure when using this function, that the function to parse list
+    * items cannot provide error recovery for anything which is allowed to be
+    * parsed after the list.
+    *
+    * @param function
+    *           the {@link ParseFunction} to parse a single element of the list
+    * @return a {@link ParseFunction} that parses a list of elements parseable
+    *         by the given function.
+    */
    public static ParseFunction listErrorRecovery(final ParseFunction function) {
       if (function == null) {
          throw new IllegalArgumentException("Provide a non null function");
