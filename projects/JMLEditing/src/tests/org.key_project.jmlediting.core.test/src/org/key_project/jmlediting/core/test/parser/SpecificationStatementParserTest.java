@@ -23,7 +23,7 @@ public class SpecificationStatementParserTest {
       testParseSpecification(
             "       assignable   hello ; ",
             "assignable",
-            "StoreRefList[20-25](List[20-25](StoreRefExpr[20-25](String[20-25](hello),List[25-25]())))",
+            "StoreRefList[20-25](List[20-25](StoreRefExpr[20-25](StoreRefName[20-25](String[20-25](hello)),List[25-25]())))",
             7, 27);
    }
 
@@ -94,7 +94,7 @@ public class SpecificationStatementParserTest {
    private static void testParseSpecification(final String specText,
          final String expectedKeyword, final String expectedContent,
          final int expctedStartOffset, final int expectedEndOffset)
-               throws ParserException {
+         throws ParserException {
       final IJMLParser parser = ProfileWrapper.testProfile.createParser();
 
       final IASTNode statement = parser.parse(specText, 0, specText.length());

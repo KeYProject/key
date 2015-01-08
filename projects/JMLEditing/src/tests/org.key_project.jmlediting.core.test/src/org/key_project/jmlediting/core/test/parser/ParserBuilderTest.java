@@ -87,6 +87,37 @@ public class ParserBuilderTest {
    }
 
    @Test
+   public void testParseEmptyListErrorRecovery() throws ParserException {
+      testParse("", listErrorRecovery(parseA), makeList('A', 0));
+   }
+
+   @Test
+   public void testListWithContentErrorRecovery() throws ParserException {
+      testParse("AAAAA", listErrorRecovery(parseA), makeList('A', 5));
+   }
+
+   @Test
+   public void testParseListWithRestErrorRecovery() throws ParserException {
+      testParse("AAABBB", listErrorRecovery(parseA), makeList('A', 3));
+   }
+
+   @Test
+   public void testParseListRecovery2() {
+      testRecovery(
+            "A;A;A",
+            listErrorRecovery(closedBy(NodeTypes.NODE, parseA, ';')),
+            "List[0-5](Node[0-2](String[0-1](A)),Node[2-4](String[2-3](A)),ErrorNode[4-5](String[4-5](A)))");
+   }
+
+   @Test
+   public void testParseListRecovery1() {
+      testRecovery(
+            "A;AA;AA;",
+            listErrorRecovery(closedBy(NodeTypes.NODE, parseA, ';')),
+            "List[0-8](Node[0-2](String[0-1](A)),ErrorNode[2-3](String[2-3](A)),Node[3-5](String[3-4](A)),ErrorNode[5-6](String[5-6](A)),Node[6-8](String[6-7](A)))");
+   }
+
+   @Test
    public void testParseNonEmptyListWithRest() throws ParserException {
       testParse("AAABBB", nonEmptyList(parseA, "Requires an A"),
             makeList('A', 3));
@@ -100,6 +131,11 @@ public class ParserBuilderTest {
    @Test(expected = IllegalArgumentException.class)
    public void testIllegalList() {
       list(null);
+   }
+
+   @Test(expected = IllegalArgumentException.class)
+   public void testIllegalListErrorRecovery() {
+      listErrorRecovery(null);
    }
 
    @Test(expected = IllegalArgumentException.class)

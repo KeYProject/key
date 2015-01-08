@@ -98,6 +98,8 @@ public class DefaultJMLParser implements IJMLParser {
                try {
                   nextPosition = LexicalHelper.findNextWhitespace(text,
                         textStart, end);
+                  nextPosition = skipWhiteSpacesOrAt(text, nextPosition, end,
+                        false);
                }
                catch (final ParserException e2) {
                   // No whitespace anymore, so take rest of the text

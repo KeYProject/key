@@ -117,17 +117,6 @@ public class ParserUtils {
       return listNode;
    }
 
-   public static IASTNode parseNonEmptyListErrorRecovery(final String text,
-         final int start, final int end, final ParseFunction function,
-         final String missingExceptionText) throws ParserException {
-      final IASTNode listNode = parseList(missingExceptionText, start, end,
-            function);
-      if (listNode.getChildren().size() == 0) {
-         throw new ParserException(missingExceptionText, text, start);
-      }
-      return listNode;
-   }
-
    public static IASTNode parseSeparatedList(final String text,
          final int start, final int end, final char sep,
          final ParseFunction function) {
