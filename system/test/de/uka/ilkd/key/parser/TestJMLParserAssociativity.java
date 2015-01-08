@@ -78,9 +78,14 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
         s2 = "or(or(equals(Z(1(#)),Z(1(#))),equals(Z(2(#)),Z(2(#)))),equals(Z(3(#)),Z(3(#))))";
         assertEquals(s1, s2);
 
-        // test <== and ==>
-        s1 = parseTerm("1 == 1 ==> 2 == 2 <== 3 == 3 <== 4 == 4 ==> 5 == 5").toString();
-        s2 = "imp(imp(equals(Z(4(#)),Z(4(#))),imp(equals(Z(3(#)),Z(3(#))),imp(equals(Z(1(#)),Z(1(#))),equals(Z(2(#)),Z(2(#)))))),equals(Z(5(#)),Z(5(#))))";
+        // test ==>
+        s1 = parseTerm("1 == 1 ==> 2 == 2 ==> 3 == 3").toString();
+        s2 = "imp(equals(Z(1(#)),Z(1(#))),imp(equals(Z(2(#)),Z(2(#))),equals(Z(3(#)),Z(3(#)))))";
+        assertEquals(s1, s2);
+        
+        // test <==
+        s1 = parseTerm("1 == 1 <== 2 == 2 <== 3 == 3").toString();
+        s2 = "imp(equals(Z(3(#)),Z(3(#))),imp(equals(Z(2(#)),Z(2(#))),equals(Z(1(#)),Z(1(#)))))";
         assertEquals(s1, s2);
 
         // test <==> and <=!=>

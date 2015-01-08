@@ -784,22 +784,47 @@ equivalenceexpr returns [SLExpression result=null] throws SLTranslationException
         )*
     ;
 
+/*
+ * Note: According to JML Manual §12.6.3 forward implication has to be parsed right-associatively
+ * and backward implication left-associatively.
+ */
 impliesexpr returns [SLExpression result=null] throws SLTranslationException
 {
     SLExpression expr;
-    boolean forward = true;
 }
 :
-    result=logicalorexpr
-    (
-        (IMPLIES {forward = true;} | IMPLIESBACKWARD {forward = false;}) expr=logicalorexpr
-        {
-        Term left = tb.convertToFormula(result.getTerm());
-        Term right = tb.convertToFormula(expr.getTerm());
-        Term imp = forward ? tb.imp(left, right) : tb.imp(right, left);
-        result = new SLExpression(imp);
-        }
-    )*
+	result=logicalorexpr
+	(
+	    IMPLIES expr=impliesforwardexpr
+	    {
+		result = new SLExpression(tb.imp(tb.convertToFormula(result.getTerm()),
+		                                 tb.convertToFormula(expr.getTerm())));
+	    }
+
+	  |
+	    (
+		IMPLIESBACKWARD expr=logicalorexpr
+		{
+		result = new SLExpression(tb.imp(tb.convertToFormula(expr.getTerm()),
+		                                 tb.convertToFormula(result.getTerm())));
+		}
+	    )+
+	)?
+;
+
+impliesforwardexpr returns [SLExpression result=null] throws SLTranslationException
+{
+    SLExpression expr;
+}
+:
+	result=logicalorexpr
+	(
+	    IMPLIES expr=impliesforwardexpr
+	    {
+		result = new SLExpression(tb.imp(tb.convertToFormula(result.getTerm()),
+		                                 tb.convertToFormula(expr.getTerm())));
+	    }
+	)?
 ;
 
 logicalorexpr returns [SLExpression result=null] throws SLTranslationException
