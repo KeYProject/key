@@ -434,25 +434,28 @@ public final class JavaInfo {
             return kjt.equals(visibleTo);
     }
 
+    private void updateSort2KJTCache() {
+        if (sort2KJTCache == null || kpmi.rec2key().size() > sortCachedSize) {
+            sortCachedSize = kpmi.rec2key().size();
+            sort2KJTCache = new LinkedHashMap<Sort, KeYJavaType>();
+            for (final Object o : kpmi.allElements()) {
+                if (o instanceof KeYJavaType) {
+                    final KeYJavaType oKJT = (KeYJavaType) o;
+                    if (sort2KJTCache.containsKey(oKJT.getSort())) {
+                        sort2KJTCache.remove(oKJT.getSort()); //XXX
+                    }
+                    sort2KJTCache.put((oKJT).getSort(), oKJT);
+                }
+            }
+        }
+    }
 
     /**
      * returns a KeYJavaType having the given sort
      */
      public KeYJavaType getKeYJavaType(Sort sort) {
-	 if(sort2KJTCache == null || kpmi.rec2key().size() > sortCachedSize){
-	     sortCachedSize = kpmi.rec2key().size();
-	     sort2KJTCache = new LinkedHashMap<Sort, KeYJavaType>();
-	     for (final Object o : kpmi.allElements()) {
-	         if (o instanceof KeYJavaType){
-	             final KeYJavaType oKJT = (KeYJavaType)o;
-	             if(sort2KJTCache.containsKey(oKJT.getSort())) {
-	                 sort2KJTCache.remove(oKJT.getSort()); //XXX
-	             }
-	             sort2KJTCache.put((oKJT).getSort(), oKJT);
-	         }
-	     }
-	 }
-
+         updateSort2KJTCache();
+	 
 	 // lookup for primitive ldts
 	 KeYJavaType result = sort2KJTCache.get(sort);
 	 if(result == null) {
