@@ -621,8 +621,8 @@ public final class JavaInfo {
             String className,
             boolean traverseHierarchy) {
         ImmutableList<KeYJavaType> argList = ImmutableSLList.<KeYJavaType>nil();
-        for (int i = 0; i < args.length; i++) {
-            argList = argList.append(getServices().getJavaInfo().getKeYJavaType(args[i].sort()));
+        for (Term arg : args) {
+            argList = argList.append(getKeYJavaType(arg.sort()));
         }
 
         IProgramMethod pm = null;
@@ -641,9 +641,9 @@ public final class JavaInfo {
                  * Traverse type hierarchy to find a method with the specified name.
                  */
                 ImmutableList<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(classKJT).reverse();
-                Iterator iterator = allSupertypes.iterator();
+                Iterator<KeYJavaType> iterator = allSupertypes.iterator();
                 while (iterator.hasNext() && pm == null) {
-                    KeYJavaType next = (KeYJavaType) iterator.next();
+                    KeYJavaType next = iterator.next();
                     pm = getProgramMethod(next, methodName, argList, next);
                     if (pm != null && pm.isPrivate() && !next.equals(classKJT)) {
                         /*
