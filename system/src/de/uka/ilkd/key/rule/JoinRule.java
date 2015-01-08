@@ -167,9 +167,16 @@ public abstract class JoinRule implements BuiltInRule {
       // Note: If the join rule is applicable for automatic
       //       rule application, the symbolic execution strategy
       //       does not seem to work as usual!
+      // Note: Rule is deactivated for automatic application in
+      //       JavaCardDLStrategy#computeCost(RuleApp, PosInOccurrence, Goal).
+      //       This is a temporary workaround that removes the
+      //       necessity to set goals to interactive. However,
+      //       it would be nicer to obtain knowledge about whether
+      //       or not this check for applicability originates from
+      //       the user or from a strategy.
       
       return isApplicable(goal, pio,
-            true,  // Only permit interactive goals
+            false, // Only permit interactive goals
             true); // Do the check for partner existence
    }
    

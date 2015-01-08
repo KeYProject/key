@@ -38,7 +38,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
+import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.JoinRule;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
@@ -2553,6 +2555,19 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 //	    System.out.println("Cost for node " + goal.node().serialNr() + ": " + result);
 //	    return result;
 //	}
+       
+       // Disable join rule from strategy.
+       // TODO: This is a temporary measure, since the join rule is
+       //       not yet suitable for automatic application. Later,
+       //       the above code should be removed (when the rule can
+       //       also be applied automatically).
+       if (app instanceof AbstractBuiltInRuleApp) {
+          AbstractBuiltInRuleApp aBiRApp = (AbstractBuiltInRuleApp) app;
+          if (aBiRApp.rule() instanceof JoinRule) {
+             return TopRuleAppCost.INSTANCE;
+          }
+       }
+       
         return costComputationF.compute ( app, pio, goal );
     }
 
