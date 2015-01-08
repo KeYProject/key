@@ -3,7 +3,6 @@ package org.key_project.jmlediting.ui.highlighting;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -40,7 +39,7 @@ import org.key_project.util.eclipse.WorkbenchUtil;
  * @author David Giessing
  */
 public class JMLPresentationDamagerRepairer implements IPresentationDamager,
-IPresentationRepairer {
+      IPresentationRepairer {
 
    /**
     * The original instance of DefaultDamagerRepairer currently in use for
@@ -90,6 +89,7 @@ IPresentationRepairer {
             .getOffset());
       final TextAttribute ta;
       if (surroundingComment != null) {
+         // JML Comment
          ta = new TextAttribute(new Color(Display.getDefault(), jmlColor.red,
                jmlColor.green, jmlColor.blue));
          this.modifyPresentationForJMLComment(presentation, ta,
@@ -129,14 +129,11 @@ IPresentationRepairer {
       }
       else {
          return new Region(surroundingComment.getBeginOffset(),
-               surroundingComment.getEndOffset()
-               - surroundingComment.getBeginOffset() + 1);
+               surroundingComment.getLength());
       }
    }
 
    /**
-    * Copied from {@link DefaultDamagerRepairer}.
-    *
     * Adds style information to the given text presentation. In case of a JML
     * Comment it provides Syntax Highlighting for JML Keywords. If the parser
     * can not find a valid Keyword, the normal Highlighting is used.
@@ -147,10 +144,7 @@ IPresentationRepairer {
     *           the attribute describing the style of the range to be styled
     * @param surroundingComment
     *           the comment to modify the presentation for
-    *
-    * @throws BadLocationException
     */
-
    protected void modifyPresentationForJMLComment(
          final TextPresentation presentation, final TextAttribute attr,
          final CommentRange surroundingComment) {
@@ -203,12 +197,12 @@ IPresentationRepairer {
 
       }
       catch (final ParserException e) {
-         // Invalid JML Code, no advanced SyntaxColoring possible
+         // Invalid JML Code, do syntax coloring with the recovered node
          parseResult = e.getErrorNode();
 
       }
-      System.out.println(parseResult);
       if (parseResult == null) {
+         // No parser recovery, so no highlightinh
          return null;
       }
       return this.doKeywordHighlighting(defaultStyleRange, attr, parseResult,
@@ -246,7 +240,7 @@ IPresentationRepairer {
          // begin until the start of first Keyword)
          styles.add(new StyleRange(lastEnd, keywordStartOffset - lastEnd,
                defaultStyleRange.foreground, defaultStyleRange.background, attr
-               .getStyle()));
+                     .getStyle()));
          // Style for the Keyword
          styles.add(new StyleRange(keywordStartOffset, keywordEndOffset
                - keywordStartOffset, defaultStyleRange.foreground,
