@@ -172,8 +172,9 @@ public abstract class StoreRefContainerKeyword extends
          else {
             ITypeBinding nextType = null;
             if (!node.containsOffset(this.context.getInvocationOffset())) {
-               //nur bis zum invooffset als prefix und auch innerhalb nur bis zum invooffset
-               final hier weiter machen
+               // nur bis zum invooffset als prefix und auch innerhalb nur bis
+               // zum invooffset
+               // TODO final hier weiter machen
                return this.propose(activeType, node,
                      Collections.<IASTNode> emptyList(), true);
             }
