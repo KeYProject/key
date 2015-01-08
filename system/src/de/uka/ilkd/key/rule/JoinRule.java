@@ -51,12 +51,6 @@ import de.uka.ilkd.key.util.Triple;
 //      then KeY introduces different constants x_1, x_2, ... in
 //      the different branches. This leads to problems, e.g. in the
 //      Path Condition construction in the ITE-Method.
-//TODO: So far, the rule shall not be applied automatically,
-//      since symbolic execution could be disturbed. In order
-//      to prevent this, it is only applicable for *interactive*
-//      goals, which is not very elegant. There should be a
-//      different way to exclude the join rules from automatic
-//      strategies....
 //TODO: Check associated CloseAfterJoin rule, update if thesis
 //      is updated.
 //TODO: Make something as a progress bar for time consumptive
