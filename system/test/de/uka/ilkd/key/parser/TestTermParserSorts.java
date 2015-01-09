@@ -47,14 +47,37 @@ public class TestTermParserSorts extends AbstractTestTermParser {
     }
 
     public void testParseIntegerArgs() throws Exception {
-//        System.out.println(parseTerm("a.queryByte(0)"));
-//        System.out.println(parseTerm("a.queryChar(0)"));
-//        System.out.println(parseTerm("a.queryShort(0)"));
-//        System.out.println(parseTerm("a.queryInt(0)"));
-//        System.out.println(parseTerm("a.queryLong(0)"));
-//        System.out.println(parseTerm("a.queryMixed(0,0,0,0,0)"));
-//        System.out.println(parseTerm("a.queryMixedStatic(0,0,0,0,0)"));
-//        System.out.println(parseTerm("testTermParserSorts.IntegerMethods.queryMixedStatic(0,0,0,0,0)"));
+        String s = "testTermParserSorts.IntegerMethods::queryByte(heap,a,Z(0(#)))";
+        Term t = parseTerm("a.queryByte(0)");
+        assertEquals(s, t.toString());
+
+        s = "testTermParserSorts.IntegerMethods::queryChar(heap,a,Z(0(#)))";
+        t = parseTerm("a.queryChar(0)");
+        assertEquals(s, t.toString());
+
+        s = "testTermParserSorts.IntegerMethods::queryShort(heap,a,Z(0(#)))";
+        t = parseTerm("a.queryShort(0)");
+        assertEquals(s, t.toString());
+
+        s = "testTermParserSorts.IntegerMethods::queryInt(heap,a,Z(0(#)))";
+        t = parseTerm("a.queryInt(0)");
+        assertEquals(s, t.toString());
+
+        s = "testTermParserSorts.IntegerMethods::queryLong(heap,a,Z(0(#)))";
+        t = parseTerm("a.queryLong(0)");
+        assertEquals(s, t.toString());
+
+        s = "testTermParserSorts.IntegerMethods::queryMixed(heap,a,Z(0(#)),Z(0(#)),Z(0(#)),Z(0(#)),Z(0(#)))";
+        t = parseTerm("a.queryMixed(0,0,0,0,0)");
+        assertEquals(s, t.toString());
+
+        s = "testTermParserSorts.IntegerMethods::queryMixedStatic(heap,Z(0(#)),Z(0(#)),Z(0(#)),Z(0(#)),Z(0(#)))";
+        t = parseTerm("a.queryMixedStatic(0,0,0,0,0)");
+        assertEquals(s, t.toString());
+
+        s = "testTermParserSorts.IntegerMethods::queryMixedStatic(heap,Z(0(#)),Z(0(#)),Z(0(#)),Z(0(#)),Z(0(#)))";
+        t = parseTerm("testTermParserSorts.IntegerMethods.queryMixedStatic(0,0,0,0,0)");
+        assertEquals(s, t.toString());
     }
 
 }

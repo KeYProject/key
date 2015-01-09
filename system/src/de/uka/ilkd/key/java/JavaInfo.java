@@ -658,13 +658,18 @@ public final class JavaInfo {
 	return getToplevelPM(kjt, methodName, sig);
     }
 
-    public Term getStaticProgramMethodTerm(String methodName, Term[] args, String className) {
-        ImmutableList<KeYJavaType> argList = ImmutableSLList.<KeYJavaType>nil();
-        for (int i = 0; i < args.length; i++) {
-            argList = argList.append(getServices().getJavaInfo().getKeYJavaType(args[i].sort()));
+    private List<List<KeYJavaType>> termArrayToSignature(Term[] args) {
+        List<List<KeYJavaType>> signature = new LinkedList<List<KeYJavaType>>();
+        for (Term arg : args) {
+            signature.add(lookupSort2KJTCache(arg.sort()));
         }
+        return signature;
+    }
+
+    public Term getStaticProgramMethodTerm(String methodName, Term[] args, String className) {
+        List<List<KeYJavaType>> signature = termArrayToSignature(args);
         KeYJavaType classKJT = getTypeByClassName(className);
-        IProgramMethod pm = getProgramMethod(classKJT, methodName, argList, classKJT);
+        IProgramMethod pm = getProgramMethod(classKJT, methodName, signature, classKJT);
         return getTermFromProgramMethod(pm, methodName, className, args, null);
     }
 
@@ -673,46 +678,44 @@ public final class JavaInfo {
             Term[] args,
             String className,
             boolean traverseHierarchy) {
-        List<List<KeYJavaType>> argList = new LinkedList<List<KeYJavaType>>();
-        for (Term arg : args) {
-            argList.add(lookupSort2KJTCache(arg.sort()));
+
+        /*
+         * This is just a safety measure. To avoid null pointers, try to call
+         * getStaticProgramMethodTerm() directly, if possible.
+         */
+        if (prefix == null) {
+            return getStaticProgramMethodTerm(methodName, args, className);
         }
 
+        List<List<KeYJavaType>> signature = termArrayToSignature(args);
         IProgramMethod pm = null;
         KeYJavaType classKJT = getTypeByClassName(className);
-        if (prefix == null) {
-            /*
-             * Method is referenced from a static context.
+        /*
+         * Method is referenced from a non-static context.
+         */
+        if (traverseHierarchy) {
+            /* 
+             * Traverse type hierarchy to find a method with the specified name.
              */
-            pm = getProgramMethod(classKJT, methodName, argList, classKJT);
-        } else {
-            /*
-             * Method is referenced from a non-static context.
-             */
-            if (traverseHierarchy) {
-                /* 
-                 * Traverse type hierarchy to find a method with the specified name.
-                 */
-                ImmutableList<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(classKJT).reverse();
-                Iterator<KeYJavaType> iterator = allSupertypes.iterator();
-                while (iterator.hasNext() && pm == null) {
-                    KeYJavaType next = iterator.next();
-                    pm = getProgramMethod(next, methodName, argList, next);
-                    if (pm != null && pm.isPrivate() && !next.equals(classKJT)) {
-                        /*
-                         * Private methods from supertypes are not visible in their
-                         * subtypes. They will not be selected here.
-                         */
-                        pm = null;
-                    }
+            ImmutableList<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(classKJT).reverse();
+            Iterator<KeYJavaType> iterator = allSupertypes.iterator();
+            while (iterator.hasNext() && pm == null) {
+                KeYJavaType next = iterator.next();
+                pm = getProgramMethod(next, methodName, signature, next);
+                if (pm != null && pm.isPrivate() && !next.equals(classKJT)) {
+                    /*
+                     * Private methods from supertypes are not visible in their
+                     * subtypes. They will not be selected here.
+                     */
+                    pm = null;
                 }
-            } else {
-                /* 
-                 * Do not traverse type hierarchy. pm stays null in case classKJT
-                 * does not contain a method with the specified name.
-                 */
-                pm = getProgramMethod(classKJT, methodName, argList, classKJT);
             }
+        } else {
+            /* 
+             * Do not traverse type hierarchy. pm stays null in case classKJT
+             * does not contain a method with the specified name.
+             */
+            pm = getProgramMethod(classKJT, methodName, signature, classKJT);
         }
         return getTermFromProgramMethod(pm, methodName, className, args, prefix);
     }
