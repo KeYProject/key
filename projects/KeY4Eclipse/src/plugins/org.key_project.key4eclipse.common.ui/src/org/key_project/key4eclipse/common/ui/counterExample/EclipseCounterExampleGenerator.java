@@ -115,8 +115,8 @@ public class EclipseCounterExampleGenerator extends AbstractSideProofCounterExam
          if (problem.createInformation()) {
             information.add(new InformationMessage(SolverListener.createExceptionTitle(problem), problem, true));
          }
-         manager.addToRoot(new SMTProblemPreferenceNode(createProblemId(problem), 
-                                                        problem.getProblem().getName() + " (" + problem.getSolver().getType().getName() + ")", 
+         manager.addToRoot(new SMTProblemPreferenceNode(computeProblemId(problem), 
+                                                        computeProblemName(problem), 
                                                         null, 
                                                         problem));
       }
@@ -126,13 +126,22 @@ public class EclipseCounterExampleGenerator extends AbstractSideProofCounterExam
       // Show dialog;
       dialog.open();
    }
+
+   /**
+    * Computes the name of the given {@link InternSMTProblem}.
+    * @param problem The {@link InternSMTProblem} to compute its name.
+    * @return The computed name.
+    */
+   public static String computeProblemName(InternSMTProblem problem) {
+      return problem.getProblem().getName() + " (" + problem.getSolver().getType().getName() + ")";
+   }
    
    /**
-    * Creates the unique ID of the given {@link InternSMTProblem}.
-    * @param problem The {@link InternSMTProblem} to create ID for.
-    * @return The created ID.
+    * Computes the unique ID of the given {@link InternSMTProblem}.
+    * @param problem The {@link InternSMTProblem} to compute ID for.
+    * @return The computed ID.
     */
-   public static String createProblemId(InternSMTProblem problem) {
+   public static String computeProblemId(InternSMTProblem problem) {
       return "problem" + problem.getProblemIndex() + ", " + problem.getSolverIndex();
    }
    

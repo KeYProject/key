@@ -6,6 +6,7 @@
    <extension-point id="org.key_project.key4eclipse.common.ui.fileStarter" name="File Starter" schema="schema/org.key_project.key4eclipse.common.ui.fileStarter.exsd"/>
    <extension-point id="org.key_project.key4eclipse.common.ui.projectStarter" name="Project Starter" schema="schema/org.key_project.key4eclipse.common.ui.projectStarter.exsd"/>
    <extension-point id="org.key_project.key4eclipse.common.ui.proofStarter" name="Proof Starter" schema="schema/org.key_project.key4eclipse.common.ui.proofStarter.exsd"/>
+   <extension-point id="org.key_project.key4eclipse.common.ui.counterexample.model.contextMenuAction" name="Counterexample Context Menu Action" schema="schema/org.key_project.key4eclipse.common.ui.counterexample.model.contextMenuAction.exsd"/>
    <extension
          point="org.eclipse.ui.propertyPages">
       <page

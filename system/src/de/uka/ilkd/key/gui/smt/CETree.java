@@ -34,17 +34,19 @@ import de.uka.ilkd.key.smt.model.LocationSet;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
 import de.uka.ilkd.key.smt.model.Sequence;
+import de.uka.ilkd.key.util.Pair;
 
 public class CETree {
-
     /**
      * A comparator that sort ignoRiNG cASe.
      * Used to sort labels.
      */
-    private static final Comparator<? super String> IGNORECASE_COMPARATOR =
-            new Comparator<String>() {
-        public int compare(String o1, String o2) {
-            return o1.compareToIgnoreCase(o2);
+    private static final Comparator<? super Pair<? super String, ? super String>> IGNORECASE_COMPARATOR =
+            new Comparator<Pair<? super String, ? super String>>() {
+        public int compare(Pair<? super String, ? super String> o1, Pair<? super String, ? super String> o2) {
+            String first = o1.first + "=" + o1.second;
+            String second = o2.first + "=" + o2.second;
+            return first.compareToIgnoreCase(second);
         }
     };
 
@@ -125,17 +127,17 @@ public class CETree {
 			DefaultMutableTreeNode object) {
 	   String sortName = computeSortName(ov);
 	   // General properties
-	   List<String> objectProperties = computeObjectProperties(ov, sortName);
-	   for (String property : objectProperties) {
-	      DefaultMutableTreeNode node = new DefaultMutableTreeNode(property);     
+	   List<Pair<String, String>> objectProperties = computeObjectProperties(ov, sortName);
+	   for (Pair<String, String> property : objectProperties) {
+	      DefaultMutableTreeNode node = new DefaultMutableTreeNode(property.first + "=" + property.second);     
 	      object.add(node);
 	   }
 		//Fields
 		DefaultMutableTreeNode fields = new DefaultMutableTreeNode("Fields");
 		object.add(fields);
-      List<String> fieldsLabels = computeFields(ov);
-      for(String label : fieldsLabels){
-         DefaultMutableTreeNode name = new DefaultMutableTreeNode(label);
+      List<Pair<String, String>> fieldsLabels = computeFields(ov);
+      for(Pair<String, String> label : fieldsLabels){
+         DefaultMutableTreeNode name = new DefaultMutableTreeNode(label.first + "=" + label.second);
          fields.add(name);
 		}
 
@@ -154,17 +156,17 @@ public class CETree {
 		//Fun Values
 		DefaultMutableTreeNode functionValues = new DefaultMutableTreeNode("Functions");
 		object.add(functionValues);
-		List<String> functionLabels = computeFunctions(ov);
-		for (String functionLabel : functionLabels) {
-         DefaultMutableTreeNode fun = new DefaultMutableTreeNode(functionLabel);
+		List<Pair<String, String>> functionLabels = computeFunctions(ov);
+		for (Pair<String, String> functionLabel : functionLabels) {
+         DefaultMutableTreeNode fun = new DefaultMutableTreeNode(functionLabel.first + "=" + functionLabel.second);
          functionValues.add(fun);
 		}
 	}
    
-   public static List<String> computeFunctions(ObjectVal ov) {
-      List<String> result = new LinkedList<String>();
+   public static List<Pair<String, String>> computeFunctions(ObjectVal ov) {
+      List<Pair<String, String>> result = new LinkedList<Pair<String, String>>();
       for(Entry<String,String> e : ov.getFunValues().entrySet()){
-         result.add(Model.removePipes(e.getKey())+"="+e.getValue());
+         result.add(new Pair<String, String>(Model.removePipes(e.getKey()), e.getValue()));
       }
       return result;
    }
@@ -185,27 +187,27 @@ public class CETree {
       return ov.getSort() == null ? "java.lang.Object" : ov.getSort().name().toString();
    }
 
-   public static List<String> computeObjectProperties(ObjectVal ov, String sortName) {
-	   List<String> result = new LinkedList<String>();
+   public static List<Pair<String, String>> computeObjectProperties(ObjectVal ov, String sortName) {
+	   List<Pair<String, String>> result = new LinkedList<Pair<String, String>>();
       //Type         
       sortName = Model.removePipes(sortName);
-      result.add("Type="+sortName);
+      result.add(new Pair<String, String>("Type", sortName));
 
       //Exact Instance           
       boolean ei = ov.isExactInstance();
-      result.add("Exact Instance="+ei);
+      result.add(new Pair<String, String>("Exact Instance", ei + ""));
 
       //Length          
       int l = ov.getLength();
-      result.add("Length="+l);
+      result.add(new Pair<String, String>("Length", l + ""));
 	   return result;
 	}
    
-   public static List<String> computeFields(ObjectVal ov) {
-        List<String> labels = new ArrayList<String>();
+   public static List<Pair<String, String>> computeFields(ObjectVal ov) {
+        List<Pair<String, String>> labels = new ArrayList<Pair<String, String>>();
 
         for(Entry<String,String> e : ov.getFieldvalues().entrySet()) {
-            labels.add(Model.removePipes(e.getKey())+"="+e.getValue());
+            labels.add(new Pair<String, String>(Model.removePipes(e.getKey()), e.getValue()));
         }
 
         // sort the labels alphabetically
@@ -287,21 +289,21 @@ public class CETree {
 	}
 
 	private void fillConstants(DefaultMutableTreeNode constants) {
-        List<String> labels = computeConstantLabels(model);
+        List<Pair<String, String>> labels = computeConstantLabels(model);
 
-        for(String label : labels){
-            DefaultMutableTreeNode name = new DefaultMutableTreeNode(label);
+        for(Pair<String, String> label : labels){
+            DefaultMutableTreeNode name = new DefaultMutableTreeNode(label.first + "=" + label.second);
 			constants.add(name);
 		}
 
 	}
 	
-	public static List<String> computeConstantLabels(Model model) {
+	public static List<Pair<String, String>> computeConstantLabels(Model model) {
 	   Map<String, String> map = model.getConstants();
-      List<String> labels = new ArrayList<String>();
+      List<Pair<String, String>> labels = new ArrayList<Pair<String, String>>();
 
       for(Entry<String,String> e : map.entrySet()) {
-          labels.add(Model.removePipes(e.getKey())+"="+e.getValue());
+          labels.add(new Pair<String, String>(Model.removePipes(e.getKey()), e.getValue()));
       }
       
       // sort the labels alphabetically

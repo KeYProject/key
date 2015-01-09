@@ -117,7 +117,7 @@ public class SMTInformationPropertyPage extends PropertyPage {
          if (element instanceof InformationMessage) {
             InformationMessage message = (InformationMessage) element;
             if (message.getData() instanceof InternSMTProblem) {
-               dialog.setCurrentPageId(EclipseCounterExampleGenerator.createProblemId((InternSMTProblem) message.getData()));
+               dialog.setCurrentPageId(EclipseCounterExampleGenerator.computeProblemId((InternSMTProblem) message.getData()));
             }
          }
       }
