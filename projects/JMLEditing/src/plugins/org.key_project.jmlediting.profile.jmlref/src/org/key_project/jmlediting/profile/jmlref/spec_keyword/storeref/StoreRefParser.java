@@ -57,7 +57,7 @@ public class StoreRefParser implements ParseFunction {
 
       // The list if filled by the constructor because the content is profile
       // sensitive
-      /*
+      /**
        * store-ref-keyword ::= \nothing | \everything | \not_specified
        */
       final ParseFunction storeRefKeyword = keywords(storeRefKeywords, profile);
@@ -66,9 +66,10 @@ public class StoreRefParser implements ParseFunction {
       // much more
       final ParseFunction specExpression = integerConstant();
 
-      /*
-       * spec-array-ref-expr ::= spec-expression <br> | spec-expression ..
-       * spec-expression <br> | *
+      /**
+       * spec-array-ref-expr ::= spec-expression <br>
+       * | spec-expression .. spec-expression <br>
+       * | *
        *
        * Need to try the second case before the first case because otherwise we
        * will never parse it
@@ -77,15 +78,17 @@ public class StoreRefParser implements ParseFunction {
             seq(specExpression, constant(".."), specExpression),
             specExpression, constant("*"));
 
-      /*
-       * store-ref-name-suffix ::= . ident <br> | . this <br> | `['
-       * spec-array-ref-expr `]' <br> | . *
+      /**
+       * store-ref-name-suffix ::= . ident <br>
+       * | . this <br>
+       * | `[' spec-array-ref-expr `]' <br>
+       * | . *
        */
       final ParseFunction storeRefNameSuffix = typed(
             STORE_REF_NAME_SUFFIX,
             alt(separateBy('.', identifier()), separateBy('.', constant("*")),
                   seq(constant("["), specArrayRefExpression, constant("]"))));
-      /*
+      /**
        * store-ref-name ::= ident | super | this
        *
        * Approximates and does not check for keywords, because they are treated
@@ -93,7 +96,7 @@ public class StoreRefParser implements ParseFunction {
        */
       final ParseFunction storeRefName = typed(STORE_REF_NAME, identifier());
 
-      /*
+      /**
        * store-ref-expression ::= store-ref-name [ store-ref-name-suffix ] ...
        */
       final ParseFunction storeRefExpr = seq(STORE_REF_EXPR, storeRefName,
@@ -102,8 +105,9 @@ public class StoreRefParser implements ParseFunction {
       // Make lexInformalDesc context free
       final ParseFunction informalDescr = allowWhitespaces(lexInformalDescr());
 
-      /*
-       * store-ref ::= store-ref-expression <br> | informal-description <br>
+      /**
+       * store-ref ::= store-ref-expression <br>
+       * | informal-description <br>
        * Informal descriptions may be disabled
        */
       final ParseFunction storeRef;
@@ -114,9 +118,10 @@ public class StoreRefParser implements ParseFunction {
          storeRef = storeRefExpr;
       }
 
-      /*
-       * store-ref-list ::= store-ref-keyword <br> | store-ref [ , store-ref ]
-       * ... Wrap the keyword in a list, to unify the AST
+      /**
+       * store-ref-list ::= store-ref-keyword <br>
+       * | store-ref [ , store-ref ] ... Wrap the keyword in a list, to unify
+       * the AST
        */
       final ParseFunction storeRefList = typed(
             STORE_REF_LIST,
