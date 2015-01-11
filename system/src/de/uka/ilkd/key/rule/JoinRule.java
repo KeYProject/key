@@ -17,6 +17,8 @@ import java.util.HashSet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.joinrule.JoinPartnerSelectionDialog;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaProgramElement;
@@ -76,6 +78,12 @@ public abstract class JoinRule implements BuiltInRule {
    public ImmutableList<Goal> apply(Goal goal, final Services services,
          RuleApp ruleApp) throws RuleAbortException {
       
+      KeYMediator mediator = MainWindow.getInstance().getMediator();
+      
+      if (!mediator.isInAutoMode()) {
+         mediator.stopInterface(true);
+      }
+      
       final TermBuilder tb = services.getTermBuilder();
       final PosInOccurrence pio = ruleApp.posInOccurrence();
       
@@ -129,6 +137,10 @@ public abstract class JoinRule implements BuiltInRule {
          closeJoinPartnerGoal(newGoal.node(), joinPartner.first, joinedState, thisSEState.third);
       }
       
+      if (!mediator.isInAutoMode()) {
+         mediator.startInterface(true);
+      }
+      
       return newGoals;
    }
    
@@ -168,7 +180,7 @@ public abstract class JoinRule implements BuiltInRule {
       //       it would be nicer to obtain knowledge about whether
       //       or not this check for applicability originates from
       //       the user or from a strategy.
-      
+
       return isApplicable(goal, pio,
             false, // Only permit interactive goals
             true); // Do the check for partner existence
