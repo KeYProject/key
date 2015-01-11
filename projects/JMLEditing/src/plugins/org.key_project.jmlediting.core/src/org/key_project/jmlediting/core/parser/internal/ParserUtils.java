@@ -183,6 +183,9 @@ public class ParserUtils {
       for (final ParseFunction function : seqs) {
          final IASTNode node = function.parse(text, startPosition, end);
          nodes.add(node);
+         if (node == null) {
+            System.out.println("nooo" + function);
+         }
          startPosition = node.getEndOffset();
       }
       assert (nodes.size() == seqs.length);
@@ -196,7 +199,11 @@ public class ParserUtils {
       IASTNode firstErrorNode = null;
       for (final ParseFunction function : alternatives) {
          try {
-            return function.parse(text, start, end);
+            final IASTNode node = function.parse(text, start, end);
+            if (node == null) {
+               System.out.println("Noalt " + function);
+            }
+            return node;
          }
          catch (final ParserException e) {
             if (exception == null) {

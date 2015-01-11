@@ -3,18 +3,24 @@ package org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression;
 import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
 import static org.key_project.jmlediting.profile.jmlref.parseutil.JavaBasicsParser.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.NodeTypes;
+import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.IRecursiveParseFunction;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
 
 public class ExpressionParser implements ParseFunction {
 
+   private final ParseFunction mainParser;
+
    @Override
    public IASTNode parse(final String text, final int start, final int end)
          throws ParserException {
-      // TODO Auto-generated method stub
-      return null;
+      return this.mainParser.parse(text, start, end);
    }
 
    // Temporary implementation, will be optimized and moved to another class
@@ -50,6 +56,40 @@ public class ExpressionParser implements ParseFunction {
       return f;
    }
 
+   private static IASTNode clean(final IASTNode node) {
+      if (node.getStartOffset() == node.getEndOffset()) {
+         return null;
+      }
+      if (node.getChildren().size() == 0) {
+         return node;
+      }
+
+      final List<IASTNode> children = new ArrayList<IASTNode>();
+      for (final IASTNode child : node.getChildren()) {
+         final IASTNode cleaned = clean(child);
+         if (cleaned != null) {
+            children.add(cleaned);
+         }
+      }
+      if (node.getType() == NodeTypes.SEQ && children.size() == 1) {
+         return children.get(0);
+      }
+      return Nodes.createNode(node.getStartOffset(), node.getEndOffset(),
+            node.getType(), children);
+   }
+
+   private static ParseFunction clean(final ParseFunction f) {
+      return new ParseFunction() {
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            final IASTNode node = f.parse(text, start, end);
+            return clean(node);
+         }
+      };
+   }
+
    public ExpressionParser() {
 
       // Initially create some parse function which refer recursivly to themself
@@ -69,6 +109,7 @@ public class ExpressionParser implements ParseFunction {
       final IRecursiveParseFunction conditionalExpr = recursiveInit();
       final IRecursiveParseFunction assignmentExpr = recursiveInit();
       final IRecursiveParseFunction impliesNonBackwardExpr = recursiveInit();
+      final IRecursiveParseFunction referenceType = recursiveInit();
 
       /**
        * dims ::= `[' `]' [ `[' `]' ] ...
@@ -119,7 +160,12 @@ public class ExpressionParser implements ParseFunction {
       /**
        * reference-type ::= name
        */
-      final ParseFunction referenceType = name();
+      // Modified to support generics:
+      /**
+       * reference-type ::= name [< reference-type >]
+       */
+      referenceType.defineAs(seq(name(),
+            opt(seq(constant("<"), referenceType, constant(">")))));
       /**
        * type ::= reference-type | built-in-type
        */
@@ -133,7 +179,7 @@ public class ExpressionParser implements ParseFunction {
                                                                  // Type
       // System
       final ParseFunction typeSpec = alt(
-            seq(ownerShipModifiers, type, opt(dims)),
+            seq(opt(ownerShipModifiers), type, opt(dims)),
             seq(constant("\\TYPE"), opt(dims)));
       /**
        * new-expr ::= new type new-suffix
@@ -166,17 +212,12 @@ public class ExpressionParser implements ParseFunction {
        * | `[' expression `]'<br>
        * | [ `[' `]' ] ... . class
        */
-      final ParseFunction primarySuffix = alt(seq(
-            constant("."),
-            alt(ident(),
-                  constant("this"),
-                  constant("class"),
-                  newExpr,
-                  seq(constant("super"), brackets(opt(expressionList))),
-                  brackets(opt(expressionList)),
-                  squareBrackets(expression),
-                  seq(list(seq(constant("["), constant("]"))),
-                        constant("class")))));
+      final ParseFunction primarySuffix = alt(
+            seq(constant("."),
+                  alt(ident(), constant("this"), constant("class"), newExpr,
+                        seq(constant("super"), brackets(opt(expressionList))))),
+            brackets(opt(expressionList)), squareBrackets(expression),
+            seq(list(seq(constant("["), constant("]"))), constant("class")));
 
       /**
        * postfix-expr ::= primary-expr [ primary-suffix ] ... [ ++ ]<br>
@@ -218,8 +259,8 @@ public class ExpressionParser implements ParseFunction {
        * mult-expr ::= unary-expr [ mult-op unary-expr ] ...<br>
        * mult-op ::= * | / | %
        */
-      final ParseFunction multExpr = listOp(unaryExpr,
-            oneConstant("*", "/", "%"));
+      final ParseFunction multExpr = listOp(oneConstant("*", "/", "%"),
+            unaryExpr);
 
       /**
        * additive-expr ::= mult-expr [ additive-op mult-expr ] ... <br>
@@ -296,11 +337,14 @@ public class ExpressionParser implements ParseFunction {
        * logical-or-expr [ ==> implies-non-backward-expr ] <br>
        * | logical-or-expr <== logical-or-expr [ <== logical-or-expr ] ...
        */
+      // Need to switch the order of the alternatives to to restrictions of alt
+      // because the ==> may parse a prefix of <==
+      // See doc for the alt combinator
       final ParseFunction impliesExpr = alt(
-            seq(logicalOrExpr,
-                  opt(seq(constant("==>"), impliesNonBackwardExpr))),
             seq(logicalOrExpr, constant("<=="), logicalOrExpr,
-                  list(seq(constant("<=="), logicalOrExpr))));
+                  list(seq(constant("<=="), logicalOrExpr))),
+            seq(logicalOrExpr,
+                  opt(seq(constant("==>"), impliesNonBackwardExpr))));
 
       /**
        * equivalence-op ::= <==> | <=!=>
@@ -338,13 +382,14 @@ public class ExpressionParser implements ParseFunction {
       /**
        * expression ::= assignment-expr
        */
-      expression.defineAs(assignmentExpr);
+      expression.defineAs(clean(assignmentExpr));
       /**
        *
        expression-list ::= expression [ , expression ] ...
        */
       expressionList.defineAs(separatedNonEmptyList(',', expression,
             "Expected an expression"));
-   }
 
+      this.mainParser = expression;
+   }
 }

@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.core.parser;
 
 import org.key_project.jmlediting.core.parser.internal.ParserUtils;
+import org.key_project.jmlediting.core.parser.internal.FastStringSet;
 
 /**
  * This class provides some utility functions for lexing.
@@ -102,7 +103,30 @@ public final class LexicalHelper {
             && Character.isJavaIdentifierPart(text.charAt(position))) {
          position++;
       }
+      final String ident = text.substring(start, position);
+      if (javaKeywords.contains(ident)) {
+         throw new ParserException("Java keyword " + ident
+               + " is not allowed as identifier.", text, start);
+      }
       return position;
+   }
+
+   private static FastStringSet javaKeywords;
+   static {
+      try {
+         javaKeywords = new FastStringSet("abstract", "assert", "boolean", "break",
+               "byte", "case", "catch", "char", "class", "const", "continue",
+               "default", "do", "double", "else", "extends", "false", "final",
+               "finally", "float", "for", "goto", "if", "implements", "import",
+               "instanceof", "int", "interface", "long", "native", "new",
+               "null", "package", "private", "protected", "public", "return",
+               "short", "static", "strictfp", "super", "switch",
+               "synchronized", "this", "throw", "throws", "transient", "true",
+               "try", "void", "volatile", "while");
+      }
+      catch (final Exception e) {
+         e.printStackTrace();
+      }
    }
 
    public static int getJMLKeywordIdentifier(final String text,

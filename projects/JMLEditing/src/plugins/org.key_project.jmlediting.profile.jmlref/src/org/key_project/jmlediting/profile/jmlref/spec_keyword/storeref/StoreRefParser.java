@@ -86,7 +86,9 @@ public class StoreRefParser implements ParseFunction {
        */
       final ParseFunction storeRefNameSuffix = typed(
             STORE_REF_NAME_SUFFIX,
-            alt(separateBy('.', identifier()), separateBy('.', constant("*")),
+            alt(separateBy('.', identifier()),
+                  separateBy('.', constant("this")),
+                  separateBy('.', constant("*")),
                   seq(constant("["), specArrayRefExpression, constant("]"))));
       /**
        * store-ref-name ::= ident | super | this
@@ -94,7 +96,8 @@ public class StoreRefParser implements ParseFunction {
        * Approximates and does not check for keywords, because they are treated
        * as identifiers
        */
-      final ParseFunction storeRefName = typed(STORE_REF_NAME, identifier());
+      final ParseFunction storeRefName = typed(STORE_REF_NAME,
+            alt(identifier(), constant("this"), constant("super")));
 
       /**
        * store-ref-expression ::= store-ref-name [ store-ref-name-suffix ] ...
