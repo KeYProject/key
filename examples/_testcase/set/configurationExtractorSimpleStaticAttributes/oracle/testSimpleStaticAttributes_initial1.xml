@@ -5,6 +5,6 @@
       <term term="null"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return SimpleStaticAttributes.instance.x+SimpleStaticAttributes.finalInstance.x+SimpleStaticAttributes.staticInt+SimpleStaticAttributes.finalStaticint;">
-      <value name="newInstance" programVariable="newInstance" isArrayIndex="false" value="null" type="Null"/>
+      <value name="newInstance {true}" programVariable="newInstance" isArrayIndex="false" value="null" type="Null" condition="true"/>
    </state>
 </model>

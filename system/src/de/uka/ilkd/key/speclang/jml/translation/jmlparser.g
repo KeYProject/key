@@ -261,10 +261,11 @@ options {
     private Term convertToOld(final Term term) {
 	    assert atPres != null && atPres.get(getBaseHeap()) != null;
 	    Map<Term, Term> map = new LinkedHashMap<Term, Term>();
-        for (LocationVariable heap : atPres.keySet()) {
-            Term heapAtPre = atPres.get(heap);
-            if (heapAtPre != null) {
-                map.put(tb.var(heap), heapAtPre);
+        for (LocationVariable var : atPres.keySet()) {
+            // caution: That may now also be other variables than only heaps.
+            Term varAtPre = atPres.get(var);
+            if (varAtPre != null) {
+                map.put(tb.var(var), varAtPre);
             }
         }
 	    OpReplacer or = new OpReplacer(map, tb.tf());

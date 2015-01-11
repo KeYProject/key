@@ -138,7 +138,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             currentTopPairs.add(pair);
          }
          else {
-            ParentDefinition parentDef = new ParentDefinition(pair.getParent(), pair.getCondition());
+            ParentDefinition parentDef = new ParentDefinition(pair.getParent(), pair.getGoalNode());
             Map<LocationDefinition, List<ExecutionVariableValuePair>> content = contentMap.get(parentDef);
             if (content == null) {
                content = new LinkedHashMap<LocationDefinition, List<ExecutionVariableValuePair>>();
@@ -229,7 +229,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             valueListToFill.add(value);
             Pair<Boolean, ImmutableList<Term>> cycleCheckResult = updateAlreadyVisitedObjects(alreadyVisitedObjects, pair.getValue());
             if (!cycleCheckResult.first) { // No cycle detected
-               ParentDefinition parentDef = new ParentDefinition(pair.getValue(), pair.getCondition());
+               ParentDefinition parentDef = new ParentDefinition(pair.getValue(), pair.getGoalNode());
                Map<LocationDefinition, List<ExecutionVariableValuePair>> content = contentMap.get(parentDef);
                if (content != null) {
                   for (List<ExecutionVariableValuePair> child : content.values()) {
@@ -243,7 +243,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             Map<LocationDefinition, List<ExecutionVariableValuePair>> childContentMap = new LinkedHashMap<ExecutionVariableExtractor.LocationDefinition, List<ExecutionVariableValuePair>>();
             for (ExecutionVariableValuePair pair : group) {
                conditions.add(pair.getCondition());
-               ParentDefinition parentDef = new ParentDefinition(pair.getValue(), pair.getCondition());
+               ParentDefinition parentDef = new ParentDefinition(pair.getValue(), pair.getGoalNode());
                Map<LocationDefinition, List<ExecutionVariableValuePair>> content = contentMap.get(parentDef);
                if (content != null) {
                   for (Entry<LocationDefinition, List<ExecutionVariableValuePair>> entry : content.entrySet()) {
@@ -310,18 +310,18 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       private final Term parent;
       
       /**
-       * The condition.
+       * The {@link Node} on which this result is based on.
        */
-      private final Term condition;
+      private final Node goalNode;
 
       /**
        * Constructor.
        * @param parent The parent.
-       * @param condition The condition.
+       * @param goalNode The {@link Node} on which this result is based on.
        */
-      public ParentDefinition(Term parent, Term condition) {
+      public ParentDefinition(Term parent, Node goalNode) {
          this.parent = parent;
-         this.condition = condition;
+         this.goalNode = goalNode;
       }
 
       /**
@@ -332,7 +332,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          if (obj instanceof ParentDefinition) {
             ParentDefinition other = (ParentDefinition)obj;
             return JavaUtil.equals(parent, other.parent) &&
-                   JavaUtil.equals(condition, other.condition);
+                   JavaUtil.equals(goalNode, other.goalNode);
          }
          else {
             return false;
@@ -346,7 +346,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       public int hashCode() {
          int result = 17;
          result = 31 * result + (parent != null ? parent.hashCode() : 0);
-         result = 31 * result + (condition != null ? condition.hashCode() : 0);
+         result = 31 * result + (goalNode != null ? goalNode.hashCode() : 0);
          return result;
       }
    }

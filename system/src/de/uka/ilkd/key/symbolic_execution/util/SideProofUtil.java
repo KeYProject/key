@@ -9,7 +9,6 @@ import java.util.Set;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -43,6 +42,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.profile.SimplifyTermProfile;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
@@ -581,7 +581,7 @@ public final class SideProofUtil {
                                                   String loopTreatment,
                                                   String queryTreatment,
                                                   String splittingOption) throws ProofInputException {
-      ProofStarter starter = createSideProof(sideProofEnvironment, sequentToProve);
+      ProofStarter starter = createSideProof(sideProofEnvironment, sequentToProve, null);
       return startSideProof(proof, starter, methodTreatment, loopTreatment, queryTreatment, splittingOption);
    }
    
@@ -590,18 +590,20 @@ public final class SideProofUtil {
     * of the given {@link Proof}.
     * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
     * @param sequentToProve The {@link Sequent} to proof in a new site proof.
+    * @param proofName An optional name for the newly created {@link Proof}.
     * @return The created {@link ProofStarter} with the site proof.
     * @throws ProofInputException Occurred Exception.
     */
    public static ProofStarter createSideProof(ProofEnvironment sideProofEnvironment,
-                                              Sequent sequentToProve) throws ProofInputException {
+                                              Sequent sequentToProve,
+                                              String proofName) throws ProofInputException {
       // Make sure that valid parameters are given
       assert sequentToProve != null;
       // Create ProofStarter
       ProofStarter starter = new ProofStarter(false);
       // Configure ProofStarter
       //TODO: Avoid proof environment use only InitConfig
-      starter.init(sequentToProve, sideProofEnvironment);
+      starter.init(sequentToProve, sideProofEnvironment, proofName);
       return starter;
    }
    

@@ -15,6 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -361,6 +362,25 @@ public final class JavaUtil {
       }
       else {
          return null;
+      }
+   }
+
+   /**
+    * Performs a binary insert on the given <b>sorted</b> {@link List}.
+    * @param list The <b>sorted</b> {@link List} to insert in.
+    * @param toInsert The element to insert.
+    * @param comparator The {@link Comparator} to use.
+    */
+   public static <T> void binaryInsert(List<T> list, T toInsert, Comparator<T> comparator) {
+      if (list.isEmpty()) {
+         list.add(toInsert);
+      }
+      else {
+         int index = Collections.binarySearch(list, toInsert, comparator);
+         if (index < 0) {
+            index = (index * -1) - 1;
+         }
+         list.add(index, toInsert);
       }
    }
 }

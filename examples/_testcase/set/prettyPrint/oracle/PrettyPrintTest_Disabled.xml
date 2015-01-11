@@ -99,6 +99,10 @@ termination: diamond" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged
                         <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </callStateVariable>
+                     <callStateVariable name="xBefore_main" isArrayIndex="false">
+                        <value name="xBefore_main {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
                   </methodReturn>
                </operationContract>
                <completedBlockEntry path="/0/0" conditionString="gt(x,Z(neglit(1(#))))"/>
@@ -254,6 +258,10 @@ mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initially
                         </callStateVariable>
                         <callStateVariable name="savedHeapBefore_main" isArrayIndex="false">
                            <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="xBefore_main" isArrayIndex="false">
+                           <value name="xBefore_main {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </callStateVariable>
                      </methodReturn>

@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -35,7 +36,8 @@ public class StayOnOperatorTermLabelPolicy implements TermLabelPolicy {
     * {@inheritDoc}
     */
    @Override
-   public TermLabel keepLabel(Services services,
+   public TermLabel keepLabel(TermLabelState state,
+                              Services services,
                               PosInOccurrence applicationPosInOccurrence,
                               Term applicationTerm,
                               Rule rule,

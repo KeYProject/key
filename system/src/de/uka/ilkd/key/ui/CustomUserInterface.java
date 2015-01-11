@@ -115,7 +115,7 @@ public class CustomUserInterface extends ConsoleUserInterface {
          ApplyStrategy.ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
 
          Proof proof = info.getProof();
-         if (!proof.closed()) {
+         if (!proof.closed() && getMediator().getSelectedProof() == proof) {
             Goal g = result.nonCloseableGoal();
             if (g == null) {
                g = proof.openGoals().head();

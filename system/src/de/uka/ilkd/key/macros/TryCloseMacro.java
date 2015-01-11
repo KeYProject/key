@@ -19,10 +19,10 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.ApplyStrategy;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left
@@ -90,7 +90,8 @@ public class TryCloseMacro extends AbstractProofMacro {
      * Run the automation on the goal. Retreat if not successful.
      */
     @Override
-    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+    public ProofMacroFinishedInfo applyTo(Proof proof,
+                                          KeYMediator mediator,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
@@ -105,7 +106,6 @@ public class TryCloseMacro extends AbstractProofMacro {
         final ApplyStrategy applyStrategy =
                 new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
         // assert: all goals have the same proof
-        final Proof proof = goals.head().proof();
 
         //
         // set the max number of steps if given
