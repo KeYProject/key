@@ -114,8 +114,8 @@ public class JMLSourceViewerConfigurationExtension extends
             newStrategys.add(s);
          }
          else {
-            newStrategys.add(new JavaJMLMultilineCommentAutoIndentStrategy(this
-                  .getPartitioning()));
+            newStrategys.add(new JavaJMLMultilineCommentAutoIndentStrategy(s,
+                  this.getPartitioning()));
          }
       }
 

@@ -3,10 +3,11 @@ package org.key_project.jmlediting.ui.highlighting;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
-import org.eclipse.jdt.internal.ui.text.javadoc.JavaDocAutoIndentStrategy;
 import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.DefaultIndentLineAutoEditStrategy;
 import org.eclipse.jface.text.DocumentCommand;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
@@ -17,12 +18,50 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.texteditor.ITextEditorExtension3;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 
+/**
+ * The {@link JavaJMLMultilineCommentAutoIndentStrategy} format JML comments
+ * correctly. It works on all comments, for all non JML comments, another given
+ * {@link IAutoEditStrategy} is called.
+ *
+ * @author Moritz Lichter
+ *
+ */
 @SuppressWarnings("restriction")
-public class JavaJMLMultilineCommentAutoIndentStrategy extends JavaDocAutoIndentStrategy {
+public class JavaJMLMultilineCommentAutoIndentStrategy extends
+      DefaultIndentLineAutoEditStrategy {
+
+   /**
+    * The strategy which is wrapped and called for non JML comments.
+    */
+   private final IAutoEditStrategy wrappedStrategy;
+
+   /** The partitioning that this strategy operates on. */
+   private final String fPartitioning;
+
+   /**
+    * Creates a new Javadoc auto indent strategy for the given document
+    * partitioning.
+    *
+    * @param partitioning
+    *           the document partitioning
+    * @param wrappedStrategy
+    *           the strategy which should be called outside JML comments
+    */
+   public JavaJMLMultilineCommentAutoIndentStrategy(
+         final IAutoEditStrategy wrappedStrategy, final String partitioning) {
+      this.fPartitioning = partitioning;
+      this.wrappedStrategy = wrappedStrategy;
+   }
+
+   /*
+    * Unfortunately, a lot of code is copied form JavaDocAutoIndentStrategy, but
+    * the code cannot be accessed. Only the inserted * are changed to @
+    */
 
    @Override
    public void customizeDocumentCommand(final IDocument document,
          final DocumentCommand command) {
+      // Detect whether JML or not
       final CommentLocator loc = new CommentLocator(document.get());
       if (loc.isInJMLComment(command.offset)) {
          if (!this.isSmartMode()) {
@@ -52,23 +91,8 @@ public class JavaJMLMultilineCommentAutoIndentStrategy extends JavaDocAutoIndent
          }
       }
       else {
-         super.customizeDocumentCommand(document, command);
+         this.wrappedStrategy.customizeDocumentCommand(document, command);
       }
-   }
-
-   /** The partitioning that this strategy operates on. */
-   private final String fPartitioning;
-
-   /**
-    * Creates a new Javadoc auto indent strategy for the given document
-    * partitioning.
-    *
-    * @param partitioning
-    *           the document partitioning
-    */
-   public JavaJMLMultilineCommentAutoIndentStrategy(final String partitioning) {
-      super(partitioning);
-      this.fPartitioning = partitioning;
    }
 
    /**
