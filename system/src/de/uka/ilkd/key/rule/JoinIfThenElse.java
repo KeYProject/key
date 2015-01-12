@@ -63,6 +63,7 @@ public class JoinIfThenElse extends JoinRule {
       Pair<Term, Term> joinedState = states.head();
       states = states.tail();
       
+      int progress = 0;
       for (Pair<Term,Term> state : states) {
          
          HashSet<LocationVariable> progVars =
@@ -166,6 +167,12 @@ public class JoinIfThenElse extends JoinRule {
          Term newPathCondition = tb.or(joinedState.second, state.second);
          
          joinedState = new Pair<Term, Term>(newSymbolicState, newPathCondition);
+         
+         // Signal progress to UI
+         //TODO: Obviously, the following call has no effect, since the EDT is
+         //      blocked and the progress bar does not receive the new information
+         //      until the task has been finished...
+         mediator().getUI().taskProgress(progress++);
       }
       
       return joinedState;
