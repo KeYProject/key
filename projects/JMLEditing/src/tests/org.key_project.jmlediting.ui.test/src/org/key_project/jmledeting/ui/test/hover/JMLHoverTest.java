@@ -22,7 +22,7 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.ui.test.Activator;
-import org.key_project.jmlediting.ui.test.TestUtils;
+import org.key_project.jmlediting.ui.test.UITestUtils;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -47,11 +47,11 @@ public class JMLHoverTest {
             .getProject().getFolder("src"), PACKAGE_NAME);
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
             "data/template/" + CLASS_NAME + ".java", testFolder);
-      TestUtils.selectFileInProject(bot, PROJECT_NAME, "src/test/" + CLASS_NAME
+      UITestUtils.selectFileInProject(bot, PROJECT_NAME, "src/test/" + CLASS_NAME
             + ".java");
       editor = bot.activeEditor().toTextEditor();
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(),
-            TestUtils.findReferenceProfile());
+            UITestUtils.findReferenceProfile());
       profile = JMLPreferencesHelper.getProjectActiveJMLProfile(project
             .getProject());
    }
@@ -73,7 +73,7 @@ public class JMLHoverTest {
          final int column = Integer.parseInt(data[1]);
          final String expectedKeyword = data[2];
 
-         final String hoverText = TestUtils.getHoverAtPosition(bot, editor,
+         final String hoverText = UITestUtils.getHoverAtPosition(bot, editor,
                line, column);
 
          final IKeyword keyword = JMLProfileHelper.findKeyword(profile,

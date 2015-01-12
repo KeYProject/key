@@ -26,12 +26,13 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
+import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-public class TestUtils {
+public class UITestUtils {
 
    public static IProject getProjectWithName(final String name) {
       final IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
@@ -167,25 +168,80 @@ public class TestUtils {
       return null;
    }
 
-   public static class ProjectOpenResult {
-      public final SWTBotEclipseEditor openedEditor;
-      public final IJavaProject project;
+   public static class TestProject {
+      private final SWTWorkbenchBot bot;
+      private final String projectName;
+      private final String packageName;
+      private final String className;
+      private final String classLocation;
+      private SWTBotEclipseEditor openedEditor;
+      private final IJavaProject project;
+      private final IFolder testFolder;
 
-      public ProjectOpenResult(final SWTBotEclipseEditor openFile,
-            final IJavaProject project) {
+      public TestProject(final SWTWorkbenchBot bot, final String projectName,
+            final String packageName, final String className,
+            final String classLoc) throws CoreException, InterruptedException {
          super();
-         this.openedEditor = openFile;
-         this.project = project;
+         this.bot = bot;
+         this.classLocation = classLoc;
+         this.projectName = projectName;
+         this.project = TestUtilsUtil.createJavaProject(this.projectName);
+         this.packageName = packageName;
+         this.className = className;
+         // Create folders for the package
+         final IFolder srcFolder = this.project.getProject().getFolder("src");
+         final String[] packageFolders = this.packageName.split("\\.");
+         IFolder testFolder = srcFolder;
+         for (final String folder : packageFolders) {
+            testFolder = TestUtilsUtil.createFolder(testFolder, folder);
+         }
+         this.testFolder = testFolder;
+      }
+
+      public void reloadClassAndOpen() throws CoreException {
+         if (this.openedEditor != null && this.openedEditor.isDirty()) {
+
+            this.bot.getDisplay().syncExec(new Runnable() {
+
+               @Override
+               public void run() {
+                  ((ITextEditor) TestProject.this.openedEditor.getReference()
+                        .getEditor(true)).doRevertToSaved();
+               }
+            });
+         }
+         else {
+            if (this.openedEditor != null) {
+               this.openedEditor.close();
+            }
+            // Copy the class
+            BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
+                  this.classLocation, this.testFolder);
+            // Open the editor
+            this.bot.tree().getTreeItem(this.projectName).select().expand()
+                  .getNode("src").select().expand().getNode(this.packageName)
+                  .select().expand().getNode(this.className + ".java").select()
+                  .doubleClick();
+            this.openedEditor = this.bot.activeEditor().toTextEditor();
+         }
+      }
+
+      public IJavaProject getProject() {
+         return this.project;
+      }
+
+      public SWTBotEclipseEditor getOpenedEditor() {
+         return this.openedEditor;
       }
 
    }
 
    /**
     * Does the same as
-    * {@link TestUtils#createProjectWithFileAndOpen(SWTWorkbenchBot, String, String, String, String)}
+    * {@link UITestUtils#createProjectWithFileAndOpen(SWTWorkbenchBot, String, String, String, String)}
     * but implies the location of the class file. The source file to copy should
     * be located in data/template/CLASSNAME.java
-    * 
+    *
     * @param bot
     *           the bot to use
     * @param projectName
@@ -198,12 +254,11 @@ public class TestUtils {
     * @throws CoreException
     * @throws InterruptedException
     */
-   public static ProjectOpenResult createProjectWithFileAndOpen(
-         final SWTWorkbenchBot bot, final String projectName,
-         final String packageName, final String className)
-         throws CoreException, InterruptedException {
-      return createProjectWithFileAndOpen(bot, projectName, packageName,
-            className, "data/template/" + className + ".java");
+   public static TestProject createProjectWithFile(final SWTWorkbenchBot bot,
+         final String projectName, final String packageName,
+         final String className) throws CoreException, InterruptedException {
+      return createProjectWithFile(bot, projectName, packageName, className,
+            "data/template/" + className + ".java");
    }
 
    /**
@@ -221,32 +276,17 @@ public class TestUtils {
     * @param classLoc
     *           the location where the class source file is located and from
     *           which it should be copied
-    * @return an object of type {@link ProjectOpenResult} which contains the
-    *         editor and the project
+    * @return an object of type {@link TestProject} which contains the editor
+    *         and the project
     * @throws CoreException
     * @throws InterruptedException
     */
-   public static ProjectOpenResult createProjectWithFileAndOpen(
-         final SWTWorkbenchBot bot, final String projectName,
-         final String packageName, final String className, final String classLoc)
-         throws CoreException, InterruptedException {
+   public static TestProject createProjectWithFile(final SWTWorkbenchBot bot,
+         final String projectName, final String packageName,
+         final String className, final String classLoc) throws CoreException,
+         InterruptedException {
 
-      final IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
-      // Create folders for the package
-      final IFolder srcFolder = project.getProject().getFolder("src");
-      final String[] packageFolders = packageName.split("\\.");
-      IFolder testFolder = srcFolder;
-      for (final String folder : packageFolders) {
-         testFolder = TestUtilsUtil.createFolder(testFolder, folder);
-      }
-      // Copy the class
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, classLoc,
-            testFolder);
-      // Open the editor
-      bot.tree().getTreeItem(projectName).select().expand().getNode("src")
-            .select().expand().getNode(packageName).select().expand()
-            .getNode(className + ".java").select().doubleClick();
-      return new ProjectOpenResult(bot.activeEditor().toTextEditor(), project);
+      return new TestProject(bot, projectName, packageName, className, classLoc);
    }
 
    /**

@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.ui.test.Activator;
-import org.key_project.jmlediting.ui.test.TestUtils;
+import org.key_project.jmlediting.ui.test.UITestUtils;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -98,13 +98,13 @@ public class JMLCompletionProposalComputerTest {
             .getNode(CLASS_NAME + ".java").select().doubleClick();
       bot.sleep(1000);
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(),
-            TestUtils.findReferenceProfile());
+            UITestUtils.findReferenceProfile());
    }
 
    private static int countKeywords() {
       int result = 0;
 
-      for (final IKeyword keywords : TestUtils.findReferenceProfile()
+      for (final IKeyword keywords : UITestUtils.findReferenceProfile()
             .getSupportedKeywords()) {
          result += keywords.getKeywords().size();
       }

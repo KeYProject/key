@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
-import org.key_project.jmlediting.ui.test.TestUtils;
+import org.key_project.jmlediting.ui.test.UITestUtils;
 
 public class ProfilePropertiesTest {
 
@@ -27,9 +27,9 @@ public class ProfilePropertiesTest {
    @Test
    public void testBasics() {
        
-      TestUtils.prepareWorkbench(bot);
+      UITestUtils.prepareWorkbench(bot);
       
-      IProject project = TestUtils.createEmptyJavaProject(bot,PROJECT_NAME);
+      IProject project = UITestUtils.createEmptyJavaProject(bot,PROJECT_NAME);
       
       
       
@@ -41,7 +41,7 @@ public class ProfilePropertiesTest {
       
       
       //Open the JML properties page for the project
-      TestUtils.openJMLProfileProperties(bot,PROJECT_NAME);
+      UITestUtils.openJMLProfileProperties(bot,PROJECT_NAME);
       
       SWTBotCheckBox enableProjectSettingsBox = bot.checkBox();
       SWTBotTable profileList = bot.table();
@@ -65,7 +65,7 @@ public class ProfilePropertiesTest {
       enableProjectSettingsBox.select();
       assertTrue("Cannot select profiles with project specific settings", profileList.isEnabled());
       
-      TestUtils.validateProfileListSelection(globalDefault, profileList);
+      UITestUtils.validateProfileListSelection(globalDefault, profileList);
       
       // Lets select a new one
       int newIndex = ALL_PROFILES.size() -1;

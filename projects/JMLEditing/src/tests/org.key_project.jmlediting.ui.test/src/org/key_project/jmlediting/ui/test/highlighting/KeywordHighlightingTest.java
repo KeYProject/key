@@ -12,7 +12,7 @@ import org.eclipse.swtbot.swt.finder.utils.Position;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
-import org.key_project.jmlediting.ui.test.TestUtils;
+import org.key_project.jmlediting.ui.test.UITestUtils;
 
 /**
  *
@@ -99,12 +99,12 @@ public class KeywordHighlightingTest {
     */
    @BeforeClass
    public static void initProject() throws CoreException, InterruptedException {
-      final TestUtils.ProjectOpenResult result = TestUtils
-            .createProjectWithFileAndOpen(bot, PROJECT_NAME, PACKAGE_NAME,
-                  CLASS_NAME);
-      JMLPreferencesHelper.setProjectJMLProfile(result.project.getProject(),
-            TestUtils.findReferenceProfile());
-      editor = result.openedEditor;
+      final UITestUtils.TestProject result = UITestUtils.createProjectWithFile(bot,
+            PROJECT_NAME, PACKAGE_NAME, CLASS_NAME);
+      result.reloadClassAndOpen();
+      JMLPreferencesHelper.setProjectJMLProfile(result.getProject()
+            .getProject(), UITestUtils.findReferenceProfile());
+      editor = result.getOpenedEditor();
    }
 
    private static void removeText(final int line, final int column,

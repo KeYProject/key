@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.ui.preferencepages.JMLColorPreferencePage;
-import org.key_project.jmlediting.ui.test.TestUtils;
+import org.key_project.jmlediting.ui.test.UITestUtils;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
 
 /**
@@ -39,7 +39,7 @@ public class JMLColorPreferencePageTest {
 
    @BeforeClass
    public static void init() {
-      TestUtils.prepareWorkbench(bot);
+      UITestUtils.prepareWorkbench(bot);
    }
 
    @Before

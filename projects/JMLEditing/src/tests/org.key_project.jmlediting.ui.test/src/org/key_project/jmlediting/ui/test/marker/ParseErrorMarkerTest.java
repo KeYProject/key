@@ -11,8 +11,8 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
-import org.key_project.jmlediting.ui.test.TestUtils;
-import org.key_project.jmlediting.ui.test.TestUtils.ProjectOpenResult;
+import org.key_project.jmlediting.ui.test.UITestUtils;
+import org.key_project.jmlediting.ui.test.UITestUtils.TestProject;
 
 public class ParseErrorMarkerTest {
 
@@ -30,12 +30,13 @@ public class ParseErrorMarkerTest {
    @BeforeClass
    public static void initializeProjectAndOpenEditor() throws CoreException,
          InterruptedException {
-      final ProjectOpenResult result = TestUtils.createProjectWithFileAndOpen(
-            bot, PROJECT_NAME, PACKAGE_NAME, CLASS_NAME);
-      testProject = result.project.getProject();
-      openEditor = result.openedEditor;
+      final TestProject result = UITestUtils.createProjectWithFile(bot,
+            PROJECT_NAME, PACKAGE_NAME, CLASS_NAME);
+      result.reloadClassAndOpen();
+      testProject = result.getProject().getProject();
+      openEditor = result.getOpenedEditor();
       JMLPreferencesHelper.setProjectJMLProfile(testProject,
-            TestUtils.findReferenceProfile());
+            UITestUtils.findReferenceProfile());
    }
 
    @Test
@@ -44,7 +45,7 @@ public class ParseErrorMarkerTest {
       openEditor.typeText(0, 0, " ");
       openEditor.save();
       bot.sleep(5000);
-      final List<Integer> errorLines = TestUtils.getAllErrorLines(bot,
+      final List<Integer> errorLines = UITestUtils.getAllErrorLines(bot,
             CLASS_NAME + ".java");
       System.out.println(errorLines);
       assertTrue("No error marker for line 8", errorLines.contains(8));

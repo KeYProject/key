@@ -17,7 +17,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.ui.test.Activator;
-import org.key_project.jmlediting.ui.test.TestUtils;
+import org.key_project.jmlediting.ui.test.UITestUtils;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -105,7 +105,7 @@ public class JMLCommentHighlightingTest {
             "data/template", testFolder);
 
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(),
-            TestUtils.findReferenceProfile());
+            UITestUtils.findReferenceProfile());
    }
 
    /*

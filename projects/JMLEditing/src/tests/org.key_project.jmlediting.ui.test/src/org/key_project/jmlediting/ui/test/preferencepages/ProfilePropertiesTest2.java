@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
-import org.key_project.jmlediting.ui.test.TestUtils;
+import org.key_project.jmlediting.ui.test.UITestUtils;
 
 public class ProfilePropertiesTest2 {
 
@@ -25,15 +25,15 @@ public class ProfilePropertiesTest2 {
    
    @Test
    public void testShowProjectSpecificProfileAndResetIt() throws CoreException{
-      TestUtils.prepareWorkbench(bot);
+      UITestUtils.prepareWorkbench(bot);
       
-      IProject project = TestUtils.createEmptyJavaProject(bot, PROJECT_NAME);
+      IProject project = UITestUtils.createEmptyJavaProject(bot, PROJECT_NAME);
       int projectProfileIndex = 0;
       JMLPreferencesHelper.setProjectJMLProfile(project, ALL_PROFILES.get(projectProfileIndex));
       int defaultProfileIndex = ALL_PROFILES.size()-1;
       JMLPreferencesHelper.setDefaultJMLProfile(ALL_PROFILES.get(defaultProfileIndex));
       
-      TestUtils.openJMLProfileProperties(bot, PROJECT_NAME);
+      UITestUtils.openJMLProfileProperties(bot, PROJECT_NAME);
       
       SWTBotCheckBox enableProjectSettingsBox = bot.checkBox();
       SWTBotTable profileList = bot.table();
@@ -42,7 +42,7 @@ public class ProfilePropertiesTest2 {
       bot.sleep(100);
       
       assertTrue("Enable specific settings checkbox is not checked", enableProjectSettingsBox.isChecked());
-      TestUtils.validateProfileListSelection(ALL_PROFILES.get(projectProfileIndex), profileList);
+      UITestUtils.validateProfileListSelection(ALL_PROFILES.get(projectProfileIndex), profileList);
       
       enableProjectSettingsBox.deselect();
       
@@ -51,7 +51,7 @@ public class ProfilePropertiesTest2 {
       bot.sleep(100);
       
       assertTrue("List is enabled when project specific settings are disabled", !profileList.isEnabled());
-      TestUtils.validateProfileListSelection(JMLPreferencesHelper.getDefaultJMLProfile(), profileList);
+      UITestUtils.validateProfileListSelection(JMLPreferencesHelper.getDefaultJMLProfile(), profileList);
       
       bot.button("Cancel").click();
       
