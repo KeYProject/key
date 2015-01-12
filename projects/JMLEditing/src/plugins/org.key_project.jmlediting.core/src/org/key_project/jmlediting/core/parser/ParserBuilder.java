@@ -699,4 +699,43 @@ public final class ParserBuilder {
       return new RecursiveParseFunction();
    }
 
+   public static ParseFunction listOp(final String op, final ParseFunction elem) {
+      return listOp(constant(op), elem);
+   }
+
+   public static ParseFunction listOp(final ParseFunction op,
+         final ParseFunction elem) {
+
+      return seq(elem, list(seq(op, elem)));
+   }
+
+   public static ParseFunction brackets(final ParseFunction p) {
+      return seq(constant("("), p, constant(")"));
+   }
+
+   public static ParseFunction squareBrackets(final ParseFunction p) {
+      return seq(constant("["), p, constant("]"));
+   }
+
+   public static ParseFunction curlyBrackets(final ParseFunction p) {
+      return seq(constant("{"), p, constant("}"));
+   }
+
+   public static ParseFunction oneConstant(final String... constants) {
+      ParseFunction f = notImplemented();
+      for (final String constant : constants) {
+         f = alt(constant(constant), f);
+      }
+      return f;
+   }
+
+   public static ParseFunction oneConstant(final int type,
+         final String... constants) {
+      ParseFunction f = notImplemented();
+      for (final String constant : constants) {
+         f = alt(constant(constant), f);
+      }
+      return typed(type, f);
+   }
+
 }

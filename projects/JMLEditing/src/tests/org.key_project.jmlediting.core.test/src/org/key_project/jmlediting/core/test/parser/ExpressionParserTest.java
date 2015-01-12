@@ -112,7 +112,8 @@ public class ExpressionParserTest {
    public static void testParse(final String content) {
       try {
          System.out.println(ParserBuilder.requireComplete(
-               new ExpressionParser()).parse(content, 0, content.length()));
+               new ExpressionParser(ProfileWrapper.testProfile)).parse(content,
+               0, content.length()));
       }
       catch (final ParserException e) {
          fail(e.getMessage());

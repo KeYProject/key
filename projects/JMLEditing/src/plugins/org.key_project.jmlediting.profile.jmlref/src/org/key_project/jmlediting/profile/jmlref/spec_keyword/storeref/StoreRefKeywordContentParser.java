@@ -2,6 +2,7 @@ package org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
+import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserBuilder;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
@@ -26,6 +27,8 @@ public class StoreRefKeywordContentParser implements IKeywordParser {
     */
    private final boolean allowInformalDescription;
 
+   private ParseFunction mainParser;
+
    /**
     * Crates a new {@link StoreRefKeywordContentParser}.
     *
@@ -42,6 +45,8 @@ public class StoreRefKeywordContentParser implements IKeywordParser {
       // This method is invoked before the parseToSemicolon method is invoked
       // Thus, the parser is valid then
       this.parser = new StoreRefParser(profile, this.allowInformalDescription);
+      this.mainParser = ParserBuilder.closedBy(NodeTypes.KEYWORD_CONTENT,
+            this.parser, ';');
    }
 
    /*
@@ -54,9 +59,7 @@ public class StoreRefKeywordContentParser implements IKeywordParser {
    @Override
    public IASTNode parse(final String text, final int start, final int end)
          throws ParserException {
-      return ParserBuilder
-            .closedBy(NodeTypes.KEYWORD_CONTENT, this.parser, ';').parse(text,
-                  start, end);
+      return this.mainParser.parse(text, start, end);
    }
 
 }

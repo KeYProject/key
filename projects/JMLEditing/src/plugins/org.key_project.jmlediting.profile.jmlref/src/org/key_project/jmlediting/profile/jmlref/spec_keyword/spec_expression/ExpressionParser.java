@@ -2,6 +2,7 @@ package org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression;
 
 import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
 import static org.key_project.jmlediting.profile.jmlref.parseutil.JavaBasicsParser.*;
+import static org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes.JAVA_KEYWORD;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,10 @@ import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.IRecursiveParseFunction;
 import org.key_project.jmlediting.core.parser.ParseFunction;
+import org.key_project.jmlediting.core.parser.ParserBuilder;
 import org.key_project.jmlediting.core.parser.ParserException;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 
 public class ExpressionParser implements ParseFunction {
 
@@ -21,39 +25,6 @@ public class ExpressionParser implements ParseFunction {
    public IASTNode parse(final String text, final int start, final int end)
          throws ParserException {
       return this.mainParser.parse(text, start, end);
-   }
-
-   // Temporary implementation, will be optimized and moved to another class
-   // later on
-   // But should cover correct semantics
-
-   private static ParseFunction listOp(final String op, final ParseFunction elem) {
-      return listOp(constant(op), elem);
-   }
-
-   private static ParseFunction listOp(final ParseFunction op,
-         final ParseFunction elem) {
-      return seq(elem, list(seq(op, elem)));
-   }
-
-   private static ParseFunction brackets(final ParseFunction p) {
-      return seq(constant("("), p, constant(")"));
-   }
-
-   private static ParseFunction squareBrackets(final ParseFunction p) {
-      return seq(constant("["), p, constant("]"));
-   }
-
-   private static ParseFunction curlyBrackets(final ParseFunction p) {
-      return seq(constant("{"), p, constant("}"));
-   }
-
-   private static ParseFunction oneConstant(final String... constants) {
-      ParseFunction f = notImplemented();
-      for (final String constant : constants) {
-         f = alt(constant(constant), f);
-      }
-      return f;
    }
 
    private static IASTNode clean(final IASTNode node) {
@@ -90,7 +61,7 @@ public class ExpressionParser implements ParseFunction {
       };
    }
 
-   public ExpressionParser() {
+   public ExpressionParser(final IJMLProfile profile) {
 
       // Initially create some parse function which refer recursivly to themself
       // It is easy to detect which them, if the function are all declared as
@@ -126,13 +97,13 @@ public class ExpressionParser implements ParseFunction {
       /**
        * array-initializer ::= { [ initializer [ , initializer ] ... [ , ] ] }
        */
-      arrayInitializer.defineAs(curlyBrackets(seq(initializer,
+      arrayInitializer.defineAs(ParserBuilder.curlyBrackets(seq(initializer,
             list(seq(constant(","), initializer)), opt(constant(",")))));
       /**
        * dim-exprs ::= `[' expression `]' [ `[' expression `]' ] ...
        */
-      final ParseFunction dimExprs = nonEmptyList(squareBrackets(expression),
-            "Expected an expression");
+      final ParseFunction dimExprs = nonEmptyList(
+            ParserBuilder.squareBrackets(expression), "Expected an expression");
 
       /**
        * array-decl ::= dim-exprs [ dims ]
@@ -147,7 +118,7 @@ public class ExpressionParser implements ParseFunction {
       final ParseFunction classBlock = notImplemented();
       final ParseFunction setComprehension = notImplemented();
       final ParseFunction newSuffix = alt(
-            seq(brackets(opt(expressionList)), opt(classBlock)),
+            seq(ParserBuilder.brackets(opt(expressionList)), opt(classBlock)),
             seq(arrayDecl, opt(arrayInitializer)), setComprehension);
 
       /**
@@ -155,8 +126,9 @@ public class ExpressionParser implements ParseFunction {
        * | char | short | int<br>
        * | long | float | double
        */
-      final ParseFunction builtInType = oneConstant("void", "boolean", "byte",
-            "char", "short", "int", "long", "float", "double");
+      final ParseFunction builtInType = ParserBuilder.oneConstant("void",
+            "boolean", "byte", "char", "short", "int", "long", "float",
+            "double");
       /**
        * reference-type ::= name
        */
@@ -184,7 +156,8 @@ public class ExpressionParser implements ParseFunction {
       /**
        * new-expr ::= new type new-suffix
        */
-      final ParseFunction newExpr = seq(constant("new"), type, newSuffix);
+      final ParseFunction newExpr = seq(typed(JAVA_KEYWORD, constant("new")),
+            type, newSuffix);
 
       /**
        * constant ::= java-literal
@@ -198,9 +171,13 @@ public class ExpressionParser implements ParseFunction {
        * | ( expression )<br>
        * | jml-primary
        */
+      final ParseFunction jmlPrimary = keywords(
+            JMLProfileHelper.filterKeywords(profile, IJMLPrimaryKeyword.class),
+            profile);
       final ParseFunction primaryExpr = alt(ident(), newExpr, constant,
-            oneConstant("super", "true", "false", "this", "null"),
-            brackets(expression), new JMLPrimaryExpressionsParser());
+            ParserBuilder.oneConstant(JAVA_KEYWORD, "super", "true", "false",
+                  "this", "null"), ParserBuilder.brackets(expression),
+            jmlPrimary);
 
       /**
        * primary-suffix ::= . ident<br>
@@ -214,9 +191,14 @@ public class ExpressionParser implements ParseFunction {
        */
       final ParseFunction primarySuffix = alt(
             seq(constant("."),
-                  alt(ident(), constant("this"), constant("class"), newExpr,
-                        seq(constant("super"), brackets(opt(expressionList))))),
-            brackets(opt(expressionList)), squareBrackets(expression),
+                  alt(ident(),
+                        constant("this"),
+                        constant("class"),
+                        newExpr,
+                        seq(constant("super"),
+                              ParserBuilder.brackets(opt(expressionList))))),
+            ParserBuilder.brackets(opt(expressionList)),
+            ParserBuilder.squareBrackets(expression),
             seq(list(seq(constant("["), constant("]"))), constant("class")));
 
       /**
@@ -239,8 +221,8 @@ public class ExpressionParser implements ParseFunction {
        */
       final ParseFunction unaryExprNotPlusMinus = alt(
             seq(constant("~"), unaryExpr), seq(constant("!"), unaryExpr),
-            seq(brackets(builtInType), unaryExpr),
-            seq(brackets(referenceType)), postfixExpr);
+            seq(ParserBuilder.brackets(builtInType), unaryExpr),
+            seq(ParserBuilder.brackets(referenceType)), postfixExpr);
 
       /**
        * unary-expr ::= ( type-spec ) unary-expr<br>
@@ -250,7 +232,7 @@ public class ExpressionParser implements ParseFunction {
        * | - unary-expr<br>
        * | unary-expr-not-plus-minus
        */
-      unaryExpr.defineAs(alt(seq(brackets(typeSpec), unaryExpr),
+      unaryExpr.defineAs(alt(seq(ParserBuilder.brackets(typeSpec), unaryExpr),
             seq(constant("++"), unaryExpr), seq(constant("--"), unaryExpr),
             seq(constant("+"), unaryExpr), seq(constant("-"), unaryExpr),
             unaryExprNotPlusMinus));
@@ -259,25 +241,27 @@ public class ExpressionParser implements ParseFunction {
        * mult-expr ::= unary-expr [ mult-op unary-expr ] ...<br>
        * mult-op ::= * | / | %
        */
-      final ParseFunction multExpr = listOp(oneConstant("*", "/", "%"),
-            unaryExpr);
+      final ParseFunction multExpr = ParserBuilder.listOp(
+            ParserBuilder.oneConstant("*", "/", "%"), unaryExpr);
 
       /**
        * additive-expr ::= mult-expr [ additive-op mult-expr ] ... <br>
        * additive-op ::= + | -
        */
-      final ParseFunction additiveExpr = listOp(
+      final ParseFunction additiveExpr = ParserBuilder.listOp(
             alt(constant("+"), constant("-")), multExpr);
 
       /**
        * shift-op ::= << | >> | >>>
        */
-      final ParseFunction shiftOp = oneConstant("<<", ">>", ">>>");
+      final ParseFunction shiftOp = ParserBuilder
+            .oneConstant("<<", ">>", ">>>");
 
       /**
        * shift-expr ::= additive-expr [ shift-op additive-expr ] ...
        */
-      final ParseFunction shiftExpr = listOp(shiftOp, additiveExpr);
+      final ParseFunction shiftExpr = ParserBuilder.listOp(shiftOp,
+            additiveExpr);
 
       /**
        * relational-expr ::= shift-expr < shift-expr <br>
@@ -287,8 +271,8 @@ public class ExpressionParser implements ParseFunction {
        * | shift-expr <: shift-expr <br>
        * | shift-expr [ instanceof type-spec ]
        */
-      final ParseFunction relationalExprOp = oneConstant("<", ">", "<=", ">=",
-            "<:");
+      final ParseFunction relationalExprOp = ParserBuilder.oneConstant("<",
+            ">", "<=", ">=", "<:");
       final ParseFunction relationalExpr = alt(
             seq(shiftExpr, relationalExprOp, shiftExpr),
             seq(shiftExpr, opt(seq(constant("instanceof"), typeSpec))));
@@ -297,33 +281,37 @@ public class ExpressionParser implements ParseFunction {
        * equality-expr ::= relational-expr [ == relational-expr] ... |
        * relational-expr [ != relational-expr] ...
        */
-      final ParseFunction equalityExpr = alt(listOp("==", relationalExpr),
-            listOp("!=", relationalExpr));
+      final ParseFunction equalityExpr = alt(
+            ParserBuilder.listOp("==", relationalExpr),
+            ParserBuilder.listOp("!=", relationalExpr));
 
       /**
        * and-expr ::= equality-expr [ & equality-expr ] ...
        */
-      final ParseFunction andExpr = listOp("&", equalityExpr);
+      final ParseFunction andExpr = ParserBuilder.listOp("&", equalityExpr);
 
       /**
        * exclusive-or-expr ::= and-expr [ ^ and-expr ] ...
        */
-      final ParseFunction exclusiveOrExpr = listOp("^", andExpr);
+      final ParseFunction exclusiveOrExpr = ParserBuilder.listOp("^", andExpr);
 
       /**
        * inclusive-or-expr ::= exclusive-or-expr [ `|' exclusive-or-expr ] ...
        */
-      final ParseFunction inclusiveOrExpr = listOp("|", exclusiveOrExpr);
+      final ParseFunction inclusiveOrExpr = ParserBuilder.listOp("|",
+            exclusiveOrExpr);
 
       /**
        * logical-and-expr ::= inclusive-or-expr [ && inclusive-or-expr ] ...
        */
-      final ParseFunction logicalAndExpr = listOp("&&", inclusiveOrExpr);
+      final ParseFunction logicalAndExpr = ParserBuilder.listOp("&&",
+            inclusiveOrExpr);
 
       /**
        * logical-or-expr ::= logical-and-expr [ `||' logical-and-expr ] ...
        */
-      final ParseFunction logicalOrExpr = listOp("||", logicalAndExpr);
+      final ParseFunction logicalOrExpr = ParserBuilder.listOp("||",
+            logicalAndExpr);
 
       /**
        * implies-non-backward-expr ::= logical-or-expr <br>
@@ -349,7 +337,8 @@ public class ExpressionParser implements ParseFunction {
       /**
        * equivalence-op ::= <==> | <=!=>
        */
-      final ParseFunction equivalenceOp = oneConstant("<==>", "<=!=>");
+      final ParseFunction equivalenceOp = ParserBuilder.oneConstant("<==>",
+            "<=!=>");
 
       /**
        * equivalence-expr ::= implies-expr [ equivalence-op implies-expr ] ...
@@ -370,8 +359,8 @@ public class ExpressionParser implements ParseFunction {
        * assignment-op ::= = | += | -= | *= | /= | %= | >>= | >>>= | <<= | &= |
        * `|=' | ^=
        */
-      final ParseFunction assignmentOp = oneConstant("=", "+=", "-=", "*=",
-            "/=", "%=", ">>=", ">>>=", "<<=", "&=", "|=", "^=");
+      final ParseFunction assignmentOp = ParserBuilder.oneConstant("=", "+=",
+            "-=", "*=", "/=", "%=", ">>=", ">>>=", "<<=", "&=", "|=", "^=");
 
       /**
        * assignment-expr ::= conditional-expr [ assignment-op assignment-expr ]

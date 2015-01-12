@@ -1,6 +1,10 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword;
 
+import org.key_project.jmlediting.core.dom.NodeTypes;
+import org.key_project.jmlediting.core.parser.ParseFunction;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
 
 /**
  * The requires keyword.
@@ -24,7 +28,14 @@ public class RequiresKeyword extends AbstractGenericSpecificationKeyword {
 
    @Override
    public IKeywordParser createParser() {
-      return new DefaultGenericSpecificationKeywordParser();
+      return new ParseFunctionGenericKeywordParser(NodeTypes.NODE) {
+
+         @Override
+         protected ParseFunction createContentParseFunction(
+               final IJMLProfile profile) {
+            return new ExpressionParser(profile);
+         }
+      };
    }
 
 }

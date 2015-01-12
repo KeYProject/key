@@ -1,17 +1,11 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression;
 
-import org.key_project.jmlediting.core.dom.IASTNode;
-import org.key_project.jmlediting.core.parser.ParseFunction;
-import org.key_project.jmlediting.core.parser.ParserException;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
 
-public class SpecExpressionParser implements ParseFunction {
+public class SpecExpressionParser extends ExpressionParser {
 
-   private ExpressionParser parser;
-
-   @Override
-   public IASTNode parse(final String text, final int start, final int end)
-         throws ParserException {
-      return this.parser.parse(text, start, end);
+   public SpecExpressionParser(final IJMLProfile profile) {
+      super(profile);
    }
 
 }
