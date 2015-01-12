@@ -179,8 +179,6 @@ public class CloseAfterJoin implements BuiltInRule {
     * @return True iff node is contained in proof.
     */
    private static boolean proofContainsNode(Proof proof, Node node) {
-      //TODO: Remove this method if not needed at end
-      
       FindNodeVisitor visitor = new FindNodeVisitor(node);
       proof.breadthFirstSearch(proof.root(), visitor);
       return visitor.success();
