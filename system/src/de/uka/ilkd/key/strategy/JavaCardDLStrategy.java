@@ -2556,18 +2556,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 //	    return result;
 //	}
        
-       // Disable join rule from strategy.
-       // TODO: This is a temporary measure, since the join rule is
-       //       not yet suitable for automatic application. Later,
-       //       the above code should be removed (when the rule can
-       //       also be applied automatically).
-       if (app instanceof AbstractBuiltInRuleApp) {
-          AbstractBuiltInRuleApp aBiRApp = (AbstractBuiltInRuleApp) app;
-          if (aBiRApp.rule() instanceof JoinRule) {
-             return TopRuleAppCost.INSTANCE;
-          }
-       }
-       
         return costComputationF.compute ( app, pio, goal );
     }
 

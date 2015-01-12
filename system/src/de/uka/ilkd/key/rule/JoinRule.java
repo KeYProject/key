@@ -78,11 +78,9 @@ public abstract class JoinRule implements BuiltInRule {
    public ImmutableList<Goal> apply(Goal goal, final Services services,
          RuleApp ruleApp) throws RuleAbortException {
       
-      KeYMediator mediator = MainWindow.getInstance().getMediator();
       boolean stoppedInterface = false;
-      
-      if (!mediator.isInAutoMode()) {
-         mediator.stopInterface(true);
+      if (!mediator().isInAutoMode()) {
+         mediator().stopInterface(true);
          stoppedInterface = true;
       }
       
@@ -140,7 +138,7 @@ public abstract class JoinRule implements BuiltInRule {
       }
       
       if (stoppedInterface) {
-         mediator.startInterface(true);
+         mediator().startInterface(true);
       }
       
       return newGoals;
@@ -175,16 +173,9 @@ public abstract class JoinRule implements BuiltInRule {
       // Note: If the join rule is applicable for automatic
       //       rule application, the symbolic execution strategy
       //       does not seem to work as usual!
-      // Note: Rule is deactivated for automatic application in
-      //       JavaCardDLStrategy#computeCost(RuleApp, PosInOccurrence, Goal).
-      //       This is a temporary workaround that removes the
-      //       necessity to set goals to interactive. However,
-      //       it would be nicer to obtain knowledge about whether
-      //       or not this check for applicability originates from
-      //       the user or from a strategy.
 
       return isApplicable(goal, pio,
-            false, // Only permit interactive goals
+            true,  // Only allow application of rule for manual calls
             true); // Do the check for partner existence
    }
    
@@ -213,7 +204,7 @@ public abstract class JoinRule implements BuiltInRule {
       // since in early stages of experimenting, it was possible
       // to perform an infinite chain of applications, which was
       // done by the automatic strategy.
-      if (checkAutomatic && goal.isAutomatic()) {
+      if (checkAutomatic && mediator().isInAutoMode()) {
          return false;
       }
       
@@ -344,6 +335,13 @@ public abstract class JoinRule implements BuiltInRule {
       progVars.addAll(visitor.getVariables());
       
       return progVars;
+   }
+   
+   /**
+    * @return The current KeYMediator.
+    */
+   protected KeYMediator mediator() {
+      return MainWindow.getInstance().getMediator();
    }
    
    /**
