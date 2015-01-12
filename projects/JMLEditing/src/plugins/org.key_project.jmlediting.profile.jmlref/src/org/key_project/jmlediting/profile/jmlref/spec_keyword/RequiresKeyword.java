@@ -1,8 +1,10 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword;
 
-import org.key_project.jmlediting.core.dom.NodeTypes;
+import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
+
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
 
@@ -28,12 +30,22 @@ public class RequiresKeyword extends AbstractGenericSpecificationKeyword {
 
    @Override
    public IKeywordParser createParser() {
-      return new ParseFunctionGenericKeywordParser(NodeTypes.NODE) {
+      return new ParseFunctionGenericKeywordParser() {
 
          @Override
          protected ParseFunction createContentParseFunction(
                final IJMLProfile profile) {
-            return new ExpressionParser(profile);
+            /**
+             * requires-clause ::= requires-keyword pred-or-not ; <br>
+             * | requires-keyword \same ; <br>
+             * requires-keyword ::= requires | pre <br>
+             * | requires_redundantly | pre_redundantly <br>
+             * pred-or-not ::= predicate | \not_specified
+             */
+            return alt(
+                  new ExpressionParser(profile),
+                  keywords(JMLProfileHelper.filterKeywords(profile,
+                        IRequiresValueKeyword.class), profile));
          }
       };
    }

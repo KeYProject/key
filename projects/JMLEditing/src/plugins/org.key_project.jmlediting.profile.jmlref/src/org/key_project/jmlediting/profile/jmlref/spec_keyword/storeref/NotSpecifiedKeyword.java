@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref;
 
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.IRequiresValueKeyword;
 
 /**
  * The \not_specified keyword.
@@ -9,7 +10,7 @@ import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
  *
  */
 public class NotSpecifiedKeyword extends AbstractEmptyKeyword implements
-IStoreRefKeyword {
+      IStoreRefKeyword, IRequiresValueKeyword {
 
    /**
     * Creates a new instance for the \not_specified keyword.

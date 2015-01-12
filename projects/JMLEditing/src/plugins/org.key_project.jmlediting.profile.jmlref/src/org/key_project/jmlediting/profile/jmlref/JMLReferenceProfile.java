@@ -19,6 +19,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.EnsuresKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.RequiresKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.SameKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.OldKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ResultKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.EverythingKeyword;
@@ -61,7 +62,8 @@ public class JMLReferenceProfile implements IJMLProfile {
             new ProtectedKeyword(), new PublicKeyword(),
             new SpecProtectedKeyword(), new SpecPublicKeyword(),
             new EverythingKeyword(), new NothingKeyword(),
-            new NotSpecifiedKeyword(), new ResultKeyword(), new OldKeyword()));
+            new NotSpecifiedKeyword(), new ResultKeyword(), new OldKeyword(),
+            new SameKeyword()));
 
    }
 

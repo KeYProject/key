@@ -12,8 +12,9 @@ public class ResultKeyword extends AbstractEmptyKeyword implements
 
    @Override
    public String getDescription() {
-      // TODO Auto-generated method stub
-      return null;
+      return "The primary \result can only be used in ensures, duration, "
+            + "and workingspace clauses of a non-void method. Its value "
+            + "is the value returned by the method.";
    }
 
 }

@@ -17,8 +17,10 @@ public class OldKeyword extends AbstractKeyword implements IJMLPrimaryKeyword {
 
    @Override
    public String getDescription() {
-      // TODO Auto-generated method stub
-      return null;
+      return "An expression of the form \\old(Expr) refers to the value that the expression "
+            + "Expr had in the pre-state of a method."
+            + "\nAn expression of the form \\old(Expr, Label) refers to the value that the "
+            + "expression Expr had when control last reached the statement label Label.";
    }
 
    @Override
