@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.ui.test.UITestUtils;
 import org.key_project.jmlediting.ui.test.UITestUtils.TestProject;
+import org.key_project.jmlediting.ui.test.UITestUtils.TestProject.SaveGuarantee;
 
 public class ParseErrorMarkerTest {
 
@@ -31,8 +32,9 @@ public class ParseErrorMarkerTest {
    public static void initializeProjectAndOpenEditor() throws CoreException,
          InterruptedException {
       final TestProject result = UITestUtils.createProjectWithFile(bot,
-            PROJECT_NAME, PACKAGE_NAME, CLASS_NAME);
-      result.reloadClassAndOpen();
+            PROJECT_NAME, PACKAGE_NAME, CLASS_NAME,
+            SaveGuarantee.SAVE_BUT_NO_CHANGES_LATER);
+      result.restoreClassAndOpen();
       testProject = result.getProject().getProject();
       openEditor = result.getOpenedEditor();
       JMLPreferencesHelper.setProjectJMLProfile(testProject,

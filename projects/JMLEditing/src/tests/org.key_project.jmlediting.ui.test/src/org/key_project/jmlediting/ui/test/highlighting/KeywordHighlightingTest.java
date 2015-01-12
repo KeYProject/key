@@ -13,6 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.ui.test.UITestUtils;
+import org.key_project.jmlediting.ui.test.UITestUtils.TestProject.SaveGuarantee;
 
 /**
  *
@@ -99,9 +100,9 @@ public class KeywordHighlightingTest {
     */
    @BeforeClass
    public static void initProject() throws CoreException, InterruptedException {
-      final UITestUtils.TestProject result = UITestUtils.createProjectWithFile(bot,
-            PROJECT_NAME, PACKAGE_NAME, CLASS_NAME);
-      result.reloadClassAndOpen();
+      final UITestUtils.TestProject result = UITestUtils.createProjectWithFile(
+            bot, PROJECT_NAME, PACKAGE_NAME, CLASS_NAME, SaveGuarantee.NO_SAVE);
+      result.restoreClassAndOpen();
       JMLPreferencesHelper.setProjectJMLProfile(result.getProject()
             .getProject(), UITestUtils.findReferenceProfile());
       editor = result.getOpenedEditor();

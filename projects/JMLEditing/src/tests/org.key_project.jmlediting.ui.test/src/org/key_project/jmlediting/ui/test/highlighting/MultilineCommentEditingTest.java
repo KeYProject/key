@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.ui.test.UITestUtils;
 import org.key_project.jmlediting.ui.test.UITestUtils.TestProject;
+import org.key_project.jmlediting.ui.test.UITestUtils.TestProject.SaveGuarantee;
 
 public class MultilineCommentEditingTest {
 
@@ -23,12 +24,13 @@ public class MultilineCommentEditingTest {
          InterruptedException {
       bot = new SWTWorkbenchBot();
       testProject = UITestUtils.createProjectWithFile(bot,
-            "MultilineCommentEditing", "test", "MultilineCommentEditingTest");
+            "MultilineCommentEditing", "test", "MultilineCommentEditingTest",
+            SaveGuarantee.NO_SAVE);
    }
 
    @Before
    public void refreshEditor() throws CoreException {
-      testProject.reloadClassAndOpen();
+      testProject.restoreClassAndOpen();
       this.editor = testProject.getOpenedEditor();
    }
 

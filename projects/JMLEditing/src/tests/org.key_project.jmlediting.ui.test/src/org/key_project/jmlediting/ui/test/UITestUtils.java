@@ -29,6 +29,7 @@ import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
+import org.key_project.jmlediting.ui.test.UITestUtils.TestProject.SaveGuarantee;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -169,6 +170,11 @@ public class UITestUtils {
    }
 
    public static class TestProject {
+
+      public static enum SaveGuarantee {
+         NO_SAVE, SAVE_BUT_NO_CHANGES_LATER, NO_GUARANTEE;
+      }
+
       private final SWTWorkbenchBot bot;
       private final String projectName;
       private final String packageName;
@@ -177,10 +183,12 @@ public class UITestUtils {
       private SWTBotEclipseEditor openedEditor;
       private final IJavaProject project;
       private final IFolder testFolder;
+      private final SaveGuarantee saveGuarantee;
 
       public TestProject(final SWTWorkbenchBot bot, final String projectName,
             final String packageName, final String className,
-            final String classLoc) throws CoreException, InterruptedException {
+            final String classLoc, final SaveGuarantee guarantee)
+            throws CoreException, InterruptedException {
          super();
          this.bot = bot;
          this.classLocation = classLoc;
@@ -188,6 +196,7 @@ public class UITestUtils {
          this.project = TestUtilsUtil.createJavaProject(this.projectName);
          this.packageName = packageName;
          this.className = className;
+         this.saveGuarantee = guarantee;
          // Create folders for the package
          final IFolder srcFolder = this.project.getProject().getFolder("src");
          final String[] packageFolders = this.packageName.split("\\.");
@@ -196,19 +205,33 @@ public class UITestUtils {
             testFolder = TestUtilsUtil.createFolder(testFolder, folder);
          }
          this.testFolder = testFolder;
+         this.openedEditor = null;
       }
 
-      public void reloadClassAndOpen() throws CoreException {
-         if (this.openedEditor != null && this.openedEditor.isDirty()) {
+      public void restoreClassAndOpen() throws CoreException {
+         // Check what to do in order to restore the content of the editor to
+         // the given class
+         // No editor -> copy class and restore
+         // No guarantee -> "
+         // SAVE_BUT_NO_CHANGES_LATER && not dirty -> "
 
-            this.bot.getDisplay().syncExec(new Runnable() {
+         // Otherwise try to do something faster
+         if (this.openedEditor != null
+               && (this.saveGuarantee == SaveGuarantee.NO_SAVE || (this.saveGuarantee == SaveGuarantee.SAVE_BUT_NO_CHANGES_LATER && this.openedEditor
+                     .isDirty()))) {
+            // if NO_SAVE and not dirty -> everything fine
+            // else revert to saved
+            if (this.saveGuarantee == SaveGuarantee.SAVE_BUT_NO_CHANGES_LATER
+                  || this.openedEditor.isDirty()) {
+               this.bot.getDisplay().syncExec(new Runnable() {
 
-               @Override
-               public void run() {
-                  ((ITextEditor) TestProject.this.openedEditor.getReference()
-                        .getEditor(true)).doRevertToSaved();
-               }
-            });
+                  @Override
+                  public void run() {
+                     ((ITextEditor) TestProject.this.openedEditor
+                           .getReference().getEditor(true)).doRevertToSaved();
+                  }
+               });
+            }
          }
          else {
             if (this.openedEditor != null) {
@@ -256,14 +279,18 @@ public class UITestUtils {
     */
    public static TestProject createProjectWithFile(final SWTWorkbenchBot bot,
          final String projectName, final String packageName,
-         final String className) throws CoreException, InterruptedException {
+         final String className, final SaveGuarantee guarantee)
+         throws CoreException, InterruptedException {
       return createProjectWithFile(bot, projectName, packageName, className,
-            "data/template/" + className + ".java");
+            "data/template/" + className + ".java", guarantee);
    }
 
    /**
     * Creates a new Java Projects and copies a class into the project. The it
-    * opens to class in the editor.
+    * opens to class in the editor. The guarantee with respect to saving the
+    * content of the opened editor influences the test speed. The higher the
+    * guarantee is, the faster the test can be because the editor does not neet
+    * be reopened that many times.
     *
     * @param bot
     *           the bot to use
@@ -276,6 +303,9 @@ public class UITestUtils {
     * @param classLoc
     *           the location where the class source file is located and from
     *           which it should be copied
+    * @param the
+    *           guarantee the user of the created TestProject gives with regards
+    *           to saving the content of the opened editor
     * @return an object of type {@link TestProject} which contains the editor
     *         and the project
     * @throws CoreException
@@ -283,10 +313,12 @@ public class UITestUtils {
     */
    public static TestProject createProjectWithFile(final SWTWorkbenchBot bot,
          final String projectName, final String packageName,
-         final String className, final String classLoc) throws CoreException,
+         final String className, final String classLoc,
+         final SaveGuarantee guarantee) throws CoreException,
          InterruptedException {
 
-      return new TestProject(bot, projectName, packageName, className, classLoc);
+      return new TestProject(bot, projectName, packageName, className,
+            classLoc, guarantee);
    }
 
    /**

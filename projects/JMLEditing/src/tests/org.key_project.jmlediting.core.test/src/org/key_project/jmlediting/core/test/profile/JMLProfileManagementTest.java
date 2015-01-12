@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Set;
 
 import org.junit.Test;
+import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
@@ -20,7 +21,7 @@ public class JMLProfileManagementTest {
 
       @Override
       public IJMLParser createParser() {
-         return null;
+         return new DefaultJMLParser(this);
       }
 
    }
@@ -33,14 +34,14 @@ public class JMLProfileManagementTest {
 
       @Override
       public IJMLParser createParser() {
-         return null;
+         return new DefaultJMLParser(this);
       }
 
    }
 
    @Test
    public void test() {
-      Set<IJMLProfile> availablesProfiles = JMLProfileManagement
+      final Set<IJMLProfile> availablesProfiles = JMLProfileManagement
             .getAvailableProfiles();
       assertTrue(
             "Found no available profiles " + availablesProfiles.getClass(),
@@ -48,7 +49,7 @@ public class JMLProfileManagementTest {
 
       boolean containsDummy1 = false;
       boolean containsDummy2 = false;
-      for (IJMLProfile profile : availablesProfiles) {
+      for (final IJMLProfile profile : availablesProfiles) {
          if (profile.getName().equals("DummyJMLProfile1")) {
             containsDummy1 = true;
          }
