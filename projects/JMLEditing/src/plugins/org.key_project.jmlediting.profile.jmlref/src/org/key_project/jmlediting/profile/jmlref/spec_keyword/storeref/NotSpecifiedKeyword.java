@@ -1,7 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref;
 
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.IRequiresValueKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.requires.IRequiresValueKeyword;
 
 /**
  * The \not_specified keyword.

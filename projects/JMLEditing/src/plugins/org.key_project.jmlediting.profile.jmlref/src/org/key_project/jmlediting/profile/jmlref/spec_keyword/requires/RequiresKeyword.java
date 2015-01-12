@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.profile.jmlref.spec_keyword;
+package org.key_project.jmlediting.profile.jmlref.spec_keyword.requires;
 
 import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
 
@@ -6,7 +6,9 @@ import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.AbstractGenericSpecificationKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.ParseFunctionGenericKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.PredicateParser;
 
 /**
  * The requires keyword.
@@ -43,7 +45,7 @@ public class RequiresKeyword extends AbstractGenericSpecificationKeyword {
              * pred-or-not ::= predicate | \not_specified
              */
             return alt(
-                  new ExpressionParser(profile),
+                  new PredicateParser(profile),
                   keywords(JMLProfileHelper.filterKeywords(profile,
                         IRequiresValueKeyword.class), profile));
          }
