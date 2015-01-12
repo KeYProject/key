@@ -192,8 +192,6 @@ public class CloseAfterJoin implements BuiltInRule {
     * @author Dominic Scheurer
     */
    private static class FindNodeVisitor implements ProofVisitor {
-      //TODO: Remove this class if not needed at end
-      
       private boolean found = false;
       private Node node = null;
       
