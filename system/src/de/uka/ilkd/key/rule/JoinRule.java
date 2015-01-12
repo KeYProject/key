@@ -17,6 +17,9 @@ import java.util.HashSet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.core.DefaultTaskFinishedInfo;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.joinrule.JoinPartnerSelectionDialog;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaProgramElement;
@@ -51,12 +54,6 @@ import de.uka.ilkd.key.util.Triple;
 //      then KeY introduces different constants x_1, x_2, ... in
 //      the different branches. This leads to problems, e.g. in the
 //      Path Condition construction in the ITE-Method.
-//TODO: So far, the rule shall not be applied automatically,
-//      since symbolic execution could be disturbed. In order
-//      to prevent this, it is only applicable for *interactive*
-//      goals, which is not very elegant. There should be a
-//      different way to exclude the join rules from automatic
-//      strategies....
 //TODO: Check associated CloseAfterJoin rule, update if thesis
 //      is updated.
 //TODO: Make something as a progress bar for time consumptive
@@ -82,6 +79,12 @@ public abstract class JoinRule implements BuiltInRule {
    public ImmutableList<Goal> apply(Goal goal, final Services services,
          RuleApp ruleApp) throws RuleAbortException {
       
+      boolean stoppedInterface = false;
+      if (!mediator().isInAutoMode()) {
+         mediator().stopInterface(true);
+         stoppedInterface = true;
+      }
+      
       final TermBuilder tb = services.getTermBuilder();
       final PosInOccurrence pio = ruleApp.posInOccurrence();
       
@@ -95,6 +98,16 @@ public abstract class JoinRule implements BuiltInRule {
       
       // Find join partner
       ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = findJoinPartners(newGoal, pio);
+      
+      // Signal this task to UI
+      mediator().getUI().taskStarted(
+            "Joining " + (joinPartners.size() + 1) + " goals",
+            joinPartners.size());
+      //TODO: Progress information is so far not properly displayed in the
+      //      UI. Obviously, the progress bar does only receive the updates
+      //      *after* the task terminated, since the EDT is blocked.
+      //      See MainStatusLine#setProgress(final int value).
+      long startTime = System.currentTimeMillis();
       
       // Convert sequents to SE states
       ImmutableList<Pair<Term, Term>> joinPartnerStates = ImmutableSLList.nil();      
@@ -134,6 +147,20 @@ public abstract class JoinRule implements BuiltInRule {
       for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
          closeJoinPartnerGoal(newGoal.node(), joinPartner.first, joinedState, thisSEState.third);
       }
+
+      long endTime = System.currentTimeMillis();
+      long duration = endTime - startTime;
+      mediator().getUI().taskFinished(new DefaultTaskFinishedInfo(
+            this,                          // source
+            joinedState,                   // result
+            mediator().getSelectedProof(), // proof
+            duration,                      // time
+            1 + joinPartners.size(),       // applied rules
+            0));                           // closed goals
+      
+      if (stoppedInterface) {
+         mediator().startInterface(true);
+      }
       
       return newGoals;
    }
@@ -167,16 +194,9 @@ public abstract class JoinRule implements BuiltInRule {
       // Note: If the join rule is applicable for automatic
       //       rule application, the symbolic execution strategy
       //       does not seem to work as usual!
-      // Note: Rule is deactivated for automatic application in
-      //       JavaCardDLStrategy#computeCost(RuleApp, PosInOccurrence, Goal).
-      //       This is a temporary workaround that removes the
-      //       necessity to set goals to interactive. However,
-      //       it would be nicer to obtain knowledge about whether
-      //       or not this check for applicability originates from
-      //       the user or from a strategy.
-      
+
       return isApplicable(goal, pio,
-            false, // Only permit interactive goals
+            true,  // Only allow application of rule for manual calls
             true); // Do the check for partner existence
    }
    
@@ -205,7 +225,7 @@ public abstract class JoinRule implements BuiltInRule {
       // since in early stages of experimenting, it was possible
       // to perform an infinite chain of applications, which was
       // done by the automatic strategy.
-      if (checkAutomatic && goal.isAutomatic()) {
+      if (checkAutomatic && mediator().isInAutoMode()) {
          return false;
       }
       
@@ -336,6 +356,13 @@ public abstract class JoinRule implements BuiltInRule {
       progVars.addAll(visitor.getVariables());
       
       return progVars;
+   }
+   
+   /**
+    * @return The current KeYMediator.
+    */
+   protected KeYMediator mediator() {
+      return MainWindow.getInstance().getMediator();
    }
    
    /**
