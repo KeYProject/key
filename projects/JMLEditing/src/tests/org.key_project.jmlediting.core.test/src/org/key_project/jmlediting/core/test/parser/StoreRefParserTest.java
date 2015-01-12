@@ -55,6 +55,12 @@ public class StoreRefParserTest {
    }
 
    @Test
+   public void testParseArrayWithExpression() throws ParserException {
+      testParse("this.states[hello.get() - 3]",
+            "Not specified, need to fix expression ast first");
+   }
+
+   @Test
    public void testParseAllFields() throws ParserException {
       testParse(
             " this.*",

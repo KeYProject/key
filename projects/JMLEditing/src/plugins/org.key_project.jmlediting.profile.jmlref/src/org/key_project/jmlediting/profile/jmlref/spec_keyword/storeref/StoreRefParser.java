@@ -12,6 +12,7 @@ import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.SpecExpressionParser;
 
 /**
  * The {@link StoreRefParser} parses the content specified as store-ref-list in
@@ -62,9 +63,7 @@ public class StoreRefParser implements ParseFunction {
        */
       final ParseFunction storeRefKeyword = keywords(storeRefKeywords, profile);
 
-      // Only temporary implementation, this expression can be more complex,
-      // much more
-      final ParseFunction specExpression = integerConstant();
+      final ParseFunction specExpression = new SpecExpressionParser(profile);
 
       /**
        * spec-array-ref-expr ::= spec-expression <br>
