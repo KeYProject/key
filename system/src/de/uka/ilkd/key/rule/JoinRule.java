@@ -79,9 +79,11 @@ public abstract class JoinRule implements BuiltInRule {
          RuleApp ruleApp) throws RuleAbortException {
       
       KeYMediator mediator = MainWindow.getInstance().getMediator();
+      boolean stoppedInterface = false;
       
       if (!mediator.isInAutoMode()) {
          mediator.stopInterface(true);
+         stoppedInterface = true;
       }
       
       final TermBuilder tb = services.getTermBuilder();
@@ -137,7 +139,7 @@ public abstract class JoinRule implements BuiltInRule {
          closeJoinPartnerGoal(newGoal.node(), joinPartner.first, joinedState, thisSEState.third);
       }
       
-      if (!mediator.isInAutoMode()) {
+      if (stoppedInterface) {
          mediator.startInterface(true);
       }
       
