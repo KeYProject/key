@@ -17,6 +17,7 @@ import java.util.HashSet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.core.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.joinrule.JoinPartnerSelectionDialog;
@@ -98,6 +99,16 @@ public abstract class JoinRule implements BuiltInRule {
       // Find join partner
       ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = findJoinPartners(newGoal, pio);
       
+      // Signal this task to UI
+      mediator().getUI().taskStarted(
+            "Joining " + (joinPartners.size() + 1) + " goals",
+            joinPartners.size());
+      //TODO: Progress information is so far not properly displayed in the
+      //      UI. Obviously, the progress bar does only receive the updates
+      //      *after* the task terminated, since the EDT is blocked.
+      //      See MainStatusLine#setProgress(final int value).
+      long startTime = System.currentTimeMillis();
+      
       // Convert sequents to SE states
       ImmutableList<Pair<Term, Term>> joinPartnerStates = ImmutableSLList.nil();      
       for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
@@ -136,6 +147,16 @@ public abstract class JoinRule implements BuiltInRule {
       for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
          closeJoinPartnerGoal(newGoal.node(), joinPartner.first, joinedState, thisSEState.third);
       }
+
+      long endTime = System.currentTimeMillis();
+      long duration = endTime - startTime;
+      mediator().getUI().taskFinished(new DefaultTaskFinishedInfo(
+            this,                          // source
+            joinedState,                   // result
+            mediator().getSelectedProof(), // proof
+            duration,                      // time
+            1 + joinPartners.size(),       // applied rules
+            0));                           // closed goals
       
       if (stoppedInterface) {
          mediator().startInterface(true);
