@@ -10,7 +10,7 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
  * 
  * @author Dominic Scheurer
  */
-public interface AbstractDomainElement extends Named {
+public abstract class AbstractDomainElement implements Named {
 
    /**
     * <p>Return the defining axiom, instantiated for a given
@@ -28,6 +28,11 @@ public interface AbstractDomainElement extends Named {
     * @return A JavaDL formula expressing that the given variable
     *    represents an instance of this abstract domain element.
     */
-   public Term getDefiningAxiom(LogicVariable var, Services services);
+   public abstract Term getDefiningAxiom(LogicVariable var, Services services);
+   
+   @Override
+   public String toString() {
+      return name().toString();
+   }
    
 }

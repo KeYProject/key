@@ -10,7 +10,7 @@ import de.uka.ilkd.key.abstraction.AbstractDomainLattice;
  * @author Dominic Scheurer
  */
 public class SignAnalysisLattice extends AbstractDomainLattice<SignAnalysisDomainElem, Integer> {
-
+   
    /**
     * TODO: Document.
     */
@@ -23,6 +23,25 @@ public class SignAnalysisLattice extends AbstractDomainLattice<SignAnalysisDomai
       Geq.getInstance(),
       Top.getInstance()
    };
+   
+   /**
+    * TODO: Document.
+    */
+   private static final SignAnalysisLattice INSTANCE = new SignAnalysisLattice();
+   
+   /**
+    * TODO: Document.
+    */
+   private SignAnalysisLattice() {}
+   
+   /**
+    * TODO: Document.
+    * 
+    * @return
+    */
+   public static SignAnalysisLattice getInstance() {
+      return INSTANCE;
+   }
    
    @Override
    public SignAnalysisDomainElem abstractFrom(Integer elem) {
@@ -136,5 +155,5 @@ public class SignAnalysisLattice extends AbstractDomainLattice<SignAnalysisDomai
          public void remove() {}
       };
    }
-
+   
 }

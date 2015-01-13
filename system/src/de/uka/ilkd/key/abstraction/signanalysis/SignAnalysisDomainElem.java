@@ -7,7 +7,7 @@ import de.uka.ilkd.key.abstraction.AbstractDomainElement;
  * 
  * @author Dominic Scheurer
  */
-public abstract class SignAnalysisDomainElem implements AbstractDomainElement {
+public abstract class SignAnalysisDomainElem extends AbstractDomainElement {
    
    public boolean isBottom() {
       return this instanceof Bottom;
