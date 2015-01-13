@@ -56,8 +56,6 @@ import de.uka.ilkd.key.util.Triple;
 //      Path Condition construction in the ITE-Method.
 //TODO: Check associated CloseAfterJoin rule, update if thesis
 //      is updated.
-//TODO: Make something as a progress bar for time consumptive
-//      joins, like the IfThenElse join rule.
 
 /**
  * Base for implementing join rules. Extend this class,
