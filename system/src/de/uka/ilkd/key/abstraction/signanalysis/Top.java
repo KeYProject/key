@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.abstraction.signanalysis;
 
+import de.uka.ilkd.key.abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 
-public class Top extends SignAnalysisDomainElem {
+public class Top extends AbstractDomainElement {
 
    private static final Top INSTANCE = new Top();
    

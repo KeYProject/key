@@ -10,13 +10,6 @@ import de.uka.ilkd.key.abstraction.AbstractDomainElement;
 public abstract class SignAnalysisDomainElem extends AbstractDomainElement {
    
    /**
-    * @return true iff this element is the bottom element.
-    */
-   public boolean isBottom() {
-      return this instanceof Bottom;
-   }
-   
-   /**
     * @return true iff this element is the neg element.
     */
    public boolean isNeg() {
@@ -49,13 +42,6 @@ public abstract class SignAnalysisDomainElem extends AbstractDomainElement {
     */
    public boolean isGeq() {
       return this instanceof Geq;
-   }
-
-   /**
-    * @return true iff this element is the top element.
-    */
-   public boolean isTop() {
-      return this instanceof Top;
    }
    
 }

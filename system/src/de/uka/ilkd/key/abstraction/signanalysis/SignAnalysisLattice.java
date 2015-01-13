@@ -2,6 +2,7 @@ package de.uka.ilkd.key.abstraction.signanalysis;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.abstraction.AbstractDomainLattice;
 
 /**
@@ -9,12 +10,12 @@ import de.uka.ilkd.key.abstraction.AbstractDomainLattice;
  * 
  * @author Dominic Scheurer
  */
-public class SignAnalysisLattice extends AbstractDomainLattice<SignAnalysisDomainElem, Integer> {
+public class SignAnalysisLattice extends AbstractDomainLattice<AbstractDomainElement, Integer> {
    
    /**
     * TODO: Document.
     */
-   public static final SignAnalysisDomainElem[] ABSTRACT_DOMAIN_ELEMS = {
+   public static final AbstractDomainElement[] ABSTRACT_DOMAIN_ELEMS = {
       Bottom.getInstance(),
       Neg.getInstance(),
       Zero.getInstance(),
@@ -44,7 +45,7 @@ public class SignAnalysisLattice extends AbstractDomainLattice<SignAnalysisDomai
    }
    
    @Override
-   public SignAnalysisDomainElem abstractFrom(Integer elem) {
+   public AbstractDomainElement abstractFrom(Integer elem) {
       if (elem == 0) {
          return Zero.getInstance();
       } else if (elem < 0) {
@@ -61,8 +62,16 @@ public class SignAnalysisLattice extends AbstractDomainLattice<SignAnalysisDomai
    }
 
    @Override
-   public SignAnalysisDomainElem join(SignAnalysisDomainElem a,
-         SignAnalysisDomainElem b) {
+   public AbstractDomainElement join(AbstractDomainElement elem1,
+         AbstractDomainElement elem2) {
+      
+      if (!(elem1 instanceof SignAnalysisDomainElem) ||
+          !(elem2 instanceof SignAnalysisDomainElem)) {
+         throw new IllegalArgumentException("Expected arguments of the abstract domain of sign analysis.");
+      }
+      
+      SignAnalysisDomainElem a = (SignAnalysisDomainElem) elem1;
+      SignAnalysisDomainElem b = (SignAnalysisDomainElem) elem2;
       
       if (a.isTop() || b.isTop()) {
          return Top.getInstance();
@@ -135,8 +144,8 @@ public class SignAnalysisLattice extends AbstractDomainLattice<SignAnalysisDomai
    }
 
    @Override
-   public Iterator<SignAnalysisDomainElem> iterator() {
-      return new Iterator<SignAnalysisDomainElem>() {
+   public Iterator<AbstractDomainElement> iterator() {
+      return new Iterator<AbstractDomainElement>() {
 
          int pos = 0;
          final int size = ABSTRACT_DOMAIN_ELEMS.length;
@@ -147,7 +156,7 @@ public class SignAnalysisLattice extends AbstractDomainLattice<SignAnalysisDomai
          }
 
          @Override
-         public SignAnalysisDomainElem next() {
+         public AbstractDomainElement next() {
             return ABSTRACT_DOMAIN_ELEMS[pos++];
          }
 
