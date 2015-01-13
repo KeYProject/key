@@ -4,7 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
 
 public class Geq extends SignAnalysisDomainElem {
 
@@ -22,7 +22,7 @@ public class Geq extends SignAnalysisDomainElem {
    }
 
    @Override
-   public Term getDefiningAxiom(LogicVariable var, Services services) {
+   public Term getDefiningAxiom(ParsableVariable var, Services services) {
       TermBuilder tb = services.getTermBuilder();
       return services.getTermBuilder().geq(tb.var(var), tb.zero());
    }

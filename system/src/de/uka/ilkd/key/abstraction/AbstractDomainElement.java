@@ -3,7 +3,7 @@ package de.uka.ilkd.key.abstraction;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
 
 /**
  * TODO: Document.
@@ -28,7 +28,7 @@ public abstract class AbstractDomainElement implements Named {
     * @return A JavaDL formula expressing that the given variable
     *    represents an instance of this abstract domain element.
     */
-   public abstract Term getDefiningAxiom(LogicVariable var, Services services);
+   public abstract Term getDefiningAxiom(ParsableVariable var, Services services);
    
    @Override
    public String toString() {

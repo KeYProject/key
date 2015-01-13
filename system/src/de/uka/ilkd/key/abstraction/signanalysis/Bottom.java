@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
 
 public class Bottom extends SignAnalysisDomainElem {
 
@@ -23,7 +24,7 @@ public class Bottom extends SignAnalysisDomainElem {
    }
 
    @Override
-   public Term getDefiningAxiom(LogicVariable var, Services services) {
+   public Term getDefiningAxiom(ParsableVariable var, Services services) {
       TermBuilder tb = services.getTermBuilder();
       
       final Name freshVarName = new Name(tb.newName(var.sort()));
