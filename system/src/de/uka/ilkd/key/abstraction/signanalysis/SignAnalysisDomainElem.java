@@ -8,6 +8,13 @@ import de.uka.ilkd.key.abstraction.AbstractDomainElement;
  * @author Dominic Scheurer
  */
 public abstract class SignAnalysisDomainElem extends AbstractDomainElement {
+
+   /**
+    * @return true iff this element is the neg element.
+    */
+   public boolean isBottom() {
+      return this instanceof Bottom;
+   }
    
    /**
     * @return true iff this element is the neg element.
@@ -42,6 +49,13 @@ public abstract class SignAnalysisDomainElem extends AbstractDomainElement {
     */
    public boolean isGeq() {
       return this instanceof Geq;
+   }
+   
+   /**
+    * @return true iff this element is the zero element.
+    */
+   public boolean isTop() {
+      return this instanceof Top;
    }
    
 }

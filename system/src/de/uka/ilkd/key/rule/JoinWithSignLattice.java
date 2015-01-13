@@ -39,6 +39,9 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.util.Pair;
 
+//TODO: In JoinRule: Must probably add some universal closure for the
+//      new logical variables...
+
 /**
  * Rule that joins two sequents based on a sign lattice
  * for integers. No-Integer-Variables (booleans, heap)

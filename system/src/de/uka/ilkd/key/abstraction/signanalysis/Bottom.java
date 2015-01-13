@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.abstraction.signanalysis;
 
-import de.uka.ilkd.key.abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
@@ -9,7 +8,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 
-public class Bottom extends AbstractDomainElement {
+public class Bottom extends SignAnalysisDomainElem {
 
    private static final Bottom INSTANCE = new Bottom();
    

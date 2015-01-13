@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.abstraction;
 
-import de.uka.ilkd.key.abstraction.signanalysis.Bottom;
-import de.uka.ilkd.key.abstraction.signanalysis.Top;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
@@ -31,20 +29,6 @@ public abstract class AbstractDomainElement implements Named {
     *    represents an instance of this abstract domain element.
     */
    public abstract Term getDefiningAxiom(ParsableVariable var, Services services);
-   
-   /**
-    * @return true iff this element is the bottom element.
-    */
-   public boolean isBottom() {
-      return this instanceof Bottom;
-   }
-
-   /**
-    * @return true iff this element is the top element.
-    */
-   public boolean isTop() {
-      return this instanceof Top;
-   }
    
    @Override
    public String toString() {
