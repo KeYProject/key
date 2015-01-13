@@ -17,7 +17,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
-import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.JMLProfileHelper;
+import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
 import org.key_project.jmlediting.ui.test.Activator;
 import org.key_project.jmlediting.ui.test.UITestUtils;
 import org.key_project.util.eclipse.BundleUtil;
@@ -78,7 +79,7 @@ public class JMLCompletionProposalComputerTest {
    private static final String INSERTTEXT_EXCEPTIONAL_BEHAVIOR = "exception";
    private static final String INSERTTEXT_ENSURES = "ensu";
 
-   private static final int MAX_KEYWORDS = countKeywords();
+   private static int MAX_KEYWORDS = -1;
 
    /*
     * Initialize a new Project and load the template class from data/template
@@ -99,17 +100,8 @@ public class JMLCompletionProposalComputerTest {
       bot.sleep(1000);
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(),
             UITestUtils.findReferenceProfile());
-   }
-
-   private static int countKeywords() {
-      int result = 0;
-
-      for (final IKeyword keywords : UITestUtils.findReferenceProfile()
-            .getSupportedKeywords()) {
-         result += keywords.getKeywords().size();
-      }
-
-      return result;
+      MAX_KEYWORDS = JMLProfileHelper.filterKeywords(
+            UITestUtils.findReferenceProfile(), IToplevelKeyword.class).size();
    }
 
    /*
@@ -147,7 +139,7 @@ public class JMLCompletionProposalComputerTest {
    /*
     * Should lead to a TimeoutException not solved via expected, because
     * inputText must be deleted from caller after this method
-    * 
+    *
     * Also can have one Proposal containing "No Default Proposals"
     */
    private void testWithTimeout(final Position pos, final String insertText) {
