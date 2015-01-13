@@ -19,6 +19,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -61,10 +62,15 @@ public class JoinWeaken extends JoinRule {
          
          ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
          
-         int varNameCounter = (int) System.currentTimeMillis();
-         final String varNamePrefix = "v_";
+         final String varNamePrefix = "v";
          for (LocationVariable v : progVars) {
-            String newName = varNamePrefix + (varNameCounter++);
+            final String newName = tb.newName(varNamePrefix);
+            services.getNamespaces().variables().add(new Named() {
+               @Override
+               public Name name() {
+                  return new Name(newName);
+               }
+            });
             
             newElementaryUpdates = newElementaryUpdates.prepend(
                   tb.elementary(
