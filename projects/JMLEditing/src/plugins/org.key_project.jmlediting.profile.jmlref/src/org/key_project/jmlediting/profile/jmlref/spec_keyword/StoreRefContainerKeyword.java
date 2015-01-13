@@ -161,24 +161,28 @@ public abstract class StoreRefContainerKeyword extends
                      replacementOffset, prefixLength, cursorPosition));
             }
             for (final IVariableBinding varBind : vars) {
+               System.out.println(varBind.getName());
                if (varBind.getName().startsWith(prefix)) {
                   final String replacementString = varBind.getName();
                   final int cursorPosition = replacementString.length();
+                  System.out.println("adding");
                   result.add(new CompletionProposal(replacementString,
                         replacementOffset, prefixLength, cursorPosition));
                }
             }
+            System.out.println("returning: " + result.size());
+
             return result;
          }
          else {
             ITypeBinding nextType = null;
-            if (!node.containsOffset(this.context.getInvocationOffset())) {
-               // nur bis zum invooffset als prefix und auch innerhalb nur bis
-               // zum invooffset
-               // TODO final hier weiter machen
-               return this.propose(activeType, node,
-                     Collections.<IASTNode> emptyList(), true);
-            }
+            // if (!node.containsOffset(this.context.getInvocationOffset())) {
+            // // nur bis zum invooffset als prefix und auch innerhalb nur bis
+            // // zum invooffset
+            // // TODO final hier weiter machen
+            // return this.propose(activeType, node,
+            // Collections.<IASTNode> emptyList(), true);
+            // }
             if (type == StoreRefNodeTypes.STORE_REF_NAME
                   || type == StoreRefNodeTypes.STORE_REF_NAME_SUFFIX) {
                final String name = ((IStringNode) node.getChildren().get(0))

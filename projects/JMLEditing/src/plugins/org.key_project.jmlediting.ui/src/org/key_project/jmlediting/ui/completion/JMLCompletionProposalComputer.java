@@ -119,6 +119,7 @@ public class JMLCompletionProposalComputer implements
                result.addAll(activeKeyword.createAutoProposals(parseResult,
                      javaContext));
             }
+            return result;
          }
          // Fallback Method to display all JML Keyword-Proposals, if
          // no active Keyword was discovered.
