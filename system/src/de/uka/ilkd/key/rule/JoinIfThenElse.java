@@ -50,7 +50,7 @@ public class JoinIfThenElse extends JoinRule {
    
    private static final String DISPLAY_NAME = "JoinByIfThenElse";
    private static final Name RULE_NAME = new Name(DISPLAY_NAME);
-   private static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
+   private static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 12;
 
    @Override
    protected Pair<Term, Term> joinStates(
