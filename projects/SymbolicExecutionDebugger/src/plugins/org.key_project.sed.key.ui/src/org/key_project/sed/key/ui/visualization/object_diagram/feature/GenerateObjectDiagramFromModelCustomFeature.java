@@ -37,6 +37,7 @@ import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUti
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.gui.smt.CETree;
@@ -132,7 +133,7 @@ public class GenerateObjectDiagramFromModelCustomFeature extends AbstractGenerat
       diagramState.setName(modelName);
       diagramModel.getStates().add(diagramState);
       // Create objects
-      Map<String, ODObject> objectMap = new HashMap<String, ODObject>();
+      Map<String, List<ODObject>> objectMap = new HashMap<String, List<ODObject>>();
       Map<AbstractODValueContainer, PictogramElement> containerPEMap = new HashMap<AbstractODValueContainer, PictogramElement>();
       Map<ObjectVal, ODObject> objectValMap = new HashMap<ObjectVal, ODObject>();
       for (Heap heap : model.getHeaps()) {
@@ -145,8 +146,12 @@ public class GenerateObjectDiagramFromModelCustomFeature extends AbstractGenerat
             objectValMap.put(ov, diagramObject);
             String[] names = ov.getName().split("/");
             for (String name : names) {
-               assert !objectMap.containsKey(name);
-               objectMap.put(name, diagramObject);
+               List<ODObject> nameList = objectMap.get(name);
+               if (nameList == null) {
+                  nameList = new LinkedList<ODObject>();
+                  objectMap.put(name, nameList);
+               }
+               nameList.add(diagramObject);
             }
             monitor.worked(1);
          }
@@ -188,18 +193,20 @@ public class GenerateObjectDiagramFromModelCustomFeature extends AbstractGenerat
     * @param containerToFill The {@link AbstractODValueContainer} to fill.
     * @param associations The {@link List} which contains all available {@link ODAssociation}s.
     */
-   protected void createValuesAndAssociations(Map<String, ODObject> objectMap, 
+   protected void createValuesAndAssociations(Map<String, List<ODObject>> objectMap, 
                                               List<Pair<String, String>> contentToAdd, 
                                               AbstractODValueContainer containerToFill, 
                                               List<Pair<ODAssociation, AbstractODValueContainer>> associations) {
       for (Pair<String, String> constant : contentToAdd) {
-         ODObject diagramObject = objectMap.get(constant.second);
-         if (diagramObject != null) {
-            ODAssociation diagramAssociation = ODFactory.eINSTANCE.createODAssociation();
-            diagramAssociation.setName(constant.first);
-            diagramAssociation.setTarget(diagramObject);
-            containerToFill.getAssociations().add(diagramAssociation);
-            associations.add(new Pair<ODAssociation, AbstractODValueContainer>(diagramAssociation, containerToFill));
+         List<ODObject> diagramObjects = objectMap.get(constant.second);
+         if (!CollectionUtil.isEmpty(diagramObjects)) {
+            for (ODObject diagramObject : diagramObjects) {
+               ODAssociation diagramAssociation = ODFactory.eINSTANCE.createODAssociation();
+               diagramAssociation.setName(constant.first);
+               diagramAssociation.setTarget(diagramObject);
+               containerToFill.getAssociations().add(diagramAssociation);
+               associations.add(new Pair<ODAssociation, AbstractODValueContainer>(diagramAssociation, containerToFill));
+            }
          }
          else {
             ODValue diagramValue = ODFactory.eINSTANCE.createODValue();
