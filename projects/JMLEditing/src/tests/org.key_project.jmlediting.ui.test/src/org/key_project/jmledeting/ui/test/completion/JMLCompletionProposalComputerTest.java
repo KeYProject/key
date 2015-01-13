@@ -4,6 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
@@ -16,8 +17,10 @@ import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
+import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
 import org.key_project.jmlediting.ui.test.Activator;
 import org.key_project.jmlediting.ui.test.UITestUtils;
@@ -79,7 +82,7 @@ public class JMLCompletionProposalComputerTest {
    private static final String INSERTTEXT_EXCEPTIONAL_BEHAVIOR = "exception";
    private static final String INSERTTEXT_ENSURES = "ensu";
 
-   private static int MAX_KEYWORDS = -1;
+   private static int MAX_KEYWORDS = 0;
 
    /*
     * Initialize a new Project and load the template class from data/template
@@ -98,10 +101,16 @@ public class JMLCompletionProposalComputerTest {
             .select().expand().getNode(PACKAGE_NAME).select().expand()
             .getNode(CLASS_NAME + ".java").select().doubleClick();
       bot.sleep(1000);
-      JMLPreferencesHelper.setProjectJMLProfile(project.getProject(),
-            UITestUtils.findReferenceProfile());
-      MAX_KEYWORDS = JMLProfileHelper.filterKeywords(
-            UITestUtils.findReferenceProfile(), IToplevelKeyword.class).size();
+
+      final IJMLProfile profile = UITestUtils.findReferenceProfile();
+      JMLPreferencesHelper.setProjectJMLProfile(project.getProject(), profile);
+
+      // count MAX_KEYWORDS
+      final Set<IKeyword> keywordSet = JMLProfileHelper.filterKeywords(profile,
+            IToplevelKeyword.class);
+      for (final IKeyword iKeyword : keywordSet) {
+         MAX_KEYWORDS += iKeyword.getKeywords().size();
+      }
    }
 
    /*
@@ -132,7 +141,7 @@ public class JMLCompletionProposalComputerTest {
       if (!insertText.isEmpty()) {
          this.removeText(pos, insertText.length());
       }
-
+      bot.sleep(20000);
       return proposals;
    }
 
