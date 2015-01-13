@@ -41,54 +41,47 @@ public class JoinWeaken extends JoinRule {
 
    @Override
    protected Pair<Term, Term> joinStates(
-         ImmutableList<Pair<Term, Term>> states,
+         Pair<Term, Term> state1,
+         Pair<Term, Term> state2,
          Term programCounter,
          Services services) {
       
       final TermBuilder tb = services.getTermBuilder();
+         
+      HashSet<LocationVariable> progVars =
+            new HashSet<LocationVariable>();
       
-      Pair<Term, Term> joinedState = states.head();
-      states = states.tail();
+      // Collect program variables in Java block
+      progVars.addAll(getProgramLocations(programCounter, services));
+      // Collect program variables in update
+      progVars.addAll(getUpdateLocations(state1.first));
       
-      for (Pair<Term,Term> state : states) {
+      ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
+      
+      final String varNamePrefix = "v";
+      for (LocationVariable v : progVars) {
+         final String newName = tb.newName(varNamePrefix);
+         services.getNamespaces().variables().add(new Named() {
+            @Override
+            public Name name() {
+               return new Name(newName);
+            }
+         });
          
-         HashSet<LocationVariable> progVars =
-               new HashSet<LocationVariable>();
-         
-         // Collect program variables in Java block
-         progVars.addAll(getProgramLocations(programCounter, services));
-         // Collect program variables in update
-         progVars.addAll(getUpdateLocations(joinedState.first));
-         
-         ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
-         
-         final String varNamePrefix = "v";
-         for (LocationVariable v : progVars) {
-            final String newName = tb.newName(varNamePrefix);
-            services.getNamespaces().variables().add(new Named() {
-               @Override
-               public Name name() {
-                  return new Name(newName);
-               }
-            });
-            
-            newElementaryUpdates = newElementaryUpdates.prepend(
-                  tb.elementary(
-                        v,
-                        tb.var(
-                              new LogicVariable(new Name(newName), v.sort()))));
-         }
-         
-         // Construct weakened symbolic state
-         Term newSymbolicState = tb.parallel(newElementaryUpdates);
-         
-         // Construct path condition as disjunction
-         Term newPathCondition = tb.or(joinedState.second, state.second);
-         
-         joinedState = new Pair<Term, Term>(newSymbolicState, newPathCondition);
+         newElementaryUpdates = newElementaryUpdates.prepend(
+               tb.elementary(
+                     v,
+                     tb.var(
+                           new LogicVariable(new Name(newName), v.sort()))));
       }
       
-      return joinedState;
+      // Construct weakened symbolic state
+      Term newSymbolicState = tb.parallel(newElementaryUpdates);
+      
+      // Construct path condition as disjunction
+      Term newPathCondition = tb.or(state1.second, state2.second);
+      
+      return new Pair<Term, Term>(newSymbolicState, newPathCondition);
    }
 
    @Override
