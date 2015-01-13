@@ -119,10 +119,14 @@ public abstract class JoinRule implements BuiltInRule {
       
       Triple<Term, Term, Term> thisSEState =
             sequentToSETriple(newGoal, pio, services);
-      joinPartnerStates = joinPartnerStates.prepend(
-            new Pair<Term, Term>(thisSEState.first, thisSEState.second));
       
-      Pair<Term, Term> joinedState = joinStates(joinPartnerStates, thisSEState.third, services);
+      // The join loop
+      Pair<Term, Term> joinedState =
+            new Pair<Term, Term>(thisSEState.first, thisSEState.second);    
+      
+      for (Pair<Term,Term> state : joinPartnerStates) {
+         joinedState = joinStates(joinedState, state, thisSEState.third, services);
+      }
       
       // Delete previous sequents      
       clearSemisequent(newGoal, true);
@@ -142,8 +146,15 @@ public abstract class JoinRule implements BuiltInRule {
             new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
       
       // Close partner goals
+      int progress = 0;
       for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
          closeJoinPartnerGoal(newGoal.node(), joinPartner.first, joinedState, thisSEState.third);
+         
+         // Signal progress to UI
+         //TODO: Obviously, the following call has no effect, since the EDT is
+         //      blocked and the progress bar does not receive the new information
+         //      until the task has been finished...
+         mediator().getUI().taskProgress(progress++);
       }
 
       long endTime = System.currentTimeMillis();
@@ -164,16 +175,20 @@ public abstract class JoinRule implements BuiltInRule {
    }
    
    /**
-    * Joins a list of SE states (U1,C1,p) and (U2,C2,p). p must
+    * Joins two SE states (U1,C1,p) and (U2,C2,p). p must
     * be the same in both states, so it is supplied separately.
     * 
-    * @param states States to join.
+    * @param state1 First state to join.
+    * @param state2 Second state to join.
+    * @param programCounter The formula \&lt;{ ... }\&gt; phi
+    *   consisting of the common program counter and the post condition.
     * @param services The services object.
     * @return A new joined SE state (U*,C*) which is a weakening
     *    of the original states.
     */
    protected abstract Pair<Term, Term> joinStates(
-         ImmutableList<Pair<Term, Term>> states,
+         Pair<Term, Term> state1,
+         Pair<Term, Term> state2,
          Term programCounter,
          Services services);
 
