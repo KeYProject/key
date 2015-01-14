@@ -55,12 +55,6 @@ public class JoinIfThenElse extends JoinRule {
       // Construct path condition as (optimized) disjunction
       Term newPathCondition =
             createSimplifiedDisjunctivePathCondition(state1.second, state2.second, services);
-      
-      //NOTE: Although experiments have shown that the optimized
-      //      path condition is really equivalent to a simple
-      //      disjunction (and, in addition, simpler!), sometimes
-      //      KeY seems to have problems with closing goals involving
-      //      the optimized version...
                
       HashSet<LocationVariable> progVars =
             new HashSet<LocationVariable>();
@@ -106,7 +100,7 @@ public class JoinIfThenElse extends JoinRule {
                   tb.imp(appl1, appl2),
                   tb.imp(appl2, appl1));
             
-            proofClosed = isProvable(toProve, services);
+            proofClosed = isProvableWithSplitting(toProve, services);
             
          }
          
@@ -127,7 +121,7 @@ public class JoinIfThenElse extends JoinRule {
             
             Term commonPartAlreadyImpliedForm =
                   tb.imp(newPathCondition, distinguishingFormula.second);
-            if (!isProvable(commonPartAlreadyImpliedForm, services)) {
+            if (!isProvableWithSplitting(commonPartAlreadyImpliedForm, services)) {
                newPathCondition = tb.and(newPathCondition, distinguishingFormula.second);
             }
             

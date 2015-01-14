@@ -52,6 +52,7 @@ import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -134,7 +135,7 @@ public abstract class JoinRule implements BuiltInRule {
       int progress = 0;
       for (Pair<Term,Term> state : joinPartnerStates) {
          System.out.print("Joining state ");
-         System.out.print(progress);
+         System.out.print(progress + 1);
          System.out.print(" of ");
          System.out.println(joinPartners.size());
          
@@ -144,7 +145,7 @@ public abstract class JoinRule implements BuiltInRule {
          //TODO: Obviously, the following call has no effect, since the EDT is
          //      blocked and the progress bar does not receive the new information
          //      until the task has been finished...
-         mediator().getUI().taskProgress(progress++);
+         mediator().getUI().taskProgress(++progress);
       }
       
       // Delete previous sequents      
@@ -423,32 +424,27 @@ public abstract class JoinRule implements BuiltInRule {
    }
    
    /**
-    * Tries to prove the given formula and returns whether the
-    * prove could be closed.
+    * Tries to prove the given formula without splitting and
+    * returns whether the prove could be closed.
     * 
     * @param toProve Formula to prove.
     * @param services The services object.
     * @return True iff the given formula has been successfully proven.
     */
    protected boolean isProvable(Term toProve, Services services) {
-      final ProofEnvironment sideProofEnv =
-            SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(
-                  services.getProof(),                            // Parent Proof
-                  false);                                         // useSimplifyTermProfile
-      
-      ApplyStrategyInfo proofResult;
-      try {
-         proofResult = SideProofUtil.startSideProof(
-               services.getProof(),                                  // Parent proof
-               sideProofEnv,                                         // Proof environment
-               Sequent.createSequent(                                // Sequent to prove
-                     Semisequent.EMPTY_SEMISEQUENT,
-                     new Semisequent(new SequentFormula(toProve))));
-      } catch (ProofInputException e) {
-         return false;
-      }
-      
-      return proofResult.getProof().closed();
+      return isProvable(toProve, services, false);
+   }
+   
+   /**
+    * Tries to prove the given formula with splitting and returns
+    * whether the prove could be closed.
+    * 
+    * @param toProve Formula to prove.
+    * @param services The services object.
+    * @return True iff the given formula has been successfully proven.
+    */
+   protected boolean isProvableWithSplitting(Term toProve, Services services) {
+      return isProvable(toProve, services, true);
    }
    
    /**
@@ -493,7 +489,7 @@ public abstract class JoinRule implements BuiltInRule {
             if (!elem1.equals(elem2)) {
                // Try to show that the different elements can be left
                // out in the disjunction, since they are complementary
-               if (isProvable(tb.or(elem1, elem2), services)) {
+               if (isProvableWithSplitting(tb.or(elem1, elem2), services)) {
                   cond1ConjElems.remove(elem1);
                   cond2ConjElems.remove(elem2);
                } else {
@@ -538,7 +534,7 @@ public abstract class JoinRule implements BuiltInRule {
          Term equivalentToCommon = tb.and(
                tb.imp(result, commonElemsTerm),
                tb.imp(commonElemsTerm, result));
-         if (isProvable(equivalentToCommon, services)) {
+         if (isProvableWithSplitting(equivalentToCommon, services)) {
             result = commonElemsTerm;
          }
       }
@@ -850,6 +846,44 @@ public abstract class JoinRule implements BuiltInRule {
       }
       
       return result;
+   }
+   
+   /**
+    * Tries to prove the given formula and returns whether the
+    * prove could be closed.
+    * 
+    * @param toProve Formula to prove.
+    * @param services The services object.
+    * @param doSplit if true, splitting is allowed (normal mode).
+    * @return True iff the given formula has been successfully proven.
+    */
+   private boolean isProvable(
+         Term toProve,
+         Services services,
+         boolean doSplit) {
+      final ProofEnvironment sideProofEnv =
+            SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(
+                  services.getProof(),                            // Parent Proof
+                  false);                                         // useSimplifyTermProfile
+      
+      ApplyStrategyInfo proofResult;
+      try {
+         proofResult = SideProofUtil.startSideProof(
+               services.getProof(),                                  // Parent proof
+               sideProofEnv,                                         // Proof environment
+               Sequent.createSequent(                                // Sequent to prove
+                     Semisequent.EMPTY_SEMISEQUENT,
+                     new Semisequent(new SequentFormula(toProve))),
+               StrategyProperties.METHOD_NONE,                       // Method Treatment
+               StrategyProperties.LOOP_NONE,                         // Loop Treatment
+               StrategyProperties.QUERY_OFF,                         // Query Treatment
+               doSplit ? StrategyProperties.SPLITTING_NORMAL:        // Splitting Option
+                  StrategyProperties.SPLITTING_OFF);
+      } catch (ProofInputException e) {
+         return false;
+      }
+      
+      return proofResult.getProof().closed();
    }
    
    /**
