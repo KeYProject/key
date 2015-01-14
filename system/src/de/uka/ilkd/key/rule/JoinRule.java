@@ -451,10 +451,15 @@ public abstract class JoinRule implements BuiltInRule {
     * of the two supplied formulae, but possibly simpler. In the ideal
     * case, the returned formula can be literally shorter than each of
     * the two formulae; in this case, it consists of the common elements
-    * of those. The underlying idea is based upon the observation that
+    * of those.<p>
+    * 
+    * The underlying idea is based upon the observation that
     * many path conditions that should be joined are conjunctions of
     * mostly the same elements and, in addition, formulae phi and !phi
-    * that vanish after creating the disjunction of the path conditions.
+    * that vanish after creating the disjunction of the path conditions.<p>
+    * 
+    * In addition, the method applies, if possible, the distributivity
+    * laws to further simplify the result.
     * 
     * @param cond1 First path condition to join.
     * @param cond2 Second path condition to join.
@@ -549,14 +554,11 @@ public abstract class JoinRule implements BuiltInRule {
       
       LinkedList<Term> distinguishingElements = new LinkedList<Term>(cond1ConjElems);
       
-      if (cond1ConjElems.size() == cond2ConjElems.size()) {
-         for (int i = 0; i < cond1ConjElems.size(); i++) {
-            Term elem1 = cond1ConjElems.get(i);
-            Term elem2 = cond2ConjElems.get(i);
-            
-            if (elem1.equals(elem2)) {
-               distinguishingElements.remove(elem1);
-            }
+      for (int i = 0; i < cond1ConjElems.size(); i++) {
+         Term elem1 = cond1ConjElems.get(i);
+
+         if (cond2ConjElems.contains(elem1)) {
+            distinguishingElements.remove(elem1);
          }
       }
       

@@ -52,9 +52,15 @@ public class JoinIfThenElse extends JoinRule {
       
       final TermBuilder tb = services.getTermBuilder();
       
-      // Construct path condition as disjunction
+      // Construct path condition as (optimized) disjunction
       Term newPathCondition =
             createSimplifiedDisjunctivePathCondition(state1.second, state2.second, services);
+      
+      //NOTE: Although experiments have shown that the optimized
+      //      path condition is really equivalent to a simple
+      //      disjunction (and, in addition, simpler!), sometimes
+      //      KeY seems to have problems with closing goals involving
+      //      the optimized version...
                
       HashSet<LocationVariable> progVars =
             new HashSet<LocationVariable>();
