@@ -121,7 +121,12 @@ public class JoinWithSignLattice extends JoinRule {
                         v,
                         tb.func(skolemConstant)));
          } else {
-            // For equal right sides, we just do nothing...
+            // For equal right sides, we just keep those...
+            
+            newElementaryUpdates = newElementaryUpdates.prepend(
+                  tb.elementary(
+                        v,
+                        rightSide1));
          }
          
       }
