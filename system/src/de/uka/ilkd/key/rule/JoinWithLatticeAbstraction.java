@@ -42,8 +42,8 @@ import de.uka.ilkd.key.util.Pair;
  * Rule that joins two sequents based on a specified set of
  * abstract domain lattices. If no lattice is specified for
  * a given sort, the rule proceeds such that program variables
- * are unchanged if they are equal in both states and set to
- * fresh variables if they have different values.
+ * are unchanged if they are equal in both states and applies
+ * the if-then-else construction otherwise.
  * 
  * @author Dominic Scheurer
  */
@@ -117,12 +117,11 @@ public abstract class JoinWithLatticeAbstraction extends JoinRule {
             
          } else if (!rightSide1.equals(rightSide2)) {
             
-            skolemConstant = getNewScolemConstantForPrefix("v", v.sort(), services);
-            
+            // Apply if-then-else construction: Different values
             newElementaryUpdates = newElementaryUpdates.prepend(
                   tb.elementary(
                         v,
-                        tb.func(skolemConstant)));
+                        tb.ife(state2.second, rightSide2, rightSide1)));
             
          } else {
             
