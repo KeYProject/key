@@ -24,8 +24,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,13 +71,22 @@ public class JoinPartnerSelectionDialog extends JDialog {
     *  resemble the standard font of KeY for proofs etc. */
    private static final Font TXT_AREA_FONT =
          new Font(Font.MONOSPACED, Font.PLAIN, 14);
+   /** Comparator for goals; sorts by serial nr. of the node */
+   private static Comparator<Pair<Goal, PosInOccurrence>> GOAL_COMPARATOR =
+      new Comparator<Pair<Goal, PosInOccurrence>>() {
+         @Override
+         public int compare(Pair<Goal, PosInOccurrence> o1,
+               Pair<Goal, PosInOccurrence> o2) {
+            return o1.first.node().serialNr() - o2.first.node().serialNr();
+         }
+      };
    
    private LinkedList<Pair<Goal, PosInOccurrence>> candidates = null;
    private Services services = null;
    
    /** The chosen goals. */
-   private HashSet<Pair<Goal, PosInOccurrence>> chosen =
-         new HashSet<Pair<Goal,PosInOccurrence>>();
+   private SortedSet<Pair<Goal, PosInOccurrence>> chosen =
+         new TreeSet<Pair<Goal,PosInOccurrence>>(GOAL_COMPARATOR);
    
    private JEditorPane txtPartner1 = null;
    private JEditorPane txtPartner2 = null;
@@ -260,13 +270,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
       
       for (Pair<Goal,PosInOccurrence> candidate : candidates) {
          int insPos = Collections.binarySearch(
-               this.candidates, candidate, new Comparator<Pair<Goal, PosInOccurrence>>() {
-                  @Override
-                  public int compare(Pair<Goal, PosInOccurrence> o1,
-                        Pair<Goal, PosInOccurrence> o2) {
-                     return o1.first.node().serialNr() - o2.first.node().serialNr();
-                  }
-               });
+               this.candidates, candidate, GOAL_COMPARATOR);
          
          insPos = (insPos + 1) * -1;
          this.candidates.add(insPos, candidate);
