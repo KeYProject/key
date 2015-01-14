@@ -474,7 +474,6 @@ public abstract class JoinRule implements BuiltInRule {
       final LinkedList<Term> fCond2ConjElems = new LinkedList<Term>(cond2ConjElems);
       
       if (cond1ConjElems.size() == cond2ConjElems.size()) {
-         
          for (int i = 0; i < fCond1ConjElems.size(); i++) {
             Term elem1 = fCond1ConjElems.get(i);
             Term elem2 = fCond2ConjElems.get(i);
@@ -490,32 +489,31 @@ public abstract class JoinRule implements BuiltInRule {
          }
       }
       
-      final Term result1 = joinConjuctiveElements(cond1ConjElems, services);
-      final Term result2 = joinConjuctiveElements(cond2ConjElems, services);
+      Term result1 = joinConjuctiveElements(cond1ConjElems, services);
+      Term result2 = joinConjuctiveElements(cond2ConjElems, services);
       
       Term result;
       
       if (result1.equals(result2)) {
          result = result1;
       } else {
-         result = tb.or(
-               result1,
-               result2);
+         // Apply distributivity to further simplify the formula
+         
+         Pair<Term, Term> distinguishingAndEqual =
+               getDistinguishingFormula(result1, result2, services);
+         LinkedList<Term> equalConjunctiveElems =
+               getConjunctiveElementsFor(distinguishingAndEqual.second);
+         
+         cond1ConjElems.removeAll(equalConjunctiveElems);
+         cond2ConjElems.removeAll(equalConjunctiveElems);
+         
+         result1 = joinConjuctiveElements(cond1ConjElems, services);
+         result2 = joinConjuctiveElements(cond2ConjElems, services);
+         
+         result = tb.and(
+               tb.or(result1, result2),
+               joinConjuctiveElements(equalConjunctiveElems, services));
       }
-      
-      Term assertionFormula = tb.and(
-            tb.imp(
-                  tb.or(
-                        joinConjuctiveElements(fCond1ConjElems, services),
-                        joinConjuctiveElements(fCond2ConjElems, services)),
-                  result),
-            tb.imp(
-                  result,
-                  tb.or(
-                        joinConjuctiveElements(fCond1ConjElems, services),
-                        joinConjuctiveElements(fCond2ConjElems, services))));
-      
-      assert(isProvable(assertionFormula, services));
       
       return result;
    }
@@ -796,13 +794,12 @@ public abstract class JoinRule implements BuiltInRule {
    private LinkedList<Term> getConjunctiveElementsFor(final Term term) {
       LinkedList<Term> result = new LinkedList<Term>();
       
-      Term current = term;
-      while (current.op().equals(Junctor.AND)) {
-         result.add(current.sub(0));
-         current = current.sub(1);
+      if (term.op().equals(Junctor.AND)) {
+         result.addAll(getConjunctiveElementsFor(term.sub(0)));
+         result.addAll(getConjunctiveElementsFor(term.sub(1)));
+      } else {
+         result.add(term);
       }
-      
-      result.add(current);
       
       return result;
    }
