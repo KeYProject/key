@@ -130,9 +130,21 @@ public abstract class JoinRule implements BuiltInRule {
       // The join loop
       Pair<Term, Term> joinedState =
             new Pair<Term, Term>(thisSEState.first, thisSEState.second);    
-      
+
+      int progress = 0;
       for (Pair<Term,Term> state : joinPartnerStates) {
+         System.out.print("Joining state ");
+         System.out.print(progress);
+         System.out.print(" of ");
+         System.out.println(joinPartners.size());
+         
          joinedState = joinStates(joinedState, state, thisSEState.third, services);
+         
+         // Signal progress to UI
+         //TODO: Obviously, the following call has no effect, since the EDT is
+         //      blocked and the progress bar does not receive the new information
+         //      until the task has been finished...
+         mediator().getUI().taskProgress(progress++);
       }
       
       // Delete previous sequents      
@@ -153,15 +165,8 @@ public abstract class JoinRule implements BuiltInRule {
             new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
       
       // Close partner goals
-      int progress = 0;
       for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
          closeJoinPartnerGoal(newGoal.node(), joinPartner.first, joinedState, thisSEState.third);
-         
-         // Signal progress to UI
-         //TODO: Obviously, the following call has no effect, since the EDT is
-         //      blocked and the progress bar does not receive the new information
-         //      until the task has been finished...
-         mediator().getUI().taskProgress(progress++);
       }
 
       long endTime = System.currentTimeMillis();
@@ -456,10 +461,12 @@ public abstract class JoinRule implements BuiltInRule {
     * The underlying idea is based upon the observation that
     * many path conditions that should be joined are conjunctions of
     * mostly the same elements and, in addition, formulae phi and !phi
-    * that vanish after creating the disjunction of the path conditions.<p>
+    * that vanish after creating the disjunction of the path conditions.
+    * The corresponding valid formula is
+    * <code>(phi & psi) | (phi & !psi) <-> phi</code><p>
     * 
-    * In addition, the method applies, if possible, the distributivity
-    * laws to further simplify the result.
+    * In addition, the method applies, if possible and if the above observation
+    * was not applicable, the distributivity laws to simplify the result.
     * 
     * @param cond1 First path condition to join.
     * @param cond2 Second path condition to join.
@@ -489,6 +496,13 @@ public abstract class JoinRule implements BuiltInRule {
                if (isProvable(tb.or(elem1, elem2), services)) {
                   cond1ConjElems.remove(elem1);
                   cond2ConjElems.remove(elem2);
+               } else {
+                  // Simplification is not applicable!
+                  // Do a reset and leave the loop.
+                  cond1ConjElems = fCond1ConjElems;
+                  cond2ConjElems = fCond2ConjElems;
+                  
+                  break;
                }
             }
          }
@@ -501,23 +515,32 @@ public abstract class JoinRule implements BuiltInRule {
       
       if (result1.equals(result2)) {
          result = result1;
-      } else {
-         // Apply distributivity to further simplify the formula
-         
+      } else {         
          Pair<Term, Term> distinguishingAndEqual =
                getDistinguishingFormula(result1, result2, services);
          LinkedList<Term> equalConjunctiveElems =
                getConjunctiveElementsFor(distinguishingAndEqual.second);
          
+         // Apply distributivity to simplify the formula
          cond1ConjElems.removeAll(equalConjunctiveElems);
          cond2ConjElems.removeAll(equalConjunctiveElems);
          
          result1 = joinConjuctiveElements(cond1ConjElems, services);
          result2 = joinConjuctiveElements(cond2ConjElems, services);
+         Term commonElemsTerm = joinConjuctiveElements(equalConjunctiveElems, services);
          
          result = tb.and(
                tb.or(result1, result2),
-               joinConjuctiveElements(equalConjunctiveElems, services));
+               commonElemsTerm);
+         
+         // Last try: Check if the formula is equivalent to only the
+         // common elements...
+         Term equivalentToCommon = tb.and(
+               tb.imp(result, commonElemsTerm),
+               tb.imp(commonElemsTerm, result));
+         if (isProvable(equivalentToCommon, services)) {
+            result = commonElemsTerm;
+         }
       }
       
       return result;
