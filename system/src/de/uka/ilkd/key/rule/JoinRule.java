@@ -379,6 +379,38 @@ public abstract class JoinRule implements BuiltInRule {
    }
    
    /**
+    * Returns the right side for a given location variable in an update
+    * (in normal form).
+    * 
+    * @param update Update term to search.
+    * @param leftSide Left side to find the right side for.
+    * @return The right side in the update for the given left side.
+    */
+   protected Term getUpdateRightSideFor(Term update, LocationVariable leftSide) {
+      if (update.op() instanceof ElementaryUpdate &&
+          ((ElementaryUpdate) update.op()).lhs().equals(leftSide)) {
+         
+         return update.sub(0);
+         
+      } else if (
+            update.op() instanceof UpdateJunctor &&
+            update.op().equals(UpdateJunctor.PARALLEL_UPDATE)) {
+         
+         for (Term sub : update.subs()) {
+            Term rightSide = getUpdateRightSideFor(sub, leftSide);
+            if (rightSide != null) {
+               return rightSide;
+            }
+         }
+         
+         return null;
+         
+      } else {      
+         return null;
+      }
+   }
+   
+   /**
     * Closes the given partner goal, using the CloseAfterJoin rule.
     * 
     * @param joinNodeParent Parent of remaining join node.
