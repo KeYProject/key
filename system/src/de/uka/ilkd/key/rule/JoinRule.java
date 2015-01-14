@@ -51,7 +51,9 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -130,9 +132,18 @@ public abstract class JoinRule implements BuiltInRule {
       // The join loop
       Pair<Term, Term> joinedState =
             new Pair<Term, Term>(thisSEState.first, thisSEState.second);    
-      
+
+      int progress = 0;
       for (Pair<Term,Term> state : joinPartnerStates) {
+         System.out.print("Joining state ");
+         System.out.print(progress + 1);
+         System.out.print(" of ");
+         System.out.println(joinPartners.size());
+         
          joinedState = joinStates(joinedState, state, thisSEState.third, services);
+         
+         // Signal progress to UI
+         mediator().getUI().taskProgress(++progress);
       }
       
       // Delete previous sequents      
@@ -146,22 +157,15 @@ public abstract class JoinRule implements BuiltInRule {
             new PosInOccurrence(newAntecedent, PosInTerm.getTopLevel(), true));
       
       // Add new succedent (symbolic state & program counter)
-      SequentFormula newSuccedent = new SequentFormula(
-            tb.apply(joinedState.first, thisSEState.third));
+      Term succedentFormula = tb.apply(joinedState.first, thisSEState.third);
+      SequentFormula newSuccedent = new SequentFormula(succedentFormula);
       newGoal.addFormula(
-            newSuccedent,
+            new SequentFormula(succedentFormula),
             new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
       
       // Close partner goals
-      int progress = 0;
       for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
          closeJoinPartnerGoal(newGoal.node(), joinPartner.first, joinedState, thisSEState.third);
-         
-         // Signal progress to UI
-         //TODO: Obviously, the following call has no effect, since the EDT is
-         //      blocked and the progress bar does not receive the new information
-         //      until the task has been finished...
-         mediator().getUI().taskProgress(progress++);
       }
 
       long endTime = System.currentTimeMillis();
@@ -418,32 +422,27 @@ public abstract class JoinRule implements BuiltInRule {
    }
    
    /**
-    * Tries to prove the given formula and returns whether the
-    * prove could be closed.
+    * Tries to prove the given formula without splitting and
+    * returns whether the prove could be closed.
     * 
     * @param toProve Formula to prove.
     * @param services The services object.
     * @return True iff the given formula has been successfully proven.
     */
    protected boolean isProvable(Term toProve, Services services) {
-      final ProofEnvironment sideProofEnv =
-            SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(
-                  services.getProof(),                            // Parent Proof
-                  false);                                         // useSimplifyTermProfile
-      
-      ApplyStrategyInfo proofResult;
-      try {
-         proofResult = SideProofUtil.startSideProof(
-               services.getProof(),                                  // Parent proof
-               sideProofEnv,                                         // Proof environment
-               Sequent.createSequent(                                // Sequent to prove
-                     Semisequent.EMPTY_SEMISEQUENT,
-                     new Semisequent(new SequentFormula(toProve))));
-      } catch (ProofInputException e) {
-         return false;
-      }
-      
-      return proofResult.getProof().closed();
+      return isProvable(toProve, services, false);
+   }
+   
+   /**
+    * Tries to prove the given formula with splitting and returns
+    * whether the prove could be closed.
+    * 
+    * @param toProve Formula to prove.
+    * @param services The services object.
+    * @return True iff the given formula has been successfully proven.
+    */
+   protected boolean isProvableWithSplitting(Term toProve, Services services) {
+      return isProvable(toProve, services, true);
    }
    
    /**
@@ -451,10 +450,17 @@ public abstract class JoinRule implements BuiltInRule {
     * of the two supplied formulae, but possibly simpler. In the ideal
     * case, the returned formula can be literally shorter than each of
     * the two formulae; in this case, it consists of the common elements
-    * of those. The underlying idea is based upon the observation that
+    * of those.<p>
+    * 
+    * The underlying idea is based upon the observation that
     * many path conditions that should be joined are conjunctions of
     * mostly the same elements and, in addition, formulae phi and !phi
     * that vanish after creating the disjunction of the path conditions.
+    * The corresponding valid formula is
+    * <code>(phi & psi) | (phi & !psi) <-> phi</code><p>
+    * 
+    * In addition, the method applies, if possible and if the above observation
+    * was not applicable, the distributivity laws to simplify the result.
     * 
     * @param cond1 First path condition to join.
     * @param cond2 Second path condition to join.
@@ -470,10 +476,10 @@ public abstract class JoinRule implements BuiltInRule {
       LinkedList<Term> cond1ConjElems = getConjunctiveElementsFor(cond1);
       LinkedList<Term> cond2ConjElems = getConjunctiveElementsFor(cond2);
       
+      final LinkedList<Term> fCond1ConjElems = new LinkedList<Term>(cond1ConjElems);
+      final LinkedList<Term> fCond2ConjElems = new LinkedList<Term>(cond2ConjElems);
+      
       if (cond1ConjElems.size() == cond2ConjElems.size()) {
-         final LinkedList<Term> fCond1ConjElems = new LinkedList<Term>(cond1ConjElems);
-         final LinkedList<Term> fCond2ConjElems = new LinkedList<Term>(cond2ConjElems);
-         
          for (int i = 0; i < fCond1ConjElems.size(); i++) {
             Term elem1 = fCond1ConjElems.get(i);
             Term elem2 = fCond2ConjElems.get(i);
@@ -481,9 +487,16 @@ public abstract class JoinRule implements BuiltInRule {
             if (!elem1.equals(elem2)) {
                // Try to show that the different elements can be left
                // out in the disjunction, since they are complementary
-               if (isProvable(tb.or(elem1, elem2), services)) {
+               if (isProvableWithSplitting(tb.or(elem1, elem2), services)) {
                   cond1ConjElems.remove(elem1);
                   cond2ConjElems.remove(elem2);
+               } else {
+                  // Simplification is not applicable!
+                  // Do a reset and leave the loop.
+                  cond1ConjElems = fCond1ConjElems;
+                  cond2ConjElems = fCond2ConjElems;
+                  
+                  break;
                }
             }
          }
@@ -492,13 +505,39 @@ public abstract class JoinRule implements BuiltInRule {
       Term result1 = joinConjuctiveElements(cond1ConjElems, services);
       Term result2 = joinConjuctiveElements(cond2ConjElems, services);
       
+      Term result;
+      
       if (result1.equals(result2)) {
-         return result1;
-      } else {
-         return tb.or(
-               joinConjuctiveElements(cond1ConjElems, services),
-               joinConjuctiveElements(cond2ConjElems, services));
+         result = result1;
+      } else {         
+         Pair<Term, Term> distinguishingAndEqual =
+               getDistinguishingFormula(result1, result2, services);
+         LinkedList<Term> equalConjunctiveElems =
+               getConjunctiveElementsFor(distinguishingAndEqual.second);
+         
+         // Apply distributivity to simplify the formula
+         cond1ConjElems.removeAll(equalConjunctiveElems);
+         cond2ConjElems.removeAll(equalConjunctiveElems);
+         
+         result1 = joinConjuctiveElements(cond1ConjElems, services);
+         result2 = joinConjuctiveElements(cond2ConjElems, services);
+         Term commonElemsTerm = joinConjuctiveElements(equalConjunctiveElems, services);
+         
+         result = tb.and(
+               tb.or(result1, result2),
+               commonElemsTerm);
+         
+         // Last try: Check if the formula is equivalent to only the
+         // common elements...
+         Term equivalentToCommon = tb.and(
+               tb.imp(result, commonElemsTerm),
+               tb.imp(commonElemsTerm, result));
+         if (isProvableWithSplitting(equivalentToCommon, services)) {
+            result = commonElemsTerm;
+         }
       }
+      
+      return result;
    }
    
    /**
@@ -532,14 +571,11 @@ public abstract class JoinRule implements BuiltInRule {
       
       LinkedList<Term> distinguishingElements = new LinkedList<Term>(cond1ConjElems);
       
-      if (cond1ConjElems.size() == cond2ConjElems.size()) {
-         for (int i = 0; i < cond1ConjElems.size(); i++) {
-            Term elem1 = cond1ConjElems.get(i);
-            Term elem2 = cond2ConjElems.get(i);
-            
-            if (elem1.equals(elem2)) {
-               distinguishingElements.remove(elem1);
-            }
+      for (int i = 0; i < cond1ConjElems.size(); i++) {
+         Term elem1 = cond1ConjElems.get(i);
+
+         if (cond2ConjElems.contains(elem1)) {
+            distinguishingElements.remove(elem1);
          }
       }
       
@@ -777,13 +813,12 @@ public abstract class JoinRule implements BuiltInRule {
    private LinkedList<Term> getConjunctiveElementsFor(final Term term) {
       LinkedList<Term> result = new LinkedList<Term>();
       
-      Term current = term;
-      while (current.op().equals(Junctor.AND)) {
-         result.add(current.sub(0));
-         current = current.sub(1);
+      if (term.op().equals(Junctor.AND)) {
+         result.addAll(getConjunctiveElementsFor(term.sub(0)));
+         result.addAll(getConjunctiveElementsFor(term.sub(1)));
+      } else {
+         result.add(term);
       }
-      
-      result.add(current);
       
       return result;
    }
@@ -802,10 +837,54 @@ public abstract class JoinRule implements BuiltInRule {
          return tb.tt();
       }
       
-      Term result = elems.pop();
-      for (Term term : elems) {
+      Term result = elems.getFirst();
+      for (int i = 1; i < elems.size(); i++) {
+         Term term = elems.get(i);
          result = tb.and(result, term);
       }
+      
+      return result;
+   }
+   
+   /**
+    * Tries to prove the given formula and returns whether the
+    * prove could be closed.
+    * 
+    * @param toProve Formula to prove.
+    * @param services The services object.
+    * @param doSplit if true, splitting is allowed (normal mode).
+    * @return True iff the given formula has been successfully proven.
+    */
+   private boolean isProvable(
+         Term toProve,
+         Services services,
+         boolean doSplit) {
+      final ProofEnvironment sideProofEnv =
+            SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(
+                  services.getProof(),                            // Parent Proof
+                  false);                                         // useSimplifyTermProfile
+      
+      ApplyStrategyInfo proofResult;
+      try {
+         proofResult = SideProofUtil.startSideProof(
+               services.getProof(),                                  // Parent proof
+               sideProofEnv,                                         // Proof environment
+               Sequent.createSequent(                                // Sequent to prove
+                     Semisequent.EMPTY_SEMISEQUENT,
+                     new Semisequent(new SequentFormula(toProve))),
+               StrategyProperties.METHOD_NONE,                       // Method Treatment
+               StrategyProperties.LOOP_NONE,                         // Loop Treatment
+               StrategyProperties.QUERY_OFF,                         // Query Treatment
+               doSplit ? StrategyProperties.SPLITTING_NORMAL:        // Splitting Option
+                  StrategyProperties.SPLITTING_OFF);
+      } catch (ProofInputException e) {
+         return false;
+      }
+      
+      boolean result = proofResult.getProof().closed();
+      
+      SideProofUtil.disposeOrStore(
+            "Finished proof of " + ProofSaver.printTerm(toProve, services), proofResult);
       
       return result;
    }

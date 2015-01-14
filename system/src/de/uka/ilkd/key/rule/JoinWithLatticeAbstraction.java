@@ -192,7 +192,7 @@ public abstract class JoinWithLatticeAbstraction extends JoinRule {
          Term appl    = tb.apply(state.first, axiom);
          Term toProve = tb.imp(state.second, appl);
          
-         if (isProvable(toProve, services)) {
+         if (isProvableWithSplitting(toProve, services)) {
             return elem;
          }
       }

@@ -41,7 +41,7 @@ public class JoinIfThenElse extends JoinRule {
    
    private static final String DISPLAY_NAME = "JoinByIfThenElse";
    private static final Name RULE_NAME = new Name(DISPLAY_NAME);
-   private static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 12;
+   private static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
 
    @Override
    protected Pair<Term, Term> joinStates(
@@ -52,10 +52,9 @@ public class JoinIfThenElse extends JoinRule {
       
       final TermBuilder tb = services.getTermBuilder();
       
-      // Construct path condition as disjunction
-//      Term newPathCondition =
-//            createSimplifiedDisjunctivePathCondition(state1.second, state2.second, services);
-      Term newPathCondition = tb.or(state1.second, state2.second);
+      // Construct path condition as (optimized) disjunction
+      Term newPathCondition =
+            createSimplifiedDisjunctivePathCondition(state1.second, state2.second, services);
                
       HashSet<LocationVariable> progVars =
             new HashSet<LocationVariable>();
@@ -101,7 +100,7 @@ public class JoinIfThenElse extends JoinRule {
                   tb.imp(appl1, appl2),
                   tb.imp(appl2, appl1));
             
-            proofClosed = isProvable(toProve, services);
+            proofClosed = isProvableWithSplitting(toProve, services);
             
          }
          
@@ -122,7 +121,7 @@ public class JoinIfThenElse extends JoinRule {
             
             Term commonPartAlreadyImpliedForm =
                   tb.imp(newPathCondition, distinguishingFormula.second);
-            if (!isProvable(commonPartAlreadyImpliedForm, services)) {
+            if (!isProvableWithSplitting(commonPartAlreadyImpliedForm, services)) {
                newPathCondition = tb.and(newPathCondition, distinguishingFormula.second);
             }
             
