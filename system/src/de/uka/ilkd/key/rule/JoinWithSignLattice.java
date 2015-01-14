@@ -102,7 +102,7 @@ public class JoinWithSignLattice extends JoinRule {
             
             // Join for integers: Sign lattice.
             
-            AbstractDomainLattice<AbstractDomainElement, Integer> lattice =
+            AbstractDomainLattice<Integer> lattice =
                   SignAnalysisLattice.getInstance();
             
             AbstractDomainElement abstrElem1 = determineAbstractElem(state1, v, lattice, services);
@@ -122,10 +122,9 @@ public class JoinWithSignLattice extends JoinRule {
             
          } else if (v.sort().equals(booleanSort)) {
             
-         // Join for booleans: Simple boolean lattice.
+            // Join for booleans: Simple boolean lattice.
             
-            AbstractDomainLattice<AbstractDomainElement, Boolean> lattice =
-                  BooleanLattice.getInstance();
+            AbstractDomainLattice<Boolean> lattice = BooleanLattice.getInstance();
             
             AbstractDomainElement abstrElem1 = determineAbstractElem(state1, v, lattice, services);
             AbstractDomainElement abstrElem2 = determineAbstractElem(state2, v, lattice, services);
@@ -211,7 +210,7 @@ public class JoinWithSignLattice extends JoinRule {
    private AbstractDomainElement determineAbstractElem(
          Pair<Term, Term> state,
          LocationVariable variable,
-         AbstractDomainLattice<AbstractDomainElement, ?> lattice,
+         AbstractDomainLattice<?> lattice,
          Services services) {
       
       TermBuilder tb = services.getTermBuilder();

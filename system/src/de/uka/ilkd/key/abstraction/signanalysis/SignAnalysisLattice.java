@@ -10,7 +10,7 @@ import de.uka.ilkd.key.abstraction.AbstractDomainLattice;
  * 
  * @author Dominic Scheurer
  */
-public class SignAnalysisLattice extends AbstractDomainLattice<AbstractDomainElement, Integer> {
+public class SignAnalysisLattice extends AbstractDomainLattice<Integer> {
    
    /**
     * All elements of this abstract domain.

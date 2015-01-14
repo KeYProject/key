@@ -10,7 +10,7 @@ import de.uka.ilkd.key.abstraction.AbstractDomainLattice;
  * 
  * @author Dominic Scheurer
  */
-public class BooleanLattice extends AbstractDomainLattice<AbstractDomainElement, Boolean> {
+public class BooleanLattice extends AbstractDomainLattice<Boolean> {
    
    /**
     * All elements of this abstract domain.

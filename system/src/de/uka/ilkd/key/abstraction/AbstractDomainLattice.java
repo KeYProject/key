@@ -13,8 +13,8 @@ import java.util.Iterator;
  * @param <AbstrDomElem>
  * @param <ConcrDomElem>
  */
-public abstract class AbstractDomainLattice<AbstrDomElem extends AbstractDomainElement, ConcrDomElem>
-implements PartialComparator<AbstrDomElem>, Iterable<AbstrDomElem> {
+public abstract class AbstractDomainLattice<ConcrDomElem>
+implements PartialComparator<AbstractDomainElement>, Iterable<AbstractDomainElement> {
    
    /**
     * Abstracts from a given element of the concrete domain by
@@ -26,7 +26,7 @@ implements PartialComparator<AbstrDomElem>, Iterable<AbstrDomElem> {
     * @param elem Element to abstract from.
     * @return A suitable abstract domain element.
     */
-   public abstract AbstrDomElem abstractFrom(ConcrDomElem elem);
+   public abstract AbstractDomainElement abstractFrom(ConcrDomElem elem);
    
    /**
     * A lattice join operation; finds an abstract element that is
@@ -38,15 +38,15 @@ implements PartialComparator<AbstrDomElem>, Iterable<AbstrDomElem> {
     * @return The least upper bound of the set consisting of the
     *     elements a and b.
     */
-   public abstract AbstrDomElem join(AbstrDomElem a, AbstrDomElem b);
+   public abstract AbstractDomainElement join(AbstractDomainElement a, AbstractDomainElement b);
    
    @Override
-   public PartialComparisonResult compare(AbstrDomElem a, AbstrDomElem b) {
+   public PartialComparisonResult compare(AbstractDomainElement a, AbstractDomainElement b) {
       if (a.equals(b)) {
          return PartialComparisonResult.EQ;
       }
       
-      AbstrDomElem joinRes = join(a, b);
+      AbstractDomainElement joinRes = join(a, b);
       if (joinRes.equals(a)) {
          return PartialComparisonResult.GTE;
       } else if (joinRes.equals(b)) {
@@ -65,6 +65,6 @@ implements PartialComparator<AbstrDomElem>, Iterable<AbstrDomElem> {
     * must hold (i.e., b may not be smaller than a). 
     */
    @Override
-   public abstract Iterator<AbstrDomElem> iterator();
+   public abstract Iterator<AbstractDomainElement> iterator();
    
 }
