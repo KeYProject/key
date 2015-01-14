@@ -3,7 +3,6 @@ package de.uka.ilkd.key.abstraction;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 
 /**
  * TODO: Document.
