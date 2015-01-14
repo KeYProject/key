@@ -750,6 +750,10 @@ public abstract class JoinRule implements BuiltInRule {
    private Term joinConjuctiveElements(final LinkedList<Term> elems, Services services) {
       TermBuilder tb = services.getTermBuilder();
       
+      if (elems.isEmpty()) {
+         return tb.tt();
+      }
+      
       Term result = elems.pop();
       for (Term term : elems) {
          result = tb.and(result, term);
