@@ -470,9 +470,10 @@ public abstract class JoinRule implements BuiltInRule {
       LinkedList<Term> cond1ConjElems = getConjunctiveElementsFor(cond1);
       LinkedList<Term> cond2ConjElems = getConjunctiveElementsFor(cond2);
       
+      final LinkedList<Term> fCond1ConjElems = new LinkedList<Term>(cond1ConjElems);
+      final LinkedList<Term> fCond2ConjElems = new LinkedList<Term>(cond2ConjElems);
+      
       if (cond1ConjElems.size() == cond2ConjElems.size()) {
-         final LinkedList<Term> fCond1ConjElems = new LinkedList<Term>(cond1ConjElems);
-         final LinkedList<Term> fCond2ConjElems = new LinkedList<Term>(cond2ConjElems);
          
          for (int i = 0; i < fCond1ConjElems.size(); i++) {
             Term elem1 = fCond1ConjElems.get(i);
@@ -496,8 +497,8 @@ public abstract class JoinRule implements BuiltInRule {
          return result1;
       } else {
          return tb.or(
-               joinConjuctiveElements(cond1ConjElems, services),
-               joinConjuctiveElements(cond2ConjElems, services));
+               joinConjuctiveElements(fCond1ConjElems, services),
+               joinConjuctiveElements(fCond2ConjElems, services));
       }
    }
    
