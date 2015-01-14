@@ -24,18 +24,11 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -199,24 +192,9 @@ public abstract class JoinWithLatticeAbstraction extends JoinRule {
          Term appl    = tb.apply(state.first, axiom);
          Term toProve = tb.imp(state.second, appl);
          
-         final ProofEnvironment sideProofEnv =
-               SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(
-                     services.getProof(),                            // Parent Proof
-                     false);                                         // useSimplifyTermProfile
-         
-         try {
-            ApplyStrategyInfo proofResult = SideProofUtil.startSideProof(
-                  services.getProof(),                                  // Parent proof
-                  sideProofEnv,                                         // Proof environment
-                  Sequent.createSequent(                                // Sequent to prove
-                        Semisequent.EMPTY_SEMISEQUENT,
-                        new Semisequent(new SequentFormula(toProve))));
-            
-            if (proofResult.getProof().closed()) {
-               return elem;
-            }
+         if (isProvable(toProve, services)) {
+            return elem;
          }
-         catch (ProofInputException e) {}
       }
       
       return Top.getInstance();

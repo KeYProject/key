@@ -19,18 +19,11 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -84,72 +77,45 @@ public class JoinIfThenElse extends JoinRule {
          }
          
          // Check if location v is set to different value in both states.
-         try {
-            // Easy check: Term equality
-            boolean proofClosed = rightSide1.equalsModRenaming(rightSide2);
+         
+         // Easy check: Term equality
+         boolean proofClosed = rightSide1.equalsModRenaming(rightSide2);
+         
+         // We skip the check for equal valuation of this variable if
+         // the depth threshold is exceeded by one of the right sides.
+         // Experiments show a very big time overhead from a depth of
+         // about 8-10 on, or sometimes even earlier.
+         if (rightSide1.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING &&
+             rightSide2.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING &&
+             !proofClosed) {
             
-            // We skip the check for equal valuation of this variable if
-            // the depth threshold is exceeded by one of the right sides.
-            // Experiments show a very big time overhead from a depth of
-            // about 8-10 on, or sometimes even earlier.
-            if (rightSide1.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING &&
-                rightSide2.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING &&
-                !proofClosed) {
-               
-               Term predicateTerm = tb.func(new Function(new Name("P"), Sort.FORMULA, v.sort()), tb.var(v));
-               Term appl1 = tb.apply(state1.first, predicateTerm);
-               Term appl2 = tb.apply(state2.first, predicateTerm);
-               Term toProve = tb.and(
-                     tb.imp(appl1, appl2),
-                     tb.imp(appl2, appl1));
-               
-               final ProofEnvironment sideProofEnv =
-                     SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(
-                           services.getProof(),                            // Parent Proof
-                           false);                                         // useSimplifyTermProfile
-               
-               ApplyStrategyInfo proofResult = SideProofUtil.startSideProof(
-                     services.getProof(),                                  // Parent proof
-                     sideProofEnv,                                         // Proof environment
-                     Sequent.createSequent(                                // Sequent to prove
-                           Semisequent.EMPTY_SEMISEQUENT,
-                           new Semisequent(new SequentFormula(toProve))));  
-               
-               proofClosed = proofResult.getProof().closed();
-               
-            }
+            Term predicateTerm = tb.func(new Function(new Name("P"), Sort.FORMULA, v.sort()), tb.var(v));
+            Term appl1 = tb.apply(state1.first, predicateTerm);
+            Term appl2 = tb.apply(state2.first, predicateTerm);
+            Term toProve = tb.and(
+                  tb.imp(appl1, appl2),
+                  tb.imp(appl2, appl1));
             
-            if (proofClosed) {
-               
-               // Arbitrary choice: Take value of first state
-               newElementaryUpdates = newElementaryUpdates.prepend(
-                     tb.elementary(
-                           v,
-                           rightSide1));
-               
-            } else {
-               
-               // Apply if-then-else construction: Different values
-               newElementaryUpdates = newElementaryUpdates.prepend(
-                     tb.elementary(
-                           v,
-                           tb.ife(state2.second, rightSide2, rightSide1)));
-               
-            }
+            proofClosed = isProvable(toProve, services);
+            
          }
-         catch (ProofInputException e) {
-            // If proof fails for some reason, just apply
-            // if-then-else construction. We still got absolute
-            // precision and soundness, only a more complicated
-            // resulting sequence.
+         
+         if (proofClosed) {
             
-            System.out.println("[INFO] Join If-Then-Else: Side proof failed.");
-            System.out.println(e.toString());
+            // Arbitrary choice: Take value of first state
+            newElementaryUpdates = newElementaryUpdates.prepend(
+                  tb.elementary(
+                        v,
+                        rightSide1));
             
+         } else {
+            
+            // Apply if-then-else construction: Different values
             newElementaryUpdates = newElementaryUpdates.prepend(
                   tb.elementary(
                         v,
                         tb.ife(state2.second, rightSide2, rightSide1)));
+            
          }
       }
       
