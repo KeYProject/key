@@ -5,6 +5,12 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 
+/**
+ * The Neg element of the sign lattice, representing
+ * all strictly negative integers.
+ * 
+ * @author Dominic Scheurer
+ */
 public class Neg extends SignAnalysisDomainElem {
 
    private static final Neg INSTANCE = new Neg();

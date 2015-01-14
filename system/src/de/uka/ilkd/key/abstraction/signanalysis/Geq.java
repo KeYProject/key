@@ -5,6 +5,12 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 
+/**
+ * The Geq element of the sign lattice, representing
+ * all positive integers and zero.
+ * 
+ * @author Dominic Scheurer
+ */
 public class Geq extends SignAnalysisDomainElem {
 
    private static final Geq INSTANCE = new Geq();

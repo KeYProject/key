@@ -5,6 +5,12 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 
+/**
+ * The True element of the boolean lattice, representing
+ * exactly the boolean true.
+ * 
+ * @author Dominic Scheurer
+ */
 public class True extends BooleanDomainElem {
 
    private static final True INSTANCE = new True();

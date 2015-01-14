@@ -3,14 +3,14 @@ package de.uka.ilkd.key.abstraction.signanalysis;
 import de.uka.ilkd.key.abstraction.AbstractDomainElement;
 
 /**
- * TODO: Document.
+ * A domain element for sign analysis.
  * 
  * @author Dominic Scheurer
  */
 public abstract class SignAnalysisDomainElem extends AbstractDomainElement {
 
    /**
-    * @return true iff this element is the neg element.
+    * @return true iff this element is the bottom element.
     */
    public boolean isBottom() {
       return this instanceof Bottom;
@@ -52,7 +52,7 @@ public abstract class SignAnalysisDomainElem extends AbstractDomainElement {
    }
    
    /**
-    * @return true iff this element is the zero element.
+    * @return true iff this element is the top element.
     */
    public boolean isTop() {
       return this instanceof Top;

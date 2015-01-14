@@ -5,6 +5,12 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 
+/**
+ * The False element of the boolean lattice, representing
+ * exactly the boolean false.
+ * 
+ * @author Dominic Scheurer
+ */
 public class False extends BooleanDomainElem {
 
    private static final False INSTANCE = new False();

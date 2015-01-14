@@ -6,14 +6,14 @@ import de.uka.ilkd.key.abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.abstraction.AbstractDomainLattice;
 
 /**
- * TODO: Document.
+ * A simple lattice for booleans.
  * 
  * @author Dominic Scheurer
  */
 public class BooleanLattice extends AbstractDomainLattice<AbstractDomainElement, Boolean> {
    
    /**
-    * TODO: Document.
+    * All elements of this abstract domain.
     */
    public static final AbstractDomainElement[] ABSTRACT_DOMAIN_ELEMS = {
       Bottom.getInstance(),
@@ -23,19 +23,17 @@ public class BooleanLattice extends AbstractDomainLattice<AbstractDomainElement,
    };
    
    /**
-    * TODO: Document.
+    * The singleton instance of the lattice.
     */
    private static final BooleanLattice INSTANCE = new BooleanLattice();
    
    /**
-    * TODO: Document.
+    * Private constructor: Singleton.
     */
    private BooleanLattice() {}
    
    /**
-    * TODO: Document.
-    * 
-    * @return
+    * @return The singleton instance of this lattice.
     */
    public static BooleanLattice getInstance() {
       return INSTANCE;

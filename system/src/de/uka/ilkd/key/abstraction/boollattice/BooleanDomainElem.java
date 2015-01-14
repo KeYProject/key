@@ -3,7 +3,7 @@ package de.uka.ilkd.key.abstraction.boollattice;
 import de.uka.ilkd.key.abstraction.AbstractDomainElement;
 
 /**
- * TODO: Document.
+ * A domain element of the simple boolean lattice.
  * 
  * @author Dominic Scheurer
  */

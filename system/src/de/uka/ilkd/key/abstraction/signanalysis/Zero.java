@@ -5,6 +5,12 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 
+/**
+ * The Zero element of the sign lattice, representing
+ * only the number 0.
+ * 
+ * @author Dominic Scheurer
+ */
 public class Zero extends SignAnalysisDomainElem {
 
    private static final Zero INSTANCE = new Zero();

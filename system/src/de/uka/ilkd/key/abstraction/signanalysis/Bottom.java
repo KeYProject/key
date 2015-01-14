@@ -7,6 +7,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 
+/**
+ * The Bottom element of the sign lattice, representing
+ * no number at all.
+ * 
+ * @author Dominic Scheurer
+ */
 public class Bottom extends SignAnalysisDomainElem {
 
    private static final Bottom INSTANCE = new Bottom();

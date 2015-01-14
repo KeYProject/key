@@ -6,14 +6,14 @@ import de.uka.ilkd.key.abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.abstraction.AbstractDomainLattice;
 
 /**
- * TODO: Document.
+ * A lattice for sign analysis of integers.
  * 
  * @author Dominic Scheurer
  */
 public class SignAnalysisLattice extends AbstractDomainLattice<AbstractDomainElement, Integer> {
    
    /**
-    * TODO: Document.
+    * All elements of this abstract domain.
     */
    public static final AbstractDomainElement[] ABSTRACT_DOMAIN_ELEMS = {
       Bottom.getInstance(),
@@ -26,19 +26,17 @@ public class SignAnalysisLattice extends AbstractDomainLattice<AbstractDomainEle
    };
    
    /**
-    * TODO: Document.
+    * The singleton instance of this lattice.
     */
    private static final SignAnalysisLattice INSTANCE = new SignAnalysisLattice();
    
    /**
-    * TODO: Document.
+    * Private constructor (singleton!).
     */
    private SignAnalysisLattice() {}
    
    /**
-    * TODO: Document.
-    * 
-    * @return
+    * @return The singleton instance of this lattice.
     */
    public static SignAnalysisLattice getInstance() {
       return INSTANCE;

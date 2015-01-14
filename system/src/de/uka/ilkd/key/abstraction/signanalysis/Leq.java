@@ -5,6 +5,12 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 
+/**
+ * The Leq element of the sign lattice, representing
+ * all negative numbers and zero.
+ * 
+ * @author Dominic Scheurer
+ */
 public class Leq extends SignAnalysisDomainElem {
 
    private static final Leq INSTANCE = new Leq();

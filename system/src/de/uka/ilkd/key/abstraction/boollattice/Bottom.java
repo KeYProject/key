@@ -7,6 +7,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 
+/**
+ * The Bottom element of the boolean lattice, representing
+ * no boolean at all.
+ * 
+ * @author Dominic Scheurer
+ */
 public class Bottom extends BooleanDomainElem {
 
    private static final Bottom INSTANCE = new Bottom();
