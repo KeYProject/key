@@ -143,9 +143,6 @@ public abstract class JoinRule implements BuiltInRule {
          joinedState = joinStates(joinedState, state, thisSEState.third, services);
          
          // Signal progress to UI
-         //TODO: Obviously, the following call has no effect, since the EDT is
-         //      blocked and the progress bar does not receive the new information
-         //      until the task has been finished...
          mediator().getUI().taskProgress(++progress);
       }
       
