@@ -22,7 +22,10 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,7 +71,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
    private static final Font TXT_AREA_FONT =
          new Font(Font.MONOSPACED, Font.PLAIN, 14);
    
-   private ImmutableList<Pair<Goal, PosInOccurrence>> candidates = null;
+   private LinkedList<Pair<Goal, PosInOccurrence>> candidates = null;
    private Services services = null;
    
    /** The chosen goals. */
@@ -251,8 +254,23 @@ public class JoinPartnerSelectionDialog extends JDialog {
          Services services) {
       
       this();
-      this.candidates = candidates;
       this.services = services;
+
+      this.candidates = new LinkedList<Pair<Goal,PosInOccurrence>>();
+      
+      for (Pair<Goal,PosInOccurrence> candidate : candidates) {
+         int insPos = Collections.binarySearch(
+               this.candidates, candidate, new Comparator<Pair<Goal, PosInOccurrence>>() {
+                  @Override
+                  public int compare(Pair<Goal, PosInOccurrence> o1,
+                        Pair<Goal, PosInOccurrence> o2) {
+                     return o1.first.node().serialNr() - o2.first.node().serialNr();
+                  }
+               });
+         
+         insPos = (insPos + 1) * -1;
+         this.candidates.add(insPos, candidate);
+      }
       
       setHighlightedSequentForArea(joinNode, pio, txtPartner1);
       loadCandidates();
@@ -307,7 +325,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
       }
       
       setHighlightedSequentForArea(
-            candidates.head().first, candidates.head().second, txtPartner2);
+            candidates.getFirst().first, candidates.getFirst().second, txtPartner2);
    }
    
    /**
