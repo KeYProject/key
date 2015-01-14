@@ -30,8 +30,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -72,30 +72,15 @@ public class JoinWithSignLattice extends JoinRule {
       // Collect program variables in update
       progVars.addAll(getUpdateLocations(state1.first));
       
-      ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
-      
-      Term newConstraints = tb.tt();
-      
       final Sort intSort =
             (Sort) services.getNamespaces().sorts().lookup(new Name("int"));
-      final String varNamePrefix = "v";
+      
+      ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
+      Term newConstraints = tb.tt();
       
       for (LocationVariable v : progVars) {
-
-         final String newName = tb.newName(varNamePrefix);
-         services.getNamespaces().variables().add(new Named() {
-            @Override
-            public Name name() {
-               return new Name(newName);
-            }
-         });
          
-         LogicVariable freshVariable = new LogicVariable(new Name(newName), v.sort());
-         
-         newElementaryUpdates = newElementaryUpdates.prepend(
-               tb.elementary(
-                     v,
-                     tb.var(freshVariable)));
+         Function skolemConstant = null;
          
          if (v.sort().equals(intSort)) {
             
@@ -118,9 +103,19 @@ public class JoinWithSignLattice extends JoinRule {
             
             AbstractDomainElement joinElem = lattice.join(abstrElem1, abstrElem2);
             
-            newConstraints = tb.and(newConstraints, joinElem.getDefiningAxiom(freshVariable, services));
+            skolemConstant =
+                  getNewScolemConstantForPrefix(joinElem.toString(), v.sort(), services);
             
+            newConstraints = tb.and(newConstraints, joinElem.getDefiningAxiom(tb.func(skolemConstant), services));
+            
+         } else {
+            skolemConstant = getNewScolemConstantForPrefix("v", v.sort(), services);
          }
+         
+         newElementaryUpdates = newElementaryUpdates.prepend(
+               tb.elementary(
+                     v,
+                     tb.func(skolemConstant)));
          
       }
       
@@ -131,6 +126,18 @@ public class JoinWithSignLattice extends JoinRule {
       Term newPathCondition = tb.and(tb.or(state1.second, state2.second), newConstraints);
       
       return new Pair<Term, Term>(newSymbolicState, newPathCondition);
+   }
+   
+   private Function getNewScolemConstantForPrefix(String prefix, Sort sort, Services services) {
+      final String newName = services.getTermBuilder().newName(prefix);
+      services.getNamespaces().functions().add(new Named() {
+         @Override
+         public Name name() {
+            return new Name(newName);
+         }
+      });
+      
+      return new Function(new Name(newName), sort, true);
    }
    
    private AbstractDomainElement determineAbstractElem(
@@ -145,7 +152,7 @@ public class JoinWithSignLattice extends JoinRule {
       while (it.hasNext()) {
          AbstractDomainElement elem = it.next();
          
-         Term axiom   = elem.getDefiningAxiom(variable, services);
+         Term axiom   = elem.getDefiningAxiom(tb.var(variable), services);
          Term appl    = tb.apply(state.first, axiom);
          Term toProve = tb.imp(state.second, appl);
          

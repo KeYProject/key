@@ -3,7 +3,7 @@ package de.uka.ilkd.key.abstraction;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 
 /**
  * TODO: Document.
@@ -22,13 +22,13 @@ public abstract class AbstractDomainElement implements Named {
     * divisible by 2, the method could return the formula
     * "var % 2 == 0".</p>
     * 
-    * @param var The logical variable representing an instance
-    *    of this abstract domain element.
+    * @param varOrConst The logical variable or skolem constant
+    *    representing an instance of this abstract domain element.
     * @param services A services object.
     * @return A JavaDL formula expressing that the given variable
     *    represents an instance of this abstract domain element.
     */
-   public abstract Term getDefiningAxiom(ParsableVariable var, Services services);
+   public abstract Term getDefiningAxiom(Term varOrConst, Services services);
    
    @Override
    public String toString() {
