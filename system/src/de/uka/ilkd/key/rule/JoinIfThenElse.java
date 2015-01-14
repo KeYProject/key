@@ -51,6 +51,10 @@ public class JoinIfThenElse extends JoinRule {
          Services services) {
       
       final TermBuilder tb = services.getTermBuilder();
+      
+      // Construct path condition as disjunction
+      Term newPathCondition =
+            createSimplifiedDisjunctivePathCondition(state1.second, state2.second, services);
                
       HashSet<LocationVariable> progVars =
             new HashSet<LocationVariable>();
@@ -111,20 +115,26 @@ public class JoinIfThenElse extends JoinRule {
          } else {
             
             // Apply if-then-else construction: Different values
+            
+            Pair<Term, Term> distinguishingFormula =
+                  getDistinguishingFormula(state1.second, state2.second, services);
+            
+            Term commonPartAlreadyImpliedForm =
+                  tb.imp(newPathCondition, distinguishingFormula.second);
+            if (!isProvable(commonPartAlreadyImpliedForm, services)) {
+               newPathCondition = tb.and(newPathCondition, distinguishingFormula.second);
+            }
+            
             newElementaryUpdates = newElementaryUpdates.prepend(
                   tb.elementary(
                         v,
-                        tb.ife(state2.second, rightSide2, rightSide1)));
+                        tb.ife(distinguishingFormula.first, rightSide1, rightSide2)));
             
          }
       }
       
       // Construct weakened symbolic state
       Term newSymbolicState = tb.parallel(newElementaryUpdates);
-      
-      // Construct path condition as disjunction
-      Term newPathCondition =
-            createSimplifiedDisjunctivePathCondition(state1.second, state2.second, services);
       
       return new Pair<Term, Term>(newSymbolicState, newPathCondition);
       

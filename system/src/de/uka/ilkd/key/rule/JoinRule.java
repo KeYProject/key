@@ -502,6 +502,56 @@ public abstract class JoinRule implements BuiltInRule {
    }
    
    /**
+    * Computes a formula that implies pathCondition1 and, if
+    * pathCondition1 and pathCondition2 are contradicting,
+    * does not imply pathCondition2. The computed formula is
+    * at most as complex as pathCondition1. This so generated
+    * distinguishing formula is returned in the first element
+    * of the pair; the "rest" is contained in the second. It
+    * always holds that the conjunction of the first element of
+    * the pair and the second element of the pair is equivalent
+    * to pathCondition1.
+    * 
+    * @param pathCondition1 The first formula to compute a
+    *    distinguishing formula for.
+    * @param pathCondition2 The second formula to compute a
+    *    distinguishing formula for.
+    * @param services The services object.
+    * @return (1) A formula that implies pathCondition1 and, if
+    *    pathCondition1 and pathCondition2 are contradicting,
+    *    does not imply pathCondition2, and (2) the "rest" of
+    *    pathCondition1 that is common with pathCondition2.
+    */
+   protected Pair<Term, Term> getDistinguishingFormula(
+         Term pathCondition1,
+         Term pathCondition2,
+         Services services) {
+      
+      LinkedList<Term> cond1ConjElems = getConjunctiveElementsFor(pathCondition1);
+      LinkedList<Term> cond2ConjElems = getConjunctiveElementsFor(pathCondition2);
+      
+      LinkedList<Term> distinguishingElements = new LinkedList<Term>(cond1ConjElems);
+      
+      if (cond1ConjElems.size() == cond2ConjElems.size()) {
+         for (int i = 0; i < cond1ConjElems.size(); i++) {
+            Term elem1 = cond1ConjElems.get(i);
+            Term elem2 = cond2ConjElems.get(i);
+            
+            if (elem1.equals(elem2)) {
+               distinguishingElements.remove(elem1);
+            }
+         }
+      }
+      
+      cond1ConjElems.removeAll(distinguishingElements); // This is the rest
+      
+      return new Pair<Term, Term> (
+            joinConjuctiveElements(distinguishingElements, services),
+            joinConjuctiveElements(cond1ConjElems, services));
+      
+   }
+   
+   /**
     * Closes the given partner goal, using the CloseAfterJoin rule.
     * 
     * @param joinNodeParent Parent of remaining join node.
