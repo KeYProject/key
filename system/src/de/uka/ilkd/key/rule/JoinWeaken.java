@@ -79,7 +79,8 @@ public class JoinWeaken extends JoinRule {
       Term newSymbolicState = tb.parallel(newElementaryUpdates);
       
       // Construct path condition as disjunction
-      Term newPathCondition = tb.or(state1.second, state2.second);
+      Term newPathCondition =
+                  createSimplifiedDisjunctivePathCondition(state1.second, state2.second, services);
       
       return new Pair<Term, Term>(newSymbolicState, newPathCondition);
    }
