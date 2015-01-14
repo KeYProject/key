@@ -140,7 +140,10 @@ public abstract class JoinWithLatticeAbstraction extends JoinRule {
       Term newSymbolicState = tb.parallel(newElementaryUpdates);
       
       // Construct path condition as disjunction
-      Term newPathCondition = tb.and(tb.or(state1.second, state2.second), newConstraints);
+      Term newPathCondition =
+            tb.and(
+                  createSimplifiedDisjunctivePathCondition(state1.second, state2.second, services),
+                  newConstraints);
       
       return new Pair<Term, Term>(newSymbolicState, newPathCondition);
    }

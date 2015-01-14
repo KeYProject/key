@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -32,12 +33,14 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -45,7 +48,11 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -411,6 +418,90 @@ public abstract class JoinRule implements BuiltInRule {
    }
    
    /**
+    * Tries to prove the given formula and returns whether the
+    * prove could be closed.
+    * 
+    * @param toProve Formula to prove.
+    * @param services The services object.
+    * @return True iff the given formula has been successfully proven.
+    */
+   protected boolean isProvable(Term toProve, Services services) {
+      final ProofEnvironment sideProofEnv =
+            SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(
+                  services.getProof(),                            // Parent Proof
+                  false);                                         // useSimplifyTermProfile
+      
+      ApplyStrategyInfo proofResult;
+      try {
+         proofResult = SideProofUtil.startSideProof(
+               services.getProof(),                                  // Parent proof
+               sideProofEnv,                                         // Proof environment
+               Sequent.createSequent(                                // Sequent to prove
+                     Semisequent.EMPTY_SEMISEQUENT,
+                     new Semisequent(new SequentFormula(toProve))));
+      } catch (ProofInputException e) {
+         return false;
+      }
+      
+      return proofResult.getProof().closed();
+   }
+   
+   /**
+    * Creates a path condition that is equivalent to the disjunction
+    * of the two supplied formulae, but possibly simpler. In the ideal
+    * case, the returned formula can be literally shorter than each of
+    * the two formulae; in this case, it consists of the common elements
+    * of those. The underlying idea is based upon the observation that
+    * many path conditions that should be joined are conjunctions of
+    * mostly the same elements and, in addition, formulae phi and !phi
+    * that vanish after creating the disjunction of the path conditions.
+    * 
+    * @param cond1 First path condition to join.
+    * @param cond2 Second path condition to join.
+    * @param services The services object.
+    * @return A path condition that is equivalent to the disjunction
+    *     of the two supplied formulae, but possibly simpler.
+    */
+   protected Term createSimplifiedDisjunctivePathCondition(
+         final Term cond1, final Term cond2, Services services) {
+      
+      TermBuilder tb = services.getTermBuilder();
+      
+      LinkedList<Term> cond1ConjElems = getConjunctiveElementsFor(cond1);
+      LinkedList<Term> cond2ConjElems = getConjunctiveElementsFor(cond2);
+      
+      if (cond1ConjElems.size() == cond2ConjElems.size()) {
+         final LinkedList<Term> fCond1ConjElems = new LinkedList<Term>(cond1ConjElems);
+         final LinkedList<Term> fCond2ConjElems = new LinkedList<Term>(cond2ConjElems);
+         
+         for (int i = 0; i < fCond1ConjElems.size(); i++) {
+            Term elem1 = fCond1ConjElems.get(i);
+            Term elem2 = fCond2ConjElems.get(i);
+            
+            if (!elem1.equals(elem2)) {
+               // Try to show that the different elements can be left
+               // out in the disjunction, since they are complementary
+               if (isProvable(tb.or(elem1, elem2), services)) {
+                  cond1ConjElems.remove(elem1);
+                  cond2ConjElems.remove(elem2);
+               }
+            }
+         }
+      }
+      
+      Term result1 = joinConjuctiveElements(cond1ConjElems, services);
+      Term result2 = joinConjuctiveElements(cond2ConjElems, services);
+      
+      if (result1.equals(result2)) {
+         return result1;
+      } else {
+         return tb.or(
+               joinConjuctiveElements(cond1ConjElems, services),
+               joinConjuctiveElements(cond2ConjElems, services));
+      }
+   }
+   
+   /**
     * Closes the given partner goal, using the CloseAfterJoin rule.
     * 
     * @param joinNodeParent Parent of remaining join node.
@@ -623,6 +714,48 @@ public abstract class JoinRule implements BuiltInRule {
       } else {
          return false;
       }
+   }
+   
+   /**
+    * Dissects a conjunction into its conjunctive elements.
+    * 
+    * @param term Conjunctive formula to dissect (may be a conjunction
+    *     of one element, i.e. no "real" conjunction). In this case,
+    *     the resulting list will contain exactly the supplied formula.
+    * @return The conjunctive elements of the supplied formula.
+    */
+   private LinkedList<Term> getConjunctiveElementsFor(final Term term) {
+      LinkedList<Term> result = new LinkedList<Term>();
+      
+      Term current = term;
+      while (current.op().equals(Junctor.AND)) {
+         result.add(current.sub(0));
+         current = current.sub(1);
+      }
+      
+      if (result.isEmpty()) {
+         result.add(term);
+      }
+      
+      return result;
+   }
+   
+   /**
+    * Joins a list of formulae to a conjunction.
+    * 
+    * @param elems Formulae to join.
+    * @param services The services object.
+    * @return A conjunction of the supplied formulae.
+    */
+   private Term joinConjuctiveElements(final LinkedList<Term> elems, Services services) {
+      TermBuilder tb = services.getTermBuilder();
+      
+      Term result = elems.pop();
+      for (Term term : elems) {
+         result = tb.and(result, term);
+      }
+      
+      return result;
    }
    
    /**
