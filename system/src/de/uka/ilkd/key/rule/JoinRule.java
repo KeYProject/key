@@ -783,9 +783,7 @@ public abstract class JoinRule implements BuiltInRule {
          current = current.sub(1);
       }
       
-      if (result.isEmpty()) {
-         result.add(term);
-      }
+      result.add(current);
       
       return result;
    }
