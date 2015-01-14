@@ -118,7 +118,7 @@ public class CloseAfterJoin implements BuiltInRule {
       linkedGoal.setBranchLabel("Joined with node " + joinNode.parent().serialNr());
       // Workaround: Disable linked goal to prevent strategies
       // from automatically working further on it.
-      linkedGoal.setLinkedNode(joinNode);
+      linkedGoal.node().setLinkedNode(joinNode);
       linkedGoal.setEnabled(false);
       
       // Add a listener to close this node if the associated join
@@ -139,7 +139,7 @@ public class CloseAfterJoin implements BuiltInRule {
             if (!proofContainsNode(e.getSource(), joinNodeF)) {
                // The joined node has been pruned; now mark this node
                // as not linked and set it to automatic again.
-               linkedGoal.setLinkedNode(null);
+               linkedGoal.node().setLinkedNode(null);
                linkedGoal.setEnabled(true);
             }
          }

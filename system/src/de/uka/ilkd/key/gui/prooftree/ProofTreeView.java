@@ -713,7 +713,7 @@ public class ProofTreeView extends JPanel {
 		    ProofTreeView.this.setToolTipText("Closed Goal");
 		    tree_cell.setToolTipText("A closed goal");
 		} else {
-		   if ( goal.isLinked() ) {
+		   if ( node.isLinked() ) {
             tree_cell.setForeground(PINK_COLOR);
             tree_cell.setIcon(IconFactory.keyHoleLinked(20, 20));
             ProofTreeView.this.setToolTipText("Linked Goal");

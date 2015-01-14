@@ -676,7 +676,7 @@ public abstract class JoinRule implements BuiltInRule {
       // they have the same program counter (and post condition).
       ImmutableList<Pair<Goal,PosInOccurrence>> potentialPartners = ImmutableSLList.nil();
       for (Goal g : allGoals) {
-         if (!g.equals(goal) && !g.isLinked()) {
+         if (!g.equals(goal) && !g.node().isLinked()) {
             Semisequent succedent = g.sequent().succedent();
             for (int i = 0; i < succedent.size(); i++) {
                SequentFormula f = succedent.get(i);

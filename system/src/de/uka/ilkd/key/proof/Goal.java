@@ -83,8 +83,6 @@ public final class Goal  {
 
     /** a goal has been excluded from automatic rule application iff automatic == false */
     private boolean automatic = true;
-    
-    private Node linkedNode = null;
 
     /**
      * If an application of a rule added some information for the strategy,
@@ -321,16 +319,6 @@ public final class Goal  {
     }
 
     /**
-     * Checks if is this goal is linked to another
-     * node (for example due to a join operation).
-     *
-     * @return true iff this goal is linked to another node.
-     */
-    public boolean isLinked() {
-        return this.linkedNode != null;
-    }
-
-    /**
      * Sets the automatic status of this goal.
      *
      * @param t
@@ -339,24 +327,6 @@ public final class Goal  {
     public void setEnabled(boolean t) {
         automatic = t;
         node().clearNameCache();
-    }
-
-    /**
-     * Returns the node that this goal is linked to.
-     *
-     * @return The node that this goal is linked to (or null if there is no such one).
-     */
-    public Node getLinkedNode() {
-        return this.linkedNode;
-    }
-
-    /**
-     * Sets the node that this goal is linked to.
-     *
-     * @param linkedNode The node that this goal is linked to.
-     */
-    public void setLinkedNode(final Node linkedNode) {
-        this.linkedNode = linkedNode;
     }
 
 
