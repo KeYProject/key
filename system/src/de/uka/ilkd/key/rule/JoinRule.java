@@ -51,6 +51,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
@@ -159,10 +160,10 @@ public abstract class JoinRule implements BuiltInRule {
             new PosInOccurrence(newAntecedent, PosInTerm.getTopLevel(), true));
       
       // Add new succedent (symbolic state & program counter)
-      SequentFormula newSuccedent = new SequentFormula(
-            tb.apply(joinedState.first, thisSEState.third));
+      Term succedentFormula = tb.apply(joinedState.first, thisSEState.third);
+      SequentFormula newSuccedent = new SequentFormula(succedentFormula);
       newGoal.addFormula(
-            newSuccedent,
+            new SequentFormula(succedentFormula),
             new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
       
       // Close partner goals
@@ -883,7 +884,12 @@ public abstract class JoinRule implements BuiltInRule {
          return false;
       }
       
-      return proofResult.getProof().closed();
+      boolean result = proofResult.getProof().closed();
+      
+      SideProofUtil.disposeOrStore(
+            "Finished proof of " + ProofSaver.printTerm(toProve, services), proofResult);
+      
+      return result;
    }
    
    /**
