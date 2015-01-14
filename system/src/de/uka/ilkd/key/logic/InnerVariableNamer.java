@@ -75,7 +75,8 @@ public class InnerVariableNamer extends VariableNamer {
                             getProgramFromPIO(posOfFind),
                             null);
             final NamespaceSet namespaces = services.getNamespaces();
-            while (!isUniqueInGlobals(newname.toString(), globals)) {
+            while (!isUniqueInGlobals(newname.toString(), globals) ||
+                  namespaces.lookupLogicSymbol(newname)!=null) {
 	        newcounter += 1;
 	        newname = createName(bai.basename, newcounter, nci);
 	    }
