@@ -497,8 +497,8 @@ public abstract class JoinRule implements BuiltInRule {
          return result1;
       } else {
          return tb.or(
-               joinConjuctiveElements(fCond1ConjElems, services),
-               joinConjuctiveElements(fCond2ConjElems, services));
+               joinConjuctiveElements(cond1ConjElems, services),
+               joinConjuctiveElements(cond2ConjElems, services));
       }
    }
    
