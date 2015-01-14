@@ -102,8 +102,7 @@ public class JoinWithSignLattice extends JoinRule {
             
             // Join for integers: Sign lattice.
             
-            AbstractDomainLattice<Integer> lattice =
-                  SignAnalysisLattice.getInstance();
+            AbstractDomainLattice<?> lattice = SignAnalysisLattice.getInstance();
             
             AbstractDomainElement abstrElem1 = determineAbstractElem(state1, v, lattice, services);
             AbstractDomainElement abstrElem2 = determineAbstractElem(state2, v, lattice, services);
@@ -124,7 +123,7 @@ public class JoinWithSignLattice extends JoinRule {
             
             // Join for booleans: Simple boolean lattice.
             
-            AbstractDomainLattice<Boolean> lattice = BooleanLattice.getInstance();
+            AbstractDomainLattice<?> lattice = BooleanLattice.getInstance();
             
             AbstractDomainElement abstrElem1 = determineAbstractElem(state1, v, lattice, services);
             AbstractDomainElement abstrElem2 = determineAbstractElem(state2, v, lattice, services);
