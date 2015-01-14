@@ -34,7 +34,7 @@ import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * Rule that for closing a partner goal after a join
+ * Rule for closing a partner goal after a join
  * operation. It does so by adding a formula corresponding
  * to the new join node as an implicative premise to the
  * goal to close; if the join rule is sound, the such

@@ -53,8 +53,9 @@ public class JoinIfThenElse extends JoinRule {
       final TermBuilder tb = services.getTermBuilder();
       
       // Construct path condition as disjunction
-      Term newPathCondition =
-            createSimplifiedDisjunctivePathCondition(state1.second, state2.second, services);
+//      Term newPathCondition =
+//            createSimplifiedDisjunctivePathCondition(state1.second, state2.second, services);
+      Term newPathCondition = tb.or(state1.second, state2.second);
                
       HashSet<LocationVariable> progVars =
             new HashSet<LocationVariable>();
