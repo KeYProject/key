@@ -42,8 +42,13 @@ import de.uka.ilkd.key.util.Pair;
 
 /**
  * Rule that joins two sequents based on a sign lattice
- * for integers. No-Integer-Variables (booleans, heap)
- * are just set to fresh variables.
+ * for integers. Boolean variables are joined with a simple
+ * lattice for booleans. Program variables of other types
+ * than int and boolean are unchanged if they are equal in
+ * both states and set to fresh variables if they have different
+ * values.
+ * 
+ * TODO: Could also add a null / non-null lattice for objects.
  * 
  * @author Dominic Scheurer
  */
@@ -168,6 +173,16 @@ public class JoinWithSignLattice extends JoinRule {
       return new Pair<Term, Term>(newSymbolicState, newPathCondition);
    }
    
+   /**
+    * Computes and registers a new Skolem constant with the given
+    * prefix in its name of the given sort.
+    * 
+    * @param prefix Prefix for the name of the constant.
+    * @param sort Sort of the constant.
+    * @param services The services object.
+    * @return A new Skolem constant of the given sort with the given
+    *     prefix in its name.
+    */
    private Function getNewScolemConstantForPrefix(String prefix, Sort sort, Services services) {
       final String newName = services.getTermBuilder().newName(prefix);
       services.getNamespaces().functions().add(new Named() {
@@ -180,6 +195,19 @@ public class JoinWithSignLattice extends JoinRule {
       return new Function(new Name(newName), sort, true);
    }
    
+   /**
+    * Determines the abstract element suitable for the given variable.
+    * This is accomplished by iterating through the abstract elements
+    * (from bottom to top) and trying to verify the corresponding axiom
+    * instances.
+    * 
+    * @param state State in which the evaluation of the defining axioms
+    *     should be tested.
+    * @param variable Variable to find an abstract description for.
+    * @param lattice The underlying abstract domain.
+    * @param services The services object.
+    * @return A suitable abstract element for the given location variable.
+    */
    private AbstractDomainElement determineAbstractElem(
          Pair<Term, Term> state,
          LocationVariable variable,
