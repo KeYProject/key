@@ -24,10 +24,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -50,7 +48,7 @@ public class JoinIfThenElse extends JoinRule {
    
    private static final String DISPLAY_NAME = "JoinByIfThenElse";
    private static final Name RULE_NAME = new Name(DISPLAY_NAME);
-   private static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
+   private static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 12;
 
    @Override
    protected Pair<Term, Term> joinStates(
@@ -178,37 +176,5 @@ public class JoinIfThenElse extends JoinRule {
    @Override
    public String toString() {
       return DISPLAY_NAME;
-   }
-   
-   /**
-    * Returns the right side for a given location variable in an update
-    * (in normal form).
-    * 
-    * @param update Update term to search.
-    * @param leftSide Left side to find the right side for.
-    * @return The right side in the update for the given left side.
-    */
-   private Term getUpdateRightSideFor(Term update, LocationVariable leftSide) {
-      if (update.op() instanceof ElementaryUpdate &&
-          ((ElementaryUpdate) update.op()).lhs().equals(leftSide)) {
-         
-         return update.sub(0);
-         
-      } else if (
-            update.op() instanceof UpdateJunctor &&
-            update.op().equals(UpdateJunctor.PARALLEL_UPDATE)) {
-         
-         for (Term sub : update.subs()) {
-            Term rightSide = getUpdateRightSideFor(sub, leftSide);
-            if (rightSide != null) {
-               return rightSide;
-            }
-         }
-         
-         return null;
-         
-      } else {      
-         return null;
-      }
    }
 }
