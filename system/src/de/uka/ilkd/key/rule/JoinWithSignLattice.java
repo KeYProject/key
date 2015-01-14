@@ -18,6 +18,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.abstraction.AbstractDomainLattice;
+import de.uka.ilkd.key.abstraction.boollattice.BooleanLattice;
 import de.uka.ilkd.key.abstraction.signanalysis.SignAnalysisLattice;
 import de.uka.ilkd.key.abstraction.signanalysis.Top;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -71,6 +72,8 @@ public class JoinWithSignLattice extends JoinRule {
       
       final Sort intSort =
             (Sort) services.getNamespaces().sorts().lookup(new Name("int"));
+      final Sort booleanSort =
+            (Sort) services.getNamespaces().sorts().lookup(new Name("boolean"));
       
       ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
       Term newConstraints = tb.tt();
@@ -92,6 +95,8 @@ public class JoinWithSignLattice extends JoinRule {
          
          if (v.sort().equals(intSort)) {
             
+            // Join for integers: Sign lattice.
+            
             AbstractDomainLattice<AbstractDomainElement, Integer> lattice =
                   SignAnalysisLattice.getInstance();
             
@@ -110,20 +115,46 @@ public class JoinWithSignLattice extends JoinRule {
                         v,
                         tb.func(skolemConstant)));
             
+         } else if (v.sort().equals(booleanSort)) {
+            
+         // Join for booleans: Simple boolean lattice.
+            
+            AbstractDomainLattice<AbstractDomainElement, Boolean> lattice =
+                  BooleanLattice.getInstance();
+            
+            AbstractDomainElement abstrElem1 = determineAbstractElem(state1, v, lattice, services);
+            AbstractDomainElement abstrElem2 = determineAbstractElem(state2, v, lattice, services);
+            
+            AbstractDomainElement joinElem = lattice.join(abstrElem1, abstrElem2);
+            
+            skolemConstant =
+                  getNewScolemConstantForPrefix(joinElem.toString(), v.sort(), services);
+            
+            newConstraints = tb.and(newConstraints, joinElem.getDefiningAxiom(tb.func(skolemConstant), services));
+            
+            newElementaryUpdates = newElementaryUpdates.prepend(
+                  tb.elementary(
+                        v,
+                        tb.func(skolemConstant)));
+            
          } else if (!rightSide1.equals(rightSide2)) {
+            
             skolemConstant = getNewScolemConstantForPrefix("v", v.sort(), services);
             
             newElementaryUpdates = newElementaryUpdates.prepend(
                   tb.elementary(
                         v,
                         tb.func(skolemConstant)));
+            
          } else {
+            
             // For equal right sides, we just keep those...
             
             newElementaryUpdates = newElementaryUpdates.prepend(
                   tb.elementary(
                         v,
                         rightSide1));
+            
          }
          
       }
@@ -152,7 +183,7 @@ public class JoinWithSignLattice extends JoinRule {
    private AbstractDomainElement determineAbstractElem(
          Pair<Term, Term> state,
          LocationVariable variable,
-         AbstractDomainLattice<AbstractDomainElement, Integer> lattice,
+         AbstractDomainLattice<AbstractDomainElement, ?> lattice,
          Services services) {
       
       TermBuilder tb = services.getTermBuilder();
