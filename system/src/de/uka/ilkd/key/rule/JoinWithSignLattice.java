@@ -82,18 +82,18 @@ public class JoinWithSignLattice extends JoinRule {
          
          Function skolemConstant = null;
          
+         Term rightSide1 = getUpdateRightSideFor(state1.first, v);
+         Term rightSide2 = getUpdateRightSideFor(state2.first, v);
+         
+         if (rightSide1 == null) {
+            rightSide1 = tb.var(v);
+         }
+         
+         if (rightSide2 == null) {
+            rightSide2 = tb.var(v);
+         }
+         
          if (v.sort().equals(intSort)) {
-            
-            Term rightSide1 = getUpdateRightSideFor(state1.first, v);
-            Term rightSide2 = getUpdateRightSideFor(state2.first, v);
-            
-            if (rightSide1 == null) {
-               rightSide1 = tb.var(v);
-            }
-            
-            if (rightSide2 == null) {
-               rightSide2 = tb.var(v);
-            }
             
             AbstractDomainLattice<AbstractDomainElement, Integer> lattice =
                   SignAnalysisLattice.getInstance();
@@ -108,14 +108,21 @@ public class JoinWithSignLattice extends JoinRule {
             
             newConstraints = tb.and(newConstraints, joinElem.getDefiningAxiom(tb.func(skolemConstant), services));
             
-         } else {
+            newElementaryUpdates = newElementaryUpdates.prepend(
+                  tb.elementary(
+                        v,
+                        tb.func(skolemConstant)));
+            
+         } else if (!rightSide1.equals(rightSide2)) {
             skolemConstant = getNewScolemConstantForPrefix("v", v.sort(), services);
+            
+            newElementaryUpdates = newElementaryUpdates.prepend(
+                  tb.elementary(
+                        v,
+                        tb.func(skolemConstant)));
+         } else {
+            // For equal right sides, we just do nothing...
          }
-         
-         newElementaryUpdates = newElementaryUpdates.prepend(
-               tb.elementary(
-                     v,
-                     tb.func(skolemConstant)));
          
       }
       
