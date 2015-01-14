@@ -490,16 +490,34 @@ public abstract class JoinRule implements BuiltInRule {
          }
       }
       
-      Term result1 = joinConjuctiveElements(cond1ConjElems, services);
-      Term result2 = joinConjuctiveElements(cond2ConjElems, services);
+      final Term result1 = joinConjuctiveElements(cond1ConjElems, services);
+      final Term result2 = joinConjuctiveElements(cond2ConjElems, services);
+      
+      Term result;
       
       if (result1.equals(result2)) {
-         return result1;
+         result = result1;
       } else {
-         return tb.or(
-               joinConjuctiveElements(cond1ConjElems, services),
-               joinConjuctiveElements(cond2ConjElems, services));
+         result = tb.or(
+               result1,
+               result2);
       }
+      
+      Term assertionFormula = tb.and(
+            tb.imp(
+                  tb.or(
+                        joinConjuctiveElements(fCond1ConjElems, services),
+                        joinConjuctiveElements(fCond2ConjElems, services)),
+                  result),
+            tb.imp(
+                  result,
+                  tb.or(
+                        joinConjuctiveElements(fCond1ConjElems, services),
+                        joinConjuctiveElements(fCond2ConjElems, services))));
+      
+      assert(isProvable(assertionFormula, services));
+      
+      return result;
    }
    
    /**
@@ -803,8 +821,9 @@ public abstract class JoinRule implements BuiltInRule {
          return tb.tt();
       }
       
-      Term result = elems.pop();
-      for (Term term : elems) {
+      Term result = elems.getFirst();
+      for (int i = 1; i < elems.size(); i++) {
+         Term term = elems.get(i);
          result = tb.and(result, term);
       }
       
