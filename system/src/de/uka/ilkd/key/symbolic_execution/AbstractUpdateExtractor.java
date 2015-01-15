@@ -155,23 +155,34 @@ public abstract class AbstractUpdateExtractor {
       for (SequentFormula sf : sequent.succedent()) {
          Term term = sf.formula();
          if (Junctor.IMP.equals(term.op())) {
-            if (term.sub(1).op() instanceof UpdateApplication) {
-               Term updateApplcationTerm = term.sub(1);
-               Term updateTerm = UpdateApplication.getUpdate(updateApplcationTerm);
-               if (updateTerm.op() == UpdateJunctor.PARALLEL_UPDATE) {
-                  for (Term subUpdate : updateTerm.subs()) {
-                     if (subUpdate.op() instanceof ElementaryUpdate) {
-                        ElementaryUpdate eu = (ElementaryUpdate)subUpdate.op();
-                        if (eu.lhs() instanceof ProgramVariable) {
-                           result.add(getServices().getTermBuilder().var((ProgramVariable)eu.lhs()));
-                        }
-                     }
-                  }
-               }
-            }
+            fillInitialObjectsToIgnoreRecursively(term.sub(1), result);
          }
       }
       return result;
+   }
+   
+   /**
+    * Utility method of {@link #computeInitialObjectsToIgnore()} which
+    * computes the objects to ignore recursively.
+    * @param term The current {@link Term}.
+    * @param toFill The {@link Set} with {@link Term}s to ignore to fill.
+    */
+   protected void fillInitialObjectsToIgnoreRecursively(Term term, Set<Term> toFill) {
+      if (term.op() instanceof UpdateApplication) {
+         Term updateTerm = UpdateApplication.getUpdate(term);
+         fillInitialObjectsToIgnoreRecursively(updateTerm, toFill);
+      }
+      else if (term.op() == UpdateJunctor.PARALLEL_UPDATE) {
+         for (int i = 0; i < term.arity(); i++) {
+            fillInitialObjectsToIgnoreRecursively(term.sub(i), toFill);
+         }
+      }
+      else if (term.op() instanceof ElementaryUpdate) {
+         ElementaryUpdate eu = (ElementaryUpdate)term.op();
+         if (eu.lhs() instanceof ProgramVariable) {
+            toFill.add(term.sub(0));
+         }
+      }
    }
 
    /**
@@ -867,8 +878,13 @@ public abstract class AbstractUpdateExtractor {
          originalUpdates = ImmutableSLList.nil();
       }
       else {
-         Term originalModifiedFormula = modalityPio.constrainedFormula().formula();
-         originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;            
+         if (node.proof().root() == node) {
+            originalUpdates = computeRootElementaryUpdates(node);
+         }
+         else {
+            Term originalModifiedFormula = modalityPio.constrainedFormula().formula();
+            originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;            
+         }
       }
       // Combine memory layout with original updates
       ImmutableList<Term> additionalUpdates = ImmutableSLList.nil();
@@ -950,6 +966,48 @@ public abstract class AbstractUpdateExtractor {
       }
    }
    
+   /**
+    * Computes the initial {@link ElementaryUpdate}s on the given root {@link Node}.
+    * @param root The root {@link Node} of the {@link Proof}.
+    * @return The found initial {@link ElementaryUpdate}s.
+    */
+   protected ImmutableList<Term> computeRootElementaryUpdates(Node root) {
+      ImmutableList<Term> result = ImmutableSLList.nil();
+      Sequent sequent = getRoot().sequent();
+      for (SequentFormula sf : sequent.succedent()) {
+         Term term = sf.formula();
+         if (Junctor.IMP.equals(term.op())) {
+            result = result.prepend(collectElementaryUpdates(term.sub(1)));
+         }
+      }
+      return result;
+   }
+
+   /**
+    * Collects the {@link ElementaryUpdate}s in the given {@link Term}.
+    * @param term The {@link Term} to collect its updates.
+    * @return The found {@link ElementaryUpdate}s.
+    */
+   protected ImmutableList<Term> collectElementaryUpdates(Term term) {
+      if (term.op() instanceof UpdateApplication) {
+         Term updateTerm = UpdateApplication.getUpdate(term);
+         return collectElementaryUpdates(updateTerm);
+      }
+      else if (term.op() == UpdateJunctor.PARALLEL_UPDATE) {
+         ImmutableList<Term> result = ImmutableSLList.nil();
+         for (int i = 0; i < term.arity(); i++) {
+            result = result.prepend(collectElementaryUpdates(term.sub(i)));
+         }
+         return result;
+      }
+      else if (term.op() instanceof ElementaryUpdate) {
+         return ImmutableSLList.<Term>nil().prepend(term);
+      }
+      else {
+         return ImmutableSLList.<Term>nil();
+      }
+   }
+
    /**
     * This method computes for all given {@link Goal}s representing the same 
     * value their path conditions. A computed path condition will consists only
