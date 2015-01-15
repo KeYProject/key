@@ -50,8 +50,10 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -59,6 +61,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -540,6 +543,19 @@ public abstract class JoinRule implements BuiltInRule {
          }
       }
       
+      //TODO: Check for the following newly added term simplification
+      //      measure whether this really has sense, or whether the
+      //      expression gets even more complicated...
+      try {
+         Term simplified = simplify(services.getProof(), result);
+         if (countAtoms(simplified) < countAtoms(result)) {
+            result = simplified;
+         }
+      }
+      catch (ProofInputException e) {
+         e.printStackTrace();
+      }
+      
       return result;
    }
    
@@ -972,6 +988,47 @@ public abstract class JoinRule implements BuiltInRule {
       return result;
    }
    
+   private static void disposeSideProof(
+         Term previousInput, ApplyStrategyInfo proofResult, Services services) {
+      SideProofUtil.disposeOrStore(
+            "Finished proof of " + ProofSaver.printTerm(previousInput, services), proofResult);
+   }
+   
+   /**
+    * Tries to prove the given formula and returns the result.
+    * 
+    * @param toProve Formula to prove.
+    * @param services The services object.
+    * @param doSplit if true, splitting is allowed (normal mode).
+    * @return The proof result.
+    */
+   private static ApplyStrategyInfo tryToProve(
+         Term toProve,
+         Services services,
+         boolean doSplit) {
+      final ProofEnvironment sideProofEnv =
+            SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(
+                  services.getProof(),                            // Parent Proof
+                  false);                                         // useSimplifyTermProfile
+      
+      ApplyStrategyInfo proofResult = null;
+      try {
+         proofResult = SideProofUtil.startSideProof(
+               services.getProof(),                                  // Parent proof
+               sideProofEnv,                                         // Proof environment
+               Sequent.createSequent(                                // Sequent to prove
+                     Semisequent.EMPTY_SEMISEQUENT,
+                     new Semisequent(new SequentFormula(toProve))),
+               StrategyProperties.METHOD_NONE,                       // Method Treatment
+               StrategyProperties.LOOP_NONE,                         // Loop Treatment
+               StrategyProperties.QUERY_OFF,                         // Query Treatment
+               doSplit ? StrategyProperties.SPLITTING_NORMAL:        // Splitting Option
+                  StrategyProperties.SPLITTING_OFF);
+      } catch (ProofInputException e) {}
+      
+      return proofResult;
+   }
+   
    /**
     * Tries to prove the given formula and returns whether the
     * prove could be closed.
@@ -985,34 +1042,14 @@ public abstract class JoinRule implements BuiltInRule {
          Term toProve,
          Services services,
          boolean doSplit) {
-      final ProofEnvironment sideProofEnv =
-            SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(
-                  services.getProof(),                            // Parent Proof
-                  false);                                         // useSimplifyTermProfile
       
-      ApplyStrategyInfo proofResult;
-      try {
-         proofResult = SideProofUtil.startSideProof(
-               services.getProof(),                                  // Parent proof
-               sideProofEnv,                                         // Proof environment
-               Sequent.createSequent(                                // Sequent to prove
-                     Semisequent.EMPTY_SEMISEQUENT,
-                     new Semisequent(new SequentFormula(toProve))),
-               StrategyProperties.METHOD_NONE,                       // Method Treatment
-               StrategyProperties.LOOP_NONE,                         // Loop Treatment
-               StrategyProperties.QUERY_OFF,                         // Query Treatment
-               doSplit ? StrategyProperties.SPLITTING_NORMAL:        // Splitting Option
-                  StrategyProperties.SPLITTING_OFF);
-      } catch (ProofInputException e) {
-         return false;
-      }
-      
+      ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit);
       boolean result = proofResult.getProof().closed();
       
-      SideProofUtil.disposeOrStore(
-            "Finished proof of " + ProofSaver.printTerm(toProve, services), proofResult);
+      disposeSideProof(toProve, proofResult, services);
       
       return result;
+      
    }
    
    /**
@@ -1072,5 +1109,76 @@ public abstract class JoinRule implements BuiltInRule {
       replVisitor2.start();
       
       return replVisitor1.result().equals(replVisitor2.result());
+   }
+   
+   /**
+    * Simplifies the given {@link Term} in a side proof with splits.
+    * This code has been copied from {@link SymbolicExecutionUtil}
+    * and only been slightly modified (to allow for splitting the proof). 
+    * 
+    * @param parentProof The parent {@link Proof}.
+    * @param term The {@link Term} to simplify.
+    * @return The simplified {@link Term}.
+    * @throws ProofInputException Occurred Exception.
+    * 
+    * @see SymbolicExecutionUtil#simplify(Proof, Term)
+    */
+   private static Term simplify(Proof parentProof, Term term)
+         throws ProofInputException {
+      
+      final Services services = parentProof.getServices();
+      
+      final ApplyStrategyInfo info = tryToProve(term, services, true);
+      
+      try {
+         // The simplified formula is the conjunction of all open goals
+         ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
+         final TermBuilder tb = services.getTermBuilder();
+         if (openGoals.isEmpty()) {
+            return tb.tt();
+         }
+         else {
+            ImmutableList<Term> goalImplications = ImmutableSLList.nil();
+            for (Goal goal : openGoals) {
+               Term goalImplication = SymbolicExecutionUtil
+                     .sequentToImplication(goal.sequent(), goal.proof()
+                           .getServices());
+               goalImplication = tb.not(goalImplication);
+               goalImplications = goalImplications.append(goalImplication);
+            }
+            return tb.not(tb.or(goalImplications));
+         }
+      }
+      finally {
+         SideProofUtil.disposeOrStore(
+               "Simplification of "
+                     + ProofSaver.printAnything(term,
+                           parentProof.getServices()), info);
+      }
+   }
+   
+   /**
+    * Counts the atoms in a formula.
+    * 
+    * @param term Formula to count atoms for.
+    * @return Number of atoms in the formula
+    * @throws IllegalArgumentException if the supplied term
+    *    is not a formula
+    */
+   private static int countAtoms(Term term) {
+      if (term.sort().equals(Sort.FORMULA)) {
+         if (term.op() instanceof Junctor) {
+            int result = 0;
+            for (Term sub : term.subs()) {
+               result += countAtoms(sub);
+            }
+            return result;
+         } else {
+            return 1;
+         }
+      } else {
+         throw new IllegalArgumentException(
+               "Can only compute atoms for formulae");
+      }
    }
 }
