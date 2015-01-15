@@ -95,6 +95,8 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -2554,13 +2556,61 @@ public final class SymbolicExecutionUtil {
                                                               boolean addResultLabel) {
       if (pio != null) {
          // Get the updates from the return node which includes the value interested in.
-         Term originalModifiedFormula = pio.constrainedFormula().formula();
-         ImmutableList<Term> originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
+         ImmutableList<Term> originalUpdates;
+         if (node.proof().root() == node) {
+            originalUpdates = computeRootElementaryUpdates(node);
+         }
+         else {
+            Term originalModifiedFormula = pio.constrainedFormula().formula();
+            originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
+         }
          // Create new sequent
          return createSequentToProveWithNewSuccedent(node, pio, additionalAntecedent, newSuccedent, originalUpdates, addResultLabel);
       }
       else {
          return createSequentToProveWithNewSuccedent(node, pio, additionalAntecedent, newSuccedent, null, addResultLabel);
+      }
+   }
+   
+   /**
+    * Computes the initial {@link ElementaryUpdate}s on the given root {@link Node}.
+    * @param root The root {@link Node} of the {@link Proof}.
+    * @return The found initial {@link ElementaryUpdate}s.
+    */
+   public static ImmutableList<Term> computeRootElementaryUpdates(Node root) {
+      ImmutableList<Term> result = ImmutableSLList.nil();
+      Sequent sequent = root.sequent();
+      for (SequentFormula sf : sequent.succedent()) {
+         Term term = sf.formula();
+         if (Junctor.IMP.equals(term.op())) {
+            result = result.prepend(collectElementaryUpdates(term.sub(1)));
+         }
+      }
+      return result;
+   }
+
+   /**
+    * Collects the {@link ElementaryUpdate}s in the given {@link Term}.
+    * @param term The {@link Term} to collect its updates.
+    * @return The found {@link ElementaryUpdate}s.
+    */
+   public static ImmutableList<Term> collectElementaryUpdates(Term term) {
+      if (term.op() instanceof UpdateApplication) {
+         Term updateTerm = UpdateApplication.getUpdate(term);
+         return collectElementaryUpdates(updateTerm);
+      }
+      else if (term.op() == UpdateJunctor.PARALLEL_UPDATE) {
+         ImmutableList<Term> result = ImmutableSLList.nil();
+         for (int i = 0; i < term.arity(); i++) {
+            result = result.prepend(collectElementaryUpdates(term.sub(i)));
+         }
+         return result;
+      }
+      else if (term.op() instanceof ElementaryUpdate) {
+         return ImmutableSLList.<Term>nil().prepend(term);
+      }
+      else {
+         return ImmutableSLList.<Term>nil();
       }
    }
    
