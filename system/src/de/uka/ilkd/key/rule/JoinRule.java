@@ -459,8 +459,12 @@ public abstract class JoinRule implements BuiltInRule {
     * The corresponding valid formula is
     * <code>(phi & psi) | (phi & !psi) <-> phi</code><p>
     * 
-    * In addition, the method applies, if possible and if the above observation
-    * was not applicable, the distributivity laws to simplify the result.
+    * For formulae that cannot be simplified by this law, the method 
+    * performs two additional steps:<br>
+    * (1) it applies, if possible, distributivity to simplify the result<br>
+    * (2) it checks whether the disjunction is already equivalent to the
+    * common parts of the formulae only. This often happens when merging
+    * all branches that occur in symbolic execution.<br>
     * 
     * @param cond1 First path condition to join.
     * @param cond2 Second path condition to join.
