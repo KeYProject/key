@@ -50,8 +50,10 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -59,6 +61,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -145,12 +148,21 @@ public abstract class JoinRule implements BuiltInRule {
          mediator().getUI().taskProgress(++progress);
       }
       
+      Term resultPathCondition = joinedState.second;
+      try {
+         Term simplified = simplify(services.getProof(), resultPathCondition);
+         if (countAtoms(simplified) < countAtoms(resultPathCondition)) {
+            resultPathCondition = simplified;
+         }
+      } catch (ProofInputException e) {}
+
+      
       // Delete previous sequents      
       clearSemisequent(newGoal, true);
       clearSemisequent(newGoal, false);
       
       // Add new antecedent (path condition)
-      for (Term antecedentFormula : getConjunctiveElementsFor(joinedState.second)) {
+      for (Term antecedentFormula : getConjunctiveElementsFor(resultPathCondition)) {
          SequentFormula newAntecedent = new SequentFormula(antecedentFormula);
          newGoal.addFormula(newAntecedent, true, false);
       }
@@ -301,7 +313,7 @@ public abstract class JoinRule implements BuiltInRule {
     * @param u The update (in normal form) to extract program locations from.
     * @return All program locations (left sides) in the given update.
     */
-   protected HashSet<LocationVariable> getUpdateLocations(Term u) {
+   protected static HashSet<LocationVariable> getUpdateLocations(Term u) {
       if (u.op() instanceof ElementaryUpdate) {
          
          HashSet<LocationVariable> result = new HashSet<LocationVariable>();
@@ -327,7 +339,7 @@ public abstract class JoinRule implements BuiltInRule {
     * @param term The term to extract program locations from.
     * @return All program locations in the given term.
     */
-   protected HashSet<LocationVariable> getTermLocations(Term term) {
+   protected static HashSet<LocationVariable> getTermLocations(Term term) {
       final HashSet<LocationVariable> result =
             new HashSet<LocationVariable>();
       
@@ -363,7 +375,7 @@ public abstract class JoinRule implements BuiltInRule {
     * @param services The Services object.
     * @return The set of contained program locations.
     */
-   protected HashSet<LocationVariable> getProgramLocations(
+   protected static HashSet<LocationVariable> getProgramLocations(
          Term programCounterTerm, Services services) {
       CollectLocationVariablesVisitor visitor =
             new CollectLocationVariablesVisitor(
@@ -396,7 +408,7 @@ public abstract class JoinRule implements BuiltInRule {
     * @param leftSide Left side to find the right side for.
     * @return The right side in the update for the given left side.
     */
-   protected Term getUpdateRightSideFor(Term update, LocationVariable leftSide) {
+   protected static Term getUpdateRightSideFor(Term update, LocationVariable leftSide) {
       if (update.op() instanceof ElementaryUpdate &&
           ((ElementaryUpdate) update.op()).lhs().equals(leftSide)) {
          
@@ -428,7 +440,7 @@ public abstract class JoinRule implements BuiltInRule {
     * @param services The services object.
     * @return True iff the given formula has been successfully proven.
     */
-   protected boolean isProvable(Term toProve, Services services) {
+   protected static boolean isProvable(Term toProve, Services services) {
       return isProvable(toProve, services, false);
    }
    
@@ -440,8 +452,36 @@ public abstract class JoinRule implements BuiltInRule {
     * @param services The services object.
     * @return True iff the given formula has been successfully proven.
     */
-   protected boolean isProvableWithSplitting(Term toProve, Services services) {
+   protected static boolean isProvableWithSplitting(Term toProve, Services services) {
       return isProvable(toProve, services, true);
+   }
+   
+   /**
+    * Tries to simplifies the given {@link Term} in a
+    * side proof with splits. If this attemt is successful,
+    * i.e. the number of atoms in the simplified formula
+    * is lower, the simplified formula is returned; otherwise,
+    * the original formula is returned.
+    * 
+    * @param parentProof The parent {@link Proof}.
+    * @param term The {@link Term} to simplify.
+    * @return The simplified {@link Term} or the original term,
+    *    if simplification was not successful.
+    * 
+    * @see #simplify(Proof, Term)
+    * @see SymbolicExecutionUtil#simplify(Proof, Term)
+    */
+   protected static Term trySimplify(final Proof parentProof, final Term term) {
+      
+      try {
+         Term simplified = simplify(parentProof, term);
+         if (countAtoms(simplified) < countAtoms(term)) {
+            return simplified;
+         }
+      } catch (ProofInputException e) {}
+      
+      return term;
+      
    }
    
    /**
@@ -471,7 +511,7 @@ public abstract class JoinRule implements BuiltInRule {
     * @return A path condition that is equivalent to the disjunction
     *     of the two supplied formulae, but possibly simpler.
     */
-   protected Term createSimplifiedDisjunctivePathCondition(
+   protected static Term createSimplifiedDisjunctivePathCondition(
          final Term cond1, final Term cond2, Services services) {
       
       TermBuilder tb = services.getTermBuilder();
@@ -512,7 +552,7 @@ public abstract class JoinRule implements BuiltInRule {
       
       if (result1.equals(result2)) {
          result = result1;
-      } else {         
+      } else {
          Pair<Term, Term> distinguishingAndEqual =
                getDistinguishingFormula(result1, result2, services);
          LinkedList<Term> equalConjunctiveElems =
@@ -564,7 +604,7 @@ public abstract class JoinRule implements BuiltInRule {
     *    does not imply pathCondition2, and (2) the "rest" of
     *    pathCondition1 that is common with pathCondition2.
     */
-   protected Pair<Term, Term> getDistinguishingFormula(
+   protected static Pair<Term, Term> getDistinguishingFormula(
          Term pathCondition1,
          Term pathCondition2,
          Services services) {
@@ -591,48 +631,27 @@ public abstract class JoinRule implements BuiltInRule {
    }
    
    /**
-    * Closes the given partner goal, using the CloseAfterJoin rule.
+    * Counts the atoms in a formula.
     * 
-    * @param joinNodeParent Parent of remaining join node.
-    * @param joinPartner Partner goal to close.
+    * @param term Formula to count atoms for.
+    * @return Number of atoms in the formula
+    * @throws IllegalArgumentException if the supplied term
+    *    is not a formula
     */
-   private void closeJoinPartnerGoal(
-         Node joinNodeParent, Goal joinPartner, Pair<Term, Term> joinState, Term pc) {
-      
-      Services services = joinNodeParent.proof().getServices();
-      InitConfig initConfig = joinNodeParent.proof().getInitConfig();
-      
-      CloseAfterJoin closeRule = new CloseAfterJoin(joinNodeParent, joinState, pc);
-      RuleApp app = closeRule.createApp(null, services);
-      
-      // Register rule if not done yet.
-      // This avoids error messages of the form "no justification found for rule...".
-      if (initConfig.getJustifInfo().getJustification(closeRule) == null) {
-         initConfig.registerRuleIntroducedAtNode(app, joinPartner.node(), true);
-      }
-
-      joinPartner.apply(app);
-   }
-   
-   /**
-    * Deletes all formulae of the succedent / antecedent.
-    * 
-    * @param goal Goal to delete formulae from.
-    * @param antec If true, antecedent formulae are deleted, else
-    *    succedent formulae.
-    */
-   private void clearSemisequent(Goal goal, boolean antec) {
-      Semisequent semiseq = antec ?
-            goal.sequent().antecedent() :
-            goal.sequent().succedent();
-      for (int i = 0; i < semiseq.size(); i++) {
-         SequentFormula f = semiseq.get(i);
-         
-         PosInTerm pit = PosInTerm.getTopLevel();
-         pit.down(i);
-         
-         PosInOccurrence gPio = new PosInOccurrence(f, pit, antec);
-         goal.removeFormula(gPio);
+   protected static int countAtoms(Term term) {
+      if (term.sort().equals(Sort.FORMULA)) {
+         if (term.op() instanceof Junctor) {
+            int result = 0;
+            for (Term sub : term.subs()) {
+               result += countAtoms(sub);
+            }
+            return result;
+         } else {
+            return 1;
+         }
+      } else {
+         throw new IllegalArgumentException(
+               "Can only compute atoms for formulae");
       }
    }
    
@@ -728,6 +747,52 @@ public abstract class JoinRule implements BuiltInRule {
    }
    
    /**
+    * Closes the given partner goal, using the CloseAfterJoin rule.
+    * 
+    * @param joinNodeParent Parent of remaining join node.
+    * @param joinPartner Partner goal to close.
+    */
+   private static void closeJoinPartnerGoal(
+         Node joinNodeParent, Goal joinPartner, Pair<Term, Term> joinState, Term pc) {
+      
+      Services services = joinNodeParent.proof().getServices();
+      InitConfig initConfig = joinNodeParent.proof().getInitConfig();
+      
+      CloseAfterJoin closeRule = new CloseAfterJoin(joinNodeParent, joinState, pc);
+      RuleApp app = closeRule.createApp(null, services);
+      
+      // Register rule if not done yet.
+      // This avoids error messages of the form "no justification found for rule...".
+      if (initConfig.getJustifInfo().getJustification(closeRule) == null) {
+         initConfig.registerRuleIntroducedAtNode(app, joinPartner.node(), true);
+      }
+
+      joinPartner.apply(app);
+   }
+   
+   /**
+    * Deletes all formulae of the succedent / antecedent.
+    * 
+    * @param goal Goal to delete formulae from.
+    * @param antec If true, antecedent formulae are deleted, else
+    *    succedent formulae.
+    */
+   private static void clearSemisequent(Goal goal, boolean antec) {
+      Semisequent semiseq = antec ?
+            goal.sequent().antecedent() :
+            goal.sequent().succedent();
+      for (int i = 0; i < semiseq.size(); i++) {
+         SequentFormula f = semiseq.get(i);
+         
+         PosInTerm pit = PosInTerm.getTopLevel();
+         pit.down(i);
+         
+         PosInOccurrence gPio = new PosInOccurrence(f, pit, antec);
+         goal.removeFormula(gPio);
+      }
+   }
+   
+   /**
     * Converts a sequent (given by goal & pos in occurrence) to
     * an SE state (U,C,p). Thereby, all program variables occurring
     * in the program counter and in the symbolic state are replaced
@@ -749,7 +814,7 @@ public abstract class JoinRule implements BuiltInRule {
     * @param services The services object.
     * @return An SE state (U,C,p).
     */
-   private Triple<Term, Term, Term> sequentToSETriple(
+   private static Triple<Term, Term, Term> sequentToSETriple(
          Goal goal, PosInOccurrence pio, Services services) {
       
       TermBuilder tb = services.getTermBuilder();
@@ -799,6 +864,324 @@ public abstract class JoinRule implements BuiltInRule {
             progCntAndPostCond);                           // Program Counter and Post Condition
    }
    
+   /**
+    * Joins a list of sequent formulae to an and-connected term.
+    * 
+    * @param formulae Formulae to join.
+    * @param services The services object.
+    * @return And-formula connecting the given terms.
+    */
+   private static Term joinListToAndTerm(ImmutableList<SequentFormula> formulae, Services services) {
+      if (formulae.size() == 0) {
+         return services.getTermBuilder().tt();
+      } else if (formulae.size() == 1) {
+         return formulae.head().formula();
+      } else {
+         return services.getTermBuilder().and(
+               formulae.head().formula(),
+               joinListToAndTerm(formulae.tail(), services));
+      }
+   }
+
+   /**
+    * Checks if an update is of the form { x := v || ... || z := q}.
+    * 
+    * @param u Update to check.
+    * @return true iff u is in normal form.
+    */
+   private static boolean isUpdateNormalForm(Term u) {
+      if (u.op() instanceof ElementaryUpdate) {
+         return true;
+      } else if (u.op() instanceof UpdateJunctor) {
+         boolean result = true;
+         for (Term sub : u.subs()) {
+            result = result && isUpdateNormalForm(sub);
+         }
+         return result;
+      } else {
+         return false;
+      }
+   }
+   
+   /**
+    * Returns all elementary updates of a parallel update.
+    * 
+    * @param u Parallel update to get elementary updates from.
+    * @return Elementary updates of the supplied parallel update.
+    */
+   private static LinkedList<Term> getElementaryUpdates(Term u) {
+      LinkedList<Term> result =
+            new LinkedList<Term>();
+      
+      if (u.op() instanceof ElementaryUpdate) {
+         result.add(u);
+      } else if (u.op() instanceof UpdateJunctor) {
+         for (Term sub : u.subs()) {
+            result.addAll(getElementaryUpdates(sub));
+         }
+      } else {
+         throw new IllegalArgumentException("Expected an update!");
+      }
+      
+      return result;
+   }
+   
+   /**
+    * Dissects a conjunction into its conjunctive elements.
+    * 
+    * @param term Conjunctive formula to dissect (may be a conjunction
+    *     of one element, i.e. no "real" conjunction). In this case,
+    *     the resulting list will contain exactly the supplied formula.
+    * @return The conjunctive elements of the supplied formula.
+    */
+   private static LinkedList<Term> getConjunctiveElementsFor(final Term term) {
+      LinkedList<Term> result = new LinkedList<Term>();
+      
+      if (term.op().equals(Junctor.AND)) {
+         result.addAll(getConjunctiveElementsFor(term.sub(0)));
+         result.addAll(getConjunctiveElementsFor(term.sub(1)));
+      } else {
+         result.add(term);
+      }
+      
+      return result;
+   }
+   
+   /**
+    * Joins a list of formulae to a conjunction.
+    * 
+    * @param elems Formulae to join.
+    * @param services The services object.
+    * @return A conjunction of the supplied formulae.
+    */
+   private static Term joinConjuctiveElements(final LinkedList<Term> elems, Services services) {
+      TermBuilder tb = services.getTermBuilder();
+      
+      if (elems.isEmpty()) {
+         return tb.tt();
+      }
+      
+      Term result = elems.getFirst();
+      for (int i = 1; i < elems.size(); i++) {
+         Term term = elems.get(i);
+         result = tb.and(result, term);
+      }
+      
+      return result;
+   }
+   
+   /**
+    * Disposes the side proof. The stored information string is
+    * assembled form the supplied term; this is expected to be
+    * the original proof input for the side proof.
+    * 
+    * @param previousInput The original input for the side proof.
+    * @param proofResult The result of the side proof.
+    * @param services The services object.
+    */
+   private static void disposeSideProof(
+         Term previousInput, ApplyStrategyInfo proofResult, Services services) {
+      SideProofUtil.disposeOrStore(
+            "Finished proof of " + ProofSaver.printTerm(previousInput, services), proofResult);
+   }
+   
+   /**
+    * Tries to prove the given formula and returns the result.
+    * 
+    * @param toProve Formula to prove.
+    * @param services The services object.
+    * @param doSplit if true, splitting is allowed (normal mode).
+    * @return The proof result.
+    */
+   private static ApplyStrategyInfo tryToProve(
+         Term toProve,
+         Services services,
+         boolean doSplit) {
+      final ProofEnvironment sideProofEnv =
+            SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(
+                  services.getProof(),                            // Parent Proof
+                  false);                                         // useSimplifyTermProfile
+      
+      ApplyStrategyInfo proofResult = null;
+      try {
+         proofResult = SideProofUtil.startSideProof(
+               services.getProof(),                                  // Parent proof
+               sideProofEnv,                                         // Proof environment
+               Sequent.createSequent(                                // Sequent to prove
+                     Semisequent.EMPTY_SEMISEQUENT,
+                     new Semisequent(new SequentFormula(toProve))),
+               StrategyProperties.METHOD_NONE,                       // Method Treatment
+               StrategyProperties.LOOP_NONE,                         // Loop Treatment
+               StrategyProperties.QUERY_OFF,                         // Query Treatment
+               doSplit ? StrategyProperties.SPLITTING_NORMAL:        // Splitting Option
+                  StrategyProperties.SPLITTING_OFF);
+      } catch (ProofInputException e) {}
+      
+      return proofResult;
+   }
+   
+   /**
+    * Tries to prove the given formula and returns whether the
+    * prove could be closed.
+    * 
+    * @param toProve Formula to prove.
+    * @param services The services object.
+    * @param doSplit if true, splitting is allowed (normal mode).
+    * @return True iff the given formula has been successfully proven.
+    */
+   private static boolean isProvable(
+         Term toProve,
+         Services services,
+         boolean doSplit) {
+      
+      ApplyStrategyInfo proofResult = tryToProve(toProve, services, doSplit);
+      boolean result = proofResult.getProof().closed();
+      
+      disposeSideProof(toProve, proofResult, services);
+      
+      return result;
+      
+   }
+   
+   /**
+    * An equals method that, before the comparison, replaces all program
+    * locations in the supplied arguments by their branch-unique versions.
+    * 
+    * @param se1 First element to check equality (mod renaming) for
+    * @param se2 Second element to check equality (mod renaming) for
+    * @param services The Services object.
+    * @return true iff source elements can be matched, considering
+    *    branch-unique location names.
+    */
+   private static boolean equalsModBranchUniqueRenaming(
+         SourceElement se1, SourceElement se2,
+         Services services) {
+      
+      ProgVarReplaceVisitor replVisitor1 =
+            new ProgVarReplaceVisitor((ProgramElement) se1, LocVarReplBranchUniqueMap.instance(), services);
+      ProgVarReplaceVisitor replVisitor2 =
+            new ProgVarReplaceVisitor((ProgramElement) se1, LocVarReplBranchUniqueMap.instance(), services);
+      
+      replVisitor1.start();
+      replVisitor2.start();
+      
+      return replVisitor1.result().equals(replVisitor2.result());
+   }
+   
+   /**
+    * Simplifies the given {@link Term} in a side proof with splits.
+    * This code has been copied from {@link SymbolicExecutionUtil}
+    * and only been slightly modified (to allow for splitting the proof). 
+    * 
+    * @param parentProof The parent {@link Proof}.
+    * @param term The {@link Term} to simplify.
+    * @return The simplified {@link Term}.
+    * @throws ProofInputException Occurred Exception.
+    * 
+    * @see SymbolicExecutionUtil#simplify(Proof, Term)
+    */
+   private static Term simplify(Proof parentProof, Term term)
+         throws ProofInputException {
+      
+      final Services services = parentProof.getServices();
+      
+      final ApplyStrategyInfo info = tryToProve(term, services, true);
+      
+      try {
+         // The simplified formula is the conjunction of all open goals
+         ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
+         final TermBuilder tb = services.getTermBuilder();
+         if (openGoals.isEmpty()) {
+            return tb.tt();
+         }
+         else {
+            ImmutableList<Term> goalImplications = ImmutableSLList.nil();
+            for (Goal goal : openGoals) {
+               Term goalImplication = sequentToFormula(goal.sequent(), services);
+               goalImplications = goalImplications.append(goalImplication);
+            }
+            
+            return tb.and(goalImplications);
+         }
+      }
+      finally {
+         SideProofUtil.disposeOrStore(
+               "Simplification of "
+                     + ProofSaver.printAnything(term,
+                           parentProof.getServices()), info);
+      }
+   }
+   
+   /**
+    * Converts a Sequent "Gamma ==> Delta" into a single formula
+    * equivalent to "/\ Gamma -> \/ Delta"; however, the formulae
+    * in Gamma are shifted to the succedent by the negation-left
+    * rule, so the reult of this method is a disjunction, not an
+    * implication.
+    * 
+    * @param sequent The sequent to convert to a formula.
+    * @param services The services object.
+    * @return A formula equivalent to the given sequent.
+    */
+   private static Term sequentToFormula(Sequent sequent, Services services) {
+      TermBuilder tb = services.getTermBuilder();
+      
+      ImmutableList<Term> negAntecedentForms = ImmutableSLList.nil();
+      ImmutableList<Term> succedentForms     = ImmutableSLList.nil();
+      
+      // Shift antecedent formulae to the succedent by negation
+      for (SequentFormula sf : sequent.antecedent().toList()) {
+         negAntecedentForms = negAntecedentForms.prepend(
+               tb.not(sf.formula()));
+      }
+      
+      for (SequentFormula sf : sequent.succedent().toList()) {
+         succedentForms = succedentForms.prepend(sf.formula());
+      }
+      
+      return tb.or(negAntecedentForms.prepend(succedentForms));
+   }
+   
+   /**
+    * Visitor for collecting program locations in a Java block.
+    * 
+    * @author Dominic Scheurer
+    */
+   private static class CollectLocationVariablesVisitor extends CreatingASTVisitor {
+      private HashSet<LocationVariable> variables =
+            new HashSet<LocationVariable>();
+
+      public CollectLocationVariablesVisitor(ProgramElement root,
+            boolean preservesPos, Services services) {
+         super(root, preservesPos, services);
+      }
+      
+      @Override
+      public void performActionOnLocationVariable(LocationVariable x) {
+         variables.add(x);
+      }
+      
+      /**
+       * Call start() before calling this method!
+       * 
+       * @return All program locations in the given Java block.
+       */
+      public HashSet<LocationVariable> getLocationVariables() {
+         return variables;
+      }
+      
+   }
+   
+   /**
+    * Map for renaming variables to their branch-unique names.
+    * Putting things into this map has absolutely no effect;
+    * the get method just relies on the
+    * {@link LocationVariable#getBranchUniqueName()} method of
+    * the respective location variable. Therefore, this map is
+    * also a singleton object.
+    * 
+    * @author Dominic Scheurer
+    */
    private static class LocVarReplBranchUniqueMap
    extends HashMap<ProgramVariable, ProgramVariable> {
       private static final long serialVersionUID = -6789836130544430938L;
@@ -866,211 +1249,25 @@ public abstract class JoinRule implements BuiltInRule {
       
    }
    
-   /**
-    * Joins a list of sequent formulae to an and-connected term.
-    * 
-    * @param formulae Formulae to join.
-    * @param services The services object.
-    * @return And-formula connecting the given terms.
-    */
-   private Term joinListToAndTerm(ImmutableList<SequentFormula> formulae, Services services) {
-      if (formulae.size() == 0) {
-         return services.getTermBuilder().tt();
-      } else if (formulae.size() == 1) {
-         return formulae.head().formula();
-      } else {
-         return services.getTermBuilder().and(
-               formulae.head().formula(),
-               joinListToAndTerm(formulae.tail(), services));
-      }
-   }
-
-   /**
-    * Checks if an update is of the form { x := v || ... || z := q}.
-    * 
-    * @param u Update to check.
-    * @return true iff u is in normal form.
-    */
-   private boolean isUpdateNormalForm(Term u) {
-      if (u.op() instanceof ElementaryUpdate) {
-         return true;
-      } else if (u.op() instanceof UpdateJunctor) {
-         boolean result = true;
-         for (Term sub : u.subs()) {
-            result = result && isUpdateNormalForm(sub);
-         }
-         return result;
-      } else {
-         return false;
-      }
-   }
-   
-   /**
-    * Returns all elementary updates of a parallel update.
-    * 
-    * @param u Parallel update to get elementary updates from.
-    * @return Elementary updates of the supplied parallel update.
-    */
-   private LinkedList<Term> getElementaryUpdates(Term u) {
-      LinkedList<Term> result =
-            new LinkedList<Term>();
-      
-      if (u.op() instanceof ElementaryUpdate) {
-         result.add(u);
-      } else if (u.op() instanceof UpdateJunctor) {
-         for (Term sub : u.subs()) {
-            result.addAll(getElementaryUpdates(sub));
-         }
-      } else {
-         throw new IllegalArgumentException("Expected an update!");
-      }
-      
-      return result;
-   }
-   
-   /**
-    * Dissects a conjunction into its conjunctive elements.
-    * 
-    * @param term Conjunctive formula to dissect (may be a conjunction
-    *     of one element, i.e. no "real" conjunction). In this case,
-    *     the resulting list will contain exactly the supplied formula.
-    * @return The conjunctive elements of the supplied formula.
-    */
-   private LinkedList<Term> getConjunctiveElementsFor(final Term term) {
-      LinkedList<Term> result = new LinkedList<Term>();
-      
-      if (term.op().equals(Junctor.AND)) {
-         result.addAll(getConjunctiveElementsFor(term.sub(0)));
-         result.addAll(getConjunctiveElementsFor(term.sub(1)));
-      } else {
-         result.add(term);
-      }
-      
-      return result;
-   }
-   
-   /**
-    * Joins a list of formulae to a conjunction.
-    * 
-    * @param elems Formulae to join.
-    * @param services The services object.
-    * @return A conjunction of the supplied formulae.
-    */
-   private Term joinConjuctiveElements(final LinkedList<Term> elems, Services services) {
-      TermBuilder tb = services.getTermBuilder();
-      
-      if (elems.isEmpty()) {
-         return tb.tt();
-      }
-      
-      Term result = elems.getFirst();
-      for (int i = 1; i < elems.size(); i++) {
-         Term term = elems.get(i);
-         result = tb.and(result, term);
-      }
-      
-      return result;
-   }
-   
-   /**
-    * Tries to prove the given formula and returns whether the
-    * prove could be closed.
-    * 
-    * @param toProve Formula to prove.
-    * @param services The services object.
-    * @param doSplit if true, splitting is allowed (normal mode).
-    * @return True iff the given formula has been successfully proven.
-    */
-   private boolean isProvable(
-         Term toProve,
-         Services services,
-         boolean doSplit) {
-      final ProofEnvironment sideProofEnv =
-            SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(
-                  services.getProof(),                            // Parent Proof
-                  false);                                         // useSimplifyTermProfile
-      
-      ApplyStrategyInfo proofResult;
-      try {
-         proofResult = SideProofUtil.startSideProof(
-               services.getProof(),                                  // Parent proof
-               sideProofEnv,                                         // Proof environment
-               Sequent.createSequent(                                // Sequent to prove
-                     Semisequent.EMPTY_SEMISEQUENT,
-                     new Semisequent(new SequentFormula(toProve))),
-               StrategyProperties.METHOD_NONE,                       // Method Treatment
-               StrategyProperties.LOOP_NONE,                         // Loop Treatment
-               StrategyProperties.QUERY_OFF,                         // Query Treatment
-               doSplit ? StrategyProperties.SPLITTING_NORMAL:        // Splitting Option
-                  StrategyProperties.SPLITTING_OFF);
-      } catch (ProofInputException e) {
-         return false;
-      }
-      
-      boolean result = proofResult.getProof().closed();
-      
-      SideProofUtil.disposeOrStore(
-            "Finished proof of " + ProofSaver.printTerm(toProve, services), proofResult);
-      
-      return result;
-   }
-   
-   /**
-    * Visitor for collecting program locations in a Java block.
-    * 
-    * @author Dominic Scheurer
-    */
-   private class CollectLocationVariablesVisitor extends CreatingASTVisitor {
-      private HashSet<LocationVariable> variables =
-            new HashSet<LocationVariable>();
-
-      public CollectLocationVariablesVisitor(ProgramElement root,
-            boolean preservesPos, Services services) {
-         super(root, preservesPos, services);
-      }
-      
-      @Override
-      public void performActionOnLocationVariable(LocationVariable x) {
-         // Calling super leads to an EmptyStackException...
-         // Without, it perfectly works.
-//         super.performActionOnLocationVariable(x);
-         
-         variables.add(x);
-      }
-      
-      /**
-       * Call start() before calling this method!
-       * 
-       * @return All program locations in the given Java block.
-       */
-      public HashSet<LocationVariable> getLocationVariables() {
-         return variables;
-      }
-      
-   }
-   
-   /**
-    * An equals method that, before the comparison, replaces all program
-    * locations in the supplied arguments by their branch-unique versions.
-    * 
-    * @param se1 First element to check equality (mod renaming) for
-    * @param se2 Second element to check equality (mod renaming) for
-    * @param services The Services object.
-    * @return true iff source elements can be matched, considering
-    *    branch-unique location names.
-    */
-   private static boolean equalsModBranchUniqueRenaming(
-         SourceElement se1, SourceElement se2,
-         Services services) {
-      
-      ProgVarReplaceVisitor replVisitor1 =
-            new ProgVarReplaceVisitor((ProgramElement) se1, LocVarReplBranchUniqueMap.instance(), services);
-      ProgVarReplaceVisitor replVisitor2 =
-            new ProgVarReplaceVisitor((ProgramElement) se1, LocVarReplBranchUniqueMap.instance(), services);
-      
-      replVisitor1.start();
-      replVisitor2.start();
-      
-      return replVisitor1.result().equals(replVisitor2.result());
-   }
+//   /**
+//    * Tries to prove the equivalence of term1 and term2 and
+//    * throws a {@link RuntimeException} if the proof fails.
+//    * 
+//    * @param term1 First term to check.
+//    * @param term2 Second term to check.
+//    * @param services The services object.
+//    * 
+//    * @throws RuntimeException iff proving the equivalence
+//    *    of term1 and term2 fails.
+//    */
+//   private static void assertEquivalent(Term term1, Term term2, Services services) {
+//      TermBuilder tb = services.getTermBuilder();
+//      
+//      Term assertionForm = tb.and(
+//            tb.imp(term1, term2),
+//            tb.imp(term2, term1));
+//      if (!isProvableWithSplitting(assertionForm, services)) {
+//         throw new RuntimeException("Could not prove expected equivalence.");
+//      }
+//   }
 }
