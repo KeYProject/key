@@ -151,10 +151,10 @@ public abstract class JoinRule implements BuiltInRule {
       clearSemisequent(newGoal, false);
       
       // Add new antecedent (path condition)
-      SequentFormula newAntecedent = new SequentFormula(joinedState.second);
-      newGoal.addFormula(
-            newAntecedent,
-            new PosInOccurrence(newAntecedent, PosInTerm.getTopLevel(), true));
+      for (Term antecedentFormula : getConjunctiveElementsFor(joinedState.second)) {
+         SequentFormula newAntecedent = new SequentFormula(antecedentFormula);
+         newGoal.addFormula(newAntecedent, true, false);
+      }
       
       // Add new succedent (symbolic state & program counter)
       Term succedentFormula = tb.apply(joinedState.first, thisSEState.third);
