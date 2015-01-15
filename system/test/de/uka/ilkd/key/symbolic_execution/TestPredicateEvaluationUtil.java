@@ -49,14 +49,13 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testEquivExample() throws Exception {
       // Create expected results
-      ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", PredicateValue.TRUE), new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("4.0", PredicateValue.TRUE));
-      ExpectedBranchResult goal50 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", PredicateValue.TRUE), new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("4.0", PredicateValue.TRUE));
-      ExpectedBranchResult goal46 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", PredicateValue.TRUE), new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("4.0", PredicateValue.TRUE));
-      ExpectedBranchResult goal40 = new ExpectedBranchResult(new ExpectedPredicateResult("5.0", PredicateValue.FALSE)); // SETAccumulate is false
-      ExpectedPredicateEvaluationResult result = new ExpectedPredicateEvaluationResult(goal55, goal50, goal46, goal40);
+      ExpectedBranchResult goal39 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", PredicateValue.TRUE), new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("4.0", PredicateValue.TRUE));
+      ExpectedBranchResult goal50 = new ExpectedBranchResult(new ExpectedPredicateResult("1.0", PredicateValue.FALSE), new ExpectedPredicateResult("2.0", PredicateValue.UNKNOWN), new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("4.0", PredicateValue.UNKNOWN), new ExpectedPredicateResult("5.0", PredicateValue.TRUE), new ExpectedPredicateResult("6.0", PredicateValue.UNKNOWN));
+      ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedPredicateResult("1.0", PredicateValue.FALSE), new ExpectedPredicateResult("2.0", PredicateValue.TRUE), new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("4.0", PredicateValue.TRUE), new ExpectedPredicateResult("5.0", PredicateValue.TRUE), new ExpectedPredicateResult("6.0", PredicateValue.TRUE));
+      ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("6.0", PredicateValue.FALSE), new ExpectedPredicateResult("4.0", PredicateValue.UNKNOWN), new ExpectedPredicateResult("5.0", PredicateValue.FALSE)); // SETAccumulate is false
+      ExpectedPredicateEvaluationResult result = new ExpectedPredicateEvaluationResult(goal39, goal50, goal53, goal55);
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/predicateEquivExample/test/EquivExample.java", 
-                                "EquivExample[EquivExample::equivExample()].JML normal_behavior operation contract.0", 
+      doPredicateEvaluationTest("examples/_testcase/set/predicateEquivExample/test/EquivExample.proof", 
                                 "examples/_testcase/set/predicateEquivExample/oracle/EquivExample.xml",
                                 false,
                                 false,

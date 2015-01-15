@@ -756,7 +756,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
          ImmutableArray<TermLabel> oldLabels = term.getLabels();
          TermLabel[] newLabels = oldLabels.toArray(new TermLabel[oldLabels.size() + 1]);
          int labelID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
-         int labelSubID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_SUB_PREFIX + labelID).getCountPlusPlus();
+         int labelSubID = PredicateTermLabel.newLabelSubID(services, labelID);
          newLabels[oldLabels.size()] = new PredicateTermLabel(labelID, labelSubID);
          return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(), new ImmutableArray<TermLabel>(newLabels));
       }

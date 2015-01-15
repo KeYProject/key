@@ -76,14 +76,14 @@ public final class SideProofUtil {
       Sequent sequentToProve = Sequent.EMPTY_SEQUENT;
       for (SequentFormula sf : goalSequent.antecedent()) {
          if (sf != currentSF) {
-            if (!SideProofUtil.containsModalityOrQuery(sf)) {
+            if (!containsModalityOrQuery(sf)) {
                sequentToProve = sequentToProve.addFormula(sf, true, false).sequent();
             }
          }
       }
       for (SequentFormula sf : goalSequent.succedent()) {
          if (sf != currentSF) {
-            if (!SideProofUtil.containsModalityOrQuery(sf)) {
+            if (!containsModalityOrQuery(sf)) {
                sequentToProve = sequentToProve.addFormula(sf, false, false).sequent();
             }
          }
@@ -121,7 +121,7 @@ public final class SideProofUtil {
                                                        String splittingOption,
                                                        boolean addNamesToServices) throws ProofInputException {
       // Execute side proof
-      ApplyStrategyInfo info = SideProofUtil.startSideProof(proof, sideProofEnvironment, sequentToProve, methodTreatment, loopTreatment, queryTreatment, splittingOption);
+      ApplyStrategyInfo info = startSideProof(proof, sideProofEnvironment, sequentToProve, methodTreatment, loopTreatment, queryTreatment, splittingOption);
       try {
          // Extract results and conditions from side proof
          List<Pair<Term, Node>> conditionsAndResultsMap = new LinkedList<Pair<Term, Node>>();
@@ -156,7 +156,7 @@ public final class SideProofUtil {
          return conditionsAndResultsMap;
       }
       finally {
-         SideProofUtil.disposeOrStore(description, info);
+         disposeOrStore(description, info);
       }
    }
    
@@ -190,10 +190,10 @@ public final class SideProofUtil {
                                                                                  String splittingOption,
                                                                                  boolean addNamesToServices) throws ProofInputException {
       // Execute side proof
-      ApplyStrategyInfo info = SideProofUtil.startSideProof(proof, sideProofEnvironment, sequentToProve, methodTreatment, loopTreatment, queryTreatment, splittingOption);
+      ApplyStrategyInfo info = startSideProof(proof, sideProofEnvironment, sequentToProve, methodTreatment, loopTreatment, queryTreatment, splittingOption);
       try {
          // Extract relevant things
-         Set<Operator> relevantThingsInSequentToProve = SideProofUtil.extractRelevantThings(info.getProof().getServices(), sequentToProve);
+         Set<Operator> relevantThingsInSequentToProve = extractRelevantThings(info.getProof().getServices(), sequentToProve);
          // Extract results and conditions from side proof
          List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap = new LinkedList<Triple<Term, Set<Term>, Node>>();
          for (Goal resultGoal : info.getProof().openGoals()) {
@@ -216,7 +216,7 @@ public final class SideProofUtil {
                      }
                   }
                }
-               if (!SideProofUtil.isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
+               if (!isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
                   if (resultConditions.add(sf.formula()) && addNamesToServices) {
                      addNewNamesToNamespace(services, sf.formula());
                   }
@@ -241,7 +241,7 @@ public final class SideProofUtil {
                   }
                }
                if (result == null) {
-                  if (!SideProofUtil.isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
+                  if (!isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
                      if (resultConditions.add(services.getTermBuilder().not(sf.formula())) && addNamesToServices) {
                         addNewNamesToNamespace(services, sf.formula());
                      }
@@ -256,7 +256,7 @@ public final class SideProofUtil {
          return conditionsAndResultsMap;
       }
       finally {
-         SideProofUtil.disposeOrStore(description, info);
+         disposeOrStore(description, info);
       }
    }
    

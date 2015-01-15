@@ -19,11 +19,14 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.PredicateTermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PositionTable;
 import de.uka.ilkd.key.pp.Range;
@@ -35,7 +38,7 @@ import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateValue
 
 /**
  * An extended {@link ProofSourceViewerDecorator} to visualize {@link BranchResult}s
- * via {@link #showTerm(Term, Services, KeYMediator, BranchResult)}.
+ * via {@link #showSequent(Term, Services, KeYMediator, BranchResult)}.
  * @author Martin Hentschel
  */
 public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
@@ -99,16 +102,16 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
 
    /**
     * Shows the given {@link Term} and visualizes the {@link BranchResult}.
-    * @param term The {@link Term} to show.
+    * @param sequent The {@link Term} to show.
     * @param services The {@link Services} to use.
     * @param mediator The {@link KeYMediator} to use.
     * @param branchResult The {@link BranchResult}s to visualize.
     * @return The shown {@link PredicateValue} of {@link Term} to show.
     */
-   public PredicateValue showTerm(Term term, 
-                                  Services services, 
-                                  KeYMediator mediator, 
-                                  final BranchResult branchResult) {
+   public PredicateValue showSequent(Sequent sequent, 
+                                     Services services, 
+                                     KeYMediator mediator, 
+                                     final BranchResult branchResult) {
       // Show Term
       VisibleTermLabels visibleTermLabels = new VisibleTermLabels() {
          @Override
@@ -116,13 +119,12 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
             return true; //!ObjectUtil.equals(name, branchResult.getTermLabelName());
          }
       };
-      String text = showTerm(term, services, mediator, visibleTermLabels);
+      String text = showSequent(sequent, services, mediator, visibleTermLabels);
       // Highlight results of all terms
       LogicPrinter printer = getPrinter();
-      PositionTable pt = printer.getPositionTable();
-      Map<Term, PredicateValue> termValueMap = new HashMap<Term, PredicateValue>();
+      InitialPositionTable ipt = printer.getInitialPositionTable();
       List<StyleRange> styleRanges = new LinkedList<StyleRange>();
-      fillTermRanges(term, pt, branchResult, text.length(), termValueMap, ImmutableSLList.<Integer>nil(), styleRanges);
+      PredicateValue sequentValue = fillSequentRanges(sequent, ipt, branchResult, text.length(), styleRanges);
       try {
          TextPresentation textPresentation = createTextPresentation(styleRanges);
          TextPresentation.applyTextPresentation(textPresentation, getViewerText());
@@ -132,8 +134,7 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
          LogUtil.getLogger().logError(e);
       }
       // Return term result
-      PredicateValue value = termValueMap.get(term);
-      return value != null ? value : PredicateValue.UNKNOWN;
+      return sequentValue != null ? sequentValue : PredicateValue.UNKNOWN;
    }
    
    /**
@@ -158,7 +159,49 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
    }
 
    /**
-    * Utility method used by {@link #showTerm(Term, Services, KeYMediator, BranchResult)}
+    * Utility method used by {@link #showSequent(Term, Services, KeYMediator, BranchResult)}
+    * to fill the {@link TextPresentation} to highlight {@link PredicateValue}s recursively.
+    * @param sequent The current {@link Sequent}.
+    * @param positionTable The {@link InitialPositionTable} to use.
+    * @param branchResult The {@link BranchResult} to use.
+    * @param textLength The length of the complete text.
+    * @param styleRanges The {@link List} with found {@link StyleRange}s to fill.
+    * @return The {@link PredicateValue} of the {@link Sequent}.
+    */
+   protected PredicateValue fillSequentRanges(Sequent sequent, 
+                                              InitialPositionTable positionTable, 
+                                              BranchResult branchResult,
+                                              int textLength,
+                                              List<StyleRange> styleRanges) {
+      Map<Term, PredicateValue> termValueMap = new HashMap<Term, PredicateValue>();
+      ImmutableList<Integer> path = ImmutableSLList.<Integer>nil().prepend(0); // Sequent arrow
+      // Evaluate antecedent
+      int i = 0;
+      PredicateValue antecedentValue = PredicateValue.TRUE;
+      for (SequentFormula sf : sequent.antecedent()) {
+         fillTermRanges(sf.formula(), positionTable, branchResult, textLength, termValueMap, path.append(i), styleRanges);
+         antecedentValue = PredicateValue.and(antecedentValue, termValueMap.get(sf.formula()));
+         i++;
+      }
+      // Evaluate succedent
+      PredicateValue succedentValue = PredicateValue.FALSE;
+      for (SequentFormula sf : sequent.succedent()) {
+         fillTermRanges(sf.formula(), positionTable, branchResult, textLength, termValueMap, path.append(i), styleRanges);
+         succedentValue = PredicateValue.or(succedentValue, termValueMap.get(sf.formula()));
+         i++;
+      }
+      // Evaluate sequent
+      int antecedentEnd = positionTable.rangeForPath(path.append(sequent.antecedent().size() - 1), textLength).end();
+      int succedentStart = positionTable.rangeForPath(path.append(sequent.antecedent().size()), textLength).start();
+      PredicateValue sequentValue = PredicateValue.imp(antecedentValue, succedentValue);
+      Color color = getColor(sequentValue);
+      StyleRange styleRange = new StyleRange(antecedentEnd, succedentStart - antecedentEnd, color, null);
+      styleRanges.add(styleRange);
+      return sequentValue;
+   }
+
+   /**
+    * Utility method used by {@link #showSequent(Term, Services, KeYMediator, BranchResult)}
     * to fill the {@link TextPresentation} to highlight {@link PredicateValue}s recursively.
     * @param term The current {@link Term}.
     * @param positionTable The {@link PositionTable} to use.
@@ -236,9 +279,6 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
       PredicateValue conditionValue = termValueMap.get(conditionTerm);
       PredicateValue thenValue = termValueMap.get(thenTerm);
       PredicateValue elseValue = termValueMap.get(elseTerm);
-      assert conditionValue != null;
-      assert thenValue != null;
-      assert elseValue != null;
       PredicateValue operatorResult;
       if (label != null) {
          PredicateResult predicateResult = branchResult.evaluate(label);
@@ -309,8 +349,6 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
       fillTermRanges(sub1, positionTable, branchResult, textLength, termValueMap, path.append(1), styleRanges);
       PredicateValue leftValue = termValueMap.get(sub0);
       PredicateValue rightValue = termValueMap.get(sub1);
-      assert leftValue != null;
-      assert rightValue != null;
       PredicateValue operatorResult = null;
       if (label != null) {
          PredicateResult predicateResult = branchResult.evaluate(label);
@@ -387,7 +425,6 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
       Term sub = term.sub(0);
       fillTermRanges(sub, positionTable, branchResult, textLength, termValueMap, path.append(0), styleRanges);
       PredicateValue childValue = termValueMap.get(sub);
-      assert childValue != null;
       PredicateValue junctorResult;
       if (label != null) {
          PredicateResult predicateResult = branchResult.evaluate(label);

@@ -1213,7 +1213,7 @@ public abstract class AbstractUpdateExtractor {
                                          Map<Node, Term> branchConditionCache) throws ProofInputException {
       Term result = branchConditionCache.get(node);
       if (result == null) {
-         result = SymbolicExecutionUtil.computeBranchCondition(node, true);
+         result = SymbolicExecutionUtil.computeBranchCondition(node, true, true);
          branchConditionCache.put(node, result);
       }
       return result;

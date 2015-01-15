@@ -65,8 +65,9 @@ public class PredicateTermLabelUpdate implements TermLabelUpdate {
                PredicateTermLabel oldLabel = (PredicateTermLabel) label;
 //               PredicateTermLabel newLabel = PredicateTermLabel.getNewInnerMostLabel(state);
 //               if (newLabel == null) {
-                  int labelSubID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_SUB_PREFIX + oldLabel.getMajorId()).getCountPlusPlus();
-                  PredicateTermLabel newLabel = new PredicateTermLabel(oldLabel.getMajorId(), labelSubID, Collections.singletonList(oldLabel.getId()));
+                  int labelSubID = PredicateTermLabel.newLabelSubID(services, oldLabel);
+//                  PredicateTermLabel newLabel = new PredicateTermLabel(oldLabel.getMajorId(), labelSubID, Collections.singletonList(oldLabel.getId()));
+                  PredicateTermLabel newLabel = new PredicateTermLabel(oldLabel.getMajorId(), labelSubID);
 //                  PredicateTermLabel.setNewInnerMostLabel(state, newLabel, oldLabel);
 //               }
                labels.add(newLabel);

@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.rule.label;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
@@ -53,7 +53,7 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
          PredicateTermLabel mostImportantLabel = originalLabel != null ? originalLabel : pLabel;
          // May change sub ID if logical operators like junctors are used
          boolean newLabelIdRequired = false;
-         List<String> originalLabelIds = new LinkedList<String>();
+         Set<String> originalLabelIds = new LinkedHashSet<String>();
          if (hint instanceof TacletLabelHint) {
             TacletLabelHint tacletHint = (TacletLabelHint) hint;
             if (TacletOperation.ADD_ANTECEDENT.equals(tacletHint.getTacletOperation()) ||
@@ -61,6 +61,7 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
                 TacletOperation.REPLACE_TO_ANTECEDENT.equals(tacletHint.getTacletOperation()) ||
                 TacletOperation.REPLACE_TO_SUCCEDENT.equals(tacletHint.getTacletOperation())) {
 //               newLabelIdRequired = true;
+//               originalLabelIds.add(mostImportantLabel.getId());
             }
             boolean topLevel = isTopLevel(tacletHint, tacletTerm);
             if (tacletHint.getSequentFormula() != null) {
@@ -82,7 +83,7 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
             if (originalLabel != null) {
                originalLabelIds.add(originalLabel.getId());
             }
-            int labelSubID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_SUB_PREFIX + mostImportantLabel.getMajorId()).getCountPlusPlus();
+            int labelSubID = PredicateTermLabel.newLabelSubID(services, mostImportantLabel);
             if (!originalLabelIds.isEmpty()) {
                return new PredicateTermLabel(mostImportantLabel.getMajorId(), labelSubID, originalLabelIds);
             }

@@ -255,7 +255,7 @@ public final class PredicateEvaluationUtil {
       // Analyze children
       int childCount = node.childrenCount();
       if (childCount == 0) {
-         Term condition = SymbolicExecutionUtil.computePathCondition(evaluationNode, node, true);
+         Term condition = SymbolicExecutionUtil.computePathCondition(evaluationNode, node, false, true);
          String conditionString = SymbolicExecutionUtil.formatTerm(condition, services, useUnicode, usePrettyPrinting);
          result.addBranchResult(new BranchResult(node, currentResults, condition, conditionString, termLabelName));
       }
@@ -348,7 +348,7 @@ public final class PredicateEvaluationUtil {
                                          Map<String, IPredicateInstruction> results) {
       Object replaceObject = tacletGoal.replaceWithExpressionAsObject();
       if (replaceObject instanceof Term) {
-         Term replaceTerm = SymbolicExecutionUtil.instantiateTerm((Term) replaceObject, tacletApp, services);
+         Term replaceTerm = SymbolicExecutionUtil.instantiateTerm(parent, (Term) replaceObject, tacletApp, services);
          for (PredicateLabelOccurrence Occurrence : labels) {
             // Check for true/false terms
             if (replaceTerm.op() == Junctor.TRUE) {
