@@ -674,6 +674,8 @@ public class ProofTreeView extends JPanel {
                 if ( ((GUIBranchNode)value).getNode().isClosed() ) {
                     // all goals below this node are closed
                     this.setIcon(IconFactory.provedFolderIcon());
+                } else if ( ((GUIBranchNode)value).getNode().isLinked() ) {
+                   this.setIcon(IconFactory.linkedFolderIcon());
                 }
                 return this;
             }

@@ -600,6 +600,12 @@ public class Node  {
      */
     public void setLinkedNode(final Node linkedNode) {
         this.linkedNode = linkedNode;
+        
+        Node current = parent();
+        while (current != null && current.childrenCount() == 1) {
+           current.setLinkedNode(linkedNode);
+           current = current.parent();
+        }
     }
 
     /**

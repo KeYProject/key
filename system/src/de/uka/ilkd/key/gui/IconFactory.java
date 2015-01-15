@@ -45,6 +45,7 @@ public class IconFactory {
     private static Image keyLogo22 = getImage("images/key22.gif");
     private static Image keyLogoSmall        = getImage("images/key-color-icon-square.png");
     private static Icon provedFolderIcon     = KeYFolderIcon.getKeYFolderIconClosed();
+    private static Icon linkedFolderIcon     = KeYFolderIcon.getKeYFolderIconLinked();
     private static Icon closableFolderIcon   = KeYFolderIcon.getKeYFolderIconClosable();
     
     private static Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png"); 
@@ -276,6 +277,10 @@ public class IconFactory {
     public static Icon provedFolderIcon() {
 	return provedFolderIcon;
     }
+
+    public static Icon linkedFolderIcon() {
+   return linkedFolderIcon;
+    }
     
     public static Icon closableFolderIcon() {
 	return closableFolderIcon;
@@ -320,12 +325,17 @@ public class IconFactory {
         private static final long serialVersionUID = 5120051888984645985L;
         private static final Icon closedIcon   = new KeYFolderIcon(Color.green.darker());
         private static final Icon closableIcon = new KeYFolderIcon(Color.blue.darker());
+        private static final Icon linkedIcon   = new KeYFolderIcon(new Color(255, 0, 240));
         private static final Dimension folderIcon16Size = new Dimension( 16, 16 );
 
         private final Color frontColor;
 
         public static Icon getKeYFolderIconClosed() {
             return closedIcon;
+        }
+
+        public static Icon getKeYFolderIconLinked() {
+            return linkedIcon;
         }
 
         public static Icon getKeYFolderIconClosable() {
