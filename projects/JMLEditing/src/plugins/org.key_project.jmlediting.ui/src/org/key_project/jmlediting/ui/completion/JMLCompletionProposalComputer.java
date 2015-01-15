@@ -16,13 +16,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Display;
-import org.key_project.jmlediting.core.dom.IASTNode;
-import org.key_project.jmlediting.core.dom.Nodes;
-import org.key_project.jmlediting.core.parser.IJMLParser;
-import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
-import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
@@ -85,42 +79,6 @@ public class JMLCompletionProposalComputer implements
             return result;
          }
 
-         final IJMLProfile currentJMLProfile = JMLPreferencesHelper
-               .getProjectActiveJMLProfile(currentProject);
-
-         final IJMLParser parser = currentJMLProfile.createParser();
-         IASTNode parseResult = null;
-         try {
-            // Parse the text
-            // End index of comment is inclusive, but input end for parser
-            // exclusive
-            parseResult = parser.parse(context.getDocument().get(), comment);
-
-         }
-         catch (final ParserException e) {
-            parseResult = e.getErrorNode();
-            // System.out.println(context.getInvocationOffset());
-            // final List<IKeywordNode> list =
-            // Nodes.getAllKeywords(parseResult);
-            // for (final IKeywordNode iKeywordNode : list) {
-            // System.out.println("keyword: " + iKeywordNode);
-            // System.out.println("children: "
-            // + iKeywordNode.getChildren().size());
-            // }
-         }
-
-         // If Parser could parse or complete Error Recovery
-         if (parseResult != null) {
-            // System.out.println(parseResult);
-            final IKeyword activeKeyword = Nodes.getKeywordNode(parseResult,
-                  context.getInvocationOffset());
-            // System.out.println("activeKeyword: " + activeKeyword);
-            if (activeKeyword != null) {
-               result.addAll(activeKeyword.createAutoProposals(parseResult,
-                     javaContext));
-            }
-            return result;
-         }
          // Fallback Method to display all JML Keyword-Proposals, if
          // no active Keyword was discovered.
          return JMLCompletionUtil.getStandardKeywordProposals(javaContext,
