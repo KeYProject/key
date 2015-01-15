@@ -13,8 +13,11 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -22,13 +25,13 @@ import de.uka.ilkd.key.core.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.joinrule.JoinPartnerSelectionDialog;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
+import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -44,6 +47,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
@@ -58,11 +62,6 @@ import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
-//TODO: There is a problem with the Java program variables that
-//      are declared inside a program; say there is a stmt "int x;",
-//      then KeY introduces different constants x_1, x_2, ... in
-//      the different branches. This leads to problems, e.g. in the
-//      Path Condition construction in the ITE-Method.
 //TODO: Check associated CloseAfterJoin rule, update if thesis
 //      is updated.
 
@@ -366,8 +365,8 @@ public abstract class JoinRule implements BuiltInRule {
     */
    protected HashSet<LocationVariable> getProgramLocations(
          Term programCounterTerm, Services services) {
-      CollectProgramVariablesVisitor visitor =
-            new CollectProgramVariablesVisitor(
+      CollectLocationVariablesVisitor visitor =
+            new CollectLocationVariablesVisitor(
                programCounterTerm.javaBlock().program(),
                true,
                services);
@@ -377,7 +376,7 @@ public abstract class JoinRule implements BuiltInRule {
       
       // Collect program variables in Java block
       visitor.start();
-      progVars.addAll(visitor.getVariables());
+      progVars.addAll(visitor.getLocationVariables());
       
       return progVars;
    }
@@ -385,7 +384,7 @@ public abstract class JoinRule implements BuiltInRule {
    /**
     * @return The current KeYMediator.
     */
-   protected KeYMediator mediator() {
+   protected static KeYMediator mediator() {
       return MainWindow.getInstance().getMediator();
    }
    
@@ -700,14 +699,8 @@ public abstract class JoinRule implements BuiltInRule {
                   //  identifiers; e.g. {int x = 10; if (x...)} could get {x_1 = 10; if (x_1...)}
                   //  in one and {x_2 = 10; if (x_2...)} in the other branch. This cannot
                   //  be circumvented with equalsModRenaming, since at this point, the
-                  //  PVs are already declared. We therefore use an own method equalsModRenamingStrong.
-                  //  In principle, the method matches all LocationVariable occurrences.
-                  //  This can lead to wrong matches! However, this should NOT be a problem,
-                  //  since PVs occurring in the post condition should be excluded by the
-                  //  doNotMatch set. However, if strange things happen, here *could* be a reason.
-                  
-                  //TODO: Case to check: Same post condition, different Java blocks
-                  //  (differing in variables that are NOT in post condition).
+                  //  PVs are already declared. We therefore check equality modulo
+                  //  switching to branch-unique (and not globally unique) names.
                   
                   JavaProgramElement ownProgramElem     = ownSEState.third.javaBlock().program();
                   JavaProgramElement partnerProgramElem = partnerSEState.third.javaBlock().program();
@@ -715,15 +708,12 @@ public abstract class JoinRule implements BuiltInRule {
                   Term ownPostCond     = ownSEState.third.sub(0);
                   Term partnerPostCond = partnerSEState.third.sub(0);
                   
-                  HashSet<LocationVariable> doNotMatch = getTermLocations(ownPostCond);
-                  
                   // Requirement: Same post condition, matching program parts
                   if (ownPostCond.equals(partnerPostCond) &&
-                        equalsModRenamingStrong(
+                        equalsModBranchUniqueRenaming(
                            ownProgramElem,
                            partnerProgramElem,
-                           null,
-                           doNotMatch)) {
+                           services)) {
                      
                      potentialPartners = potentialPartners.prepend(
                            new Pair<Goal, PosInOccurrence> (g, gPio));
@@ -739,7 +729,20 @@ public abstract class JoinRule implements BuiltInRule {
    
    /**
     * Converts a sequent (given by goal & pos in occurrence) to
-    * an SE state (U,C,p).
+    * an SE state (U,C,p). Thereby, all program variables occurring
+    * in the program counter and in the symbolic state are replaced
+    * by branch-unique correspondents in order to enable merging of
+    * different branches declaring local variables.<p>
+    * 
+    * The problem which makes this renaming necessary is the fact that
+    * when executing a program like <code>int x; x = ...</code>, the
+    * variable x is renamed to x_1, x_2 and so on in different branches,
+    * which makes a "normal" merging impossible. Branch unique names are
+    * tracked in the LocationVariables when they are renamed in
+    * InnerVariableNamer. Soundness is not effected by the switch to
+    * branch-unique names. However, merged nodes are then of course
+    * potentially different from their predecessors concerning the
+    * involved local variable symbols. 
     * 
     * @param goal Current goal.
     * @param pio Position of update-program counter formula in goal.
@@ -748,6 +751,8 @@ public abstract class JoinRule implements BuiltInRule {
     */
    private Triple<Term, Term, Term> sequentToSETriple(
          Goal goal, PosInOccurrence pio, Services services) {
+      
+      TermBuilder tb = services.getTermBuilder();
       
       ImmutableList<SequentFormula> pathConditionSet = ImmutableSLList.nil();
       pathConditionSet = pathConditionSet.prepend(goal.sequent().antecedent().toList());
@@ -761,10 +766,104 @@ public abstract class JoinRule implements BuiltInRule {
          }
       }
       
+      ProgramElement programCounter = selected.sub(1).javaBlock().program();
+      Term postCondition = selected.sub(1).sub(0);
+      
+      // Replace location variables in program counter by their
+      // branch-unique versions
+      ProgVarReplaceVisitor replVisitor =
+            new ProgVarReplaceVisitor(programCounter, LocVarReplBranchUniqueMap.instance(), services);
+      replVisitor.start();
+      programCounter = replVisitor.result();
+      Term progCntAndPostCond = services.getTermBuilder().prog(
+            Modality.DIA,
+            JavaBlock.createJavaBlock((StatementBlock) programCounter),
+            postCondition);
+      
+      // Replace location variables in update by branch-unique versions
+      LinkedList<Term> elementaries = getElementaryUpdates(selected.sub(0));
+      ImmutableList<Term> newElementaries = ImmutableSLList.nil();
+      for (Term elementary : elementaries) {
+         ElementaryUpdate upd = (ElementaryUpdate) elementary.op();
+         LocationVariable lhs = (LocationVariable) upd.lhs();
+               
+         newElementaries = newElementaries.prepend(
+               tb.elementary(
+                     (LocationVariable) (LocVarReplBranchUniqueMap.instance().get(lhs)),
+                     elementary.sub(0)));
+      }
+      
       return new Triple<Term, Term, Term>(
-            selected.sub(0),                               // Update
+            tb.parallel(newElementaries),                  // Update
             joinListToAndTerm(pathConditionSet, services), // Path Condition
-            selected.sub(1));                              // Program Counter and Post Condition
+            progCntAndPostCond);                           // Program Counter and Post Condition
+   }
+   
+   private static class LocVarReplBranchUniqueMap
+   extends HashMap<ProgramVariable, ProgramVariable> {
+      private static final long serialVersionUID = -6789836130544430938L;
+
+      private static final LocVarReplBranchUniqueMap INSTANCE =
+            new LocVarReplBranchUniqueMap();
+      
+      private LocVarReplBranchUniqueMap() {}
+      
+      public static LocVarReplBranchUniqueMap instance() {
+         return INSTANCE;
+      }
+      
+      @Override
+      public boolean isEmpty() {
+         return false;
+      }
+
+      @Override
+      public boolean containsKey(Object key) {
+         return key instanceof LocationVariable;
+      }
+
+      @Override
+      public boolean containsValue(Object value) {
+         return false;
+      }
+
+      @Override
+      public ProgramVariable get(Object key) {
+         if (key instanceof LocationVariable) {
+            LocationVariable var = (LocationVariable) key;
+            return var.getBranchUniqueName() == null ?
+                  var :
+                  (ProgramVariable) mediator().progVar_ns().lookup(var.getBranchUniqueName());
+         } else {
+            return null;
+         }
+      }
+
+      @Override
+      public ProgramVariable put(ProgramVariable key, ProgramVariable value) {
+         return null;
+      }
+
+      @Override
+      public ProgramVariable remove(Object key) {
+         return null;
+      }
+
+      @Override
+      public Set<ProgramVariable> keySet() {
+         return null;
+      }
+
+      @Override
+      public Collection<ProgramVariable> values() {
+         return null;
+      }
+
+      @Override
+      public Set<java.util.Map.Entry<ProgramVariable, ProgramVariable>> entrySet() {
+         return null;
+      }
+      
    }
    
    /**
@@ -804,6 +903,29 @@ public abstract class JoinRule implements BuiltInRule {
       } else {
          return false;
       }
+   }
+   
+   /**
+    * Returns all elementary updates of a parallel update.
+    * 
+    * @param u Parallel update to get elementary updates from.
+    * @return Elementary updates of the supplied parallel update.
+    */
+   private LinkedList<Term> getElementaryUpdates(Term u) {
+      LinkedList<Term> result =
+            new LinkedList<Term>();
+      
+      if (u.op() instanceof ElementaryUpdate) {
+         result.add(u);
+      } else if (u.op() instanceof UpdateJunctor) {
+         for (Term sub : u.subs()) {
+            result.addAll(getElementaryUpdates(sub));
+         }
+      } else {
+         throw new IllegalArgumentException("Expected an update!");
+      }
+      
+      return result;
    }
    
    /**
@@ -898,11 +1020,11 @@ public abstract class JoinRule implements BuiltInRule {
     * 
     * @author Dominic Scheurer
     */
-   private class CollectProgramVariablesVisitor extends CreatingASTVisitor {
+   private class CollectLocationVariablesVisitor extends CreatingASTVisitor {
       private HashSet<LocationVariable> variables =
             new HashSet<LocationVariable>();
 
-      public CollectProgramVariablesVisitor(ProgramElement root,
+      public CollectLocationVariablesVisitor(ProgramElement root,
             boolean preservesPos, Services services) {
          super(root, preservesPos, services);
       }
@@ -921,66 +1043,34 @@ public abstract class JoinRule implements BuiltInRule {
        * 
        * @return All program locations in the given Java block.
        */
-      public HashSet<LocationVariable> getVariables() {
+      public HashSet<LocationVariable> getLocationVariables() {
          return variables;
       }
       
    }
    
    /**
-    * An equalsModRenaming that does not only abstract from variable declarations, 
-    * but from *all* LocationVariable occurrences. Usually, this is quite to strong
-    * and can lead to wrong matches. However, when the doNotMatch parameter is wisely
-    * used (LocationVariables of post condition, for example), there *should* not be
-    * a problem here.
+    * An equals method that, before the comparison, replaces all program
+    * locations in the supplied arguments by their branch-unique versions.
     * 
-    * @see SourceElement#equalsModRenaming(SourceElement, NameAbstractionTable)}
     * @param se1 First element to check equality (mod renaming) for
     * @param se2 Second element to check equality (mod renaming) for
-    * @param nat Table for storing name abstractions. May be null at first call.
-    * @param doNotMatch Set of variables that should NOT be matched.
-    * @return true iff source elements can be matched, ignoring variable names.
+    * @param services The Services object.
+    * @return true iff source elements can be matched, considering
+    *    branch-unique location names.
     */
-   private static boolean equalsModRenamingStrong(
+   private static boolean equalsModBranchUniqueRenaming(
          SourceElement se1, SourceElement se2,
-         NameAbstractionTable nat,
-         HashSet<LocationVariable> doNotMatch) {
+         Services services) {
       
-      if (nat == null) {
-         nat = new NameAbstractionTable();
-      }
+      ProgVarReplaceVisitor replVisitor1 =
+            new ProgVarReplaceVisitor((ProgramElement) se1, LocVarReplBranchUniqueMap.instance(), services);
+      ProgVarReplaceVisitor replVisitor2 =
+            new ProgVarReplaceVisitor((ProgramElement) se1, LocVarReplBranchUniqueMap.instance(), services);
       
-      // Core part: Match location variables
-      if (se1 instanceof LocationVariable && 
-            se2 instanceof LocationVariable &&
-            !doNotMatch.contains(se1) &&
-            !doNotMatch.contains(se2)) {
-         
-         nat.add(se1, se2);
-         return true;
-         
-      }
+      replVisitor1.start();
+      replVisitor2.start();
       
-      if (!(se1 instanceof JavaNonTerminalProgramElement) ||
-            !(se2 instanceof JavaNonTerminalProgramElement)) {
-         // No children here, can delegate to normal method.
-         return se1.equalsModRenaming(se2, nat);
-      }
-      
-      final JavaNonTerminalProgramElement jnte1 =
-            (JavaNonTerminalProgramElement) se1;
-      final JavaNonTerminalProgramElement jnte2 =
-            (JavaNonTerminalProgramElement) se2;
-
-      if (jnte1.getChildCount() != jnte2.getChildCount()) {
-         return false;
-      }
-
-      for (int i = 0, cc = jnte1.getChildCount(); i < cc; i++) {
-         if (!equalsModRenamingStrong(jnte1.getChildAt(i), jnte2.getChildAt(i), nat, doNotMatch)) {
-            return false;
-         }
-      }
-      return true;
+      return replVisitor1.result().equals(replVisitor2.result());
    }
 }

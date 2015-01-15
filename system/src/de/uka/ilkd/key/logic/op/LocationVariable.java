@@ -26,7 +26,15 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public final class LocationVariable extends ProgramVariable
 			            implements UpdateableOperator {
 
-
+   /**
+    * The name of this variable that is unique for the
+    * branch where the variable resides. Was introduced
+    * for the joining methods. If global namespaces
+    * should be removed in the future, this field becomes
+    * obsolete.
+    */
+   private ProgramElementName branchUniqueName = null;
+   
     public LocationVariable(ProgramElementName name,
                         KeYJavaType        t,
                         KeYJavaType        containingType,
@@ -81,4 +89,21 @@ public final class LocationVariable extends ProgramVariable
             return new LocationVariable(new ProgramElementName(name.toString()), sort());
         }
     }
+   
+    /**
+     * @return Branch-unique name for this variable.
+     */
+    public ProgramElementName getBranchUniqueName() {
+       return branchUniqueName;
+    }
+
+   /**
+    * Sets the name of this program variables that it would obtain if
+    * names only had to be unique *per branch*, and not globally.
+    * 
+    * @param branchUniqueName Branch-unique name for this variable.
+    */
+   public void setBranchUniqueName(ProgramElementName branchUniqueName) {
+      this.branchUniqueName = branchUniqueName;
+   }
 }

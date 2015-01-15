@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ProgramVariableName;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -58,6 +59,7 @@ public class InnerVariableNamer extends VariableNamer {
 	//prepare renaming of inner var
 	final NameCreationInfo nci = getMethodStack(posOfFind);
 	ProgramElementName newname = null;
+   ProgramElementName branchUniqueName = null;
 
 	// Name proposal = services.getProof().getNameRecorder().getProposal();
         Name proposal = services.getNameRecorder().getProposal();
@@ -75,6 +77,19 @@ public class InnerVariableNamer extends VariableNamer {
                             getProgramFromPIO(posOfFind),
                             null);
             final NamespaceSet namespaces = services.getNamespaces();
+            
+            // First compute a branch-unique name for this variable.
+            // This measure was introduced for the join methods, where
+            // it is crucial that locations declared inside a Java
+            // block have the same names in all branches that are to
+            // be merged, if they were originally the same variables.
+            int newCounterCopy = newcounter;
+            branchUniqueName = newname;
+            while (!isUniqueInGlobals(branchUniqueName.toString(), globals)) {
+               newCounterCopy += 1;
+               branchUniqueName = createName(bai.basename, newCounterCopy, nci);
+            }
+            
             while (!isUniqueInGlobals(newname.toString(), globals) ||
                   namespaces.lookupLogicSymbol(newname)!=null) {
 	        newcounter += 1;
@@ -85,6 +100,7 @@ public class InnerVariableNamer extends VariableNamer {
         ProgramVariable newvar = var;
         if (!newname.equals(name)) {
             newvar = new LocationVariable(newname, var.getKeYJavaType());
+            ((LocationVariable) newvar).setBranchUniqueName(branchUniqueName);
             map.put(var, newvar);
             renamingHistory = map;
         }
