@@ -41,7 +41,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 
 /**
@@ -294,7 +294,7 @@ public class FileChooser extends JPanel{
         private KeYFileChooser getFileChooser(String title) {
            if (fileChooser == null) {
                     String initDir = System.getProperty("user.dir");
-                    fileChooser = new KeYFileChooser(initDir);
+                    fileChooser = KeYFileChooser.getFileChooser(initDir);
                 }
                 fileChooser.setDialogTitle(title);
                 fileChooser.prepare();

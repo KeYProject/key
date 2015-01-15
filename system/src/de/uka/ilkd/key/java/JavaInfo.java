@@ -576,13 +576,22 @@ public final class JavaInfo {
     public IProgramMethod getToplevelPM(KeYJavaType kjt,
 	    			       String methodName,
 	    			       ImmutableList<KeYJavaType> sig) {
+        return findToplevelPM(kjt, methodName, sig, kjt);
+    }
+
+    /* This method has been introduced as bugfix to #1487 */
+    private IProgramMethod findToplevelPM(KeYJavaType kjt,
+            String methodName,
+            ImmutableList<KeYJavaType> sig,
+            KeYJavaType context) {
+
 	for(KeYJavaType sup : getAllSupertypes(kjt).removeAll(kjt)) {
-	    final IProgramMethod result = getToplevelPM(sup, methodName, sig);
+            final IProgramMethod result = findToplevelPM(sup, methodName, sig, context);
 	    if(result != null) {
 		return result;
 	    }
 	}
-	return getProgramMethod(kjt, methodName, sig, kjt);
+        return getProgramMethod(kjt, methodName, sig, context);
     }
 
 
@@ -1159,25 +1168,33 @@ public final class JavaInfo {
      * returns the KeYJavaType for class java.lang.Object
      */
     public Sort objectSort() {
-	try {
-	    return getJavaLangObject().getSort();
-	} catch(RuntimeException e) {//XXX
-	    return null;
-	}
+        if (getJavaLangObject() == null) {
+            return (Sort) services.getNamespaces().sorts().lookup("java.lang.Object");
+        } else {
+            return getJavaLangObject().getSort();
+        }
     }
 
     /**
      * returns the KeYJavaType for class java.lang.Cloneable
      */
     public Sort cloneableSort() {
-        return getJavaLangCloneable().getSort();
+        if (getJavaLangCloneable() == null) {
+            return (Sort) services.getNamespaces().sorts().lookup("java.lang.Cloneable");
+        } else {
+            return getJavaLangCloneable().getSort();
+        }
     }
 
     /**
      * returns the KeYJavaType for class java.io.Serializable
      */
     public Sort serializableSort() {
-        return getJavaIoSerializable().getSort();
+        if (getJavaIoSerializable() == null) {
+            return (Sort) services.getNamespaces().sorts().lookup("java.io.Serializable");
+        } else {
+            return getJavaIoSerializable().getSort();
+        }
     }
 
     public Sort nullSort() {

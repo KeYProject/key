@@ -28,11 +28,11 @@ import de.uka.ilkd.key.core.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.core.RuleAppListener;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Debug;
 

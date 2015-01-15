@@ -11,7 +11,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
@@ -31,6 +30,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult;
@@ -186,9 +186,11 @@ public abstract class AbstractTestGenerator {
     * Removes all generated proofs.
     */
    public void dispose() {
-      for (final Proof p : proofs) {
-         mediator.getUI().removeProof(p);
-         p.dispose();
+      if (proofs != null) {
+         for (final Proof p : proofs) {
+            mediator.getUI().removeProof(p);
+            p.dispose();
+         }
       }
    }
 
@@ -343,6 +345,7 @@ public abstract class AbstractTestGenerator {
             generateFiles(launcher, problemSolvers, log, originalProof);
          } else {
             log.writeln("No test data was generated.");
+            informAboutNoTestResults(launcher, problemSolvers, log, originalProof);
          }
          log.testGenerationCompleted();
       }
@@ -350,7 +353,7 @@ public abstract class AbstractTestGenerator {
          log.writeException(e);
       }
    }
-   
+
    protected void generateFiles(SolverLauncher launcher, Collection<SMTSolver> problemSolvers, TestGenerationLog log, Proof originalProof) throws Exception {
       final TestCaseGenerator tg = new TestCaseGenerator(originalProof);
       tg.setLogger(log);
@@ -360,6 +363,12 @@ public abstract class AbstractTestGenerator {
       } else {
          log.writeln("Compile and run the file with openjml!");
       }
+   }
+
+   /**
+    * This method is used in the Eclipse world to show a dialog with the log.
+    */
+   protected void informAboutNoTestResults(SolverLauncher launcher, Collection<SMTSolver> problemSolvers, TestGenerationLog log, Proof originalProof) {
    }
 
    public Collection<SMTSolver> filterSolverResultsAndShowSolverStatistics(Collection<SMTSolver> problemSolvers, TestGenerationLog log) {
