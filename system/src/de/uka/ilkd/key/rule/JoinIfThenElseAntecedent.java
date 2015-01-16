@@ -24,7 +24,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.Quadruple;
 
 /**
  * Rule that joins two sequents based on the if-then-else
@@ -121,21 +121,30 @@ public class JoinIfThenElseAntecedent extends JoinRule {
             
             // Apply if-then-else construction: Different values
             
-            Triple<Term, Term, Term> distFormAndRightSidesForITEUpd =
+            Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
                   JoinIfThenElse.createDistFormAndRightSidesForITEUpd(v, state1, state2, services);
             
-            Term cond     = distFormAndRightSidesForITEUpd.first;
-            Term ifForm   = distFormAndRightSidesForITEUpd.second;
-            Term elseForm = distFormAndRightSidesForITEUpd.third;
+            Term cond         = distFormAndRightSidesForITEUpd.first;
+            Term ifForm       = distFormAndRightSidesForITEUpd.second;
+            Term elseForm     = distFormAndRightSidesForITEUpd.third;
+            boolean isSwapped = distFormAndRightSidesForITEUpd.fourth;
             
             Term vTerm = tb.var(v);
             
             Term varEqualsIfForm   = tb.equals(vTerm, ifForm);
             Term varEqualsElseForm = tb.equals(vTerm, elseForm);
             
-            newPathCondition = tb.and(newPathCondition, 
-                  tb.imp(cond, varEqualsIfForm),
-                  tb.or (cond, varEqualsElseForm));
+            if (!(rightSide1.equals(vTerm) && !isSwapped ||
+                  rightSide2.equals(vTerm) && isSwapped)) {
+               newPathCondition = tb.and(newPathCondition, 
+                     tb.imp(cond, varEqualsIfForm));
+            }
+            
+            if (!(rightSide2.equals(vTerm) && !isSwapped ||
+                  rightSide1.equals(vTerm) && isSwapped)) {
+               newPathCondition = tb.and(newPathCondition, 
+                     tb.or (cond, varEqualsElseForm));
+            }
             
             newElementaryUpdates = newElementaryUpdates.prepend(
                   tb.elementary(vTerm, vTerm));

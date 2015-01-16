@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.Quadruple;
 
 /**
  * Rule that joins two sequents based on the if-then-else
@@ -155,14 +155,14 @@ public class JoinIfThenElse extends JoinRule {
     *    where the cI are the path conditions of stateI.
     */
    static Term createIfThenElseTerm (
-         LocationVariable v,
-         SymbolicExecutionState state1,
-         SymbolicExecutionState state2,
-         Services services) {
+         final LocationVariable v,
+         final SymbolicExecutionState state1,
+         final SymbolicExecutionState state2,
+         final Services services) {
       
       TermBuilder tb = services.getTermBuilder();
       
-      Triple<Term, Term, Term> distFormAndRightSidesForITEUpd =
+      Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
             createDistFormAndRightSidesForITEUpd(v, state1, state2, services);
       
       Term cond     = distFormAndRightSidesForITEUpd.first;
@@ -172,9 +172,7 @@ public class JoinIfThenElse extends JoinRule {
       // Construct the update for the symbolic state
       return tb.elementary(
                v,
-               tb.ife(cond,
-                     ifForm,
-                     elseForm));
+               tb.ife(cond, ifForm, elseForm));
       
    }
    
@@ -202,9 +200,12 @@ public class JoinIfThenElse extends JoinRule {
     * @return Input to construct an elementary update like
     *         <code>{ v := \if (first) \then (second) \else (third) }</code>,
     *         where first, second and third are the respective components of
-    *         the returned triple.
+    *         the returned triple. The fourth component indicates whether the
+    *         path condition of the first (fourth component = false) or the
+    *         second (fourth component = true) state was used as a basis for
+    *         the condition (first component).
     */
-   static Triple<Term, Term, Term> createDistFormAndRightSidesForITEUpd (
+   static Quadruple<Term, Term, Term, Boolean> createDistFormAndRightSidesForITEUpd (
          LocationVariable v,
          SymbolicExecutionState state1,
          SymbolicExecutionState state2,
@@ -260,10 +261,11 @@ public class JoinIfThenElse extends JoinRule {
          newPathCondition = tb.and(newPathCondition, equalSubFormula);
       }*/
       
-      return new Triple<Term, Term, Term> (
+      return new Quadruple<Term, Term, Term, Boolean> (
             distinguishingFormula,
             commuteSides ? rightSide2 : rightSide1,
-            commuteSides ? rightSide1 : rightSide2);
+            commuteSides ? rightSide1 : rightSide2,
+            commuteSides);
       
    }
 
