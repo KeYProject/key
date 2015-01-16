@@ -33,7 +33,7 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
  * @author Martin Hentschel
  */
 public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
-   public static final Name CONCRETE_AND_1 = new Name("concrete_and_1");
+   public static final Name CONCRETE_AND_1 = new Name("concrete_and_1"); // TODO: Generalize concrete to label below updates
    public static final Name CONCRETE_AND_2 = new Name("concrete_and_2");
    public static final Name CONCRETE_AND_3 = new Name("concrete_and_3");
    public static final Name CONCRETE_AND_4 = new Name("concrete_and_4");
@@ -83,7 +83,8 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
                                         .prepend(CONCRETE_OR_2)
                                         .prepend(CONCRETE_OR_3)
                                         .prepend(CONCRETE_OR_4)
-                                        .prepend(PredicateTermLabelUpdate.IF_THEN_ELSE_SPLIT);
+                                        .prepend(PredicateTermLabelUpdate.IF_THEN_ELSE_SPLIT)
+                                        .prepend(PredicateTermLabelUpdate.ARRAY_LENGTH_NOT_NEGATIVE);
    }
 
    /**
@@ -101,7 +102,8 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
       if (shouldRefactorSpecificationApplication(goal, hint)) {
          return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE;
       }
-      else if (PredicateTermLabelUpdate.IF_THEN_ELSE_SPLIT.equals(rule.name())) {
+      else if (PredicateTermLabelUpdate.IF_THEN_ELSE_SPLIT.equals(rule.name()) ||
+               PredicateTermLabelUpdate.ARRAY_LENGTH_NOT_NEGATIVE.equals(rule.name())) {
          return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS;
       }
       else if (applicationPosInOccurrence != null && isConcreteJunctor(rule)) {
@@ -195,8 +197,9 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
       if (shouldRefactorSpecificationApplication(goal, hint)) {
          refactorSpecificationApplication(term, goal ,services, labels);
       }
-      else if (PredicateTermLabelUpdate.IF_THEN_ELSE_SPLIT.equals(rule.name())) {
-//         refactorIfThenElseSplit(state, goal, term, services, labels);
+      else if (PredicateTermLabelUpdate.IF_THEN_ELSE_SPLIT.equals(rule.name()) ||
+               PredicateTermLabelUpdate.ARRAY_LENGTH_NOT_NEGATIVE.equals(rule.name())) {
+         refactorInCaseOfNewIdRequired(state, goal, term, services, labels);
       }
       else if (isConcreteJunctor(rule)) {
          refactorConcreteJunctor(applicationPosInOccurrence, term, labels);
@@ -225,18 +228,18 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
    }
    
    /**
-    * Refactors an if then else split.
+    * Refactors in case that the inner most label needs a new ID.
     * @param state The {@link TermLabelState} of the current rule application.
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
     * @param term The {@link Term} which is now refactored.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
     * @param labels The new labels the {@link Term} will have after the refactoring.
     */
-   protected void refactorIfThenElseSplit(TermLabelState state, 
-                                          Goal goal, 
-                                          Term term, 
-                                          Services services, 
-                                          List<TermLabel> labels) {
+   protected void refactorInCaseOfNewIdRequired(TermLabelState state, 
+                                                Goal goal, 
+                                                Term term, 
+                                                Services services, 
+                                                List<TermLabel> labels) {
       if (goal != null && !isInnerMostParentRefactored(state, goal)) {
          TermLabel existingLabel = term.getLabel(PredicateTermLabel.NAME);
          if (existingLabel instanceof PredicateTermLabel) {
