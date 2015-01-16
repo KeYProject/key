@@ -9,6 +9,7 @@
   <property name="dist.dir"  value="${basedir}/binary" />
   <property name="gen.dir"  value="${basedir}/genSrc" />
   <property name="docs.dir"  value="${basedir}/doc"   />
+  <property name="examples.dir"  value="${basedir}/proofExamples"   />
 
   <condition property="ext.dir" value="${env.KEY_LIB}">
   	<isset property="env.KEY_LIB"/>
@@ -194,10 +195,39 @@
   </target>
 
   <target name="jar" depends="compile">
-  	 <jar destfile="${basedir}/key.jar"
-  	       basedir="${build.dir}"
-  	       manifest="${basedir}/resources/MANIFEST.MF"
-  	  />
+    <jar destfile="${basedir}/key.jar"
+  	 basedir="${build.dir}"
+  	 manifest="${basedir}/resources/MANIFEST.MF" />
+  </target>
+
+  <target name="examples.jar" depends="prepare" 
+          description="Create the collection of example files as needed by the example browser">
+    
+    <loadfile srcFile="${examples.dir}/index/samplesIndex.txt" property="exs.patterns">
+      <filterchain>
+        <striplinecomments>
+          <comment value="#"/>
+        </striplinecomments>
+        <containsregex pattern="."/>
+        <replaceregex pattern="/[^/]+.txt *$" replace="/**, "/>
+        <striplinebreaks/>
+      </filterchain>
+    </loadfile>
+    <echo>${exs.patterns}</echo>
+
+    <jar destfile="examples.jar" basedir="${examples.dir}" includes="${exs.patterns}"/>
+  </target>
+
+  <target name="standalone-jar" depends="jar">
+    <jar destfile="${basedir}/key-standalone.jar">
+      <fileset dir="${build.dir}"/>
+      <zipfileset excludes="META-INF/**" src="${ext.dir}/antlr.jar"/>
+      <zipfileset excludes="META-INF/**" src="${ext.dir}/recoderKey.jar"/>
+      <fileset file="examples.jar" />
+      <manifest>
+        <attribute name="Main-Class" value="de.uka.ilkd.core.Webstart"/>
+      </manifest>
+    </jar>
   </target>
 	
     <target name="keylexer" unless="keylexer.notRequired">
