@@ -1249,6 +1249,84 @@ public abstract class JoinRule implements BuiltInRule {
       
    }
    
+   /**
+    * A symbolic execution state is a pair of a symbolic state in
+    * form of a parallel update, and a path condition in form of
+    * a JavaDL formula.
+    * 
+    * @author Dominic Scheurer
+    */
+   static class SymbolicExecutionState extends Pair<Term, Term> {
+
+      /**
+       * @param symbolicState The symbolic state (parallel update).
+       * @param pathCondition The path condition (formula).
+       */
+      public SymbolicExecutionState(Term symbolicState, Term pathCondition) {
+         super(symbolicState, pathCondition);
+      }
+      
+      /**
+       * @return The symbolic state.
+       */
+      public Term getSymbolicState() {
+         return first;
+      }
+      
+      /**
+       * @return The path condition.
+       */
+      public Term getPathCondition() {
+         return second;
+      }
+      
+   }
+   
+   /**
+    * A symbolic execution state with program counter is a triple
+    * of a symbolic state in form of a parallel update, a path
+    * condition in form of a JavaDL formula, and a program counter
+    * in form of a JavaDL formula with non-empty Java Block (and a
+    * possible post condition as first, and only, sub term).
+    * 
+    * @author Dominic Scheurer
+    */
+   static class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> {
+
+      /**
+       * @param symbolicState The symbolic state (parallel update).
+       * @param pathCondition The path condition (formula).
+       * @param programCounter The program counter: Formula with non-empty
+       *    Java block and post condition as only sub term.
+       */
+      public SymbolicExecutionStateWithProgCnt(
+            Term symbolicState, Term pathCondition, Term programCounter) {
+         super(symbolicState, pathCondition, programCounter);
+      }
+      
+      /**
+       * @return The symbolic state.
+       */
+      public Term getSymbolicState() {
+         return first;
+      }
+      
+      /**
+       * @return The path condition.
+       */
+      public Term getPathCondition() {
+         return second;
+      }
+      
+      /**
+       * @return The program counter (and post condition).
+       */
+      public Term getProgramCounter() {
+         return third;
+      }
+      
+   }
+   
 //   /**
 //    * Tries to prove the equivalence of term1 and term2 and
 //    * throws a {@link RuntimeException} if the proof fails.
