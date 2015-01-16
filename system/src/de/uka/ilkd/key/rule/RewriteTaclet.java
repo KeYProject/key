@@ -380,6 +380,12 @@ public class RewriteTaclet extends FindTaclet {
       else {
          // Then there was no replacewith...
          // This is strange in a RewriteTaclet, but who knows...
+         // However, term label refactorings have to be performed.
+         Term oldFormula = posOfFind.constrainedFormula().formula();
+         Term newFormula = TermLabelManager.refactorSequentFormula(termLabelState, services, oldFormula, posOfFind, this, goal, null, null);
+         if (oldFormula != newFormula) {
+            currentSequent.combine(currentSequent.sequent().changeFormula(new SequentFormula(newFormula), posOfFind));
+         }
       }
    }
 
