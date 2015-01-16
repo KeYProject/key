@@ -726,7 +726,7 @@ public final class SideProofUtil {
     * @param source The {@link Proof} to copy its {@link ProofEnvironment}.
     * @return The created {@link ProofEnvironment} which is a copy of the environment of the given {@link Proof} but with its own {@link OneStepSimplifier} instance.
     */
-   public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(Proof source, boolean useSimplifyTermProfile) {
+   public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(final Proof source, final boolean useSimplifyTermProfile) {
       assert source != null;
       assert !source.isDisposed();
       // Get required source instances
@@ -741,7 +741,7 @@ public final class SideProofUtil {
                Profile sourceProfile = sourceInitConfig.getProfile();
                if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
                   ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
-                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations()); // Make sure that the term labels of symbolic execution are also supported by the new environment.
+                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations(SymbolicExecutionJavaProfile.isPredicateEvaluationEnabled(source))); // Make sure that the term labels of symbolic execution are also supported by the new environment.
                   return result;
                }
                else {
@@ -757,7 +757,7 @@ public final class SideProofUtil {
                Profile sourceProfile = sourceInitConfig.getProfile();
                if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
                   ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
-                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations()); // Make sure that the term labels of symbolic execution are also supported by the new environment.
+                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations(SymbolicExecutionJavaProfile.isPredicateEvaluationEnabled(source))); // Make sure that the term labels of symbolic execution are also supported by the new environment.
                   return result;
                }
                else {

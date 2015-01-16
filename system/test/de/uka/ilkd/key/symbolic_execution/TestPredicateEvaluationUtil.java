@@ -350,7 +350,8 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
                          false, 
                          false, 
                          false, 
-                         false);
+                         false,
+                         true);
          assertNotNull(env);
          // Evaluate predicates
          doPredicateEvaluationTest(env, expectedResults);
@@ -397,7 +398,8 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
                          false,
                          false,
                          false,
-                         false);
+                         false,
+                         true);
          // Evaluate predicates
          doPredicateEvaluationTest(env, expectedResults);
       }

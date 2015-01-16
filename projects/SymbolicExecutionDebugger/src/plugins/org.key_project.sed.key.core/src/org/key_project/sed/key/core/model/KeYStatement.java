@@ -28,6 +28,7 @@ import org.key_project.sed.key.core.util.LogUtil;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -386,5 +387,13 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
    @Override
    public void setParent(ISEDDebugNode parent) {
       super.setParent(parent);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isPredicateEvaluationEnabled() {
+      return SymbolicExecutionJavaProfile.isPredicateEvaluationEnabled(getExecutionNode().getProof());
    }
 }

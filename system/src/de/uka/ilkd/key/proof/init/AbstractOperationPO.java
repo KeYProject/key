@@ -63,6 +63,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 
 /**
  * <p>
@@ -711,7 +712,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                           atPreVars.keySet().contains(getSavedHeap(services)), sb);
 
       // create program term
-      if (addSymbolicExecutionLabel) {
+      if (SymbolicExecutionJavaProfile.isPredicateEvaluationEnabled(proofConfig)) {
          postTerm = labelPostTerm(services, postTerm);
       }
       Term programTerm = tb.prog(getTerminationMarker(), jb, postTerm);
