@@ -1777,11 +1777,11 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertNotNull(oracleRoot);
          // Make sure that the created symbolic execution tree matches the expected one.
          assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables, includeCallStack, false, includeReturnValues, includeConstraints);
+         return env;
       }
       finally {
          // Restore original options
          setOneStepSimplificationEnabled(null, originalOneStepSimplification);
-         return env;
       }
    }
    
