@@ -563,6 +563,7 @@ public final class ParserBuilder {
                return Nodes.createNode(type, function.parse(text, start, end));
             }
             catch (final ParserException e) {
+               System.out.println("Tzpes error: " + e.getErrorNode());
                if (e.getErrorNode() == null) {
                   throw e;
                }

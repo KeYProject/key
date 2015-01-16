@@ -141,17 +141,57 @@ public class ParserUtils {
          throws ParserException {
       final List<IASTNode> nodes = new ArrayList<IASTNode>();
       int startPosition = start;
+      ParserException ex = null;
+      boolean error = false;
+      System.out.println("Parser list");
       try {
          final IASTNode node = function.parse(text, startPosition, end);
          nodes.add(node);
          startPosition = node.getEndOffset();
       }
       catch (final ParserException e) {
-         throw new ParserException(missingExceptionText, text, start, e);
+         System.out.println("Listerror " + e.getErrorNode());
+         if (e.getErrorNode() != null) {
+            error = true;
+            startPosition = e.getErrorNode().getEndOffset();
+            nodes.add(e.getErrorNode());
+            if (ex == null) {
+               ex = e;
+            }
+         }
+         else {
+            System.out.println("Nothing");
+            throw new ParserException(missingExceptionText, text, start, e);
+         }
       }
       final ParseFunction sepFunction = ParserBuilder.separateBy(sep, function);
-      parseListImpl(text, startPosition, end, sepFunction, nodes);
-      return Nodes.createNode(NodeTypes.LIST, nodes);
+      while (true) {
+         try {
+            final IASTNode node = sepFunction.parse(text, startPosition, end);
+            nodes.add(node);
+            startPosition = node.getEndOffset();
+         }
+         catch (final ParserException e) {
+            if (e.getErrorNode() != null) {
+               error = true;
+               startPosition = e.getErrorNode().getEndOffset();
+               nodes.add(e.getErrorNode());
+               if (ex == null) {
+                  ex = e;
+               }
+            }
+            else {
+               break;
+            }
+         }
+      }
+      final IASTNode node = Nodes.createNode(NodeTypes.LIST, nodes);
+      if (error) {
+         System.out.println("Throw " + node);
+         throw new ParserException(ex, node);
+      }
+      System.out.println("Return " + node);
+      return node;
    }
 
    public static IASTNode parseList(final String text, final int start,
@@ -180,15 +220,31 @@ public class ParserUtils {
          throws ParserException {
       final List<IASTNode> nodes = new ArrayList<IASTNode>();
       int startPosition = start;
+      ParserException ex = null;
       for (final ParseFunction function : seqs) {
-         final IASTNode node = function.parse(text, startPosition, end);
-         nodes.add(node);
-         if (node == null) {
-            System.out.println("nooo" + function);
+         try {
+            final IASTNode node = function.parse(text, startPosition, end);
+            nodes.add(node);
+            startPosition = node.getEndOffset();
          }
-         startPosition = node.getEndOffset();
+         catch (final ParserException e) {
+            System.out.println("Seq error " + e);
+            if (e.getErrorNode() != null) {
+               nodes.add(e.getErrorNode());
+               startPosition = e.getErrorNode().getEndOffset();
+               if (ex == null) {
+                  ex = e;
+               }
+            }
+            else {
+               throw e;
+            }
+         }
       }
       assert (nodes.size() == seqs.length);
+      if (ex != null) {
+         throw new ParserException(ex, Nodes.createNode(type, nodes));
+      }
       return Nodes.createNode(type, nodes);
    }
 
@@ -200,9 +256,6 @@ public class ParserUtils {
       for (final ParseFunction function : alternatives) {
          try {
             final IASTNode node = function.parse(text, start, end);
-            if (node == null) {
-               System.out.println("Noalt " + function);
-            }
             return node;
          }
          catch (final ParserException e) {
@@ -219,6 +272,7 @@ public class ParserUtils {
          throw exception;
       }
       else {
+         System.out.println("Alt error " + firstErrorNode);
          throw new ParserException(exception, firstErrorNode);
       }
    }

@@ -34,6 +34,19 @@ public class StoreRefParserTest {
    }
 
    @Test
+   public void testParseQualifiedRecovery() throws ParserException {
+      try {
+         testParse(
+               " this.state. ",
+               "StoreRefList[1-20](List[1-20](StoreRefExpr[1-20](StoreRefName[1-5](String[1-5](this)),List[6-20](StoreRefNameSuffix[6-11](String[6-11](state)),StoreRefNameSuffix[14-20](String[14-20](action))))))");
+      }
+      catch (final ParserException e) {
+         System.out.println("Error Node " + e.getErrorNode());
+         fail();
+      }
+   }
+
+   @Test
    public void testParseArrayIndex() throws ParserException {
       testParse(
             " this.states[5]",
