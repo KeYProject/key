@@ -25,15 +25,22 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * Rule that joins two sequents based on the if-then-else
  * construction: If two locations are assigned different
  * values in the states, the value in the joined state is
  * chosen based on the path condition. This rule retains
- * total precision.
+ * total precision. The if-then-else distinction is realized
+ * by the respective construct for the update / symbolic
+ * state of the symbolic execution state. Note: Doing this
+ * not with updates, but in the antecedent / path condition
+ * can be much more efficient: See {@link JoinIfThenElseAntecedent}.
  * 
  * @author Dominic Scheurer
+ * @see JoinIfThenElseAntecedent
+ * @see JoinRule
  */
 public class JoinIfThenElse extends JoinRule {
    
@@ -147,7 +154,57 @@ public class JoinIfThenElse extends JoinRule {
     * @return An elementary update like <code>{ v := \if (c1) \then (t1) \else (t2) }</code>,
     *    where the cI are the path conditions of stateI.
     */
-   static Term createIfThenElseTerm(
+   static Term createIfThenElseTerm (
+         LocationVariable v,
+         SymbolicExecutionState state1,
+         SymbolicExecutionState state2,
+         Services services) {
+      
+      TermBuilder tb = services.getTermBuilder();
+      
+      Triple<Term, Term, Term> distFormAndRightSidesForITEUpd =
+            createDistFormAndRightSidesForITEUpd(v, state1, state2, services);
+      
+      Term cond     = distFormAndRightSidesForITEUpd.first;
+      Term ifForm   = distFormAndRightSidesForITEUpd.second;
+      Term elseForm = distFormAndRightSidesForITEUpd.third;
+      
+      // Construct the update for the symbolic state
+      return tb.elementary(
+               v,
+               tb.ife(cond,
+                     ifForm,
+                     elseForm));
+      
+   }
+   
+   /**
+    * Creates the input for an if-then-else update for the variable v. If t1 is
+    * the right side for v in state1, and t2 is the right side in state1, the
+    * elements of the resulting triple can be used to construct an elementary
+    * update corresponding to
+    * <code>{ v := \if (c1) \then (t1) \else (t2) }</code>, where c1 is the path
+    * condition of state1. However, the method also tries an optimization: The
+    * path condition c2 of state2 could be used if it is shorter than c1.
+    * Moreover, equal parts of c1 and c2 could be omitted, since the condition
+    * shall only distinguish between the states. The first element of the triple
+    * is the discriminating condition, the second and third elements are the
+    * respective parts for the if and else branch.
+    * 
+    * @param v
+    *           Variable to return the update for.
+    * @param state1
+    *           First state to evaluate.
+    * @param state2
+    *           Second state to evaluate.
+    * @param services
+    *           The services object.
+    * @return Input to construct an elementary update like
+    *         <code>{ v := \if (first) \then (second) \else (third) }</code>,
+    *         where first, second and third are the respective components of
+    *         the returned triple.
+    */
+   static Triple<Term, Term, Term> createDistFormAndRightSidesForITEUpd (
          LocationVariable v,
          SymbolicExecutionState state1,
          SymbolicExecutionState state2,
@@ -187,7 +244,7 @@ public class JoinIfThenElse extends JoinRule {
       }
       
       // Try an automatic simplification
-      distinguishingFormula = trySimplify(services.getProof(), distinguishingFormula);
+      distinguishingFormula = trySimplify(services.getProof(), distinguishingFormula, true);
 
       // Originally, here was a specific check of whether the equal parts
       // of the two path conditions was still included in the new path condition.
@@ -203,12 +260,10 @@ public class JoinIfThenElse extends JoinRule {
          newPathCondition = tb.and(newPathCondition, equalSubFormula);
       }*/
       
-      // Construct the update for the symbolic state
-      return tb.elementary(
-               v,
-               tb.ife(distinguishingFormula,
-                     commuteSides ? rightSide2 : rightSide1,
-                           commuteSides ? rightSide1 : rightSide2));
+      return new Triple<Term, Term, Term> (
+            distinguishingFormula,
+            commuteSides ? rightSide2 : rightSide1,
+            commuteSides ? rightSide1 : rightSide2);
       
    }
 

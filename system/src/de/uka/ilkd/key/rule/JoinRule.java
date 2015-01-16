@@ -33,6 +33,8 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -43,6 +45,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -149,13 +152,7 @@ public abstract class JoinRule implements BuiltInRule {
       }
       
       Term resultPathCondition = joinedState.second;
-      try {
-         Term simplified = simplify(services.getProof(), resultPathCondition);
-         if (countAtoms(simplified) < countAtoms(resultPathCondition)) {
-            resultPathCondition = simplified;
-         }
-      } catch (ProofInputException e) {}
-
+      resultPathCondition = trySimplify(services.getProof(), resultPathCondition, true);
       
       // Delete previous sequents      
       clearSemisequent(newGoal, true);
@@ -458,24 +455,34 @@ public abstract class JoinRule implements BuiltInRule {
    
    /**
     * Tries to simplifies the given {@link Term} in a
-    * side proof with splits. If this attemt is successful,
+    * side proof with splits. If this attempt is successful,
     * i.e. the number of atoms in the simplified formula
-    * is lower, the simplified formula is returned; otherwise,
-    * the original formula is returned.
+    * is lower (and, if requested, also the number of disjunctions),
+    * the simplified formula is returned; otherwise, the original
+    * formula is returned.
     * 
     * @param parentProof The parent {@link Proof}.
     * @param term The {@link Term} to simplify.
+    * @param countDisjunctions If set to true, the method also takes
+    *    the number of disjunctions (in addition to the number of atoms)
+    *    into account when judging about the complexity of the "simplified"
+    *    formula.
     * @return The simplified {@link Term} or the original term,
     *    if simplification was not successful.
     * 
     * @see #simplify(Proof, Term)
     * @see SymbolicExecutionUtil#simplify(Proof, Term)
     */
-   protected static Term trySimplify(final Proof parentProof, final Term term) {
+   protected static Term trySimplify(
+         final Proof parentProof, final Term term, boolean countDisjunctions) {
       
       try {
          Term simplified = simplify(parentProof, term);
-         if (countAtoms(simplified) < countAtoms(term)) {
+         
+         if (countAtoms(simplified) < countAtoms(term) &&
+               (!countDisjunctions ||
+                     countDisjunctions(simplified, false) < countDisjunctions(term, false))) {
+            
             return simplified;
          }
       } catch (ProofInputException e) {}
@@ -653,6 +660,69 @@ public abstract class JoinRule implements BuiltInRule {
          throw new IllegalArgumentException(
                "Can only compute atoms for formulae");
       }
+   }
+   
+   /**
+    * Counts the disjunctions in a formula.
+    * 
+    * @param term Formula to count disjunctions for.
+    * @param negated Set to true iff the current subformula
+    *    is in the scope of a negation; in this case, "and"
+    *    junctors have the role of "or" junctors considering
+    *    the disjunctive complexity.
+    * @return Number of disjunctions in the formula
+    * @throws IllegalArgumentException if the supplied term
+    *    is not a formula
+    */
+   protected static int countDisjunctions(Term term, boolean negated) {
+      if (term.sort().equals(Sort.FORMULA)) {
+         if (term.op() instanceof Junctor) {
+            int result = 0;
+            
+            if (!negated && term.op().equals(Junctor.OR) ||
+                !negated && term.op().equals(Junctor.IMP) ||
+                 negated && term.op().equals(Junctor.AND)) {
+               result++;
+            }
+            
+            if (term.op().equals(Junctor.NOT)) {
+               negated = !negated;
+            }
+            
+            for (Term sub : term.subs()) {
+               result += countDisjunctions(sub, negated);
+            }
+            
+            return result;
+         } else {
+            return 0;
+         }
+      } else {
+         throw new IllegalArgumentException(
+               "Can only compute atoms for formulae");
+      }
+   }
+   
+   /**
+    * Computes and registers a new Skolem constant with the given
+    * prefix in its name of the given sort.
+    * 
+    * @param prefix Prefix for the name of the constant.
+    * @param sort Sort of the constant.
+    * @param services The services object.
+    * @return A new Skolem constant of the given sort with the given
+    *     prefix in its name.
+    */
+   protected static Function getNewScolemConstantForPrefix(String prefix, Sort sort, Services services) {
+      final String newName = services.getTermBuilder().newName(prefix);
+      services.getNamespaces().functions().add(new Named() {
+         @Override
+         public Name name() {
+            return new Name(newName);
+         }
+      });
+      
+      return new Function(new Name(newName), sort, true);
    }
    
    /**
@@ -1044,31 +1114,6 @@ public abstract class JoinRule implements BuiltInRule {
    }
    
    /**
-    * An equals method that, before the comparison, replaces all program
-    * locations in the supplied arguments by their branch-unique versions.
-    * 
-    * @param se1 First element to check equality (mod renaming) for
-    * @param se2 Second element to check equality (mod renaming) for
-    * @param services The Services object.
-    * @return true iff source elements can be matched, considering
-    *    branch-unique location names.
-    */
-   private static boolean equalsModBranchUniqueRenaming(
-         SourceElement se1, SourceElement se2,
-         Services services) {
-      
-      ProgVarReplaceVisitor replVisitor1 =
-            new ProgVarReplaceVisitor((ProgramElement) se1, LocVarReplBranchUniqueMap.instance(), services);
-      ProgVarReplaceVisitor replVisitor2 =
-            new ProgVarReplaceVisitor((ProgramElement) se1, LocVarReplBranchUniqueMap.instance(), services);
-      
-      replVisitor1.start();
-      replVisitor2.start();
-      
-      return replVisitor1.result().equals(replVisitor2.result());
-   }
-   
-   /**
     * Simplifies the given {@link Term} in a side proof with splits.
     * This code has been copied from {@link SymbolicExecutionUtil}
     * and only been slightly modified (to allow for splitting the proof). 
@@ -1110,6 +1155,31 @@ public abstract class JoinRule implements BuiltInRule {
                      + ProofSaver.printAnything(term,
                            parentProof.getServices()), info);
       }
+   }
+   
+   /**
+    * An equals method that, before the comparison, replaces all program
+    * locations in the supplied arguments by their branch-unique versions.
+    * 
+    * @param se1 First element to check equality (mod renaming) for
+    * @param se2 Second element to check equality (mod renaming) for
+    * @param services The Services object.
+    * @return true iff source elements can be matched, considering
+    *    branch-unique location names.
+    */
+   private static boolean equalsModBranchUniqueRenaming(
+         SourceElement se1, SourceElement se2,
+         Services services) {
+      
+      ProgVarReplaceVisitor replVisitor1 =
+            new ProgVarReplaceVisitor((ProgramElement) se1, LocVarReplBranchUniqueMap.instance(), services);
+      ProgVarReplaceVisitor replVisitor2 =
+            new ProgVarReplaceVisitor((ProgramElement) se1, LocVarReplBranchUniqueMap.instance(), services);
+      
+      replVisitor1.start();
+      replVisitor2.start();
+      
+      return replVisitor1.result().equals(replVisitor2.result());
    }
    
    /**

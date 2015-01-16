@@ -22,8 +22,6 @@ import de.uka.ilkd.key.abstraction.signanalysis.Top;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -137,28 +135,6 @@ public abstract class JoinWithLatticeAbstraction extends JoinRule {
                   newConstraints);
       
       return new SymbolicExecutionState(newSymbolicState, newPathCondition);
-   }
-   
-   /**
-    * Computes and registers a new Skolem constant with the given
-    * prefix in its name of the given sort.
-    * 
-    * @param prefix Prefix for the name of the constant.
-    * @param sort Sort of the constant.
-    * @param services The services object.
-    * @return A new Skolem constant of the given sort with the given
-    *     prefix in its name.
-    */
-   private Function getNewScolemConstantForPrefix(String prefix, Sort sort, Services services) {
-      final String newName = services.getTermBuilder().newName(prefix);
-      services.getNamespaces().functions().add(new Named() {
-         @Override
-         public Name name() {
-            return new Name(newName);
-         }
-      });
-      
-      return new Function(new Name(newName), sort, true);
    }
    
    /**

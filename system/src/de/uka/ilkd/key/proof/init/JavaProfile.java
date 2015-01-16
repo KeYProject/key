@@ -27,6 +27,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.JoinIfThenElse;
+import de.uka.ilkd.key.rule.JoinIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.JoinWeaken;
 import de.uka.ilkd.key.rule.JoinWithSignLattice;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
@@ -122,6 +123,7 @@ public class JavaProfile extends AbstractProfile {
         			   .prepend(QueryExpand.INSTANCE)
                   .prepend(JoinWeaken.INSTANCE)
                   .prepend(JoinIfThenElse.INSTANCE)
+                  .prepend(JoinIfThenElseAntecedent.INSTANCE)
                   .prepend(JoinWithSignLattice.INSTANCE);
   
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact 
