@@ -155,23 +155,34 @@ public abstract class AbstractUpdateExtractor {
       for (SequentFormula sf : sequent.succedent()) {
          Term term = sf.formula();
          if (Junctor.IMP.equals(term.op())) {
-            if (term.sub(1).op() instanceof UpdateApplication) {
-               Term updateApplcationTerm = term.sub(1);
-               Term updateTerm = UpdateApplication.getUpdate(updateApplcationTerm);
-               if (updateTerm.op() == UpdateJunctor.PARALLEL_UPDATE) {
-                  for (Term subUpdate : updateTerm.subs()) {
-                     if (subUpdate.op() instanceof ElementaryUpdate) {
-                        ElementaryUpdate eu = (ElementaryUpdate)subUpdate.op();
-                        if (eu.lhs() instanceof ProgramVariable) {
-                           result.add(getServices().getTermBuilder().var((ProgramVariable)eu.lhs()));
-                        }
-                     }
-                  }
-               }
-            }
+            fillInitialObjectsToIgnoreRecursively(term.sub(1), result);
          }
       }
       return result;
+   }
+   
+   /**
+    * Utility method of {@link #computeInitialObjectsToIgnore()} which
+    * computes the objects to ignore recursively.
+    * @param term The current {@link Term}.
+    * @param toFill The {@link Set} with {@link Term}s to ignore to fill.
+    */
+   protected void fillInitialObjectsToIgnoreRecursively(Term term, Set<Term> toFill) {
+      if (term.op() instanceof UpdateApplication) {
+         Term updateTerm = UpdateApplication.getUpdate(term);
+         fillInitialObjectsToIgnoreRecursively(updateTerm, toFill);
+      }
+      else if (term.op() == UpdateJunctor.PARALLEL_UPDATE) {
+         for (int i = 0; i < term.arity(); i++) {
+            fillInitialObjectsToIgnoreRecursively(term.sub(i), toFill);
+         }
+      }
+      else if (term.op() instanceof ElementaryUpdate) {
+         ElementaryUpdate eu = (ElementaryUpdate)term.op();
+         if (eu.lhs() instanceof ProgramVariable) {
+            toFill.add(term.sub(0));
+         }
+      }
    }
 
    /**
@@ -867,8 +878,13 @@ public abstract class AbstractUpdateExtractor {
          originalUpdates = ImmutableSLList.nil();
       }
       else {
-         Term originalModifiedFormula = modalityPio.constrainedFormula().formula();
-         originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;            
+         if (node.proof().root() == node) {
+            originalUpdates = SymbolicExecutionUtil.computeRootElementaryUpdates(node);
+         }
+         else {
+            Term originalModifiedFormula = modalityPio.constrainedFormula().formula();
+            originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;            
+         }
       }
       // Combine memory layout with original updates
       ImmutableList<Term> additionalUpdates = ImmutableSLList.nil();
@@ -949,7 +965,7 @@ public abstract class AbstractUpdateExtractor {
          SideProofUtil.disposeOrStore("Layout computation on node " + node.serialNr() + " with layout term " + ProofSaver.printAnything(layoutTerm, getServices()) + ".", info);
       }
    }
-   
+
    /**
     * This method computes for all given {@link Goal}s representing the same 
     * value their path conditions. A computed path condition will consists only
@@ -1213,7 +1229,7 @@ public abstract class AbstractUpdateExtractor {
                                          Map<Node, Term> branchConditionCache) throws ProofInputException {
       Term result = branchConditionCache.get(node);
       if (result == null) {
-         result = SymbolicExecutionUtil.computeBranchCondition(node, true);
+         result = SymbolicExecutionUtil.computeBranchCondition(node, true, true);
          branchConditionCache.put(node, result);
       }
       return result;

@@ -43,6 +43,8 @@ import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.PredicateTermLabel;
@@ -250,11 +252,25 @@ System.out.println(result);
    }
    
    /**
-    * Computes the {@link Term} to show.
+    * Computes the {@link Sequent} to show.
+    * @param antecedent The antecedent.
+    * @param succedent The succedent.
+    * @return The created {@link Sequent}.
+    */
+   protected Sequent createSequentToShow(Term antecedent,
+                                         Term succedent) {
+      Sequent sequent = Sequent.EMPTY_SEQUENT;
+      sequent = sequent.addFormula(new SequentFormula(antecedent), true, false).sequent();
+      sequent = sequent.addFormula(new SequentFormula(succedent), false, false).sequent();
+      return sequent;
+   }
+   
+   /**
+    * Computes the {@link Sequent} to show.
     * @param node The {@link IKeYSEDDebugNode}.
     * @param executionNode The {@link IExecutionNode}.
     * @param keyNode The {@link Node}.
-    * @return The {@link Term} to show and optionally the uninterpreted predicate.
+    * @return The {@link Sequent} to show and optionally the uninterpreted predicate.
     */
    protected abstract Pair<Term, Term> computeTermToShow(IKeYSEDDebugNode<?> node, 
                                                          IExecutionNode<?> executionNode, 
@@ -263,12 +279,12 @@ System.out.println(result);
    /**
     * Shows the given content.
     * @param result The {@link PredicateEvaluationResult} to consider.
-    * @param term The {@link Term} to show.
+    * @param succedent The {@link Term} to show as succedent.
     * @param uninterpretedPredicate The optional {@link Term} with the uninterpreted predicate offering the {@link PredicateTermLabel}.
     * @param node The {@link IKeYSEDDebugNode} which provides the new content.
     */
    protected void addNewContent(PredicateEvaluationResult result,
-                                Term term,
+                                Term succedent,
                                 Term uninterpretedPredicate,
                                 IExecutionNode<?> executionNode) {
       removeOldContent();
@@ -276,7 +292,7 @@ System.out.println(result);
       for (BranchResult branchResult : branchResults) {
          if (shouldShowBranchResult(branchResult, uninterpretedPredicate)) {
             // Create group
-            Group viewerGroup = factory.createGroup(root, branchResult.getLeafNode().serialNr() + ": " + branchResult.getConditionString());
+            Group viewerGroup = factory.createGroup(root, "Node " + branchResult.getLeafNode().serialNr());
             viewerGroup.setLayout(new FillLayout());
             viewerGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             controls.add(viewerGroup);
@@ -286,10 +302,11 @@ System.out.println(result);
             EvaluationViewerDecorator viewerDecorator = new EvaluationViewerDecorator(viewer);
             decorators.add(viewerDecorator);
             // Show term and results
-            PredicateValue value = viewerDecorator.showTerm(term, 
-                                                            executionNode.getServices(), 
-                                                            executionNode.getMediator(), 
-                                                            branchResult);
+            Sequent sequent = createSequentToShow(branchResult.getCondition(), succedent);
+            PredicateValue value = viewerDecorator.showSequent(sequent, 
+                                                               executionNode.getServices(), 
+                                                               executionNode.getMediator(), 
+                                                               branchResult);
             viewerGroup.setBackground(viewerDecorator.getColor(value));
          }
       }

@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
+import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.util.java.ArrayUtil;
@@ -38,6 +39,81 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
  * @author Martin Hentschel
  */
 public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTestCase {
+   /**
+    * Tests the launch where predicate evaluation is enabled.
+    */
+   @Test
+   public void testPredicateEvaluationEnabled() throws Exception {
+      doPredicateEvaluationTest("SWTBotLaunchDefaultPreferencesTest_testPredicateEvaluationEnabled", true);
+   }
+
+   /**
+    * Tests the launch where predicate evaluation is disbled.
+    */
+   @Test
+   public void testPredicateEvaluationDisabled() throws Exception {
+      doPredicateEvaluationTest("SWTBotLaunchDefaultPreferencesTest_testPredicateEvaluationDisabled", false);
+   }
+   
+   /**
+    * Does the test steps of {@link #testPredicateEvaluationEnabled()}
+    * and {@link #testPredicateEvaluationDisabled()}.
+    * @param projectName The project name to use.
+    * @param predicateEvaluationEnabled Is predicate evaluation enabled?
+    * @throws Exception Occurred Exception
+    */
+   protected void doPredicateEvaluationTest(String projectName, 
+                                            final boolean predicateEvaluationEnabled) throws Exception {
+      boolean originalPredicateEvaluationEnabled = KeYSEDPreferences.isPredicateEvaluationEnabled();
+      try {
+         KeYSEDPreferences.setUsePrettyPrinting(true);
+         // Set preference
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
+         if (predicateEvaluationEnabled) {
+            preferenceShell.bot().checkBox("Predicate evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)").select();
+         }
+         else {
+            preferenceShell.bot().checkBox("Predicate evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)").deselect();
+         }
+         preferenceShell.bot().button("OK").click();
+         assertEquals(predicateEvaluationEnabled, KeYSEDPreferences.isPredicateEvaluationEnabled());
+         // Launch something
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
+            @Override
+            public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+               // Get debug target TreeItem
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+               // Check launch
+               Object threadObject = TestUtilsUtil.getTreeItemData(item);
+               assertTrue(threadObject instanceof IKeYSEDDebugNode);
+               assertEquals(predicateEvaluationEnabled, ((IKeYSEDDebugNode<?>) threadObject).isPredicateEvaluationEnabled());
+            }
+         };
+         doKeYDebugTargetTest(projectName,
+                              "data/unicodeTest/test",
+                              true,
+                              true,
+                              createMethodSelector("UnicodeTest", "magic", "Z", "Z"),
+                              null,
+                              null,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              null,
+                              Boolean.TRUE,
+                              Boolean.TRUE,
+                              8, 
+                              executor);
+      }
+      finally {
+         // Restore original value
+         KeYSEDPreferences.setPredicateEvaluationEnabled(originalPredicateEvaluationEnabled);
+         assertEquals(originalPredicateEvaluationEnabled, KeYSEDPreferences.isPredicateEvaluationEnabled());
+      }
+   }
+   
    /**
     * Tests the launch where unicode signs are used.
     */

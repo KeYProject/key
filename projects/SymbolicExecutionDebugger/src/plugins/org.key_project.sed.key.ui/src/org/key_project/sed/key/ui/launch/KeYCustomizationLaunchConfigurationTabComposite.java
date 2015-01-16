@@ -77,6 +77,11 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
    private CCombo variablesAreOnlyComputedFromUpdatesCombo;
    
    /**
+    * Defines if predicate evaluation is enabled or not.
+    */
+   private Button predicateEvaluationEnabledButton;
+   
+   /**
     * Constructor.
     * @param parent The parent {@link Composite}.
     * @param style The style.
@@ -135,6 +140,14 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       showSignatureOnMethodReturnNodes = widgetFactory.createButton(symbolicExecutionTreeGroup, "Show signature instead of only the name on method &return nodes", SWT.CHECK);
       showSignatureOnMethodReturnNodes.setEnabled(isEditable());
       showSignatureOnMethodReturnNodes.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateLaunchConfigurationDialog();
+         }
+      });
+      predicateEvaluationEnabledButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "Predicate evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)", SWT.CHECK);
+      predicateEvaluationEnabledButton.setEnabled(isEditable());
+      predicateEvaluationEnabledButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
             updateLaunchConfigurationDialog();
@@ -218,6 +231,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
          usePrettyPrintingButton.setSelection(KeySEDUtil.isUsePrettyPrinting(configuration));
          showSignatureOnMethodReturnNodes.setSelection(KeySEDUtil.isShowSignatureOnMethodReturnNodes(configuration));
          variablesAreOnlyComputedFromUpdatesCombo.setText(KeySEDUtil.isVariablesAreOnlyComputedFromUpdates(configuration) ? "Based on sequent" : "Based on visible type structure");
+         predicateEvaluationEnabledButton.setSelection(KeySEDUtil.isPredicateEvaluationEnabled(configuration));
          updatePrettyPrintingDependingEnabledStates();
          updateShowVariablesEnabledState();
       } 
@@ -239,6 +253,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       usePrettyPrintingButton.setSelection(launchSettings.isUsePrettyPrinting());
       showSignatureOnMethodReturnNodes.setSelection(launchSettings.isShowSignatureOnMethodReturnNodes());
       variablesAreOnlyComputedFromUpdatesCombo.setText(launchSettings.isVariablesAreOnlyComputedFromUpdates() ? "Based on sequent" : "Based on visible type structure");
+      predicateEvaluationEnabledButton.setSelection(launchSettings.isPredicateEvaluationEnabled());
       updatePrettyPrintingDependingEnabledStates();
       updateShowVariablesEnabledState();
    }
@@ -256,5 +271,6 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrintingButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, showSignatureOnMethodReturnNodes.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_VARIABLES_ARE_COMPUTED_FROM_UPDATES, "Based on sequent".equals(variablesAreOnlyComputedFromUpdatesCombo.getText()));
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PREDICATE_EVALUATION_ENABLED, predicateEvaluationEnabledButton.getSelection());
    }
 }

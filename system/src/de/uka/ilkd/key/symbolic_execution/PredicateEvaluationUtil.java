@@ -255,7 +255,7 @@ public final class PredicateEvaluationUtil {
       // Analyze children
       int childCount = node.childrenCount();
       if (childCount == 0) {
-         Term condition = SymbolicExecutionUtil.computePathCondition(evaluationNode, node, true);
+         Term condition = SymbolicExecutionUtil.computePathCondition(evaluationNode, node, false, true);
          String conditionString = SymbolicExecutionUtil.formatTerm(condition, services, useUnicode, usePrettyPrinting);
          result.addBranchResult(new BranchResult(node, currentResults, condition, conditionString, termLabelName));
       }
@@ -348,7 +348,7 @@ public final class PredicateEvaluationUtil {
                                          Map<String, IPredicateInstruction> results) {
       Object replaceObject = tacletGoal.replaceWithExpressionAsObject();
       if (replaceObject instanceof Term) {
-         Term replaceTerm = SymbolicExecutionUtil.instantiateTerm((Term) replaceObject, tacletApp, services);
+         Term replaceTerm = SymbolicExecutionUtil.instantiateTerm(parent, (Term) replaceObject, tacletApp, services);
          for (PredicateLabelOccurrence Occurrence : labels) {
             // Check for true/false terms
             if (replaceTerm.op() == Junctor.TRUE) {
@@ -415,34 +415,37 @@ public final class PredicateEvaluationUtil {
       // Compute term
       return createSequentTerm(antecedentReplacements, succedentReplacements, antecedentRuleApplication, tb);
    }
-
-   protected static Term createSequentTerm(List<Term> antecedentReplacements, List<Term> succedentReplacements, boolean antecedentRuleApplication, TermBuilder tb) {
+   
+   protected static Term createSequentTerm(List<Term> antecedentReplacements, 
+                                           List<Term> succedentReplacements, 
+                                           boolean antecedentRuleApplication, 
+                                           TermBuilder tb) {
       if (!antecedentReplacements.isEmpty() && !succedentReplacements.isEmpty()) {
-         Term left = tb.and(antecedentReplacements);
-         Term right = tb.or(succedentReplacements);
+         Term left = tb.andMaintainLabels(antecedentReplacements);
+         Term right = tb.orMaintainLabels(succedentReplacements);
          if (antecedentRuleApplication) {
             throw new UnsupportedOperationException();
          }
          else {
-            return tb.imp(left, right);
+            return tb.impMaintainLabels(left, right);
          }
       }
       else if (!antecedentReplacements.isEmpty()) {
-         Term left = tb.and(antecedentReplacements);
+         Term left = tb.andMaintainLabels(antecedentReplacements);
          if (antecedentRuleApplication) {
             return left;
          }
          else {
-            return tb.not(left);
+            return tb.notMaintainLabels(left);
          }
       }
       else if (!succedentReplacements.isEmpty()) {
-         Term right = tb.or(succedentReplacements);
+         Term right = tb.orMaintainLabels(succedentReplacements);
          if (!antecedentRuleApplication) {
             return right;
          }
          else {
-            return tb.not(right);
+            return tb.notMaintainLabels(right);
          }
       }
       else {

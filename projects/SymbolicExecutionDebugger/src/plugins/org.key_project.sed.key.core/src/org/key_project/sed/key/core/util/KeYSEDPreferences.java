@@ -71,6 +71,11 @@ public class KeYSEDPreferences {
     * Preference key to define how variables are computed.
     */
    public static final String VARIABLES_ARE_COMPUTED_FROM_UPDATES = "org.key_project.sed.key.core.preference.variablesAreOnlyComputedFromUpdates";
+
+   /**
+    * Preference key to enable predicate evaluation.
+    */
+   public static final String PREDICATE_EVALUATION_ENABLED = "org.key_project.sed.key.core.preference.predicateEvaluationEnabled";
    
    /**
     * Returns the managed {@link IPreferenceStore}.
@@ -366,5 +371,37 @@ public class KeYSEDPreferences {
     */
    public static void setDefaultVariablesAreOnlyComputedFromUpdates(boolean defaultValue) {
       getStore().setDefault(VARIABLES_ARE_COMPUTED_FROM_UPDATES, defaultValue);
+   }
+   
+   /**
+    * Checks if predicate evaluation is enabled.
+    * @return Is predicate evaluation enabled?
+    */
+   public static boolean isPredicateEvaluationEnabled() {
+      return getStore().getBoolean(PREDICATE_EVALUATION_ENABLED);
+   }
+   
+   /**
+    * Checks if predicate evaluation is enabled by default.
+    * @return Is predicate evaluation enabled?
+    */
+   public static boolean isDefaultPredicateEvaluationEnabled() {
+      return getStore().getDefaultBoolean(PREDICATE_EVALUATION_ENABLED);
+   }
+   
+   /**
+    * Sets if predicate evaluation is enabled.
+    * @param value Enable predicate evaluation?
+    */
+   public static void setPredicateEvaluationEnabled(boolean value) {
+      getStore().setValue(PREDICATE_EVALUATION_ENABLED, value);
+   }
+   
+   /**
+    * Sets if predicate evaluation is enabled by default.
+    * @param defaultValue Enable predicate evaluation?
+    */
+   public static void setDefaultPredicateEvaluationEnabled(boolean defaultValue) {
+      getStore().setDefault(PREDICATE_EVALUATION_ENABLED, defaultValue);
    }
 }

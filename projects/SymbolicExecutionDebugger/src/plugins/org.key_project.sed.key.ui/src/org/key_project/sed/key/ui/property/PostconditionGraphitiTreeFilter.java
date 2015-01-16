@@ -17,6 +17,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.platform.AbstractPropertySectionFilter;
 import org.eclipse.jface.viewers.IFilter;
 import org.eclipse.ui.IWorkbenchPart;
+import org.key_project.sed.key.core.model.IKeYTerminationNode;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
@@ -34,7 +35,8 @@ public class PostconditionGraphitiTreeFilter extends AbstractPropertySectionFilt
       if (part != null) {
          PostconditionGraphitiPropertySection section = new PostconditionGraphitiPropertySection();
          section.setInput(part, null);
-         return section.getDebugNode(pe) != null;
+         IKeYTerminationNode<?> node = section.getDebugNode(pe);
+         return node != null && node.isPredicateEvaluationEnabled();
       }
       else {
          return false;

@@ -33,6 +33,7 @@ import org.key_project.util.java.CollectionUtil;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -433,5 +434,13 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
    @Override
    public boolean isGroupable() {
       return executionNode.isBlockOpened();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isPredicateEvaluationEnabled() {
+      return SymbolicExecutionJavaProfile.isPredicateEvaluationEnabled(getExecutionNode().getProof());
    }
 }

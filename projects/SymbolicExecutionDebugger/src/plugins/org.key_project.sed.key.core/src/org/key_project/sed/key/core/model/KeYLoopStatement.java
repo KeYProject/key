@@ -34,6 +34,7 @@ import org.key_project.sed.key.core.util.LogUtil;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -431,5 +432,13 @@ public class KeYLoopStatement extends AbstractSEDLoopStatement implements IKeYSE
    @Override
    public boolean isGroupable() {
       return executionNode.isBlockOpened();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isPredicateEvaluationEnabled() {
+      return SymbolicExecutionJavaProfile.isPredicateEvaluationEnabled(getExecutionNode().getProof());
    }
 }

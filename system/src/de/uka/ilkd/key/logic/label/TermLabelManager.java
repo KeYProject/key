@@ -48,6 +48,7 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.util.LinkedHashMap;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * <p>
@@ -1107,6 +1108,7 @@ public class TermLabelManager {
                                                        Object hint,
                                                        Term tacletTerm) {
       ImmutableList<TermLabelRefactoring> sequentRefactorings = ImmutableSLList.nil();
+      ImmutableList<TermLabelRefactoring> belowUpdatesRefactorings = ImmutableSLList.nil();      
       ImmutableList<TermLabelRefactoring> childAndGrandchildRefactorings = ImmutableSLList.nil();
       ImmutableList<TermLabelRefactoring> directChildRefactorings = ImmutableSLList.nil();
       ImmutableList<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents = ImmutableSLList.nil();
@@ -1117,6 +1119,9 @@ public class TermLabelManager {
                RefactoringScope scope = refactoring.defineRefactoringScope(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
                if (RefactoringScope.SEQUENT.equals(scope)) {
                   sequentRefactorings = sequentRefactorings.prepend(refactoring);
+               }
+               else if (RefactoringScope.APPLICATION_BELOW_UPDATES.equals(scope)) {
+                  belowUpdatesRefactorings = belowUpdatesRefactorings.prepend(refactoring);
                }
                else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE.equals(scope)) {
                   childAndGrandchildRefactorings = childAndGrandchildRefactorings.prepend(refactoring);
@@ -1135,6 +1140,9 @@ public class TermLabelManager {
          if (RefactoringScope.SEQUENT.equals(scope)) {
             sequentRefactorings = sequentRefactorings.prepend(refactoring);
          }
+         else if (RefactoringScope.APPLICATION_BELOW_UPDATES.equals(scope)) {
+            belowUpdatesRefactorings = belowUpdatesRefactorings.prepend(refactoring);
+         }
          else if (RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE.equals(scope)) {
             childAndGrandchildRefactorings = childAndGrandchildRefactorings.prepend(refactoring);
          }
@@ -1145,7 +1153,7 @@ public class TermLabelManager {
             childAndGrandchildRefactoringsAndParents = childAndGrandchildRefactoringsAndParents.prepend(refactoring);
          }
       }
-      return new RefactoringsContainer(sequentRefactorings, childAndGrandchildRefactorings, childAndGrandchildRefactoringsAndParents, directChildRefactorings);
+      return new RefactoringsContainer(sequentRefactorings, belowUpdatesRefactorings, childAndGrandchildRefactorings, childAndGrandchildRefactoringsAndParents, directChildRefactorings);
    }
    
    /**
@@ -1157,6 +1165,11 @@ public class TermLabelManager {
        * The {@link TermLabelRefactoring} for {@link RefactoringScope#SEQUENT}.
        */
       private final ImmutableList<TermLabelRefactoring> sequentRefactorings;
+      
+      /**
+       * The {@link TermLabelRefactoring} for {@link RefactoringScope#APPLICATION_BELOW_UPDATES}.
+       */
+      private final ImmutableList<TermLabelRefactoring> belowUpdatesRefactorings;
 
       /**
        * The {@link TermLabelRefactoring} for {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE}.
@@ -1176,15 +1189,18 @@ public class TermLabelManager {
       /**
        * Constructor.
        * @param sequentRefactorings The {@link TermLabelRefactoring} for {@link RefactoringScope#SEQUENT}.
+       * @param belowUpdatesRefactorings The {@link TermLabelRefactoring} for {@link RefactoringScope#APPLICATION_BELOW_UPDATES}.
        * @param childAndGrandchildRefactorings The {@link TermLabelRefactoring} for {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE}.
        * @param childAndGrandchildRefactoringsAndParents The {@link TermLabelRefactoring} for {@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS}.
        * @param directChildRefactorings The {@link TermLabelRefactoring} for {@link RefactoringScope#APPLICATION_DIRECT_CHILDREN}.
        */
       public RefactoringsContainer(ImmutableList<TermLabelRefactoring> sequentRefactorings,
+                                   ImmutableList<TermLabelRefactoring> belowUpdatesRefactorings,
                                    ImmutableList<TermLabelRefactoring> childAndGrandchildRefactorings,
                                    ImmutableList<TermLabelRefactoring> childAndGrandchildRefactoringsAndParents,
                                    ImmutableList<TermLabelRefactoring> directChildRefactorings) {
          this.sequentRefactorings = sequentRefactorings;
+         this.belowUpdatesRefactorings = belowUpdatesRefactorings;
          this.childAndGrandchildRefactorings = childAndGrandchildRefactorings;
          this.childAndGrandchildRefactoringsAndParents = childAndGrandchildRefactoringsAndParents;
          this.directChildRefactorings = directChildRefactorings;
@@ -1230,6 +1246,14 @@ public class TermLabelManager {
       public ImmutableList<TermLabelRefactoring> getAllApplicationChildAndGrandchildRefactorings() {
          return childAndGrandchildRefactorings.prepend(childAndGrandchildRefactoringsAndParents);
       }
+
+      /**
+       * Returns the {@link TermLabelRefactoring} for {@link RefactoringScope#APPLICATION_BELOW_UPDATES}.
+       * @return The {@link TermLabelRefactoring} for {@link RefactoringScope#APPLICATION_BELOW_UPDATES}.
+       */
+      public ImmutableList<TermLabelRefactoring> getBelowUpdatesRefactorings() {
+         return belowUpdatesRefactorings;
+      }
    }
    
    /**
@@ -1256,7 +1280,9 @@ public class TermLabelManager {
                                           RefactoringsContainer refactorings,
                                           TermFactory tf) {
       if (applicationTerm != null && 
-          (!refactorings.getDirectChildRefactorings().isEmpty() || !refactorings.getChildAndGrandchildRefactorings().isEmpty())) {
+          (!refactorings.getDirectChildRefactorings().isEmpty() || 
+           !refactorings.getChildAndGrandchildRefactorings().isEmpty() ||
+           !refactorings.getBelowUpdatesRefactorings().isEmpty())) {
          Term newApplicationTerm = applicationTerm;
          // Do direct child refactoring if required
          if (!refactorings.getDirectChildRefactorings().isEmpty()) {
@@ -1273,6 +1299,19 @@ public class TermLabelManager {
             newApplicationTerm = changed ?
                                  tf.createTerm(newApplicationTerm.op(), newSubs, newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(), newApplicationTerm.getLabels()) :
                                  applicationTerm;
+         }
+         // Do below updates refactoring
+         if (!refactorings.getBelowUpdatesRefactorings().isEmpty()) {
+            Pair<ImmutableList<Term>,Term> pair = TermBuilder.goBelowUpdates2(newApplicationTerm);
+            ImmutableArray<TermLabel> newLabels = performRefactoring(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, pair.second, refactorings.getBelowUpdatesRefactorings());
+            if (!newLabels.equals(pair.second.getLabels())) {
+               Term newModality = tf.createTerm(pair.second.op(), pair.second.subs(), pair.second.boundVars(), pair.second.javaBlock(), newLabels);
+               ImmutableArray<TermLabel> applicationLabels = newApplicationTerm.getLabels();
+               newApplicationTerm = services.getTermBuilder().applyParallel(pair.first, newModality);
+               if (!applicationLabels.isEmpty()) {
+                  newApplicationTerm = services.getTermBuilder().label(newApplicationTerm, applicationLabels);
+               }
+            }
          }
          // Do child and grandchild refactoring if required
          ImmutableList<TermLabelRefactoring> allChildAndGrandchildRefactorings = refactorings.getAllApplicationChildAndGrandchildRefactorings();

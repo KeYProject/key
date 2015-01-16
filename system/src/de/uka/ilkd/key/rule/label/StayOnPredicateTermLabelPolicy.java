@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.rule.label;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.PredicateTermLabel;
@@ -26,6 +27,11 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
  * @author Martin Hentschel
  */
 public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
+   /**
+    * The name of the rule {@code cut_direct}.
+    */
+   public static final Name CUT_DIRET = new Name("cut_direct");
+   
    /**
     * {@inheritDoc}
     */
@@ -49,18 +55,21 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
           PredicateEvaluationUtil.isLogicOperator(newTermOp, newTermSubs)) {
          assert label instanceof PredicateTermLabel;
          PredicateTermLabel pLabel = (PredicateTermLabel) label;
-         PredicateTermLabel originalLabel = ensureThatOriginalLabelIsMaintained(newTermOriginalLabels);
+         PredicateTermLabel originalLabel = searchPredicateTermLabel(newTermOriginalLabels);
          PredicateTermLabel mostImportantLabel = originalLabel != null ? originalLabel : pLabel;
          // May change sub ID if logical operators like junctors are used
          boolean newLabelIdRequired = false;
-         List<String> originalLabelIds = new LinkedList<String>();
+         Set<String> originalLabelIds = new LinkedHashSet<String>();
          if (hint instanceof TacletLabelHint) {
             TacletLabelHint tacletHint = (TacletLabelHint) hint;
             if (TacletOperation.ADD_ANTECEDENT.equals(tacletHint.getTacletOperation()) ||
                 TacletOperation.ADD_SUCCEDENT.equals(tacletHint.getTacletOperation()) ||
                 TacletOperation.REPLACE_TO_ANTECEDENT.equals(tacletHint.getTacletOperation()) ||
                 TacletOperation.REPLACE_TO_SUCCEDENT.equals(tacletHint.getTacletOperation())) {
-//               newLabelIdRequired = true;
+               if (!CUT_DIRET.equals(rule.name())) { // Do not give new labels for cut direct.
+                  newLabelIdRequired = true;
+                  originalLabelIds.add(mostImportantLabel.getId());
+               }
             }
             boolean topLevel = isTopLevel(tacletHint, tacletTerm);
             if (tacletHint.getSequentFormula() != null) {
@@ -73,7 +82,7 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
                   newLabelIdRequired = true;
                }
             }
-            if (mostImportantLabel != pLabel && topLevel) {
+            if (mostImportantLabel != pLabel) { // Without support of quantors '&& topLevel' can be added.
                originalLabelIds.add(pLabel.getId());
             }
          }
@@ -82,7 +91,7 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
             if (originalLabel != null) {
                originalLabelIds.add(originalLabel.getId());
             }
-            int labelSubID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_SUB_PREFIX + mostImportantLabel.getMajorId()).getCountPlusPlus();
+            int labelSubID = PredicateTermLabel.newLabelSubID(services, mostImportantLabel);
             if (!originalLabelIds.isEmpty()) {
                return new PredicateTermLabel(mostImportantLabel.getMajorId(), labelSubID, originalLabelIds);
             }
@@ -104,16 +113,27 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
       }
    }
 
-   protected PredicateTermLabel ensureThatOriginalLabelIsMaintained(ImmutableArray<TermLabel> originalLabels) {
-      TermLabel originalLabel = JavaUtil.search(originalLabels, new IFilter<TermLabel>() {
+   /**
+    * Searches the {@link PredicateTermLabel} in the given {@link TermLabel}s.
+    * @param labels The {@link TermLabel}s to search in.
+    * @return The found {@link PredicateTermLabel} or {@code null} if not available.
+    */
+   protected PredicateTermLabel searchPredicateTermLabel(ImmutableArray<TermLabel> labels) {
+      TermLabel result = JavaUtil.search(labels, new IFilter<TermLabel>() {
          @Override
          public boolean select(TermLabel element) {
             return element instanceof PredicateTermLabel;
          }
       });
-      return (PredicateTermLabel)originalLabel;
+      return (PredicateTermLabel)result;
    }
 
+   /**
+    * Checks if the given taclet {@link Term} is top level.
+    * @param tacletHint The {@link TacletLabelHint} to use.
+    * @param tacletTerm The taclet {@link Term} to check.
+    * @return {@code true} is top level, {@code false} is not top level.
+    */
    protected boolean isTopLevel(TacletLabelHint tacletHint, Term tacletTerm) {
       if (TacletOperation.REPLACE_TERM.equals(tacletHint.getTacletOperation())) {
          return tacletHint.getTerm() == tacletTerm;

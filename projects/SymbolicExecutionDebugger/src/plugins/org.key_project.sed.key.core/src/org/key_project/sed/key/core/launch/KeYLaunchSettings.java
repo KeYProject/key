@@ -138,10 +138,14 @@ public class KeYLaunchSettings {
    private final boolean showSignatureOnMethodReturnNodes;
    
    /**
-    * Checks how variables are computed.
-    * @return {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
+    * Are variables computed based on updates or on the visible type structure instead?
     */
    private final boolean variablesAreOnlyComputedFromUpdates;
+   
+   /**
+    * Is predicate evaluation enabled?
+    */
+   private final boolean predicateEvaluationEnabled;
    
    /**
     * Constructor.
@@ -164,6 +168,7 @@ public class KeYLaunchSettings {
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
+    * @param predicateEvaluationEnabled Is predicate evaluation enabled?
     * @throws JavaModelException Occurred Exception.
     */
    public KeYLaunchSettings(boolean newDebugSession,
@@ -185,7 +190,8 @@ public class KeYLaunchSettings {
                             boolean useUnicode,
                             boolean usePrettyPrinting,
                             boolean showSignatureOnMethodReturnNodes,
-                            boolean variablesAreOnlyComputedFromUpdates) throws JavaModelException {
+                            boolean variablesAreOnlyComputedFromUpdates,
+                            boolean predicateEvaluationEnabled) throws JavaModelException {
       this.newDebugSession = newDebugSession;
       this.proofFileToContinue = proofFileToContinue;
       this.method = method;
@@ -207,6 +213,7 @@ public class KeYLaunchSettings {
       this.usePrettyPrinting = usePrettyPrinting;
       this.showSignatureOnMethodReturnNodes = showSignatureOnMethodReturnNodes;
       this.variablesAreOnlyComputedFromUpdates = variablesAreOnlyComputedFromUpdates;
+      this.predicateEvaluationEnabled = predicateEvaluationEnabled;
    }
 
    /**
@@ -375,5 +382,13 @@ public class KeYLaunchSettings {
     */
    public boolean isVariablesAreOnlyComputedFromUpdates() {
       return variablesAreOnlyComputedFromUpdates;
+   }
+
+   /**
+    * Checks if predicate evaluation is enabled.
+    * @return {@code true} enabled, {@code false} disabled
+    */
+   public boolean isPredicateEvaluationEnabled() {
+      return predicateEvaluationEnabled;
    }
 }

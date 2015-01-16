@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -96,6 +97,12 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
        * No refactoring required.
        */
       NONE,
+
+      /**
+       * Refactor the child below the updates computed via
+       * {@link TermBuilder#goBelowUpdates(Term)}.
+       */
+      APPLICATION_BELOW_UPDATES,
 
       /**
        * Refactor direct children of the application term.
