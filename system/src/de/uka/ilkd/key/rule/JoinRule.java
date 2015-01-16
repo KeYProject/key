@@ -119,24 +119,24 @@ public abstract class JoinRule implements BuiltInRule {
       long startTime = System.currentTimeMillis();
       
       // Convert sequents to SE states
-      ImmutableList<Pair<Term, Term>> joinPartnerStates = ImmutableSLList.nil();      
+      ImmutableList<SymbolicExecutionState> joinPartnerStates = ImmutableSLList.nil();      
       for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
          Triple<Term, Term, Term> partnerSEState =
                sequentToSETriple(joinPartner.first, joinPartner.second, services);
          
          joinPartnerStates = joinPartnerStates.prepend(
-               new Pair<Term, Term>(partnerSEState.first, partnerSEState.second));
+               new SymbolicExecutionState(partnerSEState.first, partnerSEState.second));
       }
       
-      Triple<Term, Term, Term> thisSEState =
+      SymbolicExecutionStateWithProgCnt thisSEState =
             sequentToSETriple(newGoal, pio, services);
       
       // The join loop
-      Pair<Term, Term> joinedState =
-            new Pair<Term, Term>(thisSEState.first, thisSEState.second);    
+      SymbolicExecutionState joinedState =
+            new SymbolicExecutionState(thisSEState.first, thisSEState.second);    
 
       int progress = 0;
-      for (Pair<Term,Term> state : joinPartnerStates) {
+      for (SymbolicExecutionState state : joinPartnerStates) {
          System.out.print("Joining state ");
          System.out.print(progress + 1);
          System.out.print(" of ");
@@ -208,9 +208,9 @@ public abstract class JoinRule implements BuiltInRule {
     * @return A new joined SE state (U*,C*) which is a weakening
     *    of the original states.
     */
-   protected abstract Pair<Term, Term> joinStates(
-         Pair<Term, Term> state1,
-         Pair<Term, Term> state2,
+   protected abstract SymbolicExecutionState joinStates(
+         SymbolicExecutionState state1,
+         SymbolicExecutionState state2,
          Term programCounter,
          Services services);
 
@@ -753,7 +753,7 @@ public abstract class JoinRule implements BuiltInRule {
     * @param joinPartner Partner goal to close.
     */
    private static void closeJoinPartnerGoal(
-         Node joinNodeParent, Goal joinPartner, Pair<Term, Term> joinState, Term pc) {
+         Node joinNodeParent, Goal joinPartner, SymbolicExecutionState joinState, Term pc) {
       
       Services services = joinNodeParent.proof().getServices();
       InitConfig initConfig = joinNodeParent.proof().getInitConfig();
@@ -814,7 +814,7 @@ public abstract class JoinRule implements BuiltInRule {
     * @param services The services object.
     * @return An SE state (U,C,p).
     */
-   private static Triple<Term, Term, Term> sequentToSETriple(
+   private static SymbolicExecutionStateWithProgCnt sequentToSETriple(
          Goal goal, PosInOccurrence pio, Services services) {
       
       TermBuilder tb = services.getTermBuilder();
@@ -858,7 +858,7 @@ public abstract class JoinRule implements BuiltInRule {
                      elementary.sub(0)));
       }
       
-      return new Triple<Term, Term, Term>(
+      return new SymbolicExecutionStateWithProgCnt(
             tb.parallel(newElementaries),                  // Update
             joinListToAndTerm(pathConditionSet, services), // Path Condition
             progCntAndPostCond);                           // Program Counter and Post Condition

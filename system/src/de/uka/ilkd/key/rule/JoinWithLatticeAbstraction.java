@@ -29,7 +29,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * Rule that joins two sequents based on a specified set of
@@ -53,9 +52,9 @@ public abstract class JoinWithLatticeAbstraction extends JoinRule {
    protected abstract AbstractDomainLattice<?> getAbstractDomainForSort(Sort s, Services services);
    
    @Override
-   protected Pair<Term, Term> joinStates(
-         Pair<Term, Term> state1,
-         Pair<Term, Term> state2,
+   protected SymbolicExecutionState joinStates(
+         SymbolicExecutionState state1,
+         SymbolicExecutionState state2,
          Term programCounter,
          Services services) {
       
@@ -138,7 +137,7 @@ public abstract class JoinWithLatticeAbstraction extends JoinRule {
                   createSimplifiedDisjunctivePathCondition(state1.second, state2.second, services),
                   newConstraints);
       
-      return new Pair<Term, Term>(newSymbolicState, newPathCondition);
+      return new SymbolicExecutionState(newSymbolicState, newPathCondition);
    }
    
    /**
@@ -177,7 +176,7 @@ public abstract class JoinWithLatticeAbstraction extends JoinRule {
     * @return A suitable abstract element for the given location variable.
     */
    private AbstractDomainElement determineAbstractElem(
-         Pair<Term, Term> state,
+         SymbolicExecutionState state,
          LocationVariable variable,
          AbstractDomainLattice<?> lattice,
          Services services) {

@@ -44,9 +44,9 @@ public class JoinIfThenElse extends JoinRule {
    private static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
 
    @Override
-   protected Pair<Term, Term> joinStates(
-         Pair<Term, Term> state1,
-         Pair<Term, Term> state2,
+   protected SymbolicExecutionState joinStates(
+         SymbolicExecutionState state1,
+         SymbolicExecutionState state2,
          Term programCounter,
          Services services) {
       
@@ -161,7 +161,7 @@ public class JoinIfThenElse extends JoinRule {
       // Construct weakened symbolic state
       Term newSymbolicState = tb.parallel(newElementaryUpdates);
       
-      return new Pair<Term, Term>(newSymbolicState, newPathCondition);
+      return new SymbolicExecutionState(newSymbolicState, newPathCondition);
       
    }
 

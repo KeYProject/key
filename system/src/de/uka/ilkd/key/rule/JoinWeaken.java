@@ -24,7 +24,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * Rule that joins two sequents based on "total" weakening:
@@ -40,9 +39,9 @@ public class JoinWeaken extends JoinRule {
    private static final Name RULE_NAME = new Name(DISPLAY_NAME);
 
    @Override
-   protected Pair<Term, Term> joinStates(
-         Pair<Term, Term> state1,
-         Pair<Term, Term> state2,
+   protected SymbolicExecutionState joinStates(
+         SymbolicExecutionState state1,
+         SymbolicExecutionState state2,
          Term programCounter,
          Services services) {
       
@@ -82,7 +81,7 @@ public class JoinWeaken extends JoinRule {
       Term newPathCondition =
                   createSimplifiedDisjunctivePathCondition(state1.second, state2.second, services);
       
-      return new Pair<Term, Term>(newSymbolicState, newPathCondition);
+      return new SymbolicExecutionState(newSymbolicState, newPathCondition);
    }
 
    @Override
