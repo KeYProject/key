@@ -116,44 +116,8 @@ public class JoinIfThenElse extends JoinRule {
             
             // Apply if-then-else construction: Different values
             
-            // We only need the distinguishing subformula; the equal part
-            // is not needed. For soundness, it suffices that the "distinguishing"
-            // formula is implied by the original path condition; for completeness,
-            // we add the common subformula in the new path condition, if it
-            // is not already implied by that.
-            Pair<Term, Term> distinguishingAndEqualFormula1 =
-                  getDistinguishingFormula(state1.second, state2.second, services);
-            Term distinguishingFormula = distinguishingAndEqualFormula1.first;
-            Term equalSubFormula = distinguishingAndEqualFormula1.second;
-            
-            Pair<Term, Term> distinguishingAndEqualFormula2 =
-                  getDistinguishingFormula(state2.second, state1.second, services);
-            Term distinguishingFormula2 = distinguishingAndEqualFormula2.first;
-            
-            // Choose the shorter distinguishing formula
-            boolean commuteSides = false;
-            if (countAtoms(distinguishingFormula2) < countAtoms(distinguishingFormula)) {
-               distinguishingFormula = distinguishingFormula2;
-               commuteSides = true;
-            }
-            
-            // Try an automatic simplification
-            distinguishingFormula = trySimplify(services.getProof(), distinguishingFormula);
-            
-            // Add common subformula to path condition, if necessary
-            Term commonPartAlreadyImpliedForm =
-                  tb.imp(newPathCondition, equalSubFormula);
-            if (!isProvableWithSplitting(commonPartAlreadyImpliedForm, services)) {
-               newPathCondition = tb.and(newPathCondition, equalSubFormula);
-            }
-            
-            // Construct the update for the symbolic state
             newElementaryUpdates = newElementaryUpdates.prepend(
-                  tb.elementary(
-                        v,
-                        tb.ife(distinguishingFormula,
-                              commuteSides ? rightSide2 : rightSide1,
-                                    commuteSides ? rightSide1 : rightSide2)));
+                  createIfThenElseTerm(v, state1, state2, services));
             
          }
       }
@@ -162,6 +126,89 @@ public class JoinIfThenElse extends JoinRule {
       Term newSymbolicState = tb.parallel(newElementaryUpdates);
       
       return new SymbolicExecutionState(newSymbolicState, newPathCondition);
+      
+   }
+   
+   /**
+    * Creates an if-then-else update for the variable v. If t1 is
+    * the right side for v in state1, and t2 is the right side
+    * in state1, the resulting elementary update corresponds to
+    * <code>{ v := \if (c1) \then (t1) \else (t2) }</code>, where
+    * c1 is the path condition of state1. However, the method also
+    * tries an optimization: The path condition c2 of state2 could
+    * be used if it is shorter than c1. Moreover, equal parts of c1
+    * and c2 could be omitted, since the condition shall only distinguish
+    * between the states.
+    * 
+    * @param v Variable to return the update for.
+    * @param state1 First state to evaluate.
+    * @param state2 Second state to evaluate.
+    * @param services The services object.
+    * @return An elementary update like <code>{ v := \if (c1) \then (t1) \else (t2) }</code>,
+    *    where the cI are the path conditions of stateI.
+    */
+   static Term createIfThenElseTerm(
+         LocationVariable v,
+         SymbolicExecutionState state1,
+         SymbolicExecutionState state2,
+         Services services) {
+      
+      TermBuilder tb = services.getTermBuilder();
+      
+      Term rightSide1 = getUpdateRightSideFor(state1.first, v);
+      Term rightSide2 = getUpdateRightSideFor(state2.first, v);
+      
+      if (rightSide1 == null) {
+         rightSide1 = tb.var(v);
+      }
+      
+      if (rightSide2 == null) {
+         rightSide2 = tb.var(v);
+      }
+      
+      // We only need the distinguishing subformula; the equal part
+      // is not needed. For soundness, it suffices that the "distinguishing"
+      // formula is implied by the original path condition; for completeness,
+      // we add the common subformula in the new path condition, if it
+      // is not already implied by that.
+      Pair<Term, Term> distinguishingAndEqualFormula1 =
+            getDistinguishingFormula(state1.second, state2.second, services);
+      Term distinguishingFormula = distinguishingAndEqualFormula1.first;
+      
+      Pair<Term, Term> distinguishingAndEqualFormula2 =
+            getDistinguishingFormula(state2.second, state1.second, services);
+      Term distinguishingFormula2 = distinguishingAndEqualFormula2.first;
+      
+      // Choose the shorter distinguishing formula
+      boolean commuteSides = false;
+      if (countAtoms(distinguishingFormula2) < countAtoms(distinguishingFormula)) {
+         distinguishingFormula = distinguishingFormula2;
+         commuteSides = true;
+      }
+      
+      // Try an automatic simplification
+      distinguishingFormula = trySimplify(services.getProof(), distinguishingFormula);
+
+      // Originally, here was a specific check of whether the equal parts
+      // of the two path conditions was still included in the new path condition.
+      // However, this should always be the case; it shouldn't vanish in
+      // the creation of the disjunction. Even if it did, soundness would
+      // not be affected, it only could be a completeness issue. Uncomment
+      // the code below if you want to test this measure.
+      /*Term equalSubFormula = distinguishingAndEqualFormula1.second;
+      // Add common subformula to path condition, if necessary
+      Term commonPartAlreadyImpliedForm =
+            tb.imp(newPathCondition, equalSubFormula);
+      if (!isProvableWithSplitting(commonPartAlreadyImpliedForm, services)) {
+         newPathCondition = tb.and(newPathCondition, equalSubFormula);
+      }*/
+      
+      // Construct the update for the symbolic state
+      return tb.elementary(
+               v,
+               tb.ife(distinguishingFormula,
+                     commuteSides ? rightSide2 : rightSide1,
+                           commuteSides ? rightSide1 : rightSide2));
       
    }
 
