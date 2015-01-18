@@ -205,6 +205,23 @@ public final class ParserBuilder {
       };
    }
 
+   public static ParseFunction separatedNonEmptyListErrorRecovery(
+         final char sep, final ParseFunction function,
+         final String missingExceptionText) {
+      if (function == null) {
+         throw new IllegalArgumentException("Provide a non null function");
+      }
+      return new ParseFunction() {
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            return ParserUtils.parseSeparatedNonEmptyListErrorRecovery(text,
+                  start, end, sep, function, missingExceptionText);
+         }
+      };
+   }
+
    /**
     * Separates the given parse function with a character. That means, that a
     * single character, the separation character) is expected before it is
@@ -563,7 +580,6 @@ public final class ParserBuilder {
                return Nodes.createNode(type, function.parse(text, start, end));
             }
             catch (final ParserException e) {
-               System.out.println("Tzpes error: " + e.getErrorNode());
                if (e.getErrorNode() == null) {
                   throw e;
                }

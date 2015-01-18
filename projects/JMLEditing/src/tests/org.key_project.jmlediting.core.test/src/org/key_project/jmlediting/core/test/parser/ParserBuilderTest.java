@@ -185,6 +185,14 @@ public class ParserBuilderTest {
    }
 
    @Test
+   public void testParseSeparatedNonEmptyListErrorRecovery()
+         throws ParserException {
+      testRecovery("A,A,",
+            separatedNonEmptyListErrorRecovery(',', parseA, "Missing an A"),
+            "List[0-4](String[0-1](A),String[2-3](A),ErrorNode[3-4](String[3-4](,)))");
+   }
+
+   @Test
    public void testParseEmptySeparatedNonEmptyList() throws ParserException {
       testParseFail("", separatedNonEmptyList(',', parseA, "Missed an A"));
    }

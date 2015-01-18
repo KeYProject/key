@@ -35,15 +35,9 @@ public class StoreRefParserTest {
 
    @Test
    public void testParseQualifiedRecovery() throws ParserException {
-      try {
-         testParse(
-               " this.state. ",
-               "StoreRefList[1-20](List[1-20](StoreRefExpr[1-20](StoreRefName[1-5](String[1-5](this)),List[6-20](StoreRefNameSuffix[6-11](String[6-11](state)),StoreRefNameSuffix[14-20](String[14-20](action))))))");
-      }
-      catch (final ParserException e) {
-         System.out.println("Error Node " + e.getErrorNode());
-         fail();
-      }
+      testRecovery(
+            " this.state. ",
+            "StoreRefList[1-12](List[1-12](StoreRefExpr[1-12](StoreRefName[1-5](String[1-5](this)),List[6-12](StoreRefNameSuffix[6-11](String[6-11](state)),StoreRefNameSuffix[11-12](ErrorNode[11-12](String[11-12](.)))))))");
    }
 
    @Test
@@ -132,6 +126,11 @@ public class StoreRefParserTest {
          return;
       }
       fail("StoreRefParser parsed \"" + text + "\"");
+   }
+
+   private static void testRecovery(final String text, final String recoveryTerm) {
+      ParserTestUtils.testRecovery(text, new StoreRefParser(
+            ProfileWrapper.testProfile, true), recoveryTerm);
    }
 
    private static void testParse(final String text, final String resultTerm)
