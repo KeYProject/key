@@ -58,6 +58,7 @@ public class KeYProjectBuildJob extends Job{
       }
       if(buildType != KeYProjectBuildJob.AUTO_BUILD && buildType != KeYProjectBuildJob.FULL_BUILD ){
          KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
+         keyDelta.update(null);
          keyDelta.setIsBuilding(true);
       }
       cancelProjectJobs();

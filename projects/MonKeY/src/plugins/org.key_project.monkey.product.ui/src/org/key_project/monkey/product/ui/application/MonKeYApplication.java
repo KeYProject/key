@@ -26,7 +26,7 @@ import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.SwingUtil;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 
 /**

@@ -84,6 +84,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
@@ -112,6 +113,7 @@ import org.key_project.util.eclipse.setup.SetupStartup;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithException;
@@ -120,7 +122,7 @@ import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.internal.ContextMenuHelper;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -1789,6 +1791,26 @@ public class TestUtilsUtil {
    }
 
    /**
+    * Selects the given text in the given {@link SWTBotStyledText}.
+    * @param styledText The {@link SWTBotStyledText} to select text in.
+    * @param text The text to select.
+    * @return The x and y coordinate of the selected text.
+    */
+   public static Point selectText(final SWTBotStyledText styledText, 
+                                  final String text) {
+      return syncExec(new Result<Point>() {
+         @Override
+         public Point run() {
+            int index = styledText.widget.getText().indexOf(text);
+            styledText.widget.setCaretOffset(index);
+            styledText.widget.setSelection(index, index + text.length());
+            int offset = styledText.widget.getCaretOffset();
+            return styledText.widget.getLocationAtOffset(offset);
+         }
+      });
+   }
+   
+   /**
     * Ensures that the given arrays contain the same elements.
     * @param expected The first array.
     * @param actual The second array.
@@ -1870,5 +1892,16 @@ public class TestUtilsUtil {
             return "Timed out waiting for " + table + " to contain at least " + minRowCount + " rows.";
          }
       });
+   }
+
+   /**
+    * Compares the given {@link String}s ignoring white space.
+    * @param expected The expected text.
+    * @param actual The actual text.
+    */
+   public static void assertEqualsIgnoreWhiteSpace(String expected, String actual) {
+      if (!StringUtil.equalIgnoreWhiteSpace(expected, actual)) {
+         assertEquals(expected, actual);
+      }
    }
 }

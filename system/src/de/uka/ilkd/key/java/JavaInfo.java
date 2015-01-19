@@ -542,6 +542,36 @@ public final class JavaInfo {
         return kpmi.getProgramMethod(classType, methodName, signature, context);
     }
 
+    public IProgramMethod getProgramMethod(KeYJavaType classType,
+            String methodName,
+            ImmutableArray<? extends Type> signature,
+            KeYJavaType context) {
+        return getProgramMethod(classType, methodName, signature.toImmutableList(), context);
+    }
+    
+    /**
+     * returns the program method defined in the KeYJavaType of the program
+     * variable clv, with the name m, and the KeYJavaTypes of the given array
+     * of program variables as signatures.
+     * @param classType the KeYJavaType of the class where to look for the
+     *  method
+     * @param methodName the name of the method
+     * @param args an array of ProgramVariables as the arguments of the
+     * method
+     * @param context the KeYJavaType of the class context from <em>where</em>
+     *  the method is called
+     * @return a matching program method
+     */
+    public IProgramMethod getProgramMethod(KeYJavaType classType,
+	    				  String methodName,
+	    				  ProgramVariable[] args,
+	    				  KeYJavaType context){
+        ImmutableList<Type> types = ImmutableSLList.<Type>nil();
+        for (int i = args.length - 1; i>=0; i--) {
+            types = types.prepend(args[i].getKeYJavaType());
+        }
+        return getProgramMethod(classType, methodName, types, context);
+    }
 
     public IProgramMethod getToplevelPM(KeYJavaType kjt,
 	    			       String methodName,
@@ -566,45 +596,93 @@ public final class JavaInfo {
 	return getToplevelPM(kjt, methodName, sig);
     }
 
-
-    public Term getProgramMethodTerm(Term prefix,
-	    			     String methodName,
-				     Term[] args,
-				     String className) {
-	ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
-	KeYJavaType clType = getTypeByClassName(className);
-	for(int i=0; i < args.length; i++) {
-	    sig = sig.append(getServices().getJavaInfo().getKeYJavaType(args[i].sort()));
-	}
-	IProgramMethod pm   = getProgramMethod(clType, methodName, sig, clType);
-	if(pm == null) {
-	    throw new IllegalArgumentException("Program method "+methodName
-					       +" in "+className+" not found.");
-	}
-	Term[] subs = new Term[pm.getHeapCount(services)*pm.getStateCount() + args.length + (pm.isStatic() ? 0 : 1)];
-	int offset = 0;
-	for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
-		if(offset >= pm.getHeapCount(services)) {
-			break;
-		}
-		subs[offset++] = services.getTermBuilder().var(heap);
-	}
-	if(!pm.isStatic()) {
-	  subs[offset++] = prefix;
-	}
-	for(int i=0; offset < subs.length; i++, offset++) {
-        subs[offset] = args[i];
-	}
-	className = translateArrayType(className);
-	assert pm.getReturnType() != null;
-	if(pm.isVoid()) {
-	    throw new IllegalArgumentException("Program method "+methodName
-					       +" in "+className+" must have"
-					       +" a non-void type.");
-	}
-	return services.getTermBuilder().tf().createTerm(pm, subs);
+    public Term getStaticProgramMethodTerm(String methodName, Term[] args, String className) {
+        ImmutableList<KeYJavaType> argList = ImmutableSLList.<KeYJavaType>nil();
+        for (int i = 0; i < args.length; i++) {
+            argList = argList.append(getServices().getJavaInfo().getKeYJavaType(args[i].sort()));
+        }
+        KeYJavaType classKJT = getTypeByClassName(className);
+        IProgramMethod pm = getProgramMethod(classKJT, methodName, argList, classKJT);
+        return getTermFromProgramMethod(pm, methodName, className, args, null);
     }
 
+    public Term getProgramMethodTerm(Term prefix,
+            String methodName,
+            Term[] args,
+            String className,
+            boolean traverseHierarchy) {
+        ImmutableList<KeYJavaType> argList = ImmutableSLList.<KeYJavaType>nil();
+        for (int i = 0; i < args.length; i++) {
+            argList = argList.append(getServices().getJavaInfo().getKeYJavaType(args[i].sort()));
+        }
+
+        IProgramMethod pm = null;
+        KeYJavaType classKJT = getTypeByClassName(className);
+        if (prefix == null) {
+            /*
+             * Method is referenced from a static context.
+             */
+            pm = getProgramMethod(classKJT, methodName, argList, classKJT);
+        } else {
+            /*
+             * Method is referenced from a non-static context.
+             */
+            if (traverseHierarchy) {
+                /* 
+                 * Traverse type hierarchy to find a method with the specified name.
+                 */
+                ImmutableList<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(classKJT).reverse();
+                Iterator iterator = allSupertypes.iterator();
+                while (iterator.hasNext() && pm == null) {
+                    KeYJavaType next = (KeYJavaType) iterator.next();
+                    pm = getProgramMethod(next, methodName, argList, next);
+                    if (pm != null && pm.isPrivate() && !next.equals(classKJT)) {
+                        /*
+                         * Private methods from supertypes are not visible in their
+                         * subtypes. They will not be selected here.
+                         */
+                        pm = null;
+                    }
+                }
+            } else {
+                /* 
+                 * Do not traverse type hierarchy. pm stays null in case classKJT
+                 * does not contain a method with the specified name.
+                 */
+                pm = getProgramMethod(classKJT, methodName, argList, classKJT);
+            }
+        }
+        return getTermFromProgramMethod(pm, methodName, className, args, prefix);
+    }
+
+    private Term getTermFromProgramMethod(IProgramMethod pm, String methodName, String className, Term[] args, Term prefix) throws IllegalArgumentException {
+        if (pm == null) {
+            throw new IllegalArgumentException("Program method " + methodName
+                    + " in " + className + " not found.");
+        }
+        Term[] subs = new Term[pm.getHeapCount(services) * pm.getStateCount() + args.length + (pm.isStatic() ? 0 : 1)];
+        int offset = 0;
+        for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+            if (offset >= pm.getHeapCount(services)) {
+                break;
+            }
+            subs[offset++] = services.getTermBuilder().var(heap);
+        }
+        if (!pm.isStatic()) {
+            subs[offset++] = prefix;
+        }
+        for (int i = 0; offset < subs.length; i++, offset++) {
+            subs[offset] = args[i];
+        }
+        className = translateArrayType(className);
+        assert pm.getReturnType() != null;
+        if (pm.isVoid()) {
+            throw new IllegalArgumentException("Program method " + methodName
+                    + " in " + className + " must have"
+                    + " a non-void type.");
+        }
+        return services.getTermBuilder().tf().createTerm(pm, subs);
+    }
 
     /**
      * returns all direct supertypes (local declared types in extends and
@@ -672,31 +750,6 @@ public final class JavaInfo {
 	}
 
         return result;
-    }
-
-
-    /**
-     * returns the program method defined in the KeYJavaType of the program
-     * variable clv, with the name m, and the KeYJavaTypes of the given array
-     * of program variables as signatures.
-     * @param classType the KeYJavaType of the class where to look for the
-     *  method
-     * @param methodName the name of the method
-     * @param args an array of ProgramVariables as the arguments of the
-     * method
-     * @param context the KeYJavaType of the class context from <em>where</em>
-     *  the method is called
-     * @return a matching program method
-     */
-    public IProgramMethod getProgramMethod(KeYJavaType classType,
-	    				  String methodName,
-	    				  ProgramVariable[] args,
-	    				  KeYJavaType context){
-        ImmutableList<Type> types = ImmutableSLList.<Type>nil();
-        for (int i = args.length - 1; i>=0; i--) {
-            types = types.prepend(args[i].getKeYJavaType());
-        }
-        return getProgramMethod(classType, methodName, types, context);
     }
 
     /** gets an array of expression and returns a list of types */
@@ -972,54 +1025,28 @@ public final class JavaInfo {
     }
     
     /*
-     Traverses the type hierarchy to find the first {@link KeYJavaType} in which
-     a field of name {@code fieldName} is declared, starting from parameter {@code kjt}. And
-     then returns a {@link ProgramVariable} for that field/type combination.
+     * Traverses the type hierarchy to find the first {@link KeYJavaType} in which
+     * a field of name {@code fieldName} is declared, starting from parameter {@code kjt}. And
+     * then returns a {@link ProgramVariable} for that field/type combination.
     
-     Type detection in this method is canonical, i.e. selecting a field of name
-     {@code fieldName} on an object of (dynamic) type {@code kjt} during Java program
-     execution would end up in the same type as the type of the returned {@link ProgramVariable}.
+     * Type detection in this method is canonical, i.e. selecting a field of name
+     * {@code fieldName} on an object of (dynamic) type {@code kjt} during Java program
+     * execution would end up in the same type as the type of the returned {@link ProgramVariable}.
      */
     public ProgramVariable getCanonicalFieldProgramVariable(String fieldName, KeYJavaType kjt) {
-
-        ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
-
-        if (!(kjt.getSort().extendsTrans(objectSort()))) {
-            return null;
-        }
-
+        ImmutableList<ProgramVariable> allAttributes = getAllAttributes(fieldName, kjt, false);
         if (kjt.getJavaType() instanceof ArrayType) {
-            ProgramVariable var = find(fieldName, getFields(((ArrayDeclaration) kjt.getJavaType())
-                    .getMembers()));
-            if (var != null) {
-                result = result.prepend(var);
-            }
-            var = getAttribute(fieldName, getJavaLangObject());
-            if (var != null) {
-                result = result.prepend(var);
-            }
-            return result.head();
+            return allAttributes.head();
+        } else {
+            return allAttributes.reverse().head();
         }
-
-        // the assert statements below are not for fun, some methods rely
-        // on the correct order
-        ImmutableList<KeYJavaType> hierarchy = kpmi.getAllSupertypes(kjt);
-        assert hierarchy.head() == kjt;
-
-        final Iterator<KeYJavaType> it = hierarchy.iterator();
-        while (it.hasNext()) {
-            KeYJavaType st = it.next();
-            if (st != null) {
-                final ProgramVariable var = getAttribute(fieldName, st);
-                if (var != null) {
-                    return var;
-                }
-            }
-        }
-
-        return null;
     }
 
+    public ImmutableList<ProgramVariable> getAllAttributes(String programName,
+                                                  KeYJavaType type) {
+        return getAllAttributes(programName, type, true);
+    }
+    
     /**
      * returns a list of all attributes with the given program name
      * declared in one of <tt>type</tt>'s sub- or supertype including
@@ -1032,10 +1059,14 @@ public final class JavaInfo {
      * in a program
      * @param type the KeYJavaType specifying the part of the hierarchy
      * where to look for
+     * @param traverseSubtypes The method will visit subtypes of {@code type}
+     * while traversing its type hierarchy iff this is set to true. Otherwise
+     * only supertypes will be visited.
      * @return list of found attributes with name <tt>programName</tt>
      */
     public ImmutableList<ProgramVariable> getAllAttributes(String programName,
-                                                  KeYJavaType type) {
+                                                  KeYJavaType type,
+                                                  boolean traverseSubtypes) {
         ImmutableList<ProgramVariable> result =
             ImmutableSLList.<ProgramVariable>nil();
 
@@ -1056,8 +1087,11 @@ public final class JavaInfo {
 
         // the assert statements below are not for fun, some methods rely
         // on the correct order
-        ImmutableList<KeYJavaType> hierarchy = kpmi.getAllSubtypes(type);
-        assert !hierarchy.contains(type);
+        ImmutableList<KeYJavaType> hierarchy = ImmutableSLList.<KeYJavaType>nil();
+        if (traverseSubtypes) {
+            hierarchy = kpmi.getAllSubtypes(type);
+            assert !hierarchy.contains(type);
+        }
 
         hierarchy = hierarchy.prepend(kpmi.getAllSupertypes(type));
         assert hierarchy.head() == type;
@@ -1369,6 +1403,28 @@ public final class JavaInfo {
            staticInvs.put(target, inv);
         }
         return inv;
+    }
+
+    public boolean isCanonicalProgramMethod(IProgramMethod method, KeYJavaType context) {
+        String name = method.getName().toString();
+        ImmutableArray<KeYJavaType> paramTypes = method.getParamTypes();
+        IProgramMethod canonicalMethod = getProgramMethod(context, name, paramTypes, context);
+        if (method.isPublic()) {
+            /*
+             * Canonical ProgramMmethod can be located in a supertype in case the method is public.
+             */
+            ImmutableList<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(context);
+            Iterator<KeYJavaType> iterator = allSupertypes.iterator();
+            iterator.next(); // skip first element (it equals context and was already processed above)
+            while (iterator.hasNext()) {
+                KeYJavaType next = iterator.next();
+                IProgramMethod programMethod = getProgramMethod(next, name, paramTypes, context);
+                if (programMethod != null) {
+                    canonicalMethod = programMethod;
+                }
+            }
+        }
+        return method.equals(canonicalMethod);
     }
 
     /**

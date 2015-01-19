@@ -39,8 +39,8 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.KeYSelectionEvent;
-import de.uka.ilkd.key.gui.KeYSelectionListener;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;

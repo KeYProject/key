@@ -257,6 +257,12 @@ public class OracleGenerator {
 			if(javaOp.equals(EQUALS)){
 				return eq(left, right);
 			}
+			else if(javaOp.equals(AND)){
+				return and(left,right);
+			}
+			else if(javaOp.equals(OR)){
+				return or(left,right);
+			}
 			
 			
 			return new OracleBinTerm(javaOp,left,right);			
@@ -299,6 +305,13 @@ public class OracleGenerator {
 		}
 		//forall
 		else if (op == Quantifier.ALL || op == Quantifier.EX) {
+			Sort field = services.getTypeConverter().getHeapLDT().getFieldSort();
+			Sort heap = services.getTypeConverter().getHeapLDT().targetSort();
+			Sort varSort = term.boundVars().get(0).sort();
+			if(varSort.equals(field) || varSort.equals(heap)){
+				return OracleConstant.TRUE;
+			}
+			
 			OracleMethod method = createQuantifierMethod(term, initialSelect);
 			oracleMethods.add(method);
 			List<OracleTerm> args = new LinkedList<OracleTerm>();
@@ -321,7 +334,15 @@ public class OracleGenerator {
 		}
 		//program variables
 		else if (op instanceof ProgramVariable){
-			LocationVariable loc = (LocationVariable) op;
+			ProgramVariable var = (ProgramVariable) op;
+			
+//			if(services.getVariableNamer().getRenamingMap().get(var) != null){
+//				var = services.getVariableNamer().getRenamingMap().get(var);
+//			}
+			
+			//System.out.println(services.getVariableNamer().getRenamingMap());
+			
+			LocationVariable loc = (LocationVariable) var;
 			//System.out.println("Term: "+loc.sort()+" "+loc.name());
 			return new OracleConstant(loc.name().toString(), loc.sort());
 		}
@@ -708,6 +729,46 @@ public class OracleGenerator {
 		}
 		else{
 			return new OracleBinTerm(EQUALS, left, right);
+		}
+	}
+	
+	private static OracleTerm and(OracleTerm left, OracleTerm right){
+		
+		
+		if(left.equals(OracleConstant.TRUE)){
+			return right;
+		}
+		else if(left.equals(OracleConstant.FALSE)){
+			return OracleConstant.FALSE;
+		}
+		else if(right.equals(OracleConstant.TRUE)){
+			return left;
+		}
+		else if(right.equals(OracleConstant.FALSE)){
+			return OracleConstant.FALSE;
+		}
+		else{
+			return new OracleBinTerm(AND, left, right);
+		}
+		
+		
+	}
+	
+	private static OracleTerm or(OracleTerm left, OracleTerm right){
+		if(left.equals(OracleConstant.TRUE)){
+			return OracleConstant.TRUE;
+		}
+		else if(left.equals(OracleConstant.FALSE)){
+			return right;
+		}
+		else if(right.equals(OracleConstant.TRUE)){
+			return OracleConstant.TRUE;
+		}
+		else if(right.equals(OracleConstant.FALSE)){
+			return left;
+		}
+		else{
+			return new OracleBinTerm(OR, left, right);
 		}
 	}
 	

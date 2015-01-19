@@ -4,12 +4,22 @@ public class ProofMetaReferenceAccess {
 
    private String kjt;
    private String name;
-   private String source;
+   private String type;
+   private String visibility;
+   private boolean isStatic;
+   private boolean isFinal;
+   private boolean assignedInConstructor;
+   private String initializer;
    
-   public ProofMetaReferenceAccess(String kjt, String name, String source){
+   public ProofMetaReferenceAccess(String kjt, String name, String type, String visibility, boolean isStatic, boolean isFinal, boolean assignedInConstructor, String initializer){
       this.kjt = kjt;
       this.name = name;
-      this.source = source;
+      this.type = type;
+      this.visibility = visibility;
+      this.isStatic = isStatic;
+      this.isFinal = isFinal;
+      this.assignedInConstructor = assignedInConstructor;
+      this.initializer = initializer;
    }
 
    public String getKjt() {
@@ -19,9 +29,29 @@ public class ProofMetaReferenceAccess {
    public String getName() {
       return name;
    }
+   
+   public String getType() {
+      return type;
+   }
 
-   public String getSource() {
-      return source;
+   public String getVisibility() {
+      return visibility;
+   }
+
+   public boolean isStatic() {
+      return isStatic;
+   }
+
+   public boolean isFinal() {
+      return isFinal;
+   }
+
+   public boolean isCalledInConstructor() {
+      return assignedInConstructor;
+   }
+
+   public String getInitializer() {
+      return initializer;
    }
    
 }

@@ -13,9 +13,10 @@
 
 package org.key_project.key4eclipse.resources.builder;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +34,8 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -42,7 +45,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaCore;
-import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
 import org.key_project.key4eclipse.resources.io.ProofMetaReferencesComparator;
 import org.key_project.key4eclipse.resources.log.LogManager;
@@ -64,34 +66,31 @@ import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 
-import recoder.ModelException;
-import recoder.parser.ParseException;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.JavaSourceElement;
-import de.uka.ilkd.key.java.PosConvertException;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomUserInterface;
+import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -154,88 +153,12 @@ public class ProofManager {
     * @throws CoreException
     */
    private void handleProblemLoaderException(ProblemLoaderException e) throws CoreException{
+      Location location = ExceptionTools.getLocation(e);
       IResource res = project;
       int lineNumber = -1;
+      res = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(location.getFilename()));
       String markerMessage = e.getMessage();
-      if (e.getCause() instanceof PosConvertException) {
-         PosConvertException pce = (PosConvertException) e.getCause();
-         if (pce.getCause() instanceof ModelException) {
-            ModelException me = (ModelException) pce.getCause();
-            markerMessage = me.getMessage();
-         }
-         else {
-            markerMessage = pce.getMessage();
-         }
-         lineNumber = pce.getLine();
-         StringBuffer sb = new StringBuffer(markerMessage);
-         int fileIndex = sb.lastIndexOf(" in FILE:");
-         if (fileIndex >= 0) {
-            sb.delete(0, fileIndex + 9);
-            IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(sb.toString()));
-            if (file.exists()) {
-               res = file;
-            }
-         }
-      }
-      else if (e.getCause() instanceof ConvertException) {
-         ConvertException ce = (ConvertException) e.getCause();
-         if (ce.getCause() instanceof RuntimeException) {
-            RuntimeException re = (RuntimeException) ce.getCause();
-            markerMessage = re.getMessage();
-            StringBuffer sb = new StringBuffer(re.getMessage());
-            int lineBreakIndex = sb.indexOf(")\n");
-            if (lineBreakIndex >= 0) {
-               sb.delete(0, lineBreakIndex + 2);
-               int lineIndex = sb.indexOf(", line ");
-               if (lineIndex >= 0) {
-                  String pathStr = sb.substring(0, lineIndex);
-                  IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(pathStr));
-                  if (file.exists()) {
-                     res = file;
-                  }
-                  sb.delete(0, lineIndex + 7);
-                  int columnIndex = sb.indexOf(", column ");
-                  if (columnIndex >= 0) {
-                     String lineStr = sb.substring(0, columnIndex);
-                     lineNumber = Integer.parseInt(lineStr);
-                  }
-               }
-               
-            }
-         }
-         else if (ce.getCause() instanceof ParseException) {
-            ParseException pe = (ParseException) ce.getCause();
-            markerMessage = pe.getMessage();
-            StringBuffer sb = new StringBuffer(pe.getMessage());
-            int errorIndex = sb.indexOf("Error in file ");
-            if (errorIndex >= 0) {
-               sb.delete(0, 14);
-               int pathEndIndex = sb.indexOf(": ");
-               if (pathEndIndex >= 0) {
-                  String path = sb.substring(0, pathEndIndex);
-                  IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(path));
-                  if (file.exists()) {
-                     res = file;
-                  }
-                  sb.delete(0, pathEndIndex + 2);
-                  int lineIndex = sb.indexOf("\" at line ");
-                  int columnIndex = sb.indexOf(", column ");
-                  if (lineIndex >= 0 && columnIndex >= 0) {
-                     sb.delete(0, lineIndex + 10);
-                     columnIndex = sb.indexOf(", column ");
-                     String lineStr = sb.substring(0, columnIndex);
-                     lineNumber = Integer.parseInt(lineStr);
-                  }
-               }
-            }
-         }
-      }
-      else if (e.getCause() instanceof SLTranslationException) {
-         SLTranslationException slte = (SLTranslationException) e.getCause();
-         res = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(slte.getFileName()));
-         lineNumber = slte.getLine();
-         markerMessage = slte.getMessage();
-      }
+      lineNumber = location.getLine();
       synchronized (keyDelta.lock) {
          keyDelta.resetDelta();
       }
@@ -254,6 +177,7 @@ public class ProofManager {
          proofElements = computeProofElementsAndUpdateProjectInfo();
          keyDelta.resetDelta();
       }
+      createBuildFile();
       sortProofElements(editorSelection);
       selectProofElementsForBuild();
       cleanMarker();
@@ -264,8 +188,41 @@ public class ProofManager {
       monitor.beginTask("Building proofs for " + project.getName(), proofElements.size());
       initThreads(monitor);
       checkContractRecursion();
+      if(!monitor.isCanceled()){
+         deleteBuildFile();
+      }
       monitor.done();
    }
+   
+   
+   private void createBuildFile() throws CoreException {
+      final IFile buildFile = KeYResourcesUtil.getProofFolder(project).getFile(KeYResourcesUtil.BUILD_FILE);
+      final String message = "The last build was not finished. A new build is required.";
+      final byte[] bytes = message.getBytes();
+      IWorkspaceRunnable operation = new IWorkspaceRunnable() {
+         @Override
+         public void run(IProgressMonitor monitor) throws CoreException {
+            if (!buildFile.exists()) {
+               buildFile.create(new ByteArrayInputStream(bytes), true, null);
+            }
+         }
+      };
+      ResourcesPlugin.getWorkspace().run(operation, null, IWorkspace.AVOID_UPDATE, null);
+   }
+
+   private void deleteBuildFile() throws CoreException {
+      final IFile buildFile = KeYResourcesUtil.getProofFolder(project).getFile(KeYResourcesUtil.BUILD_FILE);
+      IWorkspaceRunnable operation = new IWorkspaceRunnable() {
+         @Override
+         public void run(IProgressMonitor monitor) throws CoreException {
+            if (buildFile.exists()) {
+               buildFile.delete(true, null);
+            }
+         }
+      };
+      ResourcesPlugin.getWorkspace().run(operation, null, IWorkspace.AVOID_UPDATE, null);
+   }
+   
    
    /**
     * Collects all {@link Proof}s available in the {@link IProject} and returns their
@@ -584,17 +541,15 @@ public class ProofManager {
          }
          if(build){
             pe.setBuild(true);
-            if(!pe.getOutdated()){
-               pe.setOutdated(true);
-               MarkerUtil.setOutdated(pe, true);
-               if(pe.hasMetaFile() && pe.hasProofFile()){
-                  try {
-                     keyDelta.addJobChangedFile(pe.getMetaFile());
-                     ProofMetaFileWriter.writeMetaFile(pe);
-                  }
-                  catch (Exception e) {
-                     LogUtil.getLogger().logError(e);
-                  }
+            pe.setOutdated(true);
+            MarkerUtil.setOutdated(pe, true);
+            if(pe.hasMetaFile() && pe.hasProofFile()){
+               try {
+                  keyDelta.addJobChangedFile(pe.getMetaFile());
+                  ProofMetaFileWriter.writeMetaFile(pe);
+               }
+               catch (Exception e) {
+                  LogUtil.getLogger().logError(e);
                }
             }
          }
@@ -732,7 +687,8 @@ public class ProofManager {
             if(res.getType() == IResource.FILE){
                if(!proofFiles.contains(res) && 
                   !ProjectInfoManager.getInstance().isProjectInfoFile((IFile)res) &&
-                  !LogManager.getInstance().isLogFile((IFile)res)) {
+                  !LogManager.getInstance().isLogFile((IFile)res) &&
+                  !KeYResourcesUtil.isBuildFile(res)) {
                   keyDelta.addJobChangedFile((IFile) res);
                   res.delete(true, null);
                }

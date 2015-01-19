@@ -36,7 +36,6 @@ options {
   import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
   import de.uka.ilkd.key.parser.UnfittingReplacewithException;
   import de.uka.ilkd.key.parser.ParserMode;
-  import de.uka.ilkd.key.parser.DeclPicker;
   import de.uka.ilkd.key.parser.IdDeclaration;
   import de.uka.ilkd.key.parser.ParserConfig;
 
@@ -135,7 +134,6 @@ options {
    private HashSet usedChoiceCategories = new LinkedHashSet();
    private HashMap taclet2Builder;
    private AbbrevMap scm;
-   private KeYExceptionHandler keh = null;
    
    
    private String filename;
@@ -158,6 +156,7 @@ options {
 
    private String chooseContract = null;
    private String proofObligation = null;
+   private String problemHeader = null;
     
    private int savedGuessing = -1;
    
@@ -181,7 +180,6 @@ options {
    private JavaReader javaReader;
 
    // if this is used then we can capture parts of the input for later use
-   private DeclPicker capturer = null;
    private IProgramMethod pm = null;
 
    private LinkedHashMap<RuleKey, Taclet> taclets = new LinkedHashMap<RuleKey, Taclet>();
@@ -209,7 +207,6 @@ options {
 
    public KeYParser(ParserMode mode, TokenStream lexer, Services services) {
        this(mode, lexer);
-       this.keh = services.getExceptionHandler();
    }
 
    /* Most general constructor, should only be used internally */
@@ -221,8 +218,6 @@ options {
         this.lexer = lexer;
         this.parserMode = mode;
  	this.services = services;
-	if(services != null)
-          this.keh = services.getExceptionHandler();
 	this.nss = nss;
     if (this.isTacletParser()) {
         switchToSchemaMode();
@@ -293,9 +288,6 @@ options {
                      HashMap taclet2Builder,
                      ImmutableSet<Taclet> taclets) { 
         this(lexer, null, null, mode);
-        if (lexer instanceof DeclPicker) {
-            this.capturer = (DeclPicker) lexer;
-        }
         if (normalConfig!=null)
         scm = new AbbrevMap();
         this.schemaConfig = schemaConfig;
@@ -309,25 +301,16 @@ options {
         	}
         }
         
-        if (normalConfig != null){
-            this.keh = normalConfig.services().getExceptionHandler();
-        } else{
-            this.keh = new KeYRecoderExcHandler();
-        }
     }
 
     public KeYParser(ParserMode mode, TokenStream lexer) {
         this(lexer, null, null, mode);
-        if (lexer instanceof DeclPicker) {
-            this.capturer = (DeclPicker) lexer;
-        }
         scm = new AbbrevMap();
         this.schemaConfig = null;
         this.normalConfig = null;       
 	switchToNormalMode();
         this.taclet2Builder = null;
         this.taclets = new LinkedHashMap<RuleKey, Taclet>();
-        this.keh = new KeYRecoderExcHandler();
     }
 
 
@@ -339,8 +322,7 @@ options {
 	    KeYParserF p =
                 new KeYParserF(ParserMode.TACLET,
                               new KeYLexerF(s,
-                                      "No file. KeYParser.parseTaclet(\n" + s + ")\n",
-                                      null),
+                                      "No file. KeYParser.parseTaclet(\n" + s + ")\n"),
                               services,
                               services.getNamespaces());
 	    return p.taclet(DefaultImmutableSet.<Choice>nil());
@@ -352,15 +334,6 @@ options {
 	}
     }
 
-    public void recover( RecognitionException ex, BitSet tokenSet ) /*throws TokenStreamException*/ {
-     input.consume();
-     int ttype = input.LA(1);
-     while (ttype != Token.EOF && !tokenSet.member(ttype)) {
-       input.consume();
-       ttype = input.LA(1);
-     }
-    }
-    
     public String getSourceName() {
     	if (super.getSourceName() == null) {
     		return filename;
@@ -374,6 +347,9 @@ options {
     
     public String getProofObligation() {
         return proofObligation;
+    }
+    public String getProblemHeader() {
+        return problemHeader;
     }
     
     public String getProfileName() {
@@ -400,8 +376,8 @@ options {
 	return parserMode == ParserMode.PROBLEM;
     }
 
-    public void reportError(RecognitionException ex){
-        keh.reportException(ex);
+    public void raiseException(RecognitionException ex) throws RecognitionException {
+        throw ex;
     }
 
     public ImmutableSet<Choice> getActivatedChoices(){
@@ -514,12 +490,14 @@ options {
     }
 
     private int getLine() {
-        return state.tokenStartLine;
-    }   
+        Token token = ((TokenStream)input).LT(1);
+        return token.getLine();
+    }
 
     private int getColumn() {
-        return state.tokenStartCharPositionInLine;
-    }   
+        Token token = ((TokenStream)input).LT(1);
+        return token.getCharPositionInLine();
+    }
 
     private void resetSkips() {
        skip_schemavariables = false;
@@ -590,20 +568,11 @@ options {
     private void addInclude(String filename, boolean relativePath, boolean ldt){
         RuleSource source=null;
         if (relativePath) {
-            int end = getSourceName().lastIndexOf(File.separator);
-            int start = 0;
-            filename = filename.replace('/', File.separatorChar);
-            filename = filename.replace('\\', File.separatorChar);
-            if(getSourceName().startsWith("file:")){
-                start = 5;
-            }
-            File path=new File(getSourceName().substring(start,end+1)+filename);
-            try{ 
-                source = RuleSourceFactory.initRuleFile(path.toURL()); 
-            }catch(java.net.MalformedURLException e){
-                System.err.println("Exception due to malformed URL of file "+
-                                   filename+"\n " +e);
-            }
+               filename = filename.replace('/', File.separatorChar); // Not required for Windows, but whatsoever
+               filename = filename.replace('\\', File.separatorChar); // Special handling for Linux
+               File parent = new File(getSourceName()).getParentFile();
+               File path = new File(parent, filename);
+               source = RuleSourceFactory.initRuleFile(path); 
         } else {
             source = RuleSourceFactory.fromBuildInRule(filename+".key"); 
         }
@@ -692,18 +661,23 @@ options {
       resetSkips();
     }  
 
-    public Term parseProblem() throws RecognitionException/*, 
-    				      TokenStreamException*/ {
-      resetSkips();
-      skipSorts(); 
-      skipFuncs();
-      skipTransformers();
-      skipPreds();
-      skipRuleSets();
-      //skipVars(); 
-      skipTaclets();
-      return problem();
-    }
+    public Term parseProblem() throws RecognitionException {
+        resetSkips();
+        skipSorts();
+        skipFuncs();
+        skipTransformers();
+        skipPreds();
+        skipRuleSets();
+        //skipVars();
+        skipTaclets();
+        Term result = problem();
+        // The parser may be ok if a totally unexpected token has turned up
+        // We better check that either the file has ended or a "\proof" follows.
+        if(input.LA(1) != EOF && input.LA(1) != PROOF) {
+            throw new NoViableAltException("after problem", -1, -1, input);
+        }
+        return result;
+      }
 
     public void parseIncludes() throws RecognitionException/*, 
     				        TokenStreamException*/ {
@@ -824,7 +798,7 @@ options {
                 try {
                     result = javaInfo.getArrayLength();
                 } catch(Exception ex) {
-                    keh.reportException
+                    raiseException
                        (new KeYSemanticException(input, getSourceName(), ex));
                 }
             } else if(attributeName.equals("<inv>")) {
@@ -862,8 +836,7 @@ options {
         }
 
         if ( result == null && !("length".equals(attributeName)) ) {
-            throw new NotDeclException ("Attribute ", attributeName,
-                getSourceName(), getLine(), getColumn());
+            throw new NotDeclException (input, "Attribute ", attributeName);
         }
         return result;
     }
@@ -1157,12 +1130,10 @@ options {
         // not found
         if (args==null) {
             throw new NotDeclException
-                ("(program) variable or constant", varfunc_name,
-                 getSourceName(), getLine(), getColumn());
+                (input, "(program) variable or constant", varfunc_name);
         } else {
             throw new NotDeclException
-                ("function or static query", varfunc_name,
-                 getSourceName(), getLine(), getColumn());
+                (input, "function or static query", varfunc_name);
         }
     }
 
@@ -1514,7 +1485,38 @@ options {
         return result;
     }
 
+    /* ---- antlr stuff ---- (Exception handling) */
+
+    @Override
+    public void reportError(RecognitionException ex) {
+        // dont do anything
+    }
+
+    public void recover(IntStream input, RecognitionException re) {
+        throw new RuntimeException(re);
+    }
+
+    /** Not currently used */
+    @Override
+    public Object recoverFromMismatchedSet(IntStream input,
+            RecognitionException e, BitSet follow) throws RecognitionException {
+        // comment says it is never used, still make sure ...
+        throw e;
+    }
+
+    protected Object recoverFromMismatchedToken(IntStream input, int ttype,
+            BitSet follow) throws RecognitionException {
+        throw new MismatchedTokenException(ttype, input);
+    }
+
 }
+
+@rulecatch {
+    catch(RecognitionException e) {
+        throw e;
+    }
+}
+
 
 // WATCHOUT Don't remove this. Ever!!! 
 // Although it's not called, it is necessary for antlr to produce the 
@@ -1589,8 +1591,7 @@ activated_choice @init{
         name = cat.getText()+":"+choice_.getText();
         c = (Choice) choices().lookup(new Name(name));
         if(c==null){
-            throw new NotDeclException("Option", choice_.getText(),
-                                       getSourceName(), choice_.getLine(), choice_.getCharPositionInLine());
+            throw new NotDeclException(input, "Option", choice_.getText());
         }else{
             activatedChoices=activatedChoices.add(c);
         }
@@ -1909,7 +1910,7 @@ one_schema_var_decl
   | (    TERM
          { mods = new SchemaVariableModifierSet.TermSV (); }
          ( schema_modifiers[mods] ) ?
-      | (VARIABLES
+      | ( (VARIABLES | VARIABLE)
          { makeVariableSV = true; }
          { mods = new SchemaVariableModifierSet.VariableSV (); }
          ( schema_modifiers[mods] ) ?)
@@ -2364,11 +2365,7 @@ any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null
             if(checkSort) {
                 s = lookupSort(name);
                 if(s == null) {
-                  throw new NotDeclException("sort", 
-                                           name, 
-                                           getSourceName(), 
-                                           getLine(),  
-                                           getColumn()); 
+                  throw new NotDeclException(input, "sort", name);
                 }
             }
             
@@ -2470,7 +2467,7 @@ term returns [Term _term = null]
         )*
     ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
         
@@ -2487,7 +2484,7 @@ elementary_update_term returns[Term _elementary_update_term=null]
         )?
    ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 			(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2499,7 +2496,7 @@ equivalence_term returns [Term _equivalence_term = null]
             { a = getTermFactory().createTerm(Equality.EQV, new Term[]{a, a1});} )*
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2510,7 +2507,7 @@ implication_term returns [Term _implication_term = null]
             { a = getTermFactory().createTerm(Junctor.IMP, new Term[]{a, a1});} )?
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2521,7 +2518,7 @@ disjunction_term returns [Term _disjunction_term = null]
             { a = getTermFactory().createTerm(Junctor.OR, new Term[]{a, a1});} )*
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2533,7 +2530,7 @@ conjunction_term returns [Term _conjunction_term = null]
             
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2544,7 +2541,7 @@ term60 returns [Term _term_60 = null]
     |   a = equality_term
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2556,7 +2553,7 @@ unary_formula returns [Term _unary_formula = null]
     |   a = modality_dl_term
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2595,7 +2592,7 @@ equality_term returns [Term _equality_term = null]
         })?
  ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2659,7 +2656,7 @@ logicTermReEntry returns [Term _logic_term_re_entry = null]
               })?
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2672,7 +2669,7 @@ weak_arith_op_term returns [Term _weak_arith_op_term = null]
                 })*
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2684,7 +2681,7 @@ strong_arith_op_term returns [Term _strong_arith_op_term = null]
                 })*
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2699,9 +2696,9 @@ term110 returns [Term _term110 = null]
 @after { _term110 = result; }
     :
         (
-            ( LBRACE ~LPAREN ) => result = update_or_substitution |
+            result = braces_term |
             result = accessterm
-        ) 
+        )
         {
 	/*
             if (result.sort() == Sort.FORMULA) {
@@ -2771,10 +2768,7 @@ staticAttributeOrQueryReference returns [String attrReference = ""]
         {   KeYJavaType kjt = null;
             kjt = getTypeByClassName(attrReference);
             if (kjt == null) {
-                throw new NotDeclException
-                    ("Class " + attrReference + " is unknown.", 
-                     attrReference, getSourceName(), getLine(), 
-                     getColumn());
+                throw new NotDeclException(input, "Class", attrReference);
             }	        
             attrReference = kjt.getSort().name().toString();            
             match(input, DOT, null);
@@ -2808,24 +2802,34 @@ static_attribute_suffix returns [Term result = null]
         { result = createAttributeTerm(null, v); }                   
  ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
 attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix = null]
 @after { _attribute_or_query_suffix = result; }
     :
-    DOT memberName = attrid
-    (result = querySuffix[prefix, memberName] {assert result != null;})?
+    DOT ( STAR { result = services.getTermBuilder().allFields(prefix); }
+    | ( memberName = attrid
+    (result = query_suffix[prefix, memberName] {assert result != null;})?
     {
-        if(result == null){
-            Operator v = getAttributeInPrefixSort(prefix.sort(), memberName);
-            result = createAttributeTerm(prefix, v);
+        if(result == null)  {
+            if(prefix.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
+                if("length".equals(memberName)) {
+                    result = getServices().getTermBuilder().seqLen(prefix);
+                } else {
+                    semanticError("There is no attribute '" + memberName +
+                                  "' for sequences (Seq), only 'length' is supported.");
+                }
+            } else {
+                Operator v = getAttributeInPrefixSort(prefix.sort(), memberName);
+                result = createAttributeTerm(prefix, v);
+            }
         }
-    }
+    } ) )
     ;
 catch [TermCreationException ex] {
-    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+    raiseException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
 attrid returns [String attr = "";]
@@ -2838,7 +2842,7 @@ attrid returns [String attr = "";]
         { attr = clss + "::" + id2; }
     ;
     
-querySuffix [Term prefix, String memberName] returns [Term result = null] 
+query_suffix [Term prefix, String memberName] returns [Term result = null] 
 @init{
     String classRef, name;
     boolean brackets = false;
@@ -2846,7 +2850,10 @@ querySuffix [Term prefix, String memberName] returns [Term result = null]
     :
     args = argument_list
     {
-       if(memberName.indexOf("::") == -1) {
+       // true in case class name is not explicitly mentioned as part of memberName
+       boolean implicitClassName = memberName.indexOf("::") == -1;
+       
+       if(implicitClassName) {
           classRef = prefix.sort().name().toString();
           name = memberName;
        } else {
@@ -2856,18 +2863,14 @@ querySuffix [Term prefix, String memberName] returns [Term result = null]
        }
        KeYJavaType kjt = getTypeByClassName(classRef);
        if(kjt == null)
-          throw new NotDeclException
-             ("Class " + classRef + " is unknown.", 
-              classRef, getSourceName(), getLine(), 
-              getColumn());
+          throw new NotDeclException(input, "Class", classRef);
        classRef = kjt.getFullName();
 
-       result = getServices().getJavaInfo().getProgramMethodTerm
-                (prefix, name, args, classRef);
+       result = getServices().getJavaInfo().getProgramMethodTerm(prefix, name, args, classRef, implicitClassName);
     }
  ;
 catch [TermCreationException ex] {
-    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+    raiseException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
 //term120
@@ -2924,7 +2927,7 @@ accessterm returns [Term _accessterm = null]
     ( result = heap_selection_suffix[result] )? // resets globalSelectNestingDepth to zero
     ;
 catch [TermCreationException ex] {
-    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+    raiseException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
 heap_selection_suffix [Term term] returns [Term result]
@@ -2962,7 +2965,7 @@ static_query returns [Term result = null]
        int index = queryRef.indexOf(':');
        String className = queryRef.substring(0, index); 
        String qname = queryRef.substring(index+2); 
-       result = getServices().getJavaInfo().getProgramMethodTerm(null, qname, args, className);
+       result = getServices().getJavaInfo().getStaticProgramMethodTerm(qname, args, className);
        if(result == null && isTermParser()) {
 	  final Sort sort = lookupSort(className);
           if (sort == null) {
@@ -2978,7 +2981,7 @@ static_query returns [Term result = null]
     }        
  ;
 catch [TermCreationException ex] {
-    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+    raiseException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
 heap_update_suffix [Term heap] returns [Term result=heap]
@@ -3010,7 +3013,7 @@ heap_update_suffix [Term heap] returns [Term result=heap]
     RBRACKET
     ;
 catch [TermCreationException ex] {
-    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+    raiseException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
 array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = null] 
@@ -3053,7 +3056,7 @@ array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = n
     }            
     ;
         catch [TermCreationException ex] {
-               keh.reportException
+               raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -3071,8 +3074,6 @@ atom returns [Term _atom = null]
     |   LPAREN a = term RPAREN
     |   TRUE  { a = getTermFactory().createTerm(Junctor.TRUE); }
     |   FALSE { a = getTermFactory().createTerm(Junctor.FALSE); }
-    |   LBRACE LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN RBRACE
-            { a = getServices().getTermBuilder().singleton(obj, field); }
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
     |   literal=STRING_LITERAL
@@ -3082,7 +3083,7 @@ atom returns [Term _atom = null]
     ) (LGUILLEMETS labels = label {if (labels.size() > 0) {a = getServices().getTermBuilder().label(a, labels);} } RGUILLEMETS)?
     ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -3119,7 +3120,7 @@ single_label returns [TermLabel label=null]
                                 .getTermLabelManager().parseLabel(labelName, parameters);
           }
       } catch(TermLabelException ex) {
-          keh.reportException
+          raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
       }
   }
@@ -3134,10 +3135,8 @@ abbreviation returns [Term _abbreviation=null]
             {
                 a =  scm.getTerm(sc);
                 if(a==null){
-                    throw new NotDeclException
-                        ("abbreviation", sc, 
-                         getSourceName(), getLine(), getColumn());
-                }                                
+                    throw new NotDeclException(input, "abbreviation", sc);
+                }
             }
         )
     ;
@@ -3161,7 +3160,7 @@ ifThenElseTerm returns [Term _if_then_else_term = null]
         }
  ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
         
@@ -3199,7 +3198,7 @@ ifExThenElseTerm returns [Term _if_ex_then_else_term = null]
         }
  ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }        
 
@@ -3241,13 +3240,30 @@ quantifierterm returns [Term _quantifier_term = null]
         }
 ;
 
-//term120_2
-update_or_substitution returns [Term _update_or_substitution = null]
+/*
+ * A term that is surrounded by braces: {}
+ */
+braces_term returns [Term _update_or_substitution = null]
 @after{ _update_or_substitution = result; }
 :
       (LBRACE SUBST) => result = substitutionterm
+      | (LBRACE (LPAREN | RBRACE)) => result = locset_term
       |  result = updateterm
-    ; 
+    ;
+    
+locset_term returns [Term result = getServices().getTermBuilder().empty()]
+    :
+    LBRACE
+        ( l = location_term { $result = l; }
+        ( COMMA l = location_term { $result = getServices().getTermBuilder().union($result, l); } )* )?
+    RBRACE
+    ;
+    
+location_term returns[Term result]
+    :
+    LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN
+            { $result = getServices().getTermBuilder().singleton(obj, field); }
+    ;
 
 substitutionterm returns [Term _substitution_term = null] 
 @init{
@@ -3279,7 +3295,7 @@ substitutionterm returns [Term _substitution_term = null]
    }
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -3299,7 +3315,7 @@ updateterm returns [Term _update_term = null]
         }
    ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }           
         
@@ -3392,7 +3408,7 @@ modality_dl_term returns [Term _modality_dl_term = null]
    )
    ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -3509,7 +3525,7 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
         }
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -3522,7 +3538,7 @@ specialTerm returns [Term _special_term = null]
        result = metaTerm
    ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -3542,8 +3558,7 @@ varId returns [ParsableVariable v = null]
         {   
             v = (ParsableVariable) variables().lookup(new Name(id.getText()));
             if (v == null) {
-                throw new NotDeclException("variable", id.getText(), 
-                                           getSourceName(), id.getLine(), id.getCharPositionInLine());
+                throw new NotDeclException(input, "variable", id.getText());
             }
         } 
   ;
@@ -3650,7 +3665,7 @@ seq returns [Sequent s] :
         { s = Sequent.createSequent(ant, suc); }
     ;
      catch [RuntimeException ex] {
-         keh.reportException
+         raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
      }
      
@@ -4190,8 +4205,7 @@ option returns [Choice c=null]
         {
             c = (Choice) choices().lookup(new Name(cat.getText()+":"+choice_.getText()));
             if(c==null) {
-                throw new NotDeclException
-			("Option", choice_.getText(), getSourceName(), choice_.getLine(), choice_.getCharPositionInLine());
+                throw new NotDeclException(input, "Option", choice_.getText());
 	    }
         }
     ;
@@ -4275,7 +4289,7 @@ ruleset[Vector rs]
         {   
             RuleSet h = (RuleSet) ruleSets().lookup(new Name(id.getText()));
             if (h == null) {
-                throw new NotDeclException("ruleset", id.getText(), getSourceName(), id.getLine(), id.getCharPositionInLine());
+                throw new NotDeclException(input, "ruleset", id.getText());
             }
             rs.add(h);
         }
@@ -4313,7 +4327,7 @@ metaTerm returns [Term result = null]
         ) 
  ;
      catch [TermCreationException ex] {
-         keh.reportException
+         raiseException
 	    (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -4393,23 +4407,23 @@ one_invariant[ParsableVariable selfVar]
 ;
 
 problem returns [ Term _problem = null ]
-@init{
+@init {
+    int beginPos = 0;
     choices=DefaultImmutableSet.<Choice>nil();
     chooseContract = this.chooseContract;
     proofObligation = this.proofObligation;
 }
-@after { _problem = a; this.chooseContract = chooseContract; this.proofObligation = proofObligation; }
-    :
-       { if (capturer != null) capturer.mark(); }
+@after { 
+    _problem = a; 
+    this.chooseContract = chooseContract; 
+    this.proofObligation = proofObligation; 
+}
+   :
 
-     profile
-
-   	{ if (profileName != null && capturer != null) capturer.mark(); }
+        profile
 
         (pref = preferences)
-        { if ((pref!=null) && (capturer != null)) capturer.begin(); }
-        
-
+           { beginPos = input.index(); }
 
         string = bootClassPath
         // the result is of no importance here (strange enough)        
@@ -4451,19 +4465,20 @@ problem returns [ Term _problem = null ]
             )*
             RBRACE {choices=DefaultImmutableSet.<Choice>nil();}
         ) *
-        { if (capturer != null) capturer.capture(); }
+
+        { if(input.index() == 0) {
+             problemHeader = "";
+          } else {
+             problemHeader = lexer.toString(beginPos, input.index()-1);
+          } }
+
         ((PROBLEM LBRACE 
-            {switchToNormalMode(); 
-	     //if (capturer != null) capturer.capture();
-	    }
+            { switchToNormalMode(); }
                 a = formula
             RBRACE) 
-           | 
+           |
            CHOOSECONTRACT (chooseContract=string_literal SEMI)?
            {
-	       if (capturer != null) {
-	            capturer.capture();
-	       }
 	       if(chooseContract == null) {
 	           chooseContract = "";
 	       }
@@ -4471,14 +4486,11 @@ problem returns [ Term _problem = null ]
            | 
            PROOFOBLIGATION  (proofObligation=string_literal SEMI)?
            {
-               if (capturer != null) {
-                    capturer.capture();
-               }
                if(proofObligation == null) {
                    proofObligation = "";
                }
            }
-	)?
+        )?
    ;
    
 bootClassPath returns [String _boot_class_path = null]
@@ -4535,7 +4547,7 @@ oneJavaSource returns [String s = null]
 
 
 profile:
-        (PROFILE profileName=string_literal SEMI)? 
+        (PROFILE profileName=string_literal { this.profileName = profileName; } SEMI)? 
 ;
 
 preferences returns [String _preferences = null]

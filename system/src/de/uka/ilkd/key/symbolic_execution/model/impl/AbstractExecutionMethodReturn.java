@@ -3,7 +3,7 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -148,7 +148,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
     * {@inheritDoc}
     */
    @Override
-   public IExecutionVariable[] getCallStateVariables() {
+   public IExecutionVariable[] getCallStateVariables() throws ProofInputException {
       synchronized (this) {
          if (callStateVariables == null) {
             callStateVariables = lazyComputeCallStateVariables();
@@ -161,8 +161,9 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
     * Computes the variables lazily when {@link #getCallStateVariables()} is 
     * called the first time.
     * @return The {@link IExecutionVariable}s of the state when the method has been called.
+    * @throws ProofInputException 
     */
-   protected IExecutionVariable[] lazyComputeCallStateVariables() {
+   protected IExecutionVariable[] lazyComputeCallStateVariables() throws ProofInputException {
       // Get relevant information in current node
       Node proofNode = methodCall.getProofNode();
       assert proofNode.childrenCount() == 1;
@@ -182,6 +183,6 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
          modalityTerm = modalityPIO.subTerm();
       }
       // Compute variables
-      return SymbolicExecutionUtil.createExecutionVariables(this, childNode, modalityPIO, null);
+      return SymbolicExecutionUtil.createExecutionVariables(this, childNode, modalityPIO, getMethodReturnCondition());
    }
 }

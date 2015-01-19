@@ -109,7 +109,7 @@ class SelectPrinter extends FieldPrinter {
      * Get sort of selected field.
      */
     private Sort getFieldSort(Term fieldTerm) {
-        String lookup = fieldTerm.toString().replace("$", "");
+        String lookup = fieldTerm.op().toString().replace("$", "");
         ProgramVariable progVar = lp.services.getJavaInfo().getAttribute(lookup);
         return progVar.sort();
     }

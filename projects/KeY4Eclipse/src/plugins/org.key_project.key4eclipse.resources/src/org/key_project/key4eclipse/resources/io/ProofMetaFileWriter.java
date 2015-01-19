@@ -22,7 +22,6 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
-import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -68,7 +67,6 @@ public class ProofMetaFileWriter {
    public static final String TAG_ACCESS_REFERENCE = "accessReference";
    public static final String TAG_CALLMETHOD_REFERENCES = "callMethodReferences";
    public static final String TAG_CALLMETHOD_REFERENCE = "callMethodReference";
-   public static final String TAG_SUBMETHOD_REFERENCE = "subMethodReference";
    public static final String TAG_INLINEMETHOD_REFERENCES = "inlineMethodReferences";
    public static final String TAG_INLINEMETHOD_REFERENCE = "inlineMethodReference";
    public static final String TAG_CONTRACT_REFERENCES = "contractReferences";
@@ -87,7 +85,13 @@ public class ProofMetaFileWriter {
    public static final String ATTRIBUTE_FULL_QUALIFIED_NAME = "fullQualifiedName";
    public static final String ATTRIBUTE_KJT = "kjt";
    public static final String ATTRIBUTE_SRC = "src";
+   public static final String ATTRIBUTE_IMPLEMENTATIONS = "implementations";
    public static final String ATTRIBUTE_PARAMETERS = "parameters";
+   public static final String ATTRIBUTE_VISIBILITY = "visibility";
+   public static final String ATTRIBUTE_IS_STATIC = "isStatic";
+   public static final String ATTRIBUTE_IS_FINAL = "isFinal";
+   public static final String ATTRIBUTE_IS_CALLED_IN_CONSTRUCTOR = "isCalledInConstructor";
+   public static final String ATTRIBUTE_INITIALIZER = "initializer";
    public static final String ATTRIBUTE_REP = "rep";
    
 
@@ -328,7 +332,12 @@ public class ProofMetaFileWriter {
                Map<String, String> attributeValues = new LinkedHashMap<String, String>();
                attributeValues.put(ATTRIBUTE_KJT, access.getKjt());
                attributeValues.put(ATTRIBUTE_NAME, access.getName());
-               attributeValues.put(ATTRIBUTE_SRC, access.getSource());
+               attributeValues.put(ATTRIBUTE_TYPE, access.getType());
+               attributeValues.put(ATTRIBUTE_VISIBILITY, access.getVisibility());
+               attributeValues.put(ATTRIBUTE_IS_STATIC, String.valueOf(access.isStatic()));
+               attributeValues.put(ATTRIBUTE_IS_FINAL, String.valueOf(access.isFinal()));
+               attributeValues.put(ATTRIBUTE_IS_CALLED_IN_CONSTRUCTOR, String.valueOf(access.isCalledInConstructor()));
+               attributeValues.put(ATTRIBUTE_INITIALIZER, access.getInitializer());
                XMLUtil.appendEmptyTag(level + 1, TAG_ACCESS_REFERENCE, attributeValues, sb);
             }
          }
@@ -345,19 +354,8 @@ public class ProofMetaFileWriter {
                attributeValues.put(ATTRIBUTE_KJT, callMethod.getKjt());
                attributeValues.put(ATTRIBUTE_NAME, callMethod.getName());
                attributeValues.put(ATTRIBUTE_PARAMETERS, callMethod.getParameters());
-               attributeValues.put(ATTRIBUTE_SRC, callMethod.getSource());
-               XMLUtil.appendStartTag(level + 1, TAG_CALLMETHOD_REFERENCE, attributeValues, sb);
-               for(ProofMetaReferenceMethod subMethod : callMethod.getSubImpl()){
-                  if(subMethod != null){
-                     Map<String, String> subAttributeValues = new LinkedHashMap<String, String>();
-                     subAttributeValues.put(ATTRIBUTE_KJT, subMethod.getKjt());
-                     subAttributeValues.put(ATTRIBUTE_NAME, subMethod.getName());
-                     subAttributeValues.put(ATTRIBUTE_PARAMETERS, subMethod.getParameters());
-                     subAttributeValues.put(ATTRIBUTE_SRC, subMethod.getSource());
-                     XMLUtil.appendEmptyTag(level + 2, TAG_SUBMETHOD_REFERENCE, subAttributeValues, sb);
-                  }
-               }
-               XMLUtil.appendEndTag(level + 1, TAG_CALLMETHOD_REFERENCE, sb);
+               attributeValues.put(ATTRIBUTE_IMPLEMENTATIONS, callMethod.getImplementations());
+               XMLUtil.appendEmptyTag(level + 1, TAG_CALLMETHOD_REFERENCE, attributeValues, sb);
             }
          }
          XMLUtil.appendEndTag(level, TAG_CALLMETHOD_REFERENCES, sb);

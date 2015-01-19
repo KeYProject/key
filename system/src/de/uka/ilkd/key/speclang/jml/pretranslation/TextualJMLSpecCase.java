@@ -96,6 +96,49 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         res.setPosition(assertStm);
         return res;
     }
+    
+    /**
+     * Merge clauses of two spec cases.
+     * Keep behavior of this one.
+     * @param tsc
+     */
+    public TextualJMLSpecCase merge(TextualJMLSpecCase tsc) {
+        TextualJMLSpecCase res = clone();
+        res.addRequires(tsc.getRequires());
+        res.addEnsures(tsc.getEnsures());
+        res.addSignals(tsc.getSignals());
+        res.addSignalsOnly(tsc.getSignalsOnly());
+        res.addAssignable(tsc.getAssignable());
+        res.addAccessible(tsc.getAccessible());
+        res.addInfFlowSpecs(tsc.getInfFlowSpecs());
+        res.addDiverges(tsc.getDiverges());
+        res.addMeasuredBy(tsc.getMeasuredBy());
+        return res;
+    }
+    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
+    public TextualJMLSpecCase clone() {
+        TextualJMLSpecCase res = new TextualJMLSpecCase(getMods(), getBehavior());
+        res.requires = new LinkedHashMap(requires);
+        res.ensures = new LinkedHashMap(ensures);
+        res.signals = signals;
+        res.signalsOnly = signalsOnly;
+        res.assignables = new LinkedHashMap(assignables);
+        res.accessibles = new LinkedHashMap(accessibles);
+        res.infFlowSpecs = infFlowSpecs;
+        res.depends = depends;
+        res.diverges = diverges;
+        res.abbreviations = abbreviations;
+        res.axioms = new LinkedHashMap(axioms);
+        res.breaks = breaks;
+        res.continues = continues;
+        res.returns = returns;
+        res.measuredBy = measuredBy;
+        res.name = name;
+        res.workingSpace = workingSpace;
+        return res;
+    }
 
 
     public void addName(PositionedString n) {
@@ -127,6 +170,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addAssignable(PositionedString ps) {
         addGeneric(assignables, ps);
+    }
+    
+    public void addAssignable(ImmutableList<PositionedString> l) {
+        for (PositionedString ps: l)
+            addAssignable(ps);
     }
 
     public void addAccessible(PositionedString ps) {
@@ -185,6 +233,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         setPosition(ps);
     }
 
+    public void addDiverges(ImmutableList<PositionedString> l) {
+        for (PositionedString ps: l)
+            addDiverges(ps);
+    }
 
     public void addDepends(PositionedString ps) {
         depends = depends.append(ps);

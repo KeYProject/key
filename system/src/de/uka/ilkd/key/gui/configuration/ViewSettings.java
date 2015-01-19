@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.gui.configuration;
 
+import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.Properties;
 
-import de.uka.ilkd.key.gui.GUIEvent;
 
 /**
  * This class encapsulates information about:
@@ -309,7 +309,7 @@ public class ViewSettings implements Settings, Cloneable {
      */
     protected void fireSettingsChanged() {
         for (SettingsListener aListenerList : listenerList) {
-            aListenerList.settingsChanged(new GUIEvent(this));
+            aListenerList.settingsChanged(new EventObject(this));
         }
     }
 

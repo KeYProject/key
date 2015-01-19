@@ -115,12 +115,17 @@ public class AnnotationManager implements IDisposable {
     * Constructor.
     * @param debugView The {@link IDebugView} to work with.
     */
-   public AnnotationManager(IDebugView debugView) {
+   public AnnotationManager(final IDebugView debugView) {
       Assert.isNotNull(debugView);
       this.debugView = debugView;
       DebugPlugin.getDefault().addDebugEventListener(debugListener);
       debugView.getViewer().addSelectionChangedListener(selectionListener);
-      updateAnnotations(debugView.getViewer().getSelection());
+      debugView.getSite().getShell().getDisplay().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            updateAnnotations(debugView.getViewer().getSelection());
+         }
+      });
       debugView.getSite().getPage().addPartListener(partListener);
    }
 
@@ -215,12 +220,14 @@ public class AnnotationManager implements IDisposable {
             ITextEditor te = (ITextEditor)editor;
             IDocumentProvider provider = te.getDocumentProvider();
             IAnnotationModel model = provider.getAnnotationModel(editor.getEditorInput());
-            Iterator<?> iter = model.getAnnotationIterator();
-            while (iter.hasNext()) {
-               Object next = iter.next();
-               if (next instanceof SymbolicallyReachedAnnotation) {
-                  SymbolicallyReachedAnnotation annotation = (SymbolicallyReachedAnnotation)next;
-                  removeTarget(model, annotation, target);
+            if (model != null) {
+               Iterator<?> iter = model.getAnnotationIterator();
+               while (iter.hasNext()) {
+                  Object next = iter.next();
+                  if (next instanceof SymbolicallyReachedAnnotation) {
+                     SymbolicallyReachedAnnotation annotation = (SymbolicallyReachedAnnotation)next;
+                     removeTarget(model, annotation, target);
+                  }
                }
             }
          }

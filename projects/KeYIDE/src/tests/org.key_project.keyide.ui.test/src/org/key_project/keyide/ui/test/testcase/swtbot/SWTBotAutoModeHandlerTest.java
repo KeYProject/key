@@ -83,6 +83,7 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
       };
       doEditorTest("SWTBotStartAutoModeHandlerTest_testStartAutoMode_proofOpen", 
                    "data/paycard", 
+                   true, 
                    TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"),
                    5,
                    false, 
@@ -130,6 +131,7 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
       };
       doEditorTest("SWTBotStartAutoModeHandlerTest_testStartAutoMode", 
                    "data/paycard", 
+                   true, 
                    TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "isValid()", "0", "normal_behavior"),
                    5,
                    false, 
@@ -195,6 +197,7 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
       };
       doEditorTest("SWTBotStopAutoModeHandlerTest_testStopAutoMode_RestartAutoMode_ProofClosed", 
                    "data/paycard", 
+                   true, 
                    TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "charge(int)", "0", "normal_behavior"),
                    5,
                    false, 
@@ -243,6 +246,7 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
       };
       doEditorTest("SWTBotStopAutoModeHandlerTest_testStopAutoMode_ProofOpen", 
                    "data/paycard", 
+                   true, 
                    TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"),
                    5,
                    false, 

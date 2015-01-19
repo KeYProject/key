@@ -47,7 +47,7 @@ public class EnvironmentCreator  {
                                 dummyFile.getName(), dummyFile, null, profile);
 
                 ProblemInitializer pi = new ProblemInitializer(monitor, 
-                                new Services(profile, new KeYRecoderExcHandler()),
+                                new Services(profile),
                                 listener );
                
                 return new ProofEnvironment(pi.prepare(keyFile));

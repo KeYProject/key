@@ -5,10 +5,9 @@
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.MethodInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 /**
  *
@@ -89,7 +89,7 @@ public class FinishAuxiliaryMethodComputationMacro
         initiatingGoal.proof().getIFSymbols().useProofSymbols();
 
         // close auxiliary computation proof
-        GuiUtilities.invokeAndWait(new Runnable() {
+        ThreadUtilities.invokeAndWait(new Runnable() {
             public void run() {
                 final UserInterface ui = mediator.getUI();
                 if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave()

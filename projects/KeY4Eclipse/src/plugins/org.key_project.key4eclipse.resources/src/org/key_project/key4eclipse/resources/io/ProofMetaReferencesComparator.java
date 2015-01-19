@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
@@ -13,9 +14,12 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -113,14 +117,28 @@ public class ProofMetaReferencesComparator {
 
    private boolean accessChanged(ProofMetaReferenceAccess access) {
       KeYJavaType kjt = env.getJavaInfo().getKeYJavaType(access.getKjt());
-      if (kjt != null && kjt.getJavaType() instanceof TypeDeclaration) {
-         TypeDeclaration typeDecl = (TypeDeclaration) kjt.getJavaType();
-         ImmutableList<Field> fields = env.getJavaInfo().getAllFields(typeDecl);
-         for (Field field : fields) {
-            if(access.getName().equals(field.getName()) && access.getSource().equals(field.toString())) {
+      if (kjt != null) {
+         FieldDeclaration fieldDecl = KeYResourcesUtil.getFieldDeclFromKjt(kjt, access.getName());
+         if(fieldDecl != null) {
+            String type = fieldDecl.getTypeReference().toString();
+            String visibility = "";
+            VisibilityModifier vm = fieldDecl.getVisibilityModifier();
+            if(vm != null) {
+               visibility = vm.toString();
+            }
+            boolean isStatic = fieldDecl.isStatic();
+            boolean isFinal = fieldDecl.isFinal();
+            IObserverFunction target = pe.getContract().getTarget();
+            boolean isCalledInConstructor = target instanceof IProgramMethod ? ((IProgramMethod) target).isConstructor() : false;
+            if(type.equals(access.getType()) && visibility.equals(access.getVisibility()) 
+                  && isStatic == access.isStatic() && isFinal == access.isFinal() && isCalledInConstructor == access.isCalledInConstructor()) {
+               if(isStatic || isFinal || isCalledInConstructor) {
+                  String initializer = fieldDecl.getFieldSpecifications().get(0).getInitializer().toString();
+                  return !initializer.equals(access.getInitializer());
+               }
                return false;
             }
-         }
+         }  
       }
       return true;
    }
@@ -137,57 +155,19 @@ public class ProofMetaReferencesComparator {
 
 
    private boolean callMethodChanged(ProofMetaReferenceCallMethod callMethod) {
-      if (!methodChanged(callMethod, true)) {
-         return subImplementationsChanged(callMethod.getSubImpl(), getAllSubMethodsFromEnv(callMethod));
+      KeYJavaType kjt = env.getJavaInfo().getKeYJavaType(callMethod.getKjt());
+      Map<KeYJavaType, IProgramMethod> implementations = KeYResourcesUtil.getKjtsOfAllImplementations(env, kjt, callMethod.getName(), callMethod.getParameters());
+      String implementationsString = KeYResourcesUtil.implementationTypesToString(implementations);
+      if(implementationsString.equals(callMethod.getImplementations())) {
+         return false;
       }
       return true;
-   }
-   
-   private List<IProgramMethod> getAllSubMethodsFromEnv(ProofMetaReferenceCallMethod callMethod){
-      List<IProgramMethod> subMethodList = new LinkedList<IProgramMethod>();
-      KeYJavaType kjt = env.getJavaInfo().getKeYJavaType(callMethod.getKjt());
-      ImmutableList<KeYJavaType> subTypes = env.getJavaInfo().getAllSubtypes(kjt);
-      for (KeYJavaType subType : subTypes) {
-         if (subType.getJavaType() instanceof TypeDeclaration) {
-            TypeDeclaration typeDecl = (TypeDeclaration) subType.getJavaType();
-            for (MemberDeclaration memberDecl : typeDecl.getMembers()) {
-               if (memberDecl instanceof IProgramMethod) {
-                  IProgramMethod pm = (IProgramMethod) memberDecl;
-                  MethodDeclaration md = pm.getMethodDeclaration();
-                  if (md.getName().equals(callMethod.getName()) 
-                        && callMethod.getParameters().equals(KeYResourcesUtil.parametersToString(md.getParameters()))){
-                     subMethodList.add(pm);
-                  }
-               }
-            }
-         }
-      }
-      return subMethodList;
-   }
-
-
-   private boolean subImplementationsChanged(List<ProofMetaReferenceMethod> subImpl, List<IProgramMethod> envSubMethods) {
-      for (ProofMetaReferenceMethod subMethod : subImpl) {
-         for (IProgramMethod pm : envSubMethods) {
-            if(subMethod.getKjt().equals(pm.getContainerType().getFullName())) {
-               envSubMethods.remove(pm);
-               break;
-            }
-         }
-         if (methodChanged(subMethod, true)) {
-            return true;
-         }
-      }
-      if (!envSubMethods.isEmpty()) {
-         return true;
-      }
-      return false;
    }
 
 
    private boolean inlineMethodsChanged() {
       for (ProofMetaReferenceMethod inlineMethod : references.getInlineMethods()) {
-         if (methodChanged(inlineMethod, false)) {
+         if (inlineMethodChanged(inlineMethod)) {
             return true;
          }
       }
@@ -195,35 +175,13 @@ public class ProofMetaReferencesComparator {
    }
    
    
-   private boolean methodChanged(ProofMetaReferenceMethod method, boolean callmethod) {
+   private boolean inlineMethodChanged(ProofMetaReferenceMethod method) {
       KeYJavaType kjt = env.getJavaInfo().getKeYJavaType(method.getKjt());
-      if (kjt != null && kjt.getJavaType() instanceof TypeDeclaration) {
-         TypeDeclaration typeDecl = (TypeDeclaration) kjt.getJavaType();
-         for (MemberDeclaration memberDecl : typeDecl.getMembers()) {
-            if (memberDecl instanceof IProgramMethod) {
-               IProgramMethod pm = (IProgramMethod) memberDecl;
-               MethodDeclaration md = pm.getMethodDeclaration();
-               if (md.getName().equals(method.getName()) && KeYResourcesUtil.parametersToString(md.getParameters()).equals(method.getParameters())) {
-                  StringWriter sw = new StringWriter();
-                  try{
-                     ProofMetaReferencesPrettyPrinter pp = new ProofMetaReferencesPrettyPrinter(sw, true);
-                     if (!callmethod) {
-                        pp.printInlineMethodDeclaration(md);
-                     }
-                     else {
-                        pp.printMethodDeclaration(md);
-                     }
-                  }
-                  catch (IOException e){
-                     LogUtil.getLogger().logError(e);
-                  }
-                  String src = sw.toString();
-                  src = KeYResourcesUtil.removeLineBreaks(src);
-                  if (method.getSource().equals(src)) {
-                     return false;
-                  }
-               }
-            }
+      IProgramMethod pm = KeYResourcesUtil.getMethodForKjt(kjt, method.getName(), method.getParameters());
+      if(pm != null){
+         String src = KeYResourcesUtil.createSourceString(pm.getMethodDeclaration());
+         if (method.getSource().equals(src)) {
+            return false;
          }
       }
       return true;

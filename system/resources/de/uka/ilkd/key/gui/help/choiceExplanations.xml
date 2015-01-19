@@ -94,14 +94,15 @@ switch sets how the rules handle these clauses.
   specifications, for example the following contradictory JML clause
   will not be rejected:
      //@ represents modelField == modelField + 1;
+  This is the default option since KeY 2.4.
   
 * If set to 'showSatisfiability', for every expansion of the represents
-  clause, it must be shown that the definition is
+  clause, it must be shown that the definition is _locally_
   satisfiable. Cross-definition inconsistencies can still be
   formulated, however:
      //@ represents modelField1 == modelField2;
      //@ represents modelField2 == modelField1 + 1;
-  This is the default option.
+  This had been the default option previously, until KeY 2.2.
 </entry>
 
 <entry key="Strings">
@@ -114,6 +115,10 @@ Loading program rules dealing with JML's \bigint datatype can be disabled.
 
 <entry key="sequences">
 Loading rules dealing with sequences can be disabled.
+</entry>
+
+<entry key="moreSeqRules">
+This option allows more fine-grained control over rules dealing with sequences. By default, it is disabled because the additional rules are known to have a negative impact on overall performance. Activate this option if your problem is concerned with permutations or information flow. 
 </entry>
 
 <entry key="reach">

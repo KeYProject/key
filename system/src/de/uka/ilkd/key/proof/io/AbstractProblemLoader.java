@@ -22,9 +22,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
 import org.antlr.runtime.MismatchedTokenException;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.parser.KeYLexer;
@@ -101,6 +102,11 @@ public abstract class AbstractProblemLoader {
     private final Properties poPropertiesToForce;
 
     /**
+     * {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
+     */
+    private final boolean forceNewProfileOfNewProofs;
+    
+    /**
      * The instantiated {@link EnvInput} which describes the file to load.
      */
     private EnvInput envInput;
@@ -146,6 +152,7 @@ public abstract class AbstractProblemLoader {
      * @param classPath The optional class path entries to use.
      * @param bootClassPath An optional boot class path.
      * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
+     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
      * @param mediator The {@link KeYMediator} to use.
      * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call {@link UserInterface#selectProofObligation(InitConfig)} if no {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
      */
@@ -153,6 +160,7 @@ public abstract class AbstractProblemLoader {
                                  List<File> classPath, 
                                  File bootClassPath,
                                  Profile profileOfNewProofs, 
+                                 boolean forceNewProfileOfNewProofs,
                                  KeYMediator mediator,
                                  boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
                                  Properties poPropertiesToForce) {
@@ -162,6 +170,7 @@ public abstract class AbstractProblemLoader {
         this.bootClassPath = bootClassPath;
         this.mediator = mediator;
         this.profileOfNewProofs = profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile();
+        this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
         this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile = askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
         this.poPropertiesToForce = poPropertiesToForce;
     }
@@ -171,10 +180,9 @@ public abstract class AbstractProblemLoader {
      * and to re-apply rules on it if possible.
      * @throws ProofInputException Occurred Exception.
      * @throws IOException Occurred Exception.
+     * @throws ProblemLoaderException Occurred Exception.
      */
-    public ProblemLoaderException load() throws ProblemLoaderException {
-        // TODO: returns AND throws exceptions?
-        try {
+    public void load() throws ProofInputException, IOException, ProblemLoaderException {
             // Read environment
             boolean oneStepSimplifier =
                             ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
@@ -185,7 +193,6 @@ public abstract class AbstractProblemLoader {
             final UserInterface ui = mediator.getUI();
             if (ui.isSaveOnly()) {
                 ui.saveAll(initConfig, file);
-                return null;
             } else {
                 // Read proof obligation settings
                 LoadedPOContainer poContainer = createProofObligationContainer();
@@ -193,15 +200,17 @@ public abstract class AbstractProblemLoader {
                     if (poContainer == null) {
                         if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
                             if (ui.selectProofObligation(initConfig)) {
-                                return null;
+                                return;
                             } else {
-                                return new ProblemLoaderException(this, "Aborted.");
+                                // That message would be reported otherwise. Undesired.
+                                // return new ProblemLoaderException(this, "Aborted.");
+                                return;
                             }
                         }
                         else {
                             // Do not instantiate any proof but allow the user of the DefaultProblemLoader
                             // to access the loaded InitConfig.
-                            return null;
+                            return;
                         }
                     }
                     // Create proof and apply rules again if possible
@@ -210,7 +219,7 @@ public abstract class AbstractProblemLoader {
                         replayProof(proof);
                     }
                     // this message is propagated to the top level in console mode
-                    return null; // Everything fine
+                    return; // Everything fine
                 }
                 finally {
                     ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
@@ -221,12 +230,8 @@ public abstract class AbstractProblemLoader {
                     }
                 }
             }
-        }
-        catch (Exception e) { // TODO give more specific exception message
-            throw recoverParserErrorMessage(e);
-        }
     }
-    
+
     /**
      * Find first 'non-wrapper' exception type in cause chain.
      */
@@ -327,10 +332,8 @@ public abstract class AbstractProblemLoader {
      */
     protected ProblemInitializer createProblemInitializer() {
         UserInterface ui = mediator.getUI();
-        return new ProblemInitializer(ui,
-                        new Services(envInput.getProfile(), 
-                                        mediator.getExceptionHandler()),
-                                        ui);
+        Profile profile = forceNewProfileOfNewProofs ? profileOfNewProofs : envInput.getProfile();
+        return new ProblemInitializer(ui, new Services(profile), ui);
     }
 
     /**

@@ -31,6 +31,10 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
@@ -44,6 +48,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.swt.custom.CBanner;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuildJob;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuilder;
@@ -335,6 +340,56 @@ public class KeY4EclipseResourcesTestUtil {
          return metaFileCount;
       }
    }
+   
+   
+   public static class cleanBuildResourceChangeListener implements IResourceChangeListener {
+      private boolean deleted = false;
+      private IFile[] files;
+      public cleanBuildResourceChangeListener(IFile... files){
+         this.files = files;
+      }
+      public boolean getDeleted(){
+         return deleted;
+      }
+      @Override
+      public void resourceChanged(IResourceChangeEvent event) {
+         if(event.getDelta() != null) {
+            try {
+               cleanBuildDelteVisitor cbdv = new cleanBuildDelteVisitor(files);
+               event.getDelta().accept(cbdv);
+               if(!deleted){
+                  deleted = cbdv.getDeleted();
+               }
+            }
+            catch (CoreException e) {
+               deleted = true;
+            }
+         }
+      }
+   }
+   
+   
+   private static class cleanBuildDelteVisitor implements IResourceDeltaVisitor {
+      private boolean deleted = false;
+      private IFile[] files;
+      public cleanBuildDelteVisitor(IFile... files){
+         this.files = files;
+      }
+      public boolean getDeleted(){
+         return deleted;
+      }
+      @Override
+      public boolean visit(IResourceDelta delta) throws CoreException {
+         IResource resource = delta.getResource();
+         for(IFile file : files){
+            if(file != null && file.equals(resource) && delta.getKind() == IResourceDelta.REMOVED){
+               deleted = true;
+               return false;
+            }
+         }
+         return true;
+      }
+   };
    
    
    public static long getCreationTime(IResource res) throws IOException {

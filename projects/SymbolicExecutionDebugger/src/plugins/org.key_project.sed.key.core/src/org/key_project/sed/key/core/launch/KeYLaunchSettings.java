@@ -25,6 +25,7 @@ import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
  * Contains the settings used in an {@link ILaunch} which contains a
@@ -137,6 +138,12 @@ public class KeYLaunchSettings {
    private final boolean showSignatureOnMethodReturnNodes;
    
    /**
+    * Checks how variables are computed.
+    * @return {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
+    */
+   private final boolean variablesAreOnlyComputedFromUpdates;
+   
+   /**
     * Constructor.
     * @param newDebugSession {@code true} new debug session, {@code false} continue existing *.proof file.
     * @param proofFileToContinue The path to the proof file to continue.
@@ -156,6 +163,7 @@ public class KeYLaunchSettings {
     * @param bootClassPath The used boot class path.
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
+    * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
     * @throws JavaModelException Occurred Exception.
     */
    public KeYLaunchSettings(boolean newDebugSession,
@@ -176,7 +184,8 @@ public class KeYLaunchSettings {
                             File bootClassPath,
                             boolean useUnicode,
                             boolean usePrettyPrinting,
-                            boolean showSignatureOnMethodReturnNodes) throws JavaModelException {
+                            boolean showSignatureOnMethodReturnNodes,
+                            boolean variablesAreOnlyComputedFromUpdates) throws JavaModelException {
       this.newDebugSession = newDebugSession;
       this.proofFileToContinue = proofFileToContinue;
       this.method = method;
@@ -197,6 +206,7 @@ public class KeYLaunchSettings {
       this.useUnicode = useUnicode;
       this.usePrettyPrinting = usePrettyPrinting;
       this.showSignatureOnMethodReturnNodes = showSignatureOnMethodReturnNodes;
+      this.variablesAreOnlyComputedFromUpdates = variablesAreOnlyComputedFromUpdates;
    }
 
    /**
@@ -357,5 +367,13 @@ public class KeYLaunchSettings {
     */
    public boolean isShowSignatureOnMethodReturnNodes() {
       return showSignatureOnMethodReturnNodes;
+   }
+   
+   /**
+    * Checks how variables are computed.
+    * @return {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
+    */
+   public boolean isVariablesAreOnlyComputedFromUpdates() {
+      return variablesAreOnlyComputedFromUpdates;
    }
 }

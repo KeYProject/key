@@ -14,8 +14,12 @@
 package org.key_project.key4eclipse.resources.util;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,6 +56,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuildJob;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.decorator.ProofFileLightweightLabelDecorator;
+import org.key_project.key4eclipse.resources.io.ProofMetaReferencesPrettyPrinter;
 import org.key_project.key4eclipse.resources.io.ProofReferenceException;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
 import org.key_project.key4eclipse.resources.util.event.IKeYResourcePropertyListener;
@@ -69,8 +74,13 @@ import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -81,6 +91,7 @@ import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -91,7 +102,7 @@ public class KeYResourcesUtil {
    public static final String PROOF_FOLDER_NAME = "proofs";
    public static final String PROOF_FILE_EXTENSION = "proof";
    public static final String META_FILE_EXTENSION = "proofmeta";
-   
+   public static final String BUILD_FILE = ".build";
    
    /**
     * Key of {@link IResource#getPersistentProperty(QualifiedName)} to store the proof closed result of a proof file.
@@ -364,9 +375,7 @@ public class KeYResourcesUtil {
     * @param project - the project to search the source folders for.
     * @return the {@link LinkedList} with the source folders
     */
-   public static LinkedList<IPath> getAllJavaSrcFolders(IProject project) {
-      LinkedList<IPath> srcFolders = new LinkedList<IPath>();
-
+   public static IFolder getJavaSrcFolder(IProject project) {
       IJavaProject javaProject = JavaCore.create(project);
       IClasspathEntry[] classpathEntries;
       try {
@@ -375,14 +384,14 @@ public class KeYResourcesUtil {
             IClasspathEntry entry = classpathEntries[i];
             if(entry.getContentKind() == IPackageFragmentRoot.K_SOURCE){
                IPath path = entry.getPath();
-               srcFolders.add(path);
+               return ResourcesPlugin.getWorkspace().getRoot().getFolder(path);
             }
          }
       }
       catch (JavaModelException e) {
-         srcFolders = new LinkedList<IPath>();
+         return null;
       }
-      return srcFolders;
+      return null;
    }
 
    /**
@@ -539,7 +548,20 @@ public class KeYResourcesUtil {
     * @return true if the given {@link IResource} is a java file and is stored in a source folder.
     */
    public static boolean isJavaFileAndInSrcFolder(IResource res){
-      if(IResource.FILE == res.getType() && isInSourceFolder(res)){
+      if(isJavaFile(res) && isInSourceFolder(res)){
+         return true;
+      }
+      return false;
+   }
+   
+   
+   /**
+    * Checks if the given {@link IResource} is a java file.
+    * @param res - the {@link IResource} to be checked
+    * @return true if the given {@link IResource} is a java file.
+    */
+   public static boolean isJavaFile(IResource res){
+      if(IResource.FILE == res.getType()){
          IJavaElement element = JavaCore.create(res);
          if (element instanceof ICompilationUnit) {
             return true;
@@ -556,10 +578,18 @@ public class KeYResourcesUtil {
     * @return true if the given {@link IResource} is stored in a source folder.
     */
    public static boolean isInSourceFolder(IResource res){
-      for(IPath path : KeYResourcesUtil.getAllJavaSrcFolders(res.getProject())){
-         if(path.isPrefixOf(res.getFullPath())){
-            return true;
-         }
+      IFolder srcFolder  = KeYResourcesUtil.getJavaSrcFolder(res.getProject());
+      if(srcFolder != null && srcFolder.getFullPath().isPrefixOf(res.getFullPath())){
+         return true;
+      }
+      return false;
+   }
+   
+   
+   public static boolean isSourceFolder(IResource res) {
+      IFolder srcFolder = KeYResourcesUtil.getJavaSrcFolder(res.getProject());
+      if(srcFolder != null && srcFolder.equals(res)){
+         return true;
       }
       return false;
    }
@@ -853,52 +883,31 @@ public class KeYResourcesUtil {
       }
       return num;
    }
+
    
+   public static boolean isProofFile(IResource res){
+      if(res != null && res.exists()){
+         return KeYResourcesUtil.PROOF_FILE_EXTENSION.equals(res.getFileExtension());
+      }
+      return false;
+   }
    
-   public static boolean isProofFile(IFile file){
-      if(file != null && file.exists()){
-         IProject project = file.getProject();
-         if(KeYResourcesUtil.isKeYProject(project) && isInProofFolder(file) && KeYResourcesUtil.PROOF_FILE_EXTENSION.equals(file.getFileExtension())){
-            return true;
-         }
+   public static boolean isMetaFile(IResource res){
+      if(res != null && res.exists()){
+         return KeYResourcesUtil.META_FILE_EXTENSION.equals(res.getFileExtension());
       }
       return false;
    }
    
    
-   public static List<IFile> getAllProofFiles(IResource res){
-      if(res != null && res.exists()){
-         if(res.getType() == IResource.PROJECT){
-            IProject project = (IProject) res;
-            if(KeYResourcesUtil.isKeYProject(project)){
-               return getAllProofFiles(project.getFolder(KeYResourcesUtil.PROOF_FOLDER_NAME));
-            }
-         }
-         else if(res.getType() == IResource.FOLDER){
-            IFolder folder = (IFolder) res;
-            if(KeYResourcesUtil.isKeYProject(folder.getProject()) && KeYResourcesUtil.isInProofFolder(folder)){
-               try{
-                  List<IFile> files = new LinkedList<IFile>();
-                  for(IResource subRes : folder.members()){
-                     files.addAll(KeYResourcesUtil.getAllProofFiles(subRes));
-                  }
-                  return files;
-               }
-               catch(CoreException e){
-                  LogUtil.getLogger().logError(e);
-               }
-            }
-         }
-         else if(res.getType() == IResource.FILE){
-            IFile file = (IFile) res;
-            if(KeYResourcesUtil.isKeYProject(file.getProject()) && KeYResourcesUtil.isInProofFolder(file) && KeYResourcesUtil.isProofFile(file)){
-               List<IFile> files = new LinkedList<IFile>();
-               files.add(file);
-               return files;
-            }
+   public static boolean isProofFileAndInProofFolder(IResource res){
+      if(res != null && res.exists() && isProofFile(res)){
+         IProject project = res.getProject();
+         if(KeYResourcesUtil.isKeYProject(project) && isInProofFolder(res)){
+            return true;
          }
       }
-      return new LinkedList<IFile>();
+      return false;
    }
    
 
@@ -928,5 +937,99 @@ public class KeYResourcesUtil {
       str = str.replaceAll("\r", " ");
       str = str.replaceAll("\n", " ");
       return str;
+   }
+   
+   
+   public static String createSourceString(MethodDeclaration methodDecl){
+      StringWriter sw = new StringWriter();
+      try{
+         ProofMetaReferencesPrettyPrinter pp = new ProofMetaReferencesPrettyPrinter(sw, true);
+         pp.printInlineMethodDeclaration(methodDecl);
+      }
+      catch (IOException e){
+         LogUtil.getLogger().logError(e);
+      }
+      String src = sw.toString();
+      src = KeYResourcesUtil.removeLineBreaks(src);
+      return src;
+   }
+   
+   
+   public static IProgramMethod getMethodForKjt(KeYJavaType kjt, String method, String parameters) {
+      if(kjt != null && kjt.getJavaType() instanceof TypeDeclaration) {
+         TypeDeclaration typeDecl = (TypeDeclaration) kjt.getJavaType();
+         for(MemberDeclaration memberDecl : typeDecl.getMembers()) {
+            if (memberDecl instanceof IProgramMethod) {
+               IProgramMethod pm = (IProgramMethod) memberDecl;
+               MethodDeclaration md = pm.getMethodDeclaration();
+               if (md.getName().equals(method) && KeYResourcesUtil.parametersToString(md.getParameters()).equals(parameters)) {
+                  return pm;
+               }
+            }
+         }
+      }
+      return null;
+   }
+   
+   
+   public static Map<KeYJavaType, IProgramMethod> getKjtsOfAllImplementations(KeYEnvironment<?> env, KeYJavaType kjt, String method, String parameters) {
+      Map<KeYJavaType, IProgramMethod> types = new HashMap<KeYJavaType, IProgramMethod>();
+      IProgramMethod pm = KeYResourcesUtil.getMethodForKjt(kjt, method, parameters);
+      if(pm != null) {
+         types.put(kjt, pm);
+      }
+      Iterator<KeYJavaType> it = env.getJavaInfo().getAllSubtypes(kjt).iterator();
+      while(it.hasNext()){
+         kjt = it.next();
+         if((pm = KeYResourcesUtil.getMethodForKjt(kjt, method, parameters)) != null && !types.containsKey(kjt)){
+            types.put(kjt, pm);
+         }
+      }
+      return types;
+   }
+   
+   public static String implementationTypesToString(Map<KeYJavaType, IProgramMethod> implementations) {
+      String implementationTypesString = "";
+      for(KeYJavaType kjt : implementations.keySet()){
+         if(implementationTypesString != null){
+            implementationTypesString += kjt.getFullName() + ";";
+         }
+      }
+      return implementationTypesString;
+   }
+
+   public static FieldDeclaration getFieldDeclFromKjt(KeYJavaType kjt, String name) {
+      if(kjt.getJavaType() instanceof TypeDeclaration) {
+         TypeDeclaration typeDecl = (TypeDeclaration) kjt.getJavaType();
+         for(MemberDeclaration memberDecl : typeDecl.getMembers()){
+            if(memberDecl instanceof FieldDeclaration){
+               FieldDeclaration fieldDecl = (FieldDeclaration) memberDecl;
+               ImmutableArray<FieldSpecification> fieldSpecs = fieldDecl.getFieldSpecifications();
+               if(fieldSpecs.size() == 1){
+                  FieldSpecification fieldSpec = fieldSpecs.get(0);
+                  if(fieldSpec.getName().equals(name)){
+                     return fieldDecl;
+                  }
+               }
+            }
+         }
+      }
+      return null;
+   }
+
+
+   public static boolean isBuildFile(IResource res) {
+      if(res != null) {
+         IFile buildFile = getProofFolder(res.getProject()).getFile(KeYResourcesUtil.BUILD_FILE);
+         if(buildFile.equals(res)) {
+            return true;
+         }
+      }
+      return false;
+   }
+   
+   public static boolean hasBuildFile(IProject project) {
+      IFile buildFile = getProofFolder(project).getFile(KeYResourcesUtil.BUILD_FILE);
+      return buildFile.exists();
    }
 }

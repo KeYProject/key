@@ -34,6 +34,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EventObject;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -67,6 +68,11 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.core.AutoModeListener;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
@@ -99,6 +105,7 @@ import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 public final class MainWindow extends JFrame  {
 
@@ -504,7 +511,7 @@ public final class MainWindow extends JFrame  {
      * Make the status line display a standard message, make progress bar and abort button invisible
      */
     public void setStandardStatusLine() {
-        GuiUtilities.invokeOnEventQueue(new Runnable() {
+        ThreadUtilities.invokeOnEventQueue(new Runnable() {
             @Override
 	    public void run() {
 		setStandardStatusLineImmediately();
@@ -530,7 +537,7 @@ public final class MainWindow extends JFrame  {
      * the progress bar range to the given value, set the current progress to zero
      */
     public void setStatusLine(final String str, final int max) {
-        GuiUtilities.invokeOnEventQueue(new Runnable() {
+        ThreadUtilities.invokeOnEventQueue(new Runnable() {
             @Override
 	    public void run() {
 		setStatusLineImmediately(str, max);
@@ -842,7 +849,7 @@ public final class MainWindow extends JFrame  {
                 updateSequentView();
             }
         };
-        GuiUtilities.invokeAndWait(guiUpdater);
+        ThreadUtilities.invokeAndWait(guiUpdater);
     }
 
     private Proof setUpNewProof(Proof proof) {
@@ -888,7 +895,7 @@ public final class MainWindow extends JFrame  {
             assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
             if (doNotReenable == null) {
                 // bug #1105 occurred
-                System.err.println("toolbar enabled w/o prior disable");
+                Debug.out("toolbar enabled w/o prior disable");
                 return;
             }
 
@@ -909,7 +916,7 @@ public final class MainWindow extends JFrame  {
         }
 
         @Override
-        public void modalDialogOpened(GUIEvent e) {
+        public void modalDialogOpened(EventObject e) {
 
             if (e.getSource() instanceof ApplyTacletDialog) {
                 // disable all elements except the sequent window (drag'n'drop !) ...
@@ -925,7 +932,7 @@ public final class MainWindow extends JFrame  {
 
         /** invoked if a frame that wants modal access is closed */
         @Override
-        public void modalDialogClosed(GUIEvent e) {
+        public void modalDialogClosed(EventObject e) {
             if (e.getSource() instanceof ApplyTacletDialog) {
                 // enable all previously diabled elements ...
                 enableMenuBar(MainWindow.this.getJMenuBar(), true);
@@ -939,7 +946,7 @@ public final class MainWindow extends JFrame  {
         }
 
         @Override
-        public void shutDown(GUIEvent e) {
+        public void shutDown(EventObject e) {
             MainWindow.this.notify(new ExitKeYEvent());
             MainWindow.this.setVisible(false);
         }
@@ -1052,7 +1059,7 @@ public final class MainWindow extends JFrame  {
 
         /** invoked when the strategy of a proof has been changed */
         @Override
-        public synchronized void settingsChanged ( GUIEvent e ) {
+        public synchronized void settingsChanged ( EventObject e ) {
             if ( proof.getSettings().getStrategySettings() == e.getSource()) {
                 // updateAutoModeConfigButton();
             }

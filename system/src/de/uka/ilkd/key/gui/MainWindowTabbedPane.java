@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;

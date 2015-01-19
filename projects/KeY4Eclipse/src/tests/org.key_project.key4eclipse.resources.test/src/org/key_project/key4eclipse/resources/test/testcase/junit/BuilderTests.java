@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
@@ -498,9 +499,9 @@ public class BuilderTests extends AbstractResourceTest {
       IFolder proofFolder = KeY4EclipseResourcesTestUtil.getProofFolder(project);
       IFile javaFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("src").append("cleanBuild").append("File.java"));
-      IFile proofFile = KeY4EclipseResourcesTestUtil.getFile(
+      final IFile proofFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("cleanBuild").append("File.java").append("cleanBuild_File[cleanBuild_File__add(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
+      final IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/BuilderTests/testCleanBuild/src", project.getFolder("src"));
       
@@ -513,13 +514,13 @@ public class BuilderTests extends AbstractResourceTest {
       assertTrue(javaFile.exists());
       assertTrue(proofFolder.exists());
       assertTrue(proofFile.exists() && metaFile.exists());
-      
-      long creationTime = KeY4EclipseResourcesTestUtil.getCreationTime(proofFile);
+
+      KeY4EclipseResourcesTestUtil.cleanBuildResourceChangeListener listener = new KeY4EclipseResourcesTestUtil.cleanBuildResourceChangeListener(proofFile, metaFile);
+      ResourcesPlugin.getWorkspace().addResourceChangeListener(listener);
 
       InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/BuilderTests/testCleanBuild/customProof.proof");
       proofFile.setContents(is, IResource.FORCE, null);
       is.close();
-      
       KeY4EclipseResourcesTestUtil.build(project);
       
       long proofFileModStamp = proofFile.getLocalTimeStamp();
@@ -536,7 +537,7 @@ public class BuilderTests extends AbstractResourceTest {
 
       assertTrue(proofFile.getLocalTimeStamp() != proofFileModStamp);
       assertTrue(metaFile.getLocalTimeStamp() != metaFileModStamp);
-      assertEquals(creationTime, KeY4EclipseResourcesTestUtil.getCreationTime(proofFile));
+      assertFalse(listener.getDeleted());
    }
    
 

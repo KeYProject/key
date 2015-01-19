@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.gui;
 import java.util.EventListener;
+import java.util.EventObject;
 
 /** 
  * GUIListener defines the interface for an object that listens to
@@ -22,12 +23,12 @@ import java.util.EventListener;
 public interface GUIListener extends EventListener {
 
     /** invoked if a frame that wants modal access is opened */
-    void modalDialogOpened(GUIEvent e);
+    void modalDialogOpened(EventObject e);
 
     /** invoked if the frame holding modal access has been closed */
-    void modalDialogClosed(GUIEvent e);
+    void modalDialogClosed(EventObject e);
 
     /** invoked if the user wants to abort the proving session */
-    void shutDown(GUIEvent e);
+    void shutDown(EventObject e);
 
 }

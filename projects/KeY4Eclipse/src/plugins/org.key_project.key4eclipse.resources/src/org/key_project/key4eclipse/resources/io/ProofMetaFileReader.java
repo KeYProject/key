@@ -216,7 +216,7 @@ public class ProofMetaFileReader {
             if (!ProofMetaFileWriter.TAG_ACCESS_REFERENCES.equals(parent)) {
                throw new SAXException(ProofMetaFileWriter.TAG_ACCESS_REFERENCE  + " has to be a child of " + ProofMetaFileWriter.TAG_ACCESS_REFERENCES + ".");
             }
-            ProofMetaReferenceAccess access = new ProofMetaReferenceAccess(getKJT(attributes), getName(attributes), getSrc(attributes));
+            ProofMetaReferenceAccess access = new ProofMetaReferenceAccess(getKJT(attributes), getName(attributes), getType(attributes), getVisibility(attributes), getIsStatic(attributes), getIsFinal(attributes), getIsCalledInConstructor(attributes), getInitializer(attributes));
             references.addAccess(access);
             parentStack.addFirst(ProofMetaFileWriter.TAG_ACCESS_REFERENCE);
          }
@@ -232,19 +232,9 @@ public class ProofMetaFileReader {
             if (!ProofMetaFileWriter.TAG_CALLMETHOD_REFERENCES.equals(parent)) {
                throw new SAXException(ProofMetaFileWriter.TAG_CALLMETHOD_REFERENCE  + " has to be a child of " + ProofMetaFileWriter.TAG_CALLMETHOD_REFERENCES + ".");
             }
-            ProofMetaReferenceCallMethod callMethod = new ProofMetaReferenceCallMethod(getKJT(attributes), getName(attributes), getParameters(attributes), getSrc(attributes), new LinkedList<ProofMetaReferenceMethod>());
+            ProofMetaReferenceCallMethod callMethod = new ProofMetaReferenceCallMethod(getKJT(attributes), getName(attributes), getParameters(attributes), getImplementations(attributes));
             references.addCallMethod(callMethod);
-            parentStack.addFirst(callMethod);
-         }
-         else if (ProofMetaFileWriter.TAG_SUBMETHOD_REFERENCE.equals(qName)) {
-            Object parent = parentStack.peekFirst();
-            if(!(parent instanceof ProofMetaReferenceCallMethod)) {
-               throw new SAXException(ProofMetaFileWriter.TAG_SUBMETHOD_REFERENCE  + " has to be a child of " + ProofMetaFileWriter.TAG_CALLMETHOD_REFERENCE + ".");
-            }
-            ProofMetaReferenceCallMethod callMethod = (ProofMetaReferenceCallMethod) parent;
-            ProofMetaReferenceMethod subMethod = new ProofMetaReferenceMethod(getKJT(attributes), getName(attributes), getParameters(attributes), getSrc(attributes));
-            callMethod.addSubMethod(subMethod);
-            parentStack.addFirst(ProofMetaFileWriter.TAG_SUBMETHOD_REFERENCE);
+            parentStack.addFirst(ProofMetaFileWriter.TAG_CALLMETHOD_REFERENCE);
          }
          else if (ProofMetaFileWriter.TAG_INLINEMETHOD_REFERENCES.equals(qName)) {
             Object parent = parentStack.peekFirst();
@@ -419,6 +409,67 @@ public class ProofMetaFileReader {
       protected String getParameters(Attributes attributes) {
          return attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_PARAMETERS);
       }
+      
+
+      /**
+       * Returns all Implementations of a CallMethod.
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      protected String getImplementations(Attributes attributes) {
+         return attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_IMPLEMENTATIONS);
+      }
+      
+
+      /**
+       * Returns a fields visibility.
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      protected String getVisibility(Attributes attributes) {
+         return attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_VISIBILITY);
+      }
+      
+
+      /**
+       * Returns if a field is static.
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      protected boolean getIsStatic(Attributes attributes) {
+         return Boolean.parseBoolean(attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_IS_STATIC));
+      }
+      
+
+      /**
+       * Returns if a field is final.
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      protected boolean getIsFinal(Attributes attributes) {
+         return Boolean.parseBoolean(attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_IS_FINAL));
+      }
+
+      
+      /**
+       * Returns if a field is called in a constructor.
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      protected boolean getIsCalledInConstructor(Attributes attributes) {
+         return Boolean.parseBoolean(attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_IS_CALLED_IN_CONSTRUCTOR));
+      }
+
+      
+      /**
+       * Returns a fields initializer
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      protected String getInitializer(Attributes attributes) {
+         return attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_INITIALIZER);
+      }
+      
       
       /**
        * Returns the representation.

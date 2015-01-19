@@ -13,15 +13,21 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /** 
  * An AntecTaclet represents a taclet whose find part has to match a top level
@@ -87,8 +93,8 @@ public class AntecTaclet extends FindTaclet{
        if (gt instanceof AntecSuccTacletGoalTemplate) {
           final Sequent replWith = ((AntecSuccTacletGoalTemplate)gt).replaceWith();
 
-          replaceAtPos(replWith.antecedent(), currentSequent, posOfFind, services, matchCond);
-          addToSucc(replWith.succedent(), currentSequent, null, services, matchCond, posOfFind);	   	    	    
+          replaceAtPos(replWith.antecedent(), currentSequent, posOfFind, services, matchCond, new TacletLabelHint(TacletOperation.REPLACE_AT_ANTECEDENT, replWith));
+          addToSucc(replWith.succedent(), currentSequent, null, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.REPLACE_TO_SUCCEDENT, replWith));	   	    	    
        } else {
           // Then there was no replacewith...
        }
@@ -110,8 +116,8 @@ public class AntecTaclet extends FindTaclet{
 			    PosInOccurrence posOfFind,
 			    Services services,
 			    MatchConditions matchCond) {
-       addToAntec(add.antecedent(), currentSequent, posOfFind, services, matchCond, posOfFind);
-       addToSucc(add.succedent(), currentSequent, null, services, matchCond, posOfFind);
+       addToAntec(add.antecedent(), currentSequent, posOfFind, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));
+       addToSucc(add.succedent(), currentSequent, null, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add));
     }
         
     /** toString for the find part */

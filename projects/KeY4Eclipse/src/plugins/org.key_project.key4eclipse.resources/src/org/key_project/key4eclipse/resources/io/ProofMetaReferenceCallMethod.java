@@ -2,23 +2,35 @@ package org.key_project.key4eclipse.resources.io;
 
 import java.util.List;
 
-public class ProofMetaReferenceCallMethod extends ProofMetaReferenceMethod {
+public class ProofMetaReferenceCallMethod {
 
-   private List<ProofMetaReferenceMethod> subImpl;
+   private String kjt;
+   private String name;
+   private String parameters; 
+   private String implementations;
    
    public ProofMetaReferenceCallMethod(String kjt, String name,
-         String parameters, String source,
-         List<ProofMetaReferenceMethod> subImpl) {
-      super(kjt, name, parameters, source);
-      this.subImpl = subImpl;
+         String parameters, String implementations) {
+      this.kjt = kjt;
+      this.name = name;
+      this.parameters = parameters;
+      this.implementations = implementations;
    }
 
-   public List<ProofMetaReferenceMethod> getSubImpl() {
-      return subImpl;
+   public String getKjt() {
+      return kjt;
    }
 
-   public void addSubMethod(ProofMetaReferenceMethod subMethod) {
-      subImpl.add(subMethod);
+   public String getName() {
+      return name;
+   }
+
+   public String getParameters() {
+      return parameters;
+   }
+
+   public String getImplementations() {
+      return implementations;
    }
       
 }

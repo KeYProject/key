@@ -53,7 +53,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       keyDelta.update(delta);
       try {
          if(KeYProjectProperties.isEnableKeYResourcesBuilds(project)){ 
-            if((IncrementalProjectBuilder.FULL_BUILD == kind || keyDelta.isBuildRequired()) && !keyDelta.isBuilding()){
+            if(keyDelta.isBuildRequired() && !keyDelta.isBuilding()){
                keyDelta.setIsBuilding(true);
                int buildType = IncrementalProjectBuilder.FULL_BUILD == kind ? KeYProjectBuildJob.FULL_BUILD : KeYProjectBuildJob.AUTO_BUILD;
                KeYProjectBuildJob proofManagerJob = new KeYProjectBuildJob(project, buildType);

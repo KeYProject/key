@@ -21,16 +21,20 @@ import java.util.Properties;
 
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -43,7 +47,6 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractUserInterface;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -167,12 +170,9 @@ public class WindowUserInterface extends AbstractUserInterface {
             }
         } else if (info.getSource() instanceof ProblemLoader) {
             resetStatus(this);
+            Throwable result = (Throwable) info.getResult();
             if (info.getResult() != null) {
-                final KeYExceptionHandler exceptionHandler = ((ProblemLoader) info
-                        .getSource()).getExceptionHandler();
-                ExceptionDialog.showDialog(
-                        mainWindow, exceptionHandler.getExceptions());
-                exceptionHandler.clear();
+                ExceptionDialog.showDialog(mainWindow, result);
             } else if (getMediator().getUI().isSaveOnly()) {
                 mainWindow.displayResults("Finished Saving!");
             } else {
@@ -287,7 +287,7 @@ public class WindowUserInterface extends AbstractUserInterface {
     @Override
     public ProblemInitializer createProblemInitializer(Profile profile) {
         ProblemInitializer pi = new ProblemInitializer(this,
-                new Services(profile, mainWindow.getMediator().getExceptionHandler()), this);
+                new Services(profile), this);
         return pi;
     }
 
@@ -304,11 +304,12 @@ public class WindowUserInterface extends AbstractUserInterface {
     */
    @Override
    public AbstractProblemLoader load(Profile profile, File file, List<File> classPath,
-                                    File bootClassPath, Properties poPropertiesToForce) throws ProblemLoaderException {
+                                     File bootClassPath, Properties poPropertiesToForce, 
+                                     boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
       if (file != null) {
          mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
       }
-      return super.load(profile, file, classPath, bootClassPath, poPropertiesToForce);
+      return super.load(profile, file, classPath, bootClassPath, poPropertiesToForce, forceNewProfileOfNewProofs);
    }
 
    /**
@@ -381,5 +382,5 @@ public class WindowUserInterface extends AbstractUserInterface {
       mainWindow.setStandardStatusLine();
    }
 
-  
+
 }
