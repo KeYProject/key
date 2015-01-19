@@ -99,8 +99,15 @@ public class JoinIfThenElse extends JoinRule {
          if (rightSide1.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING &&
              rightSide2.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING &&
              !proofClosed) {
-            
-            Term predicateTerm = tb.func(new Function(new Name("P"), Sort.FORMULA, v.sort()), tb.var(v));
+
+            // Create the predicate term
+            final Name predicateSymbName = new Name(tb.newName("P"));
+            final Function predicateSymb =
+                  new Function(predicateSymbName, Sort.FORMULA, v.sort());
+            services.getNamespaces().functions().add(predicateSymb);
+            final Term predicateTerm = tb.func(predicateSymb, tb.var(v));
+
+            // Create the formula to check
             Term appl1 = tb.apply(state1.first, predicateTerm);
             Term appl2 = tb.apply(state2.first, predicateTerm);
             Term toProve = tb.and(
