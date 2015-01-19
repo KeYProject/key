@@ -760,7 +760,7 @@ public abstract class JoinRule implements BuiltInRule {
     * @param antec If true, antecedent formulae are deleted, else
     *    succedent formulae.
     */
-   static void clearSemisequent(Goal goal, boolean antec) {
+   protected static void clearSemisequent(Goal goal, boolean antec) {
       Semisequent semiseq = antec ?
             goal.sequent().antecedent() :
             goal.sequent().succedent();

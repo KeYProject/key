@@ -90,6 +90,7 @@ public class CloseAfterJoin implements BuiltInRule {
     *    the place of this rule application.
     * @param joinState The join state; needed for adding an implicative
     *    premise ensuring the soundness of join rules.
+    * @param thisSEState The SE state corresponding to this state.
     * @param pc The program counter (formula of the form U\<{...}\> PHI,
     *    where U is an update in normal form and PHI is a DL formula).
     */
@@ -173,15 +174,19 @@ public class CloseAfterJoin implements BuiltInRule {
       return jpNewGoals;
    }
    
+   /**
+    * Constructs the actual syntactic weakening formula \phi(s1, s2)
+    * expressing that s2 is a weakening of s1.
+    * 
+    * @param services The services object.
+    * @return The syntactic weakening formula for this.joinState and
+    *    this.thisSEState.
+    */
    private Term getSyntacticWeakeningFormula(Services services) {
       TermBuilder tb = services.getTermBuilder();
       
       final LinkedHashSet<QuantifiableVariable> allQfableVariables =
             new LinkedHashSet<QuantifiableVariable>();
-//      allVariables.addAll(JoinRule.getFreeQfableVariables(thisSEState.getSymbolicState()));
-//      allVariables.addAll(JoinRule.getFreeQfableVariables(joinState.getSymbolicState()));
-//      allVariables.addAll(JoinRule.getFreeQfableVariables(thisSEState.getPathCondition()));
-//      allVariables.addAll(JoinRule.getFreeQfableVariables(joinState.getPathCondition()));
       allQfableVariables.addAll(toList(thisSEState.getSymbolicState().freeVars()));
       allQfableVariables.addAll(toList(joinState.getSymbolicState().freeVars()));
       allQfableVariables.addAll(toList(thisSEState.getPathCondition().freeVars()));
@@ -194,19 +199,13 @@ public class CloseAfterJoin implements BuiltInRule {
       allLocs.addAll(JoinRule.getTermLocations(thisSEState.getPathCondition()));
       allLocs.addAll(JoinRule.getTermLocations(joinState.getPathCondition()));
       
-      final LinkedList<Term> qfdVarTerms = new LinkedList<Term>();
       final LinkedList<Term> origQfdVarTerms = new LinkedList<Term>();
-      
-      final LinkedList<QuantifiableVariable> allVariables =
-            new LinkedList<QuantifiableVariable>();
-      allVariables.addAll(allQfableVariables);
       
       // Collect sorts and create logical variables for
       // closing over program variables.
       final LinkedList<Sort> argSorts = new LinkedList<Sort>();
       for (QuantifiableVariable var : allQfableVariables) {
          argSorts.add(var.sort());
-         qfdVarTerms.add(tb.var(var));
          origQfdVarTerms.add(tb.var(var));
       }
       for (LocationVariable var : allLocs) {
@@ -218,8 +217,6 @@ public class CloseAfterJoin implements BuiltInRule {
                new LogicVariable(new Name(newName), var.sort());
          services.getNamespaces().variables().add(newVar);
          
-         qfdVarTerms.add(tb.var(newVar));
-         allVariables.add(newVar);
          origQfdVarTerms.add(tb.var(var));
       }
       
@@ -234,32 +231,55 @@ public class CloseAfterJoin implements BuiltInRule {
       // Create the predicate term
       final Term predTerm = tb.func(predicateSymb, origQfdVarTerms.toArray(new Term[] {}));
       
-      // Create the formula (C1 & {U1} P(...)) -> (C2 & {U2} P(...))
+      // Create the formula Ex-Cl(C1 & {U1} P(...)) -> Ex-Cl(C2 & {U2} P(...))      
       Term result = tb.imp(
-            tb.and(
+            exClosure(tb.and(
                   thisSEState.getPathCondition(),
-                  tb.apply(thisSEState.getSymbolicState(), predTerm)),
-            tb.and(
+                  tb.apply(thisSEState.getSymbolicState(), predTerm)), services),
+            exClosure(tb.and(
                   joinState.getPathCondition(),
-                  tb.apply(joinState.getSymbolicState(), predTerm)));
+                  tb.apply(joinState.getSymbolicState(), predTerm)), services));
       
-      // Bind the program variables
-      LocationVariable[] allLocsArr = allLocs.toArray(new LocationVariable[] {});
+      return result;
+   }
+   
+   /**
+    * Existentially closes all logical and location variables in
+    * the given term.
+    * 
+    * @param term Term to existentially close.
+    * @param services The services object.
+    * @return A new term which is equivalent to the existential closure
+    *    of the argument term.
+    */
+   private static Term exClosure(final Term term, final Services services) {
+      TermBuilder tb = services.getTermBuilder();
+      
+      final LinkedHashSet<QuantifiableVariable> qfableVariables =
+            new LinkedHashSet<QuantifiableVariable>();
+      qfableVariables.addAll(toList(term.freeVars()));
+      
+      final LinkedHashSet<LocationVariable> locs =
+            new LinkedHashSet<LocationVariable>();
+      locs.addAll(JoinRule.getTermLocations(term));
+      
       Term bindForm = tb.tt();
-      for (int i = allQfableVariables.size(); i < qfdVarTerms.size(); i++) {
+      for (LocationVariable loc : locs) {
+         final String varNamePrefix = "v";
+         final String newName = tb.newName(varNamePrefix);
+         final LogicVariable newVar =
+               new LogicVariable(new Name(newName), loc.sort());
+         services.getNamespaces().variables().add(newVar);
+         qfableVariables.add(newVar);
+         
          bindForm = tb.and(
                tb.equals(
-                     tb.var(allLocsArr[i - allQfableVariables.size()]),
-                     qfdVarTerms.get(i)),
+                     tb.var(loc),
+                     tb.var(newVar)),
                bindForm);
       }
       
-      result = tb.imp(bindForm, result);
-      
-      // Form the universal closure
-      result = tb.all(allVariables, result);
-      
-      return result;
+      return tb.ex(qfableVariables, tb.imp(bindForm, term));
    }
 
    @Override
