@@ -68,9 +68,6 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
-//TODO: Check associated CloseAfterJoin rule, update if thesis
-//      is updated.
-
 /**
  * Base for implementing join rules. Extend this class,
  * implement method joinStates(...) and register in
@@ -173,7 +170,12 @@ public abstract class JoinRule implements BuiltInRule {
       
       // Close partner goals
       for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
-         closeJoinPartnerGoal(newGoal.node(), joinPartner.first, joinedState, thisSEState.third);
+         closeJoinPartnerGoal(
+               newGoal.node(),
+               joinPartner.first,
+               joinedState,
+               sequentToSEPair(joinPartner.first, joinPartner.second, services),
+               thisSEState.third);
       }
 
       long endTime = System.currentTimeMillis();
@@ -361,6 +363,37 @@ public abstract class JoinRule implements BuiltInRule {
       
       return result;
    }
+   
+//   /**
+//    * @param term The term to extract quantifiable (i.e., logic) variables from.
+//    * @return All quantifiable (i.e., logic) variables in the given term.
+//    */
+//   protected static HashSet<QuantifiableVariable> getFreeQfableVariables(final Term term) {
+//      final HashSet<QuantifiableVariable> result =
+//            new HashSet<QuantifiableVariable>();
+//      
+//      term.execPreOrder(new Visitor() {
+//         
+//         @Override
+//         public void visit(Term visited) {
+//            Operator op = visited.op();
+//            
+//            if (op.isRigid() &&
+//                  op instanceof LogicVariable &&
+//                  term.freeVars().contains((LogicVariable) op)) {
+//               result.add((LogicVariable) op);
+//            }
+//         }
+//         
+//         @Override
+//         public void subtreeLeft(Term subtreeRoot) {}
+//         
+//         @Override
+//         public void subtreeEntered(Term subtreeRoot) {}
+//      });
+//      
+//      return result;
+//   }
    
    
    /**
@@ -823,12 +856,16 @@ public abstract class JoinRule implements BuiltInRule {
     * @param joinPartner Partner goal to close.
     */
    private static void closeJoinPartnerGoal(
-         Node joinNodeParent, Goal joinPartner, SymbolicExecutionState joinState, Term pc) {
+         Node joinNodeParent,
+         Goal joinPartner,
+         SymbolicExecutionState joinState,
+         SymbolicExecutionState joinPartnerState,
+         Term pc) {
       
       Services services = joinNodeParent.proof().getServices();
       InitConfig initConfig = joinNodeParent.proof().getInitConfig();
       
-      CloseAfterJoin closeRule = new CloseAfterJoin(joinNodeParent, joinState, pc);
+      CloseAfterJoin closeRule = new CloseAfterJoin(joinNodeParent, joinState, joinPartnerState, pc);
       RuleApp app = closeRule.createApp(null, services);
       
       // Register rule if not done yet.
@@ -860,6 +897,28 @@ public abstract class JoinRule implements BuiltInRule {
          PosInOccurrence gPio = new PosInOccurrence(f, pit, antec);
          goal.removeFormula(gPio);
       }
+   }
+   
+   /**
+    * Converts a sequent (given by goal & pos in occurrence) to
+    * an SE state (U,C). Thereby, all program variables occurring
+    * in the symbolic state are replaced by branch-unique correspondents
+    * in order to enable merging of different branches declaring local
+    * variables.<p>
+    * 
+    * @param goal Current goal.
+    * @param pio Position of update-program counter formula in goal.
+    * @param services The services object.
+    * @return An SE state (U,C).
+    * @see #sequentToSETriple(Goal, PosInOccurrence, Services)
+    */
+   private static SymbolicExecutionState sequentToSEPair(
+         Goal goal, PosInOccurrence pio, Services services) {
+      
+      SymbolicExecutionStateWithProgCnt triple =
+            sequentToSETriple(goal, pio, services);
+      
+      return new SymbolicExecutionState(triple.first, triple.second);
    }
    
    /**

@@ -13,10 +13,13 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-
+import java.util.LinkedList;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -24,14 +27,18 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofVisitor;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.rule.JoinRule.SymbolicExecutionState;
 
 /**
  * Rule for closing a partner goal after a join
@@ -52,7 +59,8 @@ public class CloseAfterJoin implements BuiltInRule {
    private static final Name RULE_NAME = new Name(DISPLAY_NAME);
    
    private Node joinNode = null;
-   private Pair<Term, Term> joinState = null;
+   private SymbolicExecutionState joinState = null;
+   private SymbolicExecutionState thisSEState = null;
    private Term pc = null;
    
    private static HashMap<Node, HashSet<Node>> JOIN_NODE_TO_PARTNERS_MAP =
@@ -84,9 +92,14 @@ public class CloseAfterJoin implements BuiltInRule {
     * @param pc The program counter (formula of the form U\<{...}\> PHI,
     *    where U is an update in normal form and PHI is a DL formula).
     */
-   public CloseAfterJoin(Node joinNode, Pair<Term, Term> joinState, Term pc) {
+   public CloseAfterJoin(
+         Node joinNode,
+         SymbolicExecutionState joinState,
+         SymbolicExecutionState thisSEState,
+         Term pc) {
       this.joinNode = joinNode;
       this.joinState = joinState;
+      this.thisSEState = thisSEState;
       this.pc = pc;
       
       if (!JOIN_NODE_TO_PARTNERS_MAP.containsKey(joinNode)) {
@@ -109,8 +122,6 @@ public class CloseAfterJoin implements BuiltInRule {
          final Goal goal,
          final Services services,
          final RuleApp ruleApp) throws RuleAbortException {
-      
-      TermBuilder tb = services.getTermBuilder();
       
       ImmutableList<Goal> jpNewGoals = goal.split(2);
       
@@ -149,16 +160,95 @@ public class CloseAfterJoin implements BuiltInRule {
       Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
       ruleIsWeakeningGoal.setBranchLabel("Joined node is weakening");
             
-      Term impForm = tb.imp(joinState.second, tb.apply(joinState.first, pc));
-      for (QuantifiableVariable v : impForm.freeVars()) {
-         impForm = tb.all(v, impForm);
-      }
-      ruleIsWeakeningGoal.addFormula(new SequentFormula(impForm), true, true);
+      Term isWeakeningForm = getSyntacticWeakeningFormula(services);
+      ruleIsWeakeningGoal.addFormula(new SequentFormula(isWeakeningForm), true, true);
       
       // Register partner nodes
       JOIN_NODE_TO_PARTNERS_MAP.get(joinNode).add(linkedGoal.node());
       
       return jpNewGoals;
+   }
+   
+   private Term getSyntacticWeakeningFormula(Services services) {
+      TermBuilder tb = services.getTermBuilder();
+      
+      final LinkedList<QuantifiableVariable> allQfableVariables =
+            new LinkedList<QuantifiableVariable>();
+//      allVariables.addAll(JoinRule.getFreeQfableVariables(thisSEState.getSymbolicState()));
+//      allVariables.addAll(JoinRule.getFreeQfableVariables(joinState.getSymbolicState()));
+//      allVariables.addAll(JoinRule.getFreeQfableVariables(thisSEState.getPathCondition()));
+//      allVariables.addAll(JoinRule.getFreeQfableVariables(joinState.getPathCondition()));
+      allQfableVariables.addAll(toList(thisSEState.getSymbolicState().freeVars()));
+      allQfableVariables.addAll(toList(joinState.getSymbolicState().freeVars()));
+      allQfableVariables.addAll(toList(thisSEState.getPathCondition().freeVars()));
+      allQfableVariables.addAll(toList(joinState.getPathCondition().freeVars()));
+      
+      final LinkedList<LocationVariable> allLocs =
+            new LinkedList<LocationVariable>();
+      allLocs.addAll(JoinRule.getUpdateLocations(thisSEState.getSymbolicState()));
+      allLocs.addAll(JoinRule.getUpdateLocations(joinState.getSymbolicState()));
+      allLocs.addAll(JoinRule.getTermLocations(thisSEState.getPathCondition()));
+      allLocs.addAll(JoinRule.getTermLocations(joinState.getPathCondition()));
+      
+      final LinkedList<Term> qfdVarTerms = new LinkedList<Term>();
+      
+      final LinkedList<QuantifiableVariable> allVariables =
+            new LinkedList<QuantifiableVariable>();
+      allVariables.addAll(allQfableVariables);
+      
+      // Collect sorts and create logical variables for
+      // closing over program variables.
+      final LinkedList<Sort> argSorts = new LinkedList<Sort>();
+      for (QuantifiableVariable var : allQfableVariables) {
+         argSorts.add(var.sort());
+         qfdVarTerms.add(tb.var(var));
+      }
+      for (LocationVariable var : allLocs) {
+         argSorts.add(var.sort());
+
+         final String varNamePrefix = "v";
+         final String newName = tb.newName(varNamePrefix);
+         final LogicVariable newVar =
+               new LogicVariable(new Name(newName), var.sort());
+         services.getNamespaces().variables().add(newVar);
+         
+         qfdVarTerms.add(tb.var(newVar));
+         allVariables.add(newVar);
+      }
+      
+      // Create and register the new predicate symbol
+      final Name predicateSymbName = new Name(tb.newName("P"));
+      
+      final Function predicateSymb =
+            new Function(predicateSymbName, Sort.FORMULA, new ImmutableArray<Sort>(argSorts));
+      
+      services.getNamespaces().functions().add(predicateSymb);
+      
+      // Create the predicate term
+      final Term predTerm = tb.func(predicateSymb, qfdVarTerms.toArray(new Term[] {}));
+      
+      // Create the formula (C1 & {U1} P(...)) -> (C2 & {U2} P(...))
+      Term result = tb.imp(
+            tb.and(
+                  thisSEState.getPathCondition(),
+                  tb.apply(thisSEState.getSymbolicState(), predTerm)),
+            tb.and(
+                  joinState.getPathCondition(),
+                  tb.apply(joinState.getSymbolicState(), predTerm)));
+      
+      // Bind the program variables
+      for (int i = allQfableVariables.size(); i < qfdVarTerms.size(); i++) {
+         result = tb.and(
+               tb.equals(
+                     tb.var(allLocs.get(i - allQfableVariables.size())),
+                     qfdVarTerms.get(i)),
+               result);
+      }
+      
+      // Form the universal closure
+      result = tb.all(allVariables, result);
+      
+      return result;
    }
 
    @Override
@@ -216,5 +306,19 @@ public class CloseAfterJoin implements BuiltInRule {
             found = true;
          }
       }
+   }
+   
+   /**
+    * Converts an {@link ImmutableSet} of {@link QuantifiableVariable}s to
+    * a {@link LinkedList}.
+    * 
+    * @param set Set to convert to {@link LinkedList}.
+    * @return A {@link LinkedList} from the given set.
+    */
+   private static LinkedList<QuantifiableVariable> toList(
+         ImmutableSet<QuantifiableVariable> set) {
+      return new LinkedList<QuantifiableVariable>(
+            Arrays.asList(
+                  set.toArray(new QuantifiableVariable[] {})));
    }
 }

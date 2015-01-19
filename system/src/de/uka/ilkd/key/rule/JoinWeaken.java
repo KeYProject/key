@@ -19,7 +19,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -60,18 +59,14 @@ public class JoinWeaken extends JoinRule {
       final String varNamePrefix = "v";
       for (LocationVariable v : progVars) {
          final String newName = tb.newName(varNamePrefix);
-         services.getNamespaces().variables().add(new Named() {
-            @Override
-            public Name name() {
-               return new Name(newName);
-            }
-         });
+         final LogicVariable newVar =
+               new LogicVariable(new Name(newName), v.sort());
+         services.getNamespaces().variables().add(newVar);
          
          newElementaryUpdates = newElementaryUpdates.prepend(
                tb.elementary(
                      v,
-                     tb.var(
-                           new LogicVariable(new Name(newName), v.sort()))));
+                     tb.var(newVar)));
       }
       
       // Construct weakened symbolic state
