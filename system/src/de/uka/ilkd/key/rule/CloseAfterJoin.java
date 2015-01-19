@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -210,13 +211,6 @@ public class CloseAfterJoin implements BuiltInRule {
       }
       for (LocationVariable var : allLocs) {
          argSorts.add(var.sort());
-
-         final String varNamePrefix = "v";
-         final String newName = tb.newName(varNamePrefix);
-         final LogicVariable newVar =
-               new LogicVariable(new Name(newName), var.sort());
-         services.getNamespaces().variables().add(newVar);
-         
          origQfdVarTerms.add(tb.var(var));
       }
       
@@ -255,22 +249,16 @@ public class CloseAfterJoin implements BuiltInRule {
    private static Term exClosure(final Term term, final Services services) {
       TermBuilder tb = services.getTermBuilder();
       
-      final LinkedHashSet<QuantifiableVariable> qfableVariables =
-            new LinkedHashSet<QuantifiableVariable>();
-      qfableVariables.addAll(toList(term.freeVars()));
-      
-      final LinkedHashSet<LocationVariable> locs =
-            new LinkedHashSet<LocationVariable>();
-      locs.addAll(JoinRule.getTermLocations(term));
+      ImmutableSet<QuantifiableVariable> freeVars = term.freeVars();
       
       Term bindForm = tb.tt();
-      for (LocationVariable loc : locs) {
-         final String varNamePrefix = "v";
-         final String newName = tb.newName(varNamePrefix);
+      for (LocationVariable loc : JoinRule.getTermLocations(term)) {
+         final String newName = tb.newName(JoinRule.stripIndex(loc.name().toString()));
          final LogicVariable newVar =
                new LogicVariable(new Name(newName), loc.sort());
          services.getNamespaces().variables().add(newVar);
-         qfableVariables.add(newVar);
+
+         freeVars = freeVars.add(newVar);
          
          bindForm = tb.and(
                tb.equals(
@@ -279,7 +267,7 @@ public class CloseAfterJoin implements BuiltInRule {
                bindForm);
       }
       
-      return tb.ex(qfableVariables, tb.imp(bindForm, term));
+      return tb.ex(freeVars, tb.imp(bindForm, term));
    }
 
    @Override

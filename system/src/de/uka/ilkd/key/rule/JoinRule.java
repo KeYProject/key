@@ -776,6 +776,23 @@ public abstract class JoinRule implements BuiltInRule {
    }
    
    /**
+    * For Strings "xxx_i", this method returns "xxx". For
+    * Strings without the underbar, the original String is
+    * returned.
+    * 
+    * @param name Name to remove the index from.
+    * @return The name without the index, if any.
+    */
+   protected static String stripIndex(String name) {
+      int underbarOccurrence = name.indexOf('_');
+      if (underbarOccurrence > -1) {
+         return name.substring(0, underbarOccurrence);
+      } else {
+         return name;
+      }
+   }
+   
+   /**
     * Selects among suitable join partners using GUI input.
     * 
     * @param goal Current goal to join.
