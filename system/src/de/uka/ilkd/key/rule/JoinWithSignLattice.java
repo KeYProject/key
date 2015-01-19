@@ -13,9 +13,9 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.abstraction.AbstractDomainLattice;
-import de.uka.ilkd.key.abstraction.boollattice.BooleanLattice;
-import de.uka.ilkd.key.abstraction.signanalysis.SignAnalysisLattice;
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
+import de.uka.ilkd.key.axiom_abstraction.boollattice.BooleanLattice;
+import de.uka.ilkd.key.axiom_abstraction.signanalysis.SignAnalysisLattice;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;

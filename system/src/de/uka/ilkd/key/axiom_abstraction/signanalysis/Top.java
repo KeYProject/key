@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.abstraction.signanalysis;
+package de.uka.ilkd.key.axiom_abstraction.signanalysis;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -6,30 +6,30 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 
 /**
- * The Leq element of the sign lattice, representing
- * all negative numbers and zero.
+ * The Top element of the sign lattice, representing
+ * all integers.
  * 
  * @author Dominic Scheurer
  */
-public class Leq extends SignAnalysisDomainElem {
+public class Top extends SignAnalysisDomainElem {
 
-   private static final Leq INSTANCE = new Leq();
+   private static final Top INSTANCE = new Top();
    
-   private Leq() {}
+   private Top() {}
    
-   public static Leq getInstance() {
+   public static Top getInstance() {
       return INSTANCE;
    }
    
    @Override
    public Name name() {
-      return new Name("leq");
+      return new Name("top");
    }
 
    @Override
    public Term getDefiningAxiom(Term varOrConst, Services services) {
       TermBuilder tb = services.getTermBuilder();
-      return services.getTermBuilder().leq(varOrConst, tb.zero());
+      return tb.inInt(varOrConst);
    }
 
 }

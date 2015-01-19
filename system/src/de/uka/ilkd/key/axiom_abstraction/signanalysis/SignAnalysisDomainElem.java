@@ -1,6 +1,6 @@
-package de.uka.ilkd.key.abstraction.signanalysis;
+package de.uka.ilkd.key.axiom_abstraction.signanalysis;
 
-import de.uka.ilkd.key.abstraction.AbstractDomainElement;
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 
 /**
  * A domain element for sign analysis.

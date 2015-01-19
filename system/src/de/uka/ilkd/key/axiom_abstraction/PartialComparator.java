@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.abstraction;
+package de.uka.ilkd.key.axiom_abstraction;
 
 /**
  * <p>A comparison function, which imposes a <i>partial ordering</i> on some

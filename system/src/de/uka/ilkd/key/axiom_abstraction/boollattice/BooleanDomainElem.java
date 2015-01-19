@@ -1,6 +1,6 @@
-package de.uka.ilkd.key.abstraction.boollattice;
+package de.uka.ilkd.key.axiom_abstraction.boollattice;
 
-import de.uka.ilkd.key.abstraction.AbstractDomainElement;
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 
 /**
  * A domain element of the simple boolean lattice.

@@ -1,9 +1,9 @@
-package de.uka.ilkd.key.abstraction.signanalysis;
+package de.uka.ilkd.key.axiom_abstraction.signanalysis;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.abstraction.AbstractDomainElement;
-import de.uka.ilkd.key.abstraction.AbstractDomainLattice;
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 
 /**
  * A lattice for sign analysis of integers.

@@ -1,9 +1,9 @@
-package de.uka.ilkd.key.abstraction.boollattice;
+package de.uka.ilkd.key.axiom_abstraction.boollattice;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.abstraction.AbstractDomainElement;
-import de.uka.ilkd.key.abstraction.AbstractDomainLattice;
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 
 /**
  * A simple lattice for booleans.

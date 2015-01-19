@@ -16,9 +16,9 @@ package de.uka.ilkd.key.rule;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import de.uka.ilkd.key.abstraction.AbstractDomainElement;
-import de.uka.ilkd.key.abstraction.AbstractDomainLattice;
-import de.uka.ilkd.key.abstraction.signanalysis.Top;
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
+import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
+import de.uka.ilkd.key.axiom_abstraction.signanalysis.Top;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;

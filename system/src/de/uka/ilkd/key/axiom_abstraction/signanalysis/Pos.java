@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.abstraction.signanalysis;
+package de.uka.ilkd.key.axiom_abstraction.signanalysis;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;

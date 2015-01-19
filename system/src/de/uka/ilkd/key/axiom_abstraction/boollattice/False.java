@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.abstraction.boollattice;
+package de.uka.ilkd.key.axiom_abstraction.boollattice;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;

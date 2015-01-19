@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.abstraction;
+package de.uka.ilkd.key.axiom_abstraction;
 
 import java.util.Iterator;
 

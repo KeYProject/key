@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.abstraction.signanalysis;
+package de.uka.ilkd.key.axiom_abstraction.signanalysis;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -6,30 +6,30 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 
 /**
- * The Geq element of the sign lattice, representing
- * all positive integers and zero.
+ * The Zero element of the sign lattice, representing
+ * only the number 0.
  * 
  * @author Dominic Scheurer
  */
-public class Geq extends SignAnalysisDomainElem {
+public class Zero extends SignAnalysisDomainElem {
 
-   private static final Geq INSTANCE = new Geq();
+   private static final Zero INSTANCE = new Zero();
    
-   private Geq() {}
+   private Zero() {}
    
-   public static Geq getInstance() {
+   public static Zero getInstance() {
       return INSTANCE;
    }
    
    @Override
    public Name name() {
-      return new Name("geq");
+      return new Name("zero");
    }
 
    @Override
    public Term getDefiningAxiom(Term varOrConst, Services services) {
       TermBuilder tb = services.getTermBuilder();
-      return services.getTermBuilder().geq(varOrConst, tb.zero());
+      return services.getTermBuilder().equals(varOrConst, tb.zero());
    }
 
 }
