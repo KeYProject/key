@@ -16,6 +16,7 @@ package de.uka.ilkd.key.rule;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -161,7 +162,10 @@ public class CloseAfterJoin implements BuiltInRule {
       ruleIsWeakeningGoal.setBranchLabel("Joined node is weakening");
             
       Term isWeakeningForm = getSyntacticWeakeningFormula(services);
-      ruleIsWeakeningGoal.addFormula(new SequentFormula(isWeakeningForm), true, true);
+      // Delete previous sequents      
+      JoinRule.clearSemisequent(ruleIsWeakeningGoal, true);
+      JoinRule.clearSemisequent(ruleIsWeakeningGoal, false);
+      ruleIsWeakeningGoal.addFormula(new SequentFormula(isWeakeningForm), false, true);
       
       // Register partner nodes
       JOIN_NODE_TO_PARTNERS_MAP.get(joinNode).add(linkedGoal.node());
@@ -172,8 +176,8 @@ public class CloseAfterJoin implements BuiltInRule {
    private Term getSyntacticWeakeningFormula(Services services) {
       TermBuilder tb = services.getTermBuilder();
       
-      final LinkedList<QuantifiableVariable> allQfableVariables =
-            new LinkedList<QuantifiableVariable>();
+      final LinkedHashSet<QuantifiableVariable> allQfableVariables =
+            new LinkedHashSet<QuantifiableVariable>();
 //      allVariables.addAll(JoinRule.getFreeQfableVariables(thisSEState.getSymbolicState()));
 //      allVariables.addAll(JoinRule.getFreeQfableVariables(joinState.getSymbolicState()));
 //      allVariables.addAll(JoinRule.getFreeQfableVariables(thisSEState.getPathCondition()));
@@ -183,14 +187,15 @@ public class CloseAfterJoin implements BuiltInRule {
       allQfableVariables.addAll(toList(thisSEState.getPathCondition().freeVars()));
       allQfableVariables.addAll(toList(joinState.getPathCondition().freeVars()));
       
-      final LinkedList<LocationVariable> allLocs =
-            new LinkedList<LocationVariable>();
+      final LinkedHashSet<LocationVariable> allLocs =
+            new LinkedHashSet<LocationVariable>();
       allLocs.addAll(JoinRule.getUpdateLocations(thisSEState.getSymbolicState()));
       allLocs.addAll(JoinRule.getUpdateLocations(joinState.getSymbolicState()));
       allLocs.addAll(JoinRule.getTermLocations(thisSEState.getPathCondition()));
       allLocs.addAll(JoinRule.getTermLocations(joinState.getPathCondition()));
       
       final LinkedList<Term> qfdVarTerms = new LinkedList<Term>();
+      final LinkedList<Term> origQfdVarTerms = new LinkedList<Term>();
       
       final LinkedList<QuantifiableVariable> allVariables =
             new LinkedList<QuantifiableVariable>();
@@ -202,6 +207,7 @@ public class CloseAfterJoin implements BuiltInRule {
       for (QuantifiableVariable var : allQfableVariables) {
          argSorts.add(var.sort());
          qfdVarTerms.add(tb.var(var));
+         origQfdVarTerms.add(tb.var(var));
       }
       for (LocationVariable var : allLocs) {
          argSorts.add(var.sort());
@@ -214,6 +220,7 @@ public class CloseAfterJoin implements BuiltInRule {
          
          qfdVarTerms.add(tb.var(newVar));
          allVariables.add(newVar);
+         origQfdVarTerms.add(tb.var(var));
       }
       
       // Create and register the new predicate symbol
@@ -225,7 +232,7 @@ public class CloseAfterJoin implements BuiltInRule {
       services.getNamespaces().functions().add(predicateSymb);
       
       // Create the predicate term
-      final Term predTerm = tb.func(predicateSymb, qfdVarTerms.toArray(new Term[] {}));
+      final Term predTerm = tb.func(predicateSymb, origQfdVarTerms.toArray(new Term[] {}));
       
       // Create the formula (C1 & {U1} P(...)) -> (C2 & {U2} P(...))
       Term result = tb.imp(
@@ -237,13 +244,17 @@ public class CloseAfterJoin implements BuiltInRule {
                   tb.apply(joinState.getSymbolicState(), predTerm)));
       
       // Bind the program variables
+      LocationVariable[] allLocsArr = allLocs.toArray(new LocationVariable[] {});
+      Term bindForm = tb.tt();
       for (int i = allQfableVariables.size(); i < qfdVarTerms.size(); i++) {
-         result = tb.and(
+         bindForm = tb.and(
                tb.equals(
-                     tb.var(allLocs.get(i - allQfableVariables.size())),
+                     tb.var(allLocsArr[i - allQfableVariables.size()]),
                      qfdVarTerms.get(i)),
-               result);
+               bindForm);
       }
+      
+      result = tb.imp(bindForm, result);
       
       // Form the universal closure
       result = tb.all(allVariables, result);

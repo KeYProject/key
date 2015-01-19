@@ -34,7 +34,6 @@ import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -748,14 +747,32 @@ public abstract class JoinRule implements BuiltInRule {
     */
    protected static Function getNewScolemConstantForPrefix(String prefix, Sort sort, Services services) {
       final String newName = services.getTermBuilder().newName(prefix);
-      services.getNamespaces().functions().add(new Named() {
-         @Override
-         public Name name() {
-            return new Name(newName);
-         }
-      });
+      final Function result = new Function(new Name(newName), sort, true);
+      services.getNamespaces().functions().add(result);
       
-      return new Function(new Name(newName), sort, true);
+      return result;
+   }
+   
+   /**
+    * Deletes all formulae of the succedent / antecedent.
+    * 
+    * @param goal Goal to delete formulae from.
+    * @param antec If true, antecedent formulae are deleted, else
+    *    succedent formulae.
+    */
+   static void clearSemisequent(Goal goal, boolean antec) {
+      Semisequent semiseq = antec ?
+            goal.sequent().antecedent() :
+            goal.sequent().succedent();
+      for (int i = 0; i < semiseq.size(); i++) {
+         SequentFormula f = semiseq.get(i);
+         
+         PosInTerm pit = PosInTerm.getTopLevel();
+         pit.down(i);
+         
+         PosInOccurrence gPio = new PosInOccurrence(f, pit, antec);
+         goal.removeFormula(gPio);
+      }
    }
    
    /**
@@ -875,28 +892,6 @@ public abstract class JoinRule implements BuiltInRule {
       }
 
       joinPartner.apply(app);
-   }
-   
-   /**
-    * Deletes all formulae of the succedent / antecedent.
-    * 
-    * @param goal Goal to delete formulae from.
-    * @param antec If true, antecedent formulae are deleted, else
-    *    succedent formulae.
-    */
-   private static void clearSemisequent(Goal goal, boolean antec) {
-      Semisequent semiseq = antec ?
-            goal.sequent().antecedent() :
-            goal.sequent().succedent();
-      for (int i = 0; i < semiseq.size(); i++) {
-         SequentFormula f = semiseq.get(i);
-         
-         PosInTerm pit = PosInTerm.getTopLevel();
-         pit.down(i);
-         
-         PosInOccurrence gPio = new PosInOccurrence(f, pit, antec);
-         goal.removeFormula(gPio);
-      }
    }
    
    /**
