@@ -272,6 +272,7 @@ public final class ProblemInitializer {
         final String javaPath = envInput.readJavaPath();
         final List<File> classPath = envInput.readClassPath();
         final File bootClassPath = envInput.readBootClassPath();
+        final Includes includes = envInput.readIncludes();
 
         //create Recoder2KeY, set classpath
         final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(),
@@ -302,6 +303,7 @@ public final class ProblemInitializer {
         initConfig.getServices().setJavaModel(JavaModel.createJavaModel(javaPath,
                                                                         classPath,
                                                                         bootClassPath,
+                                                                        includes,
                                                                         initialFile));
     }
     

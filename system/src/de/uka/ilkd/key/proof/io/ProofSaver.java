@@ -236,7 +236,7 @@ public class ProofSaver {
     * by paths relative to the proof file to be saved.
     */
    private String makePathsRelative(String header) {
-       final String[] search = new String[]{"\\javaSource","\\bootclasspath","\\classpath"};
+       final String[] search = new String[]{"\\javaSource","\\bootclasspath","\\classpath","\\include"};
        String basePath = null;
        String tmp = header;
        final char sep = File.separatorChar;
@@ -258,7 +258,11 @@ public class ProofSaver {
                
                // there may be more than one path
                while (0 <= tmp.indexOf("\"",i) && tmp.indexOf("\"",i) < l) {
-                   // path is always put in quotation marks
+            	   if(!relPathString.isEmpty()) {
+            		   relPathString += ", ";
+            	   }
+            	   
+            	   // path is always put in quotation marks
                    int k = tmp.indexOf("\"",i)+1;
                    int j = tmp.indexOf("\"", k);
 
