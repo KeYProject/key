@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -19,11 +18,12 @@ import org.key_project.jmlediting.core.dom.IStringNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.core.utilities.JMLJavaResolver;
+import org.key_project.jmlediting.core.utilities.TypeDeclarationFinder;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.IStoreRefKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefKeywordContentParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefNodeTypes;
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
-import org.key_project.jmlediting.ui.util.JMLJavaResolver;
 
 /**
  * A keyword, which contains storage references as content.
@@ -52,20 +52,6 @@ public abstract class StoreRefContainerKeyword extends
    public IKeywordParser createParser() {
       return new StoreRefKeywordContentParser(true);
    }
-
-   private static class TypeDeclarationFinder extends ASTVisitor {
-      private final List<TypeDeclaration> decls = new ArrayList<TypeDeclaration>();
-
-      public List<TypeDeclaration> getDecls() {
-         return this.decls;
-      }
-
-      @Override
-      public boolean visit(final TypeDeclaration node) {
-         this.decls.add(node);
-         return super.visit(node);
-      }
-   };
 
    @Override
    public List<ICompletionProposal> createAutoProposals(final IASTNode node,

@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.ui.util;
+package org.key_project.jmlediting.core.utilities;
 
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
