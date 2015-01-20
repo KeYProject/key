@@ -122,7 +122,6 @@ public final class PredicateEvaluationUtil {
     * @return {@code true} is logical operator, {@code false} is something else.
     */
    public static boolean isLogicOperator(Operator operator, ImmutableArray<Term> subs) {
-      // TODO: Quantors
       if (operator instanceof Junctor) {
          return operator != Junctor.TRUE && operator != Junctor.FALSE;
       }

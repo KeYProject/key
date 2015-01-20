@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
@@ -107,6 +108,21 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
                return label;
             }
          }
+      }
+      else if (UpdateApplication.UPDATE_APPLICATION.equals(newTermOp)) {
+         Term target = newTermSubs.get(UpdateApplication.targetPos());
+         TermLabel targetLabel = target.getLabel(PredicateTermLabel.NAME);
+         if (targetLabel instanceof PredicateTermLabel) {
+            if (applicationPosInOccurrence != null) {
+               Term appliationTerm = applicationPosInOccurrence.subTerm();
+               TermLabel applicationLabel = appliationTerm.getLabel(PredicateTermLabel.NAME);
+               if (applicationLabel instanceof PredicateTermLabel) {
+                  // Let the PredicateTermLabelRefactoring perform the refactoring, see also PredicateTermLabelRefactoring#UPDATE_REFACTORING_REQUIRED
+                  PredicateTermLabelRefactoring.setUpdateRefactroingRequired(state, true);
+               }
+            }
+         }
+         return null;
       }
       else {
          return null;

@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -16,7 +15,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.PredicateTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
@@ -33,25 +31,6 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
  * @author Martin Hentschel
  */
 public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
-   public static final Name CONCRETE_AND_1 = new Name("concrete_and_1"); // TODO: Generalize concrete to label below updates
-   public static final Name CONCRETE_AND_2 = new Name("concrete_and_2");
-   public static final Name CONCRETE_AND_3 = new Name("concrete_and_3");
-   public static final Name CONCRETE_AND_4 = new Name("concrete_and_4");
-   public static final Name CONCRETE_EQ_1 = new Name("concrete_eq_1");
-   public static final Name CONCRETE_EQ_2 = new Name("concrete_eq_2");
-   public static final Name CONCRETE_EQ_3 = new Name("concrete_eq_3");
-   public static final Name CONCRETE_EQ_4 = new Name("concrete_eq_4");
-   public static final Name CONCRETE_IMPL_1 = new Name("concrete_impl_1");
-   public static final Name CONCRETE_IMPL_2 = new Name("concrete_impl_2");
-   public static final Name CONCRETE_IMPL_3 = new Name("concrete_impl_3");
-   public static final Name CONCRETE_IMPL_4 = new Name("concrete_impl_4");
-   public static final Name CONCRETE_NOT_1 = new Name("concrete_not_1");
-   public static final Name CONCRETE_NOT_2 = new Name("concrete_not_2");
-   public static final Name CONCRETE_OR_1 = new Name("concrete_or_1");
-   public static final Name CONCRETE_OR_2 = new Name("concrete_or_2");
-   public static final Name CONCRETE_OR_3 = new Name("concrete_or_3");
-   public static final Name CONCRETE_OR_4 = new Name("concrete_or_4");
-   
    /**
     * Key prefix used in {@link TermLabelState} to store that the inner most
     * label was already refactored on a given {@link Goal}.
@@ -59,32 +38,42 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
    private static final String INNER_MOST_PARENT_REFACTORED_PREFIX = "innerMostParentRefactoredAtGoal_";
    
    /**
+    * Key used in {@link TermLabelState} by the {@link StayOnOperatorTermLabelPolicy}
+    * to indicate that a refactoring below an update 
+    * ({@link RefactoringScope#APPLICATION_BELOW_UPDATES})
+    * is required performed by
+    * {@link #refactorBewlowUpdates(PosInOccurrence, Term, List)}.
+    * <p>
+    * This is for instance required for the following rules:
+    * <ul>
+    *    <li>{@code concrete_and_1}</li>
+    *    <li>{@code concrete_and_2}</li>
+    *    <li>{@code concrete_and_3}</li>
+    *    <li>{@code concrete_and_4}</li>
+    *    <li>{@code concrete_eq_1}</li>
+    *    <li>{@code concrete_eq_2}</li>
+    *    <li>{@code concrete_eq_3}</li>
+    *    <li>{@code concrete_eq_4}</li>
+    *    <li>{@code concrete_impl_1}</li>
+    *    <li>{@code concrete_impl_2}</li>
+    *    <li>{@code concrete_impl_3}</li>
+    *    <li>{@code concrete_impl_4}</li>
+    *    <li>{@code concrete_not_1}</li>
+    *    <li>{@code concrete_not_2}</li>
+    *    <li>{@code concrete_or_1}</li>
+    *    <li>{@code concrete_or_2}</li>
+    *    <li>{@code concrete_or_3}</li>
+    *    <li>{@code concrete_or_4}</li>
+    * </ul>
+    */
+   private static final String UPDATE_REFACTORING_REQUIRED = "updateRefactroingRequired";
+   
+   /**
     * {@inheritDoc}
     */
    @Override
    public ImmutableList<Name> getSupportedRuleNames() {
-      return ImmutableSLList.<Name>nil().prepend(UseOperationContractRule.INSTANCE.name())
-                                        .prepend(WhileInvariantRule.INSTANCE.name())
-                                        .prepend(CONCRETE_AND_1)
-                                        .prepend(CONCRETE_AND_2)
-                                        .prepend(CONCRETE_AND_3)
-                                        .prepend(CONCRETE_AND_4)
-                                        .prepend(CONCRETE_EQ_1)
-                                        .prepend(CONCRETE_EQ_2)
-                                        .prepend(CONCRETE_EQ_3)
-                                        .prepend(CONCRETE_EQ_4)
-                                        .prepend(CONCRETE_IMPL_1)
-                                        .prepend(CONCRETE_IMPL_2)
-                                        .prepend(CONCRETE_IMPL_3)
-                                        .prepend(CONCRETE_IMPL_4)
-                                        .prepend(CONCRETE_NOT_1)
-                                        .prepend(CONCRETE_NOT_2)
-                                        .prepend(CONCRETE_OR_1)
-                                        .prepend(CONCRETE_OR_2)
-                                        .prepend(CONCRETE_OR_3)
-                                        .prepend(CONCRETE_OR_4)
-                                        .prepend(PredicateTermLabelUpdate.IF_THEN_ELSE_SPLIT)
-                                        .prepend(PredicateTermLabelUpdate.ARRAY_LENGTH_NOT_NEGATIVE);
+      return null; // Support all rules
    }
 
    /**
@@ -106,49 +95,12 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
                PredicateTermLabelUpdate.ARRAY_LENGTH_NOT_NEGATIVE.equals(rule.name())) {
          return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS;
       }
-      else if (applicationPosInOccurrence != null && isConcreteJunctor(rule)) {
-         if (applicationTerm.op() instanceof UpdateApplication) {
-            TermLabel existingLabel = applicationPosInOccurrence.subTerm().getLabel(PredicateTermLabel.NAME);
-            if (existingLabel != null) {
-               return RefactoringScope.APPLICATION_BELOW_UPDATES;
-            }
-            else {
-               return RefactoringScope.NONE;
-            }
-         }
-         else {
-            return RefactoringScope.NONE; // If the application term is not an update the StayOnPredicateTermLabelPolicy ensures that the label is maintained.
-         }
+      else if (isUpdateRefactroingRequired(state)) {
+         return RefactoringScope.APPLICATION_BELOW_UPDATES;
       }
       else {
          return RefactoringScope.NONE;
       }
-   }
-   
-   /**
-    * Checks if the given {@link Rule} is a concrete junctor operation.
-    * @param rule The {@link Rule} to check.
-    * @return {@code true} is concrete junctor operation, {@code false} is something else.
-    */
-   protected boolean isConcreteJunctor(Rule rule) {
-      return CONCRETE_AND_1.equals(rule.name()) ||
-             CONCRETE_AND_2.equals(rule.name()) ||
-             CONCRETE_AND_3.equals(rule.name()) ||
-             CONCRETE_AND_4.equals(rule.name()) ||
-             CONCRETE_EQ_1.equals(rule.name()) ||
-             CONCRETE_EQ_2.equals(rule.name()) ||
-             CONCRETE_EQ_3.equals(rule.name()) ||
-             CONCRETE_EQ_4.equals(rule.name()) ||
-             CONCRETE_IMPL_1.equals(rule.name()) ||
-             CONCRETE_IMPL_2.equals(rule.name()) ||
-             CONCRETE_IMPL_3.equals(rule.name()) ||
-             CONCRETE_IMPL_4.equals(rule.name()) ||
-             CONCRETE_NOT_1.equals(rule.name()) ||
-             CONCRETE_NOT_2.equals(rule.name()) ||
-             CONCRETE_OR_1.equals(rule.name()) ||
-             CONCRETE_OR_2.equals(rule.name()) ||
-             CONCRETE_OR_3.equals(rule.name()) ||
-             CONCRETE_OR_4.equals(rule.name());
    }
    
    /**
@@ -201,8 +153,8 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
                PredicateTermLabelUpdate.ARRAY_LENGTH_NOT_NEGATIVE.equals(rule.name())) {
          refactorInCaseOfNewIdRequired(state, goal, term, services, labels);
       }
-      else if (isConcreteJunctor(rule)) {
-         refactorConcreteJunctor(applicationPosInOccurrence, term, labels);
+      else if (isUpdateRefactroingRequired(state)) {
+         refactorBewlowUpdates(applicationPosInOccurrence, term, labels);
       }
    }
    
@@ -254,25 +206,27 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
    }
    
    /**
-    * Refactors a concrete junctor application.
+    * Refactors the {@link Term} below its update.
     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
     * @param term The {@link Term} which is now refactored.
     * @param labels The new labels the {@link Term} will have after the refactoring.
     */
-   protected void refactorConcreteJunctor(PosInOccurrence applicationPosInOccurrence, 
-                                          Term term, 
-                                          List<TermLabel> labels) {
+   protected void refactorBewlowUpdates(PosInOccurrence applicationPosInOccurrence, 
+                                        Term term, 
+                                        List<TermLabel> labels) {
       PredicateTermLabel applicationLabel = (PredicateTermLabel)applicationPosInOccurrence.subTerm().getLabel(PredicateTermLabel.NAME);
-      PredicateTermLabel termLabel = (PredicateTermLabel)term.getLabel(PredicateTermLabel.NAME);
-      if (termLabel == null) {
-         labels.add(applicationLabel);
-      }
-      else {
-         labels.remove(termLabel);
-         Set<String> beforeIds = new LinkedHashSet<String>();
-         JavaUtil.addAll(beforeIds, termLabel.getBeforeIds());
-         beforeIds.add(applicationLabel.getId());
-         labels.add(new PredicateTermLabel(termLabel.getMajorId(), termLabel.getMinorId(), beforeIds));
+      if (applicationLabel != null) {
+         PredicateTermLabel termLabel = (PredicateTermLabel)term.getLabel(PredicateTermLabel.NAME);
+         if (termLabel == null) {
+            labels.add(applicationLabel);
+         }
+         else {
+            labels.remove(termLabel);
+            Set<String> beforeIds = new LinkedHashSet<String>();
+            JavaUtil.addAll(beforeIds, termLabel.getBeforeIds());
+            beforeIds.add(applicationLabel.getId());
+            labels.add(new PredicateTermLabel(termLabel.getMajorId(), termLabel.getMinorId(), beforeIds));
+         }
       }
    }
    
@@ -296,5 +250,26 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
    public static void setInnerMostParentRefactored(TermLabelState state, Goal goal, boolean refactored) {
       Map<Object, Object> labelState = state.getLabelState(PredicateTermLabel.NAME);
       labelState.put(INNER_MOST_PARENT_REFACTORED_PREFIX + goal.node().serialNr(), Boolean.valueOf(refactored));
+   }
+   
+   /**
+    * Checks if a refactoring below the updates is required.
+    * @param state The {@link TermLabelState} to read from.
+    * @return {@code true} refactoring required, {@code false} refactoring is not required.
+    */
+   public static boolean isUpdateRefactroingRequired(TermLabelState state) {
+      Map<Object, Object> labelState = state.getLabelState(PredicateTermLabel.NAME);
+      Object value = labelState.get(UPDATE_REFACTORING_REQUIRED);
+      return value instanceof Boolean && ((Boolean) value).booleanValue();
+   }
+   
+   /**
+    * Defines if a refactoring below the updates is required.
+    * @param state The {@link TermLabelState} to modify.
+    * @param required {@code true} refactoring required, {@code false} refactoring is not required.
+    */
+   public static void setUpdateRefactroingRequired(TermLabelState state, boolean required) {
+      Map<Object, Object> labelState = state.getLabelState(PredicateTermLabel.NAME);
+      labelState.put(UPDATE_REFACTORING_REQUIRED, Boolean.valueOf(required));
    }
 }
