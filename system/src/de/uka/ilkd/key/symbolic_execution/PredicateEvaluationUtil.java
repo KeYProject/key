@@ -307,24 +307,50 @@ public final class PredicateEvaluationUtil {
       return result;
    }
    
+   /**
+    * Utility class which specifies the occurrence of a {@link PredicateTermLabel}.
+    * @author Martin Hentschel
+    */
    private static class PredicateLabelOccurrence {
+      /**
+       * The {@link PredicateTermLabel}.
+       */
       private final PredicateTermLabel label;
-      private final boolean inAntecedent;
       
+      /**
+       * {@code true} occurred in antecedent, {@code false} occurred in succedent.
+       */
+      private final boolean inAntecedent;
+
+      /**
+       * Constructor.
+       * @param label The {@link PredicateTermLabel}.
+       * @param inAntecedent {@code true} occurred in antecedent, {@code false} occurred in succedent.
+       */
       public PredicateLabelOccurrence(PredicateTermLabel label, boolean inAntecedent) {
-         super();
          this.label = label;
          this.inAntecedent = inAntecedent;
       }
 
+      /**
+       * Returns the {@link PredicateTermLabel}.
+       * @return The {@link PredicateTermLabel}.
+       */
       public PredicateTermLabel getLabel() {
          return label;
       }
 
+      /**
+       * Checks if the lable occurred in antecedent or succedent.
+       * @return {@code true} occurred in antecedent, {@code false} occurred in succedent.
+       */
       public boolean isInAntecedent() {
          return inAntecedent;
       }
 
+      /**
+       * {@inheritDoc}
+       */
       @Override
       public String toString() {
          return label + (inAntecedent ? " in antecedent" : " in succedent");
@@ -361,29 +387,47 @@ public final class PredicateEvaluationUtil {
       }
    }
    
+   /**
+    * Updates the {@link PredicateResult}s based on minor ID changes if available.
+    * @param childNode The child {@link Node}.
+    * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
+    * @param tb The {@link TermBuilder} to use.
+    * @param results The {@link Map} with all available {@link PredicateResult}s. 
+    */
    protected static void updatePredicateResultBasedOnNewMinorIds(final Node childNode,
                                                                  final Name termLabelName,
                                                                  final TermBuilder tb,
                                                                  final Map<String, IPredicateInstruction> results) {
-      Node parentNode = childNode.parent();
-      final PosInOccurrence pio = parentNode.getAppliedRuleApp().posInOccurrence();
-      if (pio != null) {
-         // Check application term and all of its children and grand children
-         pio.subTerm().execPreOrder(new DefaultVisitor() {
-            @Override
-            public void visit(Term visited) {
-               checkForNewMinorIds(childNode, visited, termLabelName, pio, tb, results);
+      final Node parentNode = childNode.parent();
+      if (parentNode != null) {
+         final PosInOccurrence parentPio = parentNode.getAppliedRuleApp().posInOccurrence();
+         if (parentPio != null) {
+            // Check application term and all of its children and grand children
+            parentPio.subTerm().execPreOrder(new DefaultVisitor() {
+               @Override
+               public void visit(Term visited) {
+                  checkForNewMinorIds(childNode, visited, termLabelName, parentPio, tb, results);
+               }
+            });
+            // Check application term parents
+            PosInOccurrence currentPio = parentPio;
+            while (!currentPio.isTopLevel()) {
+               currentPio = currentPio.up();
+               checkForNewMinorIds(childNode, currentPio.subTerm(), termLabelName, parentPio, tb, results);
             }
-         });
-         // Check application term parents
-         PosInOccurrence currentPio = pio;
-         while (!currentPio.isTopLevel()) {
-            currentPio = currentPio.up();
-            checkForNewMinorIds(childNode, currentPio.subTerm(), termLabelName, pio, tb, results);
          }
       }
    }
    
+   /**
+    * Checks if new minor IDs are available.
+    * @param childNode The child {@link Node}.
+    * @param term The {@link Term} contained in the child {@link Node} to check.
+    * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
+    * @param pio The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
+    * @param tb The {@link TermBuilder} to use.
+    * @param results The {@link Map} with all available {@link PredicateResult}s. 
+    */
    protected static void checkForNewMinorIds(Node childNode, 
                                              Term term, 
                                              Name termLabelName, 
@@ -399,6 +443,14 @@ public final class PredicateEvaluationUtil {
       }
    }
 
+   /**
+    * Checks if new minor IDs are available.
+    * @param childNode The child {@link Node}.
+    * @param label The {@link PredicateTermLabel} of interest.
+    * @param antecedentRuleApplication {@code true} rule applied on antecedent, {@code false} rule applied on succedent.
+    * @param tb The {@link TermBuilder} to use.
+    * @return The computed instruction {@link Term} or {@code null} if not available.
+    */
    protected static Term checkForNewMinorIds(Node childNode, 
                                              PredicateTermLabel label,
                                              boolean antecedentRuleApplication,
@@ -407,19 +459,54 @@ public final class PredicateEvaluationUtil {
       List<Term> antecedentReplacements = new LinkedList<Term>();
       List<Term> succedentReplacements = new LinkedList<Term>();
       for (SequentFormula sf : childNode.sequent().antecedent()) {
-         findLabelReplacements(sf, label.name(), label.getId(), antecedentReplacements);
+         listLabelReplacements(sf, label.name(), label.getId(), antecedentReplacements);
       }
       for (SequentFormula sf : childNode.sequent().succedent()) {
-         findLabelReplacements(sf, label.name(), label.getId(), succedentReplacements);
+         listLabelReplacements(sf, label.name(), label.getId(), succedentReplacements);
       }
       // Compute term
-      return createSequentTerm(antecedentReplacements, succedentReplacements, antecedentRuleApplication, tb);
+      return computeInstructionTerm(antecedentReplacements, succedentReplacements, antecedentRuleApplication, tb);
    }
    
-   protected static Term createSequentTerm(List<Term> antecedentReplacements, 
-                                           List<Term> succedentReplacements, 
-                                           boolean antecedentRuleApplication, 
-                                           TermBuilder tb) {
+   /**
+    * Lists all label replacements in the given {@link SequentFormula}.
+    * @param sf The {@link SequentFormula} to analyze.
+    * @param labelName The name of the {@link TermLabel} which is added to predicates.
+    * @param labelId The label ID of interest.
+    * @param resultToFill The result {@link List} to fill.
+    */
+   protected static void listLabelReplacements(final SequentFormula sf, 
+                                               final Name labelName,
+                                               final String labelId, 
+                                               final List<Term> resultToFill) {
+      sf.formula().execPreOrder(new DefaultVisitor() {
+         @Override
+         public void visit(Term visited) {
+            TermLabel visitedLabel = visited.getLabel(labelName);
+            if (visitedLabel instanceof PredicateTermLabel) {
+               PredicateTermLabel pLabel = (PredicateTermLabel) visitedLabel;
+               String[] beforeIds = pLabel.getBeforeIds();
+               if (JavaUtil.contains(beforeIds, labelId)) {
+                  resultToFill.add(visited);
+               }
+            }
+         }
+      });
+   }
+   
+   /**
+    * Computes the {@link Term} with the instruction how to compute the truth
+    * value based on the found replacements.
+    * @param antecedentReplacements The replacements found in the antecedent.
+    * @param succedentReplacements The replacements found in the succedent.
+    * @param antecedentRuleApplication {@code true} rule applied on antecedent, {@code false} rule applied on succedent.
+    * @param tb The {@link TermBuilder} to use.
+    * @return The computed instruction {@link Term} or {@code null} if not available.
+    */
+   protected static Term computeInstructionTerm(List<Term> antecedentReplacements, 
+                                                List<Term> succedentReplacements, 
+                                                boolean antecedentRuleApplication, 
+                                                TermBuilder tb) {
       if (!antecedentReplacements.isEmpty() && !succedentReplacements.isEmpty()) {
          Term left = tb.andMaintainLabels(antecedentReplacements);
          Term right = tb.orMaintainLabels(succedentReplacements);
@@ -451,25 +538,6 @@ public final class PredicateEvaluationUtil {
       else {
          return null;
       }
-   }
-   
-   protected static void findLabelReplacements(final SequentFormula sf, 
-                                               final Name labelName,
-                                               final String labelId, 
-                                               final List<Term> resultToFill) {
-      sf.formula().execPreOrder(new DefaultVisitor() {
-         @Override
-         public void visit(Term visited) {
-            TermLabel visitedLabel = visited.getLabel(labelName);
-            if (visitedLabel instanceof PredicateTermLabel) {
-               PredicateTermLabel pLabel = (PredicateTermLabel) visitedLabel;
-               String[] beforeIds = pLabel.getBeforeIds();
-               if (JavaUtil.contains(beforeIds, labelId)) {
-                  resultToFill.add(visited);
-               }
-            }
-         }
-      });
    }
 
    /**
@@ -694,7 +762,18 @@ public final class PredicateEvaluationUtil {
       }
    }
    
+   /**
+    * Instances of this interface are used to compute the truth value
+    * of a predicate.
+    * @author Martin Hentschel
+    */
    public static interface IPredicateInstruction {
+      /**
+       * Evaluates the truth values.
+       * @param termLabelName The {@link Name} of the term label which is added to predicates.
+       * @param results All available {@link IPredicateInstruction}s for IDs of {@link PredicateTermLabel}s.
+       * @return The computed {@link PredicateResult}.
+       */
       public PredicateResult evaluate(Name termLabelName, Map<String, IPredicateInstruction> results);
    }
    
@@ -787,24 +866,49 @@ public final class PredicateEvaluationUtil {
       }
    }
    
+   /**
+    * Represents an instruction which specifies how to compute the
+    * truth value of a predicate.
+    * @author Martin Hentschel
+    */
    public static class TermPredicateInstruction implements IPredicateInstruction {
+      /**
+       * The {@link Term} with the truth value computation instruction.
+       */
       private final Term term;
 
+      /**
+       * Constructor.
+       * @param term The {@link Term} with the truth value computation instruction.
+       */
       public TermPredicateInstruction(Term term) {
          assert term != null;
          this.term = term;
       }
 
+      /**
+       * {@inheritDoc}
+       */
       @Override
       public String toString() {
          return term.toString();
       }
 
+      /**
+       * {@inheritDoc}
+       */
       @Override
       public PredicateResult evaluate(Name termLabelName, Map<String, IPredicateInstruction> results) {
          return evaluateTerm(term, termLabelName, results);
       }
-      
+
+      /**
+       * Evaluates the truth values.
+       * @param term The {@link Term} to evaluate.
+       * @param termLabelName The {@link Name} of the term label which is added to predicates.
+       * @param results All available {@link IPredicateInstruction}s for IDs of {@link PredicateTermLabel}s.
+       * @return The computed {@link PredicateResult}.
+       */
       public static PredicateResult evaluateTerm(Term term, Name termLabelName, Map<String, IPredicateInstruction> results) {
          TermLabel label = term.getLabel(termLabelName);
          // Return direct label result if available
