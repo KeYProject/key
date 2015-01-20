@@ -1,10 +1,11 @@
 package org.key_project.jmlediting.core.test.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+import static org.key_project.jmlediting.core.dom.Nodes.createString;
+import static org.key_project.jmlediting.core.test.parser.ParserTestUtils.*;
+import static org.key_project.jmlediting.profile.jmlref.parseutil.Lexicals.integerLiteral;
 
 import org.junit.Test;
-import org.key_project.jmlediting.core.parser.ParserBuilder;
 import org.key_project.jmlediting.core.parser.ParserException;
 
 public class LexicalHelperTest {
@@ -45,6 +46,26 @@ public class LexicalHelperTest {
       parseWrongConstantTest("0xI");
    }
 
+   @Test
+   public void testIntegerConstant() throws ParserException {
+      testParse("1234", integerLiteral(), createString(0, 4, "1234"));
+   }
+
+   @Test
+   public void testIntegerConstantWithWhitespaces() throws ParserException {
+      testParse("  12323sh", integerLiteral(), createString(2, 7, "12323"));
+   }
+
+   @Test
+   public void testIntegerConstantFail() {
+      testParseFail(" sj", integerLiteral());
+   }
+
+   @Test
+   public void testIntegerConstantEmpty() {
+      testParseFail("", integerLiteral());
+   }
+
    public static void parseIntegerConstantTest(final String constant)
          throws ParserException {
       parseIntegerConstantTest(constant, constant.length());
@@ -52,8 +73,8 @@ public class LexicalHelperTest {
 
    public static void parseIntegerConstantTest(final String constant,
          final int expectedEnd) throws ParserException {
-      final int end = ParserBuilder.integerConstant()
-            .parse(constant, 0, constant.length()).getEndOffset();
+      final int end = integerLiteral().parse(constant, 0, constant.length())
+            .getEndOffset();
       assertEquals("Parse Integer Constant stopped at wrong position",
             expectedEnd, end);
    }

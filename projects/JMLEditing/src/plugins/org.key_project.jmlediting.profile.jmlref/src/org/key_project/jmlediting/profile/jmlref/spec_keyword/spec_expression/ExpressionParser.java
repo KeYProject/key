@@ -3,6 +3,7 @@ package org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression;
 import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
 import static org.key_project.jmlediting.profile.jmlref.parseutil.JavaBasicsParser.*;
 import static org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes.*;
+import static org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParserUtils.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -211,8 +212,8 @@ public class ExpressionParser implements ParseFunction {
        * | primary-expr [ primary-suffix ] ... [ -- ]<br>
        * | built-in-type [ `[' `]' ] ... . class
        */
-      final ParseFunction fieldMethodExpr = seq(PRIMARY_EXPR,
-            primaryExpr, list(primarySuffix));
+      final ParseFunction fieldMethodExpr = seq(PRIMARY_EXPR, primaryExpr,
+            list(primarySuffix));
       final ParseFunction postfixExpr = alt(
             repackListOp(
                   POST_FIX_EXPR,

@@ -361,26 +361,6 @@ public class ParserBuilderTest {
    }
 
    @Test
-   public void testIntegerConstant() throws ParserException {
-      testParse("1234", integerConstant(), createString(0, 4, "1234"));
-   }
-
-   @Test
-   public void testIntegerConstantWithWhitespaces() throws ParserException {
-      testParse("  12323sh", integerConstant(), createString(2, 7, "12323"));
-   }
-
-   @Test
-   public void testIntegerConstantFail() {
-      testParseFail(" sj", integerConstant());
-   }
-
-   @Test
-   public void testIntegerConstantEmpty() {
-      testParseFail("", integerConstant());
-   }
-
-   @Test
    public void testConstant() throws ParserException {
       testParse("  hallo", constant("hallo"), createString(2, 7, "hallo"));
    }

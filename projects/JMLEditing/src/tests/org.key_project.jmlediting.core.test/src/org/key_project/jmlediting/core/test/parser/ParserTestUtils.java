@@ -44,6 +44,14 @@ public class ParserTestUtils {
       assertEquals(resultTerm, result.toString());
    }
 
+   public static void testParsePPComplete(final String text,
+         final ParseFunction parser, final String resultPPTerm)
+         throws ParserException {
+      final IASTNode result = ParserBuilder.requireComplete(parser).parse(text,
+            0, text.length());
+      assertEquals(resultPPTerm, result.prettyPrintAST());
+   }
+
    private static void testRecovery(final String text,
          final ParseFunction parser, final Object expectedErrorNode) {
       try {

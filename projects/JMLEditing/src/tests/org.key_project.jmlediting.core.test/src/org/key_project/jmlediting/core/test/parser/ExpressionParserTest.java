@@ -11,32 +11,41 @@ public class ExpressionParserTest {
 
    @Test
    public void testSimpleExpressionLIdentifier() {
-      testParse("hello");
+      testParsePP("hello", "Primary(Identifier(\"hello\"))");
    }
 
    @Test
    public void testSimpleExpressionIntConstant() {
-      testParse("12");
+      testParsePP("12", "Primary(IntegerLiteral(\"12\"))");
    }
 
    @Test
    public void testSimpleExpressionBoolLiteral() {
-      testParse("true");
+      testParsePP("true", "Primary(JavaKeyword(\"true\"))");
    }
 
    @Test
    public void testBooleanAnd() {
-      testParse("hello && goodby");
+      testParsePP(
+            "hello && goodby",
+            "LogicalAnd(Primary(Identifier(\"hello\")),\"&&\",Primary(Identifier(\"goodby\")))");
    }
 
    @Test
    public void testBooleanOr() {
-      testParse("a || b");
+      testParsePP("a || b",
+            "LogicalOr(Primary(Identifier(\"a\")),\"||\",Primary(Identifier(\"b\")))");
    }
 
    @Test
    public void testCombinedBooleans() {
-      testParse("a && b || (c && d || e ^ f) | g ");
+      testParsePP(
+            "a && b || (c && d || e ^ f) | g ",
+            "LogicalOr("
+                  + "LogicalAnd(Primary(Identifier(\"a\")),\"&&\",Primary(Identifier(\"b\"))),\"||\","
+                  + "BinaryOr(Primary(LogicalOr(LogicalAnd(Primary(Identifier(\"c\")),\"&&\","
+                  + "Primary(Identifier(\"d\"))),\"||\",BinaryExclusiveOr(Primary(Identifier(\"e\")),\"^\","
+                  + "Primary(Identifier(\"f\"))))),\"|\",Primary(Identifier(\"g\"))))");
    }
 
    @Test
@@ -121,10 +130,21 @@ public class ExpressionParserTest {
 
    public static void testParse(final String content) {
       try {
-         System.out.println(ParserBuilder
+         ParserBuilder
                .requireComplete(
                      new ExpressionParser(ProfileWrapper.testProfile))
-               .parse(content, 0, content.length()).prettyPrintAST());
+               .parse(content, 0, content.length()).prettyPrintAST();
+      }
+      catch (final ParserException e) {
+         fail(e.getMessage());
+      }
+   }
+
+   public static void testParsePP(final String content,
+         final String expectedPPResult) {
+      try {
+         ParserTestUtils.testParsePPComplete(content, new ExpressionParser(
+               ProfileWrapper.testProfile), expectedPPResult);
       }
       catch (final ParserException e) {
          fail(e.getMessage());
