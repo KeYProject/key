@@ -156,15 +156,14 @@ public class ExpressionParser implements ParseFunction {
        * | ( expression )<br>
        * | jml-primary
        */
+      // Do no include true/false, which is implemented in the constant type
       final ParseFunction jmlPrimary = typed(
             JML_PRIMARY,
             keywords(JMLProfileHelper.filterKeywords(profile,
                   IJMLPrimaryKeyword.class), profile));
-      final ParseFunction primaryExpr = alt(
-            typed(IDENTIFIER, ident()),
-            newExpr,
-            constant,
-            oneConstant(JAVA_KEYWORD, "super", "true", "false", "this", "null"),
+      final ParseFunction primaryExpr = alt(typed(IDENTIFIER, ident()),
+            newExpr, constant,
+            oneConstant(JAVA_KEYWORD, "super", "this", "null"),
             brackets(expression), jmlPrimary);
 
       /**

@@ -95,7 +95,7 @@ public class LexicalHelperTest {
 
    @Test
    public void testParseIntAsFloat() {
-      testParseInvalidFloat("2343");
+      testParseInvalidFloat("4");
    }
 
    @Test

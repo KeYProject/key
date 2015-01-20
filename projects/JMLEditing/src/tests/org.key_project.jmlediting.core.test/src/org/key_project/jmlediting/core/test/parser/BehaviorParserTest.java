@@ -23,8 +23,8 @@ public class BehaviorParserTest {
       final String parseText2 = "normal_behavior ensures true; requires false;  ";
       final IASTNode result2 = buildKeywordSequence(0, 45,
             buildKeywordSpec("normal_behavior", 0),
-            buildKeywordSpec("ensures", 16, 29, "true"),
-            buildKeywordSpec("requires", 30, 45, "false"));
+            buildKeywordSpec("ensures", 16, 29, null),
+            buildKeywordSpec("requires", 30, 45, null));
       testParse(parseText2, result2);
    }
 

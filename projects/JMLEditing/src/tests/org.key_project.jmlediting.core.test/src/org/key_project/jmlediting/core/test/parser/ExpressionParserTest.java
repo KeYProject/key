@@ -21,7 +21,7 @@ public class ExpressionParserTest {
 
    @Test
    public void testSimpleExpressionBoolLiteral() {
-      testParsePP("true", "Primary(JavaKeyword(\"true\"))");
+      testParsePP("true", "Primary(BooleanLiteral(\"true\"))");
    }
 
    @Test

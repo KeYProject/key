@@ -270,10 +270,22 @@ public final class LexicalHelper {
                "Expected an float constant, not an integer", text, start);
       }
       final boolean dotFound = text.charAt(digitsEnd) == '.';
+      // Tracks whether something was found which can be used to distinguish the
+      // float from an int
+      boolean floatTypeFound = dotFound;
       if (dotFound) {
          digitsEnd = scanDigits(text, digitsEnd + 1, end);
          if (digitsEnd == end) {
             return digitsEnd;
+         }
+         // HACK: here we look further than needed but otherwise we get a
+         // problem in the
+         // grammar because at this subtle points the JML grammar requires the
+         // parser
+         // to look in the future
+         if (text.charAt(digitsEnd) == '.') {
+            throw new ParserException("Float contains two dots", text,
+                  digitsEnd);
          }
       }
       // At least one digit needs to be scanned
@@ -302,6 +314,7 @@ public final class LexicalHelper {
          }
          // Get an integer
          exponentEnd = getIntegerConstant(text, expBeginPos, end);
+         floatTypeFound = true;
          break;
       default:
          // No exponent
@@ -318,9 +331,16 @@ public final class LexicalHelper {
       case 'F':
       case 'd':
       case 'D':
+         floatTypeFound = true;
          return exponentEnd + 1;
       default:
-         return exponentEnd;
+         if (floatTypeFound) {
+            return exponentEnd;
+         }
+         else {
+            throw new ParserException("Got an integer literal", text,
+                  exponentEnd);
+         }
       }
    }
 
