@@ -127,16 +127,17 @@ public abstract class StoreRefContainerKeyword extends
             return this.propose(topDecl.resolveBinding(), Nodes.createNode(
                   StoreRefNodeTypes.STORE_REF_NAME,
                   Nodes.createString(invocationOffset, invocationOffset, "")),
-                  Collections.<IASTNode> emptyList(), false, true);
+                  Collections.<IASTNode> emptyList(), false, true, true);
          }
          return this.propose(topDecl.resolveBinding(), list.get(0)
                .getChildren().get(0), list.get(0).getChildren().get(1)
-               .getChildren(), false, false);
+               .getChildren(), false, false, true);
       }
 
       private List<ICompletionProposal> propose(final ITypeBinding activeType,
             final IASTNode node, final List<IASTNode> restNodes,
-            final boolean allowAsteric, final boolean allowKeywords) {
+            final boolean allowAsteric, final boolean allowKeywords,
+            final boolean withProtectedOrInline) {
          final int type = node.getType();
          // any prefix?
          System.out.println("------------------------------------------------");
@@ -153,9 +154,8 @@ public abstract class StoreRefContainerKeyword extends
                         this.context.getInvocationOffset());
          }
 
-         // need to resolve variable?
          final JMLJavaResolver resolver = JMLJavaResolver.getInstance(
-               activeType, true);
+               activeType, withProtectedOrInline);
 
          if (restNodes.isEmpty() || prefix != null) {
             final List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
@@ -200,8 +200,10 @@ public abstract class StoreRefContainerKeyword extends
                if (nextType == null) {
                   return Collections.emptyList();
                }
-               return this.propose(nextType, restNodes.get(0),
-                     restNodes.subList(1, restNodes.size()), true, false);
+               return this
+                     .propose(nextType, restNodes.get(0),
+                           restNodes.subList(1, restNodes.size()), true, false,
+                           false);
             }
             return Collections.emptyList();
          }

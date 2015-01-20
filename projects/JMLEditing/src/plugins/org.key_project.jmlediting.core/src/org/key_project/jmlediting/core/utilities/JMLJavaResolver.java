@@ -15,8 +15,8 @@ public class JMLJavaResolver {
    }
 
    public static JMLJavaResolver getInstance(final ITypeBinding activeType,
-         final boolean withProtected) {
-      return new JMLJavaResolver(activeType, withProtected);
+         final boolean withProtectedOrInline) {
+      return new JMLJavaResolver(activeType, withProtectedOrInline);
    }
 
    public ITypeBinding getTypeForName(final String fieldName) {
@@ -38,37 +38,32 @@ public class JMLJavaResolver {
    public boolean isVariableVisible(final IVariableBinding variable) {
       final int modifier = variable.getModifiers();
 
+      // which modifier is set?
       final boolean isPublic = Modifier.isPublic(modifier);
       final boolean isPrivate = Modifier.isPrivate(modifier);
       final boolean isProtected = Modifier.isProtected(modifier);
       final boolean isDefault = !isPublic && !isPrivate && !isProtected;
 
-      boolean isProtectedVisible = false;
-      boolean isPrivateVisible = false;
-      if (this.withProtectedOrInline) {
-         isProtectedVisible = isProtected
-               && variable.getDeclaringClass()
-                     .isCastCompatible(this.activeType);
-         isPrivateVisible = isPrivate
-               && (variable.getDeclaringClass().isAnonymous() || variable
-                     .getDeclaringClass().isNested());
-      }
-
+      // compute the visibilities
       final boolean isDefaultVisible = isDefault
             && (this.activeType.getPackage().isEqualTo(variable.getType()
                   .getPackage()));
 
-      System.out.println("public?" + isPublic);
-      System.out.println("protected?" + isProtected);
-      System.out.println("protectedVisible?" + isProtectedVisible);
-      System.out.println("private?" + isPrivate);
-      System.out.println("privateVisible?" + isPrivateVisible);
-      System.out.println("default?" + isDefault);
-      System.out.println("defaultVisible?" + isDefaultVisible);
+      boolean isProtectedVisible = false;
+      boolean isPrivateVisible = false;
 
-      final boolean visible = isPublic || isDefaultVisible
-            || isProtectedVisible || isPrivateVisible;
-      System.out.println("==> " + visible);
-      return visible;
+      // only compute those visibilities for the first call
+      if (this.withProtectedOrInline) {
+         isProtectedVisible = isProtected
+               && variable.getDeclaringClass()
+                     .isCastCompatible(this.activeType);
+
+         isPrivateVisible = isPrivate
+               && !variable.getDeclaringClass().isNested();
+      }
+
+      // combine the computed visibilities
+      return isPublic || isDefaultVisible || isProtectedVisible
+            || isPrivateVisible;
    }
 }
