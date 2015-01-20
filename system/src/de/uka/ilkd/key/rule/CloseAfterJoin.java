@@ -226,15 +226,23 @@ public class CloseAfterJoin implements BuiltInRule {
       final Term predTerm = tb.func(predicateSymb, origQfdVarTerms.toArray(new Term[] {}));
       
       // Create the formula Ex-Cl(C1 & {U1} P(...)) -> Ex-Cl(C2 & {U2} P(...))      
-      Term result = tb.imp(
-            exClosure(tb.and(
-                  thisSEState.getPathCondition(),
-                  tb.apply(thisSEState.getSymbolicState(), predTerm)), services),
-            exClosure(tb.and(
-                  joinState.getPathCondition(),
-                  tb.apply(joinState.getSymbolicState(), predTerm)), services));
+//      Term result = tb.imp(
+//            exClosure(tb.and(
+//                  thisSEState.getPathCondition(),
+//                  tb.apply(thisSEState.getSymbolicState(), predTerm)), services),
+//            exClosure(tb.and(
+//                  joinState.getPathCondition(),
+//                  tb.apply(joinState.getSymbolicState(), predTerm)), services));
       
-      return result;
+      Term result = tb.imp(
+            tb.and(
+                  thisSEState.getPathCondition(),
+                  tb.apply(thisSEState.getSymbolicState(), predTerm)),
+            tb.and(
+                  joinState.getPathCondition(),
+                  tb.apply(joinState.getSymbolicState(), predTerm)));
+      
+      return allClosure(result, services);
    }
    
    /**
@@ -246,6 +254,7 @@ public class CloseAfterJoin implements BuiltInRule {
     * @return A new term which is equivalent to the existential closure
     *    of the argument term.
     */
+   @SuppressWarnings("unused")
    private static Term exClosure(final Term term, final Services services) {
       TermBuilder tb = services.getTermBuilder();
       
@@ -268,6 +277,39 @@ public class CloseAfterJoin implements BuiltInRule {
       }
       
       return tb.ex(freeVars, tb.imp(bindForm, term));
+   }
+   
+   /**
+    * Existentially closes all logical and location variables in
+    * the given term.
+    * 
+    * @param term Term to existentially close.
+    * @param services The services object.
+    * @return A new term which is equivalent to the existential closure
+    *    of the argument term.
+    */
+   private static Term allClosure(final Term term, final Services services) {
+      TermBuilder tb = services.getTermBuilder();
+      
+      ImmutableSet<QuantifiableVariable> freeVars = term.freeVars();
+      
+      Term bindForm = tb.tt();
+      for (LocationVariable loc : JoinRule.getTermLocations(term)) {
+         final String newName = tb.newName(JoinRule.stripIndex(loc.name().toString()));
+         final LogicVariable newVar =
+               new LogicVariable(new Name(newName), loc.sort());
+         services.getNamespaces().variables().add(newVar);
+
+         freeVars = freeVars.add(newVar);
+         
+         bindForm = tb.and(
+               tb.equals(
+                     tb.var(loc),
+                     tb.var(newVar)),
+               bindForm);
+      }
+      
+      return tb.all(freeVars, tb.imp(bindForm, term));
    }
 
    @Override
