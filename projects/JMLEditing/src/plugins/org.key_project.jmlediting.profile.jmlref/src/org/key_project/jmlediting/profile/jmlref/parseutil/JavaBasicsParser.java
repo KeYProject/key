@@ -5,20 +5,48 @@ import static org.key_project.jmlediting.profile.jmlref.parseutil.JavaBasicsNode
 
 import org.key_project.jmlediting.core.parser.ParseFunction;
 
-public class JavaBasicsParser {
+/**
+ * This class contains {@link ParseFunction} to parse basic elements of Java.
+ *
+ * @author Moritz Lichter
+ *
+ */
+public final class JavaBasicsParser {
 
-   private final static JavaBasicsParser defaultInstance = new JavaBasicsParser();
+   /**
+    * no instances.
+    */
+   private JavaBasicsParser() {
 
+   }
+
+   /**
+    * The default instance.
+    */
+   private static final JavaBasicsParser DEFAULT_INSTANCE = new JavaBasicsParser();
+
+   /**
+    *
+    * @return a ParseFunction, which parses a Java literal
+    */
    public static ParseFunction javaLiteral() {
-      return defaultInstance.javaLiteral;
+      return DEFAULT_INSTANCE.javaLiteral;
    }
 
+   /**
+    *
+    * @return a {@link ParseFunction} which parses a Java name
+    */
    public static ParseFunction name() {
-      return defaultInstance.name;
+      return DEFAULT_INSTANCE.name;
    }
 
+   /**
+    *
+    * @return a {@link ParseFunction} which parses a Java identifier
+    */
    public static ParseFunction ident() {
-      return defaultInstance.ident;
+      return DEFAULT_INSTANCE.ident;
    }
 
    private final ParseFunction ident = identifier();
@@ -40,6 +68,7 @@ public class JavaBasicsParser {
     * java-literal ::= integer-literal<br>
     * | floating-point-literal | boolean-literal<br>
     * | character-literal | string-literal | null-literal<br>
+    * .
     */
    // Float before int, because prefixes of some floats are ints
    private final ParseFunction javaLiteral = alt(this.floatingPointLiteral,

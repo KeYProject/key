@@ -2,7 +2,20 @@ package org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression;
 
 import org.key_project.jmlediting.core.dom.NodeTypes;
 
-public class ExpressionNodeTypes {
+/**
+ * This class contains final constants for types of nodes in the expression AST.
+ *
+ * @author Moritz Lichter
+ *
+ */
+public final class ExpressionNodeTypes {
+
+   /**
+    * no instances.
+    */
+   private ExpressionNodeTypes() {
+
+   }
 
    public static final int JAVA_KEYWORD = NodeTypes.getNewType("JavaKeyword");
    public static final int IDENTIFIER = NodeTypes.getNewType("Identifier");

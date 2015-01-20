@@ -2,12 +2,20 @@ package org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression;
 
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 
+/**
+ * Implementation of the result keyword.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public class ResultKeyword extends AbstractEmptyKeyword implements
       IJMLPrimaryKeyword {
 
+   /**
+    * Creates a new instance for the result keyword.
+    */
    public ResultKeyword() {
       super("\\result");
-      // TODO Auto-generated constructor stub
    }
 
    @Override

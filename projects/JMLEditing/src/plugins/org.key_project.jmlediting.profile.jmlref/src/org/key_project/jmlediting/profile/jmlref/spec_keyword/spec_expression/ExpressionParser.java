@@ -5,20 +5,29 @@ import static org.key_project.jmlediting.profile.jmlref.parseutil.JavaBasicsPars
 import static org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes.*;
 import static org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParserUtils.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.key_project.jmlediting.core.dom.IASTNode;
-import org.key_project.jmlediting.core.dom.NodeTypes;
-import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.IRecursiveParseFunction;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 
+/**
+ * The Expression Parser parses expressions as defined in the JML Reference
+ * Manual. {@link http
+ * ://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_12.html#SEC128}.
+ * Currently the following is not implemented: inner classes in JML, set
+ * comprehension and owner ship modifiers.
+ *
+ *
+ * @author Moritz Lichter
+ *
+ */
 public class ExpressionParser implements ParseFunction {
 
+   /**
+    * The main parser which is used to parse text.
+    */
    private final ParseFunction mainParser;
 
    @Override
@@ -27,46 +36,18 @@ public class ExpressionParser implements ParseFunction {
       return this.mainParser.parse(text, start, end);
    }
 
-   private static IASTNode clean(final IASTNode node) {
-      if (node.getStartOffset() == node.getEndOffset()) {
-         return null;
-      }
-      if (node.getChildren().size() == 0) {
-         return node;
-      }
-
-      final List<IASTNode> children = new ArrayList<IASTNode>();
-      for (final IASTNode child : node.getChildren()) {
-         final IASTNode cleaned = clean(child);
-         if (cleaned != null) {
-            children.add(cleaned);
-         }
-      }
-      if (node.getType() == NodeTypes.SEQ && children.size() == 1) {
-         return children.get(0);
-      }
-      if (node.getType() == NodeTypes.SOME) {
-         return children.get(0);
-      }
-      return Nodes.createNode(node.getStartOffset(), node.getEndOffset(),
-            node.getType(), children);
-   }
-
-   private static ParseFunction clean(final ParseFunction f) {
-      return new ParseFunction() {
-
-         @Override
-         public IASTNode parse(final String text, final int start, final int end)
-               throws ParserException {
-            final IASTNode node = f.parse(text, start, end);
-            return clean(node);
-         }
-      };
-   }
-
+   /**
+    * Creates a new {@link ExpressionParser} for the given profile. The parser
+    * is profile specific because the profile determines the available jml
+    * primaries.
+    *
+    * @param profile
+    *           the profile to parse according to
+    */
    public ExpressionParser(final IJMLProfile profile) {
 
-      // Initially create some parse function which refer recursivly to themself
+      // Initially create some parse function which refer recursively to
+      // themselves
       // It is easy to detect which them, if the function are all declared as
       // local variables. Then all compile errors caused by by referencing a
       // variable
@@ -402,4 +383,5 @@ public class ExpressionParser implements ParseFunction {
 
       this.mainParser = expression;
    }
+
 }

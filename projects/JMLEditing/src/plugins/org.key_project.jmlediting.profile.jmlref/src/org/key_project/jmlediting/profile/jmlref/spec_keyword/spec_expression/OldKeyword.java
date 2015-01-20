@@ -9,8 +9,17 @@ import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.parseutil.JavaBasicsParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.ParseFunctionKeywordParser;
 
+/**
+ * The implementation of the {@link OldKeyword}.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public class OldKeyword extends AbstractKeyword implements IJMLPrimaryKeyword {
 
+   /**
+    * Creates a new instance of the old keyword.
+    */
    public OldKeyword() {
       super("\\old");
    }
@@ -29,6 +38,10 @@ public class OldKeyword extends AbstractKeyword implements IJMLPrimaryKeyword {
 
          @Override
          protected ParseFunction createParseFunction(final IJMLProfile profile) {
+            /**
+             * old-expression ::= \old ( spec-expression [ , ident ] )<br>
+             * | \pre ( spec-expression )
+             */
             return brackets(seq(new SpecExpressionParser(profile),
                   opt(separateBy(',', JavaBasicsParser.ident()))));
          }
