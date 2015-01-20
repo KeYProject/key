@@ -39,8 +39,9 @@ public class JavaBasicsParser {
     * | floating-point-literal | boolean-literal<br>
     * | character-literal | string-literal | null-literal<br>
     */
-   private final ParseFunction javaLiteral = alt(this.integerLiteral,
-         this.floatingPointLiteral, this.booleanLiteral, this.characterLiteral,
+   // Float before int, because prefixes of some floats are ints
+   private final ParseFunction javaLiteral = alt(this.floatingPointLiteral,
+         this.integerLiteral, this.booleanLiteral, this.characterLiteral,
          this.stringLiteral, this.nullLiteral);
 
    private final ParseFunction name = separatedNonEmptyList(
