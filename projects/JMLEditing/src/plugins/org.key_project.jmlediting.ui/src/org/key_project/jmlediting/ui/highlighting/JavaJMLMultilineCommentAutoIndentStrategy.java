@@ -28,7 +28,7 @@ import org.key_project.jmlediting.core.utilities.CommentLocator;
  */
 @SuppressWarnings("restriction")
 public class JavaJMLMultilineCommentAutoIndentStrategy extends
-      DefaultIndentLineAutoEditStrategy {
+DefaultIndentLineAutoEditStrategy {
 
    /**
     * The strategy which is wrapped and called for non JML comments.
@@ -113,7 +113,13 @@ public class JavaJMLMultilineCommentAutoIndentStrategy extends
       }
 
       try {
-         final int p = (offset == d.getLength() ? offset - 1 : offset);
+         int p = 0;
+         if (offset == d.getLength()) {
+            p = offset - 1;
+         }
+         else {
+            p = offset;
+         }
          final IRegion line = d.getLineInformationOfOffset(p);
 
          final int lineOffset = line.getOffset();

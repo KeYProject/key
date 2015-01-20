@@ -1,5 +1,8 @@
 package org.key_project.jmlediting.core.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
@@ -201,6 +204,23 @@ public final class ParserBuilder {
                throws ParserException {
             return ParserUtils.parseSeparatedNonEmptyList(text, start, end,
                   sep, function, missingExceptionText);
+         }
+      };
+   }
+
+   public static ParseFunction separatedNonEmptyListErrorRecovery(
+         final char sep, final ParseFunction function,
+         final String missingExceptionText) {
+      if (function == null) {
+         throw new IllegalArgumentException("Provide a non null function");
+      }
+      return new ParseFunction() {
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            return ParserUtils.parseSeparatedNonEmptyListErrorRecovery(text,
+                  start, end, sep, function, missingExceptionText);
          }
       };
    }
@@ -706,7 +726,33 @@ public final class ParserBuilder {
    public static ParseFunction listOp(final ParseFunction op,
          final ParseFunction elem) {
 
-      return seq(elem, list(seq(op, elem)));
+      final ParseFunction listFunction = list(seq(op, elem));
+
+      return new ParseFunction() {
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+
+            final IASTNode elemResult = elem.parse(text, start, end);
+
+            final IASTNode otherResults = listFunction.parse(text,
+                  elemResult.getEndOffset(), end);
+            if (otherResults.getChildren().size() == 0) {
+               return elemResult;
+            }
+            final List<IASTNode> opElems = new ArrayList<IASTNode>(otherResults
+                  .getChildren().size() + 1);
+            opElems.add(elemResult);
+            opElems.addAll(otherResults.getChildren());
+            return Nodes.createNode(NodeTypes.SEQ, opElems);
+
+         }
+      };
+
+      // return alt(seq(elem, nonEmptyList(seq(op, elem),
+      // "Missed an operator")),
+      // elem);
    }
 
    public static ParseFunction brackets(final ParseFunction p) {

@@ -99,35 +99,38 @@ public class JMLCompletionProposalComputer implements
          }
          catch (final ParserException e) {
             parseResult = e.getErrorNode();
-            // System.out.println(context.getInvocationOffset());
-            // final List<IKeywordNode> list =
-            // Nodes.getAllKeywords(parseResult);
-            // for (final IKeywordNode iKeywordNode : list) {
-            // System.out.println("keyword: " + iKeywordNode);
-            // System.out.println("children: "
-            // + iKeywordNode.getChildren().size());
-            // }
          }
 
          // If Parser could parse or complete Error Recovery
          if (parseResult != null) {
-            // System.out.println(parseResult);
+            System.out.println("parseResult (@"
+                  + javaContext.getInvocationOffset() + ") == " + parseResult);
             final IKeyword activeKeyword = Nodes.getKeywordNode(parseResult,
                   context.getInvocationOffset());
-            // System.out.println("activeKeyword: " + activeKeyword);
             if (activeKeyword != null) {
                result.addAll(activeKeyword.createAutoProposals(parseResult,
                      javaContext));
+            }
+            else {
+               System.out.println("no activeKeyword");
+               return this.getFallback(javaContext);
             }
             return result;
          }
          // Fallback Method to display all JML Keyword-Proposals, if
          // no active Keyword was discovered.
-         return JMLCompletionUtil.getStandardKeywordProposals(javaContext,
-               getJMLImg());
+         System.out.println("no parseResult");
+         return this.getFallback(javaContext);
       }
       return result;
 
+   }
+
+   private List<ICompletionProposal> getFallback(
+         final JavaContentAssistInvocationContext javaContext) {
+      System.out.println("fallback");
+      return JMLCompletionUtil.getStandardKeywordProposals(javaContext,
+            getJMLImg());
    }
 
    @Override

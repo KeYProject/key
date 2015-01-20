@@ -128,7 +128,7 @@ public class StoreRefParser implements ParseFunction {
       final ParseFunction storeRefList = typed(
             STORE_REF_LIST,
             alt(storeRefKeyword,
-                  separatedNonEmptyList(',', storeRef,
+                  separatedNonEmptyListErrorRecovery(',', storeRef,
                         "Expected at least one storage reference")));
 
       this.mainParser = storeRefList;
