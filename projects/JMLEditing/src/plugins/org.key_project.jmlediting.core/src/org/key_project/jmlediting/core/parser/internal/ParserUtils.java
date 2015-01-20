@@ -135,8 +135,8 @@ public class ParserUtils {
       return Nodes.createNode(NodeTypes.LIST, nodes);
    }
 
-   public static IASTNode parseSeparatedNonEmptyList(final String text,
-         final int start, final int end, final char sep,
+   public static IASTNode parseSeparatedNonEmptyList(final int type,
+         final String text, final int start, final int end, final char sep,
          final ParseFunction function, final String missingExceptionText)
          throws ParserException {
       final List<IASTNode> nodes = new ArrayList<IASTNode>();
@@ -153,7 +153,7 @@ public class ParserUtils {
       }
       final ParseFunction sepFunction = ParserBuilder.separateBy(sep, function);
       parseListImpl(text, startPosition, end, sepFunction, nodes);
-      final IASTNode node = Nodes.createNode(NodeTypes.LIST, nodes);
+      final IASTNode node = Nodes.createNode(type, nodes);
       return node;
    }
 

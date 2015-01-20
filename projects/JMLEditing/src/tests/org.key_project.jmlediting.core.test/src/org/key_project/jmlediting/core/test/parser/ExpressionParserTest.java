@@ -75,6 +75,11 @@ public class ExpressionParserTest {
    }
 
    @Test
+   public void testArrayInitializer() {
+      testParse("new double[]{2,3,4}");
+   }
+
+   @Test
    public void testArrayAccess() {
       testParse("hallo[4].name[foo()]");
    }
@@ -109,11 +114,17 @@ public class ExpressionParserTest {
       testParse(" hallo <== you <== (me ==> you) <== me");
    }
 
+   @Test
+   public void testPostfix() {
+      testParse("myname ++");
+   }
+
    public static void testParse(final String content) {
       try {
-         System.out.println(ParserBuilder.requireComplete(
-               new ExpressionParser(ProfileWrapper.testProfile)).parse(content,
-               0, content.length()));
+         System.out.println(ParserBuilder
+               .requireComplete(
+                     new ExpressionParser(ProfileWrapper.testProfile))
+               .parse(content, 0, content.length()).prettyPrintAST());
       }
       catch (final ParserException e) {
          fail(e.getMessage());

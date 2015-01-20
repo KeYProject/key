@@ -104,4 +104,19 @@ public abstract class AbstractASTNode implements IASTNode {
       return str;
    }
 
+   @Override
+   public String prettyPrintAST() {
+      String str = NodeTypes.getTypeName(this.getType()) + "(";
+      final Iterator<IASTNode> childIterator = this.getChildren().iterator();
+      while (childIterator.hasNext()) {
+         final IASTNode node = childIterator.next();
+         str += node.prettyPrintAST();
+         if (childIterator.hasNext()) {
+            str += ",";
+         }
+      }
+      str += ")";
+      return str;
+   }
+
 }

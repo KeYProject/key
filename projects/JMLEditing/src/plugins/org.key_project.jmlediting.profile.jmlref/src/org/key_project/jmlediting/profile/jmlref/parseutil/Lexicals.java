@@ -3,6 +3,7 @@ package org.key_project.jmlediting.profile.jmlref.parseutil;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
+import org.key_project.jmlediting.core.parser.LexicalHelper;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
 
@@ -31,7 +32,7 @@ public final class Lexicals {
    /**
     * Creates a {@link ParseFunction} that lexes an informal description for
     * storage references. An informal description is of the form: (*...*).
-    * 
+    *
     * @return the parse function
     */
    public static ParseFunction lexInformalDescr() {
@@ -74,6 +75,31 @@ public final class Lexicals {
                   Nodes.createString(start + 2, position,
                         text.substring(start + 2, position)));
 
+         }
+
+      };
+   }
+
+   /**
+    * Parses an integer literal starting at the current position accepting
+    * whitespaces before the constant. The result is a string term in order not
+    * to lose the format of the identifier (hex, oct, dec).
+    *
+    * @see LexicalHelper#getIntegerConstant(String, int, int)
+    * @return a {@link ParseFunction} that parses an integer constant
+    */
+   public static ParseFunction integerLiteral() {
+      return new ParseFunction() {
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            final int identifierStart = LexicalHelper.skipWhiteSpacesOrAt(text,
+                  start, end);
+            final int identifierEnd = LexicalHelper.getIntegerConstant(text,
+                  identifierStart, end);
+            return Nodes.createString(identifierStart, identifierEnd,
+                  text.substring(identifierStart, identifierEnd));
          }
 
       };

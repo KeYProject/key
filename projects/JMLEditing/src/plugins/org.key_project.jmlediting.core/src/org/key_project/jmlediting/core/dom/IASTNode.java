@@ -31,7 +31,7 @@ public interface IASTNode {
    /**
     * Returns true if the given offset is covered by this node, so if it is in
     * between to start and end offset.
-    * 
+    *
     * @param offset
     *           the offset to check
     * @return whether the offset is between start and end node
@@ -88,5 +88,7 @@ public interface IASTNode {
     * @return the result of the traversal
     */
    <T> T traverse(INodeTraverser<T> traverser, T init);
+
+   String prettyPrintAST();
 
 }

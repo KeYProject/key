@@ -49,4 +49,9 @@ public class StringNode extends PrimitiveNode implements IStringNode {
             + this.string + ")";
    }
 
+   @Override
+   public String prettyPrintAST() {
+      return "\"" + this.string + "\"";
+   }
+
 }

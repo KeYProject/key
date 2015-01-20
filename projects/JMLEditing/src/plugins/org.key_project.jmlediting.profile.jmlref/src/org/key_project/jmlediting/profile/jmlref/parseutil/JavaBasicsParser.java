@@ -22,7 +22,8 @@ public class JavaBasicsParser {
 
    ParseFunction ident = identifier();
 
-   ParseFunction integerLiteral = integerConstant();
+   ParseFunction integerLiteral = typed(JavaBasicsNodeTypes.INTEGER_LITERAL,
+         Lexicals.integerLiteral());
    ParseFunction floatingPointLiteral = notImplemented();
    ParseFunction booleanLiteral = notImplemented();
    ParseFunction characterLiteral = notImplemented();
@@ -38,7 +39,7 @@ public class JavaBasicsParser {
          this.floatingPointLiteral, this.booleanLiteral, this.characterLiteral,
          this.stringLiteral, this.nullLiteral);
 
-   ParseFunction name = separatedNonEmptyList('.', this.ident,
-         "Expected an identifier for a name");
+   ParseFunction name = separatedNonEmptyList(JavaBasicsNodeTypes.NAME, '.',
+         this.ident, "Expected an identifier for a name");
 
 }
