@@ -66,7 +66,6 @@ public abstract class StoreRefContainerKeyword extends
       }
    };
 
-   @SuppressWarnings("restriction")
    @Override
    public List<ICompletionProposal> createAutoProposals(final IASTNode node,
          final JavaContentAssistInvocationContext context) {
@@ -87,18 +86,21 @@ public abstract class StoreRefContainerKeyword extends
       final IASTNode tmpNode = nodeAtPos.getChildren().get(1);
       if (tmpNode.getChildren().isEmpty()) {
          result.addAll(new Proposer(context).propose(cu, null));
-         result.addAll(JMLCompletionUtil.getKeywordProposals(context, null,
-               null, IStoreRefKeyword.class));
          return result;
       }
       final IASTNode content = tmpNode.getChildren().get(0);
 
       if (content.getType() == StoreRefNodeTypes.STORE_REF_LIST) {
-         // System.out.println(content);
          final IASTNode exprInOffset = Nodes.selectChildWithPosition(content,
                context.getInvocationOffset() - 1);
-         // TODO checl exprInOffset == null
-         final List<IASTNode> list = exprInOffset.getChildren();
+         // TODO check exprInOffset == null
+         final List<IASTNode> list;
+         if (exprInOffset == null) {
+            list = null;
+         }
+         else {
+            list = exprInOffset.getChildren();
+         }
          result.addAll(new Proposer(context).propose(cu, list));
       }
       else if (content.getType() == NodeTypes.KEYWORD) {
@@ -131,31 +133,51 @@ public abstract class StoreRefContainerKeyword extends
          final TypeDeclaration topDecl = decls.get(0);
          if (list == null) {
             final int invocationOffset = this.context.getInvocationOffset();
-            System.out.println("list == null");
             return this.propose(topDecl.resolveBinding(), Nodes.createNode(
                   StoreRefNodeTypes.STORE_REF_NAME,
                   Nodes.createString(invocationOffset, invocationOffset, "")),
-                  Collections.<IASTNode> emptyList(), false);
+                  Collections.<IASTNode> emptyList(), false, true);
          }
-         System.out.println("");
          return this.propose(topDecl.resolveBinding(), list.get(0)
                .getChildren().get(0), list.get(0).getChildren().get(1)
-               .getChildren(), false);
+               .getChildren(), false, false);
       }
 
       private List<ICompletionProposal> propose(final ITypeBinding activeType,
             final IASTNode node, final List<IASTNode> restNodes,
-            final boolean allowAsteric) {
+            final boolean allowAsteric, final boolean allowKeywords) {
          final int type = node.getType();
          // any prefix?
-         if (restNodes.isEmpty()) {
+         System.out.println("------------------------------------------------");
+         System.out.println("allowKeywords == " + allowKeywords);
+         System.out.println("node == " + node);
+         System.out.println("restNodes == " + restNodes);
+
+         String prefix = null;
+         if (node.containsOffset(this.context.getInvocationOffset())) {
+            System.out.println("im offset");
+            prefix = this.context
+                  .getDocument()
+                  .get()
+                  .substring(node.getStartOffset(),
+                        this.context.getInvocationOffset());
+         }
+
+         // need to resolve variable?
+         if (restNodes.isEmpty() || prefix != null) {
             final List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
             final IVariableBinding[] vars = activeType.getDeclaredFields();
-            final String prefix = ((IStringNode) node.getChildren().get(0))
-                  .getString();
+            if (prefix == null) {
+               prefix = ((IStringNode) node.getChildren().get(0)).getString();
+            }
+            System.out.println("prefix == " + prefix);
             final int replacementOffset = this.context.getInvocationOffset()
                   - prefix.length();
             final int prefixLength = prefix.length();
+            if (prefix.isEmpty() && allowKeywords) {
+               result.addAll(JMLCompletionUtil.getKeywordProposals(
+                     this.context, null, null, IStoreRefKeyword.class));
+            }
             if (prefix.isEmpty() && allowAsteric) {
                final String replacementString = "*";
                final int cursorPosition = replacementString.length();
@@ -173,21 +195,11 @@ public abstract class StoreRefContainerKeyword extends
 
             return result;
          }
-         // we have a prefix
          else {
             ITypeBinding nextType = null;
-            System.out.println(node + " @ "
-                  + this.context.getInvocationOffset());
-            if (!node.containsOffset(this.context.getInvocationOffset())) {
-               // nur bis zum invooffset als prefix und auch innerhalb nur bis
-               // zum invooffset
-               // TODO final hier weiter machen
-               return this.propose(activeType, node,
-                     Collections.<IASTNode> emptyList(), true);
-            }
             if (type == StoreRefNodeTypes.STORE_REF_NAME
                   || type == StoreRefNodeTypes.STORE_REF_NAME_SUFFIX) {
-               System.out.println("in sore_ref_name[_suffix]");
+               System.out.println("in store_ref_name[_suffix]");
                final String name = ((IStringNode) node.getChildren().get(0))
                      .getString();
                IVariableBinding foundBinding = null;
@@ -199,13 +211,12 @@ public abstract class StoreRefContainerKeyword extends
                   }
                }
                if (foundBinding == null) {
-                  System.out.println("foundBinding is null");
                   return Collections.emptyList();
                }
                nextType = foundBinding.getType();
             }
             return this.propose(nextType, restNodes.get(0),
-                  restNodes.subList(1, restNodes.size()), true);
+                  restNodes.subList(1, restNodes.size()), true, false);
          }
       }
    }

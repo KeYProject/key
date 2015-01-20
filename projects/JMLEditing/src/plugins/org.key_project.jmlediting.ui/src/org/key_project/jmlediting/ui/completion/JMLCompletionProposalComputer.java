@@ -60,6 +60,9 @@ public class JMLCompletionProposalComputer implements
    public List<ICompletionProposal> computeCompletionProposals(
          final ContentAssistInvocationContext context,
          final IProgressMonitor monitor) {
+      System.out
+            .println("InvocationOffset == " + context.getInvocationOffset());
+
       // Can only provide anything if there is a valid profile
       if (!JMLPreferencesHelper.isAnyProfileAvailable()) {
          return Collections.emptyList();
@@ -103,8 +106,6 @@ public class JMLCompletionProposalComputer implements
 
          // If Parser could parse or complete Error Recovery
          if (parseResult != null) {
-            System.out.println("parseResult (@"
-                  + javaContext.getInvocationOffset() + ") == " + parseResult);
             final IKeyword activeKeyword = Nodes.getKeywordNode(parseResult,
                   context.getInvocationOffset());
             if (activeKeyword != null) {
