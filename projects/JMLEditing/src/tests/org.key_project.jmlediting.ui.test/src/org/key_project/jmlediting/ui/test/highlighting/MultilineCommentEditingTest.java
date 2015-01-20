@@ -60,7 +60,8 @@ public class MultilineCommentEditingTest {
 
    @Test
    public void testCreateJMLComment() {
-      this.editor.typeText(24, 3, "/*@\n");
+      this.editor.insertText(24, 3, "/*@");
+      this.editor.typeText(24, 6, "\n");
       final String nextLine = this.editor.getTextOnLine(25);
       assertEquals("Next line when opening new JML comment is wrong",
             "     @ ", nextLine);
