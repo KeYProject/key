@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -186,13 +185,6 @@ public class CloseAfterJoin implements BuiltInRule {
    private Term getSyntacticWeakeningFormula(Services services) {
       TermBuilder tb = services.getTermBuilder();
       
-      final LinkedHashSet<QuantifiableVariable> allQfableVariables =
-            new LinkedHashSet<QuantifiableVariable>();
-      allQfableVariables.addAll(toList(thisSEState.getSymbolicState().freeVars()));
-      allQfableVariables.addAll(toList(joinState.getSymbolicState().freeVars()));
-      allQfableVariables.addAll(toList(thisSEState.getPathCondition().freeVars()));
-      allQfableVariables.addAll(toList(joinState.getPathCondition().freeVars()));
-      
       final LinkedHashSet<LocationVariable> allLocs =
             new LinkedHashSet<LocationVariable>();
       allLocs.addAll(JoinRule.getUpdateLocations(thisSEState.getSymbolicState()));
@@ -205,10 +197,6 @@ public class CloseAfterJoin implements BuiltInRule {
       // Collect sorts and create logical variables for
       // closing over program variables.
       final LinkedList<Sort> argSorts = new LinkedList<Sort>();
-      for (QuantifiableVariable var : allQfableVariables) {
-         argSorts.add(var.sort());
-         origQfdVarTerms.add(tb.var(var));
-      }
       for (LocationVariable var : allLocs) {
          argSorts.add(var.sort());
          origQfdVarTerms.add(tb.var(var));
@@ -367,19 +355,5 @@ public class CloseAfterJoin implements BuiltInRule {
             found = true;
          }
       }
-   }
-   
-   /**
-    * Converts an {@link ImmutableSet} of {@link QuantifiableVariable}s to
-    * a {@link LinkedList}.
-    * 
-    * @param set Set to convert to {@link LinkedList}.
-    * @return A {@link LinkedList} from the given set.
-    */
-   private static LinkedList<QuantifiableVariable> toList(
-         ImmutableSet<QuantifiableVariable> set) {
-      return new LinkedList<QuantifiableVariable>(
-            Arrays.asList(
-                  set.toArray(new QuantifiableVariable[] {})));
    }
 }
