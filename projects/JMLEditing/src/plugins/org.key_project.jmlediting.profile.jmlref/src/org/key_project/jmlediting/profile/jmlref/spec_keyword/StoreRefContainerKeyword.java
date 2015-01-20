@@ -23,6 +23,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.IStoreRef
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefKeywordContentParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefNodeTypes;
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
+import org.key_project.jmlediting.ui.util.JMLJavaResolver;
 
 /**
  * A keyword, which contains storage references as content.
@@ -90,6 +91,7 @@ public abstract class StoreRefContainerKeyword extends
       }
       final IASTNode content = tmpNode.getChildren().get(0);
 
+      // TODO NodeTypes.LIST?
       if (content.getType() == StoreRefNodeTypes.STORE_REF_LIST) {
          final IASTNode exprInOffset = Nodes.selectChildWithPosition(content,
                context.getInvocationOffset() - 1);
@@ -110,6 +112,9 @@ public abstract class StoreRefContainerKeyword extends
       else if (content.getType() == NodeTypes.ERROR_NODE) {
          // TODO
          System.out.println("error");
+      }
+      else {
+         System.out.println("nothing... ");
       }
       return result;
    }
@@ -149,7 +154,6 @@ public abstract class StoreRefContainerKeyword extends
          final int type = node.getType();
          // any prefix?
          System.out.println("------------------------------------------------");
-         System.out.println("allowKeywords == " + allowKeywords);
          System.out.println("node == " + node);
          System.out.println("restNodes == " + restNodes);
 
@@ -164,6 +168,9 @@ public abstract class StoreRefContainerKeyword extends
          }
 
          // need to resolve variable?
+         final JMLJavaResolver resolver = JMLJavaResolver
+               .getInstance(activeType);
+
          if (restNodes.isEmpty() || prefix != null) {
             final List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
             final IVariableBinding[] vars = activeType.getDeclaredFields();
@@ -185,7 +192,8 @@ public abstract class StoreRefContainerKeyword extends
                      replacementOffset, prefixLength, cursorPosition));
             }
             for (final IVariableBinding varBind : vars) {
-               if (varBind.getName().startsWith(prefix)) {
+               if (resolver.isVariableVisible(varBind)
+                     && varBind.getName().startsWith(prefix)) {
                   final String replacementString = varBind.getName();
                   final int cursorPosition = replacementString.length();
                   result.add(new CompletionProposal(replacementString,
@@ -196,27 +204,20 @@ public abstract class StoreRefContainerKeyword extends
             return result;
          }
          else {
-            ITypeBinding nextType = null;
             if (type == StoreRefNodeTypes.STORE_REF_NAME
                   || type == StoreRefNodeTypes.STORE_REF_NAME_SUFFIX) {
                System.out.println("in store_ref_name[_suffix]");
                final String name = ((IStringNode) node.getChildren().get(0))
                      .getString();
-               IVariableBinding foundBinding = null;
-               for (final IVariableBinding varBind : activeType
-                     .getDeclaredFields()) {
-                  if (name.equals(varBind.getName())) {
-                     foundBinding = varBind;
-                     break;
-                  }
-               }
-               if (foundBinding == null) {
+
+               final ITypeBinding nextType = resolver.getTypeForName(name);
+               if (nextType == null) {
                   return Collections.emptyList();
                }
-               nextType = foundBinding.getType();
+               return this.propose(nextType, restNodes.get(0),
+                     restNodes.subList(1, restNodes.size()), true, false);
             }
-            return this.propose(nextType, restNodes.get(0),
-                  restNodes.subList(1, restNodes.size()), true, false);
+            return Collections.emptyList();
          }
       }
    }

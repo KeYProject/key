@@ -109,6 +109,7 @@ public class JMLCompletionProposalComputer implements
             final IKeyword activeKeyword = Nodes.getKeywordNode(parseResult,
                   context.getInvocationOffset());
             if (activeKeyword != null) {
+               System.out.println("activeKeyword == " + activeKeyword);
                result.addAll(activeKeyword.createAutoProposals(parseResult,
                      javaContext));
             }
