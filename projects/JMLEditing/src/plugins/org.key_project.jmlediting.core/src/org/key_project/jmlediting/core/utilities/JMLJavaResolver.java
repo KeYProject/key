@@ -20,19 +20,31 @@ public class JMLJavaResolver {
    }
 
    public ITypeBinding getTypeForName(final String fieldName) {
+      return this.getTypeForName(this.activeType, fieldName);
+   }
+
+   private ITypeBinding getTypeForName(final ITypeBinding active,
+         final String fieldName) {
       IVariableBinding foundBinding = null;
-      for (final IVariableBinding varBind : this.activeType.getDeclaredFields()) {
+
+      // local variables
+      for (final IVariableBinding varBind : active.getDeclaredFields()) {
          if (this.isVariableVisible(varBind)
                && (fieldName.equals(varBind.getName()))) {
             foundBinding = varBind;
             break;
          }
       }
-      if (foundBinding == null) {
-         System.out.println("foundBinding == null");
-         return null;
+      if (foundBinding != null) {
+         return foundBinding.getType();
       }
-      return foundBinding.getType();
+      // TODO see JavaDoc of getSuperclass() and do the
+      // ast.resolveWellKnownType("java.lang.object")... thingy
+      else if (active.getSuperclass() != null) {
+         this.getTypeForName(active.getSuperclass(), fieldName);
+      }
+
+      return null;
    }
 
    public boolean isVariableVisible(final IVariableBinding variable) {

@@ -81,7 +81,6 @@ public abstract class StoreRefContainerKeyword extends
       if (content.getType() == StoreRefNodeTypes.STORE_REF_LIST) {
          final IASTNode exprInOffset = Nodes.selectChildWithPosition(content,
                context.getInvocationOffset() - 1);
-         // TODO check exprInOffset == null
          final List<IASTNode> list;
          if (exprInOffset == null) {
             list = null;
@@ -145,13 +144,17 @@ public abstract class StoreRefContainerKeyword extends
          System.out.println("restNodes == " + restNodes);
 
          String prefix = null;
-         if (node.containsOffset(this.context.getInvocationOffset())) {
+         if (node.containsOffset(this.context.getInvocationOffset() - 1)) {
             System.out.println("im offset");
             prefix = this.context
                   .getDocument()
                   .get()
                   .substring(node.getStartOffset(),
                         this.context.getInvocationOffset());
+         }
+         else if (node.getStartOffset() >= this.context.getInvocationOffset()) {
+            System.out.println("zu spät...");
+            prefix = "";
          }
 
          final JMLJavaResolver resolver = JMLJavaResolver.getInstance(
