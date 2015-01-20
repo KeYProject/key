@@ -67,6 +67,23 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
     * </ul>
     */
    private static final String UPDATE_REFACTORING_REQUIRED = "updateRefactroingRequired";
+
+   /**
+    * Key used in {@link TermLabelState} by the {@link PredicateTermLabelUpdate}
+    * to indicate that a refactoring of parents
+    * ({@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS})
+    * is required performed by
+    * {@link #refactorInCaseOfNewIdRequired(TermLabelState, Goal, Term, Services, List)}.
+    * <p>
+    * This is for instance required if a rule is applied on a sub term without 
+    * a {@link PredicateTermLabel} of a parent which has a {@link PredicateTermLabel}.
+    * Example rules are:
+    * <ul>
+    *    <li>{@code ifthenelse_split}</li>
+    *    <li>{@code arrayLengthNotNegative}</li>
+    * </ul>
+    */
+   private static final String PARENT_REFACTORING_REQUIRED = "parentRefactoringRequired";
    
    /**
     * {@inheritDoc}
@@ -91,8 +108,7 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
       if (shouldRefactorSpecificationApplication(goal, hint)) {
          return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE;
       }
-      else if (PredicateTermLabelUpdate.IF_THEN_ELSE_SPLIT.equals(rule.name()) ||
-               PredicateTermLabelUpdate.ARRAY_LENGTH_NOT_NEGATIVE.equals(rule.name())) {
+      else if (isParentRefactroingRequired(state)) {
          return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS;
       }
       else if (isUpdateRefactroingRequired(state)) {
@@ -149,8 +165,7 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
       if (shouldRefactorSpecificationApplication(goal, hint)) {
          refactorSpecificationApplication(term, goal ,services, labels);
       }
-      else if (PredicateTermLabelUpdate.IF_THEN_ELSE_SPLIT.equals(rule.name()) ||
-               PredicateTermLabelUpdate.ARRAY_LENGTH_NOT_NEGATIVE.equals(rule.name())) {
+      else if (isParentRefactroingRequired(state)) {
          refactorInCaseOfNewIdRequired(state, goal, term, services, labels);
       }
       else if (isUpdateRefactroingRequired(state)) {
@@ -271,5 +286,26 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
    public static void setUpdateRefactroingRequired(TermLabelState state, boolean required) {
       Map<Object, Object> labelState = state.getLabelState(PredicateTermLabel.NAME);
       labelState.put(UPDATE_REFACTORING_REQUIRED, Boolean.valueOf(required));
+   }
+   
+   /**
+    * Checks if a refactoring of parents is required.
+    * @param state The {@link TermLabelState} to read from.
+    * @return {@code true} refactoring required, {@code false} refactoring is not required.
+    */
+   public static boolean isParentRefactroingRequired(TermLabelState state) {
+      Map<Object, Object> labelState = state.getLabelState(PredicateTermLabel.NAME);
+      Object value = labelState.get(PARENT_REFACTORING_REQUIRED);
+      return value instanceof Boolean && ((Boolean) value).booleanValue();
+   }
+   
+   /**
+    * Defines if a refactoring of parents is required.
+    * @param state The {@link TermLabelState} to modify.
+    * @param required {@code true} refactoring required, {@code false} refactoring is not required.
+    */
+   public static void setParentRefactroingRequired(TermLabelState state, boolean required) {
+      Map<Object, Object> labelState = state.getLabelState(PredicateTermLabel.NAME);
+      labelState.put(PARENT_REFACTORING_REQUIRED, Boolean.valueOf(required));
    }
 }

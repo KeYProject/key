@@ -31,7 +31,7 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
    /**
     * The name of the rule {@code cut_direct}.
     */
-   public static final Name CUT_DIRET = new Name("cut_direct");
+   public static final Name CUT_DIRECT = new Name("cut_direct");
    
    /**
     * {@inheritDoc}
@@ -67,7 +67,7 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
                 TacletOperation.ADD_SUCCEDENT.equals(tacletHint.getTacletOperation()) ||
                 TacletOperation.REPLACE_TO_ANTECEDENT.equals(tacletHint.getTacletOperation()) ||
                 TacletOperation.REPLACE_TO_SUCCEDENT.equals(tacletHint.getTacletOperation())) {
-               if (!CUT_DIRET.equals(rule.name())) { // Do not give new labels for cut direct.
+               if (!CUT_DIRECT.equals(rule.name())) { // Do not give new labels for cut direct.
                   newLabelIdRequired = true;
                   originalLabelIds.add(mostImportantLabel.getId());
                }
