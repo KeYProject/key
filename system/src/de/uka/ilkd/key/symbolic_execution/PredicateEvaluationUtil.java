@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -208,11 +209,11 @@ public final class PredicateEvaluationUtil {
                                     final Services services) throws ProofInputException {
       // Create new stack entry
       final Map<String, IPredicateInstruction> currentResults = evaluationStack.getFirst();
-      // Check for new minor ids created by parent rule application
-      updatePredicateResultBasedOnNewMinorIds(node, termLabelName, services.getTermBuilder(), currentResults);
       // Analyze applied rule
       boolean childrenAlreadyTreated = false;
       if (node.getAppliedRuleApp() instanceof TacletApp) {
+         // Check for new minor ids created by parent rule application
+         updatePredicateResultBasedOnNewMinorIds(node, termLabelName, services.getTermBuilder(), currentResults);
          TacletApp tacletApp = (TacletApp) node.getAppliedRuleApp();
          List<PredicateLabelOccurrence> labels = findInvolvedLabels(node.sequent(), tacletApp, termLabelName);
          if (!labels.isEmpty()) {
@@ -240,16 +241,20 @@ public final class PredicateEvaluationUtil {
       }
       else if (node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
          OneStepSimplifierRuleApp app = (OneStepSimplifierRuleApp) node.getAppliedRuleApp();
+         PosInOccurrence parentPio = null;
          for (RuleApp protocolApp : app.getProtocol()) {
-            if (protocolApp instanceof TacletApp) {
-               TacletApp tacletApp = (TacletApp) protocolApp;
-               Taclet taclet = tacletApp.taclet();
-               assert taclet.goalTemplates().size() == 1;
-               List<PredicateLabelOccurrence> labels = findInvolvedLabels(node.sequent(), tacletApp, termLabelName);
-               if (!labels.isEmpty()) {
-                  analyzeTacletGoal(node, tacletApp, taclet.goalTemplates().head(), labels, services, currentResults);
-               }
+            if (parentPio != null) {
+               updatePredicateResultBasedOnNewMinorIdsOSS(protocolApp.posInOccurrence(), parentPio, termLabelName, services.getTermBuilder(), currentResults);
             }
+            assert protocolApp instanceof TacletApp;
+            TacletApp tacletApp = (TacletApp) protocolApp;
+            Taclet taclet = tacletApp.taclet();
+            assert taclet.goalTemplates().size() == 1;
+            List<PredicateLabelOccurrence> labels = findInvolvedLabels(node.sequent(), tacletApp, termLabelName);
+            if (!labels.isEmpty()) {
+               analyzeTacletGoal(node, tacletApp, taclet.goalTemplates().head(), labels, services, currentResults);
+            }
+            parentPio = protocolApp.posInOccurrence();
          }
       }
       // Analyze children
@@ -388,6 +393,85 @@ public final class PredicateEvaluationUtil {
    }
    
    /**
+    * Updates the {@link PredicateResult}s based on minor ID changes if 
+    * available in case of {@link OneStepSimplifier} usage.
+    * @param childNode The child {@link Node}.
+    * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
+    * @param tb The {@link TermBuilder} to use.
+    * @param results The {@link Map} with all available {@link PredicateResult}s. 
+    */
+   protected static void updatePredicateResultBasedOnNewMinorIdsOSS(final PosInOccurrence childPio,
+                                                                    final PosInOccurrence parentPio,
+                                                                    final Name termLabelName,
+                                                                    final TermBuilder tb,
+                                                                    final Map<String, IPredicateInstruction> results) {
+      if (parentPio != null) {
+         // Check application term and all of its children and grand children
+         parentPio.subTerm().execPreOrder(new DefaultVisitor() {
+            @Override
+            public void visit(Term visited) {
+               checkForNewMinorIdsOSS(childPio.constrainedFormula(), visited, termLabelName, parentPio, tb, results);
+            }
+         });
+         // Check application term parents
+         PosInOccurrence currentPio = parentPio;
+         while (!currentPio.isTopLevel()) {
+            currentPio = currentPio.up();
+            checkForNewMinorIdsOSS(childPio.constrainedFormula(), currentPio.subTerm(), termLabelName, parentPio, tb, results);
+         }
+      }
+   }
+   
+   /**
+    * Checks if new minor IDs are available in case of {@link OneStepSimplifier} usage.
+    * @param onlyChangedChildSF The only changed {@link SequentFormula} in the child {@link Node}.
+    * @param term The {@link Term} contained in the child {@link Node} to check.
+    * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
+    * @param parentPio The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
+    * @param tb The {@link TermBuilder} to use.
+    * @param results The {@link Map} with all available {@link PredicateResult}s. 
+    */
+   protected static void checkForNewMinorIdsOSS(SequentFormula onlyChangedChildSF, 
+                                                Term term, 
+                                                Name termLabelName, 
+                                                PosInOccurrence parentPio, 
+                                                TermBuilder tb, 
+                                                Map<String, IPredicateInstruction> results) {
+      TermLabel label = term.getLabel(termLabelName);
+      if (label instanceof PredicateTermLabel) {
+         Term replacement = checkForNewMinorIdsOSS(onlyChangedChildSF, (PredicateTermLabel) label, parentPio.isInAntec(), tb);
+         if (replacement != null) {
+            updatePredicateResult((PredicateTermLabel) label, new TermPredicateInstruction(replacement), results);
+         }
+      }
+   }
+
+   /**
+    * Checks if new minor IDs are available in case of {@link OneStepSimplifier} usage.
+    * @param onlyChangedChildSF The only changed {@link SequentFormula} in the child {@link Node}.
+    * @param label The {@link PredicateTermLabel} of interest.
+    * @param antecedentRuleApplication {@code true} rule applied on antecedent, {@code false} rule applied on succedent.
+    * @param tb The {@link TermBuilder} to use.
+    * @return The computed instruction {@link Term} or {@code null} if not available.
+    */
+   protected static Term checkForNewMinorIdsOSS(SequentFormula onlyChangedChildSF, 
+                                                PredicateTermLabel label,
+                                                boolean antecedentRuleApplication,
+                                                TermBuilder tb) {
+      // Search replacements
+      List<Term> antecedentReplacements = new LinkedList<Term>();
+      List<Term> succedentReplacements = new LinkedList<Term>();
+      if (antecedentRuleApplication) {
+         listLabelReplacements(onlyChangedChildSF, label.name(), label.getId(), antecedentReplacements);
+      }
+      else {
+         listLabelReplacements(onlyChangedChildSF, label.name(), label.getId(), succedentReplacements);
+      }
+      // Compute term
+      return computeInstructionTerm(antecedentReplacements, succedentReplacements, antecedentRuleApplication, tb);
+   }
+   
+   /**
     * Updates the {@link PredicateResult}s based on minor ID changes if available.
     * @param childNode The child {@link Node}.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
@@ -424,19 +508,19 @@ public final class PredicateEvaluationUtil {
     * @param childNode The child {@link Node}.
     * @param term The {@link Term} contained in the child {@link Node} to check.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
-    * @param pio The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
+    * @param parentPio The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
     * @param tb The {@link TermBuilder} to use.
     * @param results The {@link Map} with all available {@link PredicateResult}s. 
     */
    protected static void checkForNewMinorIds(Node childNode, 
                                              Term term, 
                                              Name termLabelName, 
-                                             PosInOccurrence pio, 
+                                             PosInOccurrence parentPio, 
                                              TermBuilder tb, 
                                              Map<String, IPredicateInstruction> results) {
       TermLabel label = term.getLabel(termLabelName);
       if (label instanceof PredicateTermLabel) {
-         Term replacement = checkForNewMinorIds(childNode, (PredicateTermLabel) label, pio.isInAntec(), tb);
+         Term replacement = checkForNewMinorIds(childNode, (PredicateTermLabel) label, parentPio.isInAntec(), tb);
          if (replacement != null) {
             updatePredicateResult((PredicateTermLabel) label, new TermPredicateInstruction(replacement), results);
          }
@@ -962,6 +1046,12 @@ public final class PredicateEvaluationUtil {
             PredicateValue resultValue = PredicateValue.not(argumentValue);
             return new PredicateResult(resultValue, 
                                        argumentResult != null ? argumentResult.getNodes() : null);
+         }
+         else if (term.op() == Junctor.TRUE) {
+            return new PredicateResult(PredicateValue.TRUE);
+         }
+         else if (term.op() == Junctor.FALSE) {
+            return new PredicateResult(PredicateValue.FALSE);
          }
          else if (isIfThenElseFormula(term)) {
             Term conditionTerm = TermBuilder.goBelowUpdates(term.sub(0));
