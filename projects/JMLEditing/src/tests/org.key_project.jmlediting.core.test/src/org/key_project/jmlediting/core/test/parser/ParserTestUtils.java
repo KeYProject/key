@@ -21,14 +21,20 @@ public class ParserTestUtils {
 
    public static void testParse(final String text, final ParseFunction parser,
          final IASTNode expectedResult) throws ParserException {
+      if (expectedResult == null) {
+         fail("No null result can be expected");
+      }
       final IASTNode parseResult = parser.parse(text, 0, text.length());
+      if (parseResult == null) {
+         fail("Parser returned null");
+      }
       DomCompareUtils.compareIASTNode(expectedResult, parseResult, true);
    }
 
    public static void testParseFail(final String text,
          final ParseFunction parser) {
       try {
-         testParse(text, parser, null);
+         parser.parse(text, 0, text.length());
       }
       catch (final ParserException e) {
          return;

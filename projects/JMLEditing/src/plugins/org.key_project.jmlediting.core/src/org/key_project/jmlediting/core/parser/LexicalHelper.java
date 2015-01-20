@@ -1,7 +1,7 @@
 package org.key_project.jmlediting.core.parser;
 
-import org.key_project.jmlediting.core.parser.internal.ParserUtils;
 import org.key_project.jmlediting.core.parser.internal.FastStringSet;
+import org.key_project.jmlediting.core.parser.internal.ParserUtils;
 
 /**
  * This class provides some utility functions for lexing.
@@ -114,15 +114,15 @@ public final class LexicalHelper {
    private static FastStringSet javaKeywords;
    static {
       try {
-         javaKeywords = new FastStringSet("abstract", "assert", "boolean", "break",
-               "byte", "case", "catch", "char", "class", "const", "continue",
-               "default", "do", "double", "else", "extends", "false", "final",
-               "finally", "float", "for", "goto", "if", "implements", "import",
-               "instanceof", "int", "interface", "long", "native", "new",
-               "null", "package", "private", "protected", "public", "return",
-               "short", "static", "strictfp", "super", "switch",
-               "synchronized", "this", "throw", "throws", "transient", "true",
-               "try", "void", "volatile", "while");
+         javaKeywords = new FastStringSet("abstract", "assert", "boolean",
+               "break", "byte", "case", "catch", "char", "class", "const",
+               "continue", "default", "do", "double", "else", "extends",
+               "false", "final", "finally", "float", "for", "goto", "if",
+               "implements", "import", "instanceof", "int", "interface",
+               "long", "native", "new", "null", "package", "private",
+               "protected", "public", "return", "short", "static", "strictfp",
+               "super", "switch", "synchronized", "this", "throw", "throws",
+               "transient", "true", "try", "void", "volatile", "while");
       }
       catch (final Exception e) {
          e.printStackTrace();
@@ -165,7 +165,7 @@ public final class LexicalHelper {
                position = start + 2;
                while (position < end) {
                   final char c = text.charAt(position);
-                  if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')) {
+                  if (isHexDigit(c)) {
                      position++;
                   }
                   else {
@@ -183,7 +183,7 @@ public final class LexicalHelper {
                position = start + 1;
                while (position < end) {
                   final char c = text.charAt(position);
-                  if ((c >= '0' && c <= '7')) {
+                  if (isOctalDigit(c)) {
                      position++;
                   }
                   else {
@@ -199,16 +199,7 @@ public final class LexicalHelper {
       }
       else {
          // Decimal integer
-         position = start;
-         while (position < end) {
-            final char c = text.charAt(position);
-            if ((c >= '0' && c <= '9')) {
-               position++;
-            }
-            else {
-               break;
-            }
-         }
+         position = scanDigits(text, start, end);
       }
 
       if (position == start) {
@@ -225,6 +216,236 @@ public final class LexicalHelper {
 
       return position;
 
+   }
+
+   private static boolean isOctalDigit(final char c) {
+      return (c >= '0' && c <= '7');
+   }
+
+   private static boolean isHexDigit(final char c) {
+      return (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F');
+   }
+
+   private static int scanDigits(final String text, final int start,
+         final int end) {
+      int position = start;
+      while (position < end) {
+         final char c = text.charAt(position);
+         if ((c >= '0' && c <= '9')) {
+            position++;
+         }
+         else {
+            break;
+         }
+      }
+      return position;
+   }
+
+   /**
+    * Scans for a floating point constant at the given start position and
+    * returns the end position of the constant. If there is no valid floating
+    * point constant a {@link ParserException} is thrown.
+    *
+    * @param text
+    *           the text to scan in
+    * @param start
+    *           the position where a float constant should be scanned
+    * @param end
+    *           the maximum position in the text (exclusive)
+    * @return the exclusive end index of the scanned float constant
+    * @throws ParserException
+    *            if no float constant could be scanned
+    */
+   public static int getFloatConstant(final String text, final int start,
+         final int end) throws ParserException {
+      ParserUtils.validatePositions(text, start, end);
+      if (start == end) {
+         throw new ParserException("Expected an float constant", text, start);
+      }
+
+      // Scan the numeric part: [digits] . [digits]
+      int digitsEnd = scanDigits(text, start, end);
+      if (digitsEnd == end) {
+         throw new ParserException(
+               "Expected an float constant, not an integer", text, start);
+      }
+      final boolean dotFound = text.charAt(digitsEnd) == '.';
+      if (dotFound) {
+         digitsEnd = scanDigits(text, digitsEnd + 1, end);
+         if (digitsEnd == end) {
+            return digitsEnd;
+         }
+      }
+      // At least one digit needs to be scanned
+      if (digitsEnd == start) {
+         throw new ParserException(
+               "Need at least one digits for a float literal", text, start);
+      }
+      int exponentEnd;
+      // Check exponent part
+      switch (text.charAt(digitsEnd)) {
+      case 'e':
+      case 'E':
+         int expBeginPos = digitsEnd + 1;
+         if (expBeginPos >= end) {
+            throw new ParserException("Expected an exponent value", text,
+                  expBeginPos);
+         }
+         // Skip a sign
+         final char maybeSignChar = text.charAt(expBeginPos);
+         if (maybeSignChar == '-' || maybeSignChar == '+') {
+            expBeginPos++;
+            if (expBeginPos >= end) {
+               throw new ParserException("Expected an exponent value", text,
+                     expBeginPos);
+            }
+         }
+         // Get an integer
+         exponentEnd = getIntegerConstant(text, expBeginPos, end);
+         break;
+      default:
+         // No exponent
+         exponentEnd = digitsEnd;
+      }
+
+      if (exponentEnd == end) {
+         return exponentEnd;
+      }
+
+      // Check float type suffix
+      switch (text.charAt(exponentEnd)) {
+      case 'f':
+      case 'F':
+      case 'd':
+      case 'D':
+         return exponentEnd + 1;
+      default:
+         return exponentEnd;
+      }
+   }
+
+   /**
+    * Scans for a character constant in the given text and the start position.
+    *
+    * @param text
+    *           the text to scan in
+    * @param start
+    *           the start position
+    * @param end
+    *           the maximum scan position (exclusive)
+    * @return the exclusive end index of the constant
+    * @throws ParserException
+    *            if no character constant could be scanned
+    */
+   public static int getCharacterConstant(final String text, final int start,
+         final int end) throws ParserException {
+      ParserUtils.validatePositions(text, start, end);
+      // A character constant needs at least three characters;
+      final int minNumChars = 3;
+      if (end - start < minNumChars) {
+         throw new ParserException("Expected an character constant", text,
+               start);
+      }
+      // Check starting '
+      if (text.charAt(start) != '\'') {
+         throw new ParserException("Expected a \'", text, start);
+      }
+      final char character = text.charAt(start + 1);
+      int contentEnd;
+      // Check the content
+      switch (character) {
+      case '\\':
+         contentEnd = getEscapeSequence(text, start + 1, end);
+         break;
+      case '\r':
+      case '\n':
+         throw new ParserException("Illegal escaped character", text, start + 1);
+      default:
+         contentEnd = start + 2;
+      }
+      // Check for closing '
+      if (contentEnd >= end) {
+         throw new ParserException("Expected closing \'", text, contentEnd);
+      }
+      if (text.charAt(contentEnd) != '\'') {
+         throw new ParserException("Expected closing \'", text, contentEnd);
+      }
+      return contentEnd + 1;
+
+   }
+
+   /**
+    * Scans for a character escape sequence at pos until end.
+    *
+    * @param text
+    *           the text to scan
+    * @param pos
+    *           the position to start at
+    * @param end
+    *           the maximum position (exclusive)
+    * @return the exclusive end index of the escape sequence
+    * @throws ParserException
+    *            if no escape sequence if found
+    */
+   private static int getEscapeSequence(final String text, final int pos,
+         final int end) throws ParserException {
+      /**
+       * escape-sequence ::= \b // backspace<br>
+       * | \t // tab<br>
+       * | \n // newline<br>
+       * | \r // carriage return<br>
+       * | \' // single quote<br>
+       * | \" // double quote<br>
+       * | \\ // backslash<br>
+       * | octal-escape<br>
+       * | unicode-escape<br>
+       * octal-escape ::= \ octal-digit [ octal-digit ] | <br>
+       * \ zero-to-three octal-digit octal-digit <br>
+       * zero-to-three ::= 0 | 1 | 2 | 3 <br>
+       * unicode-escape ::= \ u hex-digit hex-digit hex-digit hex-digit Note: No
+       * whitespace between backslash and u
+       */
+      if (end - pos < 2) {
+         throw new ParserException("Expected an escape sequence", text, pos);
+      }
+      if (text.charAt(pos) != '\\') {
+         throw new ParserException("Expected a \\", text, pos);
+      }
+      final char escapedChar = text.charAt(pos + 1);
+      switch (escapedChar) {
+      case 't':
+      case 'n':
+      case 'r':
+      case '\'':
+      case '\"':
+      case '\\':
+         return pos + 2;
+      case 'u':
+         // Unicode escape, need four hex digits
+         for (int i = pos + 2; i < pos + 6; i++) {
+            if (i < end && !isHexDigit(text.charAt(i))) {
+               throw new ParserException("Invalid unicode escape", text, i);
+            }
+         }
+         return pos + 6;
+      default:
+         // octal escape
+         if (isOctalDigit(escapedChar)) {
+            int maxNum = 2;
+            if ('0' <= escapedChar && escapedChar <= '3') {
+               maxNum++;
+            }
+            for (int i = pos + 2; i < pos + maxNum + 1; i++) {
+               if (i < end && !isOctalDigit(text.charAt(i))) {
+                  return i;
+               }
+            }
+            return pos + maxNum + 1;
+         }
+         else {
+            throw new ParserException("Illegal escale sequence", text, pos + 1);
+         }
+      }
    }
 
    /**
