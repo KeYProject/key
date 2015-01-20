@@ -133,6 +133,7 @@ public class LexicalHelperTest {
 
    @Test
    public void testParseCharEscapes() throws ParserException {
+      testParseCharLiteral("\'\\b\'");
       testParseCharLiteral("\'\\t\'");
       testParseCharLiteral("\'\\n\'");
       testParseCharLiteral("\'\\r\'");
@@ -183,7 +184,34 @@ public class LexicalHelperTest {
    public void testInvalidCharUnicodeEscapes() {
       testParseInvalidChar("\'\\u39\'");
       testParseInvalidChar("\'\\u93821\'");
+      testParseInvalidChar("\'\\u9a21\'");
       testParseInvalidChar("\'\\u'");
+   }
+
+   @Test
+   public void testParseStrings() throws ParserException {
+      testParseStringLiteral("\"ashdjs\"");
+      testParseStringLiteral("\"hallo mein name ist hase\"");
+      testParseStringLiteral("\"Ja slJ kJS    ksl;kj Sjk/sf/nskj \"");
+   }
+
+   @Test
+   public void testParseStringsWithEscapes() throws ParserException {
+      testParseStringLiteral("\"\"");
+      testParseStringLiteral("\"jas\\\" sdf\"");
+      testParseStringLiteral("\"\\\\ sj\"");
+      testParseStringLiteral("\"\b sjd \\u9283 kd sl \t \\n \' \\\" \043\"");
+   }
+
+   @Test
+   public void testWrongString() {
+      testParseInvalidString("\"jsaj");
+      testParseInvalidString("asj\"");
+      testParseInvalidString("\'skds\"");
+      testParseInvalidString("\"\'");
+      testParseInvalidString("\"\n\"");
+      testParseInvalidString("\"\r\"");
+      testParseInvalidString("\"\\\"");
    }
 
    public static void parseIntegerConstantTest(final String constant)
@@ -215,6 +243,15 @@ public class LexicalHelperTest {
 
    private static void testParseInvalidChar(final String text) {
       testParseInvalidLiteral(text, characterLiteral());
+   }
+
+   private static void testParseStringLiteral(final String textString)
+         throws ParserException {
+      testParseLiteral(textString, stringLiteral());
+   }
+
+   private static void testParseInvalidString(final String text) {
+      testParseInvalidLiteral(text, stringLiteral());
    }
 
    private static void testParseLiteral(final String textString,

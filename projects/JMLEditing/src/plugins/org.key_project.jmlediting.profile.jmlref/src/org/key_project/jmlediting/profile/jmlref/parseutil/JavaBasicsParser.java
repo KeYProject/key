@@ -31,8 +31,10 @@ public class JavaBasicsParser {
          "true", "false");
    private final ParseFunction characterLiteral = typed(CHARACTER_LITERAL,
          Lexicals.characterLiteral());
-   private final ParseFunction stringLiteral = notImplemented();
-   private final ParseFunction nullLiteral = constant("null");
+   private final ParseFunction stringLiteral = typed(STRING_LITERAL,
+         Lexicals.stringLiteral());
+   private final ParseFunction nullLiteral = typed(NULL_LITERAL,
+         constant("null"));
 
    /**
     * java-literal ::= integer-literal<br>

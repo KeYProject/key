@@ -375,6 +375,53 @@ public final class LexicalHelper {
    }
 
    /**
+    * Scans for a string constant in the given text and the start position.
+    *
+    * @param text
+    *           the text to scan in
+    * @param start
+    *           the start position
+    * @param end
+    *           the maximum scan position (exclusive)
+    * @return the exclusive end index of the constant
+    * @throws ParserException
+    *            if no string constant could be scanned
+    */
+   public static int getStringConstant(final String text, final int start,
+         final int end) throws ParserException {
+      ParserUtils.validatePositions(text, start, end);
+      // Need at least two characters for "
+      if (end - start < 2) {
+         throw new ParserException("Expected a string constant", text, start);
+      }
+
+      if (text.charAt(start) != '\"') {
+         throw new ParserException("Expected a \"", text, start);
+      }
+      // Check for characters in the string
+      int position = start + 1;
+      while (position < end) {
+         final char c = text.charAt(position);
+         switch (c) {
+         case '\"':
+            return position + 1;
+         case '\\':
+            position = getEscapeSequence(text, position, end);
+            break;
+         case '\r':
+         case '\n':
+            throw new ParserException("Illegal new line in string", text,
+                  position);
+         default:
+            position++;
+         }
+      }
+      // If the string is valid, the while loop has been exited with the return
+      throw new ParserException("Unclosed String", text, position);
+
+   }
+
+   /**
     * Scans for a character escape sequence at pos until end.
     *
     * @param text
@@ -413,6 +460,7 @@ public final class LexicalHelper {
       }
       final char escapedChar = text.charAt(pos + 1);
       switch (escapedChar) {
+      case 'b':
       case 't':
       case 'n':
       case 'r':

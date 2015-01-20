@@ -132,8 +132,8 @@ public final class Lexicals {
     * Parses a character literal starting at the current position accepting
     * whitespaces before the constant.
     *
-    * @see LexicalHelper#getFloatConstant(String, int, int)
-    * @return a {@link ParseFunction} that parses a float constant
+    * @see LexicalHelper#getCharacterConstant(String, int, int)
+    * @return a {@link ParseFunction} that parses a character constant
     */
    public static ParseFunction characterLiteral() {
       return new ParseFunction() {
@@ -144,6 +144,29 @@ public final class Lexicals {
             final int identifierStart = LexicalHelper.skipWhiteSpacesOrAt(text,
                   start, end);
             final int identifierEnd = LexicalHelper.getCharacterConstant(text,
+                  identifierStart, end);
+            return Nodes.createString(identifierStart, identifierEnd,
+                  text.substring(identifierStart, identifierEnd));
+         }
+      };
+   }
+
+   /**
+    * Parses a string literal starting at the current position accepting
+    * whitespaces before the constant.
+    *
+    * @see LexicalHelper#getStringConstant(String, int, int) * @return a
+    *      {@link ParseFunction} that parses a string constant
+    */
+   public static ParseFunction stringLiteral() {
+      return new ParseFunction() {
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            final int identifierStart = LexicalHelper.skipWhiteSpacesOrAt(text,
+                  start, end);
+            final int identifierEnd = LexicalHelper.getStringConstant(text,
                   identifierStart, end);
             return Nodes.createString(identifierStart, identifierEnd,
                   text.substring(identifierStart, identifierEnd));
