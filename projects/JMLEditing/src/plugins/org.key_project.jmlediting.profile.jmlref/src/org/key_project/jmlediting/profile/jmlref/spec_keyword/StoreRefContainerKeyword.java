@@ -168,8 +168,8 @@ public abstract class StoreRefContainerKeyword extends
          }
 
          // need to resolve variable?
-         final JMLJavaResolver resolver = JMLJavaResolver
-               .getInstance(activeType);
+         final JMLJavaResolver resolver = JMLJavaResolver.getInstance(
+               activeType, true);
 
          if (restNodes.isEmpty() || prefix != null) {
             final List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
