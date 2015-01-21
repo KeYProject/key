@@ -4,6 +4,11 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.Modifier;
 
+/**
+ *
+ * @author Thomas Glaser Utility Class to resolve TypeBindings.
+ *
+ */
 public class JMLJavaResolver {
    private final ITypeBinding activeType;
    private final boolean withProtectedOrInline;
@@ -23,6 +28,14 @@ public class JMLJavaResolver {
       return this.getTypeForName(this.activeType, fieldName);
    }
 
+   /**
+    * A method to find the Type for a given name.
+    *
+    * @param active
+    * @param fieldName
+    * @return the ITypeBinding for the given name or null if the fieldName is
+    *         not found
+    */
    private ITypeBinding getTypeForName(final ITypeBinding active,
          final String fieldName) {
       IVariableBinding foundBinding = null;
@@ -47,6 +60,14 @@ public class JMLJavaResolver {
       return null;
    }
 
+   /**
+    * A method to determine whether a variable is visible from the current
+    * activeType.
+    *
+    * @param variable
+    *           the variable to check
+    * @return true if variable is Visible, else false
+    */
    public boolean isVariableVisible(final IVariableBinding variable) {
       final int modifier = variable.getModifiers();
 

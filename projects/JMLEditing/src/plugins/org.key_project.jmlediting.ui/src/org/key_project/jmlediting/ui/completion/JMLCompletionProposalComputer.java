@@ -117,6 +117,7 @@ public class JMLCompletionProposalComputer implements
                System.out.println("no activeKeyword");
                return this.getFallback(javaContext);
             }
+
             return result;
          }
          // Fallback Method to display all JML Keyword-Proposals, if
