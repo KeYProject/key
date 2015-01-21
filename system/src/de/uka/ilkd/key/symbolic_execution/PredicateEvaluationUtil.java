@@ -590,32 +590,14 @@ public final class PredicateEvaluationUtil {
                                                 List<Term> succedentReplacements, 
                                                 boolean antecedentRuleApplication, 
                                                 TermBuilder tb) {
-      if (!antecedentReplacements.isEmpty() && !succedentReplacements.isEmpty()) {
-         Term left = tb.andMaintainLabels(antecedentReplacements);
-         Term right = tb.orMaintainLabels(succedentReplacements);
+      if (!antecedentReplacements.isEmpty() || !succedentReplacements.isEmpty()) {
+         Term left = tb.andPreserveLabels(antecedentReplacements);
+         Term right = tb.orPreserveLabels(succedentReplacements);
          if (antecedentRuleApplication) {
-            throw new UnsupportedOperationException();
+            return tb.andPreserveLabels(left, tb.notPreserveLabels(right));
          }
          else {
-            return tb.impMaintainLabels(left, right);
-         }
-      }
-      else if (!antecedentReplacements.isEmpty()) {
-         Term left = tb.andMaintainLabels(antecedentReplacements);
-         if (antecedentRuleApplication) {
-            return left;
-         }
-         else {
-            return tb.notMaintainLabels(left);
-         }
-      }
-      else if (!succedentReplacements.isEmpty()) {
-         Term right = tb.orMaintainLabels(succedentReplacements);
-         if (!antecedentRuleApplication) {
-            return right;
-         }
-         else {
-            return tb.notMaintainLabels(right);
+            return tb.impPreserveLabels(left, right);
          }
       }
       else {
