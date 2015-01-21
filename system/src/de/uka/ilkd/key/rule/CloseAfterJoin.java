@@ -257,8 +257,8 @@ public class CloseAfterJoin implements BuiltInRule {
 
          freeVars = freeVars.add(newVar);
          
-         bindForm = tb.and(
-               tb.equals(
+         bindForm = tb.apply(
+               tb.elementary(
                      tb.var(loc),
                      tb.var(newVar)),
                bindForm);
@@ -290,8 +290,8 @@ public class CloseAfterJoin implements BuiltInRule {
 
          freeVars = freeVars.add(newVar);
          
-         bindForm = tb.and(
-               tb.equals(
+         bindForm = tb.apply(
+               tb.elementary(
                      tb.var(loc),
                      tb.var(newVar)),
                bindForm);
