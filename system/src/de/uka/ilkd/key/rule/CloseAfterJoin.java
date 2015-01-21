@@ -20,7 +20,6 @@ import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -30,8 +29,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -63,6 +60,7 @@ public class CloseAfterJoin implements BuiltInRule {
    private SymbolicExecutionState joinState = null;
    private SymbolicExecutionState thisSEState = null;
    private Term pc = null;
+   private Services services = null;
    
    private static HashMap<Node, HashSet<Node>> JOIN_NODE_TO_PARTNERS_MAP =
          new HashMap<Node, HashSet<Node>>();
@@ -98,11 +96,13 @@ public class CloseAfterJoin implements BuiltInRule {
          Node joinNode,
          SymbolicExecutionState joinState,
          SymbolicExecutionState thisSEState,
-         Term pc) {
+         Term pc,
+         Services services) {
       this.joinNode = joinNode;
       this.joinState = joinState;
       this.thisSEState = thisSEState;
       this.pc = pc;
+      this.services = services;
       
       if (!JOIN_NODE_TO_PARTNERS_MAP.containsKey(joinNode)) {
          JOIN_NODE_TO_PARTNERS_MAP.put(joinNode, new HashSet<Node>());
@@ -225,12 +225,12 @@ public class CloseAfterJoin implements BuiltInRule {
       Term result = tb.imp(
             tb.and(
                   thisSEState.getPathCondition(),
-                  tb.apply(thisSEState.getSymbolicState(), predTerm)),
-            tb.and(
                   joinState.getPathCondition(),
-                  tb.apply(joinState.getSymbolicState(), predTerm)));
+                  tb.apply(joinState.getSymbolicState(), predTerm)),
+            tb.and(
+                  tb.apply(thisSEState.getSymbolicState(), predTerm)));
       
-      return allClosure(result, services);
+      return allClosure(result);
    }
    
    /**
@@ -242,62 +242,8 @@ public class CloseAfterJoin implements BuiltInRule {
     * @return A new term which is equivalent to the existential closure
     *    of the argument term.
     */
-   @SuppressWarnings("unused")
-   private static Term exClosure(final Term term, final Services services) {
-      TermBuilder tb = services.getTermBuilder();
-      
-      ImmutableSet<QuantifiableVariable> freeVars = term.freeVars();
-      
-      Term bindForm = tb.tt();
-      for (LocationVariable loc : JoinRule.getTermLocations(term)) {
-         final String newName = tb.newName(JoinRule.stripIndex(loc.name().toString()));
-         final LogicVariable newVar =
-               new LogicVariable(new Name(newName), loc.sort());
-         services.getNamespaces().variables().add(newVar);
-
-         freeVars = freeVars.add(newVar);
-         
-         bindForm = tb.apply(
-               tb.elementary(
-                     tb.var(loc),
-                     tb.var(newVar)),
-               bindForm);
-      }
-      
-      return tb.ex(freeVars, tb.imp(bindForm, term));
-   }
-   
-   /**
-    * Existentially closes all logical and location variables in
-    * the given term.
-    * 
-    * @param term Term to existentially close.
-    * @param services The services object.
-    * @return A new term which is equivalent to the existential closure
-    *    of the argument term.
-    */
-   private static Term allClosure(final Term term, final Services services) {
-      TermBuilder tb = services.getTermBuilder();
-      
-      ImmutableSet<QuantifiableVariable> freeVars = term.freeVars();
-      
-      Term bindForm = tb.tt();
-      for (LocationVariable loc : JoinRule.getTermLocations(term)) {
-         final String newName = tb.newName(JoinRule.stripIndex(loc.name().toString()));
-         final LogicVariable newVar =
-               new LogicVariable(new Name(newName), loc.sort());
-         services.getNamespaces().variables().add(newVar);
-
-         freeVars = freeVars.add(newVar);
-         
-         bindForm = tb.apply(
-               tb.elementary(
-                     tb.var(loc),
-                     tb.var(newVar)),
-               bindForm);
-      }
-      
-      return tb.all(freeVars, tb.imp(bindForm, term));
+   private Term allClosure(final Term term) {
+      return JoinRule.allClosure(term, services);
    }
 
    @Override

@@ -21,6 +21,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.core.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -47,9 +48,11 @@ import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -797,6 +800,72 @@ public abstract class JoinRule implements BuiltInRule {
    }
    
    /**
+    * Existentially closes all logical and location variables in
+    * the given term.
+    * 
+    * @param term Term to existentially close.
+    * @param services The services object.
+    * @return A new term which is equivalent to the existential closure
+    *    of the argument term.
+    */
+   protected static Term exClosure(final Term term, final Services services) {
+      TermBuilder tb = services.getTermBuilder();
+      
+      ImmutableSet<QuantifiableVariable> freeVars = term.freeVars();
+      
+      Term bindForm = tb.tt();
+      for (LocationVariable loc : JoinRule.getTermLocations(term)) {
+         final String newName = tb.newName(JoinRule.stripIndex(loc.name().toString()));
+         final LogicVariable newVar =
+               new LogicVariable(new Name(newName), loc.sort());
+         services.getNamespaces().variables().add(newVar);
+
+         freeVars = freeVars.add(newVar);
+         
+         bindForm = tb.apply(
+               tb.elementary(
+                     tb.var(loc),
+                     tb.var(newVar)),
+               bindForm);
+      }
+      
+      return tb.ex(freeVars, tb.imp(bindForm, term));
+   }
+   
+   /**
+    * Existentially closes all logical and location variables in
+    * the given term.
+    * 
+    * @param term Term to existentially close.
+    * @param services The services object.
+    * @return A new term which is equivalent to the existential closure
+    *    of the argument term.
+    */
+   protected static Term allClosure(final Term term, final Services services) {
+      TermBuilder tb = services.getTermBuilder();
+      
+      ImmutableSet<QuantifiableVariable> freeVars = term.freeVars();
+      
+      Term bindForm = tb.tt();
+      for (LocationVariable loc : JoinRule.getTermLocations(term)) {
+         final String newName = tb.newName(JoinRule.stripIndex(loc.name().toString()));
+         final LogicVariable newVar =
+               new LogicVariable(new Name(newName), loc.sort());
+         services.getNamespaces().variables().add(newVar);
+
+         freeVars = freeVars.add(newVar);
+         
+         bindForm = tb.apply(
+               tb.elementary(
+                     tb.var(loc),
+                     tb.var(newVar)),
+               bindForm);
+      }
+      
+      return tb.all(freeVars, tb.imp(bindForm, term));
+   }
+   
+   /**
     * Selects among suitable join partners using GUI input.
     * 
     * @param goal Current goal to join.
@@ -903,7 +972,7 @@ public abstract class JoinRule implements BuiltInRule {
       Services services = joinNodeParent.proof().getServices();
       InitConfig initConfig = joinNodeParent.proof().getInitConfig();
       
-      CloseAfterJoin closeRule = new CloseAfterJoin(joinNodeParent, joinState, joinPartnerState, pc);
+      CloseAfterJoin closeRule = new CloseAfterJoin(joinNodeParent, joinState, joinPartnerState, pc, services);
       RuleApp app = closeRule.createApp(null, services);
       
       // Register rule if not done yet.
