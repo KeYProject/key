@@ -67,6 +67,10 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
+//TODO The implementation of #equalsModBranchUniqueRenaming(...) will
+//     have to be changed, since LocationVariables are not allowed to
+//     have setters - they are immutable by strict design decision.
+
 /**
  * Base for implementing join rules. Extend this class,
  * implement method joinStates(...) and register in

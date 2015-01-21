@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.JoinRule;
 
 /**
  * This class represents proper program variables, which are not program
@@ -98,6 +99,11 @@ public final class LocationVariable extends ProgramVariable
     }
 
    /**
+    * TODO: We will have to remove this setter since it violates the
+    * design decision that {@link LocationVariable}s are immutable.
+    * In {@link JoinRule}, we will have to introduce another method
+    * of getting branchwise unique names.
+    * 
     * Sets the name of this program variables that it would obtain if
     * names only had to be unique *per branch*, and not globally.
     * 
