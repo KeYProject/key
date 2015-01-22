@@ -31,9 +31,9 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    public void testEquivExample_NoOneStepSimplification() throws Exception {
       // Create expected results
       ExpectedBranchResult goal79 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.TRUE));
-      ExpectedBranchResult goal91 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.TRUE));
-      ExpectedBranchResult goal95 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.TRUE));
-      ExpectedBranchResult goal97 = new ExpectedBranchResult(new ExpectedPredicateResult("5.0", TruthValue.FALSE)); // SETAccumulate is false
+      ExpectedBranchResult goal91 = new ExpectedBranchResult(new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.TRUE));
+      ExpectedBranchResult goal95 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE));
+      ExpectedBranchResult goal97 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.FALSE)); // SETAccumulate is false
       ExpectedPredicateEvaluationResult result = new ExpectedPredicateEvaluationResult(goal79, goal91, goal95, goal97);
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/truthValueEquivExample/test/EquivExampleNoOneStepSimplification.proof", 
@@ -49,9 +49,9 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    public void testEquivExample() throws Exception {
       // Create expected results
       ExpectedBranchResult goal39 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.TRUE));
-      ExpectedBranchResult goal50 = new ExpectedBranchResult(new ExpectedPredicateResult("1.0", TruthValue.FALSE), new ExpectedPredicateResult("2.0", TruthValue.UNKNOWN), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.UNKNOWN), new ExpectedPredicateResult("5.0", TruthValue.TRUE), new ExpectedPredicateResult("6.0", TruthValue.UNKNOWN));
-      ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.TRUE), new ExpectedPredicateResult("6.0", TruthValue.TRUE));
-      ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("6.0", TruthValue.FALSE), new ExpectedPredicateResult("4.0", TruthValue.UNKNOWN), new ExpectedPredicateResult("5.0", TruthValue.FALSE)); // SETAccumulate is false
+      ExpectedBranchResult goal50 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.TRUE));
+      ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.TRUE));
+      ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.FALSE)); // SETAccumulate is false
       ExpectedPredicateEvaluationResult result = new ExpectedPredicateEvaluationResult(goal39, goal50, goal53, goal55);
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/truthValueEquivExample/test/EquivExample.proof", 

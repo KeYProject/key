@@ -29,8 +29,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -280,8 +278,8 @@ public final class TruthValueEvaluationUtil {
     * @return The found {@link LabelOccurrence}s.
     */
    protected static List<LabelOccurrence> findInvolvedLabels(Sequent sequent, 
-                                                                      TacletApp tacletApp, 
-                                                                      Name termLabelName) {
+                                                             TacletApp tacletApp, 
+                                                             Name termLabelName) {
       List<LabelOccurrence> result = new LinkedList<LabelOccurrence>();
       // Search for labels in find part
       PosInOccurrence pio = tacletApp.posInOccurrence();
@@ -291,21 +289,7 @@ public final class TruthValueEvaluationUtil {
             // Check for evaluated truth values
             TermLabel label = term.getLabel(termLabelName);
             if (label instanceof FormulaTermLabel) {
-               result.add(new LabelOccurrence((FormulaTermLabel) label, pio.isInAntec(), false));
-            }
-         }
-      }
-      // Search for labels in assumes part
-      if (tacletApp.ifFormulaInstantiations() != null) {
-         for (IfFormulaInstantiation inst : tacletApp.ifFormulaInstantiations()) {
-            SequentFormula sf = inst.getConstrainedFormula();
-            Term instTerm = sf.formula();
-            TermLabel label = instTerm.getLabel(termLabelName);
-            if (label instanceof FormulaTermLabel) {
-               boolean inAntecedent = inst instanceof IfFormulaInstSeq ? // Term was found in sequent
-                                      ((IfFormulaInstSeq) inst).inAntec() :
-                                      pio.isInAntec(); // Term was entered by the user and position is unknown. pio.isInAntec() may work in this case or not.
-               result.add(new LabelOccurrence((FormulaTermLabel) label, inAntecedent, true));
+               result.add(new LabelOccurrence((FormulaTermLabel) label, pio.isInAntec()));
             }
          }
       }
@@ -326,21 +310,15 @@ public final class TruthValueEvaluationUtil {
        * {@code true} occurred in antecedent, {@code false} occurred in succedent.
        */
       private final boolean inAntecedent;
-      
-      /**
-       * {@code true} occurred in assumes clause, {@code false} occurred in find clause.
-       */
-      private final boolean assumesClause;
 
       /**
        * Constructor.
        * @param label The {@link FormulaTermLabel}.
        * @param inAntecedent {@code true} occurred in antecedent, {@code false} occurred in succedent.
        */
-      public LabelOccurrence(FormulaTermLabel label, boolean inAntecedent, boolean assumesClause) {
+      public LabelOccurrence(FormulaTermLabel label, boolean inAntecedent) {
          this.label = label;
          this.inAntecedent = inAntecedent;
-         this.assumesClause = assumesClause;
       }
 
       /**
@@ -360,21 +338,12 @@ public final class TruthValueEvaluationUtil {
       }
 
       /**
-       * Checks if the label occurred in the assumes or find clause.
-       * @return {@code true} occurred in assumes clause, {@code false} occurred in find clause.
-       */
-      public boolean isAssumesClause() {
-         return assumesClause;
-      }
-
-      /**
        * {@inheritDoc}
        */
       @Override
       public String toString() {
          return label + 
-                (inAntecedent ? " in antecedent" : " in succedent") +
-                (assumesClause ? " of assumes clause" : " of find clause");
+                (inAntecedent ? " in antecedent" : " in succedent");
       }
    }
 
@@ -399,27 +368,13 @@ public final class TruthValueEvaluationUtil {
          if (replaceTerm.op() == Junctor.TRUE) {
             // Find term is replaced by true
             for (LabelOccurrence occurrence : labels) {
-               if (occurrence.isAssumesClause()) {
-                  // Set result for assumes clause which is based on the side of occurrence
-                  updatePredicateResult(occurrence.getLabel(), occurrence.isInAntecedent(), results);
-               }
-               else {
-                  // Set result for find clause which is the replacement (true)
-                  updatePredicateResult(occurrence.getLabel(), true, results);
-               }
+               updatePredicateResult(occurrence.getLabel(), true, results);
             }
          }
          else if (replaceTerm.op() == Junctor.FALSE) {
             // Find term is replaced by false
             for (LabelOccurrence occurrence : labels) {
-               if (occurrence.isAssumesClause()) {
-                  // Set result for assumes clause which is based on the side of occurrence
-                  updatePredicateResult(occurrence.getLabel(), occurrence.isInAntecedent(), results);
-               }
-               else {
-                  // Set result for find clause which is the replacement (false)
-                  updatePredicateResult(occurrence.getLabel(), false, results);
-               }
+               updatePredicateResult(occurrence.getLabel(), false, results);
             }
          }
       }
