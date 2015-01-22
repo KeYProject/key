@@ -370,7 +370,6 @@ public final class ParserBuilder {
                // error
                final IASTNode errorNode = Nodes.createNode(type,
                      Nodes.createErrorNode(node));
-               System.out.println("ErrorNode:  " + errorNode);
                throw new ParserException("Expected a " + close, semicolonPos,
                      text, errorNode);
             }

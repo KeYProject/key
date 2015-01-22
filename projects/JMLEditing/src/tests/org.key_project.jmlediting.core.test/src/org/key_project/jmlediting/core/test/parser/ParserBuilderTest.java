@@ -106,7 +106,7 @@ public class ParserBuilderTest {
       testRecovery(
             "A;A;A",
             listErrorRecovery(closedBy(NodeTypes.NODE, parseA, ';')),
-            "List[0-5](Node[0-2](String[0-1](A)),Node[2-4](String[2-3](A)),ErrorNode[4-5](String[4-5](A)))");
+            "List[0-5](Node[0-2](String[0-1](A)),Node[2-4](String[2-3](A)),Node[4-5](ErrorNode[4-5](String[4-5](A))))");
    }
 
    @Test
@@ -114,7 +114,7 @@ public class ParserBuilderTest {
       testRecovery(
             "A;AA;AA;",
             listErrorRecovery(closedBy(NodeTypes.NODE, parseA, ';')),
-            "List[0-8](Node[0-2](String[0-1](A)),ErrorNode[2-3](String[2-3](A)),Node[3-5](String[3-4](A)),ErrorNode[5-6](String[5-6](A)),Node[6-8](String[6-7](A)))");
+            "List[0-8](Node[0-2](String[0-1](A)),Node[2-3](ErrorNode[2-3](String[2-3](A))),Node[3-5](String[3-4](A)),Node[5-6](ErrorNode[5-6](String[5-6](A))),Node[6-8](String[6-7](A)))");
    }
 
    @Test
@@ -416,7 +416,10 @@ public class ParserBuilderTest {
       testRecovery(
             "A",
             typed(NodeTypes.SOME, closedBy(NodeTypes.NODE, parseA, ',')),
-            createNode(NodeTypes.SOME, createErrorNode(createString(0, 1, "A"))));
+            createNode(
+                  NodeTypes.SOME,
+                  createNode(NodeTypes.NODE,
+                        createErrorNode(createString(0, 1, "A")))));
    }
 
    @Test
@@ -507,20 +510,26 @@ public class ParserBuilderTest {
 
    @Test
    public void testClosedByErrorRecovery1() {
-      testRecovery("A ", closedBy(NodeTypes.NODE, parseA, ','),
-            createErrorNode(createString(0, 1, "A")));
+      testRecovery(
+            "A ",
+            closedBy(NodeTypes.NODE, parseA, ','),
+            createNode(NodeTypes.NODE, createErrorNode(createString(0, 1, "A"))));
    }
 
    @Test
    public void testClosedByErrorRecovery2() {
-      testRecovery("A B", closedBy(NodeTypes.NODE, parseA, ','),
-            createErrorNode(createString(0, 1, "A")));
+      testRecovery(
+            "A B",
+            closedBy(NodeTypes.NODE, parseA, ','),
+            createNode(NodeTypes.NODE, createErrorNode(createString(0, 1, "A"))));
    }
 
    @Test
    public void testClosedByErrorRecovery3() {
-      testRecovery("A ", closedBy(NodeTypes.NODE, parseA, ','),
-            createErrorNode(createString(0, 1, "A")));
+      testRecovery(
+            "A ",
+            closedBy(NodeTypes.NODE, parseA, ','),
+            createNode(NodeTypes.NODE, createErrorNode(createString(0, 1, "A"))));
    }
 
 }
