@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -213,37 +214,81 @@ public class CloseAfterJoin implements BuiltInRule {
       // Create the predicate term
       final Term predTerm = tb.func(predicateSymb, origQfdVarTerms.toArray(new Term[] {}));
       
-      // Create the formula Ex-Cl(C1 & {U1} P(...)) -> Ex-Cl(C2 & {U2} P(...))      
-//      Term result = tb.imp(
-//            exClosure(tb.and(
-//                  thisSEState.getPathCondition(),
-//                  tb.apply(thisSEState.getSymbolicState(), predTerm)), services),
-//            exClosure(tb.and(
-//                  joinState.getPathCondition(),
-//                  tb.apply(joinState.getSymbolicState(), predTerm)), services));
-      
+      // Create the formula All-Cl(C2 -> {U2} P(...)) -> All-Cl(C1 -> {U1} P(...))
       Term result = tb.imp(
-            tb.and(
-                  thisSEState.getPathCondition(),
+            allClosure(tb.imp(
                   joinState.getPathCondition(),
-                  tb.apply(joinState.getSymbolicState(), predTerm)),
-            tb.and(
-                  tb.apply(thisSEState.getSymbolicState(), predTerm)));
+                  tb.apply(joinState.getSymbolicState(), predTerm))),
+            allClosure(tb.imp(
+                  thisSEState.getPathCondition(),
+                  tb.apply(thisSEState.getSymbolicState(), predTerm))));
       
-      return allClosure(result);
+      return result;
    }
    
    /**
-    * Existentially closes all logical and location variables in
-    * the given term.
+    * Universally closes all logical and location variables in
+    * the given term. Before, all Skolem constants in the term
+    * are replaced by fresh variables, where multiple occurrences
+    * of the same constant are replaced by the same variable.
     * 
-    * @param term Term to existentially close.
+    * @param term Term to universally close.
     * @param services The services object.
-    * @return A new term which is equivalent to the existential closure
-    *    of the argument term.
+    * @return A new term which is equivalent to the universal closure
+    *    of the argument term, with Skolem constants having been replaced
+    *    by fresh variables before.
     */
    private Term allClosure(final Term term) {
-      return JoinRule.allClosure(term, services);
+      return JoinRule.allClosure(
+            substConstantsByFreshVars(
+                  term, new HashMap<Function, LogicVariable>()),
+            services);
+   }
+   
+   /**
+    * Substitutes all constants in the given term by fresh variables.
+    * Multiple occurrences of a constant are substituted by the same
+    * variable.
+    * 
+    * @param term Term in which to substitute constants by variables.
+    * @param replMap Map from constants to variables in order to remember
+    *    substitutions of one constant.
+    * @return A term equal to the input, but with constants substituted by
+    *    fresh variables.
+    */
+   private Term substConstantsByFreshVars(Term term, HashMap<Function, LogicVariable> replMap) {
+      TermBuilder tb = services.getTermBuilder();
+      
+      if (term.op() instanceof Function
+            && ((Function) term.op()).isSkolemConstant()) {
+         
+         Function constant = (Function) term.op();
+         
+         if (!replMap.containsKey(constant)) {
+            LogicVariable freshVariable = JoinRule.getFreshVariableForPrefix(
+                  JoinRule.stripIndex(constant.toString()),
+                  constant.sort(),
+                  services);
+            replMap.put(constant, freshVariable);
+         }
+         
+         return tb.var(replMap.get(constant));
+         
+      } else {
+         
+         LinkedList<Term> transfSubs = new LinkedList<Term>();
+         for (Term sub : term.subs()) {
+            transfSubs.add(substConstantsByFreshVars(sub, replMap));
+         }
+         
+         return services.getTermFactory().createTerm(
+               term.op(),
+               new ImmutableArray<Term>(transfSubs),
+               term.boundVars(),
+               term.javaBlock(),
+               term.getLabels());
+         
+      }
    }
 
    @Override

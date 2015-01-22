@@ -58,10 +58,8 @@ public class JoinWeaken extends JoinRule {
       
       final String varNamePrefix = "v";
       for (LocationVariable v : progVars) {
-         final String newName = tb.newName(varNamePrefix);
          final LogicVariable newVar =
-               new LogicVariable(new Name(newName), v.sort());
-         services.getNamespaces().variables().add(newVar);
+               getFreshVariableForPrefix(varNamePrefix, v.sort(), services);
          
          newElementaryUpdates = newElementaryUpdates.prepend(
                tb.elementary(

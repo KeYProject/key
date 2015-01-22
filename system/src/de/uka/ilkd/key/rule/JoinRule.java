@@ -753,9 +753,37 @@ public abstract class JoinRule implements BuiltInRule {
     *     prefix in its name.
     */
    protected static Function getNewScolemConstantForPrefix(String prefix, Sort sort, Services services) {
-      final String newName = services.getTermBuilder().newName(prefix);
-      final Function result = new Function(new Name(newName), sort, true);
-      services.getNamespaces().functions().add(result);
+      Function result = null;
+      String newName = "";
+      
+      do {
+         newName = services.getTermBuilder().newName(prefix);
+         result = new Function(new Name(newName), sort, true);
+         services.getNamespaces().functions().add(result);
+      } while (newName.equals(prefix));
+      
+      return result;
+   }
+   
+   /**
+    * Computes and registers a fresh variable with the given
+    * prefix in its name of the given sort.
+    * 
+    * @param prefix Prefix for the name of the variable.
+    * @param sort Sort of the variable.
+    * @param services The services object.
+    * @return A fresh variable of the given sort with the given
+    *     prefix in its name.
+    */
+   protected static LogicVariable getFreshVariableForPrefix(String prefix, Sort sort, Services services) {
+      LogicVariable result = null;
+      String newName = "";
+      
+      do {
+         newName = services.getTermBuilder().newName(prefix);
+         result = new LogicVariable(new Name(newName), sort);
+         services.getNamespaces().variables().add(result);
+      } while (newName.equals(prefix));
       
       return result;
    }
@@ -810,43 +838,48 @@ public abstract class JoinRule implements BuiltInRule {
     */
    protected static Term exClosure(final Term term, final Services services) {
       TermBuilder tb = services.getTermBuilder();
+      Pair<Term, ImmutableSet<QuantifiableVariable>> anonymized =
+            anonymizeProgramVariables(term, services);
       
-      ImmutableSet<QuantifiableVariable> freeVars = term.freeVars();
-      
-      Term bindForm = tb.tt();
-      for (LocationVariable loc : JoinRule.getTermLocations(term)) {
-         final String newName = tb.newName(JoinRule.stripIndex(loc.name().toString()));
-         final LogicVariable newVar =
-               new LogicVariable(new Name(newName), loc.sort());
-         services.getNamespaces().variables().add(newVar);
-
-         freeVars = freeVars.add(newVar);
-         
-         bindForm = tb.apply(
-               tb.elementary(
-                     tb.var(loc),
-                     tb.var(newVar)),
-               bindForm);
-      }
-      
-      return tb.ex(freeVars, tb.imp(bindForm, term));
+      return tb.ex(anonymized.second, anonymized.first);
    }
    
    /**
-    * Existentially closes all logical and location variables in
+    * Universally closes all logical and location variables in
     * the given term.
     * 
-    * @param term Term to existentially close.
+    * @param term Term to universally close.
     * @param services The services object.
-    * @return A new term which is equivalent to the existential closure
+    * @return A new term which is equivalent to the universal closure
     *    of the argument term.
     */
    protected static Term allClosure(final Term term, final Services services) {
       TermBuilder tb = services.getTermBuilder();
+      Pair<Term, ImmutableSet<QuantifiableVariable>> anonymized =
+            anonymizeProgramVariables(term, services);
+      
+      return tb.all(anonymized.second, anonymized.first);
+   }
+   
+   /**
+    * Anonymizes all program variables occurring in the given term.
+    * If x is a PV in the term, the result will be of the form
+    * <code>{ ... || x := vx || ...} term</code> where vx is a fresh
+    * variable. Returns all free variables of the new termin the
+    * second component of the pair.
+    * 
+    * @param term Term to anonymize.
+    * @param services The services object.
+    * @return A term of the form <code>{ ... || x := vx || ...} term</code>
+    *    for every PV x occurring in the term, where vx is a fresh variable.
+    */
+   private static Pair<Term, ImmutableSet<QuantifiableVariable>> anonymizeProgramVariables(
+         final Term term, final Services services) {
+      TermBuilder tb = services.getTermBuilder();
       
       ImmutableSet<QuantifiableVariable> freeVars = term.freeVars();
+      ImmutableList<Term> elementaries = ImmutableSLList.nil();
       
-      Term bindForm = tb.tt();
       for (LocationVariable loc : JoinRule.getTermLocations(term)) {
          final String newName = tb.newName(JoinRule.stripIndex(loc.name().toString()));
          final LogicVariable newVar =
@@ -855,14 +888,15 @@ public abstract class JoinRule implements BuiltInRule {
 
          freeVars = freeVars.add(newVar);
          
-         bindForm = tb.apply(
+         elementaries = elementaries.prepend(
                tb.elementary(
                      tb.var(loc),
-                     tb.var(newVar)),
-               bindForm);
+                     tb.var(newVar)));
       }
       
-      return tb.all(freeVars, tb.imp(bindForm, term));
+      return new Pair<Term, ImmutableSet<QuantifiableVariable>>(
+            tb.apply(tb.parallel(elementaries), term),
+            freeVars);
    }
    
    /**
@@ -1330,7 +1364,7 @@ public abstract class JoinRule implements BuiltInRule {
     * Converts a Sequent "Gamma ==> Delta" into a single formula
     * equivalent to "/\ Gamma -> \/ Delta"; however, the formulae
     * in Gamma are shifted to the succedent by the negation-left
-    * rule, so the reult of this method is a disjunction, not an
+    * rule, so the result of this method is a disjunction, not an
     * implication.
     * 
     * @param sequent The sequent to convert to a formula.
