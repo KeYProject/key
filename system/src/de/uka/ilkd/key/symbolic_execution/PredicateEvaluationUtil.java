@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
@@ -292,7 +293,7 @@ public final class PredicateEvaluationUtil {
             // Check for evaluated truth values
             TermLabel label = term.getLabel(termLabelName);
             if (label instanceof PredicateTermLabel) {
-               result.add(new PredicateLabelOccurrence((PredicateTermLabel) label, pio.isInAntec()));
+               result.add(new PredicateLabelOccurrence((PredicateTermLabel) label, pio.isInAntec(), false));
             }
          }
       }
@@ -303,8 +304,10 @@ public final class PredicateEvaluationUtil {
             Term instTerm = sf.formula();
             TermLabel label = instTerm.getLabel(termLabelName);
             if (label instanceof PredicateTermLabel) {
-               boolean inAntecedent = sequent.antecedent().contains(sf);
-               result.add(new PredicateLabelOccurrence((PredicateTermLabel) label, inAntecedent));
+               boolean inAntecedent = inst instanceof IfFormulaInstSeq ? // Term was found in sequent
+                                      ((IfFormulaInstSeq) inst).inAntec() :
+                                      pio.isInAntec(); // Term was entered by the user and position is unknown. pio.isInAntec() may work in this case or not.
+               result.add(new PredicateLabelOccurrence((PredicateTermLabel) label, inAntecedent, true));
             }
          }
       }
@@ -325,15 +328,21 @@ public final class PredicateEvaluationUtil {
        * {@code true} occurred in antecedent, {@code false} occurred in succedent.
        */
       private final boolean inAntecedent;
+      
+      /**
+       * {@code true} occurred in assumes clause, {@code false} occurred in find clause.
+       */
+      private final boolean assumesClause;
 
       /**
        * Constructor.
        * @param label The {@link PredicateTermLabel}.
        * @param inAntecedent {@code true} occurred in antecedent, {@code false} occurred in succedent.
        */
-      public PredicateLabelOccurrence(PredicateTermLabel label, boolean inAntecedent) {
+      public PredicateLabelOccurrence(PredicateTermLabel label, boolean inAntecedent, boolean assumesClause) {
          this.label = label;
          this.inAntecedent = inAntecedent;
+         this.assumesClause = assumesClause;
       }
 
       /**
@@ -345,7 +354,7 @@ public final class PredicateEvaluationUtil {
       }
 
       /**
-       * Checks if the lable occurred in antecedent or succedent.
+       * Checks if the label occurred in antecedent or succedent.
        * @return {@code true} occurred in antecedent, {@code false} occurred in succedent.
        */
       public boolean isInAntecedent() {
@@ -353,11 +362,21 @@ public final class PredicateEvaluationUtil {
       }
 
       /**
+       * Checks if the label occurred in the assumes or find clause.
+       * @return {@code true} occurred in assumes clause, {@code false} occurred in find clause.
+       */
+      public boolean isAssumesClause() {
+         return assumesClause;
+      }
+
+      /**
        * {@inheritDoc}
        */
       @Override
       public String toString() {
-         return label + (inAntecedent ? " in antecedent" : " in succedent");
+         return label + 
+                (inAntecedent ? " in antecedent" : " in succedent") +
+                (assumesClause ? " of assumes clause" : " of find clause");
       }
    }
 
@@ -379,13 +398,30 @@ public final class PredicateEvaluationUtil {
       Object replaceObject = tacletGoal.replaceWithExpressionAsObject();
       if (replaceObject instanceof Term) {
          Term replaceTerm = SymbolicExecutionUtil.instantiateTerm(parent, (Term) replaceObject, tacletApp, services);
-         for (PredicateLabelOccurrence Occurrence : labels) {
-            // Check for true/false terms
-            if (replaceTerm.op() == Junctor.TRUE) {
-               updatePredicateResult(Occurrence.getLabel(), new PredicateResult(PredicateValue.TRUE, parent), results);
+         if (replaceTerm.op() == Junctor.TRUE) {
+            // Find term is replaced by true
+            for (PredicateLabelOccurrence occurrence : labels) {
+               if (occurrence.isAssumesClause()) {
+                  // Set result for assumes clause which is based on the side of occurrence
+                  updatePredicateResult(occurrence.getLabel(), new PredicateResult(occurrence.isInAntecedent() ? PredicateValue.TRUE : PredicateValue.FALSE, parent), results);
+               }
+               else {
+                  // Set result for find clause which is the replacement (true)
+                  updatePredicateResult(occurrence.getLabel(), new PredicateResult(PredicateValue.TRUE, parent), results);
+               }
             }
-            else if (replaceTerm.op() == Junctor.FALSE) {
-               updatePredicateResult(Occurrence.getLabel(), new PredicateResult(PredicateValue.FALSE, parent), results);
+         }
+         else if (replaceTerm.op() == Junctor.FALSE) {
+            // Find term is replaced by false
+            for (PredicateLabelOccurrence occurrence : labels) {
+               if (occurrence.isAssumesClause()) {
+                  // Set result for assumes clause which is based on the side of occurrence
+                  updatePredicateResult(occurrence.getLabel(), new PredicateResult(occurrence.isInAntecedent() ? PredicateValue.TRUE : PredicateValue.FALSE, parent), results);
+               }
+               else {
+                  // Set result for find clause which is the replacement (false)
+                  updatePredicateResult(occurrence.getLabel(), new PredicateResult(PredicateValue.FALSE, parent), results);
+               }
             }
          }
       }
