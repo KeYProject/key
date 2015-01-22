@@ -43,7 +43,7 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionStateWithProgCnt;
 /**
  * Base for implementing join rules. Extend this class,
  * implement method joinStates(...) and register in
- * class JavaProfile.
+ * class JavaProfile.<p>
  * 
  * The rule is applicable if the chosen subterm has the
  * form { x := v || ... } \&lt;{ ... }\&gt; PHI and there
@@ -53,6 +53,13 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionStateWithProgCnt;
  * up and asks for a manual selection.
  * 
  * @author Dominic Scheurer
+ * 
+ * @see JoinRuleUtils
+ * @see JoinWeaken
+ * @see JoinIfThenElse
+ * @see JoinIfThenElseAntecedent
+ * @see JoinWithLatticeAbstraction
+ * @see JoinWithSignLattice
  */
 public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
 
