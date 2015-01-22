@@ -77,6 +77,9 @@ public abstract class StoreRefContainerKeyword extends
       }
       final IASTNode content = tmpNode.getChildren().get(0);
 
+      System.out.println("node: " + node.prettyPrintAST());
+      System.out.println("content: " + content);
+
       // TODO NodeTypes.LIST?
       if (content.getType() == StoreRefNodeTypes.STORE_REF_LIST) {
          final IASTNode exprInOffset = Nodes.selectChildWithPosition(content,
@@ -143,8 +146,10 @@ public abstract class StoreRefContainerKeyword extends
          System.out.println("node == " + node);
          System.out.println("restNodes == " + restNodes);
 
+         // cut the prefix to the cursor position
          String prefix = null;
          if (node.containsOffset(this.context.getInvocationOffset() - 1)) {
+            // the cursor is in the current Node => substring
             System.out.println("im offset");
             prefix = this.context
                   .getDocument()
@@ -153,16 +158,20 @@ public abstract class StoreRefContainerKeyword extends
                         this.context.getInvocationOffset());
          }
          else if (node.getStartOffset() >= this.context.getInvocationOffset()) {
+            // the node is after the cursor => empty prefix and break the
+            // recursion
             System.out.println("zu spät...");
             prefix = "";
          }
 
-         final JMLJavaResolver resolver = JMLJavaResolver.getInstance(
-               activeType, withProtectedOrInline);
+         final JMLJavaResolver resolver = new JMLJavaResolver(activeType);
 
+         // if prefix != null the cursor is in or before the currentNode ->
+         // compute the proposals
          if (restNodes.isEmpty() || prefix != null) {
             final List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
-            final IVariableBinding[] vars = activeType.getDeclaredFields();
+            final List<IVariableBinding> vars = resolver
+                  .getAllVisibleVariableBindings();
             if (prefix == null) {
                prefix = ((IStringNode) node.getChildren().get(0)).getString();
             }
@@ -181,8 +190,7 @@ public abstract class StoreRefContainerKeyword extends
                      replacementOffset, prefixLength, cursorPosition));
             }
             for (final IVariableBinding varBind : vars) {
-               if (resolver.isVariableVisible(varBind)
-                     && varBind.getName().startsWith(prefix)) {
+               if (varBind.getName().startsWith(prefix)) {
                   final String replacementString = varBind.getName();
                   final int cursorPosition = replacementString.length();
                   result.add(new CompletionProposal(replacementString,

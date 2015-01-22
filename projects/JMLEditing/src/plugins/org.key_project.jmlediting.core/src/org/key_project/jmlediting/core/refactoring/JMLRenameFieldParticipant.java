@@ -73,8 +73,8 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
       final List<TypeDeclaration> decls = finder.getDecls();
       final TypeDeclaration topDecl = decls.get(0);
       System.out.println(topDecl.resolveBinding().getName());
-      final JMLJavaResolver resolver = JMLJavaResolver.getInstance(
-            topDecl.resolveBinding(), true);
+      final JMLJavaResolver resolver = new JMLJavaResolver(
+            topDecl.resolveBinding());
       final JavaElementIdentifier refGoal = new JavaElementIdentifier(
             elem.getElementName(), resolver.getTypeForName(elem
                   .getElementName()), elem.getDeclaringType());
