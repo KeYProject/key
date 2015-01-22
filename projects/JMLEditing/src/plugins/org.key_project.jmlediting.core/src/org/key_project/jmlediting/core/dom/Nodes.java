@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.core.dom;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -173,18 +174,66 @@ public final class Nodes {
       });
    }
 
-   public static IKeyword getKeywordNode(final IASTNode node, final int position) {
-      final IASTNode keywordApplNode = getNodeAtPosition(node, position,
-            NodeTypes.KEYWORD_APPL);
-      if (keywordApplNode == null) {
-         return null;
-      }
-      final IASTNode keywordNode = keywordApplNode.getChildren().get(0);
-      if (Nodes.isKeyword(keywordNode)) {
-         return ((IKeywordNode) keywordNode).getKeyword();
-      }
-      return null;
+   /**
+    * Selects the topmost node with the given type that satisfies the following
+    * condition: The caretPosition is on the node, so after a character that
+    * belongs to the node, or at the whitespaces at the right of the node, so
+    * after a character that belongs to this node and before a character that
+    * belongs to the next right node which has the same parent.
+    *
+    * @param root
+    *           the root node to start search at
+    * @param caretPosition
+    *           the caret position
+    * @param type
+    *           the type of node for which is searched
+    * @return the node found or null if no node was found
+    */
+   public static IASTNode getNodeAtCaretPositionIncludeRightWhiteSpace(
+         final IASTNode root, final int caretPosition, final int type) {
+      return root.search(new INodeSearcher<IASTNode>() {
 
+         @Override
+         public IASTNode searchNode(final IASTNode node) {
+            if (node.getType() == type) {
+               return node;
+            }
+            return null;
+         }
+
+         @Override
+         public IASTNode selectChild(final List<IASTNode> children) {
+            if (children.isEmpty()) {
+               return null;
+            }
+            final Iterator<IASTNode> childIterator = children.iterator();
+            IASTNode node = childIterator.next();
+            IASTNode nextNode = node;
+            do {
+               // Check whether is is a next node
+               if (childIterator.hasNext()) {
+                  nextNode = childIterator.next();
+                  // Check whether the caret is valid
+                  if (node.getStartOffset() < caretPosition
+                        && caretPosition <= nextNode.getStartOffset()) {
+                     return node;
+                  }
+                  // Go to next node
+                  node = nextNode;
+               }
+               else {
+                  // Can only look into this node
+                  if (node.getStartOffset() < caretPosition
+                        && caretPosition <= node.getEndOffset()) {
+                     return node;
+                  }
+               }
+            }
+            while (childIterator.hasNext());
+
+            return null;
+         }
+      });
    }
 
 }

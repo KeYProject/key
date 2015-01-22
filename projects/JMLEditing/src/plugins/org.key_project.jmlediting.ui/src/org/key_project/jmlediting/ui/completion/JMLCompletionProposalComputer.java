@@ -17,6 +17,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.IKeywordNode;
+import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserException;
@@ -106,11 +108,22 @@ public class JMLCompletionProposalComputer implements
 
          // If Parser could parse or complete Error Recovery
          if (parseResult != null) {
-            final IKeyword activeKeyword = Nodes.getKeywordNode(parseResult,
-                  context.getInvocationOffset());
-            if (activeKeyword != null) {
+
+            // Get keyword application node
+            final IASTNode keywordApplNode = Nodes
+                  .getNodeAtCaretPositionIncludeRightWhiteSpace(parseResult,
+                        context.getInvocationOffset(), NodeTypes.KEYWORD_APPL);
+            // Check that there is a keyword appl and the caret not on the
+            // keyword itself
+            if (keywordApplNode != null
+                  && !keywordApplNode.getChildren().get(0)
+                        .containsCaret(context.getInvocationOffset())) {
+               // Get the keyword from the node and get result of autoproposals
+               final IKeyword activeKeyword = ((IKeywordNode) keywordApplNode
+                     .getChildren().get(0)).getKeyword();
                System.out.println("activeKeyword == " + activeKeyword);
-               result.addAll(activeKeyword.createAutoProposals(parseResult,
+
+               result.addAll(activeKeyword.createAutoProposals(keywordApplNode,
                      javaContext));
             }
             else {

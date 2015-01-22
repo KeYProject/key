@@ -59,8 +59,7 @@ public abstract class StoreRefContainerKeyword extends
          final JavaContentAssistInvocationContext context) {
       final List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 
-      final IASTNode nodeAtPos = Nodes.getNodeAtPosition(node,
-            context.getInvocationOffset() - 1, NodeTypes.KEYWORD_APPL);
+      final IASTNode nodeAtPos = node;
 
       final CompilationUnit cu;
       if (context.getCompilationUnit() instanceof CompilationUnit) {

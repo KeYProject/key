@@ -39,6 +39,16 @@ public interface IASTNode {
    boolean containsOffset(int offset);
 
    /**
+    * Returns true if the given caret is on the current node. So it is after a
+    * character of this node.
+    *
+    * @param caretPosition
+    *           the caretPosition to check
+    * @return whether the caretPosition is on the node
+    */
+   boolean containsCaret(int caretPosition);
+
+   /**
     * Returns the type of the node.
     *
     * @return the type of this node
