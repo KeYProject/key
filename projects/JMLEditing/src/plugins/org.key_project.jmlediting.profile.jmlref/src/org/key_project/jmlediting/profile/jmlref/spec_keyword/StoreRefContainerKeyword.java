@@ -14,6 +14,7 @@ import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.INodeTraverser;
 import org.key_project.jmlediting.core.dom.IStringNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
@@ -71,8 +72,9 @@ public abstract class StoreRefContainerKeyword extends
       }
       // Keyword APPL or error Node
       final IASTNode tmpNode = nodeAtPos.getChildren().get(1);
+      // empty KeywordContent
       if (tmpNode.getChildren().isEmpty()) {
-         result.addAll(new Proposer(context).propose(cu, null));
+         result.addAll(new Proposer(context).propose(cu, null, false));
          return result;
       }
       final IASTNode content = tmpNode.getChildren().get(0);
@@ -82,16 +84,22 @@ public abstract class StoreRefContainerKeyword extends
 
       // TODO NodeTypes.LIST?
       if (content.getType() == StoreRefNodeTypes.STORE_REF_LIST) {
-         final IASTNode exprInOffset = Nodes.selectChildWithPosition(content,
-               context.getInvocationOffset() - 1);
-         final List<IASTNode> list;
-         if (exprInOffset == null) {
-            list = null;
-         }
-         else {
-            list = exprInOffset.getChildren();
-         }
-         result.addAll(new Proposer(context).propose(cu, list));
+         final IASTNode exprInOffset = Nodes.selectChildWithPosition(content
+               .getChildren().get(0), context.getInvocationOffset() - 1);
+         final boolean hasExpr = content.traverse(
+               new INodeTraverser<Boolean>() {
+
+                  @Override
+                  public Boolean traverse(final IASTNode node,
+                        final Boolean existing) {
+                     if (node.getType() == StoreRefNodeTypes.STORE_REF_NAME) {
+                        return true;
+                     }
+                     return existing;
+                  }
+               }, false);
+
+         result.addAll(new Proposer(context).propose(cu, exprInOffset, hasExpr));
       }
       else if (content.getType() == NodeTypes.KEYWORD) {
          // TODO
@@ -116,7 +124,8 @@ public abstract class StoreRefContainerKeyword extends
       }
 
       private Collection<? extends ICompletionProposal> propose(
-            final CompilationUnit cu, final List<IASTNode> list) {
+            final CompilationUnit cu, final IASTNode expr,
+            final boolean hasOtherExpressions) {
          final org.eclipse.jdt.core.dom.CompilationUnit ast = SharedASTProvider
                .getAST(cu, SharedASTProvider.WAIT_YES, null);
 
@@ -124,16 +133,20 @@ public abstract class StoreRefContainerKeyword extends
          ast.accept(finder);
          final List<TypeDeclaration> decls = finder.getDecls();
          final TypeDeclaration topDecl = decls.get(0);
-         if (list == null) {
+         if (expr == null) {
             final int invocationOffset = this.context.getInvocationOffset();
             return this.propose(topDecl.resolveBinding(), Nodes.createNode(
                   StoreRefNodeTypes.STORE_REF_NAME,
                   Nodes.createString(invocationOffset, invocationOffset, "")),
-                  Collections.<IASTNode> emptyList(), false, true, true);
+                  Collections.<IASTNode> emptyList(), false,
+                  !hasOtherExpressions, true);
          }
-         return this.propose(topDecl.resolveBinding(), list.get(0)
-               .getChildren().get(0), list.get(0).getChildren().get(1)
-               .getChildren(), false, false, true);
+
+         System.out.println("expr: " + expr.prettyPrintAST());
+
+         return this.propose(topDecl.resolveBinding(), expr.getChildren()
+               .get(0), expr.getChildren().get(1).getChildren(), false, false,
+               true);
       }
 
       private List<ICompletionProposal> propose(final ITypeBinding activeType,
@@ -149,12 +162,14 @@ public abstract class StoreRefContainerKeyword extends
          // cut the prefix to the cursor position
          String prefix = null;
          if (node.containsOffset(this.context.getInvocationOffset() - 1)) {
+            final IASTNode wordNode = Nodes.getDepthMostNodeWithPosition(
+                  this.context.getInvocationOffset() - 1, node);
             // the cursor is in the current Node => substring
-            System.out.println("im offset");
+            System.out.println("im offset ");
             prefix = this.context
                   .getDocument()
                   .get()
-                  .substring(node.getStartOffset(),
+                  .substring(wordNode.getStartOffset(),
                         this.context.getInvocationOffset());
          }
          else if (node.getStartOffset() >= this.context.getInvocationOffset()) {
@@ -175,6 +190,15 @@ public abstract class StoreRefContainerKeyword extends
             if (prefix == null) {
                prefix = ((IStringNode) node.getChildren().get(0)).getString();
             }
+            // ignore . as a prefix
+            if (prefix.equals(".")) {
+               prefix = "";
+            }
+            // don't accept * as a prefix
+            else if (prefix.equals("*")) {
+               return result;
+            }
+            // TODO check for ArrayIndices
             System.out.println("prefix == " + prefix);
             final int replacementOffset = this.context.getInvocationOffset()
                   - prefix.length();

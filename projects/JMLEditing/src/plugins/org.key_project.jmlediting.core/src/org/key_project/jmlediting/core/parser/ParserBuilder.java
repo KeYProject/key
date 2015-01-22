@@ -286,8 +286,10 @@ public final class ParserBuilder {
             }
             catch (final ParserException e) {
                if (e.getErrorNode() != null) {
-                  throw new ParserException(e, Nodes.createErrorNode(sepStart,
-                        e.getErrorNode().getEndOffset(), e.getErrorNode()));
+                  throw e;
+                  // throw new ParserException(e,
+                  // Nodes.createErrorNode(sepStart,
+                  // e.getErrorNode().getEndOffset(), e.getErrorNode()));
                }
                else {
                   throw new ParserException(e, Nodes.createErrorNode(
