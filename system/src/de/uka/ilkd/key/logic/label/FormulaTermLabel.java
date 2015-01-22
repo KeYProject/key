@@ -14,6 +14,8 @@
 package de.uka.ilkd.key.logic.label;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -46,14 +48,40 @@ public class FormulaTermLabel implements TermLabel {
    public static final String BEFORE_ID_SEPARATOR = ";";
    
    /**
-    * The unique ID of this term label in the {@link Sequent}.
+    * The unique major ID of this term label in the {@link Sequent}.
     */
-   private final String id;
+   private final int majorId;
+   
+   /**
+    * The per major ID unique minor ID of this term label in the {@link Sequent}.
+    */
+   private final int minorId;
    
    /**
     * The optional previous IDs of the label this one is derived from separated by {@value #BEFORE_ID_SEPARATOR}.
     */
-   private final String beforeId;
+   private final String beforeIds;
+   
+   /**
+    * Constructor.
+    * @param id The unique ID of this term label in the {@link Sequent}.
+    * @throws TermLabelException Occurred Exception in case that the given ID is not valid.
+    */
+   public FormulaTermLabel(String id) throws TermLabelException {
+      this(getMajorId(id), getMinorId(id));
+   }
+   
+   /**
+    * Constructor.
+    * @param id The unique ID of this term label in the {@link Sequent}.
+    * @param beforeIds The optional previous IDs of the label this one is derived from separated by {@value #BEFORE_ID_SEPARATOR}.
+    * @throws TermLabelException Occurred Exception in case that the given IDs are not valid.
+    */
+   public FormulaTermLabel(String id, String beforeIds) throws TermLabelException {
+      this(getMajorId(id), 
+           getMinorId(id),
+           getValidBeforeIds(beforeIds)); // Ensure that before IDs are valid.
+   }
    
    /**
     * Constructor.
@@ -68,11 +96,12 @@ public class FormulaTermLabel implements TermLabel {
     * Constructor.
     * @param majorId The major part of the unique ID.
     * @param minorId The minor part of the unique ID.
-    * @param beforeId The optional previous ID of the label this one is derived from.
+    * @param beforeIds The optional previous ID of the label this one is derived from.
     */
    public FormulaTermLabel(int majorId, int minorId, Collection<String> beforeIds) {
-       this.id = majorId + "." + minorId;
-       if (beforeIds != null) {
+       this.majorId = majorId;
+       this.minorId = minorId;
+       if (beforeIds != null && !beforeIds.isEmpty()) {
           StringBuffer sb = new StringBuffer();
           boolean afterFirst = false;
           for (String id : beforeIds) {
@@ -86,10 +115,10 @@ public class FormulaTermLabel implements TermLabel {
                 sb.append(id);
              }
           }
-          this.beforeId = sb.toString();
+          this.beforeIds = sb.toString();
        }
        else {
-          this.beforeId = null;
+          this.beforeIds = null;
        }
    }
 
@@ -106,9 +135,9 @@ public class FormulaTermLabel implements TermLabel {
    public String toString() {
        return NAME.toString() + 
               "(" + 
-             id + 
-             (beforeId != null ? ", " + beforeId : "") +
-             ")";
+              getId() + 
+              (beforeIds != null ? ", " + beforeIds : "") +
+              ")";
    }
 
    /**
@@ -117,8 +146,8 @@ public class FormulaTermLabel implements TermLabel {
    @Override
    public Object getChild(int i) {
 	   switch (i) {
-	      case 0 : return id;
-	      case 1 : return beforeId;
+	      case 0 : return getId();
+	      case 1 : return beforeIds;
   	      default : return null;
 	   }
    }
@@ -128,7 +157,7 @@ public class FormulaTermLabel implements TermLabel {
     */
    @Override
    public int getChildCount() {
-      if (beforeId != null) {
+      if (beforeIds != null) {
          return 2;
       }
       else {
@@ -141,7 +170,7 @@ public class FormulaTermLabel implements TermLabel {
     * @return The unique ID of this label in the {@link Sequent}.
     */
    public String getId() {
-      return id;
+      return majorId + "." + minorId;
    }
    
    /**
@@ -149,8 +178,26 @@ public class FormulaTermLabel implements TermLabel {
     * @return The major part of the unique ID.
     */
    public int getMajorId() {
+      return majorId;
+   }
+   
+   /**
+    * Returns the major part of the given ID.
+    * @param id The ID to extract its major part.
+    * @return The major part of the given ID.
+    * @throws TermLabelException Occurred Exception in case that the given ID is not valid.
+    */
+   public static int getMajorId(String id) throws TermLabelException {
       int index = id.indexOf(".");
-      return Integer.parseInt(id.substring(0, index));
+      if (index < 0) {
+         throw new TermLabelException("The ID '" + id + "' is not separated into major and minor ID by '.'.");
+      }
+      try {
+         return Integer.parseInt(id.substring(0, index));
+      }
+      catch (NumberFormatException e) {
+         throw new TermLabelException("The major ID of '" + id + "' is not a valid integer.");
+      }
    }
    
    /**
@@ -158,8 +205,26 @@ public class FormulaTermLabel implements TermLabel {
     * @return The minor part of the unique ID.
     */
    public int getMinorId() {
+      return minorId;
+   }
+   
+   /**
+    * Returns the minor part of the given ID.
+    * @param id The ID to extract its minor part.
+    * @return The minor part of the given ID.
+    * @throws TermLabelException Occurred Exception in case that the given ID is not valid.
+    */
+   public static int getMinorId(String id) throws TermLabelException {
       int index = id.indexOf(".");
-      return Integer.parseInt(id.substring(index + 1));
+      if (index < 0) {
+         throw new TermLabelException("The ID '" + id + "' is not separated into major and minor ID by '.'.");
+      }
+      try {
+         return Integer.parseInt(id.substring(index + 1));
+      }
+      catch (NumberFormatException e) {
+         throw new TermLabelException("The minor ID of '" + id + "' is not a valid integer.");
+      }
    }
 
    /**
@@ -167,7 +232,43 @@ public class FormulaTermLabel implements TermLabel {
     * @return The optional previous IDs of the label this one is derived from.
     */
    public String[] getBeforeIds() {
-      return beforeId != null ? beforeId.split(BEFORE_ID_SEPARATOR) : new String[0];
+      return getBeforeIds(beforeIds);
+   }
+   
+   /**
+    * Returns the optional previous IDs of the label this one is derived from.
+    * @param beforeIds The {@link String} with the before IDs.
+    * @return The optional previous IDs of the label this one is derived from.
+    */
+   private static String[] getBeforeIds(String beforeIds) {
+      return beforeIds != null ? 
+             beforeIds.split(BEFORE_ID_SEPARATOR) : 
+             new String[0];
+   }
+   
+   /**
+    * Returns the optional previous IDs if they are all valid.
+    * @param beforeIds The {@link String} with the before IDs to analyze.
+    * @return The valid before IDs.
+    * @throws TermLabelException Occurred Exception in case that the given IDs are not valid.
+    */
+   public static List<String> getValidBeforeIds(String beforeIds) throws TermLabelException {
+      if (beforeIds == null || beforeIds.isEmpty()) {
+         throw new TermLabelException("No before IDs defined.");
+      }
+      List<String> result = new LinkedList<String>();
+      String[] candidates = getBeforeIds(beforeIds);
+      for (String id : candidates) {
+         if (!id.isEmpty()) {
+            getMinorId(id); // Validate minor ID.
+            getMajorId(id); // Validate major ID.
+            result.add(id);
+         }
+         else {
+            throw new TermLabelException("Empty entry in beforeIds '" + beforeIds + "' found.");
+         }
+      }
+      return result;
    }
 
    /**

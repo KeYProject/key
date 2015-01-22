@@ -19,32 +19,22 @@ import java.util.List;
  * A factory for creating {@link FormulaTermLabel} objects.
  */
 public class FormulaTermLabelFactory implements TermLabelFactory<FormulaTermLabel> {
-    /**
-     * {@inheritDoc}
-     *
-     * <p>
-     * This method accepts single arguments which can be parsed as an integer.
-     */
-    @Override
-    public FormulaTermLabel parseInstance(List<String> parameters) throws TermLabelException {
-        if (parameters == null || parameters.size() != 2) {
-            throw new TermLabelException("Label " + FormulaTermLabel.NAME +
-                    " requires exactly two Integer-Parameter with its ID and sub ID.");
-        }
-        Integer id;
-        try {
-            id = Integer.valueOf(parameters.get(0));
-        } catch (NumberFormatException e) {
-            throw new TermLabelException("Label " + FormulaTermLabel.NAME +
-                  " requires exactly two Integer-Parameter with its ID and sub ID.", e);
-        }
-        Integer subId;
-        try {
-           subId = Integer.valueOf(parameters.get(1));
-        } catch (NumberFormatException e) {
-            throw new TermLabelException("Label " + FormulaTermLabel.NAME +
-                  " requires exactly two Integer-Parameter with its ID and sub ID.", e);
-        }
-        return new FormulaTermLabel(id, subId);
-    }
+   /**
+    * {@inheritDoc}
+    * 
+    * <p>
+    * This method accepts single arguments which can be parsed as an integer.
+    */
+   @Override
+   public FormulaTermLabel parseInstance(List<String> parameters) throws TermLabelException {
+      if (parameters != null && parameters.size() == 1) {
+         return new FormulaTermLabel(parameters.get(0));
+      }
+      else if (parameters != null && parameters.size() == 2) {
+         return new FormulaTermLabel(parameters.get(0), parameters.get(1));
+      }
+      else {
+         throw new TermLabelException("Label " + FormulaTermLabel.NAME + " requires the unique ID as first parameter and an optional by semicolon separated list of parent IDs as second parameter.");
+      }
+   }   
 }
