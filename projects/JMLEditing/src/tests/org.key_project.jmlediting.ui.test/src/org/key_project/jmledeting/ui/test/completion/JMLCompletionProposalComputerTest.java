@@ -106,8 +106,8 @@ public class JMLCompletionProposalComputerTest {
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(), profile);
 
       // count MAX_KEYWORDS
-      final Set<IKeyword> keywordSet = JMLProfileHelper.filterKeywords(profile,
-            IToplevelKeyword.class);
+      final Set<IToplevelKeyword> keywordSet = JMLProfileHelper.filterKeywords(
+            profile, IToplevelKeyword.class);
       for (final IKeyword iKeyword : keywordSet) {
          MAX_KEYWORDS += iKeyword.getKeywords().size();
       }
@@ -148,7 +148,7 @@ public class JMLCompletionProposalComputerTest {
    /*
     * Should lead to a TimeoutException not solved via expected, because
     * inputText must be deleted from caller after this method
-    *
+    * 
     * Also can have one Proposal containing "No Default Proposals"
     */
    private void testWithTimeout(final Position pos, final String insertText) {

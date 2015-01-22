@@ -339,23 +339,47 @@ public final class ParserBuilder {
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
             // Parse with the given function
-            final IASTNode node = function.parse(text, start, end);
+            ParserException contentException;
+            IASTNode node;
+            try {
+               node = function.parse(text, start, end);
+               contentException = null;
+            }
+            catch (final ParserException e) {
+               contentException = e;
+               if (e.getErrorNode() == null) {
+                  node = null;
+                  throw e;
+               }
+               else {
+                  node = e.getErrorNode();
+               }
+            }
 
             // Then scan for the closing semicolon
             if (node.getEndOffset() == end) {
                // error, do not scan for whitespaces
                throw new ParserException("Expected a " + close, end, text,
-                     Nodes.createErrorNode(node));
+                     Nodes.createNode(type, Nodes.createErrorNode(node)));
             }
             final int semicolonPos = LexicalHelper.skipWhiteSpacesOrAt(text,
                   node.getEndOffset(), end);
             if (semicolonPos >= end || text.charAt(semicolonPos) != close) {
                // error
+               final IASTNode errorNode = Nodes.createNode(type,
+                     Nodes.createErrorNode(node));
+               System.out.println("ErrorNode:  " + errorNode);
                throw new ParserException("Expected a " + close, semicolonPos,
-                     text, Nodes.createErrorNode(node));
+                     text, errorNode);
             }
-            return Nodes.createNode(node.getStartOffset(), semicolonPos + 1,
-                  type, node);
+            final IASTNode resultNode = Nodes.createNode(node.getStartOffset(),
+                  semicolonPos + 1, type, node);
+            if (contentException == null) {
+               return resultNode;
+            }
+            else {
+               throw new ParserException(contentException, resultNode);
+            }
          }
       };
    }

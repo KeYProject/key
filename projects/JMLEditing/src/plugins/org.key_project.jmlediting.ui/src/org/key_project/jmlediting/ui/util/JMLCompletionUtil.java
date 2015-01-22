@@ -38,12 +38,14 @@ public class JMLCompletionUtil {
     *           Image
     * @param filter
     *           the Class extending {@link IKeyword} to filter the proposals
+    * @param <T>
+    *           the type of the keywords to propose
     * @return List<{@link ICompletionProposal}> the computed standardProposals
     */
-   public static List<ICompletionProposal> getKeywordProposals(
+   public static <T extends IKeyword> List<ICompletionProposal> getKeywordProposals(
          final JavaContentAssistInvocationContext context,
          final String proposalPrefix, final Image proposalImage,
-         final Class<? extends IKeyword> filter) {
+         final Class<T> filter) {
       if (filter == null) {
          throw new IllegalArgumentException("filter may not be null!");
       }
@@ -68,8 +70,8 @@ public class JMLCompletionUtil {
                - prefixLength;
 
          // get only the Keywords that match the filter
-         final Set<IKeyword> filteredKeywordList = JMLProfileHelper
-               .filterKeywords(currentJMLProfile, filter);
+         final Set<T> filteredKeywordList = JMLProfileHelper.filterKeywords(
+               currentJMLProfile, filter);
 
          // Iterate through the supported Keywords defined in JMLProfile
          for (final IKeyword keywordContainer : filteredKeywordList) {

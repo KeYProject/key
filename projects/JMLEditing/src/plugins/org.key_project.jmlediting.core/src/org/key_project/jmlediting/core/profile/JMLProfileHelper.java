@@ -33,14 +33,17 @@ public class JMLProfileHelper {
     *           the {@link IJMLProfile} to get the {@link IKeyword} from
     * @param clazz
     *           the Class extending from {@link IKeyword} to filter
+    * @param <T>
+    *           the type of the filtered keywords
     * @return the filtered Set of {@link IKeyword} all Assignable from clazz
     */
-   public static Set<IKeyword> filterKeywords(final IJMLProfile profile,
-         final Class<? extends IKeyword> clazz) {
-      final Set<IKeyword> result = new HashSet<IKeyword>();
+   @SuppressWarnings("unchecked")
+   public static <T extends IKeyword> Set<T> filterKeywords(
+         final IJMLProfile profile, final Class<T> clazz) {
+      final Set<T> result = new HashSet<T>();
       for (final IKeyword container : profile.getSupportedKeywords()) {
          if (clazz.isAssignableFrom(container.getClass())) {
-            result.add(container);
+            result.add((T) container);
          }
       }
       return Collections.unmodifiableSet(result);

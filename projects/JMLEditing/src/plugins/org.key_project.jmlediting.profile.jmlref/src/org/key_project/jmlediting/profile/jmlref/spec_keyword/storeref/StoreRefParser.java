@@ -4,14 +4,13 @@ import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
 import static org.key_project.jmlediting.profile.jmlref.parseutil.Lexicals.lexInformalDescr;
 import static org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefNodeTypes.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.SpecExpressionParser;
 
 /**
@@ -49,12 +48,8 @@ public class StoreRefParser implements ParseFunction {
    public StoreRefParser(final IJMLProfile profile,
          final boolean allowInformalDescription) {
       // Determine keywords which are allowed as storage location keywords
-      final List<IStoreRefKeyword> storeRefKeywords = new ArrayList<IStoreRefKeyword>();
-      for (final IKeyword k : profile.getSupportedKeywords()) {
-         if (k instanceof IStoreRefKeyword) {
-            storeRefKeywords.add((IStoreRefKeyword) k);
-         }
-      }
+      final Set<IStoreRefKeyword> storeRefKeywords = JMLProfileHelper
+            .filterKeywords(profile, IStoreRefKeyword.class);
 
       // The list if filled by the constructor because the content is profile
       // sensitive
