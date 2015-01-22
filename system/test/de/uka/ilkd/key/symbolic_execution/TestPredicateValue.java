@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution;
 
-import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.TruthValue;
+import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValue;
 import junit.framework.TestCase;
 
 /**

@@ -47,7 +47,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.PredicateTermLabel;
+import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -55,10 +55,10 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil;
-import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.BranchResult;
-import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateEvaluationResult;
-import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.TruthValue;
+import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
+import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.BranchResult;
+import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValueEvaluationResult;
+import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.util.Pair;
@@ -207,8 +207,8 @@ public abstract class AbstractPredicateComposite implements IDisposable {
             final Pair<Term, Term> pair = computeTermToShow(node, executionNode, keyNode);
             // Compute result
             ITreeSettings settings = node.getExecutionNode().getSettings();
-            final PredicateEvaluationResult result = PredicateEvaluationUtil.evaluate(keyNode, 
-                                                                                      PredicateTermLabel.NAME,
+            final TruthValueEvaluationResult result = TruthValueEvaluationUtil.evaluate(keyNode, 
+                                                                                      FormulaTermLabel.NAME,
                                                                                       settings.isUseUnicode(),
                                                                                       settings.isUsePrettyPrinting());
 System.out.println(result);
@@ -277,12 +277,12 @@ System.out.println(result);
 
    /**
     * Shows the given content.
-    * @param result The {@link PredicateEvaluationResult} to consider.
+    * @param result The {@link TruthValueEvaluationResult} to consider.
     * @param succedent The {@link Term} to show as succedent.
-    * @param uninterpretedPredicate The optional {@link Term} with the uninterpreted predicate offering the {@link PredicateTermLabel}.
+    * @param uninterpretedPredicate The optional {@link Term} with the uninterpreted predicate offering the {@link FormulaTermLabel}.
     * @param node The {@link IKeYSEDDebugNode} which provides the new content.
     */
-   protected void addNewContent(PredicateEvaluationResult result,
+   protected void addNewContent(TruthValueEvaluationResult result,
                                 Term succedent,
                                 Term uninterpretedPredicate,
                                 IExecutionNode<?> executionNode) {
@@ -318,15 +318,15 @@ System.out.println(result);
    /**
     * Check is the given {@link BranchResult} should be shown.
     * @param branchResult The {@link BranchResult} to check.
-    * @param uninterpretedPredicate The uninterpreted predicate which provides the {@link PredicateTermLabel}.
+    * @param uninterpretedPredicate The uninterpreted predicate which provides the {@link FormulaTermLabel}.
     * @return {@code true} show branch result, {@code false} do not show branch result.
     */
    protected boolean shouldShowBranchResult(BranchResult branchResult, Term uninterpretedPredicate) {
       if (branchResult != null) {
          if (uninterpretedPredicate != null) {
-            TermLabel label = uninterpretedPredicate.getLabel(PredicateTermLabel.NAME);
-            if (label instanceof PredicateTermLabel) {
-               TruthValue result = branchResult.evaluate((PredicateTermLabel) label);
+            TermLabel label = uninterpretedPredicate.getLabel(FormulaTermLabel.NAME);
+            if (label instanceof FormulaTermLabel) {
+               TruthValue result = branchResult.evaluate((FormulaTermLabel) label);
                return result == null || !TruthValue.FALSE.equals(result);
             }
             else {

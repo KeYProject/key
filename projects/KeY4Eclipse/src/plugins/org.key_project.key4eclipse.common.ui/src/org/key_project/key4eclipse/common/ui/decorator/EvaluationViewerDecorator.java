@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.PredicateTermLabel;
+import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -31,9 +31,9 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PositionTable;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
-import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil;
-import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.BranchResult;
-import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.TruthValue;
+import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
+import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.BranchResult;
+import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValue;
 
 /**
  * An extended {@link ProofSourceViewerDecorator} to visualize {@link BranchResult}s
@@ -217,8 +217,8 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
                                  Map<Term, TruthValue> termValueMap,
                                  ImmutableList<Integer> path,
                                  List<StyleRange> styleRanges) {
-      PredicateTermLabel label = branchResult.getPredicateLabel(term);
-      if (PredicateEvaluationUtil.isIfThenElseFormula(term)) {
+      FormulaTermLabel label = branchResult.getPredicateLabel(term);
+      if (TruthValueEvaluationUtil.isIfThenElseFormula(term)) {
          fillIfThenElse(term, positionTable, branchResult, textLength, termValueMap, path, styleRanges, label);
       }
       else if (term.op() instanceof Junctor || term.op() == Equality.EQV) {
@@ -261,7 +261,7 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
     * @param termValueMap The already computed {@link TruthValue}s.
     * @param path The path to the current {@link Term}.
     * @param styleRanges The {@link List} with found {@link StyleRange}s to fill.
-    * @param label The {@link PredicateTermLabel} of the current {@link Term} or {@code null} if {@link Term} is not labeled.
+    * @param label The {@link FormulaTermLabel} of the current {@link Term} or {@code null} if {@link Term} is not labeled.
     */
    protected void fillIfThenElse(Term term, 
                                  PositionTable positionTable, 
@@ -270,7 +270,7 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
                                  Map<Term, TruthValue> termValueMap,
                                  ImmutableList<Integer> path,
                                  List<StyleRange> styleRanges,
-                                 PredicateTermLabel label) {
+                                 FormulaTermLabel label) {
       Term conditionTerm = term.sub(0);
       Term thenTerm = term.sub(1);
       Term elseTerm = term.sub(2);
@@ -333,7 +333,7 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
     * @param path The path to the current {@link Term}.
     * @param styleRanges The {@link List} with found {@link StyleRange}s to fill.
     * @param operator The {@link Operator} of the current {@link Term}.
-    * @param label The {@link PredicateTermLabel} of the current {@link Term} or {@code null} if {@link Term} is not labeled.
+    * @param label The {@link FormulaTermLabel} of the current {@link Term} or {@code null} if {@link Term} is not labeled.
     */
    protected void fillArity2(Term term, 
                              PositionTable positionTable, 
@@ -343,7 +343,7 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
                              ImmutableList<Integer> path,
                              List<StyleRange> styleRanges,
                              Operator operator,
-                             PredicateTermLabel label) {
+                             FormulaTermLabel label) {
       Term sub0 = term.sub(0);
       Term sub1 = term.sub(1);
       fillTermRanges(sub0, positionTable, branchResult, textLength, termValueMap, path.append(0), styleRanges);
@@ -412,7 +412,7 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
     * @param path The path to the current {@link Term}.
     * @param styleRanges The {@link List} with found {@link StyleRange}s to fill.
     * @param operator The {@link Operator} of the current {@link Term}.
-    * @param label The {@link PredicateTermLabel} of the current {@link Term} or {@code null} if {@link Term} is not labeled.
+    * @param label The {@link FormulaTermLabel} of the current {@link Term} or {@code null} if {@link Term} is not labeled.
     */
    protected void fillArity1(Term term, 
                              PositionTable positionTable, 
@@ -422,7 +422,7 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
                              ImmutableList<Integer> path,
                              List<StyleRange> styleRanges,
                              Operator operator,
-                             PredicateTermLabel label) {
+                             FormulaTermLabel label) {
       Term sub = term.sub(0);
       fillTermRanges(sub, positionTable, branchResult, textLength, termValueMap, path.append(0), styleRanges);
       TruthValue childValue = termValueMap.get(sub);

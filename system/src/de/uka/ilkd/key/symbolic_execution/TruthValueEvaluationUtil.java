@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.PredicateTermLabel;
+import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -45,11 +45,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * (predicates and junctors).
  * @author Martin Hentschel
  */
-public final class PredicateEvaluationUtil {
+public final class TruthValueEvaluationUtil {
    /**
     * Forbid instances.
     */
-   private PredicateEvaluationUtil() {
+   private TruthValueEvaluationUtil() {
    }
    
    /**
@@ -176,13 +176,13 @@ public final class PredicateEvaluationUtil {
     * @return The result.
     * @throws ProofInputException Occurred Exception
     */
-   public static PredicateEvaluationResult evaluate(Node node, 
+   public static TruthValueEvaluationResult evaluate(Node node, 
                                                     Name termLabelName,
                                                     boolean useUnicode,
                                                     boolean usePrettyPrinting) throws ProofInputException {
-      PredicateEvaluationResult result = new PredicateEvaluationResult();
-      Deque<Map<String, MultiPredicateResult>> evaluationStack = new LinkedList<Map<String, MultiPredicateResult>>();
-      evaluationStack.addFirst(new HashMap<String, MultiPredicateResult>());
+      TruthValueEvaluationResult result = new TruthValueEvaluationResult();
+      Deque<Map<String, MultiEvaluationResult>> evaluationStack = new LinkedList<Map<String, MultiEvaluationResult>>();
+      evaluationStack.addFirst(new HashMap<String, MultiEvaluationResult>());
       evaluateNode(node, useUnicode, usePrettyPrinting, node, termLabelName, evaluationStack, result, node.proof().getServices());
       return result;
    }
@@ -194,7 +194,7 @@ public final class PredicateEvaluationUtil {
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
     * @param evaluationStack The not empty stack with evaluation results.
-    * @param result The {@link PredicateEvaluationResult} to fill with leaf nodes.
+    * @param result The {@link TruthValueEvaluationResult} to fill with leaf nodes.
     * @param services The {@link Services} to use.
     * @throws ProofInputException Occurred Exception
     */
@@ -203,25 +203,25 @@ public final class PredicateEvaluationUtil {
                                       final boolean usePrettyPrinting,
                                       final Node node, 
                                       final Name termLabelName, 
-                                      final Deque<Map<String, MultiPredicateResult>> evaluationStack, 
-                                      final PredicateEvaluationResult result,
+                                      final Deque<Map<String, MultiEvaluationResult>> evaluationStack, 
+                                      final TruthValueEvaluationResult result,
                                       final Services services) throws ProofInputException {
       // Create new stack entry
-      final Map<String, MultiPredicateResult> currentResults = evaluationStack.getFirst();
+      final Map<String, MultiEvaluationResult> currentResults = evaluationStack.getFirst();
       // Analyze applied rule
       boolean childrenAlreadyTreated = false;
       if (node.getAppliedRuleApp() instanceof TacletApp) {
          // Check for new minor ids created by parent rule application
          updatePredicateResultBasedOnNewMinorIds(node, termLabelName, services.getTermBuilder(), currentResults);
          TacletApp tacletApp = (TacletApp) node.getAppliedRuleApp();
-         List<PredicateLabelOccurrence> labels = findInvolvedLabels(node.sequent(), tacletApp, termLabelName);
+         List<LabelOccurrence> labels = findInvolvedLabels(node.sequent(), tacletApp, termLabelName);
          if (!labels.isEmpty()) {
             Taclet taclet = ((TacletApp) tacletApp).taclet();
             if (taclet.goalTemplates().size() >= 1) { // Not a closing taclet
                childrenAlreadyTreated = true;
                int i = 0;
                for (TacletGoalTemplate tacletGoal : taclet.goalTemplates().reverse()) {
-                  Map<String, MultiPredicateResult> childResults = new HashMap<String, MultiPredicateResult>(currentResults);
+                  Map<String, MultiEvaluationResult> childResults = new HashMap<String, MultiEvaluationResult>(currentResults);
                   analyzeTacletGoal(node, tacletApp, tacletGoal, labels, services, childResults);
                   // Evaluate children with branch specific Taclet result
                   evaluationStack.addFirst(childResults);
@@ -231,7 +231,7 @@ public final class PredicateEvaluationUtil {
                }
             }
             else if (tacletApp.posInOccurrence() != null){
-               for (PredicateLabelOccurrence occurrence : labels) {
+               for (LabelOccurrence occurrence : labels) {
                   updatePredicateResult(occurrence.getLabel(), !occurrence.isInAntecedent(), currentResults);
                }
             }
@@ -248,7 +248,7 @@ public final class PredicateEvaluationUtil {
             TacletApp tacletApp = (TacletApp) protocolApp;
             Taclet taclet = tacletApp.taclet();
             assert taclet.goalTemplates().size() == 1;
-            List<PredicateLabelOccurrence> labels = findInvolvedLabels(node.sequent(), tacletApp, termLabelName);
+            List<LabelOccurrence> labels = findInvolvedLabels(node.sequent(), tacletApp, termLabelName);
             if (!labels.isEmpty()) {
                analyzeTacletGoal(node, tacletApp, taclet.goalTemplates().head(), labels, services, currentResults);
             }
@@ -265,7 +265,7 @@ public final class PredicateEvaluationUtil {
       else if (!childrenAlreadyTreated) {
          // Evaluate children in case that branch specific Taclet results are not available and thus not evaluated yet.
          for (int i = 0; i < childCount; i++) {
-            evaluationStack.addFirst(new HashMap<String, MultiPredicateResult>(currentResults));
+            evaluationStack.addFirst(new HashMap<String, MultiEvaluationResult>(currentResults));
             evaluateNode(evaluationNode, useUnicode, usePrettyPrinting, node.child(i), termLabelName, evaluationStack, result, services);
             evaluationStack.removeFirst();
          }
@@ -273,16 +273,16 @@ public final class PredicateEvaluationUtil {
    }
    
    /**
-    * Computes the occurrences of all involved {@link PredicateTermLabel}s.
+    * Computes the occurrences of all involved {@link FormulaTermLabel}s.
     * @param sequent The {@link Sequent} on which the given {@link TacletApp} was applied.
     * @param tacletApp The applied {@link TacletApp}.
     * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
-    * @return The found {@link PredicateLabelOccurrence}s.
+    * @return The found {@link LabelOccurrence}s.
     */
-   protected static List<PredicateLabelOccurrence> findInvolvedLabels(Sequent sequent, 
+   protected static List<LabelOccurrence> findInvolvedLabels(Sequent sequent, 
                                                                       TacletApp tacletApp, 
                                                                       Name termLabelName) {
-      List<PredicateLabelOccurrence> result = new LinkedList<PredicateLabelOccurrence>();
+      List<LabelOccurrence> result = new LinkedList<LabelOccurrence>();
       // Search for labels in find part
       PosInOccurrence pio = tacletApp.posInOccurrence();
       if (pio != null) {
@@ -290,8 +290,8 @@ public final class PredicateEvaluationUtil {
          if (term != null) {
             // Check for evaluated truth values
             TermLabel label = term.getLabel(termLabelName);
-            if (label instanceof PredicateTermLabel) {
-               result.add(new PredicateLabelOccurrence((PredicateTermLabel) label, pio.isInAntec(), false));
+            if (label instanceof FormulaTermLabel) {
+               result.add(new LabelOccurrence((FormulaTermLabel) label, pio.isInAntec(), false));
             }
          }
       }
@@ -301,11 +301,11 @@ public final class PredicateEvaluationUtil {
             SequentFormula sf = inst.getConstrainedFormula();
             Term instTerm = sf.formula();
             TermLabel label = instTerm.getLabel(termLabelName);
-            if (label instanceof PredicateTermLabel) {
+            if (label instanceof FormulaTermLabel) {
                boolean inAntecedent = inst instanceof IfFormulaInstSeq ? // Term was found in sequent
                                       ((IfFormulaInstSeq) inst).inAntec() :
                                       pio.isInAntec(); // Term was entered by the user and position is unknown. pio.isInAntec() may work in this case or not.
-               result.add(new PredicateLabelOccurrence((PredicateTermLabel) label, inAntecedent, true));
+               result.add(new LabelOccurrence((FormulaTermLabel) label, inAntecedent, true));
             }
          }
       }
@@ -313,14 +313,14 @@ public final class PredicateEvaluationUtil {
    }
    
    /**
-    * Utility class which specifies the occurrence of a {@link PredicateTermLabel}.
+    * Utility class which specifies the occurrence of a {@link FormulaTermLabel}.
     * @author Martin Hentschel
     */
-   private static class PredicateLabelOccurrence {
+   private static class LabelOccurrence {
       /**
-       * The {@link PredicateTermLabel}.
+       * The {@link FormulaTermLabel}.
        */
-      private final PredicateTermLabel label;
+      private final FormulaTermLabel label;
       
       /**
        * {@code true} occurred in antecedent, {@code false} occurred in succedent.
@@ -334,20 +334,20 @@ public final class PredicateEvaluationUtil {
 
       /**
        * Constructor.
-       * @param label The {@link PredicateTermLabel}.
+       * @param label The {@link FormulaTermLabel}.
        * @param inAntecedent {@code true} occurred in antecedent, {@code false} occurred in succedent.
        */
-      public PredicateLabelOccurrence(PredicateTermLabel label, boolean inAntecedent, boolean assumesClause) {
+      public LabelOccurrence(FormulaTermLabel label, boolean inAntecedent, boolean assumesClause) {
          this.label = label;
          this.inAntecedent = inAntecedent;
          this.assumesClause = assumesClause;
       }
 
       /**
-       * Returns the {@link PredicateTermLabel}.
-       * @return The {@link PredicateTermLabel}.
+       * Returns the {@link FormulaTermLabel}.
+       * @return The {@link FormulaTermLabel}.
        */
-      public PredicateTermLabel getLabel() {
+      public FormulaTermLabel getLabel() {
          return label;
       }
 
@@ -383,22 +383,22 @@ public final class PredicateEvaluationUtil {
     * @param parent The current {@link Node} on which the rule was applied.
     * @param tacletApp The {@link TacletApp}.
     * @param tacletGoal The {@link TacletGoalTemplate}.
-    * @param labels The {@link PredicateTermLabel}s.
+    * @param labels The {@link FormulaTermLabel}s.
     * @param servies The {@link Services} to use.
-    * @param results The {@link Map} with all available {@link MultiPredicateResult}s.
+    * @param results The {@link Map} with all available {@link MultiEvaluationResult}s.
     */
    protected static void analyzeTacletGoal(Node parent, 
                                            TacletApp tacletApp, 
                                            TacletGoalTemplate tacletGoal, 
-                                           List<PredicateLabelOccurrence> labels, 
+                                           List<LabelOccurrence> labels, 
                                            Services services,
-                                           Map<String, MultiPredicateResult> results) {
+                                           Map<String, MultiEvaluationResult> results) {
       Object replaceObject = tacletGoal.replaceWithExpressionAsObject();
       if (replaceObject instanceof Term) {
          Term replaceTerm = SymbolicExecutionUtil.instantiateTerm(parent, (Term) replaceObject, tacletApp, services);
          if (replaceTerm.op() == Junctor.TRUE) {
             // Find term is replaced by true
-            for (PredicateLabelOccurrence occurrence : labels) {
+            for (LabelOccurrence occurrence : labels) {
                if (occurrence.isAssumesClause()) {
                   // Set result for assumes clause which is based on the side of occurrence
                   updatePredicateResult(occurrence.getLabel(), occurrence.isInAntecedent(), results);
@@ -411,7 +411,7 @@ public final class PredicateEvaluationUtil {
          }
          else if (replaceTerm.op() == Junctor.FALSE) {
             // Find term is replaced by false
-            for (PredicateLabelOccurrence occurrence : labels) {
+            for (LabelOccurrence occurrence : labels) {
                if (occurrence.isAssumesClause()) {
                   // Set result for assumes clause which is based on the side of occurrence
                   updatePredicateResult(occurrence.getLabel(), occurrence.isInAntecedent(), results);
@@ -431,13 +431,13 @@ public final class PredicateEvaluationUtil {
     * @param childNode The child {@link Node}.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
     * @param tb The {@link TermBuilder} to use.
-    * @param results The {@link Map} with all available {@link MultiPredicateResult}s. 
+    * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void updatePredicateResultBasedOnNewMinorIdsOSS(final PosInOccurrence childPio,
                                                                     final PosInOccurrence parentPio,
                                                                     final Name termLabelName,
                                                                     final TermBuilder tb,
-                                                                    final Map<String, MultiPredicateResult> results) {
+                                                                    final Map<String, MultiEvaluationResult> results) {
       if (parentPio != null) {
          // Check application term and all of its children and grand children
          parentPio.subTerm().execPreOrder(new DefaultVisitor() {
@@ -462,19 +462,19 @@ public final class PredicateEvaluationUtil {
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
     * @param parentPio The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
     * @param tb The {@link TermBuilder} to use.
-    * @param results The {@link Map} with all available {@link MultiPredicateResult}s. 
+    * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void checkForNewMinorIdsOSS(SequentFormula onlyChangedChildSF, 
                                                 Term term, 
                                                 Name termLabelName, 
                                                 PosInOccurrence parentPio, 
                                                 TermBuilder tb, 
-                                                Map<String, MultiPredicateResult> results) {
+                                                Map<String, MultiEvaluationResult> results) {
       TermLabel label = term.getLabel(termLabelName);
-      if (label instanceof PredicateTermLabel) {
-         Term replacement = checkForNewMinorIdsOSS(onlyChangedChildSF, (PredicateTermLabel) label, parentPio.isInAntec(), tb);
+      if (label instanceof FormulaTermLabel) {
+         Term replacement = checkForNewMinorIdsOSS(onlyChangedChildSF, (FormulaTermLabel) label, parentPio.isInAntec(), tb);
          if (replacement != null) {
-            updatePredicateResult((PredicateTermLabel) label, replacement, results);
+            updatePredicateResult((FormulaTermLabel) label, replacement, results);
          }
       }
    }
@@ -482,13 +482,13 @@ public final class PredicateEvaluationUtil {
    /**
     * Checks if new minor IDs are available in case of {@link OneStepSimplifier} usage.
     * @param onlyChangedChildSF The only changed {@link SequentFormula} in the child {@link Node}.
-    * @param label The {@link PredicateTermLabel} of interest.
+    * @param label The {@link FormulaTermLabel} of interest.
     * @param antecedentRuleApplication {@code true} rule applied on antecedent, {@code false} rule applied on succedent.
     * @param tb The {@link TermBuilder} to use.
     * @return The computed instruction {@link Term} or {@code null} if not available.
     */
    protected static Term checkForNewMinorIdsOSS(SequentFormula onlyChangedChildSF, 
-                                                PredicateTermLabel label,
+                                                FormulaTermLabel label,
                                                 boolean antecedentRuleApplication,
                                                 TermBuilder tb) {
       // Search replacements
@@ -509,12 +509,12 @@ public final class PredicateEvaluationUtil {
     * @param childNode The child {@link Node}.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
     * @param tb The {@link TermBuilder} to use.
-    * @param results The {@link Map} with all available {@link MultiPredicateResult}s. 
+    * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void updatePredicateResultBasedOnNewMinorIds(final Node childNode,
                                                                  final Name termLabelName,
                                                                  final TermBuilder tb,
-                                                                 final Map<String, MultiPredicateResult> results) {
+                                                                 final Map<String, MultiEvaluationResult> results) {
       final Node parentNode = childNode.parent();
       if (parentNode != null) {
          final PosInOccurrence parentPio = parentNode.getAppliedRuleApp().posInOccurrence();
@@ -543,19 +543,19 @@ public final class PredicateEvaluationUtil {
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
     * @param parentPio The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
     * @param tb The {@link TermBuilder} to use.
-    * @param results The {@link Map} with all available {@link MultiPredicateResult}s. 
+    * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
    protected static void checkForNewMinorIds(Node childNode, 
                                              Term term, 
                                              Name termLabelName, 
                                              PosInOccurrence parentPio, 
                                              TermBuilder tb, 
-                                             Map<String, MultiPredicateResult> results) {
+                                             Map<String, MultiEvaluationResult> results) {
       TermLabel label = term.getLabel(termLabelName);
-      if (label instanceof PredicateTermLabel) {
-         Term replacement = checkForNewMinorIds(childNode, (PredicateTermLabel) label, parentPio.isInAntec(), tb);
+      if (label instanceof FormulaTermLabel) {
+         Term replacement = checkForNewMinorIds(childNode, (FormulaTermLabel) label, parentPio.isInAntec(), tb);
          if (replacement != null) {
-            updatePredicateResult((PredicateTermLabel) label, replacement, results);
+            updatePredicateResult((FormulaTermLabel) label, replacement, results);
          }
       }
    }
@@ -563,13 +563,13 @@ public final class PredicateEvaluationUtil {
    /**
     * Checks if new minor IDs are available.
     * @param childNode The child {@link Node}.
-    * @param label The {@link PredicateTermLabel} of interest.
+    * @param label The {@link FormulaTermLabel} of interest.
     * @param antecedentRuleApplication {@code true} rule applied on antecedent, {@code false} rule applied on succedent.
     * @param tb The {@link TermBuilder} to use.
     * @return The computed instruction {@link Term} or {@code null} if not available.
     */
    protected static Term checkForNewMinorIds(Node childNode, 
-                                             PredicateTermLabel label,
+                                             FormulaTermLabel label,
                                              boolean antecedentRuleApplication,
                                              TermBuilder tb) {
       // Search replacements
@@ -600,8 +600,8 @@ public final class PredicateEvaluationUtil {
          @Override
          public void visit(Term visited) {
             TermLabel visitedLabel = visited.getLabel(labelName);
-            if (visitedLabel instanceof PredicateTermLabel) {
-               PredicateTermLabel pLabel = (PredicateTermLabel) visitedLabel;
+            if (visitedLabel instanceof FormulaTermLabel) {
+               FormulaTermLabel pLabel = (FormulaTermLabel) visitedLabel;
                String[] beforeIds = pLabel.getBeforeIds();
                if (JavaUtil.contains(beforeIds, labelId)) {
                   resultToFill.add(visited);
@@ -640,18 +640,18 @@ public final class PredicateEvaluationUtil {
    }
 
    /**
-    * Updates the instruction {@link Term} for the given {@link PredicateTermLabel}
+    * Updates the instruction {@link Term} for the given {@link FormulaTermLabel}
     * in the result {@link Map}.
-    * @param label The {@link PredicateTermLabel} to update its instruction {@link Term}.
+    * @param label The {@link FormulaTermLabel} to update its instruction {@link Term}.
     * @param instructionTerm The new instruction {@link Term} to set.
-    * @param results The {@link Map} with all available {@link MultiPredicateResult}s. 
+    * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
-   protected static void updatePredicateResult(PredicateTermLabel label, 
+   protected static void updatePredicateResult(FormulaTermLabel label, 
                                                Term instructionTerm, 
-                                               Map<String, MultiPredicateResult> results) {
-      MultiPredicateResult result = results.get(label.getId());
+                                               Map<String, MultiEvaluationResult> results) {
+      MultiEvaluationResult result = results.get(label.getId());
       if (result == null) {
-         result = new MultiPredicateResult(instructionTerm);
+         result = new MultiEvaluationResult(instructionTerm);
       }
       else {
          result = result.newInstructionTerm(instructionTerm);
@@ -660,18 +660,18 @@ public final class PredicateEvaluationUtil {
    }
 
    /**
-    * Updates the evaluation result for the given {@link PredicateTermLabel}
+    * Updates the evaluation result for the given {@link FormulaTermLabel}
     * in the result {@link Map}.
-    * @param label The {@link PredicateTermLabel} to update its instruction {@link Term}.
+    * @param label The {@link FormulaTermLabel} to update its instruction {@link Term}.
     * @param evaluationResult {@code true} label evaluates at least once to true, {@code false} label evaluates at least once to false.
-    * @param results The {@link Map} with all available {@link MultiPredicateResult}s. 
+    * @param results The {@link Map} with all available {@link MultiEvaluationResult}s. 
     */
-   protected static void updatePredicateResult(PredicateTermLabel label, 
+   protected static void updatePredicateResult(FormulaTermLabel label, 
                                                boolean evaluationResult, 
-                                               Map<String, MultiPredicateResult> results) {
-      MultiPredicateResult result = results.get(label.getId());
+                                               Map<String, MultiEvaluationResult> results) {
+      MultiEvaluationResult result = results.get(label.getId());
       if (result == null) {
-         result = new MultiPredicateResult(evaluationResult);
+         result = new MultiEvaluationResult(evaluationResult);
       }
       else {
          result = result.newEvaluationResult(evaluationResult);
@@ -684,7 +684,7 @@ public final class PredicateEvaluationUtil {
     * evaluation results.
     * @author Martin Hentschel
     */
-   public static class MultiPredicateResult {
+   public static class MultiEvaluationResult {
       /**
        * {@code true} label evaluates at least once to true, {@code false} label never evaluates to true.
        */
@@ -704,7 +704,7 @@ public final class PredicateEvaluationUtil {
        * Constructor.
        * @param evaluationResult {@code true} label evaluates at least once to true, {@code false} label evaluates at least once to false.
        */
-      public MultiPredicateResult(boolean evaluationResult) {
+      public MultiEvaluationResult(boolean evaluationResult) {
          this(evaluationResult, !evaluationResult, null);
       }
 
@@ -712,7 +712,7 @@ public final class PredicateEvaluationUtil {
        * Constructor.
        * @param instructionTerm The instruction {@link Term}.
        */
-      public MultiPredicateResult(Term instructionTerm) {
+      public MultiEvaluationResult(Term instructionTerm) {
          this(false, false, instructionTerm);
       }
 
@@ -722,7 +722,7 @@ public final class PredicateEvaluationUtil {
        * @param evaluatesToFalse {@code true} label evaluates at least once to false, {@code false} label never evaluates to false.
        * @param instructionTerm The instruction {@link Term}.
        */
-      public MultiPredicateResult(boolean evaluatesToTrue, boolean evaluatesToFalse, Term instructionTerm) {
+      public MultiEvaluationResult(boolean evaluatesToTrue, boolean evaluatesToFalse, Term instructionTerm) {
          this.evaluatesToTrue = evaluatesToTrue;
          this.evaluatesToFalse = evaluatesToFalse;
          this.instructionTerm = instructionTerm;
@@ -753,12 +753,12 @@ public final class PredicateEvaluationUtil {
       }
       
       /**
-       * Creates a new {@link MultiPredicateResult} based on the current once
+       * Creates a new {@link MultiEvaluationResult} based on the current once
        * but with an updated evaluation result.
        * @param evaluationResult {@code true} label evaluates at least once to true, {@code false} label evaluates at least once to false.
-       * @return The new created {@link MultiPredicateResult}.
+       * @return The new created {@link MultiEvaluationResult}.
        */
-      public MultiPredicateResult newEvaluationResult(boolean evaluationResult) {
+      public MultiEvaluationResult newEvaluationResult(boolean evaluationResult) {
          if (evaluationResult) {
             return newEvaluatesToTrue(true);
          }
@@ -768,33 +768,33 @@ public final class PredicateEvaluationUtil {
       }
 
       /**
-       * Creates a new {@link MultiPredicateResult} based on the current once
+       * Creates a new {@link MultiEvaluationResult} based on the current once
        * but with an update evaluates to true state.
        * @param newEvaluatesToTrue {@code true} label evaluates at least once to true, {@code false} label never evaluates to true.
-       * @return The new created {@link MultiPredicateResult}.
+       * @return The new created {@link MultiEvaluationResult}.
        */
-      public MultiPredicateResult newEvaluatesToTrue(boolean newEvaluatesToTrue) {
-         return new MultiPredicateResult(newEvaluatesToTrue, evaluatesToFalse, instructionTerm);
+      public MultiEvaluationResult newEvaluatesToTrue(boolean newEvaluatesToTrue) {
+         return new MultiEvaluationResult(newEvaluatesToTrue, evaluatesToFalse, instructionTerm);
       }
 
       /**
-       * Creates a new {@link MultiPredicateResult} based on the current once
+       * Creates a new {@link MultiEvaluationResult} based on the current once
        * but with an update evaluates to false state.
        * @param newEvaluatesToFalse {@code true} label evaluates at least once to false, {@code false} label never evaluates to false.
-       * @return The new created {@link MultiPredicateResult}.
+       * @return The new created {@link MultiEvaluationResult}.
        */
-      public MultiPredicateResult newEvaluatesToFalse(boolean newEvaluatesToFalse) {
-         return new MultiPredicateResult(evaluatesToTrue, newEvaluatesToFalse, instructionTerm);
+      public MultiEvaluationResult newEvaluatesToFalse(boolean newEvaluatesToFalse) {
+         return new MultiEvaluationResult(evaluatesToTrue, newEvaluatesToFalse, instructionTerm);
       }
 
       /**
-       * Creates a new {@link MultiPredicateResult} based on the current once
+       * Creates a new {@link MultiEvaluationResult} based on the current once
        * but with an update instruction term.
        * @param newInstructionTerm The new instruction {@link Term}.
-       * @return The new created {@link MultiPredicateResult}.
+       * @return The new created {@link MultiEvaluationResult}.
        */
-      public MultiPredicateResult newInstructionTerm(Term newInstructionTerm) {
-         return new MultiPredicateResult(evaluatesToTrue, evaluatesToFalse, newInstructionTerm);
+      public MultiEvaluationResult newInstructionTerm(Term newInstructionTerm) {
+         return new MultiEvaluationResult(evaluatesToTrue, evaluatesToFalse, newInstructionTerm);
       }
       
       /**
@@ -810,10 +810,10 @@ public final class PredicateEvaluationUtil {
       /**
        * Computes the final truth value.
        * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
-       * @param results All available {@link MultiPredicateResult}s.
+       * @param results All available {@link MultiEvaluationResult}s.
        * @return The computed {@link TruthValue}.
        */
-      public TruthValue evaluate(Name termLabelName, Map<String, MultiPredicateResult> results) {
+      public TruthValue evaluate(Name termLabelName, Map<String, MultiEvaluationResult> results) {
          if (evaluatesToTrue && evaluatesToFalse) {
             return TruthValue.UNKNOWN;
          }
@@ -835,14 +835,14 @@ public final class PredicateEvaluationUtil {
        * Computes the {@link TruthValue} of the given instruction {@link Term}.
        * @param term The instruction {@link Term} to evaluate.
        * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
-       * @param results All available {@link MultiPredicateResult}s.
+       * @param results All available {@link MultiEvaluationResult}s.
        * @return The computed {@link TruthValue}.
        */
-      private static TruthValue evaluateTerm(Term term, Name termLabelName, Map<String, MultiPredicateResult> results) {
+      private static TruthValue evaluateTerm(Term term, Name termLabelName, Map<String, MultiEvaluationResult> results) {
          TermLabel label = term.getLabel(termLabelName);
          // Return direct label result if available
-         if (label instanceof PredicateTermLabel) {
-            MultiPredicateResult instruction = results.get(((PredicateTermLabel) label).getId());
+         if (label instanceof FormulaTermLabel) {
+            MultiEvaluationResult instruction = results.get(((FormulaTermLabel) label).getId());
             if (instruction != null) {
                return instruction.evaluate(termLabelName, results);
             }
@@ -856,8 +856,8 @@ public final class PredicateEvaluationUtil {
             Term rightTerm = TermBuilder.goBelowUpdates(term.sub(1));
             TermLabel leftLabel = leftTerm.getLabel(termLabelName);
             TermLabel rightLabel = rightTerm.getLabel(termLabelName);
-            MultiPredicateResult leftInstruction = leftLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) leftLabel).getId()) : null;
-            MultiPredicateResult rightInstruction = rightLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) rightLabel).getId()) : null;
+            MultiEvaluationResult leftInstruction = leftLabel instanceof FormulaTermLabel ? results.get(((FormulaTermLabel) leftLabel).getId()) : null;
+            MultiEvaluationResult rightInstruction = rightLabel instanceof FormulaTermLabel ? results.get(((FormulaTermLabel) rightLabel).getId()) : null;
             TruthValue leftValue = leftInstruction != null ? leftInstruction.evaluate(termLabelName, results) : evaluateTerm(leftTerm, termLabelName, results);
             TruthValue rightValue = rightInstruction != null ? rightInstruction.evaluate(termLabelName, results) : evaluateTerm(rightTerm, termLabelName, results);
             TruthValue resultValue;
@@ -881,7 +881,7 @@ public final class PredicateEvaluationUtil {
          else if (term.op() == Junctor.NOT) {
             Term argumentTerm = TermBuilder.goBelowUpdates(term.sub(0));
             TermLabel argumentLabel = argumentTerm.getLabel(termLabelName);
-            MultiPredicateResult argumentInstruction = argumentLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) argumentLabel).getId()) : null;
+            MultiEvaluationResult argumentInstruction = argumentLabel instanceof FormulaTermLabel ? results.get(((FormulaTermLabel) argumentLabel).getId()) : null;
             TruthValue argumentValue = argumentInstruction != null ? argumentInstruction.evaluate(termLabelName, results) : evaluateTerm(argumentTerm, termLabelName, results);
             TruthValue resultValue = TruthValue.not(argumentValue);
             return resultValue;
@@ -899,9 +899,9 @@ public final class PredicateEvaluationUtil {
             TermLabel conditionLabel = conditionTerm.getLabel(termLabelName);
             TermLabel thenLabel = thenTerm.getLabel(termLabelName);
             TermLabel elseLabel = elseTerm.getLabel(termLabelName);
-            MultiPredicateResult conditionInstruction = conditionLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) conditionLabel).getId()) : null;
-            MultiPredicateResult thenInstruction = thenLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) thenLabel).getId()) : null;
-            MultiPredicateResult elseInstruction = elseLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) elseLabel).getId()) : null;
+            MultiEvaluationResult conditionInstruction = conditionLabel instanceof FormulaTermLabel ? results.get(((FormulaTermLabel) conditionLabel).getId()) : null;
+            MultiEvaluationResult thenInstruction = thenLabel instanceof FormulaTermLabel ? results.get(((FormulaTermLabel) thenLabel).getId()) : null;
+            MultiEvaluationResult elseInstruction = elseLabel instanceof FormulaTermLabel ? results.get(((FormulaTermLabel) elseLabel).getId()) : null;
             TruthValue conditionValue = conditionInstruction != null ? conditionInstruction.evaluate(termLabelName, results) : evaluateTerm(conditionTerm, termLabelName, results);
             TruthValue thenValue = thenInstruction != null ? thenInstruction.evaluate(termLabelName, results) : evaluateTerm(thenTerm, termLabelName, results);
             TruthValue elseValue = elseInstruction != null ? elseInstruction.evaluate(termLabelName, results) : evaluateTerm(elseTerm, termLabelName, results);
@@ -916,10 +916,10 @@ public final class PredicateEvaluationUtil {
    
    /**
     * Represents the final predicate evaluation result returned by
-    * {@link PredicateEvaluationUtil#evaluateNode(Node, Name, Deque, PredicateEvaluationResult)}.
+    * {@link TruthValueEvaluationUtil#evaluate(Node, Name, boolean, boolean).
     * @author Martin Hentschel
     */
-   public static class PredicateEvaluationResult {
+   public static class TruthValueEvaluationResult {
       /**
        * The {@link BranchResult}s.
        */
@@ -971,7 +971,7 @@ public final class PredicateEvaluationUtil {
       /**
        * All found results.
        */
-      private final Map<String, MultiPredicateResult> results;
+      private final Map<String, MultiEvaluationResult> results;
       
       /**
        * The leaf {@link Node}.
@@ -1002,7 +1002,7 @@ public final class PredicateEvaluationUtil {
        * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
        */
       public BranchResult(Node leafNode, 
-                          Map<String, MultiPredicateResult> results,
+                          Map<String, MultiEvaluationResult> results,
                           Term condition,
                           String conditionString,
                           Name termLabelName) {
@@ -1020,16 +1020,16 @@ public final class PredicateEvaluationUtil {
        * Returns all found results.
        * @return All found results.
        */
-      public Map<String, MultiPredicateResult> getResults() {
+      public Map<String, MultiEvaluationResult> getResults() {
          return Collections.unmodifiableMap(results);
       }
       
       /**
-       * Returns the {@link MultiPredicateResult} for the given {@link PredicateTermLabel}.
-       * @param termLabel The {@link PredicateTermLabel}.
-       * @return The found {@link MultiPredicateResult} or {@code null} if not available.
+       * Returns the {@link MultiEvaluationResult} for the given {@link FormulaTermLabel}.
+       * @param termLabel The {@link FormulaTermLabel}.
+       * @return The found {@link MultiEvaluationResult} or {@code null} if not available.
        */
-      public MultiPredicateResult getResult(PredicateTermLabel termLabel) {
+      public MultiEvaluationResult getResult(FormulaTermLabel termLabel) {
          return termLabel != null ? results.get(termLabel.getId()) : null;
       }
       
@@ -1067,13 +1067,13 @@ public final class PredicateEvaluationUtil {
       }
 
       /**
-       * Returns the first {@link PredicateTermLabel} with {@link Name} {@link #getTermLabelName()}.
+       * Returns the first {@link FormulaTermLabel} with {@link Name} {@link #getTermLabelName()}.
        * @param term The {@link Term}.
-       * @return The found {@link PredicateTermLabel} or {@code null} otherwise.
+       * @return The found {@link FormulaTermLabel} or {@code null} otherwise.
        */
-      public PredicateTermLabel getPredicateLabel(Term term) {
+      public FormulaTermLabel getPredicateLabel(Term term) {
          TermLabel label = term.getLabel(termLabelName);
-         return label instanceof PredicateTermLabel ? (PredicateTermLabel) label : null;
+         return label instanceof FormulaTermLabel ? (FormulaTermLabel) label : null;
       }
 
       /**
@@ -1094,7 +1094,7 @@ public final class PredicateEvaluationUtil {
          sb.append(leafNode.serialNr());
          sb.append("\n");
          boolean afterFirst = false;
-         for (Entry<String, MultiPredicateResult> entry : results.entrySet()) {
+         for (Entry<String, MultiEvaluationResult> entry : results.entrySet()) {
             if (afterFirst) {
                sb.append("\n");
             }
@@ -1111,13 +1111,13 @@ public final class PredicateEvaluationUtil {
       }
 
       /**
-       * Evaluates the given {@link PredicateTermLabel}.
-       * @param termLabel The {@link PredicateTermLabel} to evaluate.
+       * Evaluates the given {@link FormulaTermLabel}.
+       * @param termLabel The {@link FormulaTermLabel} to evaluate.
        * @return The evaluation result.
        */
-      public TruthValue evaluate(PredicateTermLabel termLabel) {
+      public TruthValue evaluate(FormulaTermLabel termLabel) {
          if (termLabel != null) {
-            MultiPredicateResult instruction = getResult(termLabel);
+            MultiEvaluationResult instruction = getResult(termLabel);
             return instruction != null ? instruction.evaluate(termLabelName, results) : null;
          }
          else {

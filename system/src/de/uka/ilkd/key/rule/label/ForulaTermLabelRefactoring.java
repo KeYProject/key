@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.PredicateTermLabel;
+import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
@@ -22,15 +22,15 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil;
+import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * The {@link TermLabelRefactoring} used to label predicates with a
- * {@link PredicateTermLabel} on applied loop invariants or operation contracts.
+ * {@link FormulaTermLabel} on applied loop invariants or operation contracts.
  * @author Martin Hentschel
  */
-public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
+public class ForulaTermLabelRefactoring implements TermLabelRefactoring {
    /**
     * Key prefix used in {@link TermLabelState} to store that the inner most
     * label was already refactored on a given {@link Goal}.
@@ -69,14 +69,14 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
    private static final String UPDATE_REFACTORING_REQUIRED = "updateRefactroingRequired";
 
    /**
-    * Key used in {@link TermLabelState} by the {@link PredicateTermLabelUpdate}
+    * Key used in {@link TermLabelState} by the {@link FormulaTermLabelUpdate}
     * to indicate that a refactoring of parents
     * ({@link RefactoringScope#APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE_AND_PARENTS})
     * is required performed by
     * {@link #refactorInCaseOfNewIdRequired(TermLabelState, Goal, Term, Services, List)}.
     * <p>
     * This is for instance required if a rule is applied on a sub term without 
-    * a {@link PredicateTermLabel} of a parent which has a {@link PredicateTermLabel}.
+    * a {@link FormulaTermLabel} of a parent which has a {@link FormulaTermLabel}.
     * Example rules are:
     * <ul>
     *    <li>{@code ifthenelse_split}</li>
@@ -184,12 +184,12 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
                                                    Goal goal,
                                                    Services services, 
                                                    List<TermLabel> labels) {
-      if (PredicateEvaluationUtil.isPredicate(term)) {
-         TermLabel existingLabel = term.getLabel(PredicateTermLabel.NAME);
+      if (TruthValueEvaluationUtil.isPredicate(term)) {
+         TermLabel existingLabel = term.getLabel(FormulaTermLabel.NAME);
          if (existingLabel == null) {
-            int labelID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
-            int labelSubID = PredicateTermLabel.newLabelSubID(services, labelID);
-            labels.add(new PredicateTermLabel(labelID, labelSubID));
+            int labelID = services.getCounter(FormulaTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
+            int labelSubID = FormulaTermLabel.newLabelSubID(services, labelID);
+            labels.add(new FormulaTermLabel(labelID, labelSubID));
          }
       }
    }
@@ -208,13 +208,13 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
                                                 Services services, 
                                                 List<TermLabel> labels) {
       if (goal != null && !isInnerMostParentRefactored(state, goal)) {
-         TermLabel existingLabel = term.getLabel(PredicateTermLabel.NAME);
-         if (existingLabel instanceof PredicateTermLabel) {
-            PredicateTermLabel pLabel = (PredicateTermLabel) existingLabel;
+         TermLabel existingLabel = term.getLabel(FormulaTermLabel.NAME);
+         if (existingLabel instanceof FormulaTermLabel) {
+            FormulaTermLabel pLabel = (FormulaTermLabel) existingLabel;
             int labelID = pLabel.getMajorId();
-            int labelSubID = PredicateTermLabel.newLabelSubID(services, labelID);
+            int labelSubID = FormulaTermLabel.newLabelSubID(services, labelID);
             labels.remove(existingLabel);
-            labels.add(new PredicateTermLabel(labelID, labelSubID, Collections.singletonList(pLabel.getId())));
+            labels.add(new FormulaTermLabel(labelID, labelSubID, Collections.singletonList(pLabel.getId())));
             setInnerMostParentRefactored(state, goal, true);
          }
       }
@@ -229,9 +229,9 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
    protected void refactorBewlowUpdates(PosInOccurrence applicationPosInOccurrence, 
                                         Term term, 
                                         List<TermLabel> labels) {
-      PredicateTermLabel applicationLabel = (PredicateTermLabel)applicationPosInOccurrence.subTerm().getLabel(PredicateTermLabel.NAME);
+      FormulaTermLabel applicationLabel = (FormulaTermLabel)applicationPosInOccurrence.subTerm().getLabel(FormulaTermLabel.NAME);
       if (applicationLabel != null) {
-         PredicateTermLabel termLabel = (PredicateTermLabel)term.getLabel(PredicateTermLabel.NAME);
+         FormulaTermLabel termLabel = (FormulaTermLabel)term.getLabel(FormulaTermLabel.NAME);
          if (termLabel == null) {
             labels.add(applicationLabel);
          }
@@ -240,7 +240,7 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
             Set<String> beforeIds = new LinkedHashSet<String>();
             JavaUtil.addAll(beforeIds, termLabel.getBeforeIds());
             beforeIds.add(applicationLabel.getId());
-            labels.add(new PredicateTermLabel(termLabel.getMajorId(), termLabel.getMinorId(), beforeIds));
+            labels.add(new FormulaTermLabel(termLabel.getMajorId(), termLabel.getMinorId(), beforeIds));
          }
       }
    }
@@ -252,7 +252,7 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
     * @return {@code true} already refactored, {@code false} not refactored yet.
     */
    public static boolean isInnerMostParentRefactored(TermLabelState state, Goal goal) {
-      Map<Object, Object> labelState = state.getLabelState(PredicateTermLabel.NAME);
+      Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
       return labelState.containsKey(INNER_MOST_PARENT_REFACTORED_PREFIX + goal.node().serialNr());
    }
    
@@ -263,7 +263,7 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
     * @param refactored {@code true} already refactored, {@code false} not refactored yet.
     */
    public static void setInnerMostParentRefactored(TermLabelState state, Goal goal, boolean refactored) {
-      Map<Object, Object> labelState = state.getLabelState(PredicateTermLabel.NAME);
+      Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
       labelState.put(INNER_MOST_PARENT_REFACTORED_PREFIX + goal.node().serialNr(), Boolean.valueOf(refactored));
    }
    
@@ -273,7 +273,7 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
     * @return {@code true} refactoring required, {@code false} refactoring is not required.
     */
    public static boolean isUpdateRefactroingRequired(TermLabelState state) {
-      Map<Object, Object> labelState = state.getLabelState(PredicateTermLabel.NAME);
+      Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
       Object value = labelState.get(UPDATE_REFACTORING_REQUIRED);
       return value instanceof Boolean && ((Boolean) value).booleanValue();
    }
@@ -284,7 +284,7 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
     * @param required {@code true} refactoring required, {@code false} refactoring is not required.
     */
    public static void setUpdateRefactroingRequired(TermLabelState state, boolean required) {
-      Map<Object, Object> labelState = state.getLabelState(PredicateTermLabel.NAME);
+      Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
       labelState.put(UPDATE_REFACTORING_REQUIRED, Boolean.valueOf(required));
    }
    
@@ -294,7 +294,7 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
     * @return {@code true} refactoring required, {@code false} refactoring is not required.
     */
    public static boolean isParentRefactroingRequired(TermLabelState state) {
-      Map<Object, Object> labelState = state.getLabelState(PredicateTermLabel.NAME);
+      Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
       Object value = labelState.get(PARENT_REFACTORING_REQUIRED);
       return value instanceof Boolean && ((Boolean) value).booleanValue();
    }
@@ -305,7 +305,7 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
     * @param required {@code true} refactoring required, {@code false} refactoring is not required.
     */
    public static void setParentRefactroingRequired(TermLabelState state, boolean required) {
-      Map<Object, Object> labelState = state.getLabelState(PredicateTermLabel.NAME);
+      Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
       labelState.put(PARENT_REFACTORING_REQUIRED, Boolean.valueOf(required));
    }
 }

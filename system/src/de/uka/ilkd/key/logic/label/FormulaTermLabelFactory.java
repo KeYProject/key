@@ -16,9 +16,9 @@ package de.uka.ilkd.key.logic.label;
 import java.util.List;
 
 /**
- * A factory for creating {@link PredicateTermLabel} objects.
+ * A factory for creating {@link FormulaTermLabel} objects.
  */
-public class PredicateTermLabelFactory implements TermLabelFactory<PredicateTermLabel> {
+public class FormulaTermLabelFactory implements TermLabelFactory<FormulaTermLabel> {
     /**
      * {@inheritDoc}
      *
@@ -26,25 +26,25 @@ public class PredicateTermLabelFactory implements TermLabelFactory<PredicateTerm
      * This method accepts single arguments which can be parsed as an integer.
      */
     @Override
-    public PredicateTermLabel parseInstance(List<String> parameters) throws TermLabelException {
+    public FormulaTermLabel parseInstance(List<String> parameters) throws TermLabelException {
         if (parameters == null || parameters.size() != 2) {
-            throw new TermLabelException("Label " + PredicateTermLabel.NAME +
+            throw new TermLabelException("Label " + FormulaTermLabel.NAME +
                     " requires exactly two Integer-Parameter with its ID and sub ID.");
         }
         Integer id;
         try {
             id = Integer.valueOf(parameters.get(0));
         } catch (NumberFormatException e) {
-            throw new TermLabelException("Label " + PredicateTermLabel.NAME +
+            throw new TermLabelException("Label " + FormulaTermLabel.NAME +
                   " requires exactly two Integer-Parameter with its ID and sub ID.", e);
         }
         Integer subId;
         try {
            subId = Integer.valueOf(parameters.get(1));
         } catch (NumberFormatException e) {
-            throw new TermLabelException("Label " + PredicateTermLabel.NAME +
+            throw new TermLabelException("Label " + FormulaTermLabel.NAME +
                   " requires exactly two Integer-Parameter with its ID and sub ID.", e);
         }
-        return new PredicateTermLabel(id, subId);
+        return new FormulaTermLabel(id, subId);
     }
 }

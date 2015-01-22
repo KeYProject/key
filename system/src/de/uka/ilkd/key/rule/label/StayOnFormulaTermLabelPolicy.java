@@ -8,7 +8,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.PredicateTermLabel;
+import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -18,15 +18,15 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
-import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil;
+import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
- * This {@link TermLabelPolicy} maintains a {@link PredicateTermLabel} on predicates.
+ * This {@link TermLabelPolicy} maintains a {@link FormulaTermLabel} on predicates.
  * @author Martin Hentschel
  */
-public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
+public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
    /**
     * {@inheritDoc}
     */
@@ -46,12 +46,12 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
                               ImmutableArray<TermLabel> newTermOriginalLabels,
                               TermLabel label) {
       // Maintain label if new Term is a predicate
-      if (PredicateEvaluationUtil.isPredicate(newTermOp) || 
-          PredicateEvaluationUtil.isLogicOperator(newTermOp, newTermSubs)) {
-         assert label instanceof PredicateTermLabel;
-         PredicateTermLabel pLabel = (PredicateTermLabel) label;
-         PredicateTermLabel originalLabel = searchPredicateTermLabel(newTermOriginalLabels);
-         PredicateTermLabel mostImportantLabel = originalLabel != null ? originalLabel : pLabel;
+      if (TruthValueEvaluationUtil.isPredicate(newTermOp) || 
+          TruthValueEvaluationUtil.isLogicOperator(newTermOp, newTermSubs)) {
+         assert label instanceof FormulaTermLabel;
+         FormulaTermLabel pLabel = (FormulaTermLabel) label;
+         FormulaTermLabel originalLabel = searchPredicateTermLabel(newTermOriginalLabels);
+         FormulaTermLabel mostImportantLabel = originalLabel != null ? originalLabel : pLabel;
          // May change sub ID if logical operators like junctors are used
          boolean newLabelIdRequired = false;
          Set<String> originalLabelIds = new LinkedHashSet<String>();
@@ -66,12 +66,12 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
             }
             boolean topLevel = isTopLevel(tacletHint, tacletTerm);
             if (tacletHint.getSequentFormula() != null) {
-               if (!PredicateEvaluationUtil.isPredicate(tacletHint.getSequentFormula())) {
+               if (!TruthValueEvaluationUtil.isPredicate(tacletHint.getSequentFormula())) {
                   newLabelIdRequired = true;
                }
             }
             else if (tacletHint.getTerm() != null) {
-               if (!topLevel && !PredicateEvaluationUtil.isPredicate(tacletHint.getTerm())) {
+               if (!topLevel && !TruthValueEvaluationUtil.isPredicate(tacletHint.getTerm())) {
                   newLabelIdRequired = true;
                }
             }
@@ -84,17 +84,17 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
             if (originalLabel != null) {
                originalLabelIds.add(originalLabel.getId());
             }
-            int labelSubID = PredicateTermLabel.newLabelSubID(services, mostImportantLabel);
+            int labelSubID = FormulaTermLabel.newLabelSubID(services, mostImportantLabel);
             if (!originalLabelIds.isEmpty()) {
-               return new PredicateTermLabel(mostImportantLabel.getMajorId(), labelSubID, originalLabelIds);
+               return new FormulaTermLabel(mostImportantLabel.getMajorId(), labelSubID, originalLabelIds);
             }
             else {
-               return new PredicateTermLabel(mostImportantLabel.getMajorId(), labelSubID);
+               return new FormulaTermLabel(mostImportantLabel.getMajorId(), labelSubID);
             }
          }
          else {
             if (!originalLabelIds.isEmpty()) {
-               return new PredicateTermLabel(mostImportantLabel.getMajorId(), mostImportantLabel.getMinorId(), originalLabelIds);
+               return new FormulaTermLabel(mostImportantLabel.getMajorId(), mostImportantLabel.getMinorId(), originalLabelIds);
             }
             else {
                return label;
@@ -103,14 +103,14 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
       }
       else if (UpdateApplication.UPDATE_APPLICATION.equals(newTermOp)) {
          Term target = newTermSubs.get(UpdateApplication.targetPos());
-         TermLabel targetLabel = target.getLabel(PredicateTermLabel.NAME);
-         if (targetLabel instanceof PredicateTermLabel) {
+         TermLabel targetLabel = target.getLabel(FormulaTermLabel.NAME);
+         if (targetLabel instanceof FormulaTermLabel) {
             if (applicationPosInOccurrence != null) {
                Term appliationTerm = applicationPosInOccurrence.subTerm();
-               TermLabel applicationLabel = appliationTerm.getLabel(PredicateTermLabel.NAME);
-               if (applicationLabel instanceof PredicateTermLabel) {
+               TermLabel applicationLabel = appliationTerm.getLabel(FormulaTermLabel.NAME);
+               if (applicationLabel instanceof FormulaTermLabel) {
                   // Let the PredicateTermLabelRefactoring perform the refactoring, see also PredicateTermLabelRefactoring#UPDATE_REFACTORING_REQUIRED
-                  PredicateTermLabelRefactoring.setUpdateRefactroingRequired(state, true);
+                  ForulaTermLabelRefactoring.setUpdateRefactroingRequired(state, true);
                }
             }
          }
@@ -122,18 +122,18 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
    }
 
    /**
-    * Searches the {@link PredicateTermLabel} in the given {@link TermLabel}s.
+    * Searches the {@link FormulaTermLabel} in the given {@link TermLabel}s.
     * @param labels The {@link TermLabel}s to search in.
-    * @return The found {@link PredicateTermLabel} or {@code null} if not available.
+    * @return The found {@link FormulaTermLabel} or {@code null} if not available.
     */
-   protected PredicateTermLabel searchPredicateTermLabel(ImmutableArray<TermLabel> labels) {
+   protected FormulaTermLabel searchPredicateTermLabel(ImmutableArray<TermLabel> labels) {
       TermLabel result = JavaUtil.search(labels, new IFilter<TermLabel>() {
          @Override
          public boolean select(TermLabel element) {
-            return element instanceof PredicateTermLabel;
+            return element instanceof FormulaTermLabel;
          }
       });
-      return (PredicateTermLabel)result;
+      return (FormulaTermLabel)result;
    }
 
    /**

@@ -22,23 +22,23 @@ import de.uka.ilkd.key.logic.Sequent;
 /**
  * Label attached to a predicates for instance in postconditions, loop invariants or precondition checks of applied operation contracts.
  */
-public class PredicateTermLabel implements TermLabel {
+public class FormulaTermLabel implements TermLabel {
    /**
     * The unique name of this label.
     */
-   public static final Name NAME = new Name("P");
+   public static final Name NAME = new Name("F");
 
    /**
     * The name used in {@link Services#getCounter(String)} to keep track
     * of the already used IDs.
     */
-   public static final String PROOF_COUNTER_NAME = "P_LABEL_COUNTER";
+   public static final String PROOF_COUNTER_NAME = "F_LABEL_COUNTER";
 
    /**
     * The prefix of the name used in {@link Services#getCounter(String)} to 
     * keep track of the already used sub IDs.
     */
-   public static final String PROOF_COUNTER_SUB_PREFIX = "P_LABEL_SUB_COUNTER_";
+   public static final String PROOF_COUNTER_SUB_PREFIX = "F_LABEL_SUB_COUNTER_";
    
    /**
     * Separator between multiple before IDs.
@@ -60,7 +60,7 @@ public class PredicateTermLabel implements TermLabel {
     * @param majorId The major part of the unique ID.
     * @param minorId The minor part of the unique ID.
     */
-   public PredicateTermLabel(int majorId, int minorId) {
+   public FormulaTermLabel(int majorId, int minorId) {
        this(majorId, minorId, null);
    }
    
@@ -70,7 +70,7 @@ public class PredicateTermLabel implements TermLabel {
     * @param minorId The minor part of the unique ID.
     * @param beforeId The optional previous ID of the label this one is derived from.
     */
-   public PredicateTermLabel(int majorId, int minorId, Collection<String> beforeIds) {
+   public FormulaTermLabel(int majorId, int minorId, Collection<String> beforeIds) {
        this.id = majorId + "." + minorId;
        if (beforeIds != null) {
           StringBuffer sb = new StringBuffer();
@@ -181,20 +181,20 @@ public class PredicateTermLabel implements TermLabel {
    /**
     * Creates a new label sub ID.
     * @param services The {@link Services} to use.
-    * @param label The parent {@link PredicateTermLabel} which provides the major ID.
+    * @param label The parent {@link FormulaTermLabel} which provides the major ID.
     * @return The new label sub ID.
     */
-   public static int newLabelSubID(Services services, PredicateTermLabel label) {
+   public static int newLabelSubID(Services services, FormulaTermLabel label) {
       return newLabelSubID(services, label.getMajorId());
    }
 
    /**
     * Creates a new label sub ID.
     * @param services The {@link Services} to use.
-    * @param labelId The parent {@link PredicateTermLabel} which provides the major ID.
+    * @param labelId The parent {@link FormulaTermLabel} which provides the major ID.
     * @return The new label sub ID.
     */
    public static int newLabelSubID(Services services, int labelId) {
-      return services.getCounter(PredicateTermLabel.PROOF_COUNTER_SUB_PREFIX + labelId).getCountPlusPlus();
+      return services.getCounter(FormulaTermLabel.PROOF_COUNTER_SUB_PREFIX + labelId).getCountPlusPlus();
    }
 }

@@ -18,8 +18,8 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.label.PredicateTermLabel;
-import de.uka.ilkd.key.logic.label.PredicateTermLabelFactory;
+import de.uka.ilkd.key.logic.label.FormulaTermLabel;
+import de.uka.ilkd.key.logic.label.FormulaTermLabelFactory;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabelFactory;
@@ -33,11 +33,11 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.label.LoopBodyTermLabelUpdate;
 import de.uka.ilkd.key.rule.label.LoopInvariantNormalBehaviorTermLabelUpdate;
-import de.uka.ilkd.key.rule.label.PredicateTermLabelRefactoring;
-import de.uka.ilkd.key.rule.label.PredicateTermLabelUpdate;
+import de.uka.ilkd.key.rule.label.ForulaTermLabelRefactoring;
+import de.uka.ilkd.key.rule.label.FormulaTermLabelUpdate;
 import de.uka.ilkd.key.rule.label.RemoveInCheckBranchesTermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.StayOnOperatorTermLabelPolicy;
-import de.uka.ilkd.key.rule.label.StayOnPredicateTermLabelPolicy;
+import de.uka.ilkd.key.rule.label.StayOnFormulaTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.SymbolicExecutionTermLabelUpdate;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
@@ -163,11 +163,11 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
                                                          seUps,
                                                          seRefs));
       if (predicateEvaluationEnabled) {
-         ImmutableList<TermLabelPolicy> predPolicies = ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayOnPredicateTermLabelPolicy());
-         ImmutableList<TermLabelUpdate> predUpdates = ImmutableSLList.<TermLabelUpdate>nil().prepend(new PredicateTermLabelUpdate());
-         ImmutableList<TermLabelRefactoring> predRefs = ImmutableSLList.<TermLabelRefactoring>nil().prepend(new PredicateTermLabelRefactoring());
-         result = result.prepend(new TermLabelConfiguration(PredicateTermLabel.NAME,
-                                                            new PredicateTermLabelFactory(),
+         ImmutableList<TermLabelPolicy> predPolicies = ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayOnFormulaTermLabelPolicy());
+         ImmutableList<TermLabelUpdate> predUpdates = ImmutableSLList.<TermLabelUpdate>nil().prepend(new FormulaTermLabelUpdate());
+         ImmutableList<TermLabelRefactoring> predRefs = ImmutableSLList.<TermLabelRefactoring>nil().prepend(new ForulaTermLabelRefactoring());
+         result = result.prepend(new TermLabelConfiguration(FormulaTermLabel.NAME,
+                                                            new FormulaTermLabelFactory(),
                                                             null,
                                                             predPolicies,
                                                             null,

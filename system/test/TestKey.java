@@ -110,7 +110,7 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.symbolic_execution.TestExecutionNodeWriterAndReader.class,
         de.uka.ilkd.key.symbolic_execution.TestExecutionVariableExtractor.class,
         de.uka.ilkd.key.symbolic_execution.TestParallelSiteProofs.class,
-        de.uka.ilkd.key.symbolic_execution.TestPredicateEvaluationUtil.class,
+        de.uka.ilkd.key.symbolic_execution.TestTruthValueEvaluationUtil.class,
         de.uka.ilkd.key.symbolic_execution.TestPredicateValue.class,
         de.uka.ilkd.key.symbolic_execution.TestSymbolicLayoutExtractor.class,
         de.uka.ilkd.key.symbolic_execution.TestSymbolicLayoutWriterAndReader.class,
