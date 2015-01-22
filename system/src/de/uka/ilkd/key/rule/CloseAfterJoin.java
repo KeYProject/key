@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.rule;
 
+import static de.uka.ilkd.key.util.joinrule.JoinRuleUtils.*;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -37,7 +39,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofVisitor;
-import de.uka.ilkd.key.rule.JoinRule.SymbolicExecutionState;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
+import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
 /**
  * Rule for closing a partner goal after a join
@@ -165,8 +168,8 @@ public class CloseAfterJoin implements BuiltInRule {
             
       Term isWeakeningForm = getSyntacticWeakeningFormula(services);
       // Delete previous sequents      
-      JoinRule.clearSemisequent(ruleIsWeakeningGoal, true);
-      JoinRule.clearSemisequent(ruleIsWeakeningGoal, false);
+      clearSemisequent(ruleIsWeakeningGoal, true);
+      clearSemisequent(ruleIsWeakeningGoal, false);
       ruleIsWeakeningGoal.addFormula(new SequentFormula(isWeakeningForm), false, true);
       
       // Register partner nodes
@@ -188,10 +191,10 @@ public class CloseAfterJoin implements BuiltInRule {
       
       final LinkedHashSet<LocationVariable> allLocs =
             new LinkedHashSet<LocationVariable>();
-      allLocs.addAll(JoinRule.getUpdateLocations(thisSEState.getSymbolicState()));
-      allLocs.addAll(JoinRule.getUpdateLocations(joinState.getSymbolicState()));
-      allLocs.addAll(JoinRule.getTermLocations(thisSEState.getPathCondition()));
-      allLocs.addAll(JoinRule.getTermLocations(joinState.getPathCondition()));
+      allLocs.addAll(getUpdateLocations(thisSEState.getSymbolicState()));
+      allLocs.addAll(getUpdateLocations(joinState.getSymbolicState()));
+      allLocs.addAll(getTermLocations(thisSEState.getPathCondition()));
+      allLocs.addAll(getTermLocations(joinState.getPathCondition()));
       
       final LinkedList<Term> origQfdVarTerms = new LinkedList<Term>();
       
@@ -239,7 +242,7 @@ public class CloseAfterJoin implements BuiltInRule {
     *    by fresh variables before.
     */
    private Term allClosure(final Term term) {
-      return JoinRule.allClosure(
+      return JoinRuleUtils.allClosure(
             substConstantsByFreshVars(
                   term, new HashMap<Function, LogicVariable>()),
             services);
@@ -265,8 +268,8 @@ public class CloseAfterJoin implements BuiltInRule {
          Function constant = (Function) term.op();
          
          if (!replMap.containsKey(constant)) {
-            LogicVariable freshVariable = JoinRule.getFreshVariableForPrefix(
-                  JoinRule.stripIndex(constant.toString()),
+            LogicVariable freshVariable = getFreshVariableForPrefix(
+                  stripIndex(constant.toString()),
                   constant.sort(),
                   services);
             replMap.put(constant, freshVariable);

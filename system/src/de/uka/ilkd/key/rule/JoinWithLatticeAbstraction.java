@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
 /**
  * Rule that joins two sequents based on a specified set of

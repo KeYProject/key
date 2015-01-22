@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Quadruple;
+import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
 /**
  * Rule that joins two sequents based on the if-then-else

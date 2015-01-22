@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
 /**
  * Rule that joins two sequents based on "total" weakening:
