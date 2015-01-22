@@ -377,26 +377,4 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
       
       return selectionDialog.getChosen();
    }
-   
-//   /**
-//    * Tries to prove the equivalence of term1 and term2 and
-//    * throws a {@link RuntimeException} if the proof fails.
-//    * 
-//    * @param term1 First term to check.
-//    * @param term2 Second term to check.
-//    * @param services The services object.
-//    * 
-//    * @throws RuntimeException iff proving the equivalence
-//    *    of term1 and term2 fails.
-//    */
-//   private static void assertEquivalent(Term term1, Term term2, Services services) {
-//      TermBuilder tb = services.getTermBuilder();
-//      
-//      Term assertionForm = tb.and(
-//            tb.imp(term1, term2),
-//            tb.imp(term2, term1));
-//      if (!isProvableWithSplitting(assertionForm, services)) {
-//         throw new RuntimeException("Could not prove expected equivalence.");
-//      }
-//   }
 }
