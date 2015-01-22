@@ -9,10 +9,10 @@ import org.key_project.jmlediting.ui.test.highlighting.MultilineCommentEditingTe
 import org.key_project.jmlediting.ui.test.marker.ParseErrorMarkerTest;
 
 @RunWith(Suite.class)
-@SuiteClasses({ CompletionSuite.class, PreferenceSuite.class,
+@SuiteClasses({ AllCoreTestsSuite.class, PreferenceSuite.class,
       JMLHoverTest.class, KeywordHighlightingSuite.class,
       JMLCommentHighlightingSuite.class, ParseErrorMarkerTest.class,
-      AllCoreTestsSuite.class, MultilineCommentEditingTest.class })
+      MultilineCommentEditingTest.class, CompletionSuite.class })
 public class AllUITests {
 
 }
