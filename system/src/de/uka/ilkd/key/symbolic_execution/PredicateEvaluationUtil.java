@@ -3,12 +3,10 @@ package de.uka.ilkd.key.symbolic_execution;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
@@ -43,7 +41,8 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Provides functionality to evaluate the truth value of labeled predicates.
+ * Provides functionality to evaluate the truth value of labeled formulas
+ * (predicates and junctors).
  * @author Martin Hentschel
  */
 public final class PredicateEvaluationUtil {
@@ -182,8 +181,8 @@ public final class PredicateEvaluationUtil {
                                                     boolean useUnicode,
                                                     boolean usePrettyPrinting) throws ProofInputException {
       PredicateEvaluationResult result = new PredicateEvaluationResult();
-      Deque<Map<String, IPredicateInstruction>> evaluationStack = new LinkedList<Map<String, IPredicateInstruction>>();
-      evaluationStack.addFirst(new HashMap<String, IPredicateInstruction>());
+      Deque<Map<String, MultiPredicateResult>> evaluationStack = new LinkedList<Map<String, MultiPredicateResult>>();
+      evaluationStack.addFirst(new HashMap<String, MultiPredicateResult>());
       evaluateNode(node, useUnicode, usePrettyPrinting, node, termLabelName, evaluationStack, result, node.proof().getServices());
       return result;
    }
@@ -199,16 +198,16 @@ public final class PredicateEvaluationUtil {
     * @param services The {@link Services} to use.
     * @throws ProofInputException Occurred Exception
     */
-   private static void evaluateNode(final Node evaluationNode,
-                                    final boolean useUnicode,
-                                    final boolean usePrettyPrinting,
-                                    final Node node, 
-                                    final Name termLabelName, 
-                                    final Deque<Map<String, IPredicateInstruction>> evaluationStack, 
-                                    final PredicateEvaluationResult result,
-                                    final Services services) throws ProofInputException {
+   protected static void evaluateNode(final Node evaluationNode,
+                                      final boolean useUnicode,
+                                      final boolean usePrettyPrinting,
+                                      final Node node, 
+                                      final Name termLabelName, 
+                                      final Deque<Map<String, MultiPredicateResult>> evaluationStack, 
+                                      final PredicateEvaluationResult result,
+                                      final Services services) throws ProofInputException {
       // Create new stack entry
-      final Map<String, IPredicateInstruction> currentResults = evaluationStack.getFirst();
+      final Map<String, MultiPredicateResult> currentResults = evaluationStack.getFirst();
       // Analyze applied rule
       boolean childrenAlreadyTreated = false;
       if (node.getAppliedRuleApp() instanceof TacletApp) {
@@ -222,7 +221,7 @@ public final class PredicateEvaluationUtil {
                childrenAlreadyTreated = true;
                int i = 0;
                for (TacletGoalTemplate tacletGoal : taclet.goalTemplates().reverse()) {
-                  Map<String, IPredicateInstruction> childResults = new HashMap<String, IPredicateInstruction>(currentResults);
+                  Map<String, MultiPredicateResult> childResults = new HashMap<String, MultiPredicateResult>(currentResults);
                   analyzeTacletGoal(node, tacletApp, tacletGoal, labels, services, childResults);
                   // Evaluate children with branch specific Taclet result
                   evaluationStack.addFirst(childResults);
@@ -233,8 +232,7 @@ public final class PredicateEvaluationUtil {
             }
             else if (tacletApp.posInOccurrence() != null){
                for (PredicateLabelOccurrence occurrence : labels) {
-                  PredicateResult newResult = new PredicateResult(occurrence.isInAntecedent() ? PredicateValue.FALSE : PredicateValue.TRUE, node);
-                  updatePredicateResult(occurrence.getLabel(), newResult, currentResults);
+                  updatePredicateResult(occurrence.getLabel(), !occurrence.isInAntecedent(), currentResults);
                }
             }
          }
@@ -267,7 +265,7 @@ public final class PredicateEvaluationUtil {
       else if (!childrenAlreadyTreated) {
          // Evaluate children in case that branch specific Taclet results are not available and thus not evaluated yet.
          for (int i = 0; i < childCount; i++) {
-            evaluationStack.addFirst(new HashMap<String, IPredicateInstruction>(currentResults));
+            evaluationStack.addFirst(new HashMap<String, MultiPredicateResult>(currentResults));
             evaluateNode(evaluationNode, useUnicode, usePrettyPrinting, node.child(i), termLabelName, evaluationStack, result, services);
             evaluationStack.removeFirst();
          }
@@ -281,9 +279,9 @@ public final class PredicateEvaluationUtil {
     * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
     * @return The found {@link PredicateLabelOccurrence}s.
     */
-   private static List<PredicateLabelOccurrence> findInvolvedLabels(Sequent sequent, 
-                                                                    TacletApp tacletApp, 
-                                                                    Name termLabelName) {
+   protected static List<PredicateLabelOccurrence> findInvolvedLabels(Sequent sequent, 
+                                                                      TacletApp tacletApp, 
+                                                                      Name termLabelName) {
       List<PredicateLabelOccurrence> result = new LinkedList<PredicateLabelOccurrence>();
       // Search for labels in find part
       PosInOccurrence pio = tacletApp.posInOccurrence();
@@ -387,14 +385,14 @@ public final class PredicateEvaluationUtil {
     * @param tacletGoal The {@link TacletGoalTemplate}.
     * @param labels The {@link PredicateTermLabel}s.
     * @param servies The {@link Services} to use.
-    * @param results The {@link Map} with all available {@link PredicateResult}s.
+    * @param results The {@link Map} with all available {@link MultiPredicateResult}s.
     */
-   private static void analyzeTacletGoal(Node parent, 
-                                         TacletApp tacletApp, 
-                                         TacletGoalTemplate tacletGoal, 
-                                         List<PredicateLabelOccurrence> labels, 
-                                         Services services,
-                                         Map<String, IPredicateInstruction> results) {
+   protected static void analyzeTacletGoal(Node parent, 
+                                           TacletApp tacletApp, 
+                                           TacletGoalTemplate tacletGoal, 
+                                           List<PredicateLabelOccurrence> labels, 
+                                           Services services,
+                                           Map<String, MultiPredicateResult> results) {
       Object replaceObject = tacletGoal.replaceWithExpressionAsObject();
       if (replaceObject instanceof Term) {
          Term replaceTerm = SymbolicExecutionUtil.instantiateTerm(parent, (Term) replaceObject, tacletApp, services);
@@ -403,11 +401,11 @@ public final class PredicateEvaluationUtil {
             for (PredicateLabelOccurrence occurrence : labels) {
                if (occurrence.isAssumesClause()) {
                   // Set result for assumes clause which is based on the side of occurrence
-                  updatePredicateResult(occurrence.getLabel(), new PredicateResult(occurrence.isInAntecedent() ? PredicateValue.TRUE : PredicateValue.FALSE, parent), results);
+                  updatePredicateResult(occurrence.getLabel(), occurrence.isInAntecedent(), results);
                }
                else {
                   // Set result for find clause which is the replacement (true)
-                  updatePredicateResult(occurrence.getLabel(), new PredicateResult(PredicateValue.TRUE, parent), results);
+                  updatePredicateResult(occurrence.getLabel(), true, results);
                }
             }
          }
@@ -416,11 +414,11 @@ public final class PredicateEvaluationUtil {
             for (PredicateLabelOccurrence occurrence : labels) {
                if (occurrence.isAssumesClause()) {
                   // Set result for assumes clause which is based on the side of occurrence
-                  updatePredicateResult(occurrence.getLabel(), new PredicateResult(occurrence.isInAntecedent() ? PredicateValue.TRUE : PredicateValue.FALSE, parent), results);
+                  updatePredicateResult(occurrence.getLabel(), occurrence.isInAntecedent(), results);
                }
                else {
                   // Set result for find clause which is the replacement (false)
-                  updatePredicateResult(occurrence.getLabel(), new PredicateResult(PredicateValue.FALSE, parent), results);
+                  updatePredicateResult(occurrence.getLabel(), false, results);
                }
             }
          }
@@ -433,13 +431,13 @@ public final class PredicateEvaluationUtil {
     * @param childNode The child {@link Node}.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
     * @param tb The {@link TermBuilder} to use.
-    * @param results The {@link Map} with all available {@link PredicateResult}s. 
+    * @param results The {@link Map} with all available {@link MultiPredicateResult}s. 
     */
    protected static void updatePredicateResultBasedOnNewMinorIdsOSS(final PosInOccurrence childPio,
                                                                     final PosInOccurrence parentPio,
                                                                     final Name termLabelName,
                                                                     final TermBuilder tb,
-                                                                    final Map<String, IPredicateInstruction> results) {
+                                                                    final Map<String, MultiPredicateResult> results) {
       if (parentPio != null) {
          // Check application term and all of its children and grand children
          parentPio.subTerm().execPreOrder(new DefaultVisitor() {
@@ -464,19 +462,19 @@ public final class PredicateEvaluationUtil {
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
     * @param parentPio The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
     * @param tb The {@link TermBuilder} to use.
-    * @param results The {@link Map} with all available {@link PredicateResult}s. 
+    * @param results The {@link Map} with all available {@link MultiPredicateResult}s. 
     */
    protected static void checkForNewMinorIdsOSS(SequentFormula onlyChangedChildSF, 
                                                 Term term, 
                                                 Name termLabelName, 
                                                 PosInOccurrence parentPio, 
                                                 TermBuilder tb, 
-                                                Map<String, IPredicateInstruction> results) {
+                                                Map<String, MultiPredicateResult> results) {
       TermLabel label = term.getLabel(termLabelName);
       if (label instanceof PredicateTermLabel) {
          Term replacement = checkForNewMinorIdsOSS(onlyChangedChildSF, (PredicateTermLabel) label, parentPio.isInAntec(), tb);
          if (replacement != null) {
-            updatePredicateResult((PredicateTermLabel) label, new TermPredicateInstruction(replacement), results);
+            updatePredicateResult((PredicateTermLabel) label, replacement, results);
          }
       }
    }
@@ -511,12 +509,12 @@ public final class PredicateEvaluationUtil {
     * @param childNode The child {@link Node}.
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
     * @param tb The {@link TermBuilder} to use.
-    * @param results The {@link Map} with all available {@link PredicateResult}s. 
+    * @param results The {@link Map} with all available {@link MultiPredicateResult}s. 
     */
    protected static void updatePredicateResultBasedOnNewMinorIds(final Node childNode,
                                                                  final Name termLabelName,
                                                                  final TermBuilder tb,
-                                                                 final Map<String, IPredicateInstruction> results) {
+                                                                 final Map<String, MultiPredicateResult> results) {
       final Node parentNode = childNode.parent();
       if (parentNode != null) {
          final PosInOccurrence parentPio = parentNode.getAppliedRuleApp().posInOccurrence();
@@ -545,19 +543,19 @@ public final class PredicateEvaluationUtil {
     * @param termLabelName The name of the {@link TermLabel} which is added to predicates.
     * @param parentPio The {@link PosInOccurrence} of the applied rule of the parent {@link Node}.
     * @param tb The {@link TermBuilder} to use.
-    * @param results The {@link Map} with all available {@link PredicateResult}s. 
+    * @param results The {@link Map} with all available {@link MultiPredicateResult}s. 
     */
    protected static void checkForNewMinorIds(Node childNode, 
                                              Term term, 
                                              Name termLabelName, 
                                              PosInOccurrence parentPio, 
                                              TermBuilder tb, 
-                                             Map<String, IPredicateInstruction> results) {
+                                             Map<String, MultiPredicateResult> results) {
       TermLabel label = term.getLabel(termLabelName);
       if (label instanceof PredicateTermLabel) {
          Term replacement = checkForNewMinorIds(childNode, (PredicateTermLabel) label, parentPio.isInAntec(), tb);
          if (replacement != null) {
-            updatePredicateResult((PredicateTermLabel) label, new TermPredicateInstruction(replacement), results);
+            updatePredicateResult((PredicateTermLabel) label, replacement, results);
          }
       }
    }
@@ -642,13 +640,278 @@ public final class PredicateEvaluationUtil {
    }
 
    /**
-    * Updates the {@link IPredicateInstruction} of the given {@link TermLabel}.
-    * @param label The {@link PredicateTermLabel} to update its {@link IPredicateInstruction}.
-    * @param result The new {@link IPredicateInstruction}.
-    * @param results The {@link Map} with all available {@link IPredicateInstruction}s.
+    * Updates the instruction {@link Term} for the given {@link PredicateTermLabel}
+    * in the result {@link Map}.
+    * @param label The {@link PredicateTermLabel} to update its instruction {@link Term}.
+    * @param instructionTerm The new instruction {@link Term} to set.
+    * @param results The {@link Map} with all available {@link MultiPredicateResult}s. 
     */
-   private static void updatePredicateResult(PredicateTermLabel label, IPredicateInstruction result, Map<String, IPredicateInstruction> results) {
+   protected static void updatePredicateResult(PredicateTermLabel label, 
+                                               Term instructionTerm, 
+                                               Map<String, MultiPredicateResult> results) {
+      MultiPredicateResult result = results.get(label.getId());
+      if (result == null) {
+         result = new MultiPredicateResult(instructionTerm);
+      }
+      else {
+         result = result.newInstructionTerm(instructionTerm);
+      }
       results.put(label.getId(), result);
+   }
+
+   /**
+    * Updates the evaluation result for the given {@link PredicateTermLabel}
+    * in the result {@link Map}.
+    * @param label The {@link PredicateTermLabel} to update its instruction {@link Term}.
+    * @param evaluationResult {@code true} label evaluates at least once to true, {@code false} label evaluates at least once to false.
+    * @param results The {@link Map} with all available {@link MultiPredicateResult}s. 
+    */
+   protected static void updatePredicateResult(PredicateTermLabel label, 
+                                               boolean evaluationResult, 
+                                               Map<String, MultiPredicateResult> results) {
+      MultiPredicateResult result = results.get(label.getId());
+      if (result == null) {
+         result = new MultiPredicateResult(evaluationResult);
+      }
+      else {
+         result = result.newEvaluationResult(evaluationResult);
+      }
+      results.put(label.getId(), result);
+   }
+   
+   /**
+    * Instances of this unmodifyable class are used to store the found
+    * evaluation results.
+    * @author Martin Hentschel
+    */
+   public static class MultiPredicateResult {
+      /**
+       * {@code true} label evaluates at least once to true, {@code false} label never evaluates to true.
+       */
+      private final boolean evaluatesToTrue;
+      
+      /**
+       * {@code true} label evaluates at least once to false, {@code false} label never evaluates to false.
+       */
+      private final boolean evaluatesToFalse;
+      
+      /**
+       * The instruction {@link Term}.
+       */
+      private final Term instructionTerm;
+
+      /**
+       * Constructor.
+       * @param evaluationResult {@code true} label evaluates at least once to true, {@code false} label evaluates at least once to false.
+       */
+      public MultiPredicateResult(boolean evaluationResult) {
+         this(evaluationResult, !evaluationResult, null);
+      }
+
+      /**
+       * Constructor.
+       * @param instructionTerm The instruction {@link Term}.
+       */
+      public MultiPredicateResult(Term instructionTerm) {
+         this(false, false, instructionTerm);
+      }
+
+      /**
+       * Constructor.
+       * @param evaluatesToTrue {@code true} label evaluates at least once to true, {@code false} label never evaluates to true.
+       * @param evaluatesToFalse {@code true} label evaluates at least once to false, {@code false} label never evaluates to false.
+       * @param instructionTerm The instruction {@link Term}.
+       */
+      public MultiPredicateResult(boolean evaluatesToTrue, boolean evaluatesToFalse, Term instructionTerm) {
+         this.evaluatesToTrue = evaluatesToTrue;
+         this.evaluatesToFalse = evaluatesToFalse;
+         this.instructionTerm = instructionTerm;
+      }
+
+      /**
+       * Checks if it is at least once evaluated to {@code true}.
+       * @return {@code true} label evaluates at least once to true, {@code false} label never evaluates to true.
+       */
+      public boolean isEvaluatesToTrue() {
+         return evaluatesToTrue;
+      }
+
+      /**
+       * Checks if it is at least once evaluated to {@code false}.
+       * @return {@code true} label evaluates at least once to false, {@code false} label never evaluates to false.
+       */
+      public boolean isEvaluatesToFalse() {
+         return evaluatesToFalse;
+      }
+
+      /**
+       * Returns the instruction {@link Term}.
+       * @return The instruction {@link Term} or {@code null} if undefined.
+       */
+      public Term getInstructionTerm() {
+         return instructionTerm;
+      }
+      
+      /**
+       * Creates a new {@link MultiPredicateResult} based on the current once
+       * but with an updated evaluation result.
+       * @param evaluationResult {@code true} label evaluates at least once to true, {@code false} label evaluates at least once to false.
+       * @return The new created {@link MultiPredicateResult}.
+       */
+      public MultiPredicateResult newEvaluationResult(boolean evaluationResult) {
+         if (evaluationResult) {
+            return newEvaluatesToTrue(true);
+         }
+         else {
+            return newEvaluatesToFalse(true);
+         }
+      }
+
+      /**
+       * Creates a new {@link MultiPredicateResult} based on the current once
+       * but with an update evaluates to true state.
+       * @param newEvaluatesToTrue {@code true} label evaluates at least once to true, {@code false} label never evaluates to true.
+       * @return The new created {@link MultiPredicateResult}.
+       */
+      public MultiPredicateResult newEvaluatesToTrue(boolean newEvaluatesToTrue) {
+         return new MultiPredicateResult(newEvaluatesToTrue, evaluatesToFalse, instructionTerm);
+      }
+
+      /**
+       * Creates a new {@link MultiPredicateResult} based on the current once
+       * but with an update evaluates to false state.
+       * @param newEvaluatesToFalse {@code true} label evaluates at least once to false, {@code false} label never evaluates to false.
+       * @return The new created {@link MultiPredicateResult}.
+       */
+      public MultiPredicateResult newEvaluatesToFalse(boolean newEvaluatesToFalse) {
+         return new MultiPredicateResult(evaluatesToTrue, newEvaluatesToFalse, instructionTerm);
+      }
+
+      /**
+       * Creates a new {@link MultiPredicateResult} based on the current once
+       * but with an update instruction term.
+       * @param newInstructionTerm The new instruction {@link Term}.
+       * @return The new created {@link MultiPredicateResult}.
+       */
+      public MultiPredicateResult newInstructionTerm(Term newInstructionTerm) {
+         return new MultiPredicateResult(evaluatesToTrue, evaluatesToFalse, newInstructionTerm);
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String toString() {
+         return "true=" + evaluatesToTrue +
+                ", false=" + evaluatesToFalse +
+                ", instruction=" + instructionTerm;
+      }
+
+      /**
+       * Computes the final truth value.
+       * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
+       * @param results All available {@link MultiPredicateResult}s.
+       * @return The computed {@link TruthValue}.
+       */
+      public TruthValue evaluate(Name termLabelName, Map<String, MultiPredicateResult> results) {
+         if (evaluatesToTrue && evaluatesToFalse) {
+            return TruthValue.UNKNOWN;
+         }
+         else if (evaluatesToTrue) {
+            return TruthValue.TRUE;
+         }
+         else if (evaluatesToFalse) {
+            return TruthValue.FALSE;
+         }
+         else if (instructionTerm != null) {
+            return evaluateTerm(instructionTerm, termLabelName, results);
+         }
+         else {
+            return TruthValue.UNKNOWN;
+         }
+      }
+
+      /***
+       * Computes the {@link TruthValue} of the given instruction {@link Term}.
+       * @param term The instruction {@link Term} to evaluate.
+       * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
+       * @param results All available {@link MultiPredicateResult}s.
+       * @return The computed {@link TruthValue}.
+       */
+      private static TruthValue evaluateTerm(Term term, Name termLabelName, Map<String, MultiPredicateResult> results) {
+         TermLabel label = term.getLabel(termLabelName);
+         // Return direct label result if available
+         if (label instanceof PredicateTermLabel) {
+            MultiPredicateResult instruction = results.get(((PredicateTermLabel) label).getId());
+            if (instruction != null) {
+               return instruction.evaluate(termLabelName, results);
+            }
+         }
+         // If direct label result is not available try to compute it. (e.g. because of or/and label was replaced by sequent top level formuals)
+         if (term.op() == Junctor.AND ||
+             term.op() == Junctor.IMP ||
+             term.op() == Junctor.OR ||
+             term.op() == Equality.EQV) {
+            Term leftTerm = TermBuilder.goBelowUpdates(term.sub(0));
+            Term rightTerm = TermBuilder.goBelowUpdates(term.sub(1));
+            TermLabel leftLabel = leftTerm.getLabel(termLabelName);
+            TermLabel rightLabel = rightTerm.getLabel(termLabelName);
+            MultiPredicateResult leftInstruction = leftLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) leftLabel).getId()) : null;
+            MultiPredicateResult rightInstruction = rightLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) rightLabel).getId()) : null;
+            TruthValue leftValue = leftInstruction != null ? leftInstruction.evaluate(termLabelName, results) : evaluateTerm(leftTerm, termLabelName, results);
+            TruthValue rightValue = rightInstruction != null ? rightInstruction.evaluate(termLabelName, results) : evaluateTerm(rightTerm, termLabelName, results);
+            TruthValue resultValue;
+            if (term.op() == Junctor.AND) {
+               resultValue = TruthValue.and(leftValue, rightValue);
+            }
+            else if (term.op() == Junctor.IMP) {
+               resultValue = TruthValue.imp(leftValue, rightValue);
+            }
+            else if (term.op() == Junctor.OR) {
+               resultValue = TruthValue.or(leftValue, rightValue);
+            }
+            else if (term.op() == Equality.EQV) {
+               resultValue = TruthValue.eqv(leftValue, rightValue);
+            }
+            else {
+               throw new IllegalStateException("Operator '" + term.op() + "' is not supported.");
+            }
+            return resultValue;
+         }
+         else if (term.op() == Junctor.NOT) {
+            Term argumentTerm = TermBuilder.goBelowUpdates(term.sub(0));
+            TermLabel argumentLabel = argumentTerm.getLabel(termLabelName);
+            MultiPredicateResult argumentInstruction = argumentLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) argumentLabel).getId()) : null;
+            TruthValue argumentValue = argumentInstruction != null ? argumentInstruction.evaluate(termLabelName, results) : evaluateTerm(argumentTerm, termLabelName, results);
+            TruthValue resultValue = TruthValue.not(argumentValue);
+            return resultValue;
+         }
+         else if (term.op() == Junctor.TRUE) {
+            return TruthValue.TRUE;
+         }
+         else if (term.op() == Junctor.FALSE) {
+            return TruthValue.FALSE;
+         }
+         else if (isIfThenElseFormula(term)) {
+            Term conditionTerm = TermBuilder.goBelowUpdates(term.sub(0));
+            Term thenTerm = TermBuilder.goBelowUpdates(term.sub(1));
+            Term elseTerm = TermBuilder.goBelowUpdates(term.sub(2));
+            TermLabel conditionLabel = conditionTerm.getLabel(termLabelName);
+            TermLabel thenLabel = thenTerm.getLabel(termLabelName);
+            TermLabel elseLabel = elseTerm.getLabel(termLabelName);
+            MultiPredicateResult conditionInstruction = conditionLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) conditionLabel).getId()) : null;
+            MultiPredicateResult thenInstruction = thenLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) thenLabel).getId()) : null;
+            MultiPredicateResult elseInstruction = elseLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) elseLabel).getId()) : null;
+            TruthValue conditionValue = conditionInstruction != null ? conditionInstruction.evaluate(termLabelName, results) : evaluateTerm(conditionTerm, termLabelName, results);
+            TruthValue thenValue = thenInstruction != null ? thenInstruction.evaluate(termLabelName, results) : evaluateTerm(thenTerm, termLabelName, results);
+            TruthValue elseValue = elseInstruction != null ? elseInstruction.evaluate(termLabelName, results) : evaluateTerm(elseTerm, termLabelName, results);
+            TruthValue resultValue = TruthValue.ifThenElse(conditionValue, thenValue, elseValue);
+            return resultValue;
+         }
+         else {
+            return null;
+         }
+      }
    }
    
    /**
@@ -706,9 +969,9 @@ public final class PredicateEvaluationUtil {
     */
    public static class BranchResult {
       /**
-       * All predicate results.
+       * All found results.
        */
-      private final Map<String, IPredicateInstruction> results;
+      private final Map<String, MultiPredicateResult> results;
       
       /**
        * The leaf {@link Node}.
@@ -733,13 +996,13 @@ public final class PredicateEvaluationUtil {
       /**
        * Constructor. 
        * @param leafNode The leaf {@link Node}.
-       * @param results All predicate results.
+       * @param results All found results.
        * @param condition The condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
        * @param conditionString The human readable condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
        * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
        */
       public BranchResult(Node leafNode, 
-                          Map<String, IPredicateInstruction> results,
+                          Map<String, MultiPredicateResult> results,
                           Term condition,
                           String conditionString,
                           Name termLabelName) {
@@ -754,19 +1017,19 @@ public final class PredicateEvaluationUtil {
       }
 
       /**
-       * Returns all predicate results.
-       * @return All predicate results.
+       * Returns all found results.
+       * @return All found results.
        */
-      public Map<String, IPredicateInstruction> getResults() {
+      public Map<String, MultiPredicateResult> getResults() {
          return Collections.unmodifiableMap(results);
       }
       
       /**
-       * Returns the {@link PredicateResult} for the given {@link PredicateTermLabel}.
+       * Returns the {@link MultiPredicateResult} for the given {@link PredicateTermLabel}.
        * @param termLabel The {@link PredicateTermLabel}.
-       * @return The found {@link PredicateResult} or {@code null} if not available.
+       * @return The found {@link MultiPredicateResult} or {@code null} if not available.
        */
-      public IPredicateInstruction getResult(PredicateTermLabel termLabel) {
+      public MultiPredicateResult getResult(PredicateTermLabel termLabel) {
          return termLabel != null ? results.get(termLabel.getId()) : null;
       }
       
@@ -831,7 +1094,7 @@ public final class PredicateEvaluationUtil {
          sb.append(leafNode.serialNr());
          sb.append("\n");
          boolean afterFirst = false;
-         for (Entry<String, IPredicateInstruction> entry : results.entrySet()) {
+         for (Entry<String, MultiPredicateResult> entry : results.entrySet()) {
             if (afterFirst) {
                sb.append("\n");
             }
@@ -852,245 +1115,10 @@ public final class PredicateEvaluationUtil {
        * @param termLabel The {@link PredicateTermLabel} to evaluate.
        * @return The evaluation result.
        */
-      public PredicateResult evaluate(PredicateTermLabel termLabel) {
+      public TruthValue evaluate(PredicateTermLabel termLabel) {
          if (termLabel != null) {
-            IPredicateInstruction instruction = getResult(termLabel);
+            MultiPredicateResult instruction = getResult(termLabel);
             return instruction != null ? instruction.evaluate(termLabelName, results) : null;
-         }
-         else {
-            return null;
-         }
-      }
-   }
-   
-   /**
-    * Instances of this interface are used to compute the truth value
-    * of a predicate.
-    * @author Martin Hentschel
-    */
-   public static interface IPredicateInstruction {
-      /**
-       * Evaluates the truth values.
-       * @param termLabelName The {@link Name} of the term label which is added to predicates.
-       * @param results All available {@link IPredicateInstruction}s for IDs of {@link PredicateTermLabel}s.
-       * @return The computed {@link PredicateResult}.
-       */
-      public PredicateResult evaluate(Name termLabelName, Map<String, IPredicateInstruction> results);
-   }
-   
-   /**
-    * Represents the truth value of a predicate.
-    * <b>This class needs to be unmodifiable.</b>
-    * @author Martin Hentschel
-    */
-   public static class PredicateResult implements IPredicateInstruction {
-      /**
-       * The truth value.
-       */
-      private final PredicateValue value;
-      
-      /**
-       * The {@link Node}s on which the truth value is based on.
-       */
-      private final Set<Node> nodes = new LinkedHashSet<Node>();
-
-      /**
-       * Constructor.
-       * @param value The truth value.
-       * @param nodes The {@link Node}s on which the truth value is based on.
-       */
-      public PredicateResult(PredicateValue value, Node... nodes) {
-         assert value != null;
-         this.value = value;
-         JavaUtil.addAll(this.nodes, nodes);
-      }
-
-      /**
-       * Constructor.
-       * @param value The truth value.
-       * @param nodes The {@link Node}s on which the truth value is based on.
-       */
-      public PredicateResult(PredicateValue value, Node[]... nodes) {
-         assert value != null;
-         this.value = value;
-         for (Node[] currentNodes : nodes) {
-            JavaUtil.addAll(this.nodes, currentNodes);
-         }
-      }
-
-      /**
-       * Returns the truth value.
-       * @return The truth value.
-       */
-      public PredicateValue getValue() {
-         return value;
-      }
-      
-      /**
-       * Returns the {@link Node}s on which the truth value is based on.
-       * @return The {@link Node}s on which the truth value is based on.
-       */
-      public Node[] getNodes() {
-         return nodes.toArray(new Node[nodes.size()]);
-      }
-
-      /**
-       * {@inheritDoc}
-       * @return
-       */
-      @Override
-      public String toString() {
-         StringBuffer sb = new StringBuffer();
-         sb.append(value);
-         if (!nodes.isEmpty()) {
-            sb.append(" based on nodes ");
-            boolean afterFirst = false;
-            for (Node node : nodes) {
-               if (afterFirst) {
-                  sb.append(", ");
-               }
-               else {
-                  afterFirst = true;
-               }
-               sb.append(node.serialNr());
-            }
-         }
-         return sb.toString();
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public PredicateResult evaluate(Name termLabelName, Map<String, IPredicateInstruction> results) {
-         return this;
-      }
-   }
-   
-   /**
-    * Represents an instruction which specifies how to compute the
-    * truth value of a predicate.
-    * @author Martin Hentschel
-    */
-   public static class TermPredicateInstruction implements IPredicateInstruction {
-      /**
-       * The {@link Term} with the truth value computation instruction.
-       */
-      private final Term term;
-
-      /**
-       * Constructor.
-       * @param term The {@link Term} with the truth value computation instruction.
-       */
-      public TermPredicateInstruction(Term term) {
-         assert term != null;
-         this.term = term;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public String toString() {
-         return term.toString();
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public PredicateResult evaluate(Name termLabelName, Map<String, IPredicateInstruction> results) {
-         return evaluateTerm(term, termLabelName, results);
-      }
-
-      /**
-       * Evaluates the truth values.
-       * @param term The {@link Term} to evaluate.
-       * @param termLabelName The {@link Name} of the term label which is added to predicates.
-       * @param results All available {@link IPredicateInstruction}s for IDs of {@link PredicateTermLabel}s.
-       * @return The computed {@link PredicateResult}.
-       */
-      public static PredicateResult evaluateTerm(Term term, Name termLabelName, Map<String, IPredicateInstruction> results) {
-         TermLabel label = term.getLabel(termLabelName);
-         // Return direct label result if available
-         if (label instanceof PredicateTermLabel) {
-            IPredicateInstruction instruction = results.get(((PredicateTermLabel) label).getId());
-            if (instruction != null) {
-               return instruction.evaluate(termLabelName, results);
-            }
-         }
-         // If direct label result is not available try to compute it. (e.g. because of or/and label was replaced by sequent top level formuals)
-         if (term.op() == Junctor.AND ||
-             term.op() == Junctor.IMP ||
-             term.op() == Junctor.OR ||
-             term.op() == Equality.EQV) {
-            Term leftTerm = TermBuilder.goBelowUpdates(term.sub(0));
-            Term rightTerm = TermBuilder.goBelowUpdates(term.sub(1));
-            TermLabel leftLabel = leftTerm.getLabel(termLabelName);
-            TermLabel rightLabel = rightTerm.getLabel(termLabelName);
-            IPredicateInstruction leftInstruction = leftLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) leftLabel).getId()) : null;
-            IPredicateInstruction rightInstruction = rightLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) rightLabel).getId()) : null;
-            PredicateResult leftResult = leftInstruction != null ? leftInstruction.evaluate(termLabelName, results) : evaluateTerm(leftTerm, termLabelName, results);
-            PredicateResult rightResult = rightInstruction != null ? rightInstruction.evaluate(termLabelName, results) : evaluateTerm(rightTerm, termLabelName, results);
-            PredicateValue leftValue = leftResult != null ? leftResult.getValue() : null;
-            PredicateValue rightValue = rightResult != null ? rightResult.getValue() : null;
-            PredicateValue resultValue;
-            if (term.op() == Junctor.AND) {
-               resultValue = PredicateValue.and(leftValue, rightValue);
-            }
-            else if (term.op() == Junctor.IMP) {
-               resultValue = PredicateValue.imp(leftValue, rightValue);
-            }
-            else if (term.op() == Junctor.OR) {
-               resultValue = PredicateValue.or(leftValue, rightValue);
-            }
-            else if (term.op() == Equality.EQV) {
-               resultValue = PredicateValue.eqv(leftValue, rightValue);
-            }
-            else {
-               throw new IllegalStateException("Operator '" + term.op() + "' is not supported.");
-            }
-            return new PredicateResult(resultValue, 
-                                       leftResult != null ? leftResult.getNodes() : null,
-                                       rightResult != null ? rightResult.getNodes() : null);
-         }
-         else if (term.op() == Junctor.NOT) {
-            Term argumentTerm = TermBuilder.goBelowUpdates(term.sub(0));
-            TermLabel argumentLabel = argumentTerm.getLabel(termLabelName);
-            IPredicateInstruction argumentInstruction = argumentLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) argumentLabel).getId()) : null;
-            PredicateResult argumentResult = argumentInstruction != null ? argumentInstruction.evaluate(termLabelName, results) : evaluateTerm(argumentTerm, termLabelName, results);
-            PredicateValue argumentValue = argumentResult != null ? argumentResult.getValue() : null;
-            PredicateValue resultValue = PredicateValue.not(argumentValue);
-            return new PredicateResult(resultValue, 
-                                       argumentResult != null ? argumentResult.getNodes() : null);
-         }
-         else if (term.op() == Junctor.TRUE) {
-            return new PredicateResult(PredicateValue.TRUE);
-         }
-         else if (term.op() == Junctor.FALSE) {
-            return new PredicateResult(PredicateValue.FALSE);
-         }
-         else if (isIfThenElseFormula(term)) {
-            Term conditionTerm = TermBuilder.goBelowUpdates(term.sub(0));
-            Term thenTerm = TermBuilder.goBelowUpdates(term.sub(1));
-            Term elseTerm = TermBuilder.goBelowUpdates(term.sub(2));
-            TermLabel conditionLabel = conditionTerm.getLabel(termLabelName);
-            TermLabel thenLabel = thenTerm.getLabel(termLabelName);
-            TermLabel elseLabel = elseTerm.getLabel(termLabelName);
-            IPredicateInstruction conditionInstruction = conditionLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) conditionLabel).getId()) : null;
-            IPredicateInstruction thenInstruction = thenLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) thenLabel).getId()) : null;
-            IPredicateInstruction elseInstruction = elseLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) elseLabel).getId()) : null;
-            PredicateResult conditionResult = conditionInstruction != null ? conditionInstruction.evaluate(termLabelName, results) : evaluateTerm(conditionTerm, termLabelName, results);
-            PredicateResult thenResult = thenInstruction != null ? thenInstruction.evaluate(termLabelName, results) : evaluateTerm(thenTerm, termLabelName, results);
-            PredicateResult elseResult = elseInstruction != null ? elseInstruction.evaluate(termLabelName, results) : evaluateTerm(elseTerm, termLabelName, results);
-            PredicateValue conditionValue = conditionResult != null ? conditionResult.getValue() : null;
-            PredicateValue thenValue = thenResult != null ? thenResult.getValue() : null;
-            PredicateValue elseValue = elseResult != null ? elseResult.getValue() : null;
-            PredicateValue resultValue = PredicateValue.ifThenElse(conditionValue, thenValue, elseValue);
-            return new PredicateResult(resultValue, 
-                                       conditionResult != null ? conditionResult.getNodes() : null,
-                                       thenResult != null ? thenResult.getNodes() : null,
-                                       elseResult != null ? elseResult.getNodes() : null);
          }
          else {
             return null;
@@ -1102,7 +1130,7 @@ public final class PredicateEvaluationUtil {
     * Represents the possible truth values.
     * @author Martin Hentschel
     */
-   public static enum PredicateValue {
+   public static enum TruthValue {
       /**
        * True.
        */
@@ -1142,11 +1170,11 @@ public final class PredicateEvaluationUtil {
 
       /**
        * Computes the {@code and} value.
-       * @param left The left {@link PredicateValue}.
-       * @param right The right {@link PredicateValue}.
+       * @param left The left {@link TruthValue}.
+       * @param right The right {@link TruthValue}.
        * @return The computed {@code and} value.
        */
-      public static PredicateValue and(PredicateValue left, PredicateValue right) {
+      public static TruthValue and(TruthValue left, TruthValue right) {
          if (left == null || UNKNOWN.equals(left)) {
             if (FALSE.equals(right)) {
                return FALSE;
@@ -1175,21 +1203,21 @@ public final class PredicateEvaluationUtil {
 
       /**
        * Computes the {@code imp} value.
-       * @param left The left {@link PredicateValue}.
-       * @param right The right {@link PredicateValue}.
+       * @param left The left {@link TruthValue}.
+       * @param right The right {@link TruthValue}.
        * @return The computed {@code imp} value.
        */
-      public static PredicateValue imp(PredicateValue left, PredicateValue right) {
+      public static TruthValue imp(TruthValue left, TruthValue right) {
          return or(not(left), right);
       }
 
       /**
        * Computes the {@code or} value.
-       * @param left The left {@link PredicateValue}.
-       * @param right The right {@link PredicateValue}.
+       * @param left The left {@link TruthValue}.
+       * @param right The right {@link TruthValue}.
        * @return The computed {@code or} value.
        */
-      public static PredicateValue or(PredicateValue left, PredicateValue right) {
+      public static TruthValue or(TruthValue left, TruthValue right) {
          if (left == null || UNKNOWN.equals(left)) {
             if (TRUE.equals(right)) {
                return TRUE;
@@ -1218,10 +1246,10 @@ public final class PredicateEvaluationUtil {
 
       /**
        * Computes the {@code not} value.
-       * @param value The {@link PredicateValue}.
+       * @param value The {@link TruthValue}.
        * @return The computed {@code not} value.
        */
-      public static PredicateValue not(PredicateValue value) {
+      public static TruthValue not(TruthValue value) {
          if (TRUE.equals(value)) {
             return FALSE;
          }
@@ -1235,10 +1263,10 @@ public final class PredicateEvaluationUtil {
 
       /**
        * Computes the {@code eqv} value.
-       * @param value The {@link PredicateValue}.
+       * @param value The {@link TruthValue}.
        * @return The computed {@code not} value.
        */
-      public static PredicateValue eqv(PredicateValue left, PredicateValue right) {
+      public static TruthValue eqv(TruthValue left, TruthValue right) {
          return or(and(left, right), and(not(left), not(right)));
       }
 
@@ -1249,9 +1277,9 @@ public final class PredicateEvaluationUtil {
        * @param elseValue The else value.
        * @return The computed {@code if-then-else} value.
        */
-      public static PredicateValue ifThenElse(PredicateValue conditionValue,
-                                              PredicateValue thenValue, 
-                                              PredicateValue elseValue) {
+      public static TruthValue ifThenElse(TruthValue conditionValue,
+                                              TruthValue thenValue, 
+                                              TruthValue elseValue) {
          if (TRUE.equals(conditionValue)) {
             return thenValue;
          }

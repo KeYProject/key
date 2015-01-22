@@ -10,10 +10,9 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.logic.label.PredicateTermLabel;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.BranchResult;
-import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.IPredicateInstruction;
+import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.MultiPredicateResult;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateEvaluationResult;
-import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateResult;
-import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateValue;
+import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.TruthValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
@@ -31,10 +30,10 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testEquivExample_NoOneStepSimplification() throws Exception {
       // Create expected results
-      ExpectedBranchResult goal79 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", PredicateValue.TRUE), new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("4.0", PredicateValue.TRUE));
-      ExpectedBranchResult goal91 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", PredicateValue.TRUE), new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("4.0", PredicateValue.TRUE));
-      ExpectedBranchResult goal95 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", PredicateValue.TRUE), new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("4.0", PredicateValue.TRUE));
-      ExpectedBranchResult goal97 = new ExpectedBranchResult(new ExpectedPredicateResult("5.0", PredicateValue.FALSE)); // SETAccumulate is false
+      ExpectedBranchResult goal79 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.TRUE));
+      ExpectedBranchResult goal91 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.TRUE));
+      ExpectedBranchResult goal95 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.TRUE));
+      ExpectedBranchResult goal97 = new ExpectedBranchResult(new ExpectedPredicateResult("5.0", TruthValue.FALSE)); // SETAccumulate is false
       ExpectedPredicateEvaluationResult result = new ExpectedPredicateEvaluationResult(goal79, goal91, goal95, goal97);
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateEquivExample/test/EquivExampleNoOneStepSimplification.proof", 
@@ -49,10 +48,10 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testEquivExample() throws Exception {
       // Create expected results
-      ExpectedBranchResult goal39 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", PredicateValue.TRUE), new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("4.0", PredicateValue.TRUE));
-      ExpectedBranchResult goal50 = new ExpectedBranchResult(new ExpectedPredicateResult("1.0", PredicateValue.FALSE), new ExpectedPredicateResult("2.0", PredicateValue.UNKNOWN), new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("4.0", PredicateValue.UNKNOWN), new ExpectedPredicateResult("5.0", PredicateValue.TRUE), new ExpectedPredicateResult("6.0", PredicateValue.UNKNOWN));
-      ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedPredicateResult("1.0", PredicateValue.TRUE), new ExpectedPredicateResult("2.0", PredicateValue.TRUE), new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("4.0", PredicateValue.TRUE), new ExpectedPredicateResult("5.0", PredicateValue.TRUE), new ExpectedPredicateResult("6.0", PredicateValue.TRUE));
-      ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("6.0", PredicateValue.FALSE), new ExpectedPredicateResult("4.0", PredicateValue.UNKNOWN), new ExpectedPredicateResult("5.0", PredicateValue.FALSE)); // SETAccumulate is false
+      ExpectedBranchResult goal39 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.TRUE));
+      ExpectedBranchResult goal50 = new ExpectedBranchResult(new ExpectedPredicateResult("1.0", TruthValue.FALSE), new ExpectedPredicateResult("2.0", TruthValue.UNKNOWN), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.UNKNOWN), new ExpectedPredicateResult("5.0", TruthValue.TRUE), new ExpectedPredicateResult("6.0", TruthValue.UNKNOWN));
+      ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.TRUE), new ExpectedPredicateResult("6.0", TruthValue.TRUE));
+      ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("6.0", TruthValue.FALSE), new ExpectedPredicateResult("4.0", TruthValue.UNKNOWN), new ExpectedPredicateResult("5.0", TruthValue.FALSE)); // SETAccumulate is false
       ExpectedPredicateEvaluationResult result = new ExpectedPredicateEvaluationResult(goal39, goal50, goal53, goal55);
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateEquivExample/test/EquivExample.proof", 
@@ -67,8 +66,8 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testIfThenElseInteger() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult thenResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult elseResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult thenResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult elseResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE)));
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateIfThenElseIntegerTest/test/IfThenElseIntegerTest.java", 
                                 "IfThenElseIntegerTest[IfThenElseIntegerTest::magic(int,int)].JML normal_behavior operation contract.0", 
@@ -84,8 +83,8 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testIfThenElseNotFormula() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult thenResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult elseResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult thenResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult elseResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE)));
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateIfThenElseNotFormulaTest/test/IfThenElseNotFormulaTest.java", 
                                 "IfThenElseNotFormulaTest[IfThenElseNotFormulaTest::magic(int,int)].JML normal_behavior operation contract.0", 
@@ -101,8 +100,8 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testIfThenElseFormula() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult thenResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("4.0", PredicateValue.TRUE), new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult elseResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("4.0", PredicateValue.TRUE), new ExpectedPredicateResult("0.0", PredicateValue.FALSE), new ExpectedPredicateResult("2.0", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult thenResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("4.0", TruthValue.TRUE), new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult elseResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("4.0", TruthValue.TRUE), new ExpectedPredicateResult("0.0", TruthValue.FALSE), new ExpectedPredicateResult("2.0", TruthValue.TRUE)));
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateIfThenElseFormulaTest/test/IfThenElseFormulaTest.java", 
                                 "IfThenElseFormulaTest[IfThenElseFormulaTest::magic(int,int)].JML normal_behavior operation contract.0", 
@@ -118,10 +117,10 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testNotLastEvaluationGivesTruthValue() throws Exception {
       // Create expected results
-      ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("6.0", PredicateValue.TRUE), new ExpectedPredicateResult("4.0", PredicateValue.TRUE), new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("8.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.12", PredicateValue.FALSE), new ExpectedPredicateResult("1.13", PredicateValue.TRUE), new ExpectedPredicateResult("2.0", PredicateValue.TRUE));
-      ExpectedBranchResult goal41 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("0.0", PredicateValue.TRUE));
-      ExpectedBranchResult goal39 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("0.0", PredicateValue.TRUE));
-      ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.11", PredicateValue.TRUE));
+      ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("6.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.TRUE), new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("8.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("1.12", TruthValue.FALSE), new ExpectedPredicateResult("1.13", TruthValue.TRUE), new ExpectedPredicateResult("2.0", TruthValue.TRUE));
+      ExpectedBranchResult goal41 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("0.0", TruthValue.TRUE));
+      ExpectedBranchResult goal39 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("0.0", TruthValue.TRUE));
+      ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.11", TruthValue.TRUE));
       ExpectedPredicateEvaluationResult result = new ExpectedPredicateEvaluationResult(goal53, goal41, goal39, goal55);
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateNotLastEvaluationGivesTruthValue/test/NotLastEvaluationGivesTruthValue.proof", 
@@ -136,9 +135,9 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testArraySumWhile_NoOneStepSimplification() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult initialResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("14.0", PredicateValue.TRUE), new ExpectedPredicateResult("15.0", PredicateValue.TRUE), new ExpectedPredicateResult("16.0", PredicateValue.TRUE), new ExpectedPredicateResult("17.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult preservesResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("18.0", PredicateValue.TRUE), new ExpectedPredicateResult("19.0", PredicateValue.TRUE), new ExpectedPredicateResult("20.0", PredicateValue.TRUE), new ExpectedPredicateResult("21.0", PredicateValue.TRUE), new ExpectedPredicateResult("22.0", PredicateValue.TRUE), new ExpectedPredicateResult("23.0", PredicateValue.TRUE), new ExpectedPredicateResult("24.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE), new ExpectedPredicateResult("2.0", PredicateValue.TRUE), new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("4.0", PredicateValue.FALSE), new ExpectedPredicateResult("8.0", PredicateValue.TRUE), new ExpectedPredicateResult("9.0", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult initialResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("14.0", TruthValue.TRUE), new ExpectedPredicateResult("15.0", TruthValue.TRUE), new ExpectedPredicateResult("16.0", TruthValue.TRUE), new ExpectedPredicateResult("17.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult preservesResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("18.0", TruthValue.TRUE), new ExpectedPredicateResult("19.0", TruthValue.TRUE), new ExpectedPredicateResult("20.0", TruthValue.TRUE), new ExpectedPredicateResult("21.0", TruthValue.TRUE), new ExpectedPredicateResult("22.0", TruthValue.TRUE), new ExpectedPredicateResult("23.0", TruthValue.TRUE), new ExpectedPredicateResult("24.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.FALSE), new ExpectedPredicateResult("8.0", TruthValue.TRUE), new ExpectedPredicateResult("9.0", TruthValue.TRUE)));
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateArraySumWhile/test/ArraySumWhileNoOneStepSimplification.proof", 
                                 "examples/_testcase/set/predicateArraySumWhile/oracle/ArraySumWhile.xml",
@@ -154,9 +153,9 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testArraySumWhile() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult initialResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("14.0", PredicateValue.TRUE), new ExpectedPredicateResult("15.0", PredicateValue.TRUE), new ExpectedPredicateResult("16.0", PredicateValue.TRUE), new ExpectedPredicateResult("17.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult preservesResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("18.0", PredicateValue.TRUE), new ExpectedPredicateResult("19.0", PredicateValue.TRUE), new ExpectedPredicateResult("20.0", PredicateValue.TRUE), new ExpectedPredicateResult("21.0", PredicateValue.TRUE), new ExpectedPredicateResult("22.0", PredicateValue.TRUE), new ExpectedPredicateResult("23.0", PredicateValue.TRUE), new ExpectedPredicateResult("24.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE), new ExpectedPredicateResult("2.0", PredicateValue.TRUE), new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("4.0", PredicateValue.FALSE), new ExpectedPredicateResult("8.0", PredicateValue.TRUE), new ExpectedPredicateResult("9.0", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult initialResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("14.0", TruthValue.TRUE), new ExpectedPredicateResult("15.0", TruthValue.TRUE), new ExpectedPredicateResult("16.0", TruthValue.TRUE), new ExpectedPredicateResult("17.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult preservesResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("18.0", TruthValue.TRUE), new ExpectedPredicateResult("19.0", TruthValue.TRUE), new ExpectedPredicateResult("20.0", TruthValue.TRUE), new ExpectedPredicateResult("21.0", TruthValue.TRUE), new ExpectedPredicateResult("22.0", TruthValue.TRUE), new ExpectedPredicateResult("23.0", TruthValue.TRUE), new ExpectedPredicateResult("24.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.FALSE), new ExpectedPredicateResult("8.0", TruthValue.TRUE), new ExpectedPredicateResult("9.0", TruthValue.TRUE)));
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateArraySumWhile/test/ArraySumWhile.proof", 
                                 "examples/_testcase/set/predicateArraySumWhile/oracle/ArraySumWhile.xml",
@@ -172,12 +171,12 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testArrayUtil_NoOneStepSimplification() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult goal97 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("5.0", PredicateValue.TRUE), new ExpectedPredicateResult("6.0", PredicateValue.TRUE), new ExpectedPredicateResult("7.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult goal826 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("17.0", PredicateValue.TRUE), new ExpectedPredicateResult("18.0", PredicateValue.TRUE), new ExpectedPredicateResult("20.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult goal630 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("8.0", PredicateValue.TRUE), new ExpectedPredicateResult("10.0", PredicateValue.TRUE), new ExpectedPredicateResult("13.0", PredicateValue.FALSE)));
-      ExpectedPredicateEvaluationResult goal792 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("8.0", PredicateValue.TRUE), new ExpectedPredicateResult("9.0", PredicateValue.TRUE), new ExpectedPredicateResult("10.0", PredicateValue.TRUE), new ExpectedPredicateResult("11.0", PredicateValue.TRUE), new ExpectedPredicateResult("12.0", PredicateValue.TRUE), new ExpectedPredicateResult("13.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult goal1024 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("3.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult goal1161 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("3.0", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult goal97 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("5.0", TruthValue.TRUE), new ExpectedPredicateResult("6.0", TruthValue.TRUE), new ExpectedPredicateResult("7.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult goal826 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("17.0", TruthValue.TRUE), new ExpectedPredicateResult("18.0", TruthValue.TRUE), new ExpectedPredicateResult("20.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult goal630 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("8.0", TruthValue.TRUE), new ExpectedPredicateResult("10.0", TruthValue.TRUE), new ExpectedPredicateResult("13.0", TruthValue.FALSE)));
+      ExpectedPredicateEvaluationResult goal792 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("8.0", TruthValue.TRUE), new ExpectedPredicateResult("9.0", TruthValue.TRUE), new ExpectedPredicateResult("10.0", TruthValue.TRUE), new ExpectedPredicateResult("11.0", TruthValue.TRUE), new ExpectedPredicateResult("12.0", TruthValue.TRUE), new ExpectedPredicateResult("13.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult goal1024 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult goal1161 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE)));
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateArrayUtil/test/ArrayUtilNoOneStepSimplification.proof", 
                                 "examples/_testcase/set/predicateArrayUtil/oracle/ArrayUtil.xml",
@@ -196,12 +195,12 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testArrayUtil() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult goal97 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("5.0", PredicateValue.TRUE), new ExpectedPredicateResult("6.0", PredicateValue.TRUE), new ExpectedPredicateResult("7.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult goal826 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("17.0", PredicateValue.TRUE), new ExpectedPredicateResult("18.0", PredicateValue.TRUE), new ExpectedPredicateResult("20.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult goal630 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("8.0", PredicateValue.TRUE), new ExpectedPredicateResult("10.0", PredicateValue.TRUE), new ExpectedPredicateResult("13.0", PredicateValue.FALSE)));
-      ExpectedPredicateEvaluationResult goal792 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("8.0", PredicateValue.TRUE), new ExpectedPredicateResult("9.0", PredicateValue.TRUE), new ExpectedPredicateResult("10.0", PredicateValue.TRUE), new ExpectedPredicateResult("11.0", PredicateValue.TRUE), new ExpectedPredicateResult("12.0", PredicateValue.TRUE), new ExpectedPredicateResult("13.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult goal1024 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("3.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult goal1161 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("3.0", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult goal97 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("5.0", TruthValue.TRUE), new ExpectedPredicateResult("6.0", TruthValue.TRUE), new ExpectedPredicateResult("7.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult goal826 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("17.0", TruthValue.TRUE), new ExpectedPredicateResult("18.0", TruthValue.TRUE), new ExpectedPredicateResult("20.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult goal630 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("8.0", TruthValue.TRUE), new ExpectedPredicateResult("10.0", TruthValue.TRUE), new ExpectedPredicateResult("13.0", TruthValue.FALSE)));
+      ExpectedPredicateEvaluationResult goal792 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("8.0", TruthValue.TRUE), new ExpectedPredicateResult("9.0", TruthValue.TRUE), new ExpectedPredicateResult("10.0", TruthValue.TRUE), new ExpectedPredicateResult("11.0", TruthValue.TRUE), new ExpectedPredicateResult("12.0", TruthValue.TRUE), new ExpectedPredicateResult("13.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult goal1024 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult goal1161 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE)));
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateArrayUtil/test/ArrayUtil.proof", 
                                 "examples/_testcase/set/predicateArrayUtil/oracle/ArrayUtil.xml",
@@ -220,8 +219,8 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testSimpleInstanceMethodContractApplication_NoOneStepSimplification() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("12.0", PredicateValue.TRUE), new ExpectedPredicateResult("10.0", PredicateValue.TRUE), new ExpectedPredicateResult("9.0", PredicateValue.TRUE), new ExpectedPredicateResult("11.0", PredicateValue.TRUE), new ExpectedPredicateResult("7.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE), new ExpectedPredicateResult("5.0", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("12.0", TruthValue.TRUE), new ExpectedPredicateResult("10.0", TruthValue.TRUE), new ExpectedPredicateResult("9.0", TruthValue.TRUE), new ExpectedPredicateResult("11.0", TruthValue.TRUE), new ExpectedPredicateResult("7.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.TRUE)));
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateSimpleInstanceMethodContractApplication/test/SimpleInstanceMethodContractApplication_NoOneStepSimplification.proof", 
                                 "examples/_testcase/set/predicateSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
@@ -236,8 +235,8 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testSimpleInstanceMethodContractApplication() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("12.0", PredicateValue.TRUE), new ExpectedPredicateResult("10.0", PredicateValue.TRUE), new ExpectedPredicateResult("9.0", PredicateValue.TRUE), new ExpectedPredicateResult("11.0", PredicateValue.TRUE), new ExpectedPredicateResult("7.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE), new ExpectedPredicateResult("5.0", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("12.0", TruthValue.TRUE), new ExpectedPredicateResult("10.0", TruthValue.TRUE), new ExpectedPredicateResult("9.0", TruthValue.TRUE), new ExpectedPredicateResult("11.0", TruthValue.TRUE), new ExpectedPredicateResult("7.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.TRUE)));
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateSimpleInstanceMethodContractApplication/test/SimpleInstanceMethodContractApplication.proof", 
                                 "examples/_testcase/set/predicateSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
@@ -252,8 +251,8 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testSimpleMethodContractApplication_NoOneStepSimplification() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("10.0", PredicateValue.TRUE), new ExpectedPredicateResult("9.0", PredicateValue.TRUE), new ExpectedPredicateResult("11.0", PredicateValue.TRUE), new ExpectedPredicateResult("7.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE), new ExpectedPredicateResult("5.0", PredicateValue.TRUE), new ExpectedPredicateResult("2.0", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("10.0", TruthValue.TRUE), new ExpectedPredicateResult("9.0", TruthValue.TRUE), new ExpectedPredicateResult("11.0", TruthValue.TRUE), new ExpectedPredicateResult("7.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.TRUE), new ExpectedPredicateResult("2.0", TruthValue.TRUE)));
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateSimpleMethodContractApplication/test/SimpleMethodContractApplication_NoOneStepSimplification.proof", 
                                 "examples/_testcase/set/predicateSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
@@ -268,8 +267,8 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testSimpleMethodContractApplication() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("10.0", PredicateValue.TRUE), new ExpectedPredicateResult("9.0", PredicateValue.TRUE), new ExpectedPredicateResult("11.0", PredicateValue.TRUE), new ExpectedPredicateResult("7.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE), new ExpectedPredicateResult("5.0", PredicateValue.TRUE), new ExpectedPredicateResult("2.0", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("10.0", TruthValue.TRUE), new ExpectedPredicateResult("9.0", TruthValue.TRUE), new ExpectedPredicateResult("11.0", TruthValue.TRUE), new ExpectedPredicateResult("7.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.TRUE), new ExpectedPredicateResult("2.0", TruthValue.TRUE)));
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateSimpleMethodContractApplication/test/SimpleMethodContractApplication.proof", 
                                 "examples/_testcase/set/predicateSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
@@ -284,10 +283,10 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testDifferentBranchesTest() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult firstResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult secondResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.FALSE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult thirdResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("1.0", PredicateValue.FALSE)));
-      ExpectedPredicateEvaluationResult fourthResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("1.0", PredicateValue.FALSE)));
+      ExpectedPredicateEvaluationResult firstResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult secondResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.FALSE), new ExpectedPredicateResult("1.0", TruthValue.TRUE)));
+      ExpectedPredicateEvaluationResult thirdResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("1.0", TruthValue.FALSE)));
+      ExpectedPredicateEvaluationResult fourthResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("1.0", TruthValue.FALSE)));
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateDifferentBranchesTest/test/DifferentBranchesTest.proof", 
                                 "examples/_testcase/set/predicateDifferentBranchesTest/oracle/DifferentBranchesTest.xml",
@@ -304,8 +303,8 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testMultiplePredicateResultsTest() throws Exception {
       // Create expected results
-      ExpectedBranchResult goal102 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.FALSE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE));
-      ExpectedBranchResult goal95 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE));
+      ExpectedBranchResult goal102 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.FALSE), new ExpectedPredicateResult("1.0", TruthValue.TRUE));
+      ExpectedBranchResult goal95 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE));
       ExpectedPredicateEvaluationResult expectedResult = new ExpectedPredicateEvaluationResult(goal102, goal95);
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateMultiplePredicateResults/test/MultiplePredicateResultsTest.java", 
@@ -483,19 +482,19 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     * @param current The current results.
     */
    protected void assertBranchResult(ExpectedBranchResult expected, BranchResult current) {
-      Map<String, IPredicateInstruction> currentResults = current.getResults();
+      Map<String, MultiPredicateResult> currentResults = current.getResults();
       assertTrue(expected.predicateResults.size() <= currentResults.size());
-      for (Entry<String, PredicateValue> expectedEntry : expected.predicateResults.entrySet()) {
-         IPredicateInstruction currentInstruction = currentResults.get(expectedEntry.getKey());
+      for (Entry<String, TruthValue> expectedEntry : expected.predicateResults.entrySet()) {
+         MultiPredicateResult currentInstruction = currentResults.get(expectedEntry.getKey());
          assertNotNull(currentInstruction);
-         PredicateResult currentResult = currentInstruction.evaluate(current.getTermLabelName(), currentResults);
-         PredicateValue expectedValue = expectedEntry.getValue();
+         TruthValue currentResult = currentInstruction.evaluate(current.getTermLabelName(), currentResults);
+         TruthValue expectedValue = expectedEntry.getValue();
          if (expectedValue == null) {
             assertNull(currentResult);
          }
          else {
             assertNotNull(currentResult);
-            assertEquals(expectedValue, currentResult.getValue());
+            assertEquals(expectedValue, currentResult);
          }
       }
    }
@@ -527,7 +526,7 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
       /**
        * The truth values of all predicates.
        */
-      private final Map<String, PredicateValue> predicateResults = new HashMap<String, PredicateValue>();
+      private final Map<String, TruthValue> predicateResults = new HashMap<String, TruthValue>();
 
       /**
        * Constructor.
@@ -553,14 +552,14 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
       /**
        * The truth value.
        */
-      private final PredicateValue value;
+      private final TruthValue value;
       
       /**
        * Constructor.
        * @param predicate The predicate.
        * @param value The truth value.
        */
-      public ExpectedPredicateResult(String predicate, PredicateValue value) {
+      public ExpectedPredicateResult(String predicate, TruthValue value) {
          this.predicate = predicate;
          this.value = value;
       }

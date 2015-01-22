@@ -58,8 +58,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.BranchResult;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateEvaluationResult;
-import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateResult;
-import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateValue;
+import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.TruthValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.util.Pair;
@@ -92,17 +91,17 @@ public abstract class AbstractPredicateComposite implements IDisposable {
 
    
    /**
-    * The {@link Color} to highlight {@link PredicateValue#TRUE}.
+    * The {@link Color} to highlight {@link TruthValue#TRUE}.
     */
    private final Color trueColor;
 
    /**
-    * The {@link Color} to highlight {@link PredicateValue#FALSE}.
+    * The {@link Color} to highlight {@link TruthValue#FALSE}.
     */
    private final Color falseColor;
 
    /**
-    * The {@link Color} to highlight {@link PredicateValue#UNKNOWN} or {@code null}.
+    * The {@link Color} to highlight {@link TruthValue#UNKNOWN} or {@code null}.
     */
    private final Color unknownColor;
    
@@ -212,6 +211,7 @@ public abstract class AbstractPredicateComposite implements IDisposable {
                                                                                       PredicateTermLabel.NAME,
                                                                                       settings.isUseUnicode(),
                                                                                       settings.isUsePrettyPrinting());
+System.out.println(result);
             if (!root.isDisposed()) {
                root.getDisplay().syncExec(new Runnable() {
                   @Override
@@ -302,7 +302,7 @@ public abstract class AbstractPredicateComposite implements IDisposable {
             decorators.add(viewerDecorator);
             // Show term and results
             Sequent sequent = createSequentToShow(branchResult.getCondition(), succedent);
-            PredicateValue value = viewerDecorator.showSequent(sequent, 
+            TruthValue value = viewerDecorator.showSequent(sequent, 
                                                                executionNode.getServices(), 
                                                                executionNode.getMediator(), 
                                                                branchResult);
@@ -326,8 +326,8 @@ public abstract class AbstractPredicateComposite implements IDisposable {
          if (uninterpretedPredicate != null) {
             TermLabel label = uninterpretedPredicate.getLabel(PredicateTermLabel.NAME);
             if (label instanceof PredicateTermLabel) {
-               PredicateResult result = branchResult.evaluate((PredicateTermLabel) label);
-               return result == null || !PredicateValue.FALSE.equals(result.getValue());
+               TruthValue result = branchResult.evaluate((PredicateTermLabel) label);
+               return result == null || !TruthValue.FALSE.equals(result);
             }
             else {
                return true;

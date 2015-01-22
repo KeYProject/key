@@ -1,198 +1,198 @@
 package de.uka.ilkd.key.symbolic_execution;
 
-import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateValue;
+import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.TruthValue;
 import junit.framework.TestCase;
 
 /**
- * Tests for {@link PredicateValue}.
+ * Tests for {@link TruthValue}.
  * @author Martin Hentschel
  */
 public class TestPredicateValue extends TestCase {
    /**
-    * Tests {@link PredicateValue#ifThenElse(PredicateValue, PredicateValue, PredicateValue)}.
+    * Tests {@link TruthValue#ifThenElse(TruthValue, TruthValue, TruthValue)}.
     */
    public void testIfThenElse() {
       // true
-      assertEquals(PredicateValue.TRUE, PredicateValue.ifThenElse(PredicateValue.TRUE, PredicateValue.TRUE, PredicateValue.TRUE));
-      assertEquals(PredicateValue.TRUE, PredicateValue.ifThenElse(PredicateValue.TRUE, PredicateValue.TRUE, PredicateValue.FALSE));
-      assertEquals(PredicateValue.TRUE, PredicateValue.ifThenElse(PredicateValue.TRUE, PredicateValue.TRUE, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.TRUE, PredicateValue.ifThenElse(PredicateValue.TRUE, PredicateValue.TRUE, null));
-      assertEquals(PredicateValue.FALSE, PredicateValue.ifThenElse(PredicateValue.TRUE, PredicateValue.FALSE, PredicateValue.TRUE));
-      assertEquals(PredicateValue.FALSE, PredicateValue.ifThenElse(PredicateValue.TRUE, PredicateValue.FALSE, PredicateValue.FALSE));
-      assertEquals(PredicateValue.FALSE, PredicateValue.ifThenElse(PredicateValue.TRUE, PredicateValue.FALSE, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.FALSE, PredicateValue.ifThenElse(PredicateValue.TRUE, PredicateValue.FALSE, null));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.TRUE, PredicateValue.UNKNOWN, PredicateValue.TRUE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.TRUE, PredicateValue.UNKNOWN, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.TRUE, PredicateValue.UNKNOWN, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.TRUE, PredicateValue.UNKNOWN, null));
-      assertEquals(null, PredicateValue.ifThenElse(PredicateValue.TRUE, null, PredicateValue.TRUE));
-      assertEquals(null, PredicateValue.ifThenElse(PredicateValue.TRUE, null, PredicateValue.FALSE));
-      assertEquals(null, PredicateValue.ifThenElse(PredicateValue.TRUE, null, PredicateValue.UNKNOWN));
-      assertEquals(null, PredicateValue.ifThenElse(PredicateValue.TRUE, null, null));
+      assertEquals(TruthValue.TRUE, TruthValue.ifThenElse(TruthValue.TRUE, TruthValue.TRUE, TruthValue.TRUE));
+      assertEquals(TruthValue.TRUE, TruthValue.ifThenElse(TruthValue.TRUE, TruthValue.TRUE, TruthValue.FALSE));
+      assertEquals(TruthValue.TRUE, TruthValue.ifThenElse(TruthValue.TRUE, TruthValue.TRUE, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.TRUE, TruthValue.ifThenElse(TruthValue.TRUE, TruthValue.TRUE, null));
+      assertEquals(TruthValue.FALSE, TruthValue.ifThenElse(TruthValue.TRUE, TruthValue.FALSE, TruthValue.TRUE));
+      assertEquals(TruthValue.FALSE, TruthValue.ifThenElse(TruthValue.TRUE, TruthValue.FALSE, TruthValue.FALSE));
+      assertEquals(TruthValue.FALSE, TruthValue.ifThenElse(TruthValue.TRUE, TruthValue.FALSE, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.FALSE, TruthValue.ifThenElse(TruthValue.TRUE, TruthValue.FALSE, null));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.TRUE, TruthValue.UNKNOWN, TruthValue.TRUE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.TRUE, TruthValue.UNKNOWN, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.TRUE, TruthValue.UNKNOWN, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.TRUE, TruthValue.UNKNOWN, null));
+      assertEquals(null, TruthValue.ifThenElse(TruthValue.TRUE, null, TruthValue.TRUE));
+      assertEquals(null, TruthValue.ifThenElse(TruthValue.TRUE, null, TruthValue.FALSE));
+      assertEquals(null, TruthValue.ifThenElse(TruthValue.TRUE, null, TruthValue.UNKNOWN));
+      assertEquals(null, TruthValue.ifThenElse(TruthValue.TRUE, null, null));
       // false
-      assertEquals(PredicateValue.TRUE, PredicateValue.ifThenElse(PredicateValue.FALSE, PredicateValue.TRUE, PredicateValue.TRUE));
-      assertEquals(PredicateValue.FALSE, PredicateValue.ifThenElse(PredicateValue.FALSE, PredicateValue.TRUE, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.FALSE, PredicateValue.TRUE, PredicateValue.UNKNOWN));
-      assertEquals(null, PredicateValue.ifThenElse(PredicateValue.FALSE, PredicateValue.TRUE, null));
-      assertEquals(PredicateValue.TRUE, PredicateValue.ifThenElse(PredicateValue.FALSE, PredicateValue.FALSE, PredicateValue.TRUE));
-      assertEquals(PredicateValue.FALSE, PredicateValue.ifThenElse(PredicateValue.FALSE, PredicateValue.FALSE, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.FALSE, PredicateValue.FALSE, PredicateValue.UNKNOWN));
-      assertEquals(null, PredicateValue.ifThenElse(PredicateValue.FALSE, PredicateValue.FALSE, null));
-      assertEquals(PredicateValue.TRUE, PredicateValue.ifThenElse(PredicateValue.FALSE, PredicateValue.UNKNOWN, PredicateValue.TRUE));
-      assertEquals(PredicateValue.FALSE, PredicateValue.ifThenElse(PredicateValue.FALSE, PredicateValue.UNKNOWN, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.FALSE, PredicateValue.UNKNOWN, PredicateValue.UNKNOWN));
-      assertEquals(null, PredicateValue.ifThenElse(PredicateValue.FALSE, PredicateValue.UNKNOWN, null));
-      assertEquals(PredicateValue.TRUE, PredicateValue.ifThenElse(PredicateValue.FALSE, null, PredicateValue.TRUE));
-      assertEquals(PredicateValue.FALSE, PredicateValue.ifThenElse(PredicateValue.FALSE, null, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.FALSE, null, PredicateValue.UNKNOWN));
-      assertEquals(null, PredicateValue.ifThenElse(PredicateValue.FALSE, null, null));
+      assertEquals(TruthValue.TRUE, TruthValue.ifThenElse(TruthValue.FALSE, TruthValue.TRUE, TruthValue.TRUE));
+      assertEquals(TruthValue.FALSE, TruthValue.ifThenElse(TruthValue.FALSE, TruthValue.TRUE, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.FALSE, TruthValue.TRUE, TruthValue.UNKNOWN));
+      assertEquals(null, TruthValue.ifThenElse(TruthValue.FALSE, TruthValue.TRUE, null));
+      assertEquals(TruthValue.TRUE, TruthValue.ifThenElse(TruthValue.FALSE, TruthValue.FALSE, TruthValue.TRUE));
+      assertEquals(TruthValue.FALSE, TruthValue.ifThenElse(TruthValue.FALSE, TruthValue.FALSE, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.FALSE, TruthValue.FALSE, TruthValue.UNKNOWN));
+      assertEquals(null, TruthValue.ifThenElse(TruthValue.FALSE, TruthValue.FALSE, null));
+      assertEquals(TruthValue.TRUE, TruthValue.ifThenElse(TruthValue.FALSE, TruthValue.UNKNOWN, TruthValue.TRUE));
+      assertEquals(TruthValue.FALSE, TruthValue.ifThenElse(TruthValue.FALSE, TruthValue.UNKNOWN, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.FALSE, TruthValue.UNKNOWN, TruthValue.UNKNOWN));
+      assertEquals(null, TruthValue.ifThenElse(TruthValue.FALSE, TruthValue.UNKNOWN, null));
+      assertEquals(TruthValue.TRUE, TruthValue.ifThenElse(TruthValue.FALSE, null, TruthValue.TRUE));
+      assertEquals(TruthValue.FALSE, TruthValue.ifThenElse(TruthValue.FALSE, null, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.FALSE, null, TruthValue.UNKNOWN));
+      assertEquals(null, TruthValue.ifThenElse(TruthValue.FALSE, null, null));
       // unknown
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.UNKNOWN, PredicateValue.TRUE, PredicateValue.TRUE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.UNKNOWN, PredicateValue.TRUE, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.UNKNOWN, PredicateValue.TRUE, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.UNKNOWN, PredicateValue.TRUE, null));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.UNKNOWN, PredicateValue.FALSE, PredicateValue.TRUE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.UNKNOWN, PredicateValue.FALSE, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.UNKNOWN, PredicateValue.FALSE, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.UNKNOWN, PredicateValue.FALSE, null));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.UNKNOWN, PredicateValue.UNKNOWN, PredicateValue.TRUE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.UNKNOWN, PredicateValue.UNKNOWN, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.UNKNOWN, PredicateValue.UNKNOWN, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.UNKNOWN, PredicateValue.UNKNOWN, null));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.UNKNOWN, null, PredicateValue.TRUE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.UNKNOWN, null, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.UNKNOWN, null, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(PredicateValue.UNKNOWN, null, null));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.UNKNOWN, TruthValue.TRUE, TruthValue.TRUE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.UNKNOWN, TruthValue.TRUE, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.UNKNOWN, TruthValue.TRUE, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.UNKNOWN, TruthValue.TRUE, null));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.UNKNOWN, TruthValue.FALSE, TruthValue.TRUE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.UNKNOWN, TruthValue.FALSE, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.UNKNOWN, TruthValue.FALSE, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.UNKNOWN, TruthValue.FALSE, null));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.UNKNOWN, TruthValue.UNKNOWN, TruthValue.TRUE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.UNKNOWN, TruthValue.UNKNOWN, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.UNKNOWN, TruthValue.UNKNOWN, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.UNKNOWN, TruthValue.UNKNOWN, null));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.UNKNOWN, null, TruthValue.TRUE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.UNKNOWN, null, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.UNKNOWN, null, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(TruthValue.UNKNOWN, null, null));
       // null
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(null, PredicateValue.TRUE, PredicateValue.TRUE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(null, PredicateValue.TRUE, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(null, PredicateValue.TRUE, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(null, PredicateValue.TRUE, null));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(null, PredicateValue.FALSE, PredicateValue.TRUE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(null, PredicateValue.FALSE, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(null, PredicateValue.FALSE, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(null, PredicateValue.FALSE, null));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(null, PredicateValue.UNKNOWN, PredicateValue.TRUE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(null, PredicateValue.UNKNOWN, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(null, PredicateValue.UNKNOWN, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(null, PredicateValue.UNKNOWN, null));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(null, null, PredicateValue.TRUE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(null, null, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(null, null, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.ifThenElse(null, null, null));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(null, TruthValue.TRUE, TruthValue.TRUE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(null, TruthValue.TRUE, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(null, TruthValue.TRUE, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(null, TruthValue.TRUE, null));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(null, TruthValue.FALSE, TruthValue.TRUE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(null, TruthValue.FALSE, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(null, TruthValue.FALSE, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(null, TruthValue.FALSE, null));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(null, TruthValue.UNKNOWN, TruthValue.TRUE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(null, TruthValue.UNKNOWN, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(null, TruthValue.UNKNOWN, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(null, TruthValue.UNKNOWN, null));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(null, null, TruthValue.TRUE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(null, null, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(null, null, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.ifThenElse(null, null, null));
    }
    
    /**
-    * Tests {@link PredicateValue#eqv(PredicateValue, PredicateValue)}.
+    * Tests {@link TruthValue#eqv(TruthValue, TruthValue)}.
     */
    public void testEqv() {
       // true
-      assertEquals(PredicateValue.TRUE, PredicateValue.eqv(PredicateValue.TRUE, PredicateValue.TRUE));
-      assertEquals(PredicateValue.FALSE, PredicateValue.eqv(PredicateValue.TRUE, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(PredicateValue.TRUE, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(PredicateValue.TRUE, null));
+      assertEquals(TruthValue.TRUE, TruthValue.eqv(TruthValue.TRUE, TruthValue.TRUE));
+      assertEquals(TruthValue.FALSE, TruthValue.eqv(TruthValue.TRUE, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.eqv(TruthValue.TRUE, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.eqv(TruthValue.TRUE, null));
       // false
-      assertEquals(PredicateValue.FALSE, PredicateValue.eqv(PredicateValue.FALSE, PredicateValue.TRUE));
-      assertEquals(PredicateValue.TRUE, PredicateValue.eqv(PredicateValue.FALSE, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(PredicateValue.FALSE, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(PredicateValue.FALSE, null));
+      assertEquals(TruthValue.FALSE, TruthValue.eqv(TruthValue.FALSE, TruthValue.TRUE));
+      assertEquals(TruthValue.TRUE, TruthValue.eqv(TruthValue.FALSE, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.eqv(TruthValue.FALSE, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.eqv(TruthValue.FALSE, null));
       // unknown
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(PredicateValue.UNKNOWN, PredicateValue.TRUE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(PredicateValue.UNKNOWN, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(PredicateValue.UNKNOWN, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(PredicateValue.UNKNOWN, null));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.eqv(TruthValue.UNKNOWN, TruthValue.TRUE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.eqv(TruthValue.UNKNOWN, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.eqv(TruthValue.UNKNOWN, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.eqv(TruthValue.UNKNOWN, null));
       // null
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(null, PredicateValue.TRUE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(null, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(null, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(null, null));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.eqv(null, TruthValue.TRUE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.eqv(null, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.eqv(null, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.eqv(null, null));
    }
    
    /**
-    * Tests {@link PredicateValue#and(PredicateValue, PredicateValue)}.
+    * Tests {@link TruthValue#and(TruthValue, TruthValue)}.
     */
    public void testAnd() {
       // true
-      assertEquals(PredicateValue.TRUE, PredicateValue.and(PredicateValue.TRUE, PredicateValue.TRUE));
-      assertEquals(PredicateValue.FALSE, PredicateValue.and(PredicateValue.TRUE, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.and(PredicateValue.TRUE, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.and(PredicateValue.TRUE, null));
+      assertEquals(TruthValue.TRUE, TruthValue.and(TruthValue.TRUE, TruthValue.TRUE));
+      assertEquals(TruthValue.FALSE, TruthValue.and(TruthValue.TRUE, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.and(TruthValue.TRUE, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.and(TruthValue.TRUE, null));
       // false
-      assertEquals(PredicateValue.FALSE, PredicateValue.and(PredicateValue.FALSE, PredicateValue.TRUE));
-      assertEquals(PredicateValue.FALSE, PredicateValue.and(PredicateValue.FALSE, PredicateValue.FALSE));
-      assertEquals(PredicateValue.FALSE, PredicateValue.and(PredicateValue.FALSE, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.FALSE, PredicateValue.and(PredicateValue.FALSE, null));
+      assertEquals(TruthValue.FALSE, TruthValue.and(TruthValue.FALSE, TruthValue.TRUE));
+      assertEquals(TruthValue.FALSE, TruthValue.and(TruthValue.FALSE, TruthValue.FALSE));
+      assertEquals(TruthValue.FALSE, TruthValue.and(TruthValue.FALSE, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.FALSE, TruthValue.and(TruthValue.FALSE, null));
       // unknown
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.and(PredicateValue.UNKNOWN, PredicateValue.TRUE));
-      assertEquals(PredicateValue.FALSE, PredicateValue.and(PredicateValue.UNKNOWN, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.and(PredicateValue.UNKNOWN, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.and(PredicateValue.UNKNOWN, null));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.and(TruthValue.UNKNOWN, TruthValue.TRUE));
+      assertEquals(TruthValue.FALSE, TruthValue.and(TruthValue.UNKNOWN, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.and(TruthValue.UNKNOWN, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.and(TruthValue.UNKNOWN, null));
       // null
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.and(null, PredicateValue.TRUE));
-      assertEquals(PredicateValue.FALSE, PredicateValue.and(null, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.and(null, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.and(null, null));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.and(null, TruthValue.TRUE));
+      assertEquals(TruthValue.FALSE, TruthValue.and(null, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.and(null, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.and(null, null));
    }
    
    /**
-    * Tests {@link PredicateValue#or(PredicateValue, PredicateValue)}.
+    * Tests {@link TruthValue#or(TruthValue, TruthValue)}.
     */
    public void testOr() {
       // true
-      assertEquals(PredicateValue.TRUE, PredicateValue.or(PredicateValue.TRUE, PredicateValue.TRUE));
-      assertEquals(PredicateValue.TRUE, PredicateValue.or(PredicateValue.TRUE, PredicateValue.FALSE));
-      assertEquals(PredicateValue.TRUE, PredicateValue.or(PredicateValue.TRUE, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.TRUE, PredicateValue.or(PredicateValue.TRUE, null));
+      assertEquals(TruthValue.TRUE, TruthValue.or(TruthValue.TRUE, TruthValue.TRUE));
+      assertEquals(TruthValue.TRUE, TruthValue.or(TruthValue.TRUE, TruthValue.FALSE));
+      assertEquals(TruthValue.TRUE, TruthValue.or(TruthValue.TRUE, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.TRUE, TruthValue.or(TruthValue.TRUE, null));
       // false
-      assertEquals(PredicateValue.TRUE, PredicateValue.or(PredicateValue.FALSE, PredicateValue.TRUE));
-      assertEquals(PredicateValue.FALSE, PredicateValue.or(PredicateValue.FALSE, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.or(PredicateValue.FALSE, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.or(PredicateValue.FALSE, null));
+      assertEquals(TruthValue.TRUE, TruthValue.or(TruthValue.FALSE, TruthValue.TRUE));
+      assertEquals(TruthValue.FALSE, TruthValue.or(TruthValue.FALSE, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.or(TruthValue.FALSE, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.or(TruthValue.FALSE, null));
       // unknown
-      assertEquals(PredicateValue.TRUE, PredicateValue.or(PredicateValue.UNKNOWN, PredicateValue.TRUE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.or(PredicateValue.UNKNOWN, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.or(PredicateValue.UNKNOWN, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.or(PredicateValue.UNKNOWN, null));
+      assertEquals(TruthValue.TRUE, TruthValue.or(TruthValue.UNKNOWN, TruthValue.TRUE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.or(TruthValue.UNKNOWN, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.or(TruthValue.UNKNOWN, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.or(TruthValue.UNKNOWN, null));
       // null
-      assertEquals(PredicateValue.TRUE, PredicateValue.or(null, PredicateValue.TRUE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.or(null, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.or(null, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.or(null, null));
+      assertEquals(TruthValue.TRUE, TruthValue.or(null, TruthValue.TRUE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.or(null, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.or(null, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.or(null, null));
    }
    
    /**
-    * Tests {@link PredicateValue#imp(PredicateValue, PredicateValue)}.
+    * Tests {@link TruthValue#imp(TruthValue, TruthValue)}.
     */
    public void testImp() {
       // true
-      assertEquals(PredicateValue.TRUE, PredicateValue.imp(PredicateValue.TRUE, PredicateValue.TRUE));
-      assertEquals(PredicateValue.FALSE, PredicateValue.imp(PredicateValue.TRUE, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.imp(PredicateValue.TRUE, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.imp(PredicateValue.TRUE, null));
+      assertEquals(TruthValue.TRUE, TruthValue.imp(TruthValue.TRUE, TruthValue.TRUE));
+      assertEquals(TruthValue.FALSE, TruthValue.imp(TruthValue.TRUE, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.imp(TruthValue.TRUE, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.imp(TruthValue.TRUE, null));
       // false
-      assertEquals(PredicateValue.TRUE, PredicateValue.imp(PredicateValue.FALSE, PredicateValue.TRUE));
-      assertEquals(PredicateValue.TRUE, PredicateValue.imp(PredicateValue.FALSE, PredicateValue.FALSE));
-      assertEquals(PredicateValue.TRUE, PredicateValue.imp(PredicateValue.FALSE, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.TRUE, PredicateValue.imp(PredicateValue.FALSE, null));
+      assertEquals(TruthValue.TRUE, TruthValue.imp(TruthValue.FALSE, TruthValue.TRUE));
+      assertEquals(TruthValue.TRUE, TruthValue.imp(TruthValue.FALSE, TruthValue.FALSE));
+      assertEquals(TruthValue.TRUE, TruthValue.imp(TruthValue.FALSE, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.TRUE, TruthValue.imp(TruthValue.FALSE, null));
       // unknown
-      assertEquals(PredicateValue.TRUE, PredicateValue.imp(PredicateValue.UNKNOWN, PredicateValue.TRUE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.imp(PredicateValue.UNKNOWN, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.imp(PredicateValue.UNKNOWN, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.imp(PredicateValue.UNKNOWN, null));
+      assertEquals(TruthValue.TRUE, TruthValue.imp(TruthValue.UNKNOWN, TruthValue.TRUE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.imp(TruthValue.UNKNOWN, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.imp(TruthValue.UNKNOWN, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.imp(TruthValue.UNKNOWN, null));
       // null
-      assertEquals(PredicateValue.TRUE, PredicateValue.imp(null, PredicateValue.TRUE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.imp(null, PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.imp(null, PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.imp(null, null));
+      assertEquals(TruthValue.TRUE, TruthValue.imp(null, TruthValue.TRUE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.imp(null, TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.imp(null, TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.imp(null, null));
    }
    
    /**
-    * Tests {@link PredicateValue#not(PredicateValue)}.
+    * Tests {@link TruthValue#not(TruthValue)}.
     */
    public void testNot() {
-      assertEquals(PredicateValue.FALSE, PredicateValue.not(PredicateValue.TRUE));
-      assertEquals(PredicateValue.TRUE, PredicateValue.not(PredicateValue.FALSE));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.not(PredicateValue.UNKNOWN));
-      assertEquals(PredicateValue.UNKNOWN, PredicateValue.not(null));
+      assertEquals(TruthValue.FALSE, TruthValue.not(TruthValue.TRUE));
+      assertEquals(TruthValue.TRUE, TruthValue.not(TruthValue.FALSE));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.not(TruthValue.UNKNOWN));
+      assertEquals(TruthValue.UNKNOWN, TruthValue.not(null));
    }
 }
