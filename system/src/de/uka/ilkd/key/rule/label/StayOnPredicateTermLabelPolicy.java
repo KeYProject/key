@@ -6,7 +6,6 @@ import java.util.Set;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.PredicateTermLabel;
@@ -28,11 +27,6 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
  * @author Martin Hentschel
  */
 public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
-   /**
-    * The name of the rule {@code cut_direct}.
-    */
-   public static final Name CUT_DIRECT = new Name("cut_direct");
-   
    /**
     * {@inheritDoc}
     */
@@ -67,10 +61,8 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
                 TacletOperation.ADD_SUCCEDENT.equals(tacletHint.getTacletOperation()) ||
                 TacletOperation.REPLACE_TO_ANTECEDENT.equals(tacletHint.getTacletOperation()) ||
                 TacletOperation.REPLACE_TO_SUCCEDENT.equals(tacletHint.getTacletOperation())) {
-               if (!CUT_DIRECT.equals(rule.name())) { // Do not give new labels for cut direct.
-                  newLabelIdRequired = true;
-                  originalLabelIds.add(mostImportantLabel.getId());
-               }
+               newLabelIdRequired = true;
+               originalLabelIds.add(mostImportantLabel.getId());
             }
             boolean topLevel = isTopLevel(tacletHint, tacletTerm);
             if (tacletHint.getSequentFormula() != null) {
