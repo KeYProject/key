@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -338,6 +339,53 @@ public class JoinRuleUtils {
       } while (newName.equals(prefix));
       
       return result;
+   }
+   
+   /**
+    * Substitutes all constants in the given term by fresh variables.
+    * Multiple occurrences of a constant are substituted by the same
+    * variable.
+    * 
+    * @param term Term in which to substitute constants by variables.
+    * @param replMap Map from constants to variables in order to remember
+    *    substitutions of one constant.
+    * @return A term equal to the input, but with constants substituted by
+    *    fresh variables.
+    */
+   public static Term substConstantsByFreshVars(
+         Term term, HashMap<Function, LogicVariable> replMap, Services services) {
+      TermBuilder tb = services.getTermBuilder();
+      
+      if (term.op() instanceof Function
+            && ((Function) term.op()).isSkolemConstant()) {
+         
+         Function constant = (Function) term.op();
+         
+         if (!replMap.containsKey(constant)) {
+            LogicVariable freshVariable = getFreshVariableForPrefix(
+                  stripIndex(constant.toString()),
+                  constant.sort(),
+                  services);
+            replMap.put(constant, freshVariable);
+         }
+         
+         return tb.var(replMap.get(constant));
+         
+      } else {
+         
+         LinkedList<Term> transfSubs = new LinkedList<Term>();
+         for (Term sub : term.subs()) {
+            transfSubs.add(substConstantsByFreshVars(sub, replMap, services));
+         }
+         
+         return services.getTermFactory().createTerm(
+               term.op(),
+               new ImmutableArray<Term>(transfSubs),
+               term.boundVars(),
+               term.javaBlock(),
+               term.getLabels());
+         
+      }
    }
    
    /**

@@ -244,54 +244,8 @@ public class CloseAfterJoin implements BuiltInRule {
    private Term allClosure(final Term term) {
       return JoinRuleUtils.allClosure(
             substConstantsByFreshVars(
-                  term, new HashMap<Function, LogicVariable>()),
+                  term, new HashMap<Function, LogicVariable>(), services),
             services);
-   }
-   
-   /**
-    * Substitutes all constants in the given term by fresh variables.
-    * Multiple occurrences of a constant are substituted by the same
-    * variable.
-    * 
-    * @param term Term in which to substitute constants by variables.
-    * @param replMap Map from constants to variables in order to remember
-    *    substitutions of one constant.
-    * @return A term equal to the input, but with constants substituted by
-    *    fresh variables.
-    */
-   private Term substConstantsByFreshVars(Term term, HashMap<Function, LogicVariable> replMap) {
-      TermBuilder tb = services.getTermBuilder();
-      
-      if (term.op() instanceof Function
-            && ((Function) term.op()).isSkolemConstant()) {
-         
-         Function constant = (Function) term.op();
-         
-         if (!replMap.containsKey(constant)) {
-            LogicVariable freshVariable = getFreshVariableForPrefix(
-                  stripIndex(constant.toString()),
-                  constant.sort(),
-                  services);
-            replMap.put(constant, freshVariable);
-         }
-         
-         return tb.var(replMap.get(constant));
-         
-      } else {
-         
-         LinkedList<Term> transfSubs = new LinkedList<Term>();
-         for (Term sub : term.subs()) {
-            transfSubs.add(substConstantsByFreshVars(sub, replMap));
-         }
-         
-         return services.getTermFactory().createTerm(
-               term.op(),
-               new ImmutableArray<Term>(transfSubs),
-               term.boundVars(),
-               term.javaBlock(),
-               term.getLabels());
-         
-      }
    }
 
    @Override
