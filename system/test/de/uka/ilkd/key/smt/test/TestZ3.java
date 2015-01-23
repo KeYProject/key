@@ -20,7 +20,7 @@ import de.uka.ilkd.key.smt.SolverType;
 public class TestZ3 extends TestSMTSolver {
 
 
-    private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
+    public static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
 
     private static boolean isInstalled = false;
     private static boolean installChecked = false;

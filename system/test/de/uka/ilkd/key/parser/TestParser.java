@@ -45,7 +45,7 @@ public class TestParser extends TestCase {
 
 	final String keyFile = "\\include \"" + include.getPath() + "\";";
 	final KeYLexerF lexer = new KeYLexerF(keyFile,
-		"No file. Test case TestParser#testRelativeInclude()", null);
+		"No file. Test case TestParser#testRelativeInclude()");
 	final KeYParserF parser = new KeYParserF(ParserMode.DECLARATION, lexer);
 	parser.parseIncludes();
 

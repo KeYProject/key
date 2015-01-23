@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;

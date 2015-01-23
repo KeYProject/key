@@ -227,11 +227,12 @@ public final class JMLTranslator {
 
                     @Override
                     public JMLTranslationMethod get(Object key) {
+                        if (key == null) throw new IllegalArgumentException("null");
                         JMLTranslationMethod m = super.get(key);
                         if (m != null) {
                             return m;
                         } else {
-                            throw new IllegalArgumentException(key.toString());
+                            throw new IllegalArgumentException(key == null ? "(null)" : key.toString());
                         }
                     }
                 };
@@ -1770,11 +1771,7 @@ public final class JMLTranslator {
             JMLKeyWord jmlKeyWord = JMLKeyWord.jmlValueOf(jmlKeyWordName);
             JMLTranslationMethod m = translationMethods.get(jmlKeyWord);
             if (m == null) {
-                throw excManager.createException(
-                        "Unknown JML-keyword or unknown translation for "
-                        + "JML-keyword \"" + jmlKeyWordName
-                        + "\". The keyword seems "
-                        + "not to be supported yet.");
+                throw new IllegalArgumentException();
             }
             Object result = m.translate(excManager, params);
             resultClass.cast(result);
@@ -2482,7 +2479,10 @@ public final class JMLTranslator {
         return translateToJDLTerm(t, functName, services, tb, list, excManager);
     }
 
-    /** Provide restriction terms for the declared KeYJavaType */
+    /** Provide restriction terms for the declared KeYJavaType 
+     *  Note that these restrictions only apply to the JML to DL translation.
+     *  See also {@link TermBuilder#reachableValue(Term, KeYJavaType)}. 
+     */
     protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<? extends QuantifiableVariable> qvs, Services services) {
         final Type type = kjt.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
@@ -2494,6 +2494,7 @@ public final class JMLTranslator {
                 if (type == PrimitiveType.JAVA_CHAR) res = tb.and(res,tb.inChar(tb.var(qv)));
                 if (type == PrimitiveType.JAVA_INT) res = tb.and(res,tb.inInt(tb.var(qv)));
                 if (type == PrimitiveType.JAVA_LONG) res = tb.and(res,tb.inLong(tb.var(qv)));
+                if (type == PrimitiveType.JAVA_LOCSET) res = tb.and(res,tb.disjoint(tb.var(qv), tb.freshLocs(tb.getBaseHeap())));
             } else {
                 // assume reference type
                 if (nullable) {

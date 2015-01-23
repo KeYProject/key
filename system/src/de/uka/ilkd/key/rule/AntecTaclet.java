@@ -13,15 +13,23 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /** 
  * An AntecTaclet represents a taclet whose find part has to match a top level
@@ -80,15 +88,16 @@ public class AntecTaclet extends FindTaclet{
     * @return 
      */
     @Override
-    protected void applyReplacewith(TacletGoalTemplate gt, SequentChangeInfo currentSequent,
+    protected void applyReplacewith(Goal goal, TermLabelState termLabelState, TacletGoalTemplate gt, SequentChangeInfo currentSequent,
 				    PosInOccurrence posOfFind,
 				    Services services, 
-				    MatchConditions matchCond) {
+				    MatchConditions matchCond,
+				    TacletApp tacletApp) {
        if (gt instanceof AntecSuccTacletGoalTemplate) {
           final Sequent replWith = ((AntecSuccTacletGoalTemplate)gt).replaceWith();
 
-          replaceAtPos(replWith.antecedent(), currentSequent, posOfFind, services, matchCond);
-          addToSucc(replWith.succedent(), currentSequent, null, services, matchCond, posOfFind);	   	    	    
+          replaceAtPos(termLabelState, replWith.antecedent(), currentSequent, posOfFind, services, matchCond, new TacletLabelHint(TacletOperation.REPLACE_AT_ANTECEDENT, replWith), goal, tacletApp);
+          addToSucc(termLabelState, replWith.succedent(), currentSequent, null, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.REPLACE_TO_SUCCEDENT, replWith), goal, tacletApp);	   	    	    
        } else {
           // Then there was no replacewith...
        }
@@ -97,6 +106,7 @@ public class AntecTaclet extends FindTaclet{
     
     /**
      * adds the sequent of the add part of the Taclet to the goal sequent
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param add the Sequent to be added
      * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
      * @param posOfFind the PosInOccurrence describes the place where to add
@@ -105,13 +115,15 @@ public class AntecTaclet extends FindTaclet{
      * @param matchCond the MatchConditions with all required instantiations 
      */
     @Override
-    protected void applyAdd(Sequent add, 
+    protected void applyAdd(TermLabelState termLabelState, Sequent add, 
              SequentChangeInfo currentSequent,
 			    PosInOccurrence posOfFind,
 			    Services services,
-			    MatchConditions matchCond) {
-       addToAntec(add.antecedent(), currentSequent, posOfFind, services, matchCond, posOfFind);
-       addToSucc(add.succedent(), currentSequent, null, services, matchCond, posOfFind);
+			    MatchConditions matchCond,
+			    Goal goal,
+			    TacletApp tacletApp) {
+       addToAntec(termLabelState, add.antecedent(), currentSequent, posOfFind, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), goal, tacletApp);
+       addToSucc(termLabelState, add.succedent(), currentSequent, null, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), goal, tacletApp);
     }
         
     /** toString for the find part */

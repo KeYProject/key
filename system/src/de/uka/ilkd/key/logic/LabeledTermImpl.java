@@ -17,6 +17,8 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.symbolic_execution.util.IFilter;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * The labeled term class is used for terms that have a label 
@@ -65,6 +67,16 @@ class LabeledTermImpl extends TermImpl {
 	public ImmutableArray<TermLabel> getLabels() {
 		return labels;
 	}
+
+   @Override
+   public TermLabel getLabel(final Name termLabelName) {
+      return JavaUtil.search(labels, new IFilter<TermLabel>() {
+         @Override
+         public boolean select(TermLabel element) {
+            return JavaUtil.equals(element.name(), termLabelName);
+         }
+      });
+   }
 
 	/**
 	 * returns true if the given label is attached

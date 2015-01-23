@@ -194,8 +194,7 @@ public class TacletForTests {
 	    br   = new StringReader(termstr);
 	    KeYParserF parser = new KeYParserF(ParserMode.TERM,
 		    new KeYLexerF(br,
-			    "No file. TacletForTests.parseTerm(" + termstr + ")",
-			    null),
+			    "No file. TacletForTests.parseTerm(" + termstr + ")"),
 		    new Recoder2KeY(services, nss),
 		    services,
 		    nss,
@@ -219,7 +218,7 @@ public class TacletForTests {
 	    br = new StringReader(termstr);
 	    KeYParserF parser = new KeYParserF(ParserMode.TERM,
 		    new KeYLexerF(br,
-			    "No file. TacletForTests.parseTerm(" + termstr + ")", null),
+			    "No file. TacletForTests.parseTerm(" + termstr + ")"),
 		    new Recoder2KeY(services(), set),
 		    services(),
 		    set,

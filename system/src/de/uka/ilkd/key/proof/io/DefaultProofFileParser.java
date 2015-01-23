@@ -23,8 +23,7 @@ import java.util.Vector;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -56,6 +55,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 

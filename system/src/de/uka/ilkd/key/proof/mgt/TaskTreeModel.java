@@ -79,9 +79,9 @@ public class TaskTreeModel extends DefaultTreeModel {
    }
 
    private void updateProofToTask(TaskTreeNode p) {
-      Proof[] proofs = p.allProofs();
-      for (int i=0; i<proofs.length; i++) {
-         proofToTask.put(proofs[i], p);
+       proofToTask.put(p.proof(), p);
+       for (TaskTreeNode child : p.getChildren()) {
+           updateProofToTask(child);
       }
    }
 

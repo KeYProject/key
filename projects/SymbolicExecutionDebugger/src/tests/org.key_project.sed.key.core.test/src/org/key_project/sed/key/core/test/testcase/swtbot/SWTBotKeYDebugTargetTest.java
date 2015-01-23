@@ -52,6 +52,30 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
+   public void testGroupStartOccurrenceTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testGroupStartOccurrenceTest",
+                     "data/groupStartOccurrenceTest/test",
+                     false,
+                     createMethodSelector("GroupStartOccurrenceTest", "main", "I"),
+                     "data/groupStartOccurrenceTest/oracle/GroupStartOccurrenceTest.xml",
+                     false,
+                     14,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false, 
+                     false);
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
    public void testConstraintsOfAppliedMethodContract() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract",
                      "data/constraintsOfAppliedMethodContract/test",

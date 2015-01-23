@@ -280,13 +280,8 @@ public class ContractFactory {
         }
     }
 
-    public FunctionalOperationContract func (IProgramMethod pm, InitiallyClause ini){
-        try {
+    public FunctionalOperationContract func (IProgramMethod pm, InitiallyClause ini) throws SLTranslationException{
             return new JMLSpecFactory(services).initiallyClauseToContract(ini, pm);
-        } catch (SLTranslationException e) {
-            services.getExceptionHandler().reportException(e);
-            return null;
-        }
     }
 
     public FunctionalOperationContract func (String baseName,

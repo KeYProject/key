@@ -2,13 +2,13 @@ package de.uka.ilkd.key.gui.testgen;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.EventObject;
 import java.util.LinkedHashSet;
 import java.util.Properties;
 
-import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.configuration.Settings;
-import de.uka.ilkd.key.gui.configuration.SettingsConverter;
-import de.uka.ilkd.key.gui.configuration.SettingsListener;
+import de.uka.ilkd.key.settings.Settings;
+import de.uka.ilkd.key.settings.SettingsConverter;
+import de.uka.ilkd.key.settings.SettingsListener;
 
 public class TestGenerationSettings implements Settings, Cloneable {
 	// Default Values for option fields
@@ -84,7 +84,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 
 	public void fireSettingsChanged() {
 		for (final SettingsListener aListenerList : listeners) {
-			aListenerList.settingsChanged(new GUIEvent(this));
+			aListenerList.settingsChanged(new EventObject(this));
 		}
 	}
 

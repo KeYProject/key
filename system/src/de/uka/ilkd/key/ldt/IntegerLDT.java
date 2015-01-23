@@ -549,38 +549,40 @@ public final class IntegerLDT extends LDT {
             literalString = 
                 literalString.substring(1);
         }
+        // We have to deal with literals coming both from programs and
+        // the logic. The former can have prefixes ("0" for octal,
+        // "0x" for hex) and suffixes ("L" for long literal). The latter
+        // do not have any of these but can have arbitrary length.
         if (lit instanceof IntLiteral) {
-            if (literalString.startsWith("0x")) {
+            if (literalString.startsWith("0")) { // hex or octal literal
                 try {
-                    int i = Integer.parseInt
-                        (literalString.substring(2),16);
+                    long l = Long.decode(literalString);
+                    //the following contortion is necessary to deal with
+                    //valid java programs like int i = 0xffffffff;
+                    //http://stackoverflow.com/questions/4355619/converting-string-to-intger-hex-value-strange-behaviour
+                    if (l>4294967295L) throw new
+                        NumberFormatException("This won't fit into an int");
+                    int i = (int) l;
+                    if (i<0) {
+                        minusFlag = true;
+                        i=-i;
+                    }
                     int_ch=(""+i).toCharArray();
-                }catch(NumberFormatException nfe) {
-                    Debug.fail("Not a hexadecimal constant!");
+                } catch(NumberFormatException nfe) {
+                    Debug.fail("Cannot convert int constant! "+literalString);
                 }
             } else {
-                int_ch = literalString.toCharArray();
-            }            
-            length = int_ch.length; 
-        } else if (lit instanceof LongLiteral) {
-            if (literalString.startsWith("0x")) {
-                try {
-                    // long literals have an 'L' as last sign; we have
-                    // to skip it 
-                    final long l = Long.parseLong
-                        (literalString.substring(2, 
-                                                 literalString.length() - 1), 
-                         16);
-                    int_ch=(""+l).toCharArray();
-                } catch (NumberFormatException nfe) {
-                    Debug.fail("Not a hexadecimal constant!");
-                }
-                length = int_ch.length; 
-            } else {
-                // long literals have an 'L' as last sign; skip it
-                int_ch = literalString.toCharArray();
-                length = int_ch.length - 1; 
+                int_ch=literalString.toCharArray();
             }
+            length = int_ch.length;
+        } else if (lit instanceof LongLiteral) {
+            try {
+                final long l = Long.decode(literalString);
+                int_ch=(""+l).toCharArray();
+            } catch (NumberFormatException nfe) {
+                Debug.fail("Cannot convert long constant! "+literalString);
+            }
+            length = int_ch.length;
         }
         
         for (int i = 0; i < length; i++) {

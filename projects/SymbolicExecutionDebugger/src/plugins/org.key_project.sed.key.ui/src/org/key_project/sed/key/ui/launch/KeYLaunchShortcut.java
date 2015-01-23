@@ -55,7 +55,7 @@ public class KeYLaunchShortcut implements ILaunchShortcut {
                     launch((IMethod)element, mode, null, null);
                 }
                 else if (element instanceof IFile) {
-                   launch((IFile)element, mode);
+                   launch((IFile)element, null, mode);
                 }
             }
         }
@@ -106,15 +106,17 @@ public class KeYLaunchShortcut implements ILaunchShortcut {
     /**
      * Launches the given {@link IFile}.
      * @param file The {@link IFile} to launch.
+     * @param method The optional {@link IMethod}.
      * @param mode The mode to use.
      * @throws CoreException Occurred Exception.
      */
     public static void launch(IFile file, 
+                              IMethod method,
                               String mode) throws CoreException {
         try {
             ILaunchConfiguration config = findLaunchConfiguration(file);
             if (config == null) {
-                config = KeySEDUtil.createConfiguration(file);
+                config = KeySEDUtil.createConfiguration(file, method);
             }
             if (config != null) {
                 DebugUITools.launch(config, mode);

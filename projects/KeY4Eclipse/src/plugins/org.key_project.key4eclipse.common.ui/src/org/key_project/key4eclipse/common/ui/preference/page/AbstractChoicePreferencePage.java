@@ -47,7 +47,7 @@ import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector.ChoiceEntry;
-import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
+import de.uka.ilkd.key.settings.ChoiceSettings;
 
 /**
  * Provides a basic {@link IPreferencePage} implementation to edit

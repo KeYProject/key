@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -82,11 +83,10 @@ import de.hentschel.visualdbc.datasource.model.memory.MemoryPackage;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.ExceptionDialog;
-import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.GUIListener;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
@@ -232,16 +232,16 @@ public class KeyConnection extends MemoryConnection {
     */
    private GUIListener mainGuiListener = new GUIListener() {
       @Override
-      public void shutDown(GUIEvent e) {
+      public void shutDown(EventObject e) {
          handleMainClosed(e);
       }
       
       @Override
-      public void modalDialogOpened(GUIEvent e) {
+      public void modalDialogOpened(EventObject e) {
       }
       
       @Override
-      public void modalDialogClosed(GUIEvent e) {
+      public void modalDialogClosed(EventObject e) {
       }
    };
    
@@ -308,7 +308,7 @@ public class KeyConnection extends MemoryConnection {
     * When the main was closed.
     * @param e The event to handle.
     */
-   protected void handleMainClosed(GUIEvent e) {
+   protected void handleMainClosed(EventObject e) {
       try {
          disconnect(false);
       }

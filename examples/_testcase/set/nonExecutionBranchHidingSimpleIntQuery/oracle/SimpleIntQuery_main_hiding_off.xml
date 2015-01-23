@@ -5,7 +5,7 @@
          <operationContract name="result_0 = magic(x) catch(exc_0)
 pre: true
 post: result_0 = SimpleIntQuery.subMagic(x) &amp; exc_0 = null
-mod: empty
+mod: {}
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="return magicValue;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false">
