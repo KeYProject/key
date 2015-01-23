@@ -1,10 +1,9 @@
-package org.key_project.jmlediting.profile.jmlref.spec_keyword;
+package org.key_project.jmlediting.core.profile.syntax;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 
 /**
  * Implements an {@link IKeywordParser} which is profile specified. This class

@@ -128,6 +128,16 @@ public class ExpressionParserTest {
       testParse("myname ++");
    }
 
+   @Test
+   public void testResult() {
+      testParse("\\result == 5");
+   }
+
+   @Test
+   public void testOld() {
+      testParse("\\old(this.name)");
+   }
+
    public static void testParse(final String content) {
       try {
          ParserBuilder

@@ -10,7 +10,6 @@ import org.key_project.jmlediting.core.parser.IRecursiveParseFunction;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 
 /**
  * The Expression Parser parses expressions as defined in the JML Reference
@@ -157,10 +156,8 @@ public class ExpressionParser implements ParseFunction {
        * | jml-primary
        */
       // Do no include true/false, which is implemented in the constant type
-      final ParseFunction jmlPrimary = typed(
-            JML_PRIMARY,
-            keywords(JMLProfileHelper.filterKeywords(profile,
-                  IJMLPrimaryKeyword.class), profile));
+      final ParseFunction jmlPrimary = typed(JML_PRIMARY, alt(profile
+            .getSupportedPrimaries().toArray(new ParseFunction[0])));
       final ParseFunction primaryExpr = alt(typed(IDENTIFIER, ident()),
             newExpr, constant,
             oneConstant(JAVA_KEYWORD, "super", "this", "null"),
@@ -382,5 +379,4 @@ public class ExpressionParser implements ParseFunction {
 
       this.mainParser = expression;
    }
-
 }
