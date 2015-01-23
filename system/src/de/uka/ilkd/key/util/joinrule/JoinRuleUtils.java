@@ -106,16 +106,16 @@ public class JoinRuleUtils {
    
    /**
     * For Strings "xxx_i", this method returns "xxx". For
-    * Strings without the underbar, the original String is
+    * Strings without the underscore, the original String is
     * returned.
     * 
     * @param name Name to remove the index from.
     * @return The name without the index, if any.
     */
    public static String stripIndex(String name) {
-      int underbarOccurrence = name.indexOf('_');
-      if (underbarOccurrence > -1) {
-         return name.substring(0, underbarOccurrence);
+      int underscoreOccurrence = name.indexOf('_');
+      if (underscoreOccurrence > -1) {
+         return name.substring(0, underscoreOccurrence);
       } else {
          return name;
       }
