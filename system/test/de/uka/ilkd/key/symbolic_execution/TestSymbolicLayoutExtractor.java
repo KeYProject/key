@@ -68,6 +68,26 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
     */
+   public void testVariableArrayIndex() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorVariableArrayIndex/test/VariableArrayIndex.java",
+             "VariableArrayIndex",
+             "examples/_testcase/set/configurationExtractorVariableArrayIndex/oracle/",
+             "StaticMember.xml",
+             "testVariableArrayIndex_initial",
+             ".xml",
+             "testVariableArrayIndex_current",
+             ".xml",
+             null,
+             1,
+             1,
+             false,
+             false);
+   }
+   
+   /**
+    * Tests "configurationExtractorInstanceCreationTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
    public void testStaticMember_OnReturnNode() throws Exception {
       doTest("examples/_testcase/set/configurationExtractorStaticMember/test/StaticMember.java",
              "StaticMember",
@@ -657,7 +677,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, useOperationContracts, false, false, false, false, false);
+         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, useOperationContracts, false, false, false, false, false, false);
          setOneStepSimplificationEnabled(null, true);
          // Resume
          resume(env.getUi(), env.getBuilder(), oraclePathInBaseDir + symbolicExecutionOracleFileName, keyRepDirectory);
@@ -911,7 +931,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          assertEquals(expected.getName(), current.getName());
          assertEquals(expected.getProgramVariableString(), current.getProgramVariableString());
          assertEquals(expected.isArrayIndex(), current.isArrayIndex());
-         assertEquals(expected.getArrayIndex(), current.getArrayIndex());
+         assertEquals(expected.getArrayIndexString(), current.getArrayIndexString());
          assertTrue("\"" + expected.getValueString() + "\" does not match \"" + current.getValueString() + "\"", JavaUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
          assertEquals(expected.getTypeString(), current.getTypeString());
          assertEquals(expected.getConditionString(), current.getConditionString());
@@ -950,7 +970,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          assertEquals(expected.getName(), current.getName());
          assertEquals(expected.getProgramVariableString(), current.getProgramVariableString());
          assertEquals(expected.isArrayIndex(), current.isArrayIndex());
-         assertEquals(expected.getArrayIndex(), current.getArrayIndex());
+         assertEquals(expected.getArrayIndexString(), current.getArrayIndexString());
          assertObject(expected.getTarget(), current.getTarget(), false);
          assertEquals(expected.getConditionString(), current.getConditionString());
       }

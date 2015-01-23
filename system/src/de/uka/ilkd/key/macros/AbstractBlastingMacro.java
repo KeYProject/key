@@ -3,7 +3,10 @@ package de.uka.ilkd.key.macros;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import de.uka.ilkd.key.gui.KeYMediator;
+
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -23,6 +26,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
@@ -41,35 +45,45 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     protected abstract RuleFilter getSemanticsRuleFilter();
     protected abstract RuleFilter getEqualityRuleFilter();
     protected abstract Set<String> getAllowedPullOut();
-    
 
     @Override
-    protected Strategy createStrategy(KeYMediator mediator,
-            PosInOccurrence posInOcc) {
+    public ProofMacroFinishedInfo applyTo(Proof proof,
+                                          KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
+       for (Goal goal : goals) {
+          addInvariantFormula(goal);
+       }
+       return super.applyTo(proof, mediator, goals, posInOcc, listener);
+    }
+    
+    protected void addInvariantFormula(Goal goal) {
+       Sort nullSort = goal.proof().getServices().getTypeConverter().getHeapLDT().getNull().sort();
 
-        
-        Sort nullSort = mediator.getServices().getTypeConverter().getHeapLDT().getNull().sort();
-        Goal goal = mediator.getSelectedGoal();
+       SortCollector sortCollector = new SortCollector();
 
-        SortCollector sortCollector = new SortCollector();
+       for(SequentFormula sf : goal.sequent()){
+           sf.formula().execPreOrder(sortCollector);
+       }
 
-        for(SequentFormula sf : goal.sequent()){
-            sf.formula().execPreOrder(sortCollector);
-        }
+       Set<Sort> sorts = sortCollector.getSorts();
+       sorts.remove(nullSort);
+       List<SequentFormula> formulae =  createFormulae(goal.proof().getServices(), sorts);
+       for(SequentFormula sf : formulae){
+           Sequent s = goal.sequent();
+           Semisequent antecedent = s.antecedent();
+           if(!antecedent.containsEqual(sf)){
+               goal.addFormula(sf, true, true);
+           }
+       }
+    }    
 
-        Set<Sort> sorts = sortCollector.getSorts();
-        sorts.remove(nullSort);
-        List<SequentFormula> formulae =  createFormulae(mediator,sorts);
-        for(SequentFormula sf : formulae){
-            Sequent s = goal.sequent();
-            Semisequent antecedent = s.antecedent();
-            if(!antecedent.containsEqual(sf)){
-                goal.addFormula(sf, true, true);
-            }
-        }
+    @Override
+    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
         return new SemanticsBlastingStrategy();
     }
-
+    
     private boolean containsSubTypes(Sort s, Set<Sort> sorts){      
         for(Sort st : sorts){
             if( st.extendsTrans(s)){
@@ -79,11 +93,10 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         return false;
     }
 
-    private List<SequentFormula> createFormulae(KeYMediator mediator, Set<Sort> sorts){
+    private List<SequentFormula> createFormulae(Services services, Set<Sort> sorts){
         List<SequentFormula> result = new LinkedList<SequentFormula>();
 
-        Services services = mediator.getServices();
-        JavaInfo info = mediator.getJavaInfo();
+        JavaInfo info = services.getJavaInfo();
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
         SpecificationRepository spec = services.getSpecificationRepository();
 

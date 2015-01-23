@@ -35,7 +35,7 @@ import org.key_project.key4eclipse.util.KeYExampleUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.core.Main;
 
 /**
  * <p>

@@ -17,9 +17,9 @@ post: (       QueryInPrecondition.xPre(x)
         &amp; y &lt; 0)
    -&gt;   result_0 = QueryInPrecondition.subSecond(x, y)
       &amp; exc_0 = null)
-mod: \if (true)  \then (empty)  \else (allLocs)
+mod: \if (true)  \then ({})  \else (allLocs)
 \cap \if (!(QueryInPrecondition.xPre(x) = TRUE &amp; y &lt; 0))
-         \then (empty)
+         \then ({})
          \else (allLocs)
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x, y" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">

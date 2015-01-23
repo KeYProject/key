@@ -321,8 +321,6 @@ public class LexPathOrdering implements TermOrdering {
             theoryFunctionNames.add("clEmpty");
             theoryFunctionNames.add("clCons");
             theoryFunctionNames.add("C");
-        
-            theoryFunctionNames.add("empty");
         }
 
 
@@ -364,6 +362,12 @@ public class LexPathOrdering implements TermOrdering {
             
             if ( opStr.equals ( "empty" ) ) return Integer.valueOf ( 0 );
 
+            
+            if ( opStr.equals ("intersect")) return Integer.valueOf ( 6 );
+            if ( opStr.equals ("union")) return Integer.valueOf ( 7 );
+            if ( opStr.equals ("infiniteUnion")) return Integer.valueOf ( 8 );            
+            if ( opStr.equals ("setMinus")) return Integer.valueOf ( 9 );
+            
             return null;
         }
     }

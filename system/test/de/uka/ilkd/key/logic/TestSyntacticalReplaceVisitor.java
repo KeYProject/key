@@ -15,17 +15,17 @@ package de.uka.ilkd.key.logic;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 public class TestSyntacticalReplaceVisitor extends TestCase {
     
@@ -89,7 +89,7 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
     }
 
     public void test1() {
-	SyntacticalReplaceVisitor srv=new SyntacticalReplaceVisitor(TacletForTests.services(), insts, null, null);
+	SyntacticalReplaceVisitor srv=new SyntacticalReplaceVisitor(new TermLabelState(), TacletForTests.services(), insts, null, null, null, null);
 	rw.execPostOrder(srv);
 	assertEquals(srv.getTerm(), t_allxpxpx);
     }
@@ -100,7 +100,7 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
 	Term result=TacletForTests.parseTerm("(\\forall s y; p(f(const)))");
 	SyntacticalReplaceVisitor v = new
 	    SyntacticalReplaceVisitor
-	    (TacletForTests.services(), SVInstantiations.EMPTY_SVINSTANTIATIONS, null, null);
+	    (new TermLabelState(), TacletForTests.services(), SVInstantiations.EMPTY_SVINSTANTIATIONS, null, null, null, null);
 	orig.execPostOrder(v);
 	assertEquals("Substitution Term not resolved correctly.",
 		     v.getTerm().sub(0), result.sub(0));

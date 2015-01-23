@@ -75,9 +75,7 @@ public class KeYGraphitiDebugNodePropertySection extends GFPropertySection {
             IFeatureProvider featureProvider = diagramProvider.getFeatureProvider();
             if (featureProvider != null) {
                Object bo = diagramProvider.getFeatureProvider().getBusinessObjectForPictogramElement(pe);
-               if (bo instanceof IKeYSEDDebugNode<?>) {
-                  node = (IKeYSEDDebugNode<?>)bo;
-               }
+               node = KeYDebugNodePropertySection.getDebugNode(bo);
             }
          }
       }

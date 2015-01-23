@@ -33,10 +33,10 @@ import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
-import de.uka.ilkd.key.gui.AutoModeListener;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.KeYSelectionEvent;
-import de.uka.ilkd.key.gui.KeYSelectionListener;
+import de.uka.ilkd.key.core.AutoModeListener;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -67,7 +67,9 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
       
       @Override
       public void selectedNodeChanged(KeYSelectionEvent e) {
-         updateSelectedNodeThreadSafe();
+         if (e.getSource().getSelectedNode().proof() == proof) {
+            updateSelectedNodeThreadSafe();
+         }
       }
    };
    
@@ -154,10 +156,12 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
     * @param e The event.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      // Listen for mediator selection changes caused by the user to synchronize them with the shown TreeViewer 
-      environment.getMediator().addKeYSelectionListener(listener);
-      // Make sure that correct selected node is shown
-      updateSelectedNodeThreadSafe();
+      if (e.getSource() == proof) {
+         // Listen for mediator selection changes caused by the user to synchronize them with the shown TreeViewer 
+         environment.getMediator().addKeYSelectionListener(listener);
+         // Make sure that correct selected node is shown
+         updateSelectedNodeThreadSafe();
+      }
    }
    
    /**

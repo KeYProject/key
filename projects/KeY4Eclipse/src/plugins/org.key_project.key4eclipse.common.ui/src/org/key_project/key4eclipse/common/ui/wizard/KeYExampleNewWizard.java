@@ -252,10 +252,15 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
                                content.substring(end);
                   }
                   else {
+                     String parentDirectories = "";
+                     while (currentDir.startsWith("../")) {
+                        parentDirectories += "../";
+                        currentDir = currentDir.substring("../".length());
+                     }
                      sourceSubDirectory = currentDir;
                      content = content.substring(0, start) +
                                JAVA_SOURCE_START +
-                               newSourceDir + '/' + currentDir +
+                               parentDirectories + newSourceDir + '/' + currentDir +
                                content.substring(end);
                   }
                }

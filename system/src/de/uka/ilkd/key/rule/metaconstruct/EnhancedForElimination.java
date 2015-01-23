@@ -47,15 +47,13 @@ import de.uka.ilkd.key.util.ExtList;
 public class EnhancedForElimination extends ProgramTransformer {
 
     private static final String IT = "it";
+    private static final String ARR = "arr";
     private static final String VALUES = "values";
-    private static final String ITERABLE = "java.lang.Iterable";
+    private static final String ITERABLE_CLASS_NAME = "java.lang.Iterable";
     private static final String ITERATOR_METH = "iterator";
     private static final String HAS_NEXT = "hasNext";
     private static final String NEXT = "next";
     private static final String ITERATOR = "java.util.Iterator";
-    private Services services;
-    private JavaInfo ji;
-    private EnhancedFor enhancedFor;
 
     public EnhancedForElimination(EnhancedFor forStatement) {
         super("enhancedfor-elim", forStatement);
@@ -97,59 +95,87 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         assert pe instanceof EnhancedFor : "Only works on enhanced fors";
 
-        this.services = services;
+        EnhancedFor enhancedFor = (EnhancedFor) pe;
 
-        enhancedFor = (EnhancedFor) pe;
-
-        LocalVariableDeclaration lvd = enhancedFor.getVariableDeclaration();
         Expression expression = enhancedFor.getGuardExpression();
-        Statement body = enhancedFor.getBody();
-        
 
         ProgramElement result;
-        if(iterable(expression)) {
-            result = makeIterableForLoop(lvd, expression, body);
+        if(isIterable(expression, services)) {
+            result = makeIterableForLoop(enhancedFor, services);
         } else {
-            result = makeArrayForLoop(lvd, expression, body);
+            result = makeArrayForLoop(enhancedFor, services);
         }
         
         return result;
     }
 
-    private boolean iterable(Expression expression) {
-        ji = services.getJavaInfo();
-        final ExecutionContext ec = ji.getDefaultExecutionContext(); // TODO: how to get a more appropriate one? 
-        boolean iterable = ji.isSubtype(expression.getKeYJavaType(services, ec),ji.getTypeByName(ITERABLE));
+    /**
+     * Checks if an expression is an {@code Iterable}.
+     *
+     * @param expression the expression to check
+     * @param services the services for lookups
+     * @return true, if expression's type is a subtype of Iterable
+     */
+    private boolean isIterable(Expression expression, Services services) {
+        JavaInfo ji = services.getJavaInfo();
+        // TODO: how to get a more appropriate execution context?
+        final ExecutionContext ec = ji.getDefaultExecutionContext();
+        boolean iterable = ji.isSubtype(expression.getKeYJavaType(services, ec),
+                ji.getTypeByName(ITERABLE_CLASS_NAME));
         return iterable;
     }
 
-    /** Transform an enhanced for-loop over an array to a regular for-loop. */
-    private ProgramElement makeArrayForLoop(LocalVariableDeclaration lvd,
-            Expression expression, Statement body) {
-        assert expression instanceof ReferencePrefix : ""+expression+" is not an arrray reference.";
-        // expected subtypes of ReferencePrefix are LocationVariable, VariableReference, etc.
-        final ReferencePrefix arrayVar = (ReferencePrefix) expression;
-        final KeYJavaType intType = ji.getPrimitiveKeYJavaType("int");
-	final ProgramVariable itVar = KeYJavaASTFactory.localVariable("i",
-		intType);
+    /*
+     * Transform an enhanced for-loop over an array to a regular for-loop.
+     *   for(T v : exp) body
+     * -->
+     *   arr = exp;
+     *   for(int i = 0; i < arr.length; i++) body;
+     */
+    private ProgramElement makeArrayForLoop(EnhancedFor enhancedFor, Services services) {
 
+        Expression expression = enhancedFor.getGuardExpression();
+        Statement body = enhancedFor.getBody();
+
+        assert expression instanceof ReferencePrefix :
+            expression + " is not an arrray reference.";
+
+        final JavaInfo ji = services.getJavaInfo();
+
+        // T[] arr = exp;
+        // TODO: how to get a more appropriate execution context?
+        final ExecutionContext ec = ji.getDefaultExecutionContext();
+        final KeYJavaType arrayType = expression.getKeYJavaType(services, ec);
+        final ProgramVariable arrayVar = KeYJavaASTFactory.localVariable(services,
+                ARR, arrayType);
+        final Statement arrAssignment = KeYJavaASTFactory.declare(arrayVar, expression);
+
+        // for(int i; i < arr.length; i++)
+        final KeYJavaType intType = ji.getPrimitiveKeYJavaType("int");
+        final ProgramVariable itVar = KeYJavaASTFactory.localVariable(services, "i", intType);
 	final ILoopInit inits = KeYJavaASTFactory.loopInitZero(intType, itVar);
         final IGuard guard = KeYJavaASTFactory.lessThanArrayLengthGuard(ji, itVar, arrayVar);
         final IForUpdates updates = KeYJavaASTFactory.postIncrementForUpdates(itVar);
 
         // there may be only one variable iterated over (see Language Specification Sect. 14.14.2)
+        final LocalVariableDeclaration lvd = enhancedFor.getVariableDeclaration();
         final IProgramVariable programVariable = lvd.getVariables().get(0).getProgramVariable();
         assert programVariable instanceof ProgramVariable :
             "Since this is a concrete program, the spec must not be schematic";
         final ProgramVariable lvdVar = (ProgramVariable)programVariable;
         final Statement declArrayElemVar = KeYJavaASTFactory.declare(lvdVar);
 
+        // a = arr[i];
         // assign element of the current iteration to the enhanced for-loop iterator variable
         final Statement getNextElement = KeYJavaASTFactory.assignArrayField(lvdVar, arrayVar, itVar);
-        final For forLoop = KeYJavaASTFactory.forLoop(inits, guard, updates, declArrayElemVar, getNextElement, body);
+        final For forLoop = KeYJavaASTFactory.forLoop(inits, guard,
+                updates, declArrayElemVar, getNextElement, body);
 
-        setInvariant(enhancedFor, forLoop);
-        return forLoop;
+        setInvariant(enhancedFor, forLoop, services);
+
+        // arr = exp; for(...) body
+        StatementBlock composition = KeYJavaASTFactory.block(arrAssignment, forLoop);
+        return composition;
     }
 
     // Methods to transform loops over Iterable
@@ -157,8 +183,7 @@ public class EnhancedForElimination extends ProgramTransformer {
     /*
      * "{ ; while(<itguard>) <block> } "
      */
-    private ProgramElement makeIterableForLoop(LocalVariableDeclaration lvd,
-            Expression expression, Statement body) {
+    private ProgramElement makeIterableForLoop(EnhancedFor enhancedFor, Services services) {
 
         // local variable "it"
         final KeYJavaType iteratorType = services.getJavaInfo().getTypeByName(ITERATOR);
@@ -176,21 +201,22 @@ public class EnhancedForElimination extends ProgramTransformer {
 
 	// Iterator itVar = expression.iterator();
 	final Statement itinit = KeYJavaASTFactory.declareMethodCall(
-		iteratorType, itVar, new ParenthesizedExpression(expression),
+                iteratorType, itVar, new ParenthesizedExpression(enhancedFor.getGuardExpression()),
 		ITERATOR_METH);
 
 	// create the method call itVar.hasNext();
 	final Expression itGuard = KeYJavaASTFactory
 		.methodCall(itVar, HAS_NEXT);
 
-        final StatementBlock block = makeBlock(itVar, valuesVar, lvd, body);
+        final LocalVariableDeclaration lvd = enhancedFor.getVariableDeclaration();
+        final StatementBlock block = makeBlock(itVar, valuesVar, lvd, enhancedFor.getBody());
 
         // while
         final While whileGuard = new While(itGuard, block, null, new ExtList());
 
         // block
         final StatementBlock outerBlock = KeYJavaASTFactory.block(itinit, valuesInit, whileGuard);
-        setInvariant(enhancedFor,whileGuard);
+        setInvariant(enhancedFor, whileGuard, services);
         return outerBlock;
 
     }
@@ -231,10 +257,10 @@ public class EnhancedForElimination extends ProgramTransformer {
     /**
      * Transfer the invariant from <code>original</code> enhanced loop to the
      * <code>transformed</code> while or for loop.
+     * @param services
      */
-    private void setInvariant (EnhancedFor original, LoopStatement transformed){
-        LoopInvariant li = 
-                services.getSpecificationRepository().getLoopInvariant(original);
+    private void setInvariant (EnhancedFor original, LoopStatement transformed, Services services) {
+        LoopInvariant li = services.getSpecificationRepository().getLoopInvariant(original);
         if (li != null) {
             li = li.setLoop(transformed);
             services.getSpecificationRepository().addLoopInvariant(li);

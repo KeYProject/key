@@ -1,4 +1,4 @@
-\profile "Java Profile";
+\profile "Java Profile for Symbolic Execution";
 
 \settings {
 "#Proof-Settings-Config-File

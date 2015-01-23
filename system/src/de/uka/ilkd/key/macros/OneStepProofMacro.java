@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.macros;
 
-import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
@@ -41,8 +41,8 @@ public class OneStepProofMacro extends StrategyProofMacro {
 
 
     @Override
-    protected Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
-        return new OneStepStrategy(mediator.getInteractiveProver().getProof().getActiveStrategy());
+    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+        return new OneStepStrategy(proof.getActiveStrategy());
     }
 
 

@@ -41,5 +41,5 @@ public interface IExecutionBaseMethodReturn<S extends SourceElement> extends IEx
     * Returns the variable value pairs of the state when the method has been called.
     * @return The variable value pairs.
     */
-   public IExecutionVariable[] getCallStateVariables();
+   public IExecutionVariable[] getCallStateVariables() throws ProofInputException;
 }

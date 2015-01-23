@@ -15,12 +15,12 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.ProgramFactory;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class ProofCrossReferenceServiceConfiguration
     extends KeYCrossReferenceServiceConfiguration {
 
-    public ProofCrossReferenceServiceConfiguration(KeYExceptionHandler keh) {
+    public ProofCrossReferenceServiceConfiguration(KeYRecoderExcHandler keh) {
 	super(keh);
     }
 

@@ -21,7 +21,6 @@ import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
-import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
@@ -57,7 +56,7 @@ public class KeYFileForTests extends KeYFile {
 		new ParserConfig(initConfig.getServices(), 
 				 initConfig.namespaces());
 	    KeYParserF problemParser = new KeYParserF
-		(ParserMode.PROBLEM,new KeYLexerF(cinp, file.toString(), null), pc, pc,initConfig.
+		(ParserMode.PROBLEM,new KeYLexerF(cinp, file.toString()), pc, pc,initConfig.
 		 getTaclet2Builder(), initConfig.getTaclets()); 
             problemParser.problem(); 
 	    initConfig.setTaclets(problemParser.getTaclets()); 

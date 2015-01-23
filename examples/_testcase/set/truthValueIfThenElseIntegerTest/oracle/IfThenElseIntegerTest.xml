@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call IfThenElseIntegerTest.magic(_x,_y)&gt;" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (_x==_y)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+         <branchCondition name="equals(y,x)" pathCondition="equals(y,x)" pathConditionChanged="true" branchCondition="equals(y,x)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="return 42;" pathCondition="equals(y,x)" pathConditionChanged="false">
+               <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of IfThenElseIntegerTest.magic(_x,_y)&gt;" pathCondition="equals(y,x)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(y,x)">
+                  <termination name="&lt;end&gt;" pathCondition="equals(y,x)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  </termination>
+               </methodReturn>
+               <completedBlockEntry path="/0/0" conditionString="equals(y,x)"/>
+            </statement>
+         </branchCondition>
+         <branchCondition name="not(equals(y,x))" pathCondition="not(equals(y,x))" pathConditionChanged="true" branchCondition="not(equals(y,x))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="return -4711;" pathCondition="not(equals(y,x))" pathConditionChanged="false">
+               <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of IfThenElseIntegerTest.magic(_x,_y)&gt;" pathCondition="not(equals(y,x))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(y,x))">
+                  <termination name="&lt;end&gt;" pathCondition="not(equals(y,x))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  </termination>
+               </methodReturn>
+               <completedBlockEntry path="/0/0" conditionString="not(equals(y,x))"/>
+            </statement>
+         </branchCondition>
+         <blockCompletionEntry path="/0/0/0/0"/>
+         <blockCompletionEntry path="/0/0/1/0"/>
+      </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0"/>
+</start>
