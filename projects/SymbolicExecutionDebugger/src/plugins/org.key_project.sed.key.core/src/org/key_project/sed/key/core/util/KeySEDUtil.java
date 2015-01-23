@@ -170,9 +170,9 @@ public final class KeySEDUtil {
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_VARIABLES_ARE_COMPUTED_FROM_UPDATES = "org.key_project.sed.key.core.launch.sed.key.attribute.variablesAreOnlyComputedFromUpdates";
 
     /**
-     * The key of the attribute to store if predicate evaluation is enabeld or not.
+     * The key of the attribute to store if truth value evaluation is enabled or not.
      */
-    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PREDICATE_EVALUATION_ENABLED = "org.key_project.sed.key.core.launch.sed.key.attribute.predicateEvaluationEnabled";
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED = "org.key_project.sed.key.core.launch.sed.key.attribute.truthValueEvaluationEnabled";
 
     /**
      * The launch mode supported by the Symbolic Execution Debugger based on KeY.
@@ -372,13 +372,13 @@ public final class KeySEDUtil {
     }
 
     /**
-     * Checks if predicate evaluation is enabled or not.
+     * Checks if truth value evaluation is enabled or not.
      * @param configuration The {@link ILaunchConfiguration} to read from.
-     * @return {@code true} predicate evaluation enabled, {@code false} predicate evaluation disabled.
+     * @return {@code true} truth value evaluation enabled, {@code false} truth value evaluation disabled.
      * @throws CoreException Occurred Exception.
      */
-    public static boolean isPredicateEvaluationEnabled(ILaunchConfiguration configuration) throws CoreException {
-       return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PREDICATE_EVALUATION_ENABLED, KeYSEDPreferences.isPredicateEvaluationEnabled()) : KeYSEDPreferences.isPredicateEvaluationEnabled();
+    public static boolean isTruthValueEvaluationEnabled(ILaunchConfiguration configuration) throws CoreException {
+       return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, KeYSEDPreferences.isTruthValueEvaluationEnabled()) : KeYSEDPreferences.isTruthValueEvaluationEnabled();
     }
     
     /**

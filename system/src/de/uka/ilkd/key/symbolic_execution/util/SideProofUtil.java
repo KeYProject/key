@@ -741,7 +741,7 @@ public final class SideProofUtil {
                Profile sourceProfile = sourceInitConfig.getProfile();
                if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
                   ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
-                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations(SymbolicExecutionJavaProfile.isPredicateEvaluationEnabled(source))); // Make sure that the term labels of symbolic execution are also supported by the new environment.
+                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations(SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(source))); // Make sure that the term labels of symbolic execution are also supported by the new environment.
                   return result;
                }
                else {
@@ -757,7 +757,7 @@ public final class SideProofUtil {
                Profile sourceProfile = sourceInitConfig.getProfile();
                if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
                   ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
-                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations(SymbolicExecutionJavaProfile.isPredicateEvaluationEnabled(source))); // Make sure that the term labels of symbolic execution are also supported by the new environment.
+                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations(SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(source))); // Make sure that the term labels of symbolic execution are also supported by the new environment.
                   return result;
                }
                else {

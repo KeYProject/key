@@ -67,7 +67,7 @@ public class SWTBotPostconditionTabTest extends AbstractSWTBotKeYPropertyTabTest
          public void assertTermination(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertTrue(tabs.selectTabItem("Postcondition"));
             TestUtilsUtil.waitForJobs();
-            assertEquals("true ==> (exc = null)<<P(\"0.0\")>>", propertiesView.bot().styledText(0).getText());
+            assertEquals("true ==> (exc = null)<<F(\"0.0\")>>", propertiesView.bot().styledText(0).getText());
          }
 
          @Override

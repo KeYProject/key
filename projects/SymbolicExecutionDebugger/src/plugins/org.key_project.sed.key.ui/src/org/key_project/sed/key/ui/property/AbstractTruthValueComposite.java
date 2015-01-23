@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
-import org.key_project.key4eclipse.common.ui.decorator.EvaluationViewerDecorator;
+import org.key_project.key4eclipse.common.ui.decorator.TruthValueEvaluationViewerDecorator;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
@@ -64,11 +64,11 @@ import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * This composite provides the content shown in {@link AbstractPredicatePropertySection}
- * and {@link AbstractPredicateGraphitiPropertySection}.
+ * This composite provides the content shown in {@link AbstractTruthValuePropertySection}
+ * and {@link AbstractTruthValueGraphitiPropertySection}.
  * @author Martin Hentschel
  */
-public abstract class AbstractPredicateComposite implements IDisposable {
+public abstract class AbstractTruthValueComposite implements IDisposable {
    /**
     * The {@link TabbedPropertySheetWidgetFactory} to use.
     */
@@ -85,9 +85,9 @@ public abstract class AbstractPredicateComposite implements IDisposable {
    private final List<Control> controls = new LinkedList<Control>();
    
    /**
-    * The used {@link EvaluationViewerDecorator}s.
+    * The used {@link TruthValueEvaluationViewerDecorator}s.
     */
-   private final List<EvaluationViewerDecorator> decorators = new LinkedList<EvaluationViewerDecorator>();
+   private final List<TruthValueEvaluationViewerDecorator> decorators = new LinkedList<TruthValueEvaluationViewerDecorator>();
 
    
    /**
@@ -115,13 +115,13 @@ public abstract class AbstractPredicateComposite implements IDisposable {
     * @param parent The parent {@link Composite}.
     * @param factory The {@link TabbedPropertySheetWidgetFactory} to use.
     */
-   public AbstractPredicateComposite(Composite parent, TabbedPropertySheetWidgetFactory factory) {
+   public AbstractTruthValueComposite(Composite parent, TabbedPropertySheetWidgetFactory factory) {
       this.factory = factory;
       root = factory.createFlatFormComposite(parent);
       root.setLayout(new GridLayout(1, false));
-      trueColor = new Color(parent.getDisplay(), EvaluationViewerDecorator.trueRGB);
-      falseColor = new Color(parent.getDisplay(), EvaluationViewerDecorator.falseRGB);
-      unknownColor = new Color(parent.getDisplay(), EvaluationViewerDecorator.unknownRGB);
+      trueColor = new Color(parent.getDisplay(), TruthValueEvaluationViewerDecorator.trueRGB);
+      falseColor = new Color(parent.getDisplay(), TruthValueEvaluationViewerDecorator.falseRGB);
+      unknownColor = new Color(parent.getDisplay(), TruthValueEvaluationViewerDecorator.unknownRGB);
    }
 
    /**
@@ -298,7 +298,7 @@ System.out.println(result);
             // Create viewer
             SourceViewer viewer = new SourceViewer(viewerGroup, null, SWT.MULTI | SWT.FULL_SELECTION);
             viewer.setEditable(false);
-            EvaluationViewerDecorator viewerDecorator = new EvaluationViewerDecorator(viewer);
+            TruthValueEvaluationViewerDecorator viewerDecorator = new TruthValueEvaluationViewerDecorator(viewer);
             decorators.add(viewerDecorator);
             // Show term and results
             Sequent sequent = createSequentToShow(branchResult.getCondition(), succedent);

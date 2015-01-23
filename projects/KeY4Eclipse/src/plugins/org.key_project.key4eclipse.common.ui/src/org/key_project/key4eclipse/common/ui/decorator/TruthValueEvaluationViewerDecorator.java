@@ -40,7 +40,7 @@ import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValue;
  * via {@link #showSequent(Term, Services, KeYMediator, BranchResult)}.
  * @author Martin Hentschel
  */
-public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
+public class TruthValueEvaluationViewerDecorator extends ProofSourceViewerDecorator {
    /**
     * The {@link RGB} specifying the {@link Color} to highlight {@link TruthValue#TRUE}.
     */
@@ -75,7 +75,7 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
     * Constructor.
     * @param viewer The {@link ISourceViewer} to decorate.
     */
-   public EvaluationViewerDecorator(ISourceViewer viewer) {
+   public TruthValueEvaluationViewerDecorator(ISourceViewer viewer) {
       super(viewer);
       trueColor = new Color(getViewerText().getDisplay(), trueRGB);
       falseColor = new Color(getViewerText().getDisplay(), falseRGB);

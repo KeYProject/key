@@ -25,7 +25,7 @@ import org.key_project.sed.key.core.model.KeYMethodContract;
  * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
  * @author Martin Hentschel
  */
-public class PreconditionGraphitiPropertySection extends AbstractPredicateGraphitiPropertySection {
+public class PreconditionGraphitiPropertySection extends AbstractTruthValueGraphitiPropertySection {
    /**
     * {@inheritDoc}
     */
@@ -49,7 +49,7 @@ public class PreconditionGraphitiPropertySection extends AbstractPredicateGraphi
     * {@inheritDoc}
     */
    @Override
-   protected AbstractPredicateComposite createContentComposite(Composite parent) {
+   protected AbstractTruthValueComposite createContentComposite(Composite parent) {
       return new PreconditionComposite(parent, getWidgetFactory());
    }
 }

@@ -7,7 +7,7 @@ import junit.framework.TestCase;
  * Tests for {@link TruthValue}.
  * @author Martin Hentschel
  */
-public class TestPredicateValue extends TestCase {
+public class TestTruthValueValue extends TestCase {
    /**
     * Tests {@link TruthValue#ifThenElse(TruthValue, TruthValue, TruthValue)}.
     */

@@ -22,14 +22,14 @@ import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 
 /**
  * Basic {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s
- * within a {@link AbstractPredicateComposite}.
+ * within a {@link AbstractTruthValueComposite}.
  * @author Martin Hentschel
  */
-public abstract class AbstractPredicatePropertySection extends AbstractPropertySection {
+public abstract class AbstractTruthValuePropertySection extends AbstractPropertySection {
    /**
     * The shown content.
     */
-   private AbstractPredicateComposite contentComposite;
+   private AbstractTruthValueComposite contentComposite;
    
    /**
     * {@inheritDoc}
@@ -41,11 +41,11 @@ public abstract class AbstractPredicatePropertySection extends AbstractPropertyS
    }
    
    /**
-    * Creates the {@link AbstractPredicateComposite} to show.
+    * Creates the {@link AbstractTruthValueComposite} to show.
     * @param parent The parent {@link Composite}.
-    * @return The created {@link AbstractPredicateComposite}.
+    * @return The created {@link AbstractTruthValueComposite}.
     */
-   protected abstract AbstractPredicateComposite createContentComposite(Composite parent);
+   protected abstract AbstractTruthValueComposite createContentComposite(Composite parent);
 
    /**
     * {@inheritDoc}

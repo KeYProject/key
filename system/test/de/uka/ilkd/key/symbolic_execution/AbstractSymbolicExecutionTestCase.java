@@ -1200,7 +1200,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
-    * @param predicateEvaluationEnabled {@code true} predicate evaluation is enabled, {@code false} predicate evaluation is disabled.
+    * @param truthValueEvaluationEnabled {@code true} truth value evaluation is enabled, {@code false} truth value evaluation is disabled.
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
@@ -1216,12 +1216,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                          boolean useUnicode,
                                                                                                          boolean usePrettyPrinting,
                                                                                                          boolean variablesAreOnlyComputedFromUpdates,
-                                                                                                         boolean predicateEvaluationEnabled) throws ProblemLoaderException, ProofInputException {
+                                                                                                         boolean truthValueEvaluationEnabled) throws ProblemLoaderException, ProofInputException {
       // Make sure that required files exists
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
       // Load java file
-      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(predicateEvaluationEnabled), javaFile, null, null, true);
+      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), javaFile, null, null, true);
       // Start proof
       final Contract contract = environment.getServices().getSpecificationRepository().getContractByName(baseContractName);
       assertTrue(contract instanceof FunctionalOperationContract);
@@ -1304,7 +1304,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
-    * @param predicateEvaluationEnabled {@code true} predicate evaluation is enabled, {@code false} predicate evaluation is disabled.
+    * @param truthValueEvaluationEnabled {@code true} truth value evaluation is enabled, {@code false} truth value evaluation is disabled.
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProblemLoaderException Occurred Exception.
     */
@@ -1318,12 +1318,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                          boolean useUnicode,
                                                                                                          boolean usePrettyPrinting,
                                                                                                          boolean variablesAreOnlyComputedFromUpdates,
-                                                                                                         boolean predicateEvaluationEnabled) throws ProblemLoaderException {
+                                                                                                         boolean truthValueEvaluationEnabled) throws ProblemLoaderException {
       // Make sure that required files exists
       File proofFile = new File(baseDir, proofPathInBaseDir);
       assertTrue(proofFile.exists());
       // Load java file
-      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(predicateEvaluationEnabled), proofFile, null, null, SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), null, true);
+      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), proofFile, null, null, SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), null, true);
       Proof proof = environment.getLoadedProof();
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
@@ -1737,7 +1737,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
-    * @param predicateEvaluationEnabled {@code true} predicate evaluation is enabled, {@code false} predicate evaluation is disabled.
+    * @param truthValueEvaluationEnabled {@code true} truth value evaluation is enabled, {@code false} truth value evaluation is disabled.
     * @return The tested {@link SymbolicExecutionEnvironment}.
     * @throws ProofInputException Occurred Exception
     * @throws IOException Occurred Exception
@@ -1760,7 +1760,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                          boolean useUnicode,
                                                                          boolean usePrettyPrinting,
                                                                          boolean variablesAreOnlyComputedFromUpdates,
-                                                                         boolean predicateEvaluationEnabled) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+                                                                         boolean truthValueEvaluationEnabled) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       SymbolicExecutionEnvironment<CustomUserInterface> env = null;
       try {
@@ -1774,7 +1774,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          // Make sure that the correct taclet options are defined.
          setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(baseDir, proofFilePathInBaseDir, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, predicateEvaluationEnabled);
+         env = createSymbolicExecutionEnvironment(baseDir, proofFilePathInBaseDir, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, truthValueEvaluationEnabled);
          // Create new oracle file if required in a temporary directory
          createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack, includeReturnValues);
          // Read oracle file
@@ -1903,7 +1903,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
-    * @param predicateEvaluationEnabled {@code true} predicate evaluation is enabled, {@code false} predicate evaluation is disabled.
+    * @param truthValueEvaluationEnabled {@code true} truth value evaluation is enabled, {@code false} truth value evaluation is disabled.
     * @return The tested {@link SymbolicExecutionEnvironment}.
     * @throws ProofInputException Occurred Exception
     * @throws IOException Occurred Exception
@@ -1928,7 +1928,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                          boolean useUnicode,
                                                                          boolean usePrettyPrinting,
                                                                          boolean variablesAreOnlyComputedFromUpdates,
-                                                                         boolean predicateEvaluationEnabled) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+                                                                         boolean truthValueEvaluationEnabled) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       HashMap<String, String> originalTacletOptions = null;
       try {
          // Make sure that parameter are valid.
@@ -1943,7 +1943,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, baseContractName);
          // Create proof environment for symbolic execution
-         SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, baseContractName, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, predicateEvaluationEnabled);
+         SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, baseContractName, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, truthValueEvaluationEnabled);
          internalDoSETTest(oracleFile, env, oraclePathInBaseDirFile, maximalNumberOfExecutedSetNodes, includeConstraints, includeVariables, includeCallStack, includeReturnValues);
          return env;
       }

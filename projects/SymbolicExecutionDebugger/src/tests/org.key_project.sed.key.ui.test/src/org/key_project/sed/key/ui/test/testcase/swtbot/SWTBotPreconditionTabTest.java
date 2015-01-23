@@ -74,8 +74,8 @@ public class SWTBotPreconditionTabTest extends AbstractSWTBotKeYPropertyTabTest 
             TestUtilsUtil.waitForJobs();
             assertEquals(" true\n" +
             		       "==>\n" +
-            		       "   (1 >= 0)<<P(\"5.0\")>>\n" +
-            		       " & (wellFormed(heap)<<P(\"6.0\")>> & inInt(1)<<P(\"7.0\")>>)", propertiesView.bot().styledText(0).getText());
+            		       "   (1 >= 0)<<F(\"5.0\")>>\n" +
+            		       " & (wellFormed(heap)<<F(\"6.0\")>> & inInt(1)<<F(\"7.0\")>>)", propertiesView.bot().styledText(0).getText());
          }
 
          @Override

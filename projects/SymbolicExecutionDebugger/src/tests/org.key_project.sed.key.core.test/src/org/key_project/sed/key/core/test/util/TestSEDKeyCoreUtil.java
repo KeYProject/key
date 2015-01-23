@@ -65,7 +65,7 @@ public final class TestSEDKeyCoreUtil {
     * @param showKeYMainWindow Show KeY's main window? Use {@code null} to use default value.
     * @param mergeBranchConditions Merge branch conditions?
     * @param usePrettyPrinting Use pretty printing?
-    * @param predicateEvaluationEnabled Predicate evaluation enabled?
+    * @param truthValueEvaluationEnabled Truth value evaluation enabled?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IFile file,
@@ -74,7 +74,7 @@ public final class TestSEDKeyCoreUtil {
                                 final Boolean showKeYMainWindow,
                                 final Boolean mergeBranchConditions,
                                 final Boolean usePrettyPrinting,
-                                final Boolean predicateEvaluationEnabled) throws Exception {
+                                final Boolean truthValueEvaluationEnabled) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
@@ -96,8 +96,8 @@ public final class TestSEDKeyCoreUtil {
                if (usePrettyPrinting != null) {
                   wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrinting);
                }
-               if (predicateEvaluationEnabled != null) {
-                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PREDICATE_EVALUATION_ENABLED, predicateEvaluationEnabled);
+               if (truthValueEvaluationEnabled != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, truthValueEvaluationEnabled);
                }
                config = wc.doSave();
                DebugUITools.launch(config, KeySEDUtil.MODE);

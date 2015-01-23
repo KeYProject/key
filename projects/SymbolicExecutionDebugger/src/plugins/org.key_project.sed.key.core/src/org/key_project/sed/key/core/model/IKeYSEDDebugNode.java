@@ -68,8 +68,8 @@ public interface IKeYSEDDebugNode<E extends IExecutionNode<?>> extends ISEDDebug
    public void setParent(ISEDDebugNode parent);
    
    /**
-    * Checks if predicate evaluation is enabled or not.
+    * Checks if truth value evaluation is enabled or not.
     * @return {@code true} enabled, {@code false} disabled.
     */
-   public boolean isPredicateEvaluationEnabled();
+   public boolean isTruthValueEvaluationEnabled();
 }

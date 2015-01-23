@@ -30,17 +30,17 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    public void testEquivExample_NoOneStepSimplification() throws Exception {
       // Create expected results
-      ExpectedBranchResult goal79 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.TRUE));
-      ExpectedBranchResult goal91 = new ExpectedBranchResult(new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.TRUE));
-      ExpectedBranchResult goal95 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE));
-      ExpectedBranchResult goal97 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.FALSE)); // SETAccumulate is false
-      ExpectedPredicateEvaluationResult result = new ExpectedPredicateEvaluationResult(goal79, goal91, goal95, goal97);
+      ExpectedBranchResult goal79 = new ExpectedBranchResult(new ExpectedTruthValueResult("2.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.TRUE));
+      ExpectedBranchResult goal91 = new ExpectedBranchResult(new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE));
+      ExpectedBranchResult goal95 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE));
+      ExpectedBranchResult goal97 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.FALSE)); // SETAccumulate is false
+      ExpectedTruthValueEvaluationResult result = new ExpectedTruthValueEvaluationResult(goal79, goal91, goal95, goal97);
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/truthValueEquivExample/test/EquivExampleNoOneStepSimplification.proof", 
-                                "examples/_testcase/set/truthValueEquivExample/oracle/EquivExample.xml",
-                                false,
-                                true,
-                                result);
+      doTruthValueEvaluationTest("examples/_testcase/set/truthValueEquivExample/test/EquivExampleNoOneStepSimplification.proof", 
+                                 "examples/_testcase/set/truthValueEquivExample/oracle/EquivExample.xml",
+                                 false,
+                                 true,
+                                 result);
    }
    
    /**
@@ -48,17 +48,17 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    public void testEquivExample() throws Exception {
       // Create expected results
-      ExpectedBranchResult goal39 = new ExpectedBranchResult(new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.TRUE));
-      ExpectedBranchResult goal50 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.TRUE));
-      ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.TRUE));
-      ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.FALSE)); // SETAccumulate is false
-      ExpectedPredicateEvaluationResult result = new ExpectedPredicateEvaluationResult(goal39, goal50, goal53, goal55);
+      ExpectedBranchResult goal39 = new ExpectedBranchResult(new ExpectedTruthValueResult("2.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.TRUE));
+      ExpectedBranchResult goal50 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE));
+      ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE));
+      ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.FALSE)); // SETAccumulate is false
+      ExpectedTruthValueEvaluationResult result = new ExpectedTruthValueEvaluationResult(goal39, goal50, goal53, goal55);
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/truthValueEquivExample/test/EquivExample.proof", 
-                                "examples/_testcase/set/truthValueEquivExample/oracle/EquivExample.xml",
-                                false,
-                                false,
-                                result);
+      doTruthValueEvaluationTest("examples/_testcase/set/truthValueEquivExample/test/EquivExample.proof", 
+                                 "examples/_testcase/set/truthValueEquivExample/oracle/EquivExample.xml",
+                                 false,
+                                 false,
+                                 result);
    }
    
    /**
@@ -66,16 +66,16 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    public void testIfThenElseInteger() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult thenResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult elseResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult thenResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult elseResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/truthValueIfThenElseIntegerTest/test/IfThenElseIntegerTest.java", 
-                                "IfThenElseIntegerTest[IfThenElseIntegerTest::magic(int,int)].JML normal_behavior operation contract.0", 
-                                "examples/_testcase/set/truthValueIfThenElseIntegerTest/oracle/IfThenElseIntegerTest.xml",
-                                false,
-                                false,
-                                thenResult,
-                                elseResult);
+      doTruthValueEvaluationTest("examples/_testcase/set/truthValueIfThenElseIntegerTest/test/IfThenElseIntegerTest.java", 
+                                 "IfThenElseIntegerTest[IfThenElseIntegerTest::magic(int,int)].JML normal_behavior operation contract.0", 
+                                 "examples/_testcase/set/truthValueIfThenElseIntegerTest/oracle/IfThenElseIntegerTest.xml",
+                                 false,
+                                 false,
+                                 thenResult,
+                                 elseResult);
    }
    
    /**
@@ -83,16 +83,16 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    public void testIfThenElseNotFormula() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult thenResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult elseResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult thenResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult elseResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/truthValueIfThenElseNotFormulaTest/test/IfThenElseNotFormulaTest.java", 
-                                "IfThenElseNotFormulaTest[IfThenElseNotFormulaTest::magic(int,int)].JML normal_behavior operation contract.0", 
-                                "examples/_testcase/set/truthValueIfThenElseNotFormulaTest/oracle/IfThenElseNotFormulaTest.xml",
-                                false,
-                                false,
-                                thenResult,
-                                elseResult);
+      doTruthValueEvaluationTest("examples/_testcase/set/truthValueIfThenElseNotFormulaTest/test/IfThenElseNotFormulaTest.java", 
+                                 "IfThenElseNotFormulaTest[IfThenElseNotFormulaTest::magic(int,int)].JML normal_behavior operation contract.0", 
+                                 "examples/_testcase/set/truthValueIfThenElseNotFormulaTest/oracle/IfThenElseNotFormulaTest.xml",
+                                 false,
+                                 false,
+                                 thenResult,
+                                 elseResult);
    }
    
    /**
@@ -100,16 +100,16 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    public void testIfThenElseFormula() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult thenResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("4.0", TruthValue.TRUE), new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult elseResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("4.0", TruthValue.TRUE), new ExpectedPredicateResult("0.0", TruthValue.FALSE), new ExpectedPredicateResult("2.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult thenResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("4.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult elseResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("4.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.FALSE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE)));
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/truthValueIfThenElseFormulaTest/test/IfThenElseFormulaTest.java", 
-                                "IfThenElseFormulaTest[IfThenElseFormulaTest::magic(int,int)].JML normal_behavior operation contract.0", 
-                                "examples/_testcase/set/truthValueIfThenElseFormulaTest/oracle/IfThenElseFormulaTest.xml",
-                                false,
-                                false,
-                                thenResult,
-                                elseResult);
+      doTruthValueEvaluationTest("examples/_testcase/set/truthValueIfThenElseFormulaTest/test/IfThenElseFormulaTest.java", 
+                                 "IfThenElseFormulaTest[IfThenElseFormulaTest::magic(int,int)].JML normal_behavior operation contract.0", 
+                                 "examples/_testcase/set/truthValueIfThenElseFormulaTest/oracle/IfThenElseFormulaTest.xml",
+                                 false,
+                                 false,
+                                 thenResult,
+                                 elseResult);
    }
    
    /**
@@ -117,17 +117,17 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    public void testNotLastEvaluationGivesTruthValue() throws Exception {
       // Create expected results
-      ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("6.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.TRUE), new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("8.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("1.12", TruthValue.FALSE), new ExpectedPredicateResult("1.13", TruthValue.TRUE), new ExpectedPredicateResult("2.0", TruthValue.TRUE));
-      ExpectedBranchResult goal41 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("0.0", TruthValue.TRUE));
-      ExpectedBranchResult goal39 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("0.0", TruthValue.TRUE));
-      ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.11", TruthValue.TRUE));
-      ExpectedPredicateEvaluationResult result = new ExpectedPredicateEvaluationResult(goal53, goal41, goal39, goal55);
+      ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("6.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("8.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.12", TruthValue.FALSE), new ExpectedTruthValueResult("1.13", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE));
+      ExpectedBranchResult goal41 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.TRUE));
+      ExpectedBranchResult goal39 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.TRUE));
+      ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.11", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult result = new ExpectedTruthValueEvaluationResult(goal53, goal41, goal39, goal55);
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/truthValueNotLastEvaluationGivesTruthValue/test/NotLastEvaluationGivesTruthValue.proof", 
-                                "examples/_testcase/set/truthValueNotLastEvaluationGivesTruthValue/oracle/NotLastEvaluationGivesTruthValue.xml",
-                                false,
-                                true,
-                                result);
+      doTruthValueEvaluationTest("examples/_testcase/set/truthValueNotLastEvaluationGivesTruthValue/test/NotLastEvaluationGivesTruthValue.proof", 
+                                 "examples/_testcase/set/truthValueNotLastEvaluationGivesTruthValue/oracle/NotLastEvaluationGivesTruthValue.xml",
+                                 false,
+                                 true,
+                                 result);
    }
    
    /**
@@ -135,17 +135,17 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    public void testArraySumWhile_NoOneStepSimplification() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult initialResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("14.0", TruthValue.TRUE), new ExpectedPredicateResult("15.0", TruthValue.TRUE), new ExpectedPredicateResult("16.0", TruthValue.TRUE), new ExpectedPredicateResult("17.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult preservesResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("18.0", TruthValue.TRUE), new ExpectedPredicateResult("19.0", TruthValue.TRUE), new ExpectedPredicateResult("20.0", TruthValue.TRUE), new ExpectedPredicateResult("21.0", TruthValue.TRUE), new ExpectedPredicateResult("22.0", TruthValue.TRUE), new ExpectedPredicateResult("23.0", TruthValue.TRUE), new ExpectedPredicateResult("24.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.FALSE), new ExpectedPredicateResult("8.0", TruthValue.TRUE), new ExpectedPredicateResult("9.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult initialResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("14.0", TruthValue.TRUE), new ExpectedTruthValueResult("15.0", TruthValue.TRUE), new ExpectedTruthValueResult("16.0", TruthValue.TRUE), new ExpectedTruthValueResult("17.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult preservesResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("18.0", TruthValue.TRUE), new ExpectedTruthValueResult("19.0", TruthValue.TRUE), new ExpectedTruthValueResult("20.0", TruthValue.TRUE), new ExpectedTruthValueResult("21.0", TruthValue.TRUE), new ExpectedTruthValueResult("22.0", TruthValue.TRUE), new ExpectedTruthValueResult("23.0", TruthValue.TRUE), new ExpectedTruthValueResult("24.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.FALSE), new ExpectedTruthValueResult("8.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE)));
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/truthValueArraySumWhile/test/ArraySumWhileNoOneStepSimplification.proof", 
-                                "examples/_testcase/set/truthValueArraySumWhile/oracle/ArraySumWhile.xml",
-                                false,
-                                true,
-                                initialResult,
-                                preservesResult,
-                                terminationResult);
+      doTruthValueEvaluationTest("examples/_testcase/set/truthValueArraySumWhile/test/ArraySumWhileNoOneStepSimplification.proof", 
+                                 "examples/_testcase/set/truthValueArraySumWhile/oracle/ArraySumWhile.xml",
+                                 false,
+                                 true,
+                                 initialResult,
+                                 preservesResult,
+                                 terminationResult);
    }
    
    /**
@@ -153,17 +153,17 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    public void testArraySumWhile() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult initialResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("14.0", TruthValue.TRUE), new ExpectedPredicateResult("15.0", TruthValue.TRUE), new ExpectedPredicateResult("16.0", TruthValue.TRUE), new ExpectedPredicateResult("17.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult preservesResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("18.0", TruthValue.TRUE), new ExpectedPredicateResult("19.0", TruthValue.TRUE), new ExpectedPredicateResult("20.0", TruthValue.TRUE), new ExpectedPredicateResult("21.0", TruthValue.TRUE), new ExpectedPredicateResult("22.0", TruthValue.TRUE), new ExpectedPredicateResult("23.0", TruthValue.TRUE), new ExpectedPredicateResult("24.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("2.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE), new ExpectedPredicateResult("4.0", TruthValue.FALSE), new ExpectedPredicateResult("8.0", TruthValue.TRUE), new ExpectedPredicateResult("9.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult initialResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("14.0", TruthValue.TRUE), new ExpectedTruthValueResult("15.0", TruthValue.TRUE), new ExpectedTruthValueResult("16.0", TruthValue.TRUE), new ExpectedTruthValueResult("17.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult preservesResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("18.0", TruthValue.TRUE), new ExpectedTruthValueResult("19.0", TruthValue.TRUE), new ExpectedTruthValueResult("20.0", TruthValue.TRUE), new ExpectedTruthValueResult("21.0", TruthValue.TRUE), new ExpectedTruthValueResult("22.0", TruthValue.TRUE), new ExpectedTruthValueResult("23.0", TruthValue.TRUE), new ExpectedTruthValueResult("24.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.FALSE), new ExpectedTruthValueResult("8.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE)));
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/truthValueArraySumWhile/test/ArraySumWhile.proof", 
-                                "examples/_testcase/set/truthValueArraySumWhile/oracle/ArraySumWhile.xml",
-                                false,
-                                true,
-                                initialResult,
-                                preservesResult,
-                                terminationResult);
+      doTruthValueEvaluationTest("examples/_testcase/set/truthValueArraySumWhile/test/ArraySumWhile.proof", 
+                                 "examples/_testcase/set/truthValueArraySumWhile/oracle/ArraySumWhile.xml",
+                                 false,
+                                 true,
+                                 initialResult,
+                                 preservesResult,
+                                 terminationResult);
    }
    
    /**
@@ -171,23 +171,23 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    public void testArrayUtil_NoOneStepSimplification() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult goal97 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("5.0", TruthValue.TRUE), new ExpectedPredicateResult("6.0", TruthValue.TRUE), new ExpectedPredicateResult("7.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult goal826 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("17.0", TruthValue.TRUE), new ExpectedPredicateResult("18.0", TruthValue.TRUE), new ExpectedPredicateResult("20.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult goal630 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("8.0", TruthValue.TRUE), new ExpectedPredicateResult("10.0", TruthValue.TRUE), new ExpectedPredicateResult("13.0", TruthValue.FALSE)));
-      ExpectedPredicateEvaluationResult goal792 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("8.0", TruthValue.TRUE), new ExpectedPredicateResult("9.0", TruthValue.TRUE), new ExpectedPredicateResult("10.0", TruthValue.TRUE), new ExpectedPredicateResult("11.0", TruthValue.TRUE), new ExpectedPredicateResult("12.0", TruthValue.TRUE), new ExpectedPredicateResult("13.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult goal1024 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult goal1161 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult goal97 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("6.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult goal826 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("17.0", TruthValue.TRUE), new ExpectedTruthValueResult("18.0", TruthValue.TRUE), new ExpectedTruthValueResult("20.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult goal630 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("8.0", TruthValue.TRUE), new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("13.0", TruthValue.FALSE)));
+      ExpectedTruthValueEvaluationResult goal792 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("8.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE), new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("11.0", TruthValue.TRUE), new ExpectedTruthValueResult("12.0", TruthValue.TRUE), new ExpectedTruthValueResult("13.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult goal1024 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult goal1161 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE)));
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/truthValueArrayUtil/test/ArrayUtilNoOneStepSimplification.proof", 
-                                "examples/_testcase/set/truthValueArrayUtil/oracle/ArrayUtil.xml",
-                                true,
-                                true,
-                                goal97,
-                                goal826,
-                                goal630,
-                                goal792,
-                                goal1024,
-                                goal1161);
+      doTruthValueEvaluationTest("examples/_testcase/set/truthValueArrayUtil/test/ArrayUtilNoOneStepSimplification.proof", 
+                                 "examples/_testcase/set/truthValueArrayUtil/oracle/ArrayUtil.xml",
+                                 true,
+                                 true,
+                                 goal97,
+                                 goal826,
+                                 goal630,
+                                 goal792,
+                                 goal1024,
+                                 goal1161);
    }
    
    /**
@@ -195,23 +195,23 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    public void testArrayUtil() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult goal97 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("5.0", TruthValue.TRUE), new ExpectedPredicateResult("6.0", TruthValue.TRUE), new ExpectedPredicateResult("7.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult goal826 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("17.0", TruthValue.TRUE), new ExpectedPredicateResult("18.0", TruthValue.TRUE), new ExpectedPredicateResult("20.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult goal630 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("8.0", TruthValue.TRUE), new ExpectedPredicateResult("10.0", TruthValue.TRUE), new ExpectedPredicateResult("13.0", TruthValue.FALSE)));
-      ExpectedPredicateEvaluationResult goal792 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("8.0", TruthValue.TRUE), new ExpectedPredicateResult("9.0", TruthValue.TRUE), new ExpectedPredicateResult("10.0", TruthValue.TRUE), new ExpectedPredicateResult("11.0", TruthValue.TRUE), new ExpectedPredicateResult("12.0", TruthValue.TRUE), new ExpectedPredicateResult("13.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult goal1024 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult goal1161 = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("3.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult goal97 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("6.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult goal826 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("17.0", TruthValue.TRUE), new ExpectedTruthValueResult("18.0", TruthValue.TRUE), new ExpectedTruthValueResult("20.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult goal630 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("8.0", TruthValue.TRUE), new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("13.0", TruthValue.FALSE)));
+      ExpectedTruthValueEvaluationResult goal792 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("8.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE), new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("11.0", TruthValue.TRUE), new ExpectedTruthValueResult("12.0", TruthValue.TRUE), new ExpectedTruthValueResult("13.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult goal1024 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult goal1161 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE)));
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/truthValueArrayUtil/test/ArrayUtil.proof", 
-                                "examples/_testcase/set/truthValueArrayUtil/oracle/ArrayUtil.xml",
-                                true,
-                                true,
-                                goal97,
-                                goal826,
-                                goal630,
-                                goal792,
-                                goal1024,
-                                goal1161);
+      doTruthValueEvaluationTest("examples/_testcase/set/truthValueArrayUtil/test/ArrayUtil.proof", 
+                                 "examples/_testcase/set/truthValueArrayUtil/oracle/ArrayUtil.xml",
+                                 true,
+                                 true,
+                                 goal97,
+                                 goal826,
+                                 goal630,
+                                 goal792,
+                                 goal1024,
+                                 goal1161);
    }
    
    /**
@@ -219,15 +219,15 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    public void testSimpleInstanceMethodContractApplication_NoOneStepSimplification() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("12.0", TruthValue.TRUE), new ExpectedPredicateResult("10.0", TruthValue.TRUE), new ExpectedPredicateResult("9.0", TruthValue.TRUE), new ExpectedPredicateResult("11.0", TruthValue.TRUE), new ExpectedPredicateResult("7.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult preResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("12.0", TruthValue.TRUE), new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE), new ExpectedTruthValueResult("11.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE)));
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/truthValueSimpleInstanceMethodContractApplication/test/SimpleInstanceMethodContractApplication_NoOneStepSimplification.proof", 
-                                "examples/_testcase/set/truthValueSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
-                                true,
-                                false,
-                                preResult,
-                                terminationResult);
+      doTruthValueEvaluationTest("examples/_testcase/set/truthValueSimpleInstanceMethodContractApplication/test/SimpleInstanceMethodContractApplication_NoOneStepSimplification.proof", 
+                                 "examples/_testcase/set/truthValueSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
+                                 true,
+                                 false,
+                                 preResult,
+                                 terminationResult);
    }
    
    /**
@@ -235,15 +235,15 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    public void testSimpleInstanceMethodContractApplication() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("12.0", TruthValue.TRUE), new ExpectedPredicateResult("10.0", TruthValue.TRUE), new ExpectedPredicateResult("9.0", TruthValue.TRUE), new ExpectedPredicateResult("11.0", TruthValue.TRUE), new ExpectedPredicateResult("7.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult preResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("12.0", TruthValue.TRUE), new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE), new ExpectedTruthValueResult("11.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE)));
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/truthValueSimpleInstanceMethodContractApplication/test/SimpleInstanceMethodContractApplication.proof", 
-                                "examples/_testcase/set/truthValueSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
-                                true,
-                                false,
-                                preResult,
-                                terminationResult);
+      doTruthValueEvaluationTest("examples/_testcase/set/truthValueSimpleInstanceMethodContractApplication/test/SimpleInstanceMethodContractApplication.proof", 
+                                 "examples/_testcase/set/truthValueSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
+                                 true,
+                                 false,
+                                 preResult,
+                                 terminationResult);
    }
 
    /**
@@ -251,15 +251,15 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    public void testSimpleMethodContractApplication_NoOneStepSimplification() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("10.0", TruthValue.TRUE), new ExpectedPredicateResult("9.0", TruthValue.TRUE), new ExpectedPredicateResult("11.0", TruthValue.TRUE), new ExpectedPredicateResult("7.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.TRUE), new ExpectedPredicateResult("2.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult preResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE), new ExpectedTruthValueResult("11.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE)));
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/truthValueSimpleMethodContractApplication/test/SimpleMethodContractApplication_NoOneStepSimplification.proof", 
-                                "examples/_testcase/set/truthValueSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
-                                true,
-                                false,
-                                preResult,
-                                terminationResult);
+      doTruthValueEvaluationTest("examples/_testcase/set/truthValueSimpleMethodContractApplication/test/SimpleMethodContractApplication_NoOneStepSimplification.proof", 
+                                 "examples/_testcase/set/truthValueSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
+                                 true,
+                                 false,
+                                 preResult,
+                                 terminationResult);
    }
    
    /**
@@ -267,15 +267,15 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    public void testSimpleMethodContractApplication() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("10.0", TruthValue.TRUE), new ExpectedPredicateResult("9.0", TruthValue.TRUE), new ExpectedPredicateResult("11.0", TruthValue.TRUE), new ExpectedPredicateResult("7.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE), new ExpectedPredicateResult("5.0", TruthValue.TRUE), new ExpectedPredicateResult("2.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult preResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE), new ExpectedTruthValueResult("11.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE)));
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/truthValueSimpleMethodContractApplication/test/SimpleMethodContractApplication.proof", 
-                                "examples/_testcase/set/truthValueSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
-                                true,
-                                false,
-                                preResult,
-                                terminationResult);
+      doTruthValueEvaluationTest("examples/_testcase/set/truthValueSimpleMethodContractApplication/test/SimpleMethodContractApplication.proof", 
+                                 "examples/_testcase/set/truthValueSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
+                                 true,
+                                 false,
+                                 preResult,
+                                 terminationResult);
    }
    
    /**
@@ -283,19 +283,19 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    public void testDifferentBranchesTest() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult firstResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult secondResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.FALSE), new ExpectedPredicateResult("1.0", TruthValue.TRUE)));
-      ExpectedPredicateEvaluationResult thirdResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("1.0", TruthValue.FALSE)));
-      ExpectedPredicateEvaluationResult fourthResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("1.0", TruthValue.FALSE)));
+      ExpectedTruthValueEvaluationResult firstResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult secondResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
+      ExpectedTruthValueEvaluationResult thirdResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("1.0", TruthValue.FALSE)));
+      ExpectedTruthValueEvaluationResult fourthResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("1.0", TruthValue.FALSE)));
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/truthValueDifferentBranchesTest/test/DifferentBranchesTest.proof", 
-                                "examples/_testcase/set/truthValueDifferentBranchesTest/oracle/DifferentBranchesTest.xml",
-                                false,
-                                false,
-                                firstResult,
-                                secondResult,
-                                thirdResult,
-                                fourthResult);
+      doTruthValueEvaluationTest("examples/_testcase/set/truthValueDifferentBranchesTest/test/DifferentBranchesTest.proof", 
+                                 "examples/_testcase/set/truthValueDifferentBranchesTest/oracle/DifferentBranchesTest.xml",
+                                 false,
+                                 false,
+                                 firstResult,
+                                 secondResult,
+                                 thirdResult,
+                                 fourthResult);
    }
    
    /**
@@ -303,16 +303,16 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    public void testMultiplePredicateResultsTest() throws Exception {
       // Create expected results
-      ExpectedBranchResult goal102 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.FALSE), new ExpectedPredicateResult("1.0", TruthValue.TRUE));
-      ExpectedBranchResult goal95 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", TruthValue.TRUE), new ExpectedPredicateResult("1.0", TruthValue.TRUE));
-      ExpectedPredicateEvaluationResult expectedResult = new ExpectedPredicateEvaluationResult(goal102, goal95);
+      ExpectedBranchResult goal102 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE));
+      ExpectedBranchResult goal95 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE));
+      ExpectedTruthValueEvaluationResult expectedResult = new ExpectedTruthValueEvaluationResult(goal102, goal95);
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/truthValueMultiplePredicateResults/test/MultiplePredicateResultsTest.java", 
-                                "MultiplePredicateResultsTest[MultiplePredicateResultsTest::main(MultiplePredicateResultsTest,MultiplePredicateResultsTest)].JML normal_behavior operation contract.0", 
-                                "examples/_testcase/set/truthValueMultiplePredicateResults/oracle/MultiplePredicateResultsTest.xml",
-                                false,
-                                false,
-                                expectedResult);
+      doTruthValueEvaluationTest("examples/_testcase/set/truthValueMultiplePredicateResults/test/MultiplePredicateResultsTest.java", 
+                                 "MultiplePredicateResultsTest[MultiplePredicateResultsTest::main(MultiplePredicateResultsTest,MultiplePredicateResultsTest)].JML normal_behavior operation contract.0", 
+                                 "examples/_testcase/set/truthValueMultiplePredicateResults/oracle/MultiplePredicateResultsTest.xml",
+                                 false,
+                                 false,
+                                 expectedResult);
    }
    
    /**
@@ -325,11 +325,11 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * @param expectedResults The expected results.
     * @throws Exception Occurred Exception.
     */
-   protected void doPredicateEvaluationTest(String proofFilePathInBaseDir,
+   protected void doTruthValueEvaluationTest(String proofFilePathInBaseDir,
                                             String oraclePathInBaseDirFile,
                                             boolean useOperationContracts,
                                             boolean useLoopInvariants,
-                                            ExpectedPredicateEvaluationResult... expectedResults) throws Exception {
+                                            ExpectedTruthValueEvaluationResult... expectedResults) throws Exception {
       SymbolicExecutionEnvironment<CustomUserInterface> env = null;
       try {
          // Perform symbolic execution
@@ -350,8 +350,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                          false,
                          true);
          assertNotNull(env);
-         // Evaluate predicates
-         doPredicateEvaluationTest(env, expectedResults);
+         // Evaluate truth values
+         doTruthValueEvaluationTest(env, expectedResults);
       }
       finally {
          if (env != null) {
@@ -370,12 +370,12 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * @param expectedResults The expected results.
     * @throws Exception Occurred Exception.
     */
-   protected void doPredicateEvaluationTest(String javaPathInBaseDir,
+   protected void doTruthValueEvaluationTest(String javaPathInBaseDir,
                                             String baseContractName,
                                             String oraclePathInBaseDirFile,
                                             boolean useOperationContracts,
                                             boolean useLoopInvariants,
-                                            ExpectedPredicateEvaluationResult... expectedResults) throws Exception {
+                                            ExpectedTruthValueEvaluationResult... expectedResults) throws Exception {
       SymbolicExecutionEnvironment<CustomUserInterface> env = null;
       try {
          // Perform symbolic execution
@@ -397,8 +397,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                          false,
                          false,
                          true);
-         // Evaluate predicates
-         doPredicateEvaluationTest(env, expectedResults);
+         // Evaluate truth values
+         doTruthValueEvaluationTest(env, expectedResults);
       }
       finally {
          if (env != null) {
@@ -413,8 +413,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * @param expectedResults The expected results.
     * @throws Exception Occurred Exception.
     */
-   protected void doPredicateEvaluationTest(SymbolicExecutionEnvironment<CustomUserInterface> env, 
-                                            ExpectedPredicateEvaluationResult... expectedResults) throws Exception {
+   protected void doTruthValueEvaluationTest(SymbolicExecutionEnvironment<CustomUserInterface> env, 
+                                             ExpectedTruthValueEvaluationResult... expectedResults) throws Exception {
       // Compute current results
       List<TruthValueEvaluationResult> currentResults = new LinkedList<TruthValueEvaluationResult>();
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(env.getBuilder().getStartNode());
@@ -451,12 +451,12 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * @param expected The expected results.
     * @param current The current results.
     */
-   protected void assertResults(ExpectedPredicateEvaluationResult[] expected, List<TruthValueEvaluationResult> current) {
+   protected void assertResults(ExpectedTruthValueEvaluationResult[] expected, List<TruthValueEvaluationResult> current) {
       assertEquals(expected.length, current.size());
       int i = 0;
       Iterator<TruthValueEvaluationResult> currentIter = current.iterator();
       while (i < expected.length && currentIter.hasNext()) {
-         assertPredicateRresults(expected[i], currentIter.next());
+         assertTruthValueResults(expected[i], currentIter.next());
          i++;
       }
       assertEquals(expected.length, i);
@@ -464,11 +464,11 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
    
    /**
-    * Asserts the predicate results.
+    * Asserts the truth value results.
     * @param expected The expected results.
     * @param current The current results.
     */
-   protected void assertPredicateRresults(ExpectedPredicateEvaluationResult expected, TruthValueEvaluationResult current) {
+   protected void assertTruthValueResults(ExpectedTruthValueEvaluationResult expected, TruthValueEvaluationResult current) {
       BranchResult[] currentResults = current.getBranchResults();
       assertEquals(expected.branchResults.length, currentResults.length);
       for (int i = 0; i < currentResults.length; i++) {
@@ -483,8 +483,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    protected void assertBranchResult(ExpectedBranchResult expected, BranchResult current) {
       Map<String, MultiEvaluationResult> currentResults = current.getResults();
-      assertTrue(expected.predicateResults.size() <= currentResults.size());
-      for (Entry<String, TruthValue> expectedEntry : expected.predicateResults.entrySet()) {
+      assertTrue(expected.labelResults.size() <= currentResults.size());
+      for (Entry<String, TruthValue> expectedEntry : expected.labelResults.entrySet()) {
          MultiEvaluationResult currentInstruction = currentResults.get(expectedEntry.getKey());
          assertNotNull(currentInstruction);
          TruthValue currentResult = currentInstruction.evaluate(current.getTermLabelName(), currentResults);
@@ -503,7 +503,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * Represents an expected evaluation result.
     * @author Martin Hentschel
     */
-   protected static class ExpectedPredicateEvaluationResult {
+   protected static class ExpectedTruthValueEvaluationResult {
       /**
        * The expected branches.
        */
@@ -513,7 +513,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
        * Constructor.
        * @param branchResults The expected branches.
        */
-      public ExpectedPredicateEvaluationResult(ExpectedBranchResult... branchResults) {
+      public ExpectedTruthValueEvaluationResult(ExpectedBranchResult... branchResults) {
          this.branchResults = branchResults;
       }
    }
@@ -524,30 +524,30 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     */
    protected static class ExpectedBranchResult {
       /**
-       * The truth values of all predicates.
+       * The truth values of all labels.
        */
-      private final Map<String, TruthValue> predicateResults = new HashMap<String, TruthValue>();
+      private final Map<String, TruthValue> labelResults = new HashMap<String, TruthValue>();
 
       /**
        * Constructor.
-       * @param predicateResults The truth values of all predicates.
+       * @param labelResults The truth values of all labels.
        */
-      public ExpectedBranchResult(ExpectedPredicateResult... predicateResults) {
-         for (ExpectedPredicateResult result : predicateResults) {
-            this.predicateResults.put(result.predicate, result.value);
+      public ExpectedBranchResult(ExpectedTruthValueResult... labelResults) {
+         for (ExpectedTruthValueResult result : labelResults) {
+            this.labelResults.put(result.labelId, result.value);
          }
       }
    }
    
    /**
-    * Represents an expected predicate result.
+    * Represents an expected truth value result of a particular label ID.
     * @author Martin Hentschel
     */
-   protected static class ExpectedPredicateResult {
+   protected static class ExpectedTruthValueResult {
       /**
-       * The predicate.
+       * The label ID.
        */
-      private final String predicate;
+      private final String labelId;
       
       /**
        * The truth value.
@@ -556,11 +556,11 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       
       /**
        * Constructor.
-       * @param predicate The predicate.
+       * @param labelId The label ID.
        * @param value The truth value.
        */
-      public ExpectedPredicateResult(String predicate, TruthValue value) {
-         this.predicate = predicate;
+      public ExpectedTruthValueResult(String labelId, TruthValue value) {
+         this.labelId = labelId;
          this.value = value;
       }
    }

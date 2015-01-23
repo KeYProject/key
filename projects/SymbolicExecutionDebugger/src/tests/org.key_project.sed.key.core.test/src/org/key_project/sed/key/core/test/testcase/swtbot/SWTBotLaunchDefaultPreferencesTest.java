@@ -40,44 +40,44 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
  */
 public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTestCase {
    /**
-    * Tests the launch where predicate evaluation is enabled.
+    * Tests the launch where truth value evaluation is enabled.
     */
    @Test
-   public void testPredicateEvaluationEnabled() throws Exception {
-      doPredicateEvaluationTest("SWTBotLaunchDefaultPreferencesTest_testPredicateEvaluationEnabled", true);
+   public void testTruthValueEvaluationEnabled() throws Exception {
+      doTruthValueEvaluationTest("SWTBotLaunchDefaultPreferencesTest_testTruthValueEvaluationEnabled", true);
    }
 
    /**
-    * Tests the launch where predicate evaluation is disbled.
+    * Tests the launch where truth value evaluation is disabled.
     */
    @Test
-   public void testPredicateEvaluationDisabled() throws Exception {
-      doPredicateEvaluationTest("SWTBotLaunchDefaultPreferencesTest_testPredicateEvaluationDisabled", false);
+   public void testTruthValueEvaluationDisabled() throws Exception {
+      doTruthValueEvaluationTest("SWTBotLaunchDefaultPreferencesTest_testTruthValueEvaluationDisabled", false);
    }
    
    /**
-    * Does the test steps of {@link #testPredicateEvaluationEnabled()}
-    * and {@link #testPredicateEvaluationDisabled()}.
+    * Does the test steps of {@link #testTruthValueEvaluationEnabled()}
+    * and {@link #testTruthValueEvaluationDisabled()}.
     * @param projectName The project name to use.
-    * @param predicateEvaluationEnabled Is predicate evaluation enabled?
+    * @param truthValueEvaluationEnabled Is truth value evaluation enabled?
     * @throws Exception Occurred Exception
     */
-   protected void doPredicateEvaluationTest(String projectName, 
-                                            final boolean predicateEvaluationEnabled) throws Exception {
-      boolean originalPredicateEvaluationEnabled = KeYSEDPreferences.isPredicateEvaluationEnabled();
+   protected void doTruthValueEvaluationTest(String projectName, 
+                                             final boolean truthValueEvaluationEnabled) throws Exception {
+      boolean originalTruthValueEvaluationEnabled = KeYSEDPreferences.isTruthValueEvaluationEnabled();
       try {
          KeYSEDPreferences.setUsePrettyPrinting(true);
          // Set preference
          SWTWorkbenchBot bot = new SWTWorkbenchBot();
          SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
-         if (predicateEvaluationEnabled) {
-            preferenceShell.bot().checkBox("Predicate evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)").select();
+         if (truthValueEvaluationEnabled) {
+            preferenceShell.bot().checkBox("Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)").select();
          }
          else {
-            preferenceShell.bot().checkBox("Predicate evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)").deselect();
+            preferenceShell.bot().checkBox("Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)").deselect();
          }
          preferenceShell.bot().button("OK").click();
-         assertEquals(predicateEvaluationEnabled, KeYSEDPreferences.isPredicateEvaluationEnabled());
+         assertEquals(truthValueEvaluationEnabled, KeYSEDPreferences.isTruthValueEvaluationEnabled());
          // Launch something
          IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
@@ -87,7 +87,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Check launch
                Object threadObject = TestUtilsUtil.getTreeItemData(item);
                assertTrue(threadObject instanceof IKeYSEDDebugNode);
-               assertEquals(predicateEvaluationEnabled, ((IKeYSEDDebugNode<?>) threadObject).isPredicateEvaluationEnabled());
+               assertEquals(truthValueEvaluationEnabled, ((IKeYSEDDebugNode<?>) threadObject).isTruthValueEvaluationEnabled());
             }
          };
          doKeYDebugTargetTest(projectName,
@@ -109,8 +109,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
       }
       finally {
          // Restore original value
-         KeYSEDPreferences.setPredicateEvaluationEnabled(originalPredicateEvaluationEnabled);
-         assertEquals(originalPredicateEvaluationEnabled, KeYSEDPreferences.isPredicateEvaluationEnabled());
+         KeYSEDPreferences.setTruthValueEvaluationEnabled(originalTruthValueEvaluationEnabled);
+         assertEquals(originalTruthValueEvaluationEnabled, KeYSEDPreferences.isTruthValueEvaluationEnabled());
       }
    }
    

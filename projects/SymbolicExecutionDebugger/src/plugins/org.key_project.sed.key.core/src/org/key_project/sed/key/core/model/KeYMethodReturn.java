@@ -477,7 +477,7 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
     * {@inheritDoc}
     */
    @Override
-   public boolean isPredicateEvaluationEnabled() {
-      return SymbolicExecutionJavaProfile.isPredicateEvaluationEnabled(getExecutionNode().getProof());
+   public boolean isTruthValueEvaluationEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
    }
 }

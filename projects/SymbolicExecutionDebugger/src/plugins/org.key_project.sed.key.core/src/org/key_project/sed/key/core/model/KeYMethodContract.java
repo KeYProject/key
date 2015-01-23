@@ -437,7 +437,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     * {@inheritDoc}
     */
    @Override
-   public boolean isPredicateEvaluationEnabled() {
-      return SymbolicExecutionJavaProfile.isPredicateEvaluationEnabled(getExecutionNode().getProof());
+   public boolean isTruthValueEvaluationEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
    }
 }

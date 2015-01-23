@@ -712,7 +712,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                           atPreVars.keySet().contains(getSavedHeap(services)), sb);
 
       // create program term
-      if (SymbolicExecutionJavaProfile.isPredicateEvaluationEnabled(proofConfig)) {
+      if (SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(proofConfig)) {
          postTerm = labelPostTerm(services, postTerm);
       }
       Term programTerm = tb.prog(getTerminationMarker(), jb, postTerm);

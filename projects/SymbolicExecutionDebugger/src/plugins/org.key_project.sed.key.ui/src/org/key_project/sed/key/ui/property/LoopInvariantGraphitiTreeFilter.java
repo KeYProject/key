@@ -36,7 +36,7 @@ public class LoopInvariantGraphitiTreeFilter extends AbstractPropertySectionFilt
          LoopInvariantGraphitiPropertySection section = new LoopInvariantGraphitiPropertySection();
          section.setInput(part, null);
          IKeYSEDDebugNode<?> node = section.getDebugNode(pe);
-         return node != null && node.isPredicateEvaluationEnabled();
+         return node != null && node.isTruthValueEvaluationEnabled();
       }
       else {
          return false;
