@@ -17,6 +17,11 @@ import org.key_project.jmlediting.profile.jmlref.other.AlsoKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.HelperKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.PureKeyword;
 import org.key_project.jmlediting.profile.jmlref.primary.KeywordJMLPrimary;
+import org.key_project.jmlediting.profile.jmlref.quantifier.ExistentialQuantifierKeyword;
+import org.key_project.jmlediting.profile.jmlref.quantifier.ForallQuantifierKeyword;
+import org.key_project.jmlediting.profile.jmlref.quantifier.MaxQuantifierKeyword;
+import org.key_project.jmlediting.profile.jmlref.quantifier.MinQuantifierKeyword;
+import org.key_project.jmlediting.profile.jmlref.quantifier.QuantifierPrimary;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.EnsuresKeyword;
@@ -69,10 +74,12 @@ public class JMLReferenceProfile implements IJMLProfile {
             new SpecProtectedKeyword(), new SpecPublicKeyword(),
             new EverythingKeyword(), new NothingKeyword(),
             new NotSpecifiedKeyword(), new ResultKeyword(), new OldKeyword(),
-            new SameKeyword()));
+            new SameKeyword(), new ForallQuantifierKeyword(),
+            new ExistentialQuantifierKeyword(), new MinQuantifierKeyword(),
+            new MaxQuantifierKeyword()));
 
-      this.supportedPrimaries = new HashSet<IJMLPrimary>(
-            Arrays.asList(new KeywordJMLPrimary(this)));
+      this.supportedPrimaries = new HashSet<IJMLPrimary>(Arrays.asList(
+            new KeywordJMLPrimary(), new QuantifierPrimary()));
 
    }
 

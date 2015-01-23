@@ -138,6 +138,21 @@ public class ExpressionParserTest {
       testParse("\\old(this.name)");
    }
 
+   @Test
+   public void testForall() {
+      testParse("(\\forall int i; a[i]<a[j])");
+   }
+
+   @Test
+   public void testForallQuantifiedExpression() {
+      testParse("(\\forall int i,j; 0 <= i && i < j && j < 10; a[i]<a[j])");
+   }
+
+   @Test
+   public void testForallEmptyQuantifiedExpression() {
+      testParse("(\\forall int i,j;; a[i]<a[j])");
+   }
+
    public static void testParse(final String content) {
       try {
          ParserBuilder

@@ -5,11 +5,14 @@ import static org.key_project.jmlediting.profile.jmlref.parseutil.JavaBasicsPars
 import static org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes.*;
 import static org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParserUtils.*;
 
+import java.util.Collection;
+
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.IRecursiveParseFunction;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 
 /**
  * The Expression Parser parses expressions as defined in the JML Reference
@@ -29,10 +32,39 @@ public class ExpressionParser implements ParseFunction {
     */
    private final ParseFunction mainParser;
 
+   private final ParseFunction dimsParser;
+   private final ParseFunction typeSpecParser;
+
+   public ParseFunction dims() {
+      return this.dimsParser;
+   }
+
+   public ParseFunction typeSpec() {
+      return this.typeSpecParser;
+   }
+
    @Override
    public IASTNode parse(final String text, final int start, final int end)
          throws ParserException {
       return this.mainParser.parse(text, start, end);
+   }
+
+   private static ParseFunction primary(
+         final Collection<IJMLPrimary> primaries, final IJMLProfile profile) {
+      return new ParseFunction() {
+
+         private final ParseFunction primary = alt(primaries
+               .toArray(new ParseFunction[0]));
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            for (final IJMLPrimary primary : primaries) {
+               primary.setProfile(profile);
+            }
+            return this.primary.parse(text, start, end);
+         }
+      };
    }
 
    /**
@@ -156,8 +188,8 @@ public class ExpressionParser implements ParseFunction {
        * | jml-primary
        */
       // Do no include true/false, which is implemented in the constant type
-      final ParseFunction jmlPrimary = typed(JML_PRIMARY, alt(profile
-            .getSupportedPrimaries().toArray(new ParseFunction[0])));
+      final ParseFunction jmlPrimary = typed(JML_PRIMARY,
+            primary(profile.getSupportedPrimaries(), profile));
       final ParseFunction primaryExpr = alt(typed(IDENTIFIER, ident()),
             newExpr, constant,
             oneConstant(JAVA_KEYWORD, "super", "this", "null"),
@@ -378,5 +410,7 @@ public class ExpressionParser implements ParseFunction {
             expression, "Expected an expression"));
 
       this.mainParser = expression;
+      this.dimsParser = dims;
+      this.typeSpecParser = typeSpec;
    }
 }

@@ -2,21 +2,48 @@ package org.key_project.jmlediting.core.test.profile;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
 import java.util.Set;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
-import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
+import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
+import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 
 public class JMLProfileManagementTest {
 
-   public static class DummyJMLProfile1 extends AbstractJMLProfile {
+   private static class DummyProfile implements IJMLProfile {
 
-      public DummyJMLProfile1() {
-         super("DummyJMLProfile1", DummyJMLProfile1.class.getName());
+      private final String name;
+      private final String identifier;
+
+      public DummyProfile(final String name, final String identifier) {
+         super();
+         this.name = name;
+         this.identifier = identifier;
+      }
+
+      @Override
+      public String getName() {
+         return this.name;
+      }
+
+      @Override
+      public String getIdentifier() {
+         return this.identifier;
+      }
+
+      @Override
+      public Set<IKeyword> getSupportedKeywords() {
+         return Collections.emptySet();
+      }
+
+      @Override
+      public Set<IJMLPrimary> getSupportedPrimaries() {
+         return Collections.emptySet();
       }
 
       @Override
@@ -26,15 +53,18 @@ public class JMLProfileManagementTest {
 
    }
 
-   public static class DummyJMLProfile2 extends AbstractJMLProfile {
+   public static class DummyJMLProfile1 extends DummyProfile {
+
+      public DummyJMLProfile1() {
+         super("DummyJMLProfile1", DummyJMLProfile1.class.getName());
+      }
+
+   }
+
+   public static class DummyJMLProfile2 extends DummyProfile {
 
       public DummyJMLProfile2() {
          super("DummyJMLProfile2", DummyJMLProfile2.class.getName());
-      }
-
-      @Override
-      public IJMLParser createParser() {
-         return new DefaultJMLParser(this);
       }
 
    }

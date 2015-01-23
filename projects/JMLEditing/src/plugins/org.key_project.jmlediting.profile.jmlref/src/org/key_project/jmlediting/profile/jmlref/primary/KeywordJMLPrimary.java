@@ -12,9 +12,10 @@ import org.key_project.jmlediting.core.profile.syntax.IJMLPrimaryKeyword;
 
 public class KeywordJMLPrimary implements IJMLPrimary {
 
-   private final ParseFunction keywordPrimaryParser;
+   private ParseFunction keywordPrimaryParser;
 
-   public KeywordJMLPrimary(final IJMLProfile profile) {
+   @Override
+   public void setProfile(final IJMLProfile profile) {
       this.keywordPrimaryParser = keywords(
             JMLProfileHelper.filterKeywords(profile, IJMLPrimaryKeyword.class),
             profile);
