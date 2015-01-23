@@ -1,7 +1,6 @@
 package org.key_project.jmlediting.core.utilities;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -9,12 +8,14 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.Modifier;
 
 /**
+ * Utility Class to resolve TypeBindings.
  *
- * @author Thomas Glaser Utility Class to resolve TypeBindings.
+ * @author Thomas Glaser
  *
  */
 public class JMLJavaResolver {
    private final ITypeBinding activeType;
+   private final ITypeBinding initialType;
 
    /**
     *
@@ -22,8 +23,10 @@ public class JMLJavaResolver {
     *           the Type the visibility has to be checked from
     * @return
     */
-   public JMLJavaResolver(final ITypeBinding activeType) {
+   public JMLJavaResolver(final ITypeBinding initialType,
+         final ITypeBinding activeType) {
       this.activeType = activeType;
+      this.initialType = initialType;
    }
 
    public ITypeBinding getTypeForName(final String fieldName) {
@@ -42,9 +45,9 @@ public class JMLJavaResolver {
          final String fieldName) {
       IVariableBinding foundBinding = null;
 
-      for (final IVariableBinding varBind : active.getDeclaredFields()) {
-         if (this.isVariableVisible(varBind)
-               && (fieldName.equals(varBind.getName()))) {
+      for (final IVariableBinding varBind : this
+            .getAllVisibleVariableBindings()) {
+         if (fieldName.equals(varBind.getName())) {
             foundBinding = varBind;
             break;
          }
@@ -72,7 +75,7 @@ public class JMLJavaResolver {
       final boolean isProtected = Modifier.isProtected(modifier);
       final boolean isPackage = !isPublic && !isPrivate && !isProtected;
 
-      final boolean visibilityDebug = false;
+      final boolean visibilityDebug = true;
 
       if (visibilityDebug) {
          System.out.println("VISIBILITY for " + variable.getName() + " in "
@@ -87,39 +90,50 @@ public class JMLJavaResolver {
       final boolean isPackageVisible;
       final boolean isProtectedVisible;
       final boolean isPrivateVisible;
+
       // only compute those visibilities for the first call
-      if (variable.getDeclaringClass().isEqualTo(this.activeType)) {
+      if (variable.getDeclaringClass().isEqualTo(this.initialType)) {
          // compute the different conditions which define Visibility for
          // different modifiers
-         final boolean isInSamePackage = this.activeType.getPackage()
-               .isEqualTo(variable.getType().getPackage());
-         final boolean isFromSuperClass = variable.getDeclaringClass()
-               .isCastCompatible(this.activeType);
+
          final boolean ifNestedThenInSameClass = !variable.getDeclaringClass()
                .isNested()
                || variable.getDeclaringClass().getDeclaringClass() == this.activeType;
 
          // combine the visibilities
-         isProtectedVisible = isProtected
-               && (isInSamePackage || isFromSuperClass);
 
          isPrivateVisible = isPrivate && ifNestedThenInSameClass;
 
-         isPackageVisible = isPackage && isInSamePackage;
-
          if (visibilityDebug) {
             System.out.println();
-            System.out.println("isInSamePackage?\t" + isInSamePackage);
-            System.out.println("isFromSuperClass?`\t" + isFromSuperClass);
             System.out.println("ifNestedThenInSameClass? "
                   + ifNestedThenInSameClass);
          }
       }
       else {
-         isProtectedVisible = false;
          isPrivateVisible = false;
+      }
+
+      if (variable.getDeclaringClass().isEqualTo(this.activeType)) {
+         final boolean isInSamePackage = this.activeType.getPackage()
+               .isEqualTo(variable.getType().getPackage());
+         final boolean isFromSuperClass = variable.getDeclaringClass()
+               .isCastCompatible(this.activeType);
+
+         isProtectedVisible = isProtected
+               && (isInSamePackage || isFromSuperClass);
+         isPackageVisible = isPackage && isInSamePackage;
+
+         if (visibilityDebug) {
+            System.out.println("isInSamePackage?\t" + isInSamePackage);
+            System.out.println("isFromSuperClass?`\t" + isFromSuperClass);
+         }
+      }
+      else {
+         isProtectedVisible = false;
          isPackageVisible = false;
       }
+
       if (visibilityDebug) {
          System.out.println();
          System.out.println("isPackageVisible?\t" + isPackageVisible);
@@ -142,11 +156,9 @@ public class JMLJavaResolver {
    public List<IVariableBinding> getAllVisibleVariableBindings() {
       final List<IVariableBinding> result = new ArrayList<IVariableBinding>();
 
-      result.addAll(Arrays.asList(this.activeType.getDeclaredFields()));
-
       // recursively search for visible variables in SuperClasses
       ITypeBinding recursiveType = this.activeType;
-      while ((recursiveType = recursiveType.getSuperclass()) != null) {
+      do {
          for (final IVariableBinding varBind : recursiveType
                .getDeclaredFields()) {
             if (this.isVariableVisible(varBind)) {
@@ -154,6 +166,7 @@ public class JMLJavaResolver {
             }
          }
       }
+      while ((recursiveType = recursiveType.getSuperclass()) != null);
 
       return result;
    }

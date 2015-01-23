@@ -9,6 +9,8 @@ import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
+import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
@@ -112,5 +114,36 @@ public class JMLCompletionUtil {
          final Image proposalImage) {
       return getKeywordProposals(context, null, proposalImage,
             IToplevelKeyword.class);
+   }
+
+   public static String computePrefix(
+         final JavaContentAssistInvocationContext context, final IASTNode node) {
+      String prefix = null;
+      if (node.containsOffset(context.getInvocationOffset() - 1)) {
+         final IASTNode wordNode = Nodes.getDepthMostNodeWithPosition(
+               context.getInvocationOffset() - 1, node);
+         // the cursor is in the current Node => substring
+         System.out.println("im offset ");
+         prefix = context
+               .getDocument()
+               .get()
+               .substring(wordNode.getStartOffset(),
+                     context.getInvocationOffset());
+      }
+      else if (node.getStartOffset() >= context.getInvocationOffset()) {
+         // the node is after the cursor => empty prefix and break the
+         // recursion
+         System.out.println("zu spät...");
+         prefix = "";
+      }
+
+      // ignore . as a prefix
+      if (prefix != null && prefix.equals(".")) {
+         prefix = "";
+      }
+
+      System.out.println("prefix == " + prefix);
+
+      return prefix;
    }
 }
