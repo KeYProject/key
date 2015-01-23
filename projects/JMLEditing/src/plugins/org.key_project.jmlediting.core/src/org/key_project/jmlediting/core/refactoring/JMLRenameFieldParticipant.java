@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.IField;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.ui.SharedASTProvider;
 import org.eclipse.ltk.core.refactoring.Change;
@@ -72,9 +73,9 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
       cu.accept(finder);
       final List<TypeDeclaration> decls = finder.getDecls();
       final TypeDeclaration topDecl = decls.get(0);
-      System.out.println(topDecl.resolveBinding().getName());
-      final JMLJavaResolver resolver = new JMLJavaResolver(
-            topDecl.resolveBinding());
+      final ITypeBinding type = topDecl.resolveBinding();
+      System.out.println(type.getName());
+      final JMLJavaResolver resolver = new JMLJavaResolver(type, type);
       final JavaElementIdentifier refGoal = new JavaElementIdentifier(
             elem.getElementName(), resolver.getTypeForName(elem
                   .getElementName()), elem.getDeclaringType());
