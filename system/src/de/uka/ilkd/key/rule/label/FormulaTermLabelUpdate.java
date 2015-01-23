@@ -70,7 +70,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                   FormulaTermLabel newLabel = new FormulaTermLabel(oldLabel.getMajorId(), labelSubID, Collections.singletonList(oldLabel.getId()));
                   labels.add(newLabel);
                   // Let the PredicateTermLabelRefactoring perform the refactoring, see also PredicateTermLabelRefactoring#PARENT_REFACTORING_REQUIRED
-                  ForulaTermLabelRefactoring.setParentRefactroingRequired(state, true);
+                  FormulaTermLabelRefactoring.setParentRefactroingRequired(state, true);
                }
             }
          }

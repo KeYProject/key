@@ -33,7 +33,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.label.LoopBodyTermLabelUpdate;
 import de.uka.ilkd.key.rule.label.LoopInvariantNormalBehaviorTermLabelUpdate;
-import de.uka.ilkd.key.rule.label.ForulaTermLabelRefactoring;
+import de.uka.ilkd.key.rule.label.FormulaTermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.FormulaTermLabelUpdate;
 import de.uka.ilkd.key.rule.label.RemoveInCheckBranchesTermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.StayOnOperatorTermLabelPolicy;
@@ -165,7 +165,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
       if (predicateEvaluationEnabled) {
          ImmutableList<TermLabelPolicy> predPolicies = ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayOnFormulaTermLabelPolicy());
          ImmutableList<TermLabelUpdate> predUpdates = ImmutableSLList.<TermLabelUpdate>nil().prepend(new FormulaTermLabelUpdate());
-         ImmutableList<TermLabelRefactoring> predRefs = ImmutableSLList.<TermLabelRefactoring>nil().prepend(new ForulaTermLabelRefactoring());
+         ImmutableList<TermLabelRefactoring> predRefs = ImmutableSLList.<TermLabelRefactoring>nil().prepend(new FormulaTermLabelRefactoring());
          result = result.prepend(new TermLabelConfiguration(FormulaTermLabel.NAME,
                                                             new FormulaTermLabelFactory(),
                                                             null,

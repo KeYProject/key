@@ -30,7 +30,7 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
  * {@link FormulaTermLabel} on applied loop invariants or operation contracts.
  * @author Martin Hentschel
  */
-public class ForulaTermLabelRefactoring implements TermLabelRefactoring {
+public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
    /**
     * Key prefix used in {@link TermLabelState} to store that the inner most
     * label was already refactored on a given {@link Goal}.

@@ -110,7 +110,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
                TermLabel applicationLabel = appliationTerm.getLabel(FormulaTermLabel.NAME);
                if (applicationLabel instanceof FormulaTermLabel) {
                   // Let the PredicateTermLabelRefactoring perform the refactoring, see also PredicateTermLabelRefactoring#UPDATE_REFACTORING_REQUIRED
-                  ForulaTermLabelRefactoring.setUpdateRefactroingRequired(state, true);
+                  FormulaTermLabelRefactoring.setUpdateRefactroingRequired(state, true);
                }
             }
          }
