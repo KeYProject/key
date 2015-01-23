@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
@@ -104,19 +105,23 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
 
 
     @Override
-    protected void addToAntec(Semisequent semi,
+    protected void addToAntec(TermLabelState termLabelState,
+                              Semisequent semi,
                               SequentChangeInfo currentSequent,
                               PosInOccurrence pos,
                               Services services,
                               MatchConditions matchCond,
-                              PosInOccurrence applicationPosInOccurrence) {
+                              PosInOccurrence applicationPosInOccurrence,
+                              TacletLabelHint labelHint,
+                              Goal goal,
+                              TacletApp tacletApp) {
         final ImmutableList<SequentFormula> replacements =
-            instantiateSemisequent(semi, services, matchCond, pos);
+            instantiateSemisequent(termLabelState, semi, services, matchCond, pos, labelHint, goal, tacletApp);
         assert replacements.size() == 1 : "information flow taclets must have " +
                                   "exactly one add!";
         updateStrategyInfo(services.getProof().openEnabledGoals().head(),
                            replacements.iterator().next().formula());
-        super.addToAntec(semi, currentSequent, pos, services, matchCond, applicationPosInOccurrence);
+        super.addToAntec(termLabelState, semi, currentSequent, pos, services, matchCond, applicationPosInOccurrence, labelHint, goal, tacletApp);
     }
 
 

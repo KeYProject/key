@@ -49,7 +49,7 @@ public final class QuickSaveAction extends MainWindowAction {
             final String filename = QUICK_SAVE_PATH;
             final Proof proof = mainWindow.getMediator().getSelectedProof();
             try {
-                new ProofSaver(proof, filename, de.uka.ilkd.key.gui.Main.INTERNAL_VERSION).save();
+                new ProofSaver(proof, filename, de.uka.ilkd.key.core.Main.INTERNAL_VERSION).save();
                 final String status = "File quicksaved: "+filename;
                 mainWindow.setStatusLine(status);
                 Debug.out(status);

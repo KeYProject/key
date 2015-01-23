@@ -28,7 +28,7 @@ public class SWTBotGraphitiKeYTabTest extends AbstractSWTBotGraphitiKeYPropertyT
     */
    @Test
    public void testValuesAndTabExistence() throws Exception {
-      doFlatStepsTest("SWTBotGraphitiCallStackTabTest_testValuesAndTabExistence", SWTBotKeYTabTest.createFixedExampleSteps());
+      doAllNodeTypesTest("SWTBotGraphitiCallStackTabTest_testValuesAndTabExistence", SWTBotKeYTabTest.createAllNodeTypesSteps());
    }
    
    /**

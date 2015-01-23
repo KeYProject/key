@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -152,7 +152,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
             }
          }
          else {
-            branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true);
+            branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true, true);
          }
          // Format branch condition
          formatedBranchCondition = formatTerm(branchCondition, services);
@@ -256,7 +256,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
          Term[] result = new Term[mergedProofNodes.size()];
          Iterator<Node> iter = mergedProofNodes.iterator();
          for (int i = 0; i < result.length; i++) {
-            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), true);
+            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), true, true);
          }
          return result;
       }

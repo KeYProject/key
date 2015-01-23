@@ -20,6 +20,8 @@ import de.uka.ilkd.key.proof.Proof;
 
 public interface TaskTreeNode extends MutableTreeNode{
 
+    public static final TaskTreeNode[] NO_CHILDREN = new TaskTreeNode[0];
+
     ProofEnvironment getProofEnv();
 
     String shortDescr();
@@ -35,4 +37,6 @@ public interface TaskTreeNode extends MutableTreeNode{
     ProofStatus getStatus();
 
     void decoupleFromEnv();
+
+    TaskTreeNode[] getChildren();
 }

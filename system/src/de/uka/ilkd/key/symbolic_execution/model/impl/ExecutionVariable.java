@@ -21,20 +21,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
@@ -48,41 +46,16 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVa
  * The default implementation of {@link IExecutionVariable}.
  * @author Martin Hentschel
  */
-public class ExecutionVariable extends AbstractExecutionElement implements IExecutionVariable {
+public class ExecutionVariable extends AbstractExecutionVariable {
    /**
     * The parent {@link IExecutionNode} which provides this {@link ExecutionVariable}.
     */
    private final IExecutionNode<?> parentNode;
    
    /**
-    * The represented {@link IProgramVariable} which value is shown.
-    */
-   private final IProgramVariable programVariable;
-   
-   /**
-    * The parent {@link ExecutionValue} or {@code null} if not available.
-    */
-   private final ExecutionValue parentValue;
-   
-   /**
-    * The index in the parent array.
-    */
-   private final int arrayIndex;
-   
-   /**
-    * An optional additional condition to consider.
-    */
-   private final Term additionalCondition;
-   
-   /**
     * The {@link ExecutionValue} from which the array length was computed.
     */
    private final ExecutionValue lengthValue;
-   
-   /**
-    * The {@link PosInOccurrence} of the modality of interest.
-    */
-   private final PosInOccurrence modalityPIO;
 
    /**
     * The possible values of this {@link IExecutionValue}.
@@ -117,16 +90,18 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
                             ExecutionValue parentValue, 
                             IProgramVariable programVariable,
                             Term additionalCondition) {
-      super(parentNode.getSettings(), parentNode.getMediator(), proofNode);
+      super(parentNode.getSettings(), 
+            parentNode.getMediator(), 
+            proofNode, 
+            programVariable, 
+            parentValue, 
+            null, 
+            additionalCondition,
+            modalityPIO);
       assert programVariable != null;
       assert modalityPIO != null;
       this.parentNode = parentNode;
-      this.parentValue = parentValue;
-      this.programVariable = programVariable;
-      this.arrayIndex = -1;
       this.lengthValue = null;
-      this.additionalCondition = additionalCondition;
-      this.modalityPIO = modalityPIO;
    }
 
    /**
@@ -141,40 +116,20 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
                             Node proofNode, 
                             PosInOccurrence modalityPIO, 
                             ExecutionValue parentValue, 
-                            int arrayIndex,
+                            Term arrayIndex,
                             ExecutionValue lengthValue,
                             Term additionalCondition) {
-      super(parentNode.getSettings(), parentNode.getMediator(), proofNode);
+      super(parentNode.getSettings(), 
+            parentNode.getMediator(), 
+            proofNode, 
+            null, 
+            parentValue, 
+            arrayIndex, 
+            additionalCondition,
+            modalityPIO);
       assert modalityPIO != null;
-      this.programVariable = null;
       this.parentNode = parentNode;
-      this.parentValue = parentValue;
-      this.arrayIndex = arrayIndex;
       this.lengthValue = lengthValue;
-      this.additionalCondition = additionalCondition;
-      this.modalityPIO = modalityPIO;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public Term getAdditionalCondition() {
-      return additionalCondition;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected String lazyComputeName() throws ProofInputException {
-      IProgramVariable pv = getProgramVariable();
-      if (pv != null) {
-         return SymbolicExecutionUtil.getDisplayString(pv);
-      }
-      else {
-         return "[" + arrayIndex + "]";
-      }
    }
 
    /**
@@ -197,35 +152,39 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     */
    protected ExecutionValue[] lazyComputeValues() throws ProofInputException {
       if (!isDisposed()) {
-         final Services services = getServices();
+         final ProofEnvironment sideProofEnv = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
+         final Services services = sideProofEnv.getServicesForEnvironment();
          final TermBuilder tb = services.getTermBuilder();
          // Start site proof to extract the value of the result variable.
          SiteProofVariableValueInput sequentToProve;
          Term siteProofSelectTerm = null;
-         Term siteProofCondition = parentNode.getPathCondition();
-         if (additionalCondition != null) {
-            siteProofCondition = tb.and(siteProofCondition, additionalCondition);
+         Term siteProofCondition;
+         if (getAdditionalCondition() != null) {
+            siteProofCondition = getAdditionalCondition();
+         }
+         else {
+            siteProofCondition = tb.tt();
          }
          if (getParentValue() != null || SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
-            siteProofSelectTerm = createSelectTerm(services);
+            siteProofSelectTerm = createSelectTerm();
             if (getParentValue() != null) { // Is null at static variables
                siteProofCondition = tb.and(siteProofCondition, getParentValue().getCondition());
             }
             if (lengthValue != null) {
                siteProofCondition = tb.and(siteProofCondition, lengthValue.getCondition());
             }
-            sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(services, getProofNode(), modalityPIO, siteProofCondition, siteProofSelectTerm, true); 
+            sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(services, getProofNode(), getModalityPIO(), siteProofCondition, siteProofSelectTerm, true); 
          }
          else {
-            sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(services, getProofNode(), modalityPIO, siteProofCondition, getProgramVariable());
+            sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(services, getProofNode(), getModalityPIO(), siteProofCondition, getProgramVariable());
          }
          ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
+                                                                             sideProofEnv,
                                                                              sequentToProve.getSequentToProve(), 
                                                                              StrategyProperties.METHOD_NONE,
                                                                              StrategyProperties.LOOP_NONE,
                                                                              StrategyProperties.QUERY_OFF,
-                                                                             StrategyProperties.SPLITTING_DELAYED,
-                                                                             true);
+                                                                             StrategyProperties.SPLITTING_DELAYED);
          try {
             List<ExecutionValue> result = new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
             // Group values of the branches
@@ -309,10 +268,10 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          boolean unknownValue = false;
          if (siteProofSelectTerm != null) {
             if (SymbolicExecutionUtil.isNullSort(value.sort(), services)) { 
-               unknownValue = SymbolicExecutionUtil.isNull(services, getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
+               unknownValue = SymbolicExecutionUtil.isNull(getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
             }
             else {
-               unknownValue = SymbolicExecutionUtil.isNotNull(services, getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
+               unknownValue = SymbolicExecutionUtil.isNotNull(getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
             }
          }
          // Add to result list
@@ -358,75 +317,11 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
    }
    
    /**
-    * Creates recursive a term which can be used to determine the value
-    * of {@link #getProgramVariable()}.
-    * @param services The {@link Services} to use.
-    * @return The created term.
-    */
-   protected Term createSelectTerm(Services services) {
-      if (SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
-         // Static field access
-         Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), services);
-         return services.getTermBuilder().staticDot(getProgramVariable().sort(), function);
-      }
-      else {
-         if (getParentValue() == null) {
-            // Direct access to a variable, so return it as term
-            return services.getTermBuilder().var((ProgramVariable)getProgramVariable());
-         }
-         else {
-            Term parentTerm = getParentValue().getVariable().createSelectTerm(services);
-            if (programVariable != null) {
-               if (services.getJavaInfo().getArrayLength() == getProgramVariable()) {
-                  // Special handling for length attribute of arrays
-                  Function function = services.getTypeConverter().getHeapLDT().getLength();
-                  return services.getTermBuilder().func(function, parentTerm);
-               }
-               else {
-                  // Field access on the parent variable
-                  Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), services);
-                  return services.getTermBuilder().dot(getProgramVariable().sort(), parentTerm, function);
-               }
-            }
-            else {
-               // Special handling for array indices.
-               Term idx = services.getTermBuilder().zTerm("" + arrayIndex);
-               return services.getTermBuilder().dotArr(parentTerm, idx);
-            }
-         }
-      }
-   }
-
-   /**
     * {@inheritDoc}
     */
    @Override
-   public IProgramVariable getProgramVariable() {
-      return programVariable;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public int getArrayIndex() {
-      return arrayIndex;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isArrayIndex() {
-      return getArrayIndex() >= 0;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getElementType() {
-      return "Variable";
+   public Term createSelectTerm() {
+      return SymbolicExecutionUtil.createSelectTerm(this);
    }
 
    /**
@@ -434,22 +329,14 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     */
    @Override
    public ExecutionValue getParentValue() {
-      return parentValue;
+      return (ExecutionValue)super.getParentValue();
    }
-   
+
    /**
     * Returns the parent {@link IExecutionNode} which provides this {@link ExecutionVariable}.
     * @return The parent {@link IExecutionNode} which provides this {@link ExecutionVariable}.
     */
    public IExecutionNode<?> getParentNode() {
       return parentNode;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public PosInOccurrence getModalityPIO() {
-      return modalityPIO;
    }
 }

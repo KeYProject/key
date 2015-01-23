@@ -24,6 +24,7 @@ import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.IStateListener;
 import org.eclipse.core.commands.State;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -69,10 +70,10 @@ import org.key_project.util.bean.IBean;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
 
-import de.uka.ilkd.key.gui.AutoModeListener;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.KeYSelectionEvent;
-import de.uka.ilkd.key.gui.KeYSelectionListener;
+import de.uka.ilkd.key.core.AutoModeListener;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -423,6 +424,26 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    }
    
    /**
+    * Returns the project which provides the proof or the source code.
+    * @return The {@link IProject} if known or {@code null} if unknown.
+    */
+   public IProject getProject() {
+      IEditorInput input = getEditorInput();
+      if (input instanceof ProofOblInputEditorInput) {
+         IMethod method = ((ProofOblInputEditorInput) input).getMethod();
+         return method != null ? method.getResource().getProject() : null;
+      }
+      else if (input instanceof FileEditorInput) {
+         FileEditorInput in = (FileEditorInput) input;
+         IFile file = in.getFile();
+         return file != null ? file.getProject() : null;
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
     * {@inheritDoc}
     */
    @Override
@@ -537,14 +558,16 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * @param e The {@link KeYSelectionEvent}.
     */
    protected void handleSelectedNodeChanged(final KeYSelectionEvent e) {
-      getEditorSite().getShell().getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            if(e.getSource().getSelectedNode() != null){
-               setCurrentNode(e.getSource().getSelectedNode());
+      if (e.getSource().getSelectedNode().proof() == getCurrentProof()) {
+         getEditorSite().getShell().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               if(e.getSource().getSelectedNode() != null){
+                  setCurrentNode(e.getSource().getSelectedNode());
+               }
             }
-         }
-      });
+         });
+      }
    }
 
    /**

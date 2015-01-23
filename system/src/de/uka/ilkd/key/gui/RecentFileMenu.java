@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.gui.configuration.PathConfig;
+import de.uka.ilkd.key.core.KeYMediator;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.Enumeration;
@@ -24,6 +24,7 @@ import java.util.Properties;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.Debug;
 import java.awt.event.ActionEvent;
 

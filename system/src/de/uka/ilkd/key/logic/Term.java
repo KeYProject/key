@@ -163,6 +163,13 @@ public interface Term extends SVSubstitute, Sorted {
     public ImmutableArray<TermLabel> getLabels();
     
     /**
+     * Returns the first {@link TermLabel} with the given {@link Name}.
+     * @param termLabelName The {@link Name} of the {@link TermLabel} to search.
+     * @return The first found {@link TermLabel} or {@code null} if not available.
+     */
+    public TermLabel getLabel(Name termLabelName);
+    
+    /**
      * Returns a serial number for a term. The serial number is not persistent.
      */
     public int serialNumber();

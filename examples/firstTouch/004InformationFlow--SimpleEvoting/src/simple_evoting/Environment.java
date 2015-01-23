@@ -16,18 +16,15 @@ public class Environment {
       @ determines  Environment.result, \result \by Environment.result;
       @*/
     //@ helper
-    public static int untrustedInput() {
-        // under specified
-    }
+    public static native int untrustedInput(); // Declared underspecified method as native
+
     /*@ normal_behavior
       @ ensures     0 <= \result && \result < x;
       @ assignable  rep;
       @ determines  Environment.result, \result \by Environment.result, x;
       @*/
     //@ helper
-    public static int untrustedInput(int x) {
-        // under specified
-    }
+    public static native int untrustedInput(int x); // Declared underspecified method as native
 
     /*@ normal_behavior
       @ ensures     true;

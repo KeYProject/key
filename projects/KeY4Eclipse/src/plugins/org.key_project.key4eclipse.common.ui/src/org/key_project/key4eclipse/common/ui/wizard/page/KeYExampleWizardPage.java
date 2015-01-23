@@ -53,9 +53,9 @@ import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.jdt.JDTUtil;
 
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.ExampleChooser.Example;
-import de.uka.ilkd.key.gui.Main;
 
 /**
  * This {@link WizardPage} allows to select a KeY example.

@@ -21,7 +21,7 @@ import javax.swing.JTextArea;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.IconFactory;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
  * for debugging - opens a window with the settings from current Proof and the
