@@ -9,8 +9,9 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.Modifier;
 
 /**
+ * Utility Class to resolve TypeBindings.
  *
- * @author Thomas Glaser Utility Class to resolve TypeBindings.
+ * @author Thomas Glaser
  *
  */
 public class JMLJavaResolver {
