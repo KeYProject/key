@@ -359,6 +359,14 @@ public class ProofDiffFrame extends JFrame {
             return node;
         }
 
+        while ((node.serialNr() != number) && (node.childrenCount() == 1)) {
+            node = node.child(0);
+        }
+
+        if(node.serialNr() == number) {
+            return node;
+        }
+
         Iterator<Node> it = node.childrenIterator();
         while(it.hasNext()) {
             Node n = it.next();
