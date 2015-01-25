@@ -7,14 +7,25 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
+import org.key_project.jmlediting.profile.jmlref.bound_mod.IBoundVarModifierKeyword;
 import org.key_project.jmlediting.profile.jmlref.parseutil.JavaBasicsParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.PredicateParser;
 
+/**
+ * The implementation of the quantifier primaries of JML. This primary parses
+ * any quantifier. The supported quantifiers are defined by the
+ * {@link IQuantifierKeyword} available in the JML profile.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public class QuantifierPrimary implements IJMLPrimary {
 
+   /**
+    * The main parser for quantifiers.
+    */
    private ParseFunction quantifierParser;
 
    @Override
@@ -27,11 +38,11 @@ public class QuantifierPrimary implements IJMLPrimary {
        * | \max | \min<br>
        * | \num_of | \product | \sum
        */
-      final ParseFunction quantifier = keywords(
-            JMLProfileHelper.filterKeywords(profile, IQuantifierKeyword.class),
+      final ParseFunction quantifier = keywords(IQuantifierKeyword.class,
             profile);
 
-      final ParseFunction boundVarModifier = notImplemented();
+      final ParseFunction boundVarModifier = keywords(
+            IBoundVarModifierKeyword.class, profile);
       /**
        * quantified-var-declarator ::= ident [ dims ]
        */

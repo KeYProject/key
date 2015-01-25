@@ -1,10 +1,18 @@
 package org.key_project.jmlediting.profile.jmlref.quantifier;
 
+/**
+ * Implementation of the existential quantifier.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public class ExistentialQuantifierKeyword extends AbstractQuantifierKeyword {
 
+   /**
+    * Creates a new instance for this keyword.
+    */
    public ExistentialQuantifierKeyword() {
       super("\\exists");
-      // TODO Auto-generated constructor stub
    }
 
    @Override

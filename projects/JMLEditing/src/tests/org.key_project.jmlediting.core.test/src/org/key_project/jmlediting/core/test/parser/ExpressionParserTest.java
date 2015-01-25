@@ -150,7 +150,7 @@ public class ExpressionParserTest {
 
    @Test
    public void testForallEmptyQuantifiedExpression() {
-      testParse("(\\forall int i,j;; a[i]<a[j])");
+      testParse("(\\forall non_null Integer i,j;; a[i]<a[j])");
    }
 
    public static void testParse(final String content) {

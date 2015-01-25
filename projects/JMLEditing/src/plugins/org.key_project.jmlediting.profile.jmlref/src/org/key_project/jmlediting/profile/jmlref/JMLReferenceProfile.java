@@ -13,6 +13,8 @@ import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.BehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.ExceptionalBehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.NormalBehaviorKeyword;
+import org.key_project.jmlediting.profile.jmlref.bound_mod.NonNullKeyword;
+import org.key_project.jmlediting.profile.jmlref.bound_mod.NullableKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.AlsoKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.HelperKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.PureKeyword;
@@ -21,7 +23,10 @@ import org.key_project.jmlediting.profile.jmlref.quantifier.ExistentialQuantifie
 import org.key_project.jmlediting.profile.jmlref.quantifier.ForallQuantifierKeyword;
 import org.key_project.jmlediting.profile.jmlref.quantifier.MaxQuantifierKeyword;
 import org.key_project.jmlediting.profile.jmlref.quantifier.MinQuantifierKeyword;
+import org.key_project.jmlediting.profile.jmlref.quantifier.NumOfQuantifierKeyword;
+import org.key_project.jmlediting.profile.jmlref.quantifier.ProductQuantifierKeyword;
 import org.key_project.jmlediting.profile.jmlref.quantifier.QuantifierPrimary;
+import org.key_project.jmlediting.profile.jmlref.quantifier.SumQuantifierKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.EnsuresKeyword;
@@ -76,7 +81,9 @@ public class JMLReferenceProfile implements IJMLProfile {
             new NotSpecifiedKeyword(), new ResultKeyword(), new OldKeyword(),
             new SameKeyword(), new ForallQuantifierKeyword(),
             new ExistentialQuantifierKeyword(), new MinQuantifierKeyword(),
-            new MaxQuantifierKeyword()));
+            new MaxQuantifierKeyword(), new ProductQuantifierKeyword(),
+            new SumQuantifierKeyword(), new NumOfQuantifierKeyword(),
+            new NonNullKeyword(), new NullableKeyword()));
 
       this.supportedPrimaries = new HashSet<IJMLPrimary>(Arrays.asList(
             new KeywordJMLPrimary(), new QuantifierPrimary()));

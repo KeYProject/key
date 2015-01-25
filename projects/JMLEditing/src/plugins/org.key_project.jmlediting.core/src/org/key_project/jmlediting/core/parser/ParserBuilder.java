@@ -6,6 +6,7 @@ import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.internal.ParserUtils;
 import org.key_project.jmlediting.core.parser.internal.RecursiveParseFunction;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 
@@ -708,6 +709,23 @@ public final class ParserBuilder {
                   activeProfile);
          }
       };
+   }
+
+   /**
+    * Short cut for filtering all keywords in the given profile by the given
+    * class.
+    *
+    * @param clazz
+    *           the class to filter keywords by
+    * @param profile
+    *           the profiles to look into
+    * @param <T>
+    *           the type of the keywords
+    * @return a {@link ParseFunction} able to parse keywords of the given type
+    */
+   public static <T extends IKeyword> ParseFunction keywords(
+         final Class<T> clazz, final IJMLProfile profile) {
+      return keywords(JMLProfileHelper.filterKeywords(profile, clazz), profile);
    }
 
    /**
