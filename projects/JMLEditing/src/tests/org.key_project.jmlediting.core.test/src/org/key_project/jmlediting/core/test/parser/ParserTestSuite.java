@@ -8,7 +8,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({ SpecificationStatementParserTest.class,
       BehaviorParserTest.class, LexicalHelperTest.class,
       StoreRefParserTest.class, ParserBuilderTest.class,
-      ParserRecoveryTest.class, ExpressionParserTest.class })
+      ParserRecoveryTest.class, ExpressionParserTest.class,
+      QuantifierParserTest.class, RequiresParserTest.class })
 public class ParserTestSuite {
 
 }

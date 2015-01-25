@@ -3,6 +3,7 @@ package org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression;
 import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
@@ -10,6 +11,8 @@ import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 
 /**
  * This class contains some utility methods to parse expressions. The declared
@@ -127,26 +130,45 @@ public final class ExpressionParserUtils {
                // Do not change to node
                return listOptResult;
             case 2:
+               final IASTNode firstNode = listOptResult.getChildren().get(0);
+               final IASTNode secondNode = listOptResult.getChildren().get(1);
+               final int secondNodeType = secondNode.getType();
                // Check whether the second child can be removed, that is the
                // case if it is an empty list or a none
-               if (listOptResult.getChildren().get(1).getType() == NodeTypes.LIST) {
-                  if (listOptResult.getChildren().get(1).getChildren().size() == 0) {
-                     return listOptResult.getChildren().get(0);
+               if (secondNodeType == NodeTypes.LIST) {
+                  if (secondNode.getChildren().size() == 0) {
+                     return firstNode;
                   }
                }
-               else if (listOptResult.getChildren().get(1).getType() == NodeTypes.NONE) {
-                  return listOptResult.getChildren().get(0);
+               else if (secondNodeType == NodeTypes.NONE) {
+                  return firstNode;
                }
+               // Unpack content depending on the type
+
+               final List<IASTNode> opElems = new ArrayList<IASTNode>(
+                     listOptResult.getChildren().size() * 2);
+               // First element is not unpacked
+               opElems.add(firstNode);
+
+               // But the second one
+
+               if (secondNodeType == NodeTypes.LIST) {
+                  for (final IASTNode child : secondNode.getChildren()) {
+                     opElems.addAll(child.getChildren());
+                  }
+               }
+               else if (secondNodeType == NodeTypes.SOME) {
+                  opElems.addAll(secondNode.getChildren());
+               }
+               else {
+                  opElems.addAll(secondNode.getChildren());
+               }
+               // Create the new node
+               return Nodes.createNode(type, opElems);
             default:
             }
-            // Unpack
-            final List<IASTNode> opElems = new ArrayList<IASTNode>(
-                  listOptResult.getChildren().size() * 2);
-            for (final IASTNode child : listOptResult.getChildren()) {
-               opElems.addAll(child.getChildren());
-            }
-            // Create the new node
-            return Nodes.createNode(type, opElems);
+            return listOptResult;
+
          }
 
          @Override
@@ -282,6 +304,34 @@ public final class ExpressionParserUtils {
       }
       return Nodes.createNode(node.getStartOffset(), node.getEndOffset(),
             node.getType(), children);
+   }
+
+   /**
+    * Parses a jml primary of the given collection.
+    *
+    * @param primaries
+    *           the supported primaries
+    * @param profile
+    *           the active profile
+    * @return a {@link ParseFunction} parsing {@link IJMLPrimary}
+    */
+   public static ParseFunction primary(final Collection<IJMLPrimary> primaries,
+         final IJMLProfile profile) {
+      return new ParseFunction() {
+
+         private final ParseFunction primary = alt(primaries
+               .toArray(new ParseFunction[0]));
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            // Set the profile lazily to allow switching it
+            for (final IJMLPrimary primary : primaries) {
+               primary.setProfile(profile);
+            }
+            return this.primary.parse(text, start, end);
+         }
+      };
    }
 
 }

@@ -5,14 +5,11 @@ import static org.key_project.jmlediting.profile.jmlref.parseutil.JavaBasicsPars
 import static org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes.*;
 import static org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParserUtils.*;
 
-import java.util.Collection;
-
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.IRecursiveParseFunction;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 
 /**
  * The Expression Parser parses expressions as defined in the JML Reference
@@ -32,13 +29,31 @@ public class ExpressionParser implements ParseFunction {
     */
    private final ParseFunction mainParser;
 
+   // Other parse function to publish
+
+   /**
+    * The parser for dims.
+    */
    private final ParseFunction dimsParser;
+   /**
+    * The parser for typeSpec.
+    */
    private final ParseFunction typeSpecParser;
 
+   /**
+    * Returns the parser which parses array dimension declaration.
+    *
+    * @return the parser for dims
+    */
    public ParseFunction dims() {
       return this.dimsParser;
    }
 
+   /**
+    * Returns the parser which parses type specifications.
+    *
+    * @return the type spec parser
+    */
    public ParseFunction typeSpec() {
       return this.typeSpecParser;
    }
@@ -47,24 +62,6 @@ public class ExpressionParser implements ParseFunction {
    public IASTNode parse(final String text, final int start, final int end)
          throws ParserException {
       return this.mainParser.parse(text, start, end);
-   }
-
-   private static ParseFunction primary(
-         final Collection<IJMLPrimary> primaries, final IJMLProfile profile) {
-      return new ParseFunction() {
-
-         private final ParseFunction primary = alt(primaries
-               .toArray(new ParseFunction[0]));
-
-         @Override
-         public IASTNode parse(final String text, final int start, final int end)
-               throws ParserException {
-            for (final IJMLPrimary primary : primaries) {
-               primary.setProfile(profile);
-            }
-            return this.primary.parse(text, start, end);
-         }
-      };
    }
 
    /**
@@ -224,10 +221,8 @@ public class ExpressionParser implements ParseFunction {
       final ParseFunction fieldMethodExpr = seq(PRIMARY_EXPR, primaryExpr,
             list(primarySuffix));
       final ParseFunction postfixExpr = alt(
-            repackListOp(
-                  POST_FIX_EXPR,
-                  seq(POST_FIX_EXPR, fieldMethodExpr,
-                        opt(oneConstant("++", "--")))),
+            repackListOp(POST_FIX_EXPR,
+                  seq(fieldMethodExpr, opt(oneConstant("++", "--")))),
             seq(ARRAY_CLASS, builtInType,
                   list(seq(constant("["), constant("]"))), constant("."),
                   constant("class")));

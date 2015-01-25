@@ -453,7 +453,7 @@ public class ParserBuilderTest {
 
    @Test(expected = IllegalArgumentException.class)
    public void testKeywordIllegal1() {
-      keywords(null, ProfileWrapper.testProfile);
+      keywords((Iterable<IKeyword>) null, ProfileWrapper.testProfile);
    }
 
    @Test(expected = IllegalArgumentException.class)

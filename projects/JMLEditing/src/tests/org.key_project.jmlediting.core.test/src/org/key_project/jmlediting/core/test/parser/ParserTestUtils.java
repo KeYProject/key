@@ -58,6 +58,12 @@ public class ParserTestUtils {
       assertEquals(resultPPTerm, result.prettyPrintAST());
    }
 
+   public static void testParsePPComplete(final String text,
+         final String resultPPTerm) throws ParserException {
+      testParsePPComplete(text, ProfileWrapper.testProfile.createParser(),
+            resultPPTerm);
+   }
+
    private static void testRecovery(final String text,
          final ParseFunction parser, final Object expectedErrorNode) {
       try {

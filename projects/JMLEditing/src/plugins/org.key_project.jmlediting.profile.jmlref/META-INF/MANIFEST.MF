@@ -15,6 +15,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.key_project.jmlediting.profile.jmlref,
  org.key_project.jmlediting.profile.jmlref.parseutil,
+ org.key_project.jmlediting.profile.jmlref.quantifier,
  org.key_project.jmlediting.profile.jmlref.spec_keyword,
  org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression,
  org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref
