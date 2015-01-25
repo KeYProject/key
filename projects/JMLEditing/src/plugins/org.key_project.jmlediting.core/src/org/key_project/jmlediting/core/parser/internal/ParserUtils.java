@@ -135,23 +135,73 @@ public class ParserUtils {
       return Nodes.createNode(NodeTypes.LIST, nodes);
    }
 
-   public static IASTNode parseSeparatedNonEmptyList(final String text,
-         final int start, final int end, final char sep,
+   public static IASTNode parseSeparatedNonEmptyList(final int type,
+         final String text, final int start, final int end, final char sep,
          final ParseFunction function, final String missingExceptionText)
          throws ParserException {
       final List<IASTNode> nodes = new ArrayList<IASTNode>();
       int startPosition = start;
+
       try {
          final IASTNode node = function.parse(text, startPosition, end);
          nodes.add(node);
          startPosition = node.getEndOffset();
       }
       catch (final ParserException e) {
+
          throw new ParserException(missingExceptionText, text, start, e);
       }
       final ParseFunction sepFunction = ParserBuilder.separateBy(sep, function);
       parseListImpl(text, startPosition, end, sepFunction, nodes);
-      return Nodes.createNode(NodeTypes.LIST, nodes);
+      final IASTNode node = Nodes.createNode(type, nodes);
+      return node;
+   }
+
+   public static IASTNode parseSeparatedNonEmptyListErrorRecovery(
+         final String text, final int start, final int end, final char sep,
+         final ParseFunction function, final String missingExceptionText)
+         throws ParserException {
+      final List<IASTNode> nodes = new ArrayList<IASTNode>();
+      List<ParserError> errors = null;
+
+      int startPosition = start;
+
+      try {
+         final IASTNode node = function.parse(text, startPosition, end);
+         nodes.add(node);
+         startPosition = node.getEndOffset();
+      }
+      catch (final ParserException e) {
+         if (e.getErrorNode() != null) {
+            if (errors == null) {
+               errors = new ArrayList<ParserError>();
+            }
+            errors.addAll(e.getAllErrors());
+            startPosition = e.getErrorNode().getEndOffset();
+            nodes.add(e.getErrorNode());
+         }
+         else {
+            throw new ParserException(missingExceptionText, text, start, e);
+         }
+      }
+      final ParseFunction sepFunction = ParserBuilder.separateBy(sep, function);
+      final List<ParserError> listErrors = parseListErrorRecoveryImpl(text,
+            startPosition, end, sepFunction, nodes);
+      if (listErrors != null) {
+         if (errors == null) {
+            errors = listErrors;
+         }
+         else {
+            errors.addAll(listErrors);
+         }
+      }
+
+      final IASTNode node = Nodes.createNode(NodeTypes.LIST, nodes);
+      if (errors != null) {
+         throw new ParserException(errors.get(0), errors.subList(1,
+               errors.size()), text, node, null);
+      }
+      return node;
    }
 
    public static IASTNode parseList(final String text, final int start,
@@ -180,15 +230,30 @@ public class ParserUtils {
          throws ParserException {
       final List<IASTNode> nodes = new ArrayList<IASTNode>();
       int startPosition = start;
+      ParserException ex = null;
       for (final ParseFunction function : seqs) {
-         final IASTNode node = function.parse(text, startPosition, end);
-         nodes.add(node);
-         if (node == null) {
-            System.out.println("nooo" + function);
+         try {
+            final IASTNode node = function.parse(text, startPosition, end);
+            nodes.add(node);
+            startPosition = node.getEndOffset();
          }
-         startPosition = node.getEndOffset();
+         catch (final ParserException e) {
+            if (e.getErrorNode() != null) {
+               nodes.add(e.getErrorNode());
+               startPosition = e.getErrorNode().getEndOffset();
+               if (ex == null) {
+                  ex = e;
+               }
+            }
+            else {
+               throw e;
+            }
+         }
       }
       assert (nodes.size() == seqs.length);
+      if (ex != null) {
+         throw new ParserException(ex, Nodes.createNode(type, nodes));
+      }
       return Nodes.createNode(type, nodes);
    }
 
@@ -200,9 +265,6 @@ public class ParserUtils {
       for (final ParseFunction function : alternatives) {
          try {
             final IASTNode node = function.parse(text, start, end);
-            if (node == null) {
-               System.out.println("Noalt " + function);
-            }
             return node;
          }
          catch (final ParserException e) {

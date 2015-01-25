@@ -10,36 +10,45 @@ import org.key_project.jmlediting.core.dom.Nodes;
 
 public class DomCompareUtils {
 
-   public static void compareIASTNode(final IASTNode n1, final IASTNode n2,
-         final boolean checkOffsets) {
+   public static final int WILDCARD_TYPE = NodeTypes
+         .getNewType("CompareWildcardType");
+
+   public static void compareIASTNode(final IASTNode expected,
+         final IASTNode actual, final boolean checkOffsets) {
       if (checkOffsets) {
-         assertEquals("Start offset not equals", n1.getStartOffset(),
-               n2.getStartOffset());
-         assertEquals("End offset not equals", n1.getEndOffset(),
-               n2.getEndOffset());
+         assertEquals("Start offset not equals", expected.getStartOffset(),
+               actual.getStartOffset());
+         assertEquals("End offset not equals", expected.getEndOffset(),
+               actual.getEndOffset());
       }
+      if (expected.getType() == WILDCARD_TYPE) {
+         return;
+      }
+
       assertEquals(
-            "Type not equals, got " + NodeTypes.getTypeName(n2.getType())
-                  + " but was " + NodeTypes.getTypeName(n1.getType()),
-            n1.getType(), n2.getType());
-      assertEquals("Number of children not equals", n1.getChildren().size(), n2
-            .getChildren().size());
+            "Type not equals, got " + NodeTypes.getTypeName(actual.getType())
+                  + " but was " + NodeTypes.getTypeName(expected.getType()),
+            expected.getType(), actual.getType());
+      assertEquals("Number of children not equals", expected.getChildren()
+            .size(), actual.getChildren().size());
 
-      if (Nodes.isString(n1)) {
+      if (Nodes.isString(expected)) {
          assertEquals("String content not equals",
-               ((IStringNode) n1).getString(), ((IStringNode) n2).getString());
+               ((IStringNode) expected).getString(),
+               ((IStringNode) actual).getString());
       }
-      else if (Nodes.isKeyword(n1)) {
+      else if (Nodes.isKeyword(expected)) {
          assertEquals("Keyword instance not equal",
-               ((IKeywordNode) n1).getKeywordInstance(),
-               ((IKeywordNode) n2).getKeywordInstance());
-         assertEquals("Keyword not equal", ((IKeywordNode) n1).getKeyword(),
-               ((IKeywordNode) n2).getKeyword());
+               ((IKeywordNode) expected).getKeywordInstance(),
+               ((IKeywordNode) actual).getKeywordInstance());
+         assertEquals("Keyword not equal",
+               ((IKeywordNode) expected).getKeyword(),
+               ((IKeywordNode) actual).getKeyword());
       }
 
-      for (int i = 0; i < n1.getChildren().size(); i++) {
-         compareIASTNode(n1.getChildren().get(i), n2.getChildren().get(i),
-               checkOffsets);
+      for (int i = 0; i < expected.getChildren().size(); i++) {
+         compareIASTNode(expected.getChildren().get(i), actual.getChildren()
+               .get(i), checkOffsets);
       }
    }
 

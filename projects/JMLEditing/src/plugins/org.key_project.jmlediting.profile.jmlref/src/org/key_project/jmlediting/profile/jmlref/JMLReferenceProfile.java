@@ -8,13 +8,25 @@ import java.util.Set;
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.BehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.ExceptionalBehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.NormalBehaviorKeyword;
+import org.key_project.jmlediting.profile.jmlref.bound_mod.NonNullKeyword;
+import org.key_project.jmlediting.profile.jmlref.bound_mod.NullableKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.AlsoKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.HelperKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.PureKeyword;
+import org.key_project.jmlediting.profile.jmlref.primary.KeywordJMLPrimary;
+import org.key_project.jmlediting.profile.jmlref.quantifier.ExistentialQuantifierKeyword;
+import org.key_project.jmlediting.profile.jmlref.quantifier.ForallQuantifierKeyword;
+import org.key_project.jmlediting.profile.jmlref.quantifier.MaxQuantifierKeyword;
+import org.key_project.jmlediting.profile.jmlref.quantifier.MinQuantifierKeyword;
+import org.key_project.jmlediting.profile.jmlref.quantifier.NumOfQuantifierKeyword;
+import org.key_project.jmlediting.profile.jmlref.quantifier.ProductQuantifierKeyword;
+import org.key_project.jmlediting.profile.jmlref.quantifier.QuantifierPrimary;
+import org.key_project.jmlediting.profile.jmlref.quantifier.SumQuantifierKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.EnsuresKeyword;
@@ -45,6 +57,10 @@ public class JMLReferenceProfile implements IJMLProfile {
     * A set containing all supported keywords.
     */
    private final Set<IKeyword> supportedKeywords;
+   /**
+    * The set containing all supported keywords.
+    */
+   private final Set<IJMLPrimary> supportedPrimaries;
 
    /**
     * Creates a new profile instance with the given supported keyword.
@@ -63,7 +79,14 @@ public class JMLReferenceProfile implements IJMLProfile {
             new SpecProtectedKeyword(), new SpecPublicKeyword(),
             new EverythingKeyword(), new NothingKeyword(),
             new NotSpecifiedKeyword(), new ResultKeyword(), new OldKeyword(),
-            new SameKeyword()));
+            new SameKeyword(), new ForallQuantifierKeyword(),
+            new ExistentialQuantifierKeyword(), new MinQuantifierKeyword(),
+            new MaxQuantifierKeyword(), new ProductQuantifierKeyword(),
+            new SumQuantifierKeyword(), new NumOfQuantifierKeyword(),
+            new NonNullKeyword(), new NullableKeyword()));
+
+      this.supportedPrimaries = new HashSet<IJMLPrimary>(Arrays.asList(
+            new KeywordJMLPrimary(), new QuantifierPrimary()));
 
    }
 
@@ -88,6 +111,11 @@ public class JMLReferenceProfile implements IJMLProfile {
    @Override
    public final Set<IKeyword> getSupportedKeywords() {
       return Collections.unmodifiableSet(this.supportedKeywords);
+   }
+
+   @Override
+   public Set<IJMLPrimary> getSupportedPrimaries() {
+      return Collections.unmodifiableSet(this.supportedPrimaries);
    }
 
    @Override

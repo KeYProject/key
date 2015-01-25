@@ -4,6 +4,7 @@ import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserBuilder;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.syntax.ParseFunctionKeywordParser;
 
 /**
  * Specialized the {@link ParseFunctionKeywordParser} for the content of generic

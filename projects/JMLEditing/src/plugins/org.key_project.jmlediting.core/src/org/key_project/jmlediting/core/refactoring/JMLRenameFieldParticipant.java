@@ -1,15 +1,22 @@
 package org.key_project.jmlediting.core.refactoring;
 
-import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.IField;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.ui.SharedASTProvider;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
+import org.key_project.jmlediting.core.utilities.JMLJavaResolver;
+import org.key_project.jmlediting.core.utilities.JavaElementIdentifier;
+import org.key_project.jmlediting.core.utilities.Range;
+import org.key_project.jmlediting.core.utilities.TypeDeclarationFinder;
 
 /**
  * Provides extended Rename Refactoring for Local Variables JML Comments.
@@ -20,6 +27,11 @@ import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
 public class JMLRenameFieldParticipant extends RenameParticipant {
 
    /**
+    * The element that shall be refactored.
+    */
+   private Object element;
+
+   /**
     * initializes the RenameParticipant with the given element.
     *
     * @return true if element implements IField else returns false to not
@@ -27,9 +39,11 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
     */
    @Override
    protected boolean initialize(final Object element) {
-      System.out.println("Element: " + element + "Type: " + element.getClass());
+
       for (final Class<?> c : element.getClass().getInterfaces()) {
          if (c.equals(IField.class)) {
+            this.element = element;
+            // TODO: Activate
             return true;
          }
       }
@@ -45,20 +59,40 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
    public RefactoringStatus checkConditions(final IProgressMonitor pm,
          final CheckConditionsContext context)
          throws OperationCanceledException {
-      // TODO Auto-generated method stub
       return new RefactoringStatus();
    }
 
    @Override
    public Change createChange(final IProgressMonitor pm) throws CoreException,
          OperationCanceledException {
-      System.out.println("Arguments: " + this.getArguments());
-      final HashMap changes;
-      final String newName = this.getArguments().getNewName();
-      // final ASTNode parseResult = JDTUtil
-      // .parse(compilationUnit, offset, length);
-      // TODO Auto-generated method stub
+      // Cast Safe because of the Check in InitializerMethod
+      final IField elem = (IField) this.element;
+      final org.eclipse.jdt.core.dom.CompilationUnit cu = SharedASTProvider
+            .getAST(elem.getCompilationUnit(), SharedASTProvider.WAIT_YES, null);
+      final TypeDeclarationFinder finder = new TypeDeclarationFinder();
+      cu.accept(finder);
+      final List<TypeDeclaration> decls = finder.getDecls();
+      final TypeDeclaration topDecl = decls.get(0);
+      final ITypeBinding type = topDecl.resolveBinding();
+      System.out.println(type.getName());
+      final JMLJavaResolver resolver = new JMLJavaResolver(type, type);
+      final JavaElementIdentifier refGoal = new JavaElementIdentifier(
+            elem.getElementName(), resolver.getTypeForName(elem
+                  .getElementName()), elem.getDeclaringType());
+
+      // final ReplaceEdit edit = new ReplaceEdit(offset,
+      // refGoal.getName().length(), this
+      // .getArguments().getNewName());
       return null;
    }
 
+   /**
+    * finds all occurences of the element that has to be refactored.
+    *
+    * @return a Range Array that contains all occurences of the Keyword. NULL if
+    *         no occurences were found.
+    */
+   public Range[] getJMLOccurences() {
+      return null;
+   }
 }

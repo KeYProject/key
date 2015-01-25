@@ -61,4 +61,9 @@ public class KeywordNode extends PrimitiveNode implements IKeywordNode {
             + "](" + this.keywordInstance + ")";
    }
 
+   @Override
+   public String prettyPrintAST() {
+      return "Keyword(" + this.keywordInstance + ")";
+   }
+
 }

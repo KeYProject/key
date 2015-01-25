@@ -31,12 +31,22 @@ public interface IASTNode {
    /**
     * Returns true if the given offset is covered by this node, so if it is in
     * between to start and end offset.
-    * 
+    *
     * @param offset
     *           the offset to check
     * @return whether the offset is between start and end node
     */
    boolean containsOffset(int offset);
+
+   /**
+    * Returns true if the given caret is on the current node. So it is after a
+    * character of this node.
+    *
+    * @param caretPosition
+    *           the caretPosition to check
+    * @return whether the caretPosition is on the node
+    */
+   boolean containsCaret(int caretPosition);
 
    /**
     * Returns the type of the node.
@@ -88,5 +98,7 @@ public interface IASTNode {
     * @return the result of the traversal
     */
    <T> T traverse(INodeTraverser<T> traverser, T init);
+
+   String prettyPrintAST();
 
 }

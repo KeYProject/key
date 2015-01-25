@@ -89,6 +89,11 @@ public abstract class AbstractASTNode implements IASTNode {
    }
 
    @Override
+   public boolean containsCaret(final int offset) {
+      return this.getStartOffset() < offset && offset <= this.getEndOffset();
+   }
+
+   @Override
    public String toString() {
       String str = NodeTypes.getTypeName(this.getType()) + "["
             + this.getStartOffset() + "-" + this.getEndOffset() + "](";
@@ -96,6 +101,21 @@ public abstract class AbstractASTNode implements IASTNode {
       while (childIterator.hasNext()) {
          final IASTNode node = childIterator.next();
          str += node.toString();
+         if (childIterator.hasNext()) {
+            str += ",";
+         }
+      }
+      str += ")";
+      return str;
+   }
+
+   @Override
+   public String prettyPrintAST() {
+      String str = NodeTypes.getTypeName(this.getType()) + "(";
+      final Iterator<IASTNode> childIterator = this.getChildren().iterator();
+      while (childIterator.hasNext()) {
+         final IASTNode node = childIterator.next();
+         str += node.prettyPrintAST();
          if (childIterator.hasNext()) {
             str += ",";
          }

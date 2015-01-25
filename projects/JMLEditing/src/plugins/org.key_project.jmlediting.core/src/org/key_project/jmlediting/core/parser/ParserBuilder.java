@@ -6,6 +6,7 @@ import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.internal.ParserUtils;
 import org.key_project.jmlediting.core.parser.internal.RecursiveParseFunction;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 
@@ -173,10 +174,9 @@ public final class ParserBuilder {
    }
 
    /**
-    * Does the same as {@link ParserBuilder#separatedList(char, ParseFunction)}
-    * but ensures that at least a single element is parsed. If no element could
-    * be parsed, a {@link ParserException} with the given exception text is
-    * thrown.
+    * Defaults to
+    * {@link #separatedNonEmptyList(int, char, ParseFunction, String)} with type
+    * {@link NodeTypes#LIST}.
     *
     * @param sep
     *           the character to separate the elements
@@ -191,6 +191,32 @@ public final class ParserBuilder {
     */
    public static ParseFunction separatedNonEmptyList(final char sep,
          final ParseFunction function, final String missingExceptionText) {
+      return separatedNonEmptyList(NodeTypes.LIST, sep, function,
+            missingExceptionText);
+   }
+
+   /**
+    * Does the same as {@link ParserBuilder#separatedList(char, ParseFunction)}
+    * but ensures that at least a single element is parsed. If no element could
+    * be parsed, a {@link ParserException} with the given exception text is
+    * thrown.
+    *
+    * @param type
+    *           the type of the list node to create
+    * @param sep
+    *           the character to separate the elements
+    * @param function
+    *           a {@link ParseFunction} which is able to parse a single element
+    *           of the list
+    * @param missingExceptionText
+    *           the text for an exception when no element could be parsed
+    * @return a {@link ParseFunction} which is able to parse a list of elements
+    *         parseable by the given {@link ParseFunction} separated by the
+    *         given separation character.
+    */
+   public static ParseFunction separatedNonEmptyList(final int type,
+         final char sep, final ParseFunction function,
+         final String missingExceptionText) {
       if (function == null) {
          throw new IllegalArgumentException("Provide a non null function");
       }
@@ -199,8 +225,25 @@ public final class ParserBuilder {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            return ParserUtils.parseSeparatedNonEmptyList(text, start, end,
-                  sep, function, missingExceptionText);
+            return ParserUtils.parseSeparatedNonEmptyList(type, text, start,
+                  end, sep, function, missingExceptionText);
+         }
+      };
+   }
+
+   public static ParseFunction separatedNonEmptyListErrorRecovery(
+         final char sep, final ParseFunction function,
+         final String missingExceptionText) {
+      if (function == null) {
+         throw new IllegalArgumentException("Provide a non null function");
+      }
+      return new ParseFunction() {
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            return ParserUtils.parseSeparatedNonEmptyListErrorRecovery(text,
+                  start, end, sep, function, missingExceptionText);
          }
       };
    }
@@ -244,8 +287,10 @@ public final class ParserBuilder {
             }
             catch (final ParserException e) {
                if (e.getErrorNode() != null) {
-                  throw new ParserException(e, Nodes.createErrorNode(sepStart,
-                        e.getErrorNode().getEndOffset(), e.getErrorNode()));
+                  throw e;
+                  // throw new ParserException(e,
+                  // Nodes.createErrorNode(sepStart,
+                  // e.getErrorNode().getEndOffset(), e.getErrorNode()));
                }
                else {
                   throw new ParserException(e, Nodes.createErrorNode(
@@ -297,23 +342,46 @@ public final class ParserBuilder {
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
             // Parse with the given function
-            final IASTNode node = function.parse(text, start, end);
+            ParserException contentException;
+            IASTNode node;
+            try {
+               node = function.parse(text, start, end);
+               contentException = null;
+            }
+            catch (final ParserException e) {
+               contentException = e;
+               if (e.getErrorNode() == null) {
+                  node = null;
+                  throw e;
+               }
+               else {
+                  node = e.getErrorNode();
+               }
+            }
 
             // Then scan for the closing semicolon
             if (node.getEndOffset() == end) {
                // error, do not scan for whitespaces
                throw new ParserException("Expected a " + close, end, text,
-                     Nodes.createErrorNode(node));
+                     Nodes.createNode(type, Nodes.createErrorNode(node)));
             }
             final int semicolonPos = LexicalHelper.skipWhiteSpacesOrAt(text,
                   node.getEndOffset(), end);
             if (semicolonPos >= end || text.charAt(semicolonPos) != close) {
                // error
+               final IASTNode errorNode = Nodes.createNode(type,
+                     Nodes.createErrorNode(node));
                throw new ParserException("Expected a " + close, semicolonPos,
-                     text, Nodes.createErrorNode(node));
+                     text, errorNode);
             }
-            return Nodes.createNode(node.getStartOffset(), semicolonPos + 1,
-                  type, node);
+            final IASTNode resultNode = Nodes.createNode(node.getStartOffset(),
+                  semicolonPos + 1, type, node);
+            if (contentException == null) {
+               return resultNode;
+            }
+            else {
+               throw new ParserException(contentException, resultNode);
+            }
          }
       };
    }
@@ -459,31 +527,6 @@ public final class ParserBuilder {
             return Nodes.createString(identifierStart, identifierEnd,
                   text.substring(identifierStart, identifierEnd));
          }
-      };
-   }
-
-   /**
-    * Parses an integer constant starting at the current position accepting
-    * whitespaces before the constant. The result is a string term in order not
-    * to lose the format of the identifier (hex, oct, dec).
-    *
-    * @see LexicalHelper#getIntegerConstant(String, int, int)
-    * @return a {@link ParseFunction} that parses an integer constant
-    */
-   public static ParseFunction integerConstant() {
-      return new ParseFunction() {
-
-         @Override
-         public IASTNode parse(final String text, final int start, final int end)
-               throws ParserException {
-            final int identifierStart = LexicalHelper.skipWhiteSpacesOrAt(text,
-                  start, end);
-            final int identifierEnd = LexicalHelper.getIntegerConstant(text,
-                  identifierStart, end);
-            return Nodes.createString(identifierStart, identifierEnd,
-                  text.substring(identifierStart, identifierEnd));
-         }
-
       };
    }
 
@@ -669,6 +712,23 @@ public final class ParserBuilder {
    }
 
    /**
+    * Short cut for filtering all keywords in the given profile by the given
+    * class.
+    *
+    * @param clazz
+    *           the class to filter keywords by
+    * @param profile
+    *           the profiles to look into
+    * @param <T>
+    *           the type of the keywords
+    * @return a {@link ParseFunction} able to parse keywords of the given type
+    */
+   public static <T extends IKeyword> ParseFunction keywords(
+         final Class<T> clazz, final IJMLProfile profile) {
+      return keywords(JMLProfileHelper.filterKeywords(profile, clazz), profile);
+   }
+
+   /**
     * Creates a {@link ParseFunction} that consumes all whitespaces found from
     * the current position on. After that, the given function is invoked. This
     * is useful to convert a {@link ParseFunction} that does not ignore
@@ -699,26 +759,50 @@ public final class ParserBuilder {
       return new RecursiveParseFunction();
    }
 
-   public static ParseFunction listOp(final String op, final ParseFunction elem) {
-      return listOp(constant(op), elem);
-   }
-
-   public static ParseFunction listOp(final ParseFunction op,
-         final ParseFunction elem) {
-
-      return seq(elem, list(seq(op, elem)));
-   }
-
    public static ParseFunction brackets(final ParseFunction p) {
-      return seq(constant("("), p, constant(")"));
+      return brackets("(", p, ")");
    }
 
    public static ParseFunction squareBrackets(final ParseFunction p) {
-      return seq(constant("["), p, constant("]"));
+      return brackets("[", p, "]");
    }
 
    public static ParseFunction curlyBrackets(final ParseFunction p) {
-      return seq(constant("{"), p, constant("}"));
+      return brackets("{", p, "}");
+   }
+
+   public static ParseFunction brackets(final String open,
+         final ParseFunction p, final String close) {
+      final ParseFunction function = seq(constant(open), p, constant(close));
+      return new ParseFunction() {
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            try {
+               final IASTNode node = function.parse(text, start, end);
+               final IASTNode openNode = node.getChildren().get(0);
+               final IASTNode contentNode = node.getChildren().get(1);
+               final IASTNode closeNode = node.getChildren().get(2);
+               return Nodes.createNode(openNode.getStartOffset(),
+                     closeNode.getEndOffset(), contentNode.getType(),
+                     contentNode.getChildren());
+            }
+            catch (final ParserException e) {
+               if (e.getErrorNode() == null) {
+                  throw e;
+               }
+               if (e.getErrorNode().getChildren().size() >= 2) {
+                  throw new ParserException(e, e.getErrorNode().getChildren()
+                        .get(1));
+               }
+               else {
+                  throw e;
+               }
+            }
+         }
+      };
+
    }
 
    public static ParseFunction oneConstant(final String... constants) {

@@ -46,10 +46,21 @@ public class DomBuildUtils {
       if (sKeyword == null) {
          fail("Unable to find keyword");
       }
+
+      IASTNode contentNode;
+      final int contentStart = start + keyword.length() + 1;
+      final int contentEnd = end - 1;
+      if (content == null) {
+         contentNode = Nodes.createNode(contentStart, contentEnd,
+               DomCompareUtils.WILDCARD_TYPE);
+      }
+      else {
+         contentNode = Nodes.createString(contentStart, contentEnd, content);
+      }
+
       return Nodes.createNode(start, end, NodeTypes.KEYWORD_APPL, Nodes
             .createKeyword(start, start + keyword.length(), sKeyword, keyword),
             Nodes.createNode(start + keyword.length() + 1, end,
-                  NodeTypes.KEYWORD_CONTENT, Nodes.createString(
-                        start + keyword.length() + 1, end - 1, content)));
+                  NodeTypes.KEYWORD_CONTENT, contentNode));
    }
 }

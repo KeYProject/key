@@ -11,32 +11,41 @@ public class ExpressionParserTest {
 
    @Test
    public void testSimpleExpressionLIdentifier() {
-      testParse("hello");
+      testParsePP("hello", "Primary(Identifier(\"hello\"))");
    }
 
    @Test
    public void testSimpleExpressionIntConstant() {
-      testParse("12");
+      testParsePP("12", "Primary(IntegerLiteral(\"12\"))");
    }
 
    @Test
    public void testSimpleExpressionBoolLiteral() {
-      testParse("true");
+      testParsePP("true", "Primary(BooleanLiteral(\"true\"))");
    }
 
    @Test
    public void testBooleanAnd() {
-      testParse("hello && goodby");
+      testParsePP(
+            "hello && goodby",
+            "LogicalAnd(Primary(Identifier(\"hello\")),\"&&\",Primary(Identifier(\"goodby\")))");
    }
 
    @Test
    public void testBooleanOr() {
-      testParse("a || b");
+      testParsePP("a || b",
+            "LogicalOr(Primary(Identifier(\"a\")),\"||\",Primary(Identifier(\"b\")))");
    }
 
    @Test
    public void testCombinedBooleans() {
-      testParse("a && b || (c && d || e ^ f) | g ");
+      testParsePP(
+            "a && b || (c && d || e ^ f) | g ",
+            "LogicalOr("
+                  + "LogicalAnd(Primary(Identifier(\"a\")),\"&&\",Primary(Identifier(\"b\"))),\"||\","
+                  + "BinaryOr(Primary(LogicalOr(LogicalAnd(Primary(Identifier(\"c\")),\"&&\","
+                  + "Primary(Identifier(\"d\"))),\"||\",BinaryExclusiveOr(Primary(Identifier(\"e\")),\"^\","
+                  + "Primary(Identifier(\"f\"))))),\"|\",Primary(Identifier(\"g\"))))");
    }
 
    @Test
@@ -75,6 +84,11 @@ public class ExpressionParserTest {
    }
 
    @Test
+   public void testArrayInitializer() {
+      testParse("new double[]{2,3,4}");
+   }
+
+   @Test
    public void testArrayAccess() {
       testParse("hallo[4].name[foo()]");
    }
@@ -109,11 +123,53 @@ public class ExpressionParserTest {
       testParse(" hallo <== you <== (me ==> you) <== me");
    }
 
+   @Test
+   public void testPostfix() {
+      testParse("myname ++");
+   }
+
+   @Test
+   public void testResult() {
+      testParse("\\result == 5");
+   }
+
+   @Test
+   public void testOld() {
+      testParse("\\old(this.name)");
+   }
+
+   @Test
+   public void testForall() {
+      testParse("(\\forall int i; a[i]<a[j])");
+   }
+
+   @Test
+   public void testForallQuantifiedExpression() {
+      testParse("(\\forall int i,j; 0 <= i && i < j && j < 10; a[i]<a[j])");
+   }
+
+   @Test
+   public void testForallEmptyQuantifiedExpression() {
+      testParse("(\\forall non_null Integer i,j;; a[i]<a[j])");
+   }
+
    public static void testParse(final String content) {
       try {
-         System.out.println(ParserBuilder.requireComplete(
-               new ExpressionParser(ProfileWrapper.testProfile)).parse(content,
-               0, content.length()));
+         ParserBuilder
+               .requireComplete(
+                     new ExpressionParser(ProfileWrapper.testProfile))
+               .parse(content, 0, content.length()).prettyPrintAST();
+      }
+      catch (final ParserException e) {
+         fail(e.getMessage());
+      }
+   }
+
+   public static void testParsePP(final String content,
+         final String expectedPPResult) {
+      try {
+         ParserTestUtils.testParsePPComplete(content, new ExpressionParser(
+               ProfileWrapper.testProfile), expectedPPResult);
       }
       catch (final ParserException e) {
          fail(e.getMessage());

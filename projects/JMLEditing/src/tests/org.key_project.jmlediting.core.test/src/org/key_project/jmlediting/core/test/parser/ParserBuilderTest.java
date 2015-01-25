@@ -106,7 +106,7 @@ public class ParserBuilderTest {
       testRecovery(
             "A;A;A",
             listErrorRecovery(closedBy(NodeTypes.NODE, parseA, ';')),
-            "List[0-5](Node[0-2](String[0-1](A)),Node[2-4](String[2-3](A)),ErrorNode[4-5](String[4-5](A)))");
+            "List[0-5](Node[0-2](String[0-1](A)),Node[2-4](String[2-3](A)),Node[4-5](ErrorNode[4-5](String[4-5](A))))");
    }
 
    @Test
@@ -114,7 +114,7 @@ public class ParserBuilderTest {
       testRecovery(
             "A;AA;AA;",
             listErrorRecovery(closedBy(NodeTypes.NODE, parseA, ';')),
-            "List[0-8](Node[0-2](String[0-1](A)),ErrorNode[2-3](String[2-3](A)),Node[3-5](String[3-4](A)),ErrorNode[5-6](String[5-6](A)),Node[6-8](String[6-7](A)))");
+            "List[0-8](Node[0-2](String[0-1](A)),Node[2-3](ErrorNode[2-3](String[2-3](A))),Node[3-5](String[3-4](A)),Node[5-6](ErrorNode[5-6](String[5-6](A))),Node[6-8](String[6-7](A)))");
    }
 
    @Test
@@ -182,6 +182,14 @@ public class ParserBuilderTest {
          throws ParserException {
       testParse("A,A,A,B", separatedNonEmptyList(',', parseA, "Missing an A"),
             makeList('A', 3, 1));
+   }
+
+   @Test
+   public void testParseSeparatedNonEmptyListErrorRecovery()
+         throws ParserException {
+      testRecovery("A,A,",
+            separatedNonEmptyListErrorRecovery(',', parseA, "Missing an A"),
+            "List[0-4](String[0-1](A),String[2-3](A),ErrorNode[3-4](String[3-4](,)))");
    }
 
    @Test
@@ -353,26 +361,6 @@ public class ParserBuilderTest {
    }
 
    @Test
-   public void testIntegerConstant() throws ParserException {
-      testParse("1234", integerConstant(), createString(0, 4, "1234"));
-   }
-
-   @Test
-   public void testIntegerConstantWithWhitespaces() throws ParserException {
-      testParse("  12323sh", integerConstant(), createString(2, 7, "12323"));
-   }
-
-   @Test
-   public void testIntegerConstantFail() {
-      testParseFail(" sj", integerConstant());
-   }
-
-   @Test
-   public void testIntegerConstantEmpty() {
-      testParseFail("", integerConstant());
-   }
-
-   @Test
    public void testConstant() throws ParserException {
       testParse("  hallo", constant("hallo"), createString(2, 7, "hallo"));
    }
@@ -428,7 +416,10 @@ public class ParserBuilderTest {
       testRecovery(
             "A",
             typed(NodeTypes.SOME, closedBy(NodeTypes.NODE, parseA, ',')),
-            createNode(NodeTypes.SOME, createErrorNode(createString(0, 1, "A"))));
+            createNode(
+                  NodeTypes.SOME,
+                  createNode(NodeTypes.NODE,
+                        createErrorNode(createString(0, 1, "A")))));
    }
 
    @Test
@@ -462,7 +453,7 @@ public class ParserBuilderTest {
 
    @Test(expected = IllegalArgumentException.class)
    public void testKeywordIllegal1() {
-      keywords(null, ProfileWrapper.testProfile);
+      keywords((Iterable<IKeyword>) null, ProfileWrapper.testProfile);
    }
 
    @Test(expected = IllegalArgumentException.class)
@@ -519,20 +510,26 @@ public class ParserBuilderTest {
 
    @Test
    public void testClosedByErrorRecovery1() {
-      testRecovery("A ", closedBy(NodeTypes.NODE, parseA, ','),
-            createErrorNode(createString(0, 1, "A")));
+      testRecovery(
+            "A ",
+            closedBy(NodeTypes.NODE, parseA, ','),
+            createNode(NodeTypes.NODE, createErrorNode(createString(0, 1, "A"))));
    }
 
    @Test
    public void testClosedByErrorRecovery2() {
-      testRecovery("A B", closedBy(NodeTypes.NODE, parseA, ','),
-            createErrorNode(createString(0, 1, "A")));
+      testRecovery(
+            "A B",
+            closedBy(NodeTypes.NODE, parseA, ','),
+            createNode(NodeTypes.NODE, createErrorNode(createString(0, 1, "A"))));
    }
 
    @Test
    public void testClosedByErrorRecovery3() {
-      testRecovery("A ", closedBy(NodeTypes.NODE, parseA, ','),
-            createErrorNode(createString(0, 1, "A")));
+      testRecovery(
+            "A ",
+            closedBy(NodeTypes.NODE, parseA, ','),
+            createNode(NodeTypes.NODE, createErrorNode(createString(0, 1, "A"))));
    }
 
 }

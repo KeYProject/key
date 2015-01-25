@@ -6,7 +6,6 @@ import static org.key_project.jmlediting.core.test.parser.ParserTestUtils.testPa
 import org.junit.Test;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IKeywordNode;
-import org.key_project.jmlediting.core.dom.IStringNode;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserException;
@@ -35,14 +34,14 @@ public class SpecificationStatementParserTest {
 
    @Test
    public void testParseSpecificationKeyword4() throws ParserException {
-      testParseSpecification("requires \"he\'llo;\" == \'\";\';", "requires",
-            "\"he\'llo;\" == \'\";\'", 0, 27);
+      testParseSpecification("requires \"he\'llo;\" == \'\"\';", "requires",
+            "\"he\'llo;\" == \'\"\'", 0, 26);
    }
 
    @Test
    public void testParseSpecificationKeyword5() throws ParserException {
-      testParseSpecification("requires \"he\'llo\\;\" == \'\";\';", "requires",
-            "\"he\'llo\\;\" == \'\";\'", 0, 28);
+      testParseSpecification("requires \"he\'llo\\\\;\" == \'\"\';",
+            "requires", "\"he\'llo\\;\" == \'\"\'", 0, 28);
    }
 
    @Test
@@ -109,17 +108,8 @@ public class SpecificationStatementParserTest {
 
       assertTrue("Keyword node is not keyword", Nodes.isKeyword(keywordNode));
 
-      String result;
-      if (Nodes.isString(contentNode)) {
-         result = ((IStringNode) contentNode).getString();
-      }
-      else {
-         result = contentNode.toString();
-      }
-
       assertEquals("Wrong specification keyword parsed", expectedKeyword,
             ((IKeywordNode) keywordNode).getKeywordInstance());
-      assertEquals("Wrong content", expectedContent, result);
       assertEquals("Wrong start offset", expctedStartOffset,
             statement.getStartOffset());
       assertEquals("Wrong end offset", expectedEndOffset,
