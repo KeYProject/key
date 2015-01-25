@@ -8,7 +8,7 @@ import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AbstractGenericSpecificationKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.ParseFunctionGenericKeywordParser;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.PredicateParser;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.PredicateOrNotParser;
 
 /**
  * The requires keyword.
@@ -45,7 +45,7 @@ public class RequiresKeyword extends AbstractGenericSpecificationKeyword {
              * pred-or-not ::= predicate | \not_specified
              */
             return alt(
-                  new PredicateParser(profile),
+                  new PredicateOrNotParser(profile),
                   keywords(JMLProfileHelper.filterKeywords(profile,
                         IRequiresValueKeyword.class), profile));
          }

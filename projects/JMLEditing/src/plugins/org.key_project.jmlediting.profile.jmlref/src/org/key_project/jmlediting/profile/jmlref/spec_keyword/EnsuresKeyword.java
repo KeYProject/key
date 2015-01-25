@@ -1,6 +1,9 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword;
 
+import org.key_project.jmlediting.core.parser.ParseFunction;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.PredicateOrNotParser;
 
 /**
  * The ensures keyword.
@@ -27,7 +30,14 @@ public class EnsuresKeyword extends AbstractGenericSpecificationKeyword {
 
    @Override
    public IKeywordParser createParser() {
-      return new DefaultGenericSpecificationKeywordParser();
+      return new ParseFunctionGenericKeywordParser() {
+
+         @Override
+         protected ParseFunction createContentParseFunction(
+               final IJMLProfile profile) {
+            return new PredicateOrNotParser(profile);
+         }
+      };
    }
 
 }

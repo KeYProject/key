@@ -14,7 +14,7 @@ public class BehaviorParserTest {
       final String parseText1 = "behavior ensures x = y;";
       final IASTNode result1 = buildKeywordSequence(0, 23,
             buildKeywordSpec("behavior", 0),
-            buildKeywordSpec("ensures", 9, 23, "x = y"));
+            buildKeywordSpec("ensures", 9, 23, null));
       testParse(parseText1, result1);
    }
 

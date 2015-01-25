@@ -9,7 +9,7 @@ import org.junit.runners.Suite.SuiteClasses;
       BehaviorParserTest.class, LexicalHelperTest.class,
       StoreRefParserTest.class, ParserBuilderTest.class,
       ParserRecoveryTest.class, ExpressionParserTest.class,
-      QuantifierParserTest.class })
+      QuantifierParserTest.class, RequiresParserTest.class })
 public class ParserTestSuite {
 
 }

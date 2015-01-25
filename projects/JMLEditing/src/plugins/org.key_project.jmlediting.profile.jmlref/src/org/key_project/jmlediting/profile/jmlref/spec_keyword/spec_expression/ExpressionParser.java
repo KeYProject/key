@@ -221,10 +221,8 @@ public class ExpressionParser implements ParseFunction {
       final ParseFunction fieldMethodExpr = seq(PRIMARY_EXPR, primaryExpr,
             list(primarySuffix));
       final ParseFunction postfixExpr = alt(
-            repackListOp(
-                  POST_FIX_EXPR,
-                  seq(POST_FIX_EXPR, fieldMethodExpr,
-                        opt(oneConstant("++", "--")))),
+            repackListOp(POST_FIX_EXPR,
+                  seq(fieldMethodExpr, opt(oneConstant("++", "--")))),
             seq(ARRAY_CLASS, builtInType,
                   list(seq(constant("["), constant("]"))), constant("."),
                   constant("class")));
