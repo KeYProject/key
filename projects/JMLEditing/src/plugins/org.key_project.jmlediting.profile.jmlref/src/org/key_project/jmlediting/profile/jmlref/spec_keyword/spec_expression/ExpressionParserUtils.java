@@ -3,6 +3,7 @@ package org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression;
 import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
@@ -10,6 +11,8 @@ import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 
 /**
  * This class contains some utility methods to parse expressions. The declared
@@ -282,6 +285,34 @@ public final class ExpressionParserUtils {
       }
       return Nodes.createNode(node.getStartOffset(), node.getEndOffset(),
             node.getType(), children);
+   }
+
+   /**
+    * Parses a jml primary of the given collection.
+    *
+    * @param primaries
+    *           the supported primaries
+    * @param profile
+    *           the active profile
+    * @return a {@link ParseFunction} parsing {@link IJMLPrimary}
+    */
+   public static ParseFunction primary(final Collection<IJMLPrimary> primaries,
+         final IJMLProfile profile) {
+      return new ParseFunction() {
+
+         private final ParseFunction primary = alt(primaries
+               .toArray(new ParseFunction[0]));
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            // Set the profile lazily to allow switching it
+            for (final IJMLPrimary primary : primaries) {
+               primary.setProfile(profile);
+            }
+            return this.primary.parse(text, start, end);
+         }
+      };
    }
 
 }
