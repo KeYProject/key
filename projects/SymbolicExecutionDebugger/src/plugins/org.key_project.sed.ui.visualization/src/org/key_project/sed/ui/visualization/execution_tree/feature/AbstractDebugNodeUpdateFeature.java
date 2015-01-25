@@ -68,7 +68,9 @@ import org.key_project.util.java.StringUtil;
  * A subtree is constructed as follows during execution of {@link #update(IUpdateContext)}
  * 
  * <ol>
- *    <li>Update label of current node via {@link #updateName(PictogramElement, IProgressMonitor)} </li>
+ *    <li>
+ *       Update label of current node via {@link #updateName(PictogramElement, IProgressMonitor)}
+ *    </li>
  *    <li>
  *       Update sub tree via {@link #updateChildren(PictogramElement, IProgressMonitor)}
  *       <ol>
@@ -79,18 +81,17 @@ import org.key_project.util.java.StringUtil;
  *                <li>Iterate over subtree in order.</li>
  *                <li>First branch (ends in first leaf node) is completely left centered with x = 0.</li>
  *                <li>
- *                   If a further branch is detected, the maximal width of the previous 
- *                   branch is computed via {@link #computeSubTreeBounds(ISEDDebugNode)}
- *                   and the x coordinate is the maximal bound (x + width) + a given offset of two grid units.
+ *                   If a further branch is detected, the most right x of the previous 
+ *                   branch is computed via {@link #findInSiblingBranch(ISEDDebugNode, boolean, boolean)}
+ *                   + a given offset of two grid units.
  *                </li>
  *             </ol>
  *          </li>
  *          <li>
  *             Center whole sub tree starting from its branches leaf nodes via {@link #centerChildren(Set, IProgressMonitor)}.
  *             <ol>
- *                <li>Iterate over all given leaf nodes. (Start with the found one via {@link #updateChildrenLeftAligned(ISEDDebugElement, IProgressMonitor, int)} and continue with nodes which children are completly centered)</li>
  *                <li>
- *                   If leaf node has children (added during step 4) compute x offset to center branch under his children.
+ *                   Iterate over all given leaf nodes. (Start with the found one via {@link #updateChildrenLeftAligned(ISEDDebugElement, IProgressMonitor, int)} and continue with nodes which children are completly centered)
  *                </li>
  *                <li>
  *                   Go back to parents until root is reached (parent is {@code null} or multiple children are detected.
@@ -98,10 +99,17 @@ import org.key_project.util.java.StringUtil;
  *                </li>
  *                <li>
  *                   If the iteration stopped because the parent has multiple children,
- *                   at the parent to leaf node to layout it later on same way. 
+ *                   add the parent to leaf node to layout it later on same way. 
+ *                </li>
+ *                <li>
+ *                   If leaf node has children (added during step 4) compute x offset to center branch under his children.
  *                </li>
  *                <li>
  *                   Go back to starting child (leaf node) and center each element with the computed maximal width.
+ *                </li>
+ *                <li>
+ *                   If the current node has multiple children and the subtree width is smaller than the upper tree
+ *                   center the subtree under it's parent. 
  *                </li>
  *                <li>
  *                   If parents maximal width is greater than the maximal width of the children move the children again to the right to center them.
@@ -109,14 +117,33 @@ import org.key_project.util.java.StringUtil;
  *             </ol>
  *          </li>
  *          <li>
- *             Move righter branches if the width of a modified branch was expanded via {@link #updateParents(PictogramElement, IProgressMonitor)}.
+ *             Check if a adjustment of the layout is needed via {@link #adjustSubtreeIfSmaller(ISEDDebugNode, IProgressMonitor)}.
  *             <ol>
- *                <li>Find most left node via {@link #findMostLeftSiblingPE(ISEDDebugNode)}</li>
- *                <li>Compute distance to move as most right node of branch + offset - most left sibling</li>
- *                <li>Move all righter nodes via {@link #moveRighterNodes(ISEDDebugNode, int, IProgressMonitor)}</li>
+ *                <li>
+ *                   Read chapter 5.2.2 of "Guided Navigation In Symbolic Execution Trees" to get the exact functionality.
+ *                </li>
+ *             </ol>
+ *          </li>
+ *          <li>
+ *             Adjust the rectangles of groups via {@link #adjustRects(ISEDDebugNode, IProgressMonitor)}.
+ *             <ol>
+ *                <li>
+ *                   Read chapter 5.3.2 of "Guided Navigation In Symbolic Execution Trees" to get the exact functionality.
+ *                </li>
  *             </ol>
  *          </li>
  *       </ol>
+ *    </li>
+ *    <li>
+ *      Move righter branches if the width of a modified branch was expanded via {@link #updateParents(PictogramElement, IProgressMonitor)}.
+ *      <ol>
+ *         <li>Find most left node via {@link #findMostLeftSiblingPE(ISEDDebugNode)}</li>
+ *         <li>Compute distance to move as most right node of branch + offset - most left sibling</li>
+ *         <li>Move all righter nodes via {@link #moveRighterNodes(ISEDDebugNode, int, IProgressMonitor)}</li>
+ *      </ol>
+ *    </li>
+ *    <li>
+ *       Adjust the rectangles of groups via {@link #adjustRects(ISEDDebugNode, IProgressMonitor)}.
  *    </li>
  * </ol>
  * <p>
@@ -199,14 +226,6 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       else {
          try {
             PictogramElement pe = context.getPictogramElement();
-            Object bo = getBusinessObjectForPictogramElement(pe);
-            
-            if(NodeUtil.canBeGrouped(bo)) {
-               ISEDGroupable groupStart = (ISEDGroupable) bo;
-               if(pe.getGraphicsAlgorithm() instanceof org.eclipse.graphiti.mm.algorithms.Rectangle || groupStart.isCollapsed()) {
-                  return Reason.createFalseReason();
-               }
-            }
 
             if (isNameUpdateNeeded(pe)) {
                return Reason.createTrueReason("Name is out of date.");
@@ -517,7 +536,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                   if(calledByExpand) {
                      // re-center subtrees
                      for(ISEDDebugNode leaf : leafs) {
-                        int mostLeftSub = findInSubtree(leaf, true, false);
+                        int mostLeftSub = findInSubtree(leaf, true, true);
                         int mostRightPrev = findInSiblingBranch(leaf, true, false);
                         if(mostRightPrev > -1 && mostRightPrev + OFFSET > mostLeftSub) {
                            int toMove = mostRightPrev + OFFSET - mostLeftSub; 
@@ -525,6 +544,10 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                            moveRightAndAbove(leaf, toMove, monitor);
                         }
                      }
+                     
+                     // needed to re-adjust bigger nodes if subtree is not complete 
+                     ISEDDebugNode mostLeftNode = findBiggestNodeInParentBranches((ISEDDebugNode) bos[i]);
+                     adjustRects(mostLeftNode, monitor);
                   }
 
                   monitor.worked(1);
@@ -597,7 +620,8 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             if(iter instanceof SEDPreorderIterator && NodeUtil.canBeGrouped(bo)) {
                iter = new SEDGroupPreorderIterator((ISEDGroupable) bo, nextNode, false);
             }
-            int mostLeftXAbove = findAbove(nextNode, true);            // Adjust the remaining endnodes and their subtrees as if there were just placed under their parents            moveSubTreeHorizontal(nextNode, mostLeftXAbove - nextPE.getGraphicsAlgorithm().getX(), true, monitor);                        int mostLeftSub = findInSubtree(nextNode, true, false);            int mostRightXInPrev = findInSiblingBranch(nextNode, true, false);                        // Since the subtree can now overlap branches on the left, adjust them again            if(mostRightXInPrev != -1 && mostRightXInPrev + OFFSET > mostLeftSub) {               moveSubTreeHorizontal(nextNode, mostRightXInPrev + OFFSET - mostLeftSub, true, monitor);            }
+            int mostLeftXAbove = findAbove(nextNode, true);            // Adjust the remaining endnodes and their subtrees as if there were just placed under their parents            moveSubTreeHorizontal(nextNode, mostLeftXAbove - nextPE.getGraphicsAlgorithm().getX(), true, monitor);                        int mostLeftSub = findInSubtree(nextNode, true, true);            int mostRightXInPrev = findInSiblingBranch(nextNode, true, false);
+            // Since the subtree can now overlap branches on the left, adjust them again            if(mostRightXInPrev != -1 && mostRightXInPrev + OFFSET > mostLeftSub) {               moveSubTreeHorizontal(nextNode, mostRightXInPrev + OFFSET - mostLeftSub, true, monitor);            }
             
             // Use that last added node as leaf            leafs.add(NodeUtil.getParent(nextNode));
             calledByExpand = true;         }
@@ -780,6 +804,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             ga.setX(xMargin + xStart + (maxWidth - ga.getWidth()) / 2);
          }
          
+         // center all subtrees under the parent they have in common
          if(subtreeShiftRequired) {
             int toMove = nextGA.getX() - calcXStart(children) - calcXMargin(children, nextGA.getWidth());
             moveSubTreeHorizontal(next, toMove, false, monitor);
@@ -855,6 +880,10 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * @throws DebugException Occured exception.
     */
    protected void adjustSubtreeIfSmaller(ISEDDebugNode node, IProgressMonitor monitor) throws DebugException {
+      if(node == null) {
+         return;
+      }
+      
       int mostLeftPrevious = findInSiblingBranch(node, true, true);
       int mostLeftFollowing = findInSiblingBranch(node, false, true);
 
@@ -876,7 +905,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             if(mlnGA.getX() < mostLeftUnderBig) {
                // if the updated node is groupable we need to add an extra METOFF to
                // the subtree width for the space between the children and the right side of the rect
-               int diff = (newChildrenSubtreeWidth + (NodeUtil.canBeGrouped(node) ? METOFF : 0) - biggestWidth) / 4;
+               int diff = (newChildrenSubtreeWidth + (NodeUtil.canBeGrouped(node) ? 0 : 0) - biggestWidth) / 4;
                moveSmallSubtree(node, mostLeftNode, diff, isLeft, monitor);
                adjustRects(mostLeftNode, monitor);
             }
@@ -904,7 +933,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       monitor.done();
    }
    
-   /** TODO
+   /**
     * Executes the adjustment of the nodes.
     * @param node The current {@link ISEDDebugNode} to adjust.
     * @param monitor The {@link IProgressMonitor} to use.
@@ -957,7 +986,6 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             
             groupStart = groups.get(i);
             ISEDGroupable outerGroup = NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart);
-//            System.out.println("AG: " + groupStart);
             // if the node overlaps only the outer rect, only a 
             // shift to the right is needed
             // (if its possible that the outer rect is not the biggest width of
@@ -966,7 +994,6 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                int toMove = groupStartGA.getX() + METOFF - ga.getX();
                moveRightAndAbove(node, toMove, monitor);
                moveSubTreeHorizontal(node, toMove, true, monitor);
-//               System.out.println("compute: :W");
                continue;
             }
 
@@ -995,7 +1022,6 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                // There is enough space to the outer rect, so it's possbile
                if(checkRange > 0) {
                   groupStartGA.setX(ga.getX() - (checkRange + 1) * METOFF);
-//                  System.out.println("compute: D:");
                }
                // There is not enough space to the next outer rect
                else {
@@ -1020,7 +1046,6 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                         
                         // add all groups which fit into the space
                         groups2.addFirst(groupGA);
-//                           System.out.println("Group: " + group);
                         // We have enough space to the left
                         if(outGroupGA.getX() + METOFF < groupGA.getX()) {
                            mostRight = findInSiblingBranch((ISEDDebugNode) group, true, false);
@@ -1037,47 +1062,23 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                   // if there is enough space, it's possible to move the groups
                   if(enoughSpace) {
                      toMove = groups2.getFirst().getX() - outX;
-//                     if(toMove >= diff || !calledByExpand) {
-                        for(GraphicsAlgorithm groupGA : groups2) {
-                           groupGA.setX(groupGA.getX() - diff);
-                        }
-//                        System.out.println(node);
-//                        System.out.println("compute: Na toll");
-//                     }
-//                     else {
-////                        groups2.getFirst().setX(groups2.getFirst().getX() - toMove);
-//                        System.out.println("2M: " + toMove + ", D: " + diff);
-//                        for(GraphicsAlgorithm groupGA : groups2) {
-//                           groupGA.setX(groupGA.getX() - toMove);
-//                        }
-//                        moveRightAndAbove(node, diff - toMove, monitor);
-//                        moveSubTreeHorizontal(node, diff - toMove, true, monitor);
-//                        System.out.println(node);
-//                        System.out.println("compute: Na toll2: " + (diff - toMove));
-//                        return;
-//                     }
+                     for(GraphicsAlgorithm groupGA : groups2) {
+                        groupGA.setX(groupGA.getX() - diff);
+                     }
                   }
                   // if there is not enough space, but we have a prev branch
                   // we move the rects as much as we can to the left and
                   // move the nodes the remaining difference afterwards
                   else if(mostRight > -1) {
-//                     GraphicsAlgorithm gga = getPictogramElementForBusinessObject(g).getGraphicsAlgorithm();
-//                     System.out.println("G: " + g + ", GX: " + gga.getX());
                      toMove = groups2.getFirst().getX() - mostRight - OFFSET;
-                     for(GraphicsAlgorithm groupGA : groups2) {
-//                        System.out.println("RX: " + groupGA.getX());
-//                        groupGA.setX(groupGA.getX() - toMove);
-                     }
                      moveRightAndAbove(node, diff - toMove, monitor);
                      moveSubTreeHorizontal(node, diff - toMove, true, monitor);
-//                     System.out.println("compute: :O1");
                   }
                   // if we dont have enough space and no prev branch
                   // the nodes have to move the complete difference
                   else {
                      moveRightAndAbove(node, diff, monitor);
                      moveSubTreeHorizontal(node, diff, true, monitor);
-//                     System.out.println("compute: :O2");
                   }
                }
             }
@@ -1382,7 +1383,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       while(node != null) {
          node = NodeUtil.getParent(node);
          
-         if(NodeUtil.getChildren(node).length > 1) {
+         if(node == null || NodeUtil.getChildren(node).length > 1) {
             break;
          }
       }

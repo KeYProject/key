@@ -259,7 +259,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
          GraphicsAlgorithm outerGA = uf.getPictogramElementForBusinessObject(outerGroup, 0).getGraphicsAlgorithm();
          
          // Either no prev branch or its more left then the outer rect
-         // Not needed, not tested!
+         // Not needed?, no problems so far...
          if(mostRightXInPrev == -1 || mostRightXInPrev + uf.OFFSET <= outerGA.getX()) {
 //               toMove = outerGA.getX() + uf.METOFF - mostLeftX;
          }
