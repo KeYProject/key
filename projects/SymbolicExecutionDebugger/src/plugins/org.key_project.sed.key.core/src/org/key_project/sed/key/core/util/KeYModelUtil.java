@@ -560,7 +560,7 @@ public final class KeYModelUtil {
                Assert.isNotNull(parent);
                result[i] = new SEDMemoryBranchCondition(child.getDebugTarget(), parent, child.getThread());
                result[i].addChild(child);
-               result[i].setCallStack(parent.getCallStack());
+               result[i].setCallStack(KeYModelUtil.createCallStack(parent.getDebugTarget(), parent.getExecutionNode().getCallStack()));
                result[i].setName(child.getExecutionNode().getFormatedBlockCompletionCondition(completedBlock));
                result[i].setPathCondition(parent.getPathCondition());
                if (parent instanceof ISourcePathProvider) {
