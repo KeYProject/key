@@ -429,7 +429,7 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
                KeYMethodCall methodCall = getMethodCall();
                methodReturnCondition = new SEDMemoryBranchCondition(getDebugTarget(), methodCall, getThread());
                methodReturnCondition.addChild(this);
-               methodReturnCondition.setCallStack(methodCall.getCallStack());
+               methodReturnCondition.setCallStack(KeYModelUtil.createCallStack(methodCall.getDebugTarget(), methodCall.getExecutionNode().getCallStack()));
                methodReturnCondition.setName(executionNode.getFormatedMethodReturnCondition());
                methodReturnCondition.setPathCondition(methodCall.getPathCondition());
                methodReturnCondition.setSourcePath(methodCall.getSourcePath());
