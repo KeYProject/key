@@ -316,9 +316,13 @@ public interface ProofMacro {
         @Override
         public void taskStarted(String message, int size) {
             //assert size == numberSteps;
-            String suffix = " [" + (completedGoals + 1) + "/" + numberGoals + "]";
+            String suffix = getMessageSuffix();
             super.taskStarted(message + suffix, numberGoals * numberSteps);
             super.taskProgress(completedGoals * numberSteps);
+        }
+
+        protected String getMessageSuffix() {
+            return " [" + (completedGoals + 1) + "/" + numberGoals + "]";
         }
 
         @Override

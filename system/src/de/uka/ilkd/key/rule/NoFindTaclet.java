@@ -79,9 +79,9 @@ public class NoFindTaclet extends Taclet {
     */   
    protected void applyAdd(TermLabelState termLabelState, Sequent add,
          SequentChangeInfo currentSequent, Services services,
-         MatchConditions matchCond) {
-      addToAntec(termLabelState, add.antecedent(), currentSequent, null, services, matchCond, null, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));
-      addToSucc(termLabelState, add.succedent(), currentSequent, null, services, matchCond, null, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add));
+         MatchConditions matchCond, Goal goal, TacletApp tacletApp) {
+      addToAntec(termLabelState, add.antecedent(), currentSequent, null, services, matchCond, null, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), goal, tacletApp);
+      addToSucc(termLabelState, add.succedent(), currentSequent, null, services, matchCond, null, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), goal, tacletApp);
    }    
 
     /**
@@ -126,7 +126,9 @@ public class NoFindTaclet extends Taclet {
 	                gt.sequent(),
 	                currentSequent,
 	                services,
-	                mc);
+	                mc,
+	                goal,
+	                (TacletApp) ruleApp);
 	    
 	    applyAddrule(     gt.rules(),
 			      currentGoal,

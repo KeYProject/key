@@ -30,7 +30,7 @@ import de.uka.ilkd.key.util.Pair;
  * and {@link PreconditionGraphitiPropertySection}.
  * @author Martin Hentschel
  */
-public class PreconditionComposite extends AbstractPredicateComposite {
+public class PreconditionComposite extends AbstractTruthValueComposite {
    /**
     * Constructor.
     * @param parent The parent {@link Composite}.

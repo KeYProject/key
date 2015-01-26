@@ -176,6 +176,9 @@ dist:	branding all
 	@mkdir -p dist/key/
 	@cp -r $(BINARYPATH)/* dist/key/
 	@cp -r $(RESOURCEPATH)/* dist/key/
+	@echo !!!!! WARNING !!!!!
+	@echo The examples package included in this distribution contains too many files.
+	@echo Consider using "ant examples.jar" to create a leaner set of example files.
 	@jar cMf dist/key/examples.jar -C ../examples .
 # for setup.jar
 	@mkdir -p dist/setup/de/uka/ilkd/key/util/
