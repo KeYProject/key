@@ -5,7 +5,10 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.ui.SharedASTProvider;
@@ -13,10 +16,13 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
+import org.key_project.jmlediting.core.utilities.CommentLocator;
+import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLJavaResolver;
 import org.key_project.jmlediting.core.utilities.JavaElementIdentifier;
 import org.key_project.jmlediting.core.utilities.Range;
 import org.key_project.jmlediting.core.utilities.TypeDeclarationFinder;
+import org.key_project.util.jdt.JDTUtil;
 
 /**
  * Provides extended Rename Refactoring for Local Variables JML Comments.
@@ -44,7 +50,7 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
          if (c.equals(IField.class)) {
             this.element = element;
             // TODO: Activate
-            return true;
+            return false;
          }
       }
       return false;
@@ -66,6 +72,7 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
    public Change createChange(final IProgressMonitor pm) throws CoreException,
          OperationCanceledException {
       // Cast Safe because of the Check in InitializerMethod
+      CommentLocator loc = null;
       final IField elem = (IField) this.element;
       final org.eclipse.jdt.core.dom.CompilationUnit cu = SharedASTProvider
             .getAST(elem.getCompilationUnit(), SharedASTProvider.WAIT_YES, null);
@@ -74,12 +81,27 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
       final List<TypeDeclaration> decls = finder.getDecls();
       final TypeDeclaration topDecl = decls.get(0);
       final ITypeBinding type = topDecl.resolveBinding();
-      System.out.println(type.getName());
       final JMLJavaResolver resolver = new JMLJavaResolver(type, type);
+      // Uniquely identify the Element that shall be refactored
       final JavaElementIdentifier refGoal = new JavaElementIdentifier(
             elem.getElementName(), resolver.getTypeForName(elem
                   .getElementName()), elem.getDeclaringType());
 
+      final IJavaProject[] projects = JDTUtil.getAllJavaProjects();
+      // In each Project
+      for (final IJavaProject project : projects) {
+         // In each Package
+         for (final IPackageFragment pac : project.getPackageFragments()) {
+            // In each Compilation Unit
+            for (final ICompilationUnit unit : pac.getCompilationUnits()) {
+               loc = new CommentLocator(unit.getSource());
+               // In each JML Comment
+               for (final CommentRange range : loc.findJMLCommentRanges()) {
+
+               }
+            }
+         }
+      }
       // final ReplaceEdit edit = new ReplaceEdit(offset,
       // refGoal.getName().length(), this
       // .getArguments().getNewName());
