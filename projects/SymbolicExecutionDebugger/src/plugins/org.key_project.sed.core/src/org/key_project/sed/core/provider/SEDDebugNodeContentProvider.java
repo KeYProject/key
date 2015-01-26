@@ -355,4 +355,38 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
          return super.hasChildren(element, context, monitor);
       }
    }
+
+   /**
+    * Checks if the given {@link ISEDDebugNode} is shown.
+    * @param element The {@link ISEDDebugNode} to check.
+    * @return {@code true} is shown, {@code false} is not shown.
+    * @throws DebugException Occurred Exception.
+    */
+   public boolean isShown(ISEDDebugNode element) throws DebugException {
+      if (element != null) {
+         boolean shown = true;
+         while (element != null && shown) {
+            ISEDDebugNode parent = element.getParent();
+            if (parent instanceof ISEDGroupable) {
+               ISEDGroupable groupable = (ISEDGroupable) parent;
+               if (groupable.isCollapsed()) {
+                  if (parent instanceof ISEDDebugNode &&
+                      ArrayUtil.contains(((ISEDDebugNode) parent).getChildren(), element)) {
+                     shown = false;
+                  }                  
+               }
+               else {
+                  if (ArrayUtil.contains(((ISEDGroupable) parent).getGroupEndConditions(), element)) {
+                     shown = false;
+                  }
+               }
+            }
+            element = parent;
+         }
+         return shown;
+      }
+      else {
+         return false;
+      }
+   }
 }
