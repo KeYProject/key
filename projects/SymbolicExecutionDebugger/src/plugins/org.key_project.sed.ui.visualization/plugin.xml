@@ -238,7 +238,7 @@
               </propertySection>
               <propertySection
                     class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiConstraintsPropertySection"
-                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiReadonlyDebugNodeTreeFilter"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiConstraintsTreeFilter"
                     id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiConstraintsPropertySection"
                     tab="org.key_project.sed.ui.visualization.constraints.tab">
               </propertySection>
