@@ -16,6 +16,11 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
+import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.parser.IJMLParser;
+import org.key_project.jmlediting.core.parser.ParserException;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLJavaResolver;
@@ -50,7 +55,7 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
          if (c.equals(IField.class)) {
             this.element = element;
             // TODO: Activate
-            return false;
+            return true;
          }
       }
       return false;
@@ -72,7 +77,6 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
    public Change createChange(final IProgressMonitor pm) throws CoreException,
          OperationCanceledException {
       // Cast Safe because of the Check in InitializerMethod
-      CommentLocator loc = null;
       final IField elem = (IField) this.element;
       final org.eclipse.jdt.core.dom.CompilationUnit cu = SharedASTProvider
             .getAST(elem.getCompilationUnit(), SharedASTProvider.WAIT_YES, null);
@@ -86,22 +90,7 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
       final JavaElementIdentifier refGoal = new JavaElementIdentifier(
             elem.getElementName(), resolver.getTypeForName(elem
                   .getElementName()), elem.getDeclaringType());
-
-      final IJavaProject[] projects = JDTUtil.getAllJavaProjects();
-      // In each Project
-      for (final IJavaProject project : projects) {
-         // In each Package
-         for (final IPackageFragment pac : project.getPackageFragments()) {
-            // In each Compilation Unit
-            for (final ICompilationUnit unit : pac.getCompilationUnits()) {
-               loc = new CommentLocator(unit.getSource());
-               // In each JML Comment
-               for (final CommentRange range : loc.findJMLCommentRanges()) {
-
-               }
-            }
-         }
-      }
+      final Range[] occurences = this.getJMLOccurences(refGoal);
       // final ReplaceEdit edit = new ReplaceEdit(offset,
       // refGoal.getName().length(), this
       // .getArguments().getNewName());
@@ -114,7 +103,42 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
     * @return a Range Array that contains all occurences of the Keyword. NULL if
     *         no occurences were found.
     */
-   public Range[] getJMLOccurences() {
+   private Range[] getJMLOccurences(final JavaElementIdentifier identifier)
+         throws CoreException {
+      CommentLocator loc = null;
+      final IJavaProject[] projects = JDTUtil.getAllJavaProjects();
+      // In each Project
+      for (final IJavaProject project : projects) {
+         // In each Package
+         for (final IPackageFragment pac : project.getPackageFragments()) {
+            // In each Compilation Unit
+            for (final ICompilationUnit unit : pac.getCompilationUnits()) {
+               loc = new CommentLocator(unit.getSource());
+               // In each JML Comment
+               for (final CommentRange range : loc.findJMLCommentRanges()) {
+                  final IJMLProfile activeProfile = JMLPreferencesHelper
+                        .getProjectActiveJMLProfile(project.getProject());
+                  final IJMLParser parser = activeProfile.createParser();
+                  IASTNode parseResult;
+                  try {
+                     parseResult = parser.parse(unit.getSource(), range);
+
+                  }
+                  catch (final ParserException e) {
+                     // Invalid JML Code, do syntax coloring with the recovered
+                     // node
+                     parseResult = e.getErrorNode();
+
+                  }
+                  if (parseResult == null) {
+                     // No parser recovery, so no highlightinh
+                     return null;
+                  }
+
+               }
+            }
+         }
+      }
       return null;
    }
 }
