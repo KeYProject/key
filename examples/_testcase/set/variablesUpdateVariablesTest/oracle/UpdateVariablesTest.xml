@@ -1,98 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <variable name="self" isArrayIndex="false">
-      <value name="self" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+      <value name="self {true}" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
    <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="self" isArrayIndex="false">
-         <value name="self" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+         <value name="self {true}" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
       <statement name="classWrite=classRead;" pathCondition="true" pathConditionChanged="false">
          <variable name="self" isArrayIndex="false">
-            <value name="self" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+            <value name="self {true}" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
          <statement name="this.fieldWrite=this.fieldRead;" pathCondition="true" pathConditionChanged="false">
             <variable name="self" isArrayIndex="false">
-               <value name="self" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+               <value name="self {true}" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <variable name="UpdateVariablesTest::classRead" isArrayIndex="false">
-               <value name="UpdateVariablesTest::classRead" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false">
+               <value name="UpdateVariablesTest::classRead {true}" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <variable name="UpdateVariablesTest::classWrite" isArrayIndex="false">
-               <value name="UpdateVariablesTest::classWrite" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false">
+               <value name="UpdateVariablesTest::classWrite {true}" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <statement name="return classWrite+this.fieldWrite;" pathCondition="true" pathConditionChanged="false">
                <variable name="self" isArrayIndex="false">
-                  <value name="self" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                  <value name="self {true}" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="fieldRead" isArrayIndex="false">
-                        <value name="fieldRead" typeString="int" valueString="int::select(heap,self,UpdateVariablesTest::$fieldRead)" isValueAnObject="false" isValueUnknown="false">
+                        <value name="fieldRead {true}" typeString="int" valueString="int::select(heap,self,UpdateVariablesTest::$fieldRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="fieldWrite" isArrayIndex="false">
-                        <value name="fieldWrite" typeString="int" valueString="int::select(heap,self,UpdateVariablesTest::$fieldRead)" isValueAnObject="false" isValueUnknown="false">
+                        <value name="fieldWrite {true}" typeString="int" valueString="int::select(heap,self,UpdateVariablesTest::$fieldRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
                <variable name="UpdateVariablesTest::classRead" isArrayIndex="false">
-                  <value name="UpdateVariablesTest::classRead" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false">
+                  <value name="UpdateVariablesTest::classRead {true}" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="UpdateVariablesTest::classWrite" isArrayIndex="false">
-                  <value name="UpdateVariablesTest::classWrite" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false">
+                  <value name="UpdateVariablesTest::classWrite {true}" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                   <variable name="self" isArrayIndex="false">
-                     <value name="self" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                     <value name="self {true}" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="fieldRead" isArrayIndex="false">
-                           <value name="fieldRead" typeString="int" valueString="int::select(heap,self,UpdateVariablesTest::$fieldRead)" isValueAnObject="false" isValueUnknown="false">
+                           <value name="fieldRead {true}" typeString="int" valueString="int::select(heap,self,UpdateVariablesTest::$fieldRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <variable name="fieldWrite" isArrayIndex="false">
-                           <value name="fieldWrite" typeString="int" valueString="int::select(heap,self,UpdateVariablesTest::$fieldRead)" isValueAnObject="false" isValueUnknown="false">
+                           <value name="fieldWrite {true}" typeString="int" valueString="int::select(heap,self,UpdateVariablesTest::$fieldRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </variable>
                   <variable name="UpdateVariablesTest::classRead" isArrayIndex="false">
-                     <value name="UpdateVariablesTest::classRead" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false">
+                     <value name="UpdateVariablesTest::classRead {true}" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="UpdateVariablesTest::classWrite" isArrayIndex="false">
-                     <value name="UpdateVariablesTest::classWrite" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false">
+                     <value name="UpdateVariablesTest::classWrite {true}" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      <variable name="self" isArrayIndex="false">
-                        <value name="self" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                        <value name="self {true}" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="fieldRead" isArrayIndex="false">
-                              <value name="fieldRead" typeString="int" valueString="int::select(heap,self,UpdateVariablesTest::$fieldRead)" isValueAnObject="false" isValueUnknown="false">
+                              <value name="fieldRead {true}" typeString="int" valueString="int::select(heap,self,UpdateVariablesTest::$fieldRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <variable name="fieldWrite" isArrayIndex="false">
-                              <value name="fieldWrite" typeString="int" valueString="int::select(heap,self,UpdateVariablesTest::$fieldRead)" isValueAnObject="false" isValueUnknown="false">
+                              <value name="fieldWrite {true}" typeString="int" valueString="int::select(heap,self,UpdateVariablesTest::$fieldRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
                      </variable>
                      <variable name="UpdateVariablesTest::classRead" isArrayIndex="false">
-                        <value name="UpdateVariablesTest::classRead" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false">
+                        <value name="UpdateVariablesTest::classRead {true}" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="UpdateVariablesTest::classWrite" isArrayIndex="false">
-                        <value name="UpdateVariablesTest::classWrite" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false">
+                        <value name="UpdateVariablesTest::classWrite {true}" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </termination>
                   <callStateVariable name="self" isArrayIndex="false">
-                     <value name="self" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                     <value name="self {true}" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      </value>
                   </callStateVariable>
                </methodReturn>

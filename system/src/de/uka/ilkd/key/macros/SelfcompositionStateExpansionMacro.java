@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.macros;
 
+import java.util.Set;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
@@ -18,8 +20,6 @@ import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
-
-import java.util.Set;
 
 /**
  * The macro SelfcompositionStateExpansionMacro applies rules to extract
@@ -59,7 +59,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     }
 
     @Override
-    protected Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
         return new SelfCompExpansionStrategy(getAdmittedRuleNames());
     }
 

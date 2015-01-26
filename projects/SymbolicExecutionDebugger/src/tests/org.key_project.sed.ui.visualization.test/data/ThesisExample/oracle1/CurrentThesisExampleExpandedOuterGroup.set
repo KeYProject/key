@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_1994be50-9a99-4b36-9b3b-0e4737bb10da" name="magic(example5.ThesisExample)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_52df45f9-533a-49de-aed0-b2e7365695cd" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java">
+         <sedMethodCall xml:id="_9aa1e074-24a2-4ab7-8ce1-49afeec24259" name="&lt;call self.magic(other)&gt;" pathCondition="true" lineNumber="-1" charStart="93" charEnd="98" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java" groupable="true">
+            <sedBranchStatement xml:id="_2d5ed8b0-95fc-4248-8bcf-cf0c4e1bbdf2" name="if (this.intValue==other.intValue)" pathCondition="true" lineNumber="-1" charStart="125" charEnd="156" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java" groupable="true">
+               <sedBranchCondition xml:id="_e72ec56a-8a47-4d8b-894f-08f8f5c22660" name="!other = null" pathCondition="!other = null" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java">
+                  <sedBranchCondition xml:id="_4f88cdb7-30de-4671-a2fb-de932a72402c" name="self.intValue = other.intValue" pathCondition="!other = null &amp; self.intValue = other.intValue" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java">
+                     <sedLoopStatement xml:id="_0be4ce7a-a618-44e8-83d1-bd0324d79718" name="for ( int j = 0; j&lt;1; j++ )" pathCondition="!other = null &amp; self.intValue = other.intValue" lineNumber="-1" charStart="162" charEnd="165" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java" groupable="true">
+                        <sedStatement xml:id="_e1e7c7bc-4765-400d-bbed-27540f2dc24c" name="int j = 0;" pathCondition="!other = null &amp; self.intValue = other.intValue" lineNumber="-1" charStart="166" charEnd="175" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java">
+                           <sedLoopCondition xml:id="_a08ed603-e6a6-47f6-9c76-e6e91d74e446" name="j&lt;1" pathCondition="!other = null &amp; self.intValue = other.intValue" lineNumber="-1" charStart="177" charEnd="182" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java" groupable="true">
+                              <sedStatement xml:id="_243cc7bf-7828-49b8-a916-f488158e2421" name="this.intValue-=j*this.intValue;" pathCondition="!other = null &amp; self.intValue = other.intValue" lineNumber="-1" charStart="196" charEnd="221" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java">
+                                 <sedStatement xml:id="_1c179d41-2a15-4856-8ed8-be932aca716f" name="j++;" pathCondition="!other = null &amp; self.intValue = other.intValue" lineNumber="-1" charStart="184" charEnd="187" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java">
+                                    <sedLoopCondition xml:id="_a2def7da-3845-463b-99b3-324f95d7d752" name="j&lt;1" pathCondition="!other = null &amp; self.intValue = other.intValue" lineNumber="-1" charStart="177" charEnd="182" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java" groupable="false">
+                                       <sedStatement xml:id="_4aa57749-0a5b-4b0c-a4a2-4299c8367a7b" name="return this.intValue;" pathCondition="!other = null &amp; self.intValue = other.intValue" lineNumber="-1" charStart="323" charEnd="339" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java">
+                                          <sedMethodReturn xml:id="_8dc29026-2e9f-49d4-a6e2-8de37c448142" name="&lt;return other.intValue as result of magic&gt;" pathCondition="!other = null &amp; self.intValue = other.intValue" lineNumber="-1" charStart="93" charEnd="98" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java" methodReturnConditionRef="_a065cac1-f820-4584-8cbd-70b8968c59c3">
+                                             <sedTermination xml:id="_7ff56c9a-1d90-40fc-916c-5b4c2e3a0bc9" name="&lt;end&gt;" pathCondition="!other = null &amp; self.intValue = other.intValue" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java" verified="true">
+                                             </sedTermination>
+                                             <sedGroupEndConditionReference nodeIdRef="_a065cac1-f820-4584-8cbd-70b8968c59c3"/>
+                                          </sedMethodReturn>
+                                       </sedStatement>
+                                       <sedGroupEndConditionReference nodeIdRef="_253a358c-5613-4f1e-8a11-fbddaaf3d889"/>
+                                       <sedGroupEndConditionReference nodeIdRef="_dee16d4b-3276-4670-b264-3b1993adda59"/>
+                                    </sedLoopCondition>
+                                    <sedGroupEndConditionReference nodeIdRef="_62df78f5-836d-4b2e-b835-25657e39c3ae"/>
+                                 </sedStatement>
+                              </sedStatement>
+                              <sedGroupEndCondition xml:id="_62df78f5-836d-4b2e-b835-25657e39c3ae" name="true" pathCondition="!other = null &amp; self.intValue = other.intValue" lineNumber="-1" charStart="-1" charEnd="-1">
+                                 <sedChildReference nodeIdRef="_1c179d41-2a15-4856-8ed8-be932aca716f"/>
+                              </sedGroupEndCondition>
+                           </sedLoopCondition>
+                        </sedStatement>
+                        <sedGroupEndCondition xml:id="_dee16d4b-3276-4670-b264-3b1993adda59" name="true" pathCondition="!other = null &amp; self.intValue = other.intValue" lineNumber="-1" charStart="-1" charEnd="-1">
+                           <sedChildReference nodeIdRef="_a2def7da-3845-463b-99b3-324f95d7d752"/>
+                        </sedGroupEndCondition>
+                     </sedLoopStatement>
+                  </sedBranchCondition>
+                  <sedBranchCondition xml:id="_19cb9edc-5efb-446d-b96f-e76c863cbd3d" name="!self.intValue = other.intValue" pathCondition="!other = null &amp; !self.intValue = other.intValue" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java">
+                     <sedLoopStatement xml:id="_1387f85e-e631-430a-a316-2031e2383a48" name="for ( int i = 0; i&lt;2; i++ )" pathCondition="!other = null &amp; !self.intValue = other.intValue" lineNumber="-1" charStart="247" charEnd="250" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java" groupable="true">
+                        <sedStatement xml:id="_d4864975-a577-4c23-82e2-04419fbb59e0" name="int i = 0;" pathCondition="!other = null &amp; !self.intValue = other.intValue" lineNumber="-1" charStart="251" charEnd="260" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java">
+                           <sedLoopCondition xml:id="_da1e055c-b885-414d-973e-56add433b70e" name="i&lt;2" pathCondition="!other = null &amp; !self.intValue = other.intValue" lineNumber="-1" charStart="262" charEnd="267" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java" groupable="true">
+                              <sedStatement xml:id="_48e1923d-c33f-4ebe-a571-ba55071c4e8e" name="this.intValue+=i*this.intValue;" pathCondition="!other = null &amp; !self.intValue = other.intValue" lineNumber="-1" charStart="281" charEnd="306" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java">
+                                 <sedStatement xml:id="_a3a91583-846a-439d-a520-589b32cb68e8" name="i++;" pathCondition="!other = null &amp; !self.intValue = other.intValue" lineNumber="-1" charStart="269" charEnd="272" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java">
+                                    <sedLoopCondition xml:id="_81635ab8-0448-4ca6-9b87-adb19d7dcc66" name="i&lt;2" pathCondition="!other = null &amp; !self.intValue = other.intValue" lineNumber="-1" charStart="262" charEnd="267" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java" groupable="true">
+                                       <sedStatement xml:id="_bdfbcfb0-7c1c-47ed-9974-3b7ba3a22bad" name="this.intValue+=i*this.intValue;" pathCondition="!other = null &amp; !self.intValue = other.intValue" lineNumber="-1" charStart="281" charEnd="306" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java">
+                                          <sedStatement xml:id="_8e341a0f-c186-48bd-a664-49de9b6cf129" name="i++;" pathCondition="!other = null &amp; !self.intValue = other.intValue" lineNumber="-1" charStart="269" charEnd="272" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java">
+                                             <sedLoopCondition xml:id="_23bbb890-c360-4af3-932f-58b20da1059f" name="i&lt;2" pathCondition="!other = null &amp; !self.intValue = other.intValue" lineNumber="-1" charStart="262" charEnd="267" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java" groupable="false">
+                                                <sedStatement xml:id="_92757859-d6de-49ec-a164-3707ed2cde67" name="return this.intValue;" pathCondition="!other = null &amp; !self.intValue = other.intValue" lineNumber="-1" charStart="323" charEnd="339" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java">
+                                                   <sedMethodReturn xml:id="_d237e5b1-a1c2-44d4-9ce4-a054a122838a" name="&lt;return self.intValue * 2 as result of magic&gt;" pathCondition="!other = null &amp; !self.intValue = other.intValue" lineNumber="-1" charStart="93" charEnd="98" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java" methodReturnConditionRef="_6e5ae4ae-c143-4976-b3d2-ee78aa4abb63">
+                                                      <sedTermination xml:id="_e3403912-ea46-4a1f-b4f6-3a81a7bd47bb" name="&lt;end&gt;" pathCondition="!other = null &amp; !self.intValue = other.intValue" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java" verified="true">
+                                                      </sedTermination>
+                                                      <sedGroupEndConditionReference nodeIdRef="_6e5ae4ae-c143-4976-b3d2-ee78aa4abb63"/>
+                                                   </sedMethodReturn>
+                                                </sedStatement>
+                                                <sedGroupEndConditionReference nodeIdRef="_a89b0390-4b98-4405-8fda-478b794d02ae"/>
+                                                <sedGroupEndConditionReference nodeIdRef="_f0fb1ed9-9c59-4a5c-8a0c-0c12e803da98"/>
+                                             </sedLoopCondition>
+                                             <sedGroupEndConditionReference nodeIdRef="_941e019e-fcda-4b42-a6ef-5f181d49da92"/>
+                                          </sedStatement>
+                                       </sedStatement>
+                                       <sedGroupEndCondition xml:id="_941e019e-fcda-4b42-a6ef-5f181d49da92" name="true" pathCondition="!other = null &amp; !self.intValue = other.intValue" lineNumber="-1" charStart="-1" charEnd="-1">
+                                          <sedChildReference nodeIdRef="_8e341a0f-c186-48bd-a664-49de9b6cf129"/>
+                                       </sedGroupEndCondition>
+                                    </sedLoopCondition>
+                                    <sedGroupEndConditionReference nodeIdRef="_51a6847a-9ae9-4a55-8400-8fe7d92f6679"/>
+                                 </sedStatement>
+                              </sedStatement>
+                              <sedGroupEndCondition xml:id="_51a6847a-9ae9-4a55-8400-8fe7d92f6679" name="true" pathCondition="!other = null &amp; !self.intValue = other.intValue" lineNumber="-1" charStart="-1" charEnd="-1">
+                                 <sedChildReference nodeIdRef="_a3a91583-846a-439d-a520-589b32cb68e8"/>
+                              </sedGroupEndCondition>
+                           </sedLoopCondition>
+                        </sedStatement>
+                        <sedGroupEndCondition xml:id="_f0fb1ed9-9c59-4a5c-8a0c-0c12e803da98" name="true" pathCondition="!other = null &amp; !self.intValue = other.intValue" lineNumber="-1" charStart="-1" charEnd="-1">
+                           <sedChildReference nodeIdRef="_23bbb890-c360-4af3-932f-58b20da1059f"/>
+                        </sedGroupEndCondition>
+                     </sedLoopStatement>
+                  </sedBranchCondition>
+               </sedBranchCondition>
+               <sedBranchCondition xml:id="_4428e3f2-95c6-4c92-ad5a-a70ee6702d03" name="other = null" pathCondition="other = null" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java">
+                  <sedExceptionalMethodReturn xml:id="_1e3ddfb2-01c8-451e-9c01-7d4b7415a841" name="&lt;throw java.lang.NullPointerException&gt;" pathCondition="other = null" lineNumber="-1" charStart="93" charEnd="98" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java" methodReturnConditionRef="_f786dc72-7fa5-4161-b99a-d7c8ff1164db">
+                     <sedExceptionalTermination xml:id="_13822408-edd9-49c3-b0b3-2dc04b530100" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="other = null" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java" verified="true">
+                     </sedExceptionalTermination>
+                     <sedGroupEndConditionReference nodeIdRef="_f786dc72-7fa5-4161-b99a-d7c8ff1164db"/>
+                     <sedGroupEndConditionReference nodeIdRef="_f3c49820-875b-463b-87a3-ecbd1998b5f7"/>
+                  </sedExceptionalMethodReturn>
+               </sedBranchCondition>
+               <sedGroupEndCondition xml:id="_253a358c-5613-4f1e-8a11-fbddaaf3d889" name="!other = null &amp; self.intValue = other.intValue" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                  <sedChildReference nodeIdRef="_a2def7da-3845-463b-99b3-324f95d7d752"/>
+               </sedGroupEndCondition>
+               <sedGroupEndCondition xml:id="_a89b0390-4b98-4405-8fda-478b794d02ae" name="!other = null &amp; !self.intValue = other.intValue" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                  <sedChildReference nodeIdRef="_23bbb890-c360-4af3-932f-58b20da1059f"/>
+               </sedGroupEndCondition>
+               <sedGroupEndCondition xml:id="_f3c49820-875b-463b-87a3-ecbd1998b5f7" name="other = null" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                  <sedChildReference nodeIdRef="_1e3ddfb2-01c8-451e-9c01-7d4b7415a841"/>
+               </sedGroupEndCondition>
+            </sedBranchStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_a065cac1-f820-4584-8cbd-70b8968c59c3" name="!other = null &amp; self.intValue = other.intValue" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_8dc29026-2e9f-49d4-a6e2-8de37c448142"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedMethodCallMethodReturnCondition xml:id="_6e5ae4ae-c143-4976-b3d2-ee78aa4abb63" name="!other = null &amp; !self.intValue = other.intValue" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_d237e5b1-a1c2-44d4-9ce4-a054a122838a"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedMethodCallMethodReturnCondition xml:id="_f786dc72-7fa5-4161-b99a-d7c8ff1164db" name="other = null" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_1e3ddfb2-01c8-451e-9c01-7d4b7415a841"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_a065cac1-f820-4584-8cbd-70b8968c59c3" name="!other = null &amp; self.intValue = other.intValue" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_8dc29026-2e9f-49d4-a6e2-8de37c448142"/>
+            </sedGroupEndCondition>
+            <sedGroupEndCondition xml:id="_6e5ae4ae-c143-4976-b3d2-ee78aa4abb63" name="!other = null &amp; !self.intValue = other.intValue" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_d237e5b1-a1c2-44d4-9ce4-a054a122838a"/>
+            </sedGroupEndCondition>
+            <sedGroupEndCondition xml:id="_f786dc72-7fa5-4161-b99a-d7c8ff1164db" name="other = null" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_1e3ddfb2-01c8-451e-9c01-7d4b7415a841"/>
+            </sedGroupEndCondition>
+         </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_7ff56c9a-1d90-40fc-916c-5b4c2e3a0bc9"/>
+         <sedTerminationEntry nodeIdRef="_e3403912-ea46-4a1f-b4f6-3a81a7bd47bb"/>
+         <sedTerminationEntry nodeIdRef="_13822408-edd9-49c3-b0b3-2dc04b530100"/>
+      </sedThread>
+   </sedTarget>
+</launch>

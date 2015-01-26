@@ -74,12 +74,12 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro {
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+    public ProofMacroFinishedInfo applyTo(Proof proof,
+                                          KeYMediator mediator,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
-        final Proof proof = goals.head().proof();
 
         final Services services = proof.getServices();
         final ProofOblInput poForProof = services.getSpecificationRepository().getProofOblInput(proof);

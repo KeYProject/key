@@ -132,6 +132,8 @@ Java and all Java-based trademarks are trademarks of Sun Microsystems, Inc. in t
       <feature id="org.eclipse.ocl" version="3.1.2.v20120206-0606"/>
       <feature id="org.eclipse.gmf" version="1.5.0.v20110607-1200-7d9Q7HFYnmMEynz0X0qrbsDiK281"/>
       <feature id="de.hentschel.visualdbc.feature" version="1.0.0.qualifier"/>
+      <feature id="org.eclipse.graphiti.feature" version="0.8.2.v20120215-0845"/>
+      <feature id="org.key_project.sed.feature" version="1.0.0.qualifier"/>
    </features>
 
 

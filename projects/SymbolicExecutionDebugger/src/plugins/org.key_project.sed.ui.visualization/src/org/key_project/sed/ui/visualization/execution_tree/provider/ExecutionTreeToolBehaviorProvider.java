@@ -45,7 +45,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDGroupable;
-import org.key_project.sed.core.model.ISEDMethodCall;
+import org.key_project.sed.core.util.NodeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeCollapseFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeResumeFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStepIntoFeature;
@@ -330,21 +330,27 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
       return result.toArray(new IPaletteCompartmentEntry[result.size()]);
    }
    
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public GraphicsAlgorithm[] getClickArea(PictogramElement pe) {
       Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pe);
-      if(bo instanceof ISEDMethodCall && pe.getGraphicsAlgorithm() instanceof Rectangle) {
-         return new GraphicsAlgorithm[] {};
+      if(NodeUtil.canBeGrouped(bo)) {
+         return new GraphicsAlgorithm[] {getFeatureProvider().getAllPictogramElementsForBusinessObject(bo)[1].getGraphicsAlgorithm()};
       }
       
       return super.getClickArea(pe);
    }
    
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public GraphicsAlgorithm getSelectionBorder(PictogramElement pe) {
       Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pe);
-      if(bo instanceof ISEDMethodCall && pe.getGraphicsAlgorithm() instanceof Rectangle) {
-         return null;
+      if(NodeUtil.canBeGrouped(bo)) {
+         return getFeatureProvider().getAllPictogramElementsForBusinessObject(bo)[1].getGraphicsAlgorithm();
       }
       
       return super.getSelectionBorder(pe);

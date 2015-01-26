@@ -58,7 +58,7 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
  * This means that labels of new {@link Term}s created during rule application are computed
  * via {@link TermLabelManager#instantiateLabels(de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.PosInOccurrence, Term, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.logic.JavaBlock)}
  * and of existing {@link Term}s are refactored (added or removed) via
- * {@link TermLabelManager#refactorLabels(de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.PosInOccurrence, Term, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Term)}.
+ * {@link TermLabelManager#refactorGoal(de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.PosInOccurrence, Term, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Term)}.
  * </p>
  * <p>
  * To implement a new {@link TermLabel} follow the following steps:

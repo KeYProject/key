@@ -24,12 +24,14 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * This composite provides the content shown in {@link LoopInvariantPropertySection}
@@ -67,9 +69,9 @@ public class LoopInvariantComposite extends AbstractPredicateComposite {
     * {@inheritDoc}
     */
    @Override
-   protected Term computeTermToShow(IKeYSEDDebugNode<?> node, 
-                                    IExecutionNode<?> executionNode, 
-                                    final Node keyNode) {
+   protected Pair<Term, Term> computeTermToShow(IKeYSEDDebugNode<?> node, 
+                                                IExecutionNode<?> executionNode, 
+                                                final Node keyNode) {
       if (node instanceof KeYLoopBodyTermination) {
          Term term;
          if (keyNode.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
@@ -88,9 +90,10 @@ public class LoopInvariantComposite extends AbstractPredicateComposite {
          if (term.op() == Junctor.IMP) {
             term = term.sub(1);
          }
+         Term predicate = findUninterpretedPredicateTerm(term, AbstractOperationPO.getUninterpretedPredicate(executionNode.getProof()));
          term = removeUninterpretedPredicate(keyNode, term);
          term = TermBuilder.goBelowUpdates(term);
-         return term;
+         return new Pair<Term, Term>(term, predicate);
       }
       else if (node instanceof KeYLoopInvariant) {
          PosInOccurrence pio = executionNode.getModalityPIO();
@@ -104,7 +107,7 @@ public class LoopInvariantComposite extends AbstractPredicateComposite {
             term = keyNode.sequent().succedent().get(index).formula();
          }
          term = TermBuilder.goBelowUpdates(term);
-         return term;
+         return new Pair<Term, Term>(term, null);
       }
       else {
          throw new IllegalArgumentException("Unsupported node.");

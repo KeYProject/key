@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <variable name="b" isArrayIndex="false">
-      <value name="b" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false">
+      <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
    <methodCall name="&lt;call ConditionalValuesTest.mainNext(b)&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="b" isArrayIndex="false">
-         <value name="b {equals(b,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(b,null)">
-         </value>
          <value name="b {not(equals(b,null))}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(b,null))">
+         </value>
+         <value name="b {equals(b,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(b,null)">
          </value>
       </variable>
       <statement name="b.x.value=2;" pathCondition="true" pathConditionChanged="false">
          <variable name="b" isArrayIndex="false">
-            <value name="b {equals(b,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(b,null)">
-            </value>
             <value name="b {not(equals(b,null))}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(b,null))">
+            </value>
+            <value name="b {equals(b,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(b,null)">
             </value>
          </variable>
          <branchCondition name="not(equals(b,null))" pathCondition="not(equals(b,null))" pathConditionChanged="true" branchCondition="not(equals(b,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -31,24 +31,24 @@
             </variable>
             <branchCondition name="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))" pathCondition="and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null)))" pathConditionChanged="true" branchCondition="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <variable name="b" isArrayIndex="false">
-                  <value name="b" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false">
+                  <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="x" isArrayIndex="false">
-                        <value name="x" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false">
+                        <value name="x {true}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
                <variable name="c" isArrayIndex="false">
-                  <value name="c" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false">
+                  <value name="c {true}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <statement name="b.y.value=3;" pathCondition="and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null)))" pathConditionChanged="false">
                   <variable name="b" isArrayIndex="false">
-                     <value name="b" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false">
+                     <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="x" isArrayIndex="false">
-                           <value name="x" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false">
+                           <value name="x {true}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="value" isArrayIndex="false">
-                                 <value name="value" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false">
+                                 <value name="value {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
@@ -100,7 +100,7 @@
                                  </value>
                                  <value name="y {not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)))}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y)" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)))">
                                     <variable name="value" isArrayIndex="false">
-                                       <value name="value {not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)))}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)))">
+                                       <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                  </value>
@@ -129,7 +129,7 @@
                                     </value>
                                     <value name="y {not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)))}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y)" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)))">
                                        <variable name="value" isArrayIndex="false">
-                                          <value name="value {not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)))}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)))">
+                                          <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                     </value>
@@ -158,7 +158,7 @@
                                        </value>
                                        <value name="y {not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)))}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y)" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)))">
                                           <variable name="value" isArrayIndex="false">
-                                             <value name="value {not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)))}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)))">
+                                             <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                              </value>
                                           </variable>
                                        </value>
@@ -167,13 +167,13 @@
                               </variable>
                            </termination>
                            <callStateVariable name="b" isArrayIndex="false">
-                              <value name="b" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false">
+                              <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="x" isArrayIndex="false">
-                                    <value name="x" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false">
+                                    <value name="x {true}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                                  <variable name="y" isArrayIndex="false">
-                                    <value name="y" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y)" isValueAnObject="true" isValueUnknown="false">
+                                    <value name="y {true}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
@@ -183,80 +183,80 @@
                   </branchCondition>
                   <branchCondition name="equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),null)" pathCondition="and(and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))),equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),null))" pathConditionChanged="true" branchCondition="equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <variable name="b" isArrayIndex="false">
-                        <value name="b" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false">
+                        <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="x" isArrayIndex="false">
-                              <value name="x" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false">
+                              <value name="x {true}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="value" isArrayIndex="false">
-                                    <value name="value" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false">
+                                    <value name="value {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
                            </variable>
                            <variable name="y" isArrayIndex="false">
-                              <value name="y" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                              <value name="y {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
                      </variable>
                      <variable name="c_1" isArrayIndex="false">
-                        <value name="c_1" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                        <value name="c_1 {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call ConditionalValuesTest.mainNext(b)&gt;&gt;" pathCondition="and(and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))),equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),null))" pathConditionChanged="false" methodReturnCondition="and(and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))),equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),null))">
                         <variable name="b" isArrayIndex="false">
-                           <value name="b" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false">
+                           <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="x" isArrayIndex="false">
-                                 <value name="x" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false">
+                                 <value name="x {true}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     <variable name="value" isArrayIndex="false">
-                                       <value name="value" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false">
+                                       <value name="value {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                  </value>
                               </variable>
                               <variable name="y" isArrayIndex="false">
-                                 <value name="y" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                                 <value name="y {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
                         </variable>
                         <variable name="n_8" isArrayIndex="false">
-                           <value name="n_8" typeString="java.lang.NullPointerException" valueString="n_11" isValueAnObject="false" isValueUnknown="false">
+                           <value name="n_8 {true}" typeString="java.lang.NullPointerException" valueString="n_11" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               <variable name="message" isArrayIndex="false">
-                                 <value name="message" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                                 <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                               <variable name="cause" isArrayIndex="false">
-                                 <value name="cause" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                                 <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
                         </variable>
                         <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))),equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                            <variable name="b" isArrayIndex="false">
-                              <value name="b" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false">
+                              <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="x" isArrayIndex="false">
-                                    <value name="x" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false">
+                                    <value name="x {true}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                        <variable name="value" isArrayIndex="false">
-                                          <value name="value" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false">
+                                          <value name="value {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                     </value>
                                  </variable>
                                  <variable name="y" isArrayIndex="false">
-                                    <value name="y" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                                    <value name="y {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
                            </variable>
                         </termination>
                         <callStateVariable name="b" isArrayIndex="false">
-                           <value name="b" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false">
+                           <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="x" isArrayIndex="false">
-                                 <value name="x" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false">
+                                 <value name="x {true}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                               <variable name="y" isArrayIndex="false">
-                                 <value name="y" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                                 <value name="y {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
@@ -267,52 +267,52 @@
             </branchCondition>
             <branchCondition name="equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null)" pathCondition="and(not(equals(b,null)),equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))" pathConditionChanged="true" branchCondition="equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
                <variable name="b" isArrayIndex="false">
-                  <value name="b" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false">
+                  <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="x" isArrayIndex="false">
-                        <value name="x" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                        <value name="x {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
                <variable name="c" isArrayIndex="false">
-                  <value name="c" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                  <value name="c {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call ConditionalValuesTest.mainNext(b)&gt;&gt;" pathCondition="and(not(equals(b,null)),equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))" pathConditionChanged="false" methodReturnCondition="and(not(equals(b,null)),equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))">
                   <variable name="b" isArrayIndex="false">
-                     <value name="b" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false">
+                     <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="x" isArrayIndex="false">
-                           <value name="x" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                           <value name="x {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </variable>
                   <variable name="n_4" isArrayIndex="false">
-                     <value name="n_4" typeString="java.lang.NullPointerException" valueString="n_7" isValueAnObject="false" isValueUnknown="false">
+                     <value name="n_4 {true}" typeString="java.lang.NullPointerException" valueString="n_7" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         <variable name="message" isArrayIndex="false">
-                           <value name="message" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                           <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <variable name="cause" isArrayIndex="false">
-                           <value name="cause" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                           <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </variable>
                   <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(not(equals(b,null)),equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                      <variable name="b" isArrayIndex="false">
-                        <value name="b" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false">
+                        <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="x" isArrayIndex="false">
-                              <value name="x" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                              <value name="x {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
                      </variable>
                   </termination>
                   <callStateVariable name="b" isArrayIndex="false">
-                     <value name="b" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false">
+                     <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="x" isArrayIndex="false">
-                           <value name="x" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                           <value name="x {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
@@ -322,34 +322,34 @@
          </branchCondition>
          <branchCondition name="equals(b,null)" pathCondition="equals(b,null)" pathConditionChanged="true" branchCondition="equals(b,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
             <variable name="b" isArrayIndex="false">
-               <value name="b" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+               <value name="b {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call ConditionalValuesTest.mainNext(b)&gt;&gt;" pathCondition="equals(b,null)" pathConditionChanged="false" methodReturnCondition="equals(b,null)">
                <variable name="b" isArrayIndex="false">
-                  <value name="b" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                  <value name="b {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="n" isArrayIndex="false">
-                  <value name="n" typeString="java.lang.NullPointerException" valueString="n_3" isValueAnObject="false" isValueUnknown="false">
+                  <value name="n {true}" typeString="java.lang.NullPointerException" valueString="n_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      <variable name="message" isArrayIndex="false">
-                        <value name="message" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                        <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="cause" isArrayIndex="false">
-                        <value name="cause" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                        <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
                <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(b,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                   <variable name="b" isArrayIndex="false">
-                     <value name="b" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                     <value name="b {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </termination>
                <callStateVariable name="b" isArrayIndex="false">
-                  <value name="b" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                  <value name="b {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </callStateVariable>
             </exceptionalMethodReturn>

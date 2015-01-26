@@ -42,7 +42,7 @@ public class InformationWindow extends JDialog {
 
     private static final long serialVersionUID = 1L;
     
-    private static String CE_HELP = "Bounded Counterexample Finder for KeY Proof Obligations"
+    public static String CE_HELP = "Bounded Counterexample Finder for KeY Proof Obligations"
     		+ "\n\n"
     		+ "- Shows a bounded model which satisfies the negation of the selected proof obligation"
     		+ "\n"
@@ -64,7 +64,7 @@ public class InformationWindow extends JDialog {
     
 
 
-    static class Information{
+    public static class Information{
 	final String content;
 	final String title;
 	final String solver;
@@ -74,7 +74,15 @@ public class InformationWindow extends JDialog {
 	    this.title = title;
 	    this.solver = solver;
         }
-	
+   public String getContent() {
+      return content;
+   }
+   public String getTitle() {
+      return title;
+   }
+   public String getSolver() {
+      return solver;
+   }
     }
     
     private JTabbedPane tabbedPane;
