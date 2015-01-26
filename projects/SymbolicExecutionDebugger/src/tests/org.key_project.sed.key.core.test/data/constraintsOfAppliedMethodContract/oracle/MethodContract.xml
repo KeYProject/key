@@ -1,128 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_b73a769e-b4c0-4b6f-8d10-0d4039b3e411" name="magic(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_985e5247-7343-418f-a998-9320877203d5" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
-         <sedVariable xml:id="_44886b53-88b4-4a7d-97b1-ee90b5303bcb" name="heapAtPre" referenceTypeName="Heap">
-            <sedValue xml:id="_394a9a8e-80d7-4dfe-acb3-3094c4ffd226" referenceTypeName="Heap" valueString="heap" allocated="true" multiValued="false">
+   <sedTarget xml:id="_8af41cfd-db56-4be6-8da7-5c0d6dc7d615" name="magic(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_04c3421b-b5e0-4ffc-b552-716c8d7580bd" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
+         <sedVariable xml:id="_08c2be0d-df79-4f78-80e6-a2dfab129f14" name="heapAtPre" referenceTypeName="Heap">
+            <sedValue xml:id="_1dfedb3a-abbe-445f-be48-b87b36823195" referenceTypeName="Heap" valueString="heap" allocated="true" multiValued="false">
             </sedValue>
          </sedVariable>
-         <sedMethodCall xml:id="_849305fc-6ba9-456d-a467-7d4fe466ccdb" name="&lt;call self.magic(m)&gt;" pathCondition="true" lineNumber="-1" charStart="345" charEnd="350" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java" groupable="true">
-            <constraint xml:id="_a83f0006-a524-47f4-9793-1e9bc92d0557" name="wellFormed(heap)"/>
-            <constraint xml:id="_8d2eaead-2054-407e-ab70-8ffb92040ece" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
-            <constraint xml:id="_e332da9b-7a5c-4849-ad7e-b36f84f1433c" name="equals(MethodContract::exactInstance(self),TRUE)"/>
-            <constraint xml:id="_e144b5ec-04ad-434a-8e17-a1ac92dc6332" name="not(equals(self,null))"/>
-            <sedVariable xml:id="_ed60858f-a67e-4540-9ad9-e5f5b01d859c" name="exc" referenceTypeName="Null">
-               <sedValue xml:id="_9d22976e-d57d-4d28-be0a-46a3f894b251" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+         <sedMethodCall xml:id="_8b56fb78-0653-4b8c-8eaa-fd46a7218172" name="&lt;call self.magic(m)&gt;" pathCondition="true" lineNumber="-1" charStart="345" charEnd="350" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java" groupable="true">
+            <constraint xml:id="_cd491ce3-6ad1-43fa-bd48-eb9cd03aa003" name="wellFormed(heap)"/>
+            <constraint xml:id="_55d00dff-e044-45ca-8a76-c7afb3c8b630" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+            <constraint xml:id="_e9c718be-16d9-4dda-92f9-175445a09fa5" name="equals(MethodContract::exactInstance(self),TRUE)"/>
+            <constraint xml:id="_983a8659-3bba-4701-a416-76497e513600" name="not(equals(self,null))"/>
+            <sedVariable xml:id="_feda44d4-1e62-4ef5-b61f-1356a95090d9" name="exc" referenceTypeName="Null">
+               <sedValue xml:id="_5a6b9dca-aba0-4b63-8516-9153ae5e9484" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                </sedValue>
             </sedVariable>
-            <sedBranchStatement xml:id="_80d0f705-2e9b-46f4-b8d2-fcf6588c775d" name="if (m&gt;10)" pathCondition="true" lineNumber="-1" charStart="367" charEnd="389" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java" groupable="true">
-               <constraint xml:id="_9f04497b-e6ea-4c07-aa23-0d542eb814ca" name="wellFormed(heap)"/>
-               <constraint xml:id="_a5128abe-9a8f-4bc9-99bd-d85a5b3a7299" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
-               <constraint xml:id="_08cd8703-891a-48ea-94bf-35c2ce6bca1a" name="equals(MethodContract::exactInstance(self),TRUE)"/>
-               <constraint xml:id="_058469e5-8064-455c-9753-79bbde2e7e3b" name="not(equals(self,null))"/>
-               <sedVariable xml:id="_d8c1a471-44ff-469b-85b3-872c306e4840" name="self" referenceTypeName="MethodContract">
-                  <sedValue xml:id="_cc7dd334-064c-47f9-813b-8c2a498c857c" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
-                     <relevantConstraint constraintIdRef="_a5128abe-9a8f-4bc9-99bd-d85a5b3a7299"/>
-                     <relevantConstraint constraintIdRef="_08cd8703-891a-48ea-94bf-35c2ce6bca1a"/>
-                     <relevantConstraint constraintIdRef="_058469e5-8064-455c-9753-79bbde2e7e3b"/>
-                     <sedVariable xml:id="_6a99097a-43ea-4082-ae5e-81cd02e0adee" name="h1" referenceTypeName="int">
-                        <sedValue xml:id="_70650c6e-5021-4b52-bcc4-d82a84db2f5d" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
+            <sedBranchStatement xml:id="_401e427a-047d-43b6-aa9b-794af228e3d9" name="if (m&gt;10)" pathCondition="true" lineNumber="-1" charStart="367" charEnd="389" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java" groupable="true">
+               <constraint xml:id="_6e866a6b-999f-4793-86c2-872a947a5805" name="wellFormed(heap)"/>
+               <constraint xml:id="_2b44d5d7-7be7-4bd6-8c99-fcdb246ea0c2" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+               <constraint xml:id="_62e43265-549d-48e1-ae52-276e866f75e1" name="equals(MethodContract::exactInstance(self),TRUE)"/>
+               <constraint xml:id="_59c76eb3-561c-4897-adac-92d3a6efefb9" name="not(equals(self,null))"/>
+               <sedVariable xml:id="_11bcbd62-34e7-40a9-82e0-f566be347216" name="self" referenceTypeName="MethodContract">
+                  <sedValue xml:id="_4427e52f-e15d-4676-a553-59635a1bb67b" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
+                     <relevantConstraint constraintIdRef="_2b44d5d7-7be7-4bd6-8c99-fcdb246ea0c2"/>
+                     <relevantConstraint constraintIdRef="_62e43265-549d-48e1-ae52-276e866f75e1"/>
+                     <relevantConstraint constraintIdRef="_59c76eb3-561c-4897-adac-92d3a6efefb9"/>
+                     <sedVariable xml:id="_a7cf131f-21ee-486a-a05c-922348831138" name="h1" referenceTypeName="int">
+                        <sedValue xml:id="_fa3491a9-db03-44b1-a3e6-1923c210b832" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
                         </sedValue>
                      </sedVariable>
-                     <sedVariable xml:id="_f5fdc99f-d3f9-42ab-9fbe-a14a8cecf2c2" name="h2" referenceTypeName="int">
-                        <sedValue xml:id="_d4dec8ce-162e-40e8-8e65-2f8db5485adb" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
+                     <sedVariable xml:id="_be9e21f9-2d3c-4906-b8b2-03d6323902d6" name="h2" referenceTypeName="int">
+                        <sedValue xml:id="_75fa28b9-c014-4a97-b478-a24ada3630d0" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
                         </sedValue>
                      </sedVariable>
-                     <sedVariable xml:id="_2e4ad04f-05fb-46ee-8d19-a701b2bf294c" name="l" referenceTypeName="int">
-                        <sedValue xml:id="_04d74313-a36f-4012-ab85-e5c1d26ab3fc" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$l)" allocated="true" multiValued="false">
+                     <sedVariable xml:id="_5d208812-1cb1-4b89-9d59-c832267f8c65" name="l" referenceTypeName="int">
+                        <sedValue xml:id="_7c95140f-f932-468f-be97-f40c34179d76" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$l)" allocated="true" multiValued="false">
                         </sedValue>
                      </sedVariable>
                   </sedValue>
                </sedVariable>
-               <sedVariable xml:id="_d7555329-afd4-4e96-b115-a30b48a74c45" name="m" referenceTypeName="int">
-                  <sedValue xml:id="_b1b083f5-abf7-4ac4-b3a5-cb9918f36b8d" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
+               <sedVariable xml:id="_8915fa6f-d380-4002-bf47-5a376043d1aa" name="m" referenceTypeName="int">
+                  <sedValue xml:id="_d4bf612d-1abf-4fd7-92be-2ce332d2baf1" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
                   </sedValue>
                </sedVariable>
-               <sedVariable xml:id="_2f7a5b9c-3e01-4e14-9ec6-f8d87a913eb6" name="exc" referenceTypeName="Null">
-                  <sedValue xml:id="_f6e3bb74-4688-475f-8a82-3d044f0b97bf" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+               <sedVariable xml:id="_e45b9a0e-9a18-48fb-8eda-eeb0e20e79c6" name="exc" referenceTypeName="Null">
+                  <sedValue xml:id="_91f43d92-278d-4f13-9f5a-fa8eae98c758" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                   </sedValue>
                </sedVariable>
-               <sedCallStackEntry nodeIdRef="_849305fc-6ba9-456d-a467-7d4fe466ccdb"/>
-               <sedBranchCondition xml:id="_8b3c1b9c-e449-4047-af0b-031e9a356485" name="gt(m,Z(0(1(#))))" pathCondition="gt(m,Z(0(1(#))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
-                  <constraint xml:id="_8056be40-0e12-427b-b67d-3e839ed6a7cc" name="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(gt(m,Z(0(1(#)))),TRUE,FALSE))),equals(x,TRUE))"/>
-                  <constraint xml:id="_1a0824ac-600c-4f9d-952f-9d8ed7290144" name="wellFormed(heap)"/>
-                  <constraint xml:id="_c629f19e-a91a-4517-afeb-fea99d181671" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
-                  <constraint xml:id="_8cdb5079-ec4b-4e1c-be8c-3ba483717d9a" name="equals(MethodContract::exactInstance(self),TRUE)"/>
-                  <constraint xml:id="_e5dd30cf-115e-4280-865d-e4b425696cb1" name="not(equals(self,null))"/>
-                  <sedVariable xml:id="_544d47b9-fe0d-400f-bb4e-9a38f33d5e76" name="self" referenceTypeName="MethodContract">
-                     <sedValue xml:id="_7c982f66-a046-435b-814b-b8bc86276b69" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
-                        <relevantConstraint constraintIdRef="_c629f19e-a91a-4517-afeb-fea99d181671"/>
-                        <relevantConstraint constraintIdRef="_8cdb5079-ec4b-4e1c-be8c-3ba483717d9a"/>
-                        <relevantConstraint constraintIdRef="_e5dd30cf-115e-4280-865d-e4b425696cb1"/>
-                        <sedVariable xml:id="_1919a82c-899a-43a6-b358-8da9b8ecb670" name="h1" referenceTypeName="int">
-                           <sedValue xml:id="_ffac40a0-075d-4ba3-b87e-ea9d04e352a5" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
+               <sedCallStackEntry nodeIdRef="_8b56fb78-0653-4b8c-8eaa-fd46a7218172"/>
+               <sedBranchCondition xml:id="_0400d1f2-1995-40a7-8b8f-40a6a3beea98" name="gt(m,Z(0(1(#))))" pathCondition="gt(m,Z(0(1(#))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
+                  <constraint xml:id="_90904923-8458-41bb-b5eb-e3d42f13174b" name="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(gt(m,Z(0(1(#)))),TRUE,FALSE))),equals(x,TRUE))"/>
+                  <constraint xml:id="_9dd0b23a-d68a-4e34-9374-d6b4a86bb500" name="wellFormed(heap)"/>
+                  <constraint xml:id="_05d8ff04-c8fb-466b-98b8-6812e70a4b7f" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+                  <constraint xml:id="_6a1ad31c-7040-482f-a093-afec6d0aa5a2" name="equals(MethodContract::exactInstance(self),TRUE)"/>
+                  <constraint xml:id="_19f34e58-c301-46b2-927f-bc2ce0170d43" name="not(equals(self,null))"/>
+                  <sedVariable xml:id="_a064d277-0111-47c0-88bb-70756d1e2e74" name="self" referenceTypeName="MethodContract">
+                     <sedValue xml:id="_38f061fd-5ca9-4cb8-ae68-26b30af59624" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
+                        <relevantConstraint constraintIdRef="_05d8ff04-c8fb-466b-98b8-6812e70a4b7f"/>
+                        <relevantConstraint constraintIdRef="_6a1ad31c-7040-482f-a093-afec6d0aa5a2"/>
+                        <relevantConstraint constraintIdRef="_19f34e58-c301-46b2-927f-bc2ce0170d43"/>
+                        <sedVariable xml:id="_1d35c67c-5ade-4cec-b4db-105f357901aa" name="h1" referenceTypeName="int">
+                           <sedValue xml:id="_365fce99-199c-49c0-beb4-0f348e7dc1b9" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
                            </sedValue>
                         </sedVariable>
-                        <sedVariable xml:id="_821b4f9d-1610-4e3e-9550-54aa5146d638" name="h2" referenceTypeName="int">
-                           <sedValue xml:id="_655875e6-7b5e-459d-a758-04c8d94a7fab" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
+                        <sedVariable xml:id="_6eab3660-2f73-4b93-9dc9-8cc53852972f" name="h2" referenceTypeName="int">
+                           <sedValue xml:id="_8f518e5c-44f5-423b-b52d-f2731b7ad1ba" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
                            </sedValue>
                         </sedVariable>
-                        <sedVariable xml:id="_7d7d02ab-2e71-4d29-8809-13fdb765ee37" name="l" referenceTypeName="int">
-                           <sedValue xml:id="_c295a2b7-1341-4d5f-b366-8572c902a961" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$l)" allocated="true" multiValued="false">
+                        <sedVariable xml:id="_0c0cf37b-39d3-4619-ae9c-5851d84b55e0" name="l" referenceTypeName="int">
+                           <sedValue xml:id="_c751f2c7-80f2-4a6f-a9b8-40be3c65a310" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$l)" allocated="true" multiValued="false">
                            </sedValue>
                         </sedVariable>
                      </sedValue>
                   </sedVariable>
-                  <sedVariable xml:id="_ee209530-a082-48a2-94f2-e7b3572f345b" name="m" referenceTypeName="int">
-                     <sedValue xml:id="_bc3f3d76-34fc-4a97-a923-1a00961127c9" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
-                        <relevantConstraint constraintIdRef="_8056be40-0e12-427b-b67d-3e839ed6a7cc"/>
+                  <sedVariable xml:id="_82461fd0-3d55-40e3-8e06-1f2cd8ce1bc3" name="m" referenceTypeName="int">
+                     <sedValue xml:id="_6cc7e439-509b-4d18-8b7b-0e56d684d4c6" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
+                        <relevantConstraint constraintIdRef="_90904923-8458-41bb-b5eb-e3d42f13174b"/>
                      </sedValue>
                   </sedVariable>
-                  <sedVariable xml:id="_525a926c-b3ec-4e97-b1b8-1bf2369b466d" name="exc" referenceTypeName="Null">
-                     <sedValue xml:id="_98ffe0f0-3352-4c7d-a640-20016c23a4ac" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                  <sedVariable xml:id="_c8355ce3-ed25-4b72-8c22-f6c32948c81e" name="exc" referenceTypeName="Null">
+                     <sedValue xml:id="_18b72808-88b9-4c7c-8c06-43cad0ec0212" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                      </sedValue>
                   </sedVariable>
-                  <sedVariable xml:id="_22a28930-cb3b-4b40-9808-b8affefafda7" name="x" referenceTypeName="boolean">
-                     <sedValue xml:id="_37248155-5e97-4ae9-be28-5871943b6560" referenceTypeName="boolean" valueString="TRUE" allocated="true" multiValued="false">
+                  <sedVariable xml:id="_d7caf448-ccc5-4e08-9828-4b06950e416a" name="x" referenceTypeName="boolean">
+                     <sedValue xml:id="_bc847ca0-c804-4b07-990c-29ca8fa10cbe" referenceTypeName="boolean" valueString="TRUE" allocated="true" multiValued="false">
                      </sedValue>
                   </sedVariable>
-                  <sedCallStackEntry nodeIdRef="_849305fc-6ba9-456d-a467-7d4fe466ccdb"/>
-                  <sedStatement xml:id="_6432f3a7-84c5-4207-8aad-68a6b359d207" name="this.l=mod(this.h1,this.h2);" pathCondition="gt(m,Z(0(1(#))))" lineNumber="-1" charStart="389" charEnd="405" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
-                     <constraint xml:id="_ae048547-dcab-49fa-806b-336fe67ae67c" name="geq(m,Z(1(1(#))))"/>
-                     <constraint xml:id="_3d1a41e5-4fb9-4824-8aab-0ef67db07c12" name="wellFormed(heap)"/>
-                     <constraint xml:id="_529f0286-af3e-42d0-ad7c-4c70d0c76fea" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
-                     <constraint xml:id="_85f4b939-911e-4f04-8469-395c718537d0" name="equals(MethodContract::exactInstance(self),TRUE)"/>
-                     <constraint xml:id="_a2c328e9-2258-44e7-836d-9c74bf18054a" name="not(equals(self,null))"/>
-                     <sedVariable xml:id="_176afb9e-5775-4c5f-be45-899b01a18a8e" name="self" referenceTypeName="MethodContract">
-                        <sedValue xml:id="_77c6f924-a475-42e7-96ac-d9601bc626c0" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
-                           <relevantConstraint constraintIdRef="_529f0286-af3e-42d0-ad7c-4c70d0c76fea"/>
-                           <relevantConstraint constraintIdRef="_85f4b939-911e-4f04-8469-395c718537d0"/>
-                           <relevantConstraint constraintIdRef="_a2c328e9-2258-44e7-836d-9c74bf18054a"/>
-                           <sedVariable xml:id="_244b41e8-29e7-40d8-8864-a628ec24ef0f" name="h1" referenceTypeName="int">
-                              <sedValue xml:id="_41bf461e-dfed-4396-aa9d-6263f8c95da8" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
+                  <sedCallStackEntry nodeIdRef="_8b56fb78-0653-4b8c-8eaa-fd46a7218172"/>
+                  <sedStatement xml:id="_0900e6b3-52da-4456-ad13-afb6d736e0b0" name="this.l=mod(this.h1,this.h2);" pathCondition="gt(m,Z(0(1(#))))" lineNumber="-1" charStart="389" charEnd="405" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
+                     <constraint xml:id="_79d7c833-e6fe-47cc-ac4f-0e25986fcba9" name="geq(m,Z(1(1(#))))"/>
+                     <constraint xml:id="_43f78de8-a00e-47d8-8768-0f63e7dc19be" name="wellFormed(heap)"/>
+                     <constraint xml:id="_6dc7693c-78d5-4300-ae6c-3c8ad3ce8f31" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+                     <constraint xml:id="_99f4b1d1-ced8-4320-8f09-c0624f89af1a" name="equals(MethodContract::exactInstance(self),TRUE)"/>
+                     <constraint xml:id="_84385d6e-b181-4c43-86e2-927fe4d784c1" name="not(equals(self,null))"/>
+                     <sedVariable xml:id="_14108519-5d87-4d3f-b3e7-c38ec4bee583" name="self" referenceTypeName="MethodContract">
+                        <sedValue xml:id="_6d0d2a64-fcc8-4ff1-afaa-ab23059cfe38" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
+                           <relevantConstraint constraintIdRef="_6dc7693c-78d5-4300-ae6c-3c8ad3ce8f31"/>
+                           <relevantConstraint constraintIdRef="_99f4b1d1-ced8-4320-8f09-c0624f89af1a"/>
+                           <relevantConstraint constraintIdRef="_84385d6e-b181-4c43-86e2-927fe4d784c1"/>
+                           <sedVariable xml:id="_6183292a-ace0-44d7-8f37-52c41c592181" name="h1" referenceTypeName="int">
+                              <sedValue xml:id="_13b9a524-5dd5-4b89-992b-64ea2626b0f1" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
                               </sedValue>
                            </sedVariable>
-                           <sedVariable xml:id="_3a581db8-b7f4-4445-a44f-d9d9325ee41a" name="h2" referenceTypeName="int">
-                              <sedValue xml:id="_b28df0a0-46d4-40bf-8ad3-cd439b0f673f" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
+                           <sedVariable xml:id="_509a8f30-687a-4908-b356-f454ad213bb3" name="h2" referenceTypeName="int">
+                              <sedValue xml:id="_10377a90-5bdd-45c4-8105-80d268016794" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
                               </sedValue>
                            </sedVariable>
-                           <sedVariable xml:id="_dc1c2d07-0214-4857-b2d0-66424f672c16" name="l" referenceTypeName="int">
-                              <sedValue xml:id="_3653f992-f090-44d7-b1e2-285b6d51bcd4" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$l)" allocated="true" multiValued="false">
+                           <sedVariable xml:id="_165ea119-126e-4a5f-bd68-524030cbaaed" name="l" referenceTypeName="int">
+                              <sedValue xml:id="_87de6dd0-e9b1-4a74-8a58-41d2b963eaa4" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$l)" allocated="true" multiValued="false">
                               </sedValue>
                            </sedVariable>
                         </sedValue>
                      </sedVariable>
-                     <sedVariable xml:id="_48f46e68-a727-4027-89b1-b819fc2d3c10" name="m" referenceTypeName="int">
-                        <sedValue xml:id="_ef558242-70f5-4295-99c3-dd0ee2f120b2" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
-                           <relevantConstraint constraintIdRef="_ae048547-dcab-49fa-806b-336fe67ae67c"/>
+                     <sedVariable xml:id="_1bdd1985-338d-4335-a608-5b5443451bda" name="m" referenceTypeName="int">
+                        <sedValue xml:id="_1b509738-b17f-4e9c-b073-3fc8981e5535" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
+                           <relevantConstraint constraintIdRef="_79d7c833-e6fe-47cc-ac4f-0e25986fcba9"/>
                         </sedValue>
                      </sedVariable>
-                     <sedVariable xml:id="_28c20ebd-f3d0-49c9-91b0-d5fbbf004a28" name="exc" referenceTypeName="Null">
-                        <sedValue xml:id="_ea0990b0-c323-4bff-bf04-f8ee536916d7" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                     <sedVariable xml:id="_1acb1e10-be77-42cd-8538-4b867ca2fcc2" name="exc" referenceTypeName="Null">
+                        <sedValue xml:id="_7e0ac800-01fd-4724-8ebd-e424e34d8658" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                         </sedValue>
                      </sedVariable>
-                     <sedCallStackEntry nodeIdRef="_849305fc-6ba9-456d-a467-7d4fe466ccdb"/>
-                     <sedMethodContract xml:id="_919171e9-448c-454b-b568-d33b87f57c0a" name="result = self.mod(var, var_1) catch(exc_0)
+                     <sedCallStackEntry nodeIdRef="_8b56fb78-0653-4b8c-8eaa-fd46a7218172"/>
+                     <sedMethodContract xml:id="_7921658c-f922-4985-85f2-224a054f0794" name="result = self.mod(var, var_1) catch(exc_0)
 pre: var &gt;= 0 &amp; var_1 &gt;  0 &amp; self.&lt;inv&gt;
 post: \exists int k;
     (  inInt(k)
@@ -131,395 +131,397 @@ post: \exists int k;
 &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="gt(m,Z(0(1(#))))" lineNumber="-1" charStart="218" charEnd="221" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
-                        <constraint xml:id="_d47feaaa-57d3-453b-81e9-6b9db97a8dbb" name="geq(m,Z(1(1(#))))"/>
-                        <constraint xml:id="_08822d9f-63c8-4bc0-bb77-773aa4869b4d" name="wellFormed(heap)"/>
-                        <constraint xml:id="_03496d60-e9a4-4b98-8546-7e4f65717736" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
-                        <constraint xml:id="_1b590a26-bf4a-4dad-b576-ffb029ab5e51" name="equals(MethodContract::exactInstance(self),TRUE)"/>
-                        <constraint xml:id="_475eb509-fd4b-47b0-a807-a0ea3e231e78" name="not(equals(self,null))"/>
-                        <sedVariable xml:id="_1de9ac76-24f1-4345-ae6c-5cacfbc5de03" name="self" referenceTypeName="MethodContract">
-                           <sedValue xml:id="_0df6389a-0121-4fac-883b-48febede1cb1" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
-                              <relevantConstraint constraintIdRef="_03496d60-e9a4-4b98-8546-7e4f65717736"/>
-                              <relevantConstraint constraintIdRef="_1b590a26-bf4a-4dad-b576-ffb029ab5e51"/>
-                              <relevantConstraint constraintIdRef="_475eb509-fd4b-47b0-a807-a0ea3e231e78"/>
-                              <sedVariable xml:id="_2e3aa4b3-281c-4c73-93c6-b39e49b961b0" name="h1" referenceTypeName="int">
-                                 <sedValue xml:id="_331f685a-050e-4fa0-8419-21aefc34fb0f" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
+                        <constraint xml:id="_ea8288db-8bdb-4476-8a2d-0d1d8c2fa94b" name="geq(m,Z(1(1(#))))"/>
+                        <constraint xml:id="_d34d9687-19c1-42f0-9b7b-0137905697ba" name="wellFormed(heap)"/>
+                        <constraint xml:id="_d561d9a3-bab3-477b-a3ee-126287bfd281" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+                        <constraint xml:id="_b2c294d3-798c-494b-ba72-b64afe096b21" name="equals(MethodContract::exactInstance(self),TRUE)"/>
+                        <constraint xml:id="_326a3e98-4833-43c1-8000-73cfde746ccc" name="not(equals(self,null))"/>
+                        <sedVariable xml:id="_837a0534-1bf2-4a2f-8526-c6d962205522" name="self" referenceTypeName="MethodContract">
+                           <sedValue xml:id="_9000258f-2b82-4511-b0d3-5b7b82d3037c" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
+                              <relevantConstraint constraintIdRef="_d561d9a3-bab3-477b-a3ee-126287bfd281"/>
+                              <relevantConstraint constraintIdRef="_b2c294d3-798c-494b-ba72-b64afe096b21"/>
+                              <relevantConstraint constraintIdRef="_326a3e98-4833-43c1-8000-73cfde746ccc"/>
+                              <sedVariable xml:id="_ac89b1f7-0d96-4666-88e6-b506e94eb81e" name="h1" referenceTypeName="int">
+                                 <sedValue xml:id="_25ef7db5-0fee-4929-adeb-d712efd5a33b" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
                                  </sedValue>
                               </sedVariable>
-                              <sedVariable xml:id="_701e616b-6fe9-4dc2-a455-d98de606dd3e" name="h2" referenceTypeName="int">
-                                 <sedValue xml:id="_e096c900-2721-47e6-8bc8-17df6dab929c" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
+                              <sedVariable xml:id="_7c5d4b49-2620-41a7-9e60-041af2a910cc" name="h2" referenceTypeName="int">
+                                 <sedValue xml:id="_3208c159-8ed3-4ac6-b992-db5591ae7be0" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
                                  </sedValue>
                               </sedVariable>
-                              <sedVariable xml:id="_92259289-f699-4117-9e39-2d72cdd2fcb2" name="l" referenceTypeName="int">
-                                 <sedValue xml:id="_12c597b7-beb1-43cb-b11a-f8b47f139df0" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$l)" allocated="true" multiValued="false">
+                              <sedVariable xml:id="_a23cb44e-ccdb-47d4-a418-d41067081fa7" name="l" referenceTypeName="int">
+                                 <sedValue xml:id="_03427854-3435-4523-adc9-8411e8dbf159" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$l)" allocated="true" multiValued="false">
                                  </sedValue>
                               </sedVariable>
                            </sedValue>
                         </sedVariable>
-                        <sedVariable xml:id="_e61ccbf5-4b92-4f65-b29f-b18a9e7f882b" name="m" referenceTypeName="int">
-                           <sedValue xml:id="_74a2139b-c8db-4e9e-bf0f-912a937b85d5" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
-                              <relevantConstraint constraintIdRef="_d47feaaa-57d3-453b-81e9-6b9db97a8dbb"/>
+                        <sedVariable xml:id="_7ab2d5d0-a75c-4c87-a8c9-231cd822d8fb" name="m" referenceTypeName="int">
+                           <sedValue xml:id="_8609448d-36b1-4171-ad81-d54aba09ba9d" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
+                              <relevantConstraint constraintIdRef="_ea8288db-8bdb-4476-8a2d-0d1d8c2fa94b"/>
                            </sedValue>
                         </sedVariable>
-                        <sedVariable xml:id="_acb1b6df-3525-462d-8ba0-fb1aafabe23c" name="exc" referenceTypeName="Null">
-                           <sedValue xml:id="_2990f554-d127-4016-a9dc-f516f48476ef" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                        <sedVariable xml:id="_861b4de5-d21e-4dff-9549-ac9ce27b42f2" name="exc" referenceTypeName="Null">
+                           <sedValue xml:id="_00dfe7a8-cfb2-4def-b3a9-65750d54a6bc" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                            </sedValue>
                         </sedVariable>
-                        <sedVariable xml:id="_4b338288-604b-4bd2-9f3d-a7f67ebfc9f0" name="var" referenceTypeName="int">
-                           <sedValue xml:id="_f4da56c7-1e4d-41c7-94de-f6cde372ad2f" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
+                        <sedVariable xml:id="_6cabd32e-de19-4152-bf35-dfa9ff1b1461" name="var" referenceTypeName="int">
+                           <sedValue xml:id="_d481d831-de4e-47ed-830a-716a2cd59f5d" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
                            </sedValue>
                         </sedVariable>
-                        <sedVariable xml:id="_4e8ff687-f67c-4918-be72-e497ccea43f6" name="var_1" referenceTypeName="int">
-                           <sedValue xml:id="_a57e2091-050f-45f0-9a5d-6aaf412e0a4a" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
+                        <sedVariable xml:id="_e6f2a245-eb3d-4e45-8a39-81792786341e" name="var_1" referenceTypeName="int">
+                           <sedValue xml:id="_cac45a3f-4b95-4bab-8047-6d9201a76e4c" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
                            </sedValue>
                         </sedVariable>
-                        <sedCallStackEntry nodeIdRef="_849305fc-6ba9-456d-a467-7d4fe466ccdb"/>
-                        <sedBranchCondition xml:id="_c5b3ecbc-19a2-4415-aa9d-40c9489cddd1" name="Post (mod): true" pathCondition="gt(m,Z(0(1(#))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
-                           <constraint xml:id="_f7e7735f-67f3-4182-909f-c799552bae10" name="geq(m,Z(1(1(#))))"/>
-                           <constraint xml:id="_8d18ee71-87fd-4f9b-ab42-5f93e08b42d5" name="wellFormed(heap)"/>
-                           <constraint xml:id="_d56af9d0-0c00-4440-bf3c-543098c53256" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
-                           <constraint xml:id="_3dc550e2-e3da-4207-9737-49b3cca93d34" name="equals(MethodContract::exactInstance(self),TRUE)"/>
-                           <constraint xml:id="_e4355350-6731-496a-9226-e1a9d2b2d684" name="wellFormed(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;)"/>
-                           <constraint xml:id="_34378e4d-0d9b-48b5-bea8-a512e0637a87" name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(var)(int::select(heap,self,MethodContract::$h1))),elem-update(var_1)(int::select(heap,self,MethodContract::$h2))),update-application(elem-update(heapBefore_mod)(heap),and(equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod),update-application(elem-update(heap)(heapAfter_mod),and(and(equals(exc_0,null),inInt(result)),and(and(exists{k:int}(and(inInt(k),equals(javaAddInt(javaMulInt(var_1,k),result),var))),java.lang.Object::&lt;inv&gt;(heap,self)),equals(exc_0,null)))))))"/>
-                           <constraint xml:id="_013f56b0-ecc0-4ae9-9d4b-12170eb4b922" name="not(equals(self,null))"/>
-                           <sedVariable xml:id="_c023cb38-7b54-4d3d-b7a7-d12bc39f85bb" name="self" referenceTypeName="MethodContract">
-                              <sedValue xml:id="_fed787a2-5060-4403-bfae-b560916dc39a" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
-                                 <relevantConstraint constraintIdRef="_d56af9d0-0c00-4440-bf3c-543098c53256"/>
-                                 <relevantConstraint constraintIdRef="_3dc550e2-e3da-4207-9737-49b3cca93d34"/>
-                                 <relevantConstraint constraintIdRef="_34378e4d-0d9b-48b5-bea8-a512e0637a87"/>
-                                 <relevantConstraint constraintIdRef="_013f56b0-ecc0-4ae9-9d4b-12170eb4b922"/>
-                                 <sedVariable xml:id="_c0c843c5-47a4-4102-b43b-9841587efe48" name="h1" referenceTypeName="int">
-                                    <sedValue xml:id="_d2c0de4d-766a-49ea-bf56-fa1d1513c3d6" referenceTypeName="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$h1)" allocated="true" multiValued="false">
+                        <sedCallStackEntry nodeIdRef="_8b56fb78-0653-4b8c-8eaa-fd46a7218172"/>
+                        <sedBranchCondition xml:id="_1e84235f-f660-4e91-8146-5665931a5966" name="Post (mod): true" pathCondition="gt(m,Z(0(1(#))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
+                           <constraint xml:id="_c351a4db-7880-4aa6-9191-3210b674ae31" name="geq(m,Z(1(1(#))))"/>
+                           <constraint xml:id="_3447dfdd-e4aa-47ac-8a06-6e0978e313df" name="wellFormed(heap)"/>
+                           <constraint xml:id="_f61f90be-e12d-4822-b88d-7601e8fa898c" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+                           <constraint xml:id="_98a390bf-852d-4aee-96db-f637f86fbd7a" name="equals(MethodContract::exactInstance(self),TRUE)"/>
+                           <constraint xml:id="_7fcb5d0d-d776-4743-90a2-43f9d9489f53" name="wellFormed(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;)"/>
+                           <constraint xml:id="_c6b33b47-dc70-4aed-a9a7-79ede5ce3680" name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(var)(int::select(heap,self,MethodContract::$h1))),elem-update(var_1)(int::select(heap,self,MethodContract::$h2))),update-application(elem-update(heapBefore_mod)(heap),and(equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod),update-application(elem-update(heap)(heapAfter_mod),and(and(equals(exc_0,null),inInt(result)),and(and(exists{k:int}(and(inInt(k),equals(javaAddInt(javaMulInt(var_1,k),result),var))),java.lang.Object::&lt;inv&gt;(heap,self)),equals(exc_0,null)))))))"/>
+                           <constraint xml:id="_3a627e69-d3ee-4e80-a496-8682481045e2" name="not(equals(self,null))"/>
+                           <sedVariable xml:id="_32fc6b04-7a56-488a-8c24-18ee1f2e913d" name="self" referenceTypeName="MethodContract">
+                              <sedValue xml:id="_833d33fc-22f7-4810-9111-d98bf23d7c70" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
+                                 <relevantConstraint constraintIdRef="_f61f90be-e12d-4822-b88d-7601e8fa898c"/>
+                                 <relevantConstraint constraintIdRef="_98a390bf-852d-4aee-96db-f637f86fbd7a"/>
+                                 <relevantConstraint constraintIdRef="_c6b33b47-dc70-4aed-a9a7-79ede5ce3680"/>
+                                 <relevantConstraint constraintIdRef="_3a627e69-d3ee-4e80-a496-8682481045e2"/>
+                                 <sedVariable xml:id="_d8aba221-0fbb-47a2-9bfa-fa302aea2801" name="h1" referenceTypeName="int">
+                                    <sedValue xml:id="_1d48c2e5-ad0b-4072-80a3-bbb515f93715" referenceTypeName="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$h1)" allocated="true" multiValued="false">
                                     </sedValue>
                                  </sedVariable>
-                                 <sedVariable xml:id="_3d2ca2ed-2048-4d6f-a6ac-bc9f05f50d05" name="h2" referenceTypeName="int">
-                                    <sedValue xml:id="_3b7d99bd-f3dc-46bc-8f79-c0162983f790" referenceTypeName="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$h2)" allocated="true" multiValued="false">
+                                 <sedVariable xml:id="_63383c34-c526-49bf-8234-11dae00b260d" name="h2" referenceTypeName="int">
+                                    <sedValue xml:id="_af490d13-476e-4eea-a714-9c12b12e933d" referenceTypeName="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$h2)" allocated="true" multiValued="false">
                                     </sedValue>
                                  </sedVariable>
-                                 <sedVariable xml:id="_fcb53258-dba9-4ba1-8caf-f048a268aa9b" name="l" referenceTypeName="int">
-                                    <sedValue xml:id="_fb581e0b-ec2f-4fa5-a7d4-3125ab58c590" referenceTypeName="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$l)" allocated="true" multiValued="false">
+                                 <sedVariable xml:id="_b281508a-99b9-4bfc-9526-721293f6411b" name="l" referenceTypeName="int">
+                                    <sedValue xml:id="_ab394438-35ef-4b4f-b649-0fb3a9f3907e" referenceTypeName="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$l)" allocated="true" multiValued="false">
                                     </sedValue>
                                  </sedVariable>
                               </sedValue>
                            </sedVariable>
-                           <sedVariable xml:id="_6e6bc6f2-c029-4d2f-8898-9bb70211b0ed" name="m" referenceTypeName="int">
-                              <sedValue xml:id="_2c8a35d0-045a-423c-b5cd-c8acbf7e4372" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
-                                 <relevantConstraint constraintIdRef="_f7e7735f-67f3-4182-909f-c799552bae10"/>
+                           <sedVariable xml:id="_5acbb049-4595-4211-8b0a-a121edf9fc13" name="m" referenceTypeName="int">
+                              <sedValue xml:id="_6bb153d2-5720-4beb-bae4-0e3fd79e0fe2" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
+                                 <relevantConstraint constraintIdRef="_c351a4db-7880-4aa6-9191-3210b674ae31"/>
                               </sedValue>
                            </sedVariable>
-                           <sedVariable xml:id="_80617eae-c423-4344-98d4-2cb31ef9fc13" name="exc" referenceTypeName="Null">
-                              <sedValue xml:id="_36ce9c8e-8f6a-43d1-bac4-93b05cfafed9" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                           <sedVariable xml:id="_80b1c60d-3140-448a-87d3-13230c3afa63" name="exc" referenceTypeName="Null">
+                              <sedValue xml:id="_6f228afe-616b-4bcb-9503-315b2d5e797b" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                               </sedValue>
                            </sedVariable>
-                           <sedVariable xml:id="_a6d9b5e6-0e2c-44b3-bbd5-86eb19977dc5" name="var" referenceTypeName="int">
-                              <sedValue xml:id="_5ca4ae5e-e71e-44ba-b64a-118b96d0e2c3" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
-                                 <relevantConstraint constraintIdRef="_34378e4d-0d9b-48b5-bea8-a512e0637a87"/>
+                           <sedVariable xml:id="_65e9f63b-b8e9-4051-95d6-311a99a1517c" name="var" referenceTypeName="int">
+                              <sedValue xml:id="_b0ee1b0d-8c47-40d6-83d3-22457aad32de" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
+                                 <relevantConstraint constraintIdRef="_c6b33b47-dc70-4aed-a9a7-79ede5ce3680"/>
                               </sedValue>
                            </sedVariable>
-                           <sedVariable xml:id="_d3236770-bf56-4f3d-b8a9-0aa5c6396a63" name="var_1" referenceTypeName="int">
-                              <sedValue xml:id="_bef8a7dc-64ae-452f-89f9-6fd7ef584102" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
-                                 <relevantConstraint constraintIdRef="_34378e4d-0d9b-48b5-bea8-a512e0637a87"/>
+                           <sedVariable xml:id="_e7edc74e-f7a1-4b82-bed0-3b876b677219" name="var_1" referenceTypeName="int">
+                              <sedValue xml:id="_ece8676c-3eff-47a2-baa8-c647d0e9ebbf" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
+                                 <relevantConstraint constraintIdRef="_c6b33b47-dc70-4aed-a9a7-79ede5ce3680"/>
                               </sedValue>
                            </sedVariable>
-                           <sedVariable xml:id="_aa4f6560-466f-48eb-b303-934575612552" name="heapBefore_mod" referenceTypeName="Heap">
-                              <sedValue xml:id="_ae339631-c3eb-4716-8a4b-4b3407a5e9e4" referenceTypeName="Heap" valueString="heapBefore_mod" allocated="true" multiValued="false">
+                           <sedVariable xml:id="_89d6554b-6ded-4822-b311-7c0c0742773f" name="heapBefore_mod" referenceTypeName="Heap">
+                              <sedValue xml:id="_7a72ba6d-895c-485f-8fcc-43a118ddccbc" referenceTypeName="Heap" valueString="heapBefore_mod" allocated="true" multiValued="false">
                               </sedValue>
                            </sedVariable>
-                           <sedVariable xml:id="_48b10e06-443f-472e-98aa-ac180878930e" name="heap" referenceTypeName="Heap">
-                              <sedValue xml:id="_f632937c-9e4b-4f9b-8867-7627563776da" referenceTypeName="Heap" valueString="heapAfter_mod" allocated="true" multiValued="false">
+                           <sedVariable xml:id="_029bd102-d4f7-4fcc-b045-5b3883b7f6ee" name="heap" referenceTypeName="Heap">
+                              <sedValue xml:id="_650c6e17-a641-4578-9320-68e6ce508214" referenceTypeName="Heap" valueString="heapAfter_mod" allocated="true" multiValued="false">
                               </sedValue>
                            </sedVariable>
-                           <sedCallStackEntry nodeIdRef="_849305fc-6ba9-456d-a467-7d4fe466ccdb"/>
-                           <sedMethodReturn xml:id="_04ac60d2-253f-4faf-b6b7-93ccaa1d8195" name="&lt;return of self.magic(m)&gt;" pathCondition="gt(m,Z(0(1(#))))" lineNumber="-1" charStart="345" charEnd="350" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java" methodReturnConditionRef="_ffdad07f-7923-45e6-a437-d6659766cab4">
-                              <constraint xml:id="_67ce0997-b894-4aa2-be47-cd70d6f0fa33" name="geq(m,Z(1(1(#))))"/>
-                              <constraint xml:id="_4a40fafe-0c95-4b96-a2ef-396bcda4e62a" name="wellFormed(heap)"/>
-                              <constraint xml:id="_b72de231-9fdc-4479-a7c3-48efaabc5da0" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
-                              <constraint xml:id="_c741801e-9582-4527-8ec1-5385048e363f" name="equals(MethodContract::exactInstance(self),TRUE)"/>
-                              <constraint xml:id="_1a02b97f-84d8-460b-80fb-4e631d79175d" name="wellFormed(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;)"/>
-                              <constraint xml:id="_a79a6a8d-220e-4565-9195-5da07e3f7bdf" name="equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod)"/>
-                              <constraint xml:id="_9fdde40f-ad97-4881-b58a-4964d5a33b95" name="equals(exc_0,null)"/>
-                              <constraint xml:id="_0288d831-b5b8-49ff-bd3c-e17b6a824eb8" name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
-                              <constraint xml:id="_75b9bc63-9c5d-4af4-8235-2c0f1c34d5aa" name="not(equals(self,null))"/>
-                              <sedVariable xml:id="_6481056a-0cb0-4bb4-8e93-4633b59eef6f" name="self" referenceTypeName="MethodContract">
-                                 <sedValue xml:id="_eca980a8-cfad-4523-98b7-9c4e1e6a86b6" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
-                                    <relevantConstraint constraintIdRef="_b72de231-9fdc-4479-a7c3-48efaabc5da0"/>
-                                    <relevantConstraint constraintIdRef="_c741801e-9582-4527-8ec1-5385048e363f"/>
-                                    <relevantConstraint constraintIdRef="_0288d831-b5b8-49ff-bd3c-e17b6a824eb8"/>
-                                    <relevantConstraint constraintIdRef="_75b9bc63-9c5d-4af4-8235-2c0f1c34d5aa"/>
-                                    <sedVariable xml:id="_532c343d-8aad-4f94-9cc8-cd2ae051defb" name="h1" referenceTypeName="int">
-                                       <sedValue xml:id="_776770f7-8b11-4691-b1fd-a169ed498ee9" referenceTypeName="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$h1)" allocated="true" multiValued="false">
+                           <sedCallStackEntry nodeIdRef="_8b56fb78-0653-4b8c-8eaa-fd46a7218172"/>
+                           <sedMethodReturn xml:id="_b27a439d-5146-43e6-a968-73324d1dc373" name="&lt;return of self.magic(m)&gt;" pathCondition="gt(m,Z(0(1(#))))" lineNumber="-1" charStart="345" charEnd="350" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java" methodReturnConditionRef="_b50e62b3-a166-40ef-90d6-b44dddddffb6">
+                              <constraint xml:id="_6a73f0ae-ebcc-469f-a858-3f47a830cba6" name="geq(m,Z(1(1(#))))"/>
+                              <constraint xml:id="_0f1ddcc7-209b-418e-a41f-6c8debffb53f" name="wellFormed(heap)"/>
+                              <constraint xml:id="_cd79448b-1ec7-4248-976c-f0f5f8775d0a" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+                              <constraint xml:id="_60ce038a-d167-4059-a6a4-a3846409db08" name="equals(MethodContract::exactInstance(self),TRUE)"/>
+                              <constraint xml:id="_d4ff4eff-c3a4-4baf-ae6d-21c191e3d8e7" name="wellFormed(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;)"/>
+                              <constraint xml:id="_80dc53e2-0572-4f42-9780-817b20a5a5bd" name="equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod)"/>
+                              <constraint xml:id="_1d41758c-987f-451e-9067-4050aaa2baf0" name="equals(exc_0,null)"/>
+                              <constraint xml:id="_d7a90342-351a-4b89-b6d9-745f39ce6ab0" name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
+                              <constraint xml:id="_9773a39a-6966-43c4-a3d5-acc1f9303317" name="not(equals(self,null))"/>
+                              <sedVariable xml:id="_aa388017-cd9f-4c6b-9458-5412140c5b02" name="self" referenceTypeName="MethodContract">
+                                 <sedValue xml:id="_527f2247-d36c-4f9f-a254-9672ebe4996c" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
+                                    <relevantConstraint constraintIdRef="_cd79448b-1ec7-4248-976c-f0f5f8775d0a"/>
+                                    <relevantConstraint constraintIdRef="_60ce038a-d167-4059-a6a4-a3846409db08"/>
+                                    <relevantConstraint constraintIdRef="_d7a90342-351a-4b89-b6d9-745f39ce6ab0"/>
+                                    <relevantConstraint constraintIdRef="_9773a39a-6966-43c4-a3d5-acc1f9303317"/>
+                                    <sedVariable xml:id="_ea492bc5-2893-4c90-b168-2bf739dba17f" name="h1" referenceTypeName="int">
+                                       <sedValue xml:id="_528e84e7-cec4-4a81-9f52-99aad97e1f5b" referenceTypeName="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$h1)" allocated="true" multiValued="false">
                                        </sedValue>
                                     </sedVariable>
-                                    <sedVariable xml:id="_dab43037-b3a9-4a7c-9cef-f6860246c9bb" name="h2" referenceTypeName="int">
-                                       <sedValue xml:id="_6edb8375-27c6-40e0-b47e-694cfc8877e1" referenceTypeName="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$h2)" allocated="true" multiValued="false">
+                                    <sedVariable xml:id="_cc6a1813-ed04-4d03-aff7-d0bc5bc3f26f" name="h2" referenceTypeName="int">
+                                       <sedValue xml:id="_b26d6092-b704-40f3-94be-9272f3abfcbf" referenceTypeName="int" valueString="int::select(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;,self,MethodContract::$h2)" allocated="true" multiValued="false">
                                        </sedValue>
                                     </sedVariable>
-                                    <sedVariable xml:id="_19b8a66f-21df-4e16-8512-cfa3121f57d1" name="l" referenceTypeName="int">
-                                       <sedValue xml:id="_6e38c23e-818c-4a84-b644-4691561d9fa2" referenceTypeName="int" valueString="result" allocated="true" multiValued="false">
-                                          <relevantConstraint constraintIdRef="_0288d831-b5b8-49ff-bd3c-e17b6a824eb8"/>
+                                    <sedVariable xml:id="_78eda465-0be6-4754-8d23-7bfd274f4df0" name="l" referenceTypeName="int">
+                                       <sedValue xml:id="_4a9df20a-5246-4261-aca2-e36f98961044" referenceTypeName="int" valueString="result" allocated="true" multiValued="false">
+                                          <relevantConstraint constraintIdRef="_d7a90342-351a-4b89-b6d9-745f39ce6ab0"/>
                                        </sedValue>
                                     </sedVariable>
                                  </sedValue>
                               </sedVariable>
-                              <sedVariable xml:id="_3e69910a-de4d-4fd7-ad07-8cdea7e8fadd" name="m" referenceTypeName="int">
-                                 <sedValue xml:id="_c51ccacc-1f6b-4a7f-a0d5-2e3d906e94b8" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
-                                    <relevantConstraint constraintIdRef="_67ce0997-b894-4aa2-be47-cd70d6f0fa33"/>
+                              <sedVariable xml:id="_960388cd-2866-46f7-aec6-39e92844dca4" name="m" referenceTypeName="int">
+                                 <sedValue xml:id="_0a373f45-54c9-4a7b-a95a-17447ba70376" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
+                                    <relevantConstraint constraintIdRef="_6a73f0ae-ebcc-469f-a858-3f47a830cba6"/>
                                  </sedValue>
                               </sedVariable>
-                              <sedVariable xml:id="_f36e5235-5b3f-4935-ada8-17f6009e75d2" name="exc" referenceTypeName="Null">
-                                 <sedValue xml:id="_001cefab-f13e-4b66-a2aa-43f6c4f21735" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                              <sedVariable xml:id="_548e290f-19b1-4928-aab6-40d78d528cec" name="exc" referenceTypeName="Null">
+                                 <sedValue xml:id="_e4a06af9-391b-4a3b-b1bb-6b711d0e57d6" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                                  </sedValue>
                               </sedVariable>
-                              <sedCallStateVariable xml:id="_f977742c-c58a-4a4e-af57-7935042be7cd" name="self" referenceTypeName="MethodContract">
-                                 <sedValue xml:id="_68e39a6b-c02e-4c97-8a49-1a8a757bc441" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
-                                    <relevantConstraint constraintIdRef="_b72de231-9fdc-4479-a7c3-48efaabc5da0"/>
-                                    <relevantConstraint constraintIdRef="_c741801e-9582-4527-8ec1-5385048e363f"/>
-                                    <relevantConstraint constraintIdRef="_0288d831-b5b8-49ff-bd3c-e17b6a824eb8"/>
-                                    <relevantConstraint constraintIdRef="_75b9bc63-9c5d-4af4-8235-2c0f1c34d5aa"/>
-                                    <sedVariable xml:id="_a5dd93e8-82eb-490c-8ddd-2d061f70dde9" name="h1" referenceTypeName="int">
-                                       <sedValue xml:id="_6c107a8a-0fd0-435a-a28d-10eed0471fdf" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
-                                          <relevantConstraint constraintIdRef="_0288d831-b5b8-49ff-bd3c-e17b6a824eb8"/>
+                              <sedCallStateVariable xml:id="_4b387eda-ae7e-45f1-a208-4be6b4c77297" name="self" referenceTypeName="MethodContract">
+                                 <sedValue xml:id="_49fe203d-6ad1-47a2-89cd-9b8e59372ed4" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
+                                    <relevantConstraint constraintIdRef="_cd79448b-1ec7-4248-976c-f0f5f8775d0a"/>
+                                    <relevantConstraint constraintIdRef="_60ce038a-d167-4059-a6a4-a3846409db08"/>
+                                    <relevantConstraint constraintIdRef="_d7a90342-351a-4b89-b6d9-745f39ce6ab0"/>
+                                    <relevantConstraint constraintIdRef="_9773a39a-6966-43c4-a3d5-acc1f9303317"/>
+                                    <sedVariable xml:id="_0f50013b-8069-45ec-a4f1-2c74bb5336af" name="h1" referenceTypeName="int">
+                                       <sedValue xml:id="_954b6901-f26b-47d9-860c-5887a810f4ce" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
+                                          <relevantConstraint constraintIdRef="_d7a90342-351a-4b89-b6d9-745f39ce6ab0"/>
                                        </sedValue>
                                     </sedVariable>
-                                    <sedVariable xml:id="_1d72a310-da82-4e45-ab65-23c4ff089fa8" name="h2" referenceTypeName="int">
-                                       <sedValue xml:id="_416e59ce-6030-405a-b59b-c22e7aeb7c56" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
-                                          <relevantConstraint constraintIdRef="_0288d831-b5b8-49ff-bd3c-e17b6a824eb8"/>
+                                    <sedVariable xml:id="_4eb14bd9-96bc-432f-8321-a058e7e7f072" name="h2" referenceTypeName="int">
+                                       <sedValue xml:id="_37336c37-1f0e-4f81-a77d-7cfc89693ce7" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
+                                          <relevantConstraint constraintIdRef="_d7a90342-351a-4b89-b6d9-745f39ce6ab0"/>
                                        </sedValue>
                                     </sedVariable>
-                                    <sedVariable xml:id="_f6fa543f-00e5-4d16-b9a5-3fa1a3bb9713" name="l" referenceTypeName="int">
-                                       <sedValue xml:id="_96c5424b-adb7-4da1-9b19-c21aae2b91d5" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$l)" allocated="true" multiValued="false">
+                                    <sedVariable xml:id="_7613b120-e6ba-4a1e-9ca7-515cd229ea52" name="l" referenceTypeName="int">
+                                       <sedValue xml:id="_ee3b8178-0019-4f9e-a01e-0db91485196c" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$l)" allocated="true" multiValued="false">
                                        </sedValue>
                                     </sedVariable>
                                  </sedValue>
                               </sedCallStateVariable>
-                              <sedCallStateVariable xml:id="_2bf85316-4a44-4b56-b6ca-507d9d1bea93" name="m" referenceTypeName="int">
-                                 <sedValue xml:id="_29842c9e-c0bb-4a3b-a1cb-a46482183a46" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
-                                    <relevantConstraint constraintIdRef="_67ce0997-b894-4aa2-be47-cd70d6f0fa33"/>
+                              <sedCallStateVariable xml:id="_ff419335-961c-436a-ad25-ea7c350251a0" name="m" referenceTypeName="int">
+                                 <sedValue xml:id="_95ee96bd-b19c-4e1e-b4d8-b68ef5d7dda5" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
+                                    <relevantConstraint constraintIdRef="_6a73f0ae-ebcc-469f-a858-3f47a830cba6"/>
                                  </sedValue>
                               </sedCallStateVariable>
-                              <sedCallStateVariable xml:id="_5b8f4585-d054-4fa1-81d0-91358a3e9189" name="exc" referenceTypeName="Null">
-                                 <sedValue xml:id="_0f20deff-ea49-4950-b470-bbe4a79ee67c" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                              <sedCallStateVariable xml:id="_fbe971ca-964a-4f8e-a3e5-23fb131bc8e4" name="exc" referenceTypeName="Null">
+                                 <sedValue xml:id="_664b83e8-d587-430a-97bb-c512b7811a24" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                                  </sedValue>
                               </sedCallStateVariable>
-                              <sedCallStateVariable xml:id="_bdd39a0e-5635-4f88-8548-cd5a8b342478" name="heapBefore_magic" referenceTypeName="Heap">
-                                 <sedValue xml:id="_57d60063-e9d4-4f66-9023-7c7554460244" referenceTypeName="Heap" valueString="heap" allocated="true" multiValued="false">
-                                    <relevantConstraint constraintIdRef="_4a40fafe-0c95-4b96-a2ef-396bcda4e62a"/>
-                                    <relevantConstraint constraintIdRef="_b72de231-9fdc-4479-a7c3-48efaabc5da0"/>
-                                    <relevantConstraint constraintIdRef="_a79a6a8d-220e-4565-9195-5da07e3f7bdf"/>
-                                    <relevantConstraint constraintIdRef="_0288d831-b5b8-49ff-bd3c-e17b6a824eb8"/>
+                              <sedCallStateVariable xml:id="_060ac577-42e4-42b5-b378-8701c15db9df" name="heapBefore_magic" referenceTypeName="Heap">
+                                 <sedValue xml:id="_34136dbf-388f-469e-a23b-a718dc23c8d4" referenceTypeName="Heap" valueString="heap" allocated="true" multiValued="false">
+                                    <relevantConstraint constraintIdRef="_0f1ddcc7-209b-418e-a41f-6c8debffb53f"/>
+                                    <relevantConstraint constraintIdRef="_cd79448b-1ec7-4248-976c-f0f5f8775d0a"/>
+                                    <relevantConstraint constraintIdRef="_80dc53e2-0572-4f42-9780-817b20a5a5bd"/>
+                                    <relevantConstraint constraintIdRef="_d7a90342-351a-4b89-b6d9-745f39ce6ab0"/>
                                  </sedValue>
                               </sedCallStateVariable>
-                              <sedCallStateVariable xml:id="_c4cfbf48-6535-47d5-bf27-a4eee03821bb" name="savedHeapBefore_magic" referenceTypeName="Heap">
-                                 <sedValue xml:id="_3eed3180-357d-4213-840e-b65126846641" referenceTypeName="Heap" valueString="savedHeap" allocated="true" multiValued="false">
+                              <sedCallStateVariable xml:id="_03156b1c-0fe7-4bf8-8071-5d8cd001b17e" name="savedHeapBefore_magic" referenceTypeName="Heap">
+                                 <sedValue xml:id="_69c1f065-36a7-40b7-9b66-ee82d776323f" referenceTypeName="Heap" valueString="savedHeap" allocated="true" multiValued="false">
                                  </sedValue>
                               </sedCallStateVariable>
-                              <sedCallStackEntry nodeIdRef="_849305fc-6ba9-456d-a467-7d4fe466ccdb"/>
-                              <sedTermination xml:id="_4f4b46a3-1dbf-41d0-847d-dbd861ccfad2" name="&lt;end&gt;" pathCondition="gt(m,Z(0(1(#))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java" verified="true">
-                                 <constraint xml:id="_14b743eb-94c9-4899-8647-8af8894dd6a2" name="geq(m,Z(1(1(#))))"/>
-                                 <constraint xml:id="_48781bc7-900d-4f19-a421-8bde37f2a350" name="wellFormed(heap)"/>
-                                 <constraint xml:id="_ea000720-e31c-4685-afb5-ddaaec0b9a57" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
-                                 <constraint xml:id="_bfe6c8d9-d130-4ac6-bd20-faefeccbc86f" name="equals(MethodContract::exactInstance(self),TRUE)"/>
-                                 <constraint xml:id="_4614019f-70e8-493f-b18e-1913aa75875e" name="wellFormed(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;)"/>
-                                 <constraint xml:id="_444c13a3-6dcb-4b69-8ac1-3aacfda72f2b" name="equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod)"/>
-                                 <constraint xml:id="_15ef0912-d514-458a-9631-05a73e54dfcd" name="equals(exc_0,null)"/>
-                                 <constraint xml:id="_53b9b9b0-c610-477a-ad31-9772f956bd0b" name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
-                                 <constraint xml:id="_e2e4999b-e7d8-4bcc-9797-b7a558f04ee5" name="not(equals(self,null))"/>
-                                 <sedVariable xml:id="_ee3b9ea4-3eea-491b-b1d4-17b3b6d95750" name="exc" referenceTypeName="Null">
-                                    <sedValue xml:id="_ae9ce1e1-013b-402d-ba20-a9f49d87ed26" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                              <sedCallStackEntry nodeIdRef="_8b56fb78-0653-4b8c-8eaa-fd46a7218172"/>
+                              <sedTermination xml:id="_0a49e727-dcfe-4011-965d-08cca0901489" name="&lt;end&gt;" pathCondition="gt(m,Z(0(1(#))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java" verified="true">
+                                 <constraint xml:id="_76c82064-d840-4d4c-b828-351af1cbc20c" name="geq(m,Z(1(1(#))))"/>
+                                 <constraint xml:id="_4ba10990-4d78-4603-9286-53845496d86f" name="wellFormed(heap)"/>
+                                 <constraint xml:id="_140ee2b1-90c9-4661-bd73-5666560104c1" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+                                 <constraint xml:id="_8d9b547f-0f7f-4cdb-864c-88bd005c8e8f" name="equals(MethodContract::exactInstance(self),TRUE)"/>
+                                 <constraint xml:id="_77094191-53cd-4ac5-9a9e-150a4799a982" name="wellFormed(anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;)"/>
+                                 <constraint xml:id="_ef1b1fc2-5702-4746-a655-b72e3481b14f" name="equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod)"/>
+                                 <constraint xml:id="_42f6f7d8-4041-4e58-9fec-e29c28177eea" name="equals(exc_0,null)"/>
+                                 <constraint xml:id="_2f5d3c21-31f4-44b5-b759-70a694cfbd2f" name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
+                                 <constraint xml:id="_291718ed-8f21-4b42-9cbc-74a9a281f108" name="not(equals(self,null))"/>
+                                 <sedVariable xml:id="_392906db-504d-4cd5-a156-66ceb432b259" name="exc" referenceTypeName="Null">
+                                    <sedValue xml:id="_75a7b08d-3f37-4ab1-b994-18f5d2f7eceb" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                                     </sedValue>
                                  </sedVariable>
                               </sedTermination>
-                              <sedGroupEndConditionReference nodeIdRef="_ffdad07f-7923-45e6-a437-d6659766cab4"/>
+                              <sedGroupEndConditionReference nodeIdRef="_b50e62b3-a166-40ef-90d6-b44dddddffb6"/>
                            </sedMethodReturn>
                         </sedBranchCondition>
                      </sedMethodContract>
-                     <sedGroupEndConditionReference nodeIdRef="_38da6e8d-8fe2-4fa0-9568-737f0602fb8d"/>
+                     <sedGroupEndConditionReference nodeIdRef="_871cd2ce-8589-4457-960e-2f3ab528b765"/>
                   </sedStatement>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_d930bec9-c60c-41ee-bdaa-74e04c12ef29" name="lt(m,Z(1(1(#))))" pathCondition="lt(m,Z(1(1(#))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
-                  <constraint xml:id="_90973af4-3681-42fd-a322-4e9403a829cc" name="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(gt(m,Z(0(1(#)))),TRUE,FALSE))),equals(x,FALSE))"/>
-                  <constraint xml:id="_79b28bc0-640e-41f3-b47c-fa8f0d7c46a9" name="wellFormed(heap)"/>
-                  <constraint xml:id="_e3e3da4c-9b58-462e-a282-91bf432476ea" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
-                  <constraint xml:id="_fea060fc-05df-44e2-afc6-cbcd1f15b092" name="equals(MethodContract::exactInstance(self),TRUE)"/>
-                  <constraint xml:id="_02a5dc92-d115-49f1-8524-b972a3253a99" name="not(equals(self,null))"/>
-                  <sedVariable xml:id="_a5052d77-6093-4088-a9be-722218509aed" name="self" referenceTypeName="MethodContract">
-                     <sedValue xml:id="_78b17317-19f7-4053-8da2-9a4db71797bf" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
-                        <relevantConstraint constraintIdRef="_e3e3da4c-9b58-462e-a282-91bf432476ea"/>
-                        <relevantConstraint constraintIdRef="_fea060fc-05df-44e2-afc6-cbcd1f15b092"/>
-                        <relevantConstraint constraintIdRef="_02a5dc92-d115-49f1-8524-b972a3253a99"/>
-                        <sedVariable xml:id="_f138b6c3-f2fe-42ad-9b8a-f27a2c620682" name="h1" referenceTypeName="int">
-                           <sedValue xml:id="_95f2cf4d-d19e-407b-bda0-fc7e69901993" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
+               <sedBranchCondition xml:id="_847f0a15-4271-4b8d-968c-ff36c470a0e4" name="lt(m,Z(1(1(#))))" pathCondition="lt(m,Z(1(1(#))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
+                  <constraint xml:id="_73193b69-6829-43e9-8cfd-74a7dcc4c3cb" name="update-application(parallel-upd(elem-update(exc)(null),elem-update(x)(if-then-else(gt(m,Z(0(1(#)))),TRUE,FALSE))),equals(x,FALSE))"/>
+                  <constraint xml:id="_1795bc94-8c41-4553-9adc-75c41bfdce48" name="wellFormed(heap)"/>
+                  <constraint xml:id="_1dc2eb3a-8cde-430b-b7e0-f66cfa955292" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+                  <constraint xml:id="_755c814f-bf94-46bd-a9fc-60500bc9d68b" name="equals(MethodContract::exactInstance(self),TRUE)"/>
+                  <constraint xml:id="_598e80a9-0833-4835-861e-52af5e819bb1" name="not(equals(self,null))"/>
+                  <sedVariable xml:id="_ea8fb1cb-e6a5-42c8-a91e-8c3c998ed281" name="self" referenceTypeName="MethodContract">
+                     <sedValue xml:id="_fcbc9fa1-c3be-41d5-8ba9-9850bb14e102" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
+                        <relevantConstraint constraintIdRef="_1dc2eb3a-8cde-430b-b7e0-f66cfa955292"/>
+                        <relevantConstraint constraintIdRef="_755c814f-bf94-46bd-a9fc-60500bc9d68b"/>
+                        <relevantConstraint constraintIdRef="_598e80a9-0833-4835-861e-52af5e819bb1"/>
+                        <sedVariable xml:id="_207ebf6b-2a19-4be5-8fed-d34a0623d157" name="h1" referenceTypeName="int">
+                           <sedValue xml:id="_96006289-5748-47c7-9530-71e767a3d443" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
                            </sedValue>
                         </sedVariable>
-                        <sedVariable xml:id="_a53dd7cd-3fd9-4575-895d-64506890e103" name="h2" referenceTypeName="int">
-                           <sedValue xml:id="_924f461d-b352-4a5d-8cfb-b956f8eea3bc" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
+                        <sedVariable xml:id="_da6008df-4fd6-4c6b-a017-7496fa225a19" name="h2" referenceTypeName="int">
+                           <sedValue xml:id="_1ce4668f-4315-4aa0-aa13-9fead6c18fb9" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
                            </sedValue>
                         </sedVariable>
-                        <sedVariable xml:id="_4063f0c6-c1df-4206-808b-4501d75152c1" name="l" referenceTypeName="int">
-                           <sedValue xml:id="_9738c311-592e-4c04-aa2e-33d2600fba53" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$l)" allocated="true" multiValued="false">
+                        <sedVariable xml:id="_3a10cf60-e070-44ab-87c8-933fb6821a71" name="l" referenceTypeName="int">
+                           <sedValue xml:id="_91ac0ed8-7fbc-432c-b039-500e2a32c19e" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$l)" allocated="true" multiValued="false">
                            </sedValue>
                         </sedVariable>
                      </sedValue>
                   </sedVariable>
-                  <sedVariable xml:id="_ae24734e-32e4-46a3-88e2-09df15766813" name="m" referenceTypeName="int">
-                     <sedValue xml:id="_3fe22a3d-2938-4527-aeef-de7a742519fb" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
-                        <relevantConstraint constraintIdRef="_90973af4-3681-42fd-a322-4e9403a829cc"/>
+                  <sedVariable xml:id="_ba22f46a-ccf3-46e7-9d83-b09e65ee36da" name="m" referenceTypeName="int">
+                     <sedValue xml:id="_b0b8bc12-2085-4252-97c9-81fa3b961430" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
+                        <relevantConstraint constraintIdRef="_73193b69-6829-43e9-8cfd-74a7dcc4c3cb"/>
                      </sedValue>
                   </sedVariable>
-                  <sedVariable xml:id="_817bf3e7-cca9-4461-9c6f-100d5453e620" name="exc" referenceTypeName="Null">
-                     <sedValue xml:id="_60704376-ce1d-4bd5-af8e-8a9a336af283" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                  <sedVariable xml:id="_3cebe2d6-78aa-489f-ad40-22264914cdad" name="exc" referenceTypeName="Null">
+                     <sedValue xml:id="_7b20c843-7bb3-4bc9-bd28-4973ef5fef3d" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                      </sedValue>
                   </sedVariable>
-                  <sedVariable xml:id="_ab8418d1-55fc-4fdb-be93-e8efcf21a81e" name="x" referenceTypeName="boolean">
-                     <sedValue xml:id="_9c41dc05-6bf1-4090-a999-27f9f70d82ab" referenceTypeName="boolean" valueString="FALSE" allocated="true" multiValued="false">
+                  <sedVariable xml:id="_3edf2c15-dcb0-4a03-867a-883c531cee1e" name="x" referenceTypeName="boolean">
+                     <sedValue xml:id="_3d8fc8d7-19b3-498e-9d4d-067b7201614d" referenceTypeName="boolean" valueString="FALSE" allocated="true" multiValued="false">
                      </sedValue>
                   </sedVariable>
-                  <sedCallStackEntry nodeIdRef="_849305fc-6ba9-456d-a467-7d4fe466ccdb"/>
-                  <sedStatement xml:id="_bee8ae37-5340-4783-bb6b-774e62701215" name="this.l=6;" pathCondition="lt(m,Z(1(1(#))))" lineNumber="-1" charStart="367" charEnd="434" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
-                     <constraint xml:id="_5c9dfe70-6e35-4070-b8d3-0f5280ae5068" name="leq(m,Z(0(1(#))))"/>
-                     <constraint xml:id="_aa29ed15-f300-41a8-a145-4c1d8eb866b4" name="wellFormed(heap)"/>
-                     <constraint xml:id="_62cc5008-b391-4389-a8f0-9fb4ff9e6399" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
-                     <constraint xml:id="_851278dc-e697-4b94-83b2-873b1f950536" name="equals(MethodContract::exactInstance(self),TRUE)"/>
-                     <constraint xml:id="_e9c3f3e4-9284-44a4-be9c-51f7ad54bb46" name="not(equals(self,null))"/>
-                     <sedVariable xml:id="_f768a845-13e8-4ecf-8142-f7390ea2d858" name="self" referenceTypeName="MethodContract">
-                        <sedValue xml:id="_cada19c2-983a-45bf-9bc4-6cfa704f3a7a" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
-                           <relevantConstraint constraintIdRef="_62cc5008-b391-4389-a8f0-9fb4ff9e6399"/>
-                           <relevantConstraint constraintIdRef="_851278dc-e697-4b94-83b2-873b1f950536"/>
-                           <relevantConstraint constraintIdRef="_e9c3f3e4-9284-44a4-be9c-51f7ad54bb46"/>
-                           <sedVariable xml:id="_eb195258-e3ed-4062-add8-04eeedbf8872" name="h1" referenceTypeName="int">
-                              <sedValue xml:id="_ee51a53f-c9d0-405b-ab74-5f4dab40cd91" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
+                  <sedCallStackEntry nodeIdRef="_8b56fb78-0653-4b8c-8eaa-fd46a7218172"/>
+                  <sedStatement xml:id="_fbc40478-0b59-4446-9739-aa163bac43de" name="this.l=6;" pathCondition="lt(m,Z(1(1(#))))" lineNumber="-1" charStart="367" charEnd="434" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
+                     <constraint xml:id="_316081d4-7533-43b0-b140-5c542fe7a534" name="leq(m,Z(0(1(#))))"/>
+                     <constraint xml:id="_a12fab33-0f56-48b3-b178-4b833a762ede" name="wellFormed(heap)"/>
+                     <constraint xml:id="_ea347f79-aacf-42c5-b311-589735a7ed15" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+                     <constraint xml:id="_d5ad03ac-5485-4239-a563-7737435e24eb" name="equals(MethodContract::exactInstance(self),TRUE)"/>
+                     <constraint xml:id="_32e4caa6-1a51-490d-b0ea-2310cec3c91c" name="not(equals(self,null))"/>
+                     <sedVariable xml:id="_240e3b44-9db1-4275-83fa-963c325a4430" name="self" referenceTypeName="MethodContract">
+                        <sedValue xml:id="_26adedde-0bc2-4196-b2ec-7d9b59cd43e5" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
+                           <relevantConstraint constraintIdRef="_ea347f79-aacf-42c5-b311-589735a7ed15"/>
+                           <relevantConstraint constraintIdRef="_d5ad03ac-5485-4239-a563-7737435e24eb"/>
+                           <relevantConstraint constraintIdRef="_32e4caa6-1a51-490d-b0ea-2310cec3c91c"/>
+                           <sedVariable xml:id="_e753fcb0-f83c-478c-9d1d-0d327192175a" name="h1" referenceTypeName="int">
+                              <sedValue xml:id="_88a447cc-a49d-4924-a5a1-acdbd74ca627" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
                               </sedValue>
                            </sedVariable>
-                           <sedVariable xml:id="_31a8f5be-8de7-4156-b99e-d9d72385bbb6" name="h2" referenceTypeName="int">
-                              <sedValue xml:id="_8f739b42-da4b-4188-993c-38ea1a127f87" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
+                           <sedVariable xml:id="_a4dcee44-f49e-46c8-b54f-ad60c34a4206" name="h2" referenceTypeName="int">
+                              <sedValue xml:id="_3b738e12-207d-427a-8f04-988ffc6cbb38" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
                               </sedValue>
                            </sedVariable>
-                           <sedVariable xml:id="_5cc847ea-82b0-4b80-b191-388dfbd70fdb" name="l" referenceTypeName="int">
-                              <sedValue xml:id="_738cc960-31dc-48e2-86b0-301a1e312471" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$l)" allocated="true" multiValued="false">
+                           <sedVariable xml:id="_d7bd9d19-cb3f-476e-b342-99c920f74b7c" name="l" referenceTypeName="int">
+                              <sedValue xml:id="_5971dadd-07d6-457f-9b79-692e273e2b70" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$l)" allocated="true" multiValued="false">
                               </sedValue>
                            </sedVariable>
                         </sedValue>
                      </sedVariable>
-                     <sedVariable xml:id="_f2dd072a-f4c3-4b68-9b17-de4e33848cef" name="m" referenceTypeName="int">
-                        <sedValue xml:id="_b1364592-8401-4e78-8465-dcd66e20df84" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
-                           <relevantConstraint constraintIdRef="_5c9dfe70-6e35-4070-b8d3-0f5280ae5068"/>
+                     <sedVariable xml:id="_2a7d6f37-9928-4db9-abbb-41acd3d96fcb" name="m" referenceTypeName="int">
+                        <sedValue xml:id="_050cdc61-88d1-45b4-a2a7-e1789dcfca90" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
+                           <relevantConstraint constraintIdRef="_316081d4-7533-43b0-b140-5c542fe7a534"/>
                         </sedValue>
                      </sedVariable>
-                     <sedVariable xml:id="_acc5d062-9384-49c2-8cf6-23dab68b6d56" name="exc" referenceTypeName="Null">
-                        <sedValue xml:id="_7f318cef-103c-47bf-9479-186d176759ac" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                     <sedVariable xml:id="_5c09505b-15a9-47b2-941a-a1c4eb161e6f" name="exc" referenceTypeName="Null">
+                        <sedValue xml:id="_20799caf-572d-434d-b629-167413539ddc" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                         </sedValue>
                      </sedVariable>
-                     <sedCallStackEntry nodeIdRef="_849305fc-6ba9-456d-a467-7d4fe466ccdb"/>
-                     <sedMethodReturn xml:id="_7d55b675-eb44-4589-a45d-a7ff918c6f2f" name="&lt;return of self.magic(m)&gt;" pathCondition="lt(m,Z(1(1(#))))" lineNumber="-1" charStart="345" charEnd="350" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java" methodReturnConditionRef="_9a387ff8-ab98-4e0b-8658-396e9feddafb">
-                        <constraint xml:id="_610c7026-4b6a-4914-8ce0-b8c87b6e5e06" name="leq(m,Z(0(1(#))))"/>
-                        <constraint xml:id="_66eae740-2bcb-4aa2-9da9-c3f0fc59a064" name="wellFormed(heap)"/>
-                        <constraint xml:id="_5ecc73dd-6575-4cc1-a363-d5b33d57e53e" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
-                        <constraint xml:id="_18a45f77-e86e-41a5-a597-a85ccdf40ac4" name="equals(MethodContract::exactInstance(self),TRUE)"/>
-                        <constraint xml:id="_cd857675-6374-4d89-96e9-769cc46d34cd" name="not(equals(self,null))"/>
-                        <sedVariable xml:id="_1b3e8f8e-0376-4be4-896b-8798930c56fe" name="self" referenceTypeName="MethodContract">
-                           <sedValue xml:id="_76d48bc9-eac7-46cc-82f9-de837e4b9d26" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
-                              <relevantConstraint constraintIdRef="_5ecc73dd-6575-4cc1-a363-d5b33d57e53e"/>
-                              <relevantConstraint constraintIdRef="_18a45f77-e86e-41a5-a597-a85ccdf40ac4"/>
-                              <relevantConstraint constraintIdRef="_cd857675-6374-4d89-96e9-769cc46d34cd"/>
-                              <sedVariable xml:id="_c8e11c08-dc23-4102-b8dc-9208215fb3ea" name="h1" referenceTypeName="int">
-                                 <sedValue xml:id="_9f546bdc-fbdd-4481-a438-f2d9a4bddf0b" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
+                     <sedCallStackEntry nodeIdRef="_8b56fb78-0653-4b8c-8eaa-fd46a7218172"/>
+                     <sedMethodReturn xml:id="_fc99e5d0-fb1b-4991-9d43-1dba89d8eb87" name="&lt;return of self.magic(m)&gt;" pathCondition="lt(m,Z(1(1(#))))" lineNumber="-1" charStart="345" charEnd="350" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java" methodReturnConditionRef="_4ec750a4-f711-4772-ab7b-cffffd73b3fb">
+                        <constraint xml:id="_da6cab52-0415-4d9f-b99d-d77b099b1ba6" name="leq(m,Z(0(1(#))))"/>
+                        <constraint xml:id="_984d5a71-00ce-4594-a53e-570372161f75" name="wellFormed(heap)"/>
+                        <constraint xml:id="_2ffc4ec5-bd32-40da-8304-f5e2a909bcd9" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+                        <constraint xml:id="_53c0d0cc-6356-402d-9bfc-d10e242a9062" name="equals(MethodContract::exactInstance(self),TRUE)"/>
+                        <constraint xml:id="_d541ba61-1ab2-4ee5-9b6f-4cbc65be1e53" name="not(equals(self,null))"/>
+                        <sedVariable xml:id="_44864a1d-b915-46d8-9195-faf67d04a5a8" name="self" referenceTypeName="MethodContract">
+                           <sedValue xml:id="_f34a4f04-17d4-4363-ba84-84e9adb7797f" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
+                              <relevantConstraint constraintIdRef="_2ffc4ec5-bd32-40da-8304-f5e2a909bcd9"/>
+                              <relevantConstraint constraintIdRef="_53c0d0cc-6356-402d-9bfc-d10e242a9062"/>
+                              <relevantConstraint constraintIdRef="_d541ba61-1ab2-4ee5-9b6f-4cbc65be1e53"/>
+                              <sedVariable xml:id="_4e2440c2-5f67-4f16-9b7a-68e9da3cc2f3" name="h1" referenceTypeName="int">
+                                 <sedValue xml:id="_10bbeadf-88a3-4061-8f61-73d0d0c37685" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
                                  </sedValue>
                               </sedVariable>
-                              <sedVariable xml:id="_63517336-446b-44b9-abc5-259adf7569c4" name="h2" referenceTypeName="int">
-                                 <sedValue xml:id="_73047c0b-0299-4a2f-8987-4d9ea2953bc8" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
+                              <sedVariable xml:id="_0dc7403a-f2b7-407b-8f31-d7064324eb3c" name="h2" referenceTypeName="int">
+                                 <sedValue xml:id="_4075b06c-58f0-46a6-a464-14f5a94d62d9" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
                                  </sedValue>
                               </sedVariable>
-                              <sedVariable xml:id="_f8bcc04e-8660-49fd-a3af-2735aad4866b" name="l" referenceTypeName="int">
-                                 <sedValue xml:id="_2b356480-0aae-40b4-a0e7-97d7096f6ea6" referenceTypeName="int" valueString="Z(6(#))" allocated="true" multiValued="false">
+                              <sedVariable xml:id="_2d353c09-20b7-4927-8577-5229e202a771" name="l" referenceTypeName="int">
+                                 <sedValue xml:id="_bce6bd8c-71a0-4931-b522-efe1968e3c19" referenceTypeName="int" valueString="Z(6(#))" allocated="true" multiValued="false">
                                  </sedValue>
                               </sedVariable>
                            </sedValue>
                         </sedVariable>
-                        <sedVariable xml:id="_b1f77a82-0d16-4886-9219-49e2c31a1d98" name="m" referenceTypeName="int">
-                           <sedValue xml:id="_822b9e78-37f7-4581-92a6-039c84c4e193" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
-                              <relevantConstraint constraintIdRef="_610c7026-4b6a-4914-8ce0-b8c87b6e5e06"/>
+                        <sedVariable xml:id="_f7ec49c1-b648-4b65-818f-cbc9889c1e84" name="m" referenceTypeName="int">
+                           <sedValue xml:id="_b4e446bd-dee2-4614-a5fb-0cafdaf79c69" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
+                              <relevantConstraint constraintIdRef="_da6cab52-0415-4d9f-b99d-d77b099b1ba6"/>
                            </sedValue>
                         </sedVariable>
-                        <sedVariable xml:id="_0a2a3fa5-ff36-40bc-91ee-a020e2d77242" name="exc" referenceTypeName="Null">
-                           <sedValue xml:id="_7522c8f1-b2b3-49c1-af0c-460f8ef8d1e3" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                        <sedVariable xml:id="_12866043-9f06-4153-b145-248353e715c6" name="exc" referenceTypeName="Null">
+                           <sedValue xml:id="_0acae617-c264-48e8-97ae-6b91bc5c0266" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                            </sedValue>
                         </sedVariable>
-                        <sedCallStateVariable xml:id="_a868f085-3103-405a-9584-df0d34b4651c" name="self" referenceTypeName="MethodContract">
-                           <sedValue xml:id="_0bcfeeaa-7841-4015-8a06-7e2f44daea9d" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
-                              <relevantConstraint constraintIdRef="_5ecc73dd-6575-4cc1-a363-d5b33d57e53e"/>
-                              <relevantConstraint constraintIdRef="_18a45f77-e86e-41a5-a597-a85ccdf40ac4"/>
-                              <relevantConstraint constraintIdRef="_cd857675-6374-4d89-96e9-769cc46d34cd"/>
-                              <sedVariable xml:id="_19acf6dc-832a-41b5-bf08-71c6fd550c23" name="h1" referenceTypeName="int">
-                                 <sedValue xml:id="_9b579f94-4d29-4851-b326-cd5eb4c2a4c2" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
+                        <sedCallStateVariable xml:id="_c75abe8b-ea20-48ec-8e8c-5f81ce5e8ea7" name="self" referenceTypeName="MethodContract">
+                           <sedValue xml:id="_055bcf5e-d21b-4244-8ed9-a064c0dd731f" referenceTypeName="MethodContract" valueString="self" allocated="true" multiValued="false">
+                              <relevantConstraint constraintIdRef="_2ffc4ec5-bd32-40da-8304-f5e2a909bcd9"/>
+                              <relevantConstraint constraintIdRef="_53c0d0cc-6356-402d-9bfc-d10e242a9062"/>
+                              <relevantConstraint constraintIdRef="_d541ba61-1ab2-4ee5-9b6f-4cbc65be1e53"/>
+                              <sedVariable xml:id="_4a549d32-acbb-4a8a-b978-ca1db6e76702" name="h1" referenceTypeName="int">
+                                 <sedValue xml:id="_ca713857-e728-4095-a493-73a9062f366f" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h1)" allocated="true" multiValued="false">
                                  </sedValue>
                               </sedVariable>
-                              <sedVariable xml:id="_2b1481c1-996c-4ec6-aa6d-324338ad010b" name="h2" referenceTypeName="int">
-                                 <sedValue xml:id="_df536683-b781-4c1f-bc49-c1e99d0e926c" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
+                              <sedVariable xml:id="_b3f8a4f0-9d57-472e-b3ca-62a254c1a1bb" name="h2" referenceTypeName="int">
+                                 <sedValue xml:id="_8d84a1db-a31a-4e82-a3e0-930acfe010d4" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$h2)" allocated="true" multiValued="false">
                                  </sedValue>
                               </sedVariable>
-                              <sedVariable xml:id="_bd9a83b2-1eb1-4eec-969b-8b8c828eb6ad" name="l" referenceTypeName="int">
-                                 <sedValue xml:id="_10133f2f-05bc-4123-af0a-43148f985c51" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$l)" allocated="true" multiValued="false">
+                              <sedVariable xml:id="_31a21a2d-3649-48ad-9ce1-61eab7220b16" name="l" referenceTypeName="int">
+                                 <sedValue xml:id="_737b7ad5-c08b-4437-9e84-09f6b7280e4b" referenceTypeName="int" valueString="int::select(heap,self,MethodContract::$l)" allocated="true" multiValued="false">
                                  </sedValue>
                               </sedVariable>
                            </sedValue>
                         </sedCallStateVariable>
-                        <sedCallStateVariable xml:id="_6f295aae-fdb1-4330-a326-41ddd6235555" name="m" referenceTypeName="int">
-                           <sedValue xml:id="_1c9033ec-8873-4699-97f3-5a6382fa18ad" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
-                              <relevantConstraint constraintIdRef="_610c7026-4b6a-4914-8ce0-b8c87b6e5e06"/>
+                        <sedCallStateVariable xml:id="_c118e048-5d8a-4cb8-bddd-5542bd67a7b1" name="m" referenceTypeName="int">
+                           <sedValue xml:id="_5def73b5-adfa-4945-9b44-3c421b3adc39" referenceTypeName="int" valueString="m" allocated="true" multiValued="false">
+                              <relevantConstraint constraintIdRef="_da6cab52-0415-4d9f-b99d-d77b099b1ba6"/>
                            </sedValue>
                         </sedCallStateVariable>
-                        <sedCallStateVariable xml:id="_98db3729-87f3-4ad3-b5f3-2a99e46bb207" name="exc" referenceTypeName="Null">
-                           <sedValue xml:id="_ad19b754-1e38-4e06-b3c4-dc370868b61f" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                        <sedCallStateVariable xml:id="_0f287e1d-0325-4c1f-acf7-865074de9004" name="exc" referenceTypeName="Null">
+                           <sedValue xml:id="_282fa2a0-c2f7-41a4-adf3-f925595b6d11" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                            </sedValue>
                         </sedCallStateVariable>
-                        <sedCallStateVariable xml:id="_85a625f4-ac18-48c4-a16d-e91cec76cdf5" name="heapBefore_magic" referenceTypeName="Heap">
-                           <sedValue xml:id="_2af84cd5-34c4-4c20-ac2d-1b5868f48f39" referenceTypeName="Heap" valueString="heap" allocated="true" multiValued="false">
-                              <relevantConstraint constraintIdRef="_66eae740-2bcb-4aa2-9da9-c3f0fc59a064"/>
-                              <relevantConstraint constraintIdRef="_5ecc73dd-6575-4cc1-a363-d5b33d57e53e"/>
+                        <sedCallStateVariable xml:id="_a5e1204a-26cc-4659-bd0a-175b25c63335" name="heapBefore_magic" referenceTypeName="Heap">
+                           <sedValue xml:id="_4f834465-7c6e-4ac9-8806-924ffe14db86" referenceTypeName="Heap" valueString="heap" allocated="true" multiValued="false">
+                              <relevantConstraint constraintIdRef="_984d5a71-00ce-4594-a53e-570372161f75"/>
+                              <relevantConstraint constraintIdRef="_2ffc4ec5-bd32-40da-8304-f5e2a909bcd9"/>
                            </sedValue>
                         </sedCallStateVariable>
-                        <sedCallStateVariable xml:id="_2a64b159-dd1e-4954-885f-80580393b061" name="savedHeapBefore_magic" referenceTypeName="Heap">
-                           <sedValue xml:id="_3e734666-27dd-4e39-802b-6c4bea78d3da" referenceTypeName="Heap" valueString="savedHeap" allocated="true" multiValued="false">
+                        <sedCallStateVariable xml:id="_5024ee29-aa4c-420b-937d-7a4d7c99a887" name="savedHeapBefore_magic" referenceTypeName="Heap">
+                           <sedValue xml:id="_d696c8b2-3220-4c10-929b-a3332bed4b4d" referenceTypeName="Heap" valueString="savedHeap" allocated="true" multiValued="false">
                            </sedValue>
                         </sedCallStateVariable>
-                        <sedCallStackEntry nodeIdRef="_849305fc-6ba9-456d-a467-7d4fe466ccdb"/>
-                        <sedTermination xml:id="_7ab0845b-490e-4229-8265-26b06915e661" name="&lt;end&gt;" pathCondition="lt(m,Z(1(1(#))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java" verified="true">
-                           <constraint xml:id="_d5160053-afe0-4de6-bb64-34c89f3a02c3" name="leq(m,Z(0(1(#))))"/>
-                           <constraint xml:id="_e42c00d8-5b34-4e11-b92f-93258e702455" name="wellFormed(heap)"/>
-                           <constraint xml:id="_dfe9d237-902d-4a3c-bc0a-856a7aaa9b0d" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
-                           <constraint xml:id="_bb8df58e-5c99-4a4a-93c1-ceae3c1a9874" name="equals(MethodContract::exactInstance(self),TRUE)"/>
-                           <constraint xml:id="_15ec45bf-39e4-45d0-bc42-98798ed637cb" name="not(equals(self,null))"/>
-                           <sedVariable xml:id="_ef5173d5-51d2-4064-a197-a85f00caecf7" name="exc" referenceTypeName="Null">
-                              <sedValue xml:id="_702de62e-3698-4c99-b1d6-b0e008e2026d" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                        <sedCallStackEntry nodeIdRef="_8b56fb78-0653-4b8c-8eaa-fd46a7218172"/>
+                        <sedTermination xml:id="_19ffd387-1fa4-4cc7-a1f7-fcaa0d9b7687" name="&lt;end&gt;" pathCondition="lt(m,Z(1(1(#))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java" verified="true">
+                           <constraint xml:id="_72fdd178-3129-42ef-88a0-59bd8786dcb7" name="leq(m,Z(0(1(#))))"/>
+                           <constraint xml:id="_93e9694a-3911-48d9-bad9-bc94178af673" name="wellFormed(heap)"/>
+                           <constraint xml:id="_8350baec-df0a-486c-8d07-43b2a803c030" name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+                           <constraint xml:id="_3b1a86f9-e4cf-4c46-a0dd-34e1099af6fe" name="equals(MethodContract::exactInstance(self),TRUE)"/>
+                           <constraint xml:id="_c201d14d-8b2d-4b50-ab57-58ddb0b0fc5d" name="not(equals(self,null))"/>
+                           <sedVariable xml:id="_b60c0d2f-a93e-4c68-962d-7edf29b87e70" name="exc" referenceTypeName="Null">
+                              <sedValue xml:id="_3c78b8d8-6cdb-4dff-aab9-2c196c5eb041" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                               </sedValue>
                            </sedVariable>
                         </sedTermination>
-                        <sedGroupEndConditionReference nodeIdRef="_9a387ff8-ab98-4e0b-8658-396e9feddafb"/>
+                        <sedGroupEndConditionReference nodeIdRef="_4ec750a4-f711-4772-ab7b-cffffd73b3fb"/>
                      </sedMethodReturn>
-                     <sedGroupEndConditionReference nodeIdRef="_a597ef65-f3a9-41d1-a3c1-6fc96c38a56a"/>
+                     <sedGroupEndConditionReference nodeIdRef="_05c1963b-3950-444c-889c-f12702efe2a2"/>
                   </sedStatement>
                </sedBranchCondition>
-               <sedGroupEndCondition xml:id="_38da6e8d-8fe2-4fa0-9568-737f0602fb8d" name="gt(m,Z(0(1(#))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                  <sedChildReference nodeIdRef="_6432f3a7-84c5-4207-8aad-68a6b359d207"/>
+               <sedGroupEndCondition xml:id="_871cd2ce-8589-4457-960e-2f3ab528b765" name="gt(m,Z(0(1(#))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
+                  <sedCallStackEntry nodeIdRef="_8b56fb78-0653-4b8c-8eaa-fd46a7218172"/>
+                  <sedChildReference nodeIdRef="_0900e6b3-52da-4456-ad13-afb6d736e0b0"/>
                </sedGroupEndCondition>
-               <sedGroupEndCondition xml:id="_a597ef65-f3a9-41d1-a3c1-6fc96c38a56a" name="lt(m,Z(1(1(#))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                  <sedChildReference nodeIdRef="_bee8ae37-5340-4783-bb6b-774e62701215"/>
+               <sedGroupEndCondition xml:id="_05c1963b-3950-444c-889c-f12702efe2a2" name="lt(m,Z(1(1(#))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
+                  <sedCallStackEntry nodeIdRef="_8b56fb78-0653-4b8c-8eaa-fd46a7218172"/>
+                  <sedChildReference nodeIdRef="_fbc40478-0b59-4446-9739-aa163bac43de"/>
                </sedGroupEndCondition>
             </sedBranchStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_ffdad07f-7923-45e6-a437-d6659766cab4" name="gt(m,Z(0(1(#))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-               <sedChildReference nodeIdRef="_04ac60d2-253f-4faf-b6b7-93ccaa1d8195"/>
+            <sedMethodCallMethodReturnCondition xml:id="_b50e62b3-a166-40ef-90d6-b44dddddffb6" name="gt(m,Z(0(1(#))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
+               <sedChildReference nodeIdRef="_b27a439d-5146-43e6-a968-73324d1dc373"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_9a387ff8-ab98-4e0b-8658-396e9feddafb" name="lt(m,Z(1(1(#))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-               <sedChildReference nodeIdRef="_7d55b675-eb44-4589-a45d-a7ff918c6f2f"/>
+            <sedMethodCallMethodReturnCondition xml:id="_4ec750a4-f711-4772-ab7b-cffffd73b3fb" name="lt(m,Z(1(1(#))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
+               <sedChildReference nodeIdRef="_fc99e5d0-fb1b-4991-9d43-1dba89d8eb87"/>
             </sedMethodCallMethodReturnCondition>
-            <sedGroupEndCondition xml:id="_ffdad07f-7923-45e6-a437-d6659766cab4" name="gt(m,Z(0(1(#))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-               <sedChildReference nodeIdRef="_04ac60d2-253f-4faf-b6b7-93ccaa1d8195"/>
+            <sedGroupEndCondition xml:id="_b50e62b3-a166-40ef-90d6-b44dddddffb6" name="gt(m,Z(0(1(#))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
+               <sedChildReference nodeIdRef="_b27a439d-5146-43e6-a968-73324d1dc373"/>
             </sedGroupEndCondition>
-            <sedGroupEndCondition xml:id="_9a387ff8-ab98-4e0b-8658-396e9feddafb" name="lt(m,Z(1(1(#))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-               <sedChildReference nodeIdRef="_7d55b675-eb44-4589-a45d-a7ff918c6f2f"/>
+            <sedGroupEndCondition xml:id="_4ec750a4-f711-4772-ab7b-cffffd73b3fb" name="lt(m,Z(1(1(#))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract\src\MethodContract.java">
+               <sedChildReference nodeIdRef="_fc99e5d0-fb1b-4991-9d43-1dba89d8eb87"/>
             </sedGroupEndCondition>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_4f4b46a3-1dbf-41d0-847d-dbd861ccfad2"/>
-         <sedTerminationEntry nodeIdRef="_7ab0845b-490e-4229-8265-26b06915e661"/>
+         <sedTerminationEntry nodeIdRef="_0a49e727-dcfe-4011-965d-08cca0901489"/>
+         <sedTerminationEntry nodeIdRef="_19ffd387-1fa4-4cc7-a1f7-fcaa0d9b7687"/>
       </sedThread>
    </sedTarget>
 </launch>
