@@ -13,7 +13,7 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
    @Override
    public List<Change> refactorFieldRename(final JavaElementIdentifier elem,
          final IASTNode contentNode) {
-      contentNode.
+
       return Collections.emptyList();
    }
 }
