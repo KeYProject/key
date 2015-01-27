@@ -1,5 +1,9 @@
 package org.key_project.jmlediting.ui.preferencepages;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
@@ -8,8 +12,6 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jdt.internal.ui.preferences.PropertyAndPreferencePage;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -23,7 +25,7 @@ import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper.ColorProperty;
  * page to show in project settings or global preferences. The page allows the
  * user to select the colors
  *
- * @author Lisa Eisenhardt
+ * @author Thomas Glaser, Moritz Lichter, Lisa Eisenhardt
  *
  */
 @SuppressWarnings("restriction")
@@ -46,10 +48,12 @@ public class JMLColorPreferencePage extends PropertyAndPreferencePage {
     */
    private final IPreferenceChangeListener currentPreferenceListener;
 
+   private final Map<ColorProperty, ColorSelector> colorSelectorMap;
+
    /**
     * A {@link ColorSelector} which selects the Color for the JML-Comments.
     */
-   private ColorSelector commentColorSelector;
+   // private ColorSelector commentColorSelector;
 
    /**
     * Creates a new {@link JMLProfilePropertiesPage}.
@@ -64,6 +68,7 @@ public class JMLColorPreferencePage extends PropertyAndPreferencePage {
          }
 
       };
+      this.colorSelectorMap = new HashMap<JMLUiPreferencesHelper.ColorProperty, ColorSelector>();
    }
 
    @Override
@@ -91,16 +96,19 @@ public class JMLColorPreferencePage extends PropertyAndPreferencePage {
 
       myComposite.setLayout(layout);
 
-      GridData data;
+      for (final ColorProperty property : ColorProperty.values()) {
+         final Label label = new Label(myComposite, SWT.NONE);
+         label.setText(property.getPropertyName() + ":");
 
-      data = new GridData();
-      final Label label = new Label(myComposite, SWT.NONE);
-      label.setText("Choose JML comment color:");
-      label.setLayoutData(data);
+         final ColorSelector colorSelector = new ColorSelector(myComposite);
+         // Make selector available in SWT bot tests
+         colorSelector.getButton()
+               .setData(TEST_KEY, property.getPropertyName());
+         colorSelector.getButton().setData(colorSelector);
 
-      this.commentColorSelector = new ColorSelector(myComposite);
-      this.commentColorSelector.getButton().setData(TEST_KEY, "CommentColor");
-      this.commentColorSelector.getButton().setData(this.commentColorSelector);
+         this.colorSelectorMap.put(property, colorSelector);
+
+      }
 
       this.updateValues();
 
@@ -113,14 +121,15 @@ public class JMLColorPreferencePage extends PropertyAndPreferencePage {
     * the pane is used for preferences or properties).
     */
    private void updateValues() {
-      if (this.commentColorSelector.getButton().isDisposed()) {
-         return;
+      for (final Entry<ColorProperty, ColorSelector> propertyEntry : this.colorSelectorMap
+            .entrySet()) {
+         final ColorSelector selector = propertyEntry.getValue();
+         if (selector.getButton().isDisposed()) {
+            continue;
+         }
+         selector.setColorValue(JMLUiPreferencesHelper
+               .getWorkspaceJMLColor(propertyEntry.getKey()));
       }
-
-      final RGB color = JMLUiPreferencesHelper
-            .getWorkspaceJMLColor(ColorProperty.COMMENT);
-
-      this.commentColorSelector.setColorValue(color);
    }
 
    @Override
@@ -146,8 +155,11 @@ public class JMLColorPreferencePage extends PropertyAndPreferencePage {
 
    @Override
    public void performDefaults() {
-      this.commentColorSelector.setColorValue(ColorProperty.COMMENT
-            .getDefaultColor());
+      for (final Entry<ColorProperty, ColorSelector> propertyEntry : this.colorSelectorMap
+            .entrySet()) {
+         propertyEntry.getValue().setColorValue(
+               propertyEntry.getKey().getDefaultColor());
+      }
       super.performDefaults();
 
    }
@@ -165,8 +177,11 @@ public class JMLColorPreferencePage extends PropertyAndPreferencePage {
    @Override
    public boolean performOk() {
       // Remove preference listener
-      JMLUiPreferencesHelper.setDefaultJMLColor(
-            this.commentColorSelector.getColorValue(), ColorProperty.COMMENT);
+      for (final Entry<ColorProperty, ColorSelector> propertyEntry : this.colorSelectorMap
+            .entrySet()) {
+         JMLUiPreferencesHelper.setDefaultJMLColor(propertyEntry.getValue()
+               .getColorValue(), propertyEntry.getKey());
+      }
 
       InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID)
             .removePreferenceChangeListener(this.currentPreferenceListener);

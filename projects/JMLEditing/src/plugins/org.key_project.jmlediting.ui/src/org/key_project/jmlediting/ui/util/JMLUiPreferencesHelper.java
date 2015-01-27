@@ -22,40 +22,59 @@ public final class JMLUiPreferencesHelper {
     *
     */
    public static enum ColorProperty {
+
       /**
        * The general color for the comment.
        */
-      COMMENT {
-         @Override
-         public RGB getDefaultColor() {
-            return new RGB(85, 80, 10);
-         }
-      },
+      COMMENT(new RGB(85, 80, 10), "JML Comment Color"),
       /**
        * The color for toplevel keywords.
        */
-      TOPLEVEL_KEYWORD {
-         @Override
-         public RGB getDefaultColor() {
-            return new RGB(200, 0, 100);
-         }
-      },
+      TOPLEVEL_KEYWORD(new RGB(200, 0, 100), "JML Toplevel Keyword Color"),
       /**
        * The color for all other keywords.
        */
-      KEYWORD {
-         @Override
-         public RGB getDefaultColor() {
-            return new RGB(100, 0, 200);
-         }
-      };
+      KEYWORD(new RGB(100, 0, 200), "JML Keyword Color");
+
+      /**
+       * The default value.
+       */
+      private final RGB defaultValue;
+      /**
+       * The property name.
+       */
+      private final String name;
+
+      /**
+       * Creates a new ColorProperty.
+       * 
+       * @param defaultValue
+       *           default value
+       * @param name
+       *           name
+       */
+      private ColorProperty(final RGB defaultValue, final String name) {
+         this.defaultValue = defaultValue;
+         this.name = name;
+      }
 
       /**
        * Returns the default color for this property.
        *
        * @return the default color
        */
-      public abstract RGB getDefaultColor();
+      public RGB getDefaultColor() {
+         return this.defaultValue;
+      }
+
+      /**
+       * Returns the name of the property.
+       * 
+       * @return the property name
+       */
+      public String getPropertyName() {
+         return this.name;
+      }
    }
 
    /**
@@ -93,7 +112,7 @@ public final class JMLUiPreferencesHelper {
 
    /**
     * Resets the active color for the given property to default.
-    * 
+    *
     * @param property
     *           the property to reset.
     */

@@ -86,7 +86,8 @@ public class JMLColorPreferencePageTest {
     */
    private void setCommentColorButton() {
       this.commentColorButton = bot.buttonWithId(
-            JMLColorPreferencePage.TEST_KEY, "CommentColor");
+            JMLColorPreferencePage.TEST_KEY,
+            ColorProperty.COMMENT.getPropertyName());
    }
 
    private void navigateToJMLColorSettings() {

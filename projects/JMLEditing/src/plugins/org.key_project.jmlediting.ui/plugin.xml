@@ -71,7 +71,7 @@
             category="org.key_project.jmlediting.ui.preferences.jml"
             class="org.key_project.jmlediting.ui.preferencepages.JMLColorPreferencePage"
             id="org.key_project.jmlediting.ui.preferences.color"
-            name="Color">
+            name="Colors">
       </page>
    </extension>
 
