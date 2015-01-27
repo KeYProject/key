@@ -85,6 +85,10 @@ public abstract class JoinWithLatticeAbstraction extends JoinRule {
             rightSide2 = tb.var(v);
          }
          
+         //TODO: Preserve idempotency! Make at least syntactical check
+         //      for equivalence of right sides, and if equivalent, preserve
+         //      the initial right side.
+         
          AbstractDomainLattice<?> lattice = getAbstractDomainForSort(v.sort(), services);
          
          if (lattice != null) {

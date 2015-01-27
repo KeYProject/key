@@ -63,6 +63,14 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionStateWithProgCnt;
  */
 public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
 
+   /**
+    * If set to true, join rules are expected to check the equivalence
+    * for right sides (for preserving idempotency) only on a pure syntactical
+    * basis. If set to false, they are allowed to do a proof to check the
+    * equivalence in the respective contexts.
+    */
+   protected static final boolean RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL = true;
+   
    @Override
    public ImmutableList<Goal> apply(Goal goal, final Services services,
          RuleApp ruleApp) throws RuleAbortException {

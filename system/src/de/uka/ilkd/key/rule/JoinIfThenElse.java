@@ -49,8 +49,9 @@ public class JoinIfThenElse extends JoinRule {
    
    private static final String DISPLAY_NAME = "JoinByIfThenElse";
    private static final Name RULE_NAME = new Name(DISPLAY_NAME);
-   private static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
+   static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
 
+   @SuppressWarnings("unused")
    @Override
    protected SymbolicExecutionState joinStates(
          SymbolicExecutionState state1,
@@ -99,7 +100,11 @@ public class JoinIfThenElse extends JoinRule {
          // about 8-10 on, or sometimes even earlier.
          if (rightSide1.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING &&
              rightSide2.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING &&
-             !proofClosed) {
+             !proofClosed &&
+             !JoinRule.RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL) {
+            
+            //TODO: The following code appears in several join rules.
+            //      Could be extracted to avoid redundancy.
 
             // Create the predicate term
             final Name predicateSymbName = new Name(tb.newName("P"));

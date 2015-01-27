@@ -49,6 +49,7 @@ public class JoinIfThenElseAntecedent extends JoinRule {
    private static final Name RULE_NAME = new Name(DISPLAY_NAME);
    private static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
 
+   @SuppressWarnings("unused")
    @Override
    protected SymbolicExecutionState joinStates(
          SymbolicExecutionState state1,
@@ -97,7 +98,11 @@ public class JoinIfThenElseAntecedent extends JoinRule {
          // about 8-10 on, or sometimes even earlier.
          if (rightSide1.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING &&
              rightSide2.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING &&
-             !proofClosed) {
+             !proofClosed &&
+             !JoinRule.RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL) {
+            
+            //TODO: The following code appears in several join rules.
+            //      Could be extracted to avoid redundancy.
             
             Term predicateTerm = tb.func(new Function(new Name("P"), Sort.FORMULA, v.sort()), tb.var(v));
             Term appl1 = tb.apply(state1.first, predicateTerm);
