@@ -26,7 +26,7 @@ import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
 @SuppressWarnings("restriction")
 public class JMLStoreRefProposer {
    private final JavaContentAssistInvocationContext context;
-   private ITypeBinding initialType;
+   private ITypeBinding declaringType;
 
    public JMLStoreRefProposer(final JavaContentAssistInvocationContext context) {
       super();
@@ -43,9 +43,20 @@ public class JMLStoreRefProposer {
       ast.accept(finder);
       final List<TypeDeclaration> decls = finder.getDecls();
       final TypeDeclaration topDecl = decls.get(0);
+      TypeDeclaration activeTypeDecl = null;
+      for (final TypeDeclaration decl : decls) {
+         final int end = decl.getStartPosition() + decl.getLength();
+         if (decl.getStartPosition() <= this.context.getInvocationOffset()
+               && end >= this.context.getInvocationOffset()) {
+            activeTypeDecl = decl;
+         }
+      }
 
-      final ITypeBinding activeType = topDecl.resolveBinding();
-      this.initialType = activeType;
+      final ITypeBinding activeType = activeTypeDecl.resolveBinding();
+      this.declaringType = topDecl.resolveBinding();
+      System.out.println("declaring: " + this.declaringType.getName());
+      System.out.println("active: " + activeType.getName());
+      System.out.println("activeIsNested?" + activeType.isNested());
       final IASTNode node;
       final List<IASTNode> restNodes;
       final boolean allowKeywords;
@@ -65,6 +76,7 @@ public class JMLStoreRefProposer {
 
       final String prefix = JMLCompletionUtil.computePrefix(this.context, node);
 
+      // TODO check for ArrayIndices
       if (prefix != null && prefix.isEmpty() && allowKeywords) {
          result.addAll(JMLCompletionUtil.getKeywordProposals(this.context,
                null, null, IStoreRefKeyword.class));
@@ -91,7 +103,7 @@ public class JMLStoreRefProposer {
       // cut the prefix to the cursor position
       final String prefix = JMLCompletionUtil.computePrefix(this.context, node);
 
-      final JMLJavaResolver resolver = new JMLJavaResolver(this.initialType,
+      final JMLJavaResolver resolver = new JMLJavaResolver(this.declaringType,
             activeType);
 
       // if prefix != null the cursor is in or before the currentNode ->
@@ -103,7 +115,6 @@ public class JMLStoreRefProposer {
          if (prefix.equals("*")) {
             return result;
          }
-         // TODO check for ArrayIndices
 
          final List<IVariableBinding> vars = resolver
                .getAllVisibleVariableBindings();
