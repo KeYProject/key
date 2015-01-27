@@ -66,4 +66,10 @@ public interface IKeYSEDDebugNode<E extends IExecutionNode<?>> extends ISEDDebug
     * @param parent The new parent to set.
     */
    public void setParent(ISEDDebugNode parent);
+   
+   /**
+    * Checks if truth value evaluation is enabled or not.
+    * @return {@code true} enabled, {@code false} disabled.
+    */
+   public boolean isTruthValueEvaluationEnabled();
 }

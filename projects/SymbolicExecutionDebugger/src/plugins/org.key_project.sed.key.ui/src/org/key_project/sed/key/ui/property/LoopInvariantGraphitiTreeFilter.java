@@ -17,6 +17,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.platform.AbstractPropertySectionFilter;
 import org.eclipse.jface.viewers.IFilter;
 import org.eclipse.ui.IWorkbenchPart;
+import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
@@ -34,7 +35,8 @@ public class LoopInvariantGraphitiTreeFilter extends AbstractPropertySectionFilt
       if (part != null) {
          LoopInvariantGraphitiPropertySection section = new LoopInvariantGraphitiPropertySection();
          section.setInput(part, null);
-         return section.getDebugNode(pe) != null;
+         IKeYSEDDebugNode<?> node = section.getDebugNode(pe);
+         return node != null && node.isTruthValueEvaluationEnabled();
       }
       else {
          return false;

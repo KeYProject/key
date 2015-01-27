@@ -14,6 +14,7 @@
 package org.key_project.sed.key.ui.property;
 
 import org.eclipse.jface.viewers.IFilter;
+import org.key_project.sed.key.core.model.IKeYTerminationNode;
 
 /**
  * {@link IFilter} implementation used to define if a {@link PostconditionPropertySection}
@@ -26,6 +27,7 @@ public class PostconditionTreeFilter implements IFilter {
     */
    @Override
    public boolean select(Object toTest) {
-      return PostconditionPropertySection.getDebugNode(toTest) != null;
+      IKeYTerminationNode<?> node = PostconditionPropertySection.getDebugNode(toTest);
+      return node != null && node.isTruthValueEvaluationEnabled();
    }
 }

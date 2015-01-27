@@ -198,6 +198,7 @@ public class EqualityConstraint implements Constraint {
 	                                  this, 
 	                                  null,
 	                                  null,
+	                                  null,
 	                                  null);
 	p.execPostOrder ( srVisitor );
 	return srVisitor.getTerm ();
