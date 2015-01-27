@@ -59,6 +59,11 @@ public interface IKeyword {
    List<ICompletionProposal> createAutoProposals(IASTNode node,
          JavaContentAssistInvocationContext context);
 
+   /**
+    * Creates an IKeywordContentRefactorer with the given Input.
+    *
+    * @return an IKeywordContentRefactorer
+    */
    IKeywordContentRefactorer createRefactorer();
 
 }

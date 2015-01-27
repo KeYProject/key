@@ -152,10 +152,9 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
                      }
                   }
                   catch (final ParserException e) {
-                     // Invalid JML Code, do syntax coloring with the recovered
-                     // node
-                     parseResult = e.getErrorNode();
-                     // --> abort
+                     // Parse Error, Refactoring in this JML Comment can not be
+                     // provided
+                     return null;
                   }
 
                }
