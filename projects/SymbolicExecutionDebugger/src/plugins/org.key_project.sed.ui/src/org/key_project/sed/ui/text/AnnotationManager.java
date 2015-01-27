@@ -33,6 +33,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.sourcesummary.ISEDSourceModel;
 import org.key_project.sed.core.sourcesummary.ISEDSourceRange;
@@ -310,9 +311,11 @@ public class AnnotationManager implements IDisposable {
       if (annotatedDebugTargets != null) {
          for (DebugEvent event : events) {
             if (DebugEvent.SUSPEND == event.getKind() && 
-                event.getSource() instanceof ISEDDebugTarget &&
-                annotatedDebugTargets.contains(event.getSource())) {
-               updateAnnotations((ISEDDebugTarget)event.getSource());
+                event.getSource() instanceof ISEDDebugElement) {
+               ISEDDebugTarget target = ((ISEDDebugElement) event.getSource()).getDebugTarget();
+               if (annotatedDebugTargets.contains(target)) {
+                  updateAnnotations(target);
+               }
             }
          }
       }

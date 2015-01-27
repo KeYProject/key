@@ -230,10 +230,10 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
     */
    @Override
    public void setFocus() {
-      if (isEditorShown()) {
+      if (isEditorShown() && editorPart != null) {
          editorPart.setFocus();
       }
-      else if (isMessageShown()) {
+      else if (isMessageShown() && messageLabel != null) {
          messageLabel.setFocus();
       }
       else {

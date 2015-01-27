@@ -433,8 +433,10 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
                KeYMethodCall methodCall = getMethodCall();
                methodReturnCondition = new SEDMemoryBranchCondition(getDebugTarget(), methodCall, getThread());
                methodReturnCondition.addChild(this);
+               methodReturnCondition.setCallStack(KeYModelUtil.createCallStack(methodCall.getDebugTarget(), methodCall.getExecutionNode().getCallStack()));
                methodReturnCondition.setName(executionNode.getFormatedMethodReturnCondition());
                methodReturnCondition.setPathCondition(methodCall.getPathCondition());
+               methodReturnCondition.setSourcePath(methodCall.getSourcePath());
             }
             return methodReturnCondition;
          }
