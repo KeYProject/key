@@ -30,6 +30,7 @@ import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
+import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper.ColorProperty;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
@@ -84,15 +85,15 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
    @Override
    public void createPresentation(final TextPresentation presentation,
          final ITypedRegion damage) {
-      final RGB jmlColor = JMLUiPreferencesHelper.getWorkspaceJMLColor();
+      final RGB jmlColor = JMLUiPreferencesHelper
+            .getWorkspaceJMLColor(ColorProperty.COMMENT);
       final CommentLocator locator = new CommentLocator(this.doc.get());
       final CommentRange surroundingComment = locator.getJMLComment(damage
             .getOffset());
       final TextAttribute ta;
       if (surroundingComment != null) {
          // JML Comment
-         ta = new TextAttribute(new Color(Display.getDefault(), jmlColor.red,
-               jmlColor.green, jmlColor.blue));
+         ta = new TextAttribute(new Color(Display.getCurrent(), jmlColor));
          this.modifyPresentationForJMLComment(presentation, ta,
                surroundingComment);
       }
@@ -230,36 +231,34 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
    private StyleRange[] doKeywordHighlighting(
          final StyleRange defaultStyleRange, final TextAttribute attr,
          final IASTNode parseResult, final CommentRange surroundingComment) {
+      // Colors for keywords
+      final Color toplevelKeywordColor = new Color(Display.getCurrent(),
+            JMLUiPreferencesHelper
+                  .getWorkspaceJMLColor(ColorProperty.TOPLEVEL_KEYWORD));
+      final Color keywordColor = new Color(Display.getCurrent(),
+            JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.KEYWORD));
 
+      // List of all keywords and list for a style for each keyword
       final List<IKeywordNode> allKeywords = Nodes.getAllKeywords(parseResult);
-      int lastEnd = surroundingComment.getBeginOffset();
       final List<StyleRange> styles = new ArrayList<StyleRange>();
-      final Color keywordColor = new Color(
-            defaultStyleRange.foreground.getDevice(), 200, 0, 100);
-      final Color quantifierColor = new Color(
-            defaultStyleRange.foreground.getDevice(), 100, 0, 200);
+
+      // Create the styles
       for (final IKeywordNode kNode : allKeywords) {
+         // Determine color for keyword
+         final Color color;
+         if (kNode.getKeyword() instanceof IToplevelKeyword) {
+            color = toplevelKeywordColor;
+         }
+         else {
+            color = keywordColor;
+         }
+         // Create style in bold for keyword
          final int keywordStartOffset = kNode.getStartOffset();
          final int keywordEndOffset = kNode.getEndOffset();
-         // Style between last and current Keyword (or from comment
-         // begin until the start of first Keyword)
-         styles.add(new StyleRange(lastEnd, keywordStartOffset - lastEnd,
-               defaultStyleRange.foreground, defaultStyleRange.background, attr
-                     .getStyle()));
-         // Style for the Keyword
-         Color kColor = quantifierColor;
-         if (kNode.getKeyword() instanceof IToplevelKeyword) {
-            kColor = keywordColor;
-         }
          styles.add(new StyleRange(keywordStartOffset, keywordEndOffset
-               - keywordStartOffset, kColor, defaultStyleRange.background,
+               - keywordStartOffset, color, defaultStyleRange.background,
                SWT.BOLD));
-         lastEnd = keywordEndOffset;
       }
-      // Adding Style after last Keyword
-      styles.add(new StyleRange(lastEnd, surroundingComment.getEndOffset()
-            - lastEnd + 1, defaultStyleRange.foreground,
-            defaultStyleRange.background, attr.getStyle()));
       // Transfer to Array
       return styles.toArray(new StyleRange[styles.size()]);
    }

@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.key_project.jmlediting.ui.preferencepages.JMLColorPreferencePage;
 import org.key_project.jmlediting.ui.test.UITestUtils;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
+import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper.ColorProperty;
 
 /**
  * Testingplan:
@@ -77,12 +78,11 @@ public class JMLColorPreferencePageTest {
 
    @AfterClass
    public static void resetColor() {
-      JMLUiPreferencesHelper.setDefaultJMLColor(JMLUiPreferencesHelper
-            .getDefaultJMLColor());
+      JMLUiPreferencesHelper.resetToDefault(ColorProperty.COMMENT);
    }
 
-   /*
-    * needed for setting the Color
+   /**
+    * needed for setting the Color.
     */
    private void setCommentColorButton() {
       this.commentColorButton = bot.buttonWithId(
@@ -133,18 +133,19 @@ public class JMLColorPreferencePageTest {
    public void testColorSettings() {
       // first check whether the ColorSelector shows the right color at the
       // beginning.
-      this.checkColor(JMLUiPreferencesHelper.getWorkspaceJMLColor());
+      this.checkColor(JMLUiPreferencesHelper
+            .getWorkspaceJMLColor(ColorProperty.COMMENT));
 
       RGB testColor = new RGB(255, 0, 0);
       this.setColor(testColor);
       bot.button("Apply").click();
       assertEquals("Not the right JML-Color was set.", testColor,
-            JMLUiPreferencesHelper.getWorkspaceJMLColor());
+            JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.COMMENT));
       bot.button("Restore Defaults").click();
       bot.button("Apply").click();
       assertEquals("Restore Default JML Color did not work.",
-            JMLUiPreferencesHelper.getDefaultJMLColor(),
-            JMLUiPreferencesHelper.getWorkspaceJMLColor());
+            ColorProperty.COMMENT.getDefaultColor(),
+            JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.COMMENT));
 
       // final test
       testColor = new RGB(0, 255, 0);
@@ -152,7 +153,8 @@ public class JMLColorPreferencePageTest {
       bot.button("OK").click();
       bot.sleep(100);
       this.openGlobalJMLColorSettings();
-      this.checkColor(JMLUiPreferencesHelper.getWorkspaceJMLColor());
+      this.checkColor(JMLUiPreferencesHelper
+            .getWorkspaceJMLColor(ColorProperty.COMMENT));
       this.checkColor(testColor);
 
       bot.button("OK").click();

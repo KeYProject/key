@@ -8,7 +8,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.key_project.jmlediting.ui.Activator;
 
 /**
- * This class provides Methods to manipulate the JML Preferences for the UI
+ * This class provides Methods to manipulate the JML Preferences for the UI.
  *
  * @author Thomas Glaser
  *
@@ -16,63 +16,115 @@ import org.key_project.jmlediting.ui.Activator;
 public final class JMLUiPreferencesHelper {
 
    /**
-    * The name of the JML profile property of a project.
+    * This enum specifies all available color properties.
+    *
+    * @author Moritz Lichter
+    *
     */
-   public static final String JML_COMMENT_COLOR_KEY = "org.key_project.jmleiditing.ui.CommentColor";
+   public static enum ColorProperty {
+      /**
+       * The general color for the comment.
+       */
+      COMMENT {
+         @Override
+         public RGB getDefaultColor() {
+            return new RGB(85, 80, 10);
+         }
+      },
+      /**
+       * The color for toplevel keywords.
+       */
+      TOPLEVEL_KEYWORD {
+         @Override
+         public RGB getDefaultColor() {
+            return new RGB(200, 0, 100);
+         }
+      },
+      /**
+       * The color for all other keywords.
+       */
+      KEYWORD {
+         @Override
+         public RGB getDefaultColor() {
+            return new RGB(100, 0, 200);
+         }
+      };
+
+      /**
+       * Returns the default color for this property.
+       *
+       * @return the default color
+       */
+      public abstract RGB getDefaultColor();
+   }
 
    /**
-    * no instantiations
+    * The name of the JML profile property of a project.
+    */
+   public static final String JML_COMMENT_COLOR_PREFIX = "org.key_project.jmlediting.ui.color.";
+
+   /**
+    * no instantiations.
     */
    private JMLUiPreferencesHelper() {
 
    }
 
    /**
-    * changes the property of the default JML Color in the Eclipse preferences
+    * Changes the property value of the given JML color in the Eclipse
+    * preferences.
     *
     * @param color
-    *           the new DefaultJMLColor to be set
+    *           the new color to be set
+    * @param property
+    *           the color property to set the color for
     */
-   public static void setDefaultJMLColor(final RGB color) {
+   public static void setDefaultJMLColor(final RGB color,
+         final ColorProperty property) {
       if (color == null) {
          throw new IllegalArgumentException("Cannot set a null default color");
       }
       final IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
       // global properties
-      preferences.put(JML_COMMENT_COLOR_KEY, rgbToString(color));
-
+      preferences.put(JML_COMMENT_COLOR_PREFIX + property.toString(),
+            rgbToString(color));
    }
 
    /**
+    * Resets the active color for the given property to default.
+    * 
+    * @param property
+    *           the property to reset.
+    */
+   public static void resetToDefault(final ColorProperty property) {
+      setDefaultJMLColor(property.getDefaultColor(), property);
+   }
+
+   /**
+    * Returns the workspace default color for the given property.
     *
+    * @param property
+    *           the color property to get the color for
     * @return the current set JML color of the workspace, if no was set
     */
-   public static RGB getWorkspaceJMLColor() {
+   public static RGB getWorkspaceJMLColor(final ColorProperty property) {
       final IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
-      final String colorString = preferences.get(JML_COMMENT_COLOR_KEY, null);
+      final String colorString = preferences.get(JML_COMMENT_COLOR_PREFIX
+            + property.toString(), null);
       // if no color was set, return the default one
       if (colorString == null) {
-         return getDefaultJMLColor();
+         return property.getDefaultColor();
       }
       final RGB color = stringtoRGB(colorString);
       // if the color could'nt be converted, return the default one
       if (color == null) {
-         return getDefaultJMLColor();
+         return property.getDefaultColor();
       }
 
       return color;
 
-   }
-
-   /**
-    * get the default JML Color the JMLComments get highlighted with.
-    *
-    * @return the default JML Color
-    */
-   public static RGB getDefaultJMLColor() {
-      return new RGB(85, 80, 10);
    }
 
    /**
@@ -97,12 +149,20 @@ public final class JMLUiPreferencesHelper {
       }
    }
 
+   /**
+    * Converts the given RGB color to a String.
+    *
+    * @param rgb
+    *           the color to convert
+    * @return the result string
+    */
    private static String rgbToString(final RGB rgb) {
       return rgb.red + "," + rgb.green + "," + rgb.blue;
    }
 
    /**
-    * add a new PreferenceListener to the EclipsePreferences
+    * Add a new PreferenceListener to the EclipsePreferences which listens to
+    * changes of JML colors.
     *
     * @param listener
     *           the listener to be added
@@ -115,7 +175,8 @@ public final class JMLUiPreferencesHelper {
       final IPreferenceChangeListener newListener = new IPreferenceChangeListener() {
          @Override
          public void preferenceChange(final PreferenceChangeEvent event) {
-            if (JML_COMMENT_COLOR_KEY.equals(event.getKey())) {
+            if (event.getKey() != null
+                  && event.getKey().startsWith(JML_COMMENT_COLOR_PREFIX)) {
                listener.preferenceChange(event);
             }
          }
@@ -126,7 +187,7 @@ public final class JMLUiPreferencesHelper {
    }
 
    /**
-    * remove the listener from the EclipsePreferences
+    * remove the listener from the EclipsePreferences.
     *
     * @param listener
     *           the listener to be removed

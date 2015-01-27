@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.key_project.jmlediting.ui.Activator;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
+import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper.ColorProperty;
 
 /**
  * The {@link JMLProfilePropertiesPage} implements a properties and preferences
@@ -34,7 +35,7 @@ public class JMLColorPreferencePage extends PropertyAndPreferencePage {
    public static final String JML_COLOUR_PREF_ID = "org.key_project.jmlediting.ui.preferences.color";
 
    /**
-    * Needed to get the button in SWTBot for testing
+    * Needed to get the button in SWTBot for testing.
     */
    public static final String TEST_KEY = "CommentColor";
 
@@ -46,7 +47,7 @@ public class JMLColorPreferencePage extends PropertyAndPreferencePage {
    private final IPreferenceChangeListener currentPreferenceListener;
 
    /**
-    * A {@link ColorSelector} which selects the Color for the JML-Comments
+    * A {@link ColorSelector} which selects the Color for the JML-Comments.
     */
    private ColorSelector commentColorSelector;
 
@@ -74,7 +75,7 @@ public class JMLColorPreferencePage extends PropertyAndPreferencePage {
          final IEclipsePreferences preferences = InstanceScope.INSTANCE
                .getNode(Activator.PLUGIN_ID);
          preferences
-         .addPreferenceChangeListener(this.currentPreferenceListener);
+               .addPreferenceChangeListener(this.currentPreferenceListener);
       }
       super.setVisible(visible);
    }
@@ -116,7 +117,8 @@ public class JMLColorPreferencePage extends PropertyAndPreferencePage {
          return;
       }
 
-      final RGB color = JMLUiPreferencesHelper.getWorkspaceJMLColor();
+      final RGB color = JMLUiPreferencesHelper
+            .getWorkspaceJMLColor(ColorProperty.COMMENT);
 
       this.commentColorSelector.setColorValue(color);
    }
@@ -144,8 +146,8 @@ public class JMLColorPreferencePage extends PropertyAndPreferencePage {
 
    @Override
    public void performDefaults() {
-      this.commentColorSelector.setColorValue(JMLUiPreferencesHelper
-            .getDefaultJMLColor());
+      this.commentColorSelector.setColorValue(ColorProperty.COMMENT
+            .getDefaultColor());
       super.performDefaults();
 
    }
@@ -156,18 +158,18 @@ public class JMLColorPreferencePage extends PropertyAndPreferencePage {
       final IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
       preferences
-      .removePreferenceChangeListener(this.currentPreferenceListener);
+            .removePreferenceChangeListener(this.currentPreferenceListener);
       return super.performCancel();
    }
 
    @Override
    public boolean performOk() {
       // Remove preference listener
-      JMLUiPreferencesHelper.setDefaultJMLColor(this.commentColorSelector
-            .getColorValue());
+      JMLUiPreferencesHelper.setDefaultJMLColor(
+            this.commentColorSelector.getColorValue(), ColorProperty.COMMENT);
 
       InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID)
-      .removePreferenceChangeListener(this.currentPreferenceListener);
+            .removePreferenceChangeListener(this.currentPreferenceListener);
       return super.performOk();
    }
 

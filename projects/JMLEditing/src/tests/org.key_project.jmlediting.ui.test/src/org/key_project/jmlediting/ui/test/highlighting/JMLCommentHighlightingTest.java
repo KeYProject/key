@@ -17,6 +17,7 @@ import org.key_project.jmlediting.ui.test.UITestUtils;
 import org.key_project.jmlediting.ui.test.UITestUtils.TestProject;
 import org.key_project.jmlediting.ui.test.UITestUtils.TestProject.SaveGuarantee;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
+import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper.ColorProperty;
 
 /**
  * Testingplan of JMLCommentHighlighting: </br> Test Comment Highlighting for
@@ -83,7 +84,8 @@ public class JMLCommentHighlightingTest {
    private final RGB defaultTextRGB = new RGB(0, 0, 0);
    private final RGB string = new RGB(42, 0, 255);
    private final RGB character = new RGB(42, 0, 255);
-   private final RGB jmlComment = JMLUiPreferencesHelper.getDefaultJMLColor();
+   private final RGB jmlComment = JMLUiPreferencesHelper
+         .getWorkspaceJMLColor(ColorProperty.COMMENT);
 
    private static TestProject testProject;
 
