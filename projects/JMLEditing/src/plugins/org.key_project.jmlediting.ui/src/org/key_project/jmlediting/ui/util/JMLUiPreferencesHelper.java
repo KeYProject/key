@@ -72,7 +72,7 @@ public final class JMLUiPreferencesHelper {
     * @return the default JML Color
     */
    public static RGB getDefaultJMLColor() {
-      return new RGB(64, 0, 128);
+      return new RGB(85, 80, 10);
    }
 
    /**
@@ -127,7 +127,7 @@ public final class JMLUiPreferencesHelper {
 
    /**
     * remove the listener from the EclipsePreferences
-    * 
+    *
     * @param listener
     *           the listener to be removed
     */
