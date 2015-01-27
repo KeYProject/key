@@ -6,13 +6,14 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaProject;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
-import org.key_project.jmlediting.core.test.TestUtils;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 public class JMLPreferencesHelperTest {
 
@@ -54,8 +55,9 @@ public class JMLPreferencesHelperTest {
    }
 
    @Test
-   public void testSetProjectProfile() throws CoreException {
-      final IProject project = TestUtils.createJavaProject("Test");
+   public void testSetProjectProfile() throws CoreException, InterruptedException {
+      final IJavaProject javaProject = TestUtilsUtil.createJavaProject("JMLPreferencesHelperTest_testSetProjectProfile");
+      final IProject project = javaProject.getProject();
       assertTrue("New profile has no project specific profile",
             !JMLPreferencesHelper.hasProjectJMLProfile(project));
       assertTrue("getProjectJMLProfile returns not null when no profile set",
