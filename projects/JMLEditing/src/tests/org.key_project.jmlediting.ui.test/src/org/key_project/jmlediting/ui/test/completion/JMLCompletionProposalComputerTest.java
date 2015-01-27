@@ -1,4 +1,4 @@
-package org.key_project.jmledeting.ui.test.completion;
+package org.key_project.jmlediting.ui.test.completion;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

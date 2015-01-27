@@ -1,4 +1,4 @@
-package org.key_project.jmledeting.ui.test.hover;
+package org.key_project.jmlediting.ui.test.hover;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
