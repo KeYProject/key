@@ -26,6 +26,7 @@ import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
+import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
@@ -233,6 +234,10 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
       final List<IKeywordNode> allKeywords = Nodes.getAllKeywords(parseResult);
       int lastEnd = surroundingComment.getBeginOffset();
       final List<StyleRange> styles = new ArrayList<StyleRange>();
+      final Color keywordColor = new Color(
+            defaultStyleRange.foreground.getDevice(), 200, 0, 100);
+      final Color quantifierColor = new Color(
+            defaultStyleRange.foreground.getDevice(), 100, 0, 200);
       for (final IKeywordNode kNode : allKeywords) {
          final int keywordStartOffset = kNode.getStartOffset();
          final int keywordEndOffset = kNode.getEndOffset();
@@ -242,9 +247,13 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
                defaultStyleRange.foreground, defaultStyleRange.background, attr
                      .getStyle()));
          // Style for the Keyword
+         Color kColor = quantifierColor;
+         if (kNode.getKeyword() instanceof IToplevelKeyword) {
+            kColor = keywordColor;
+         }
          styles.add(new StyleRange(keywordStartOffset, keywordEndOffset
-               - keywordStartOffset, defaultStyleRange.foreground,
-               defaultStyleRange.background, SWT.BOLD));
+               - keywordStartOffset, kColor, defaultStyleRange.background,
+               SWT.BOLD));
          lastEnd = keywordEndOffset;
       }
       // Adding Style after last Keyword
