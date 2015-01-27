@@ -60,4 +60,9 @@ public abstract class AbstractKeyword implements IKeyword {
       return Collections.emptyList();
    }
 
+   @Override
+   public IKeywordContentRefactorer createRefactorer() {
+      return null;
+   }
+
 }

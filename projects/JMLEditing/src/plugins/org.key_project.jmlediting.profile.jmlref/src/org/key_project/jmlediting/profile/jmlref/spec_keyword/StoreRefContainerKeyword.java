@@ -10,8 +10,10 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.INodeTraverser;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordContentRefactorer;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefKeywordContentParser;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefKeywordRefactorer;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefNodeTypes;
 
 /**
@@ -61,7 +63,8 @@ public abstract class StoreRefContainerKeyword extends
       final IASTNode tmpNode = nodeAtPos.getChildren().get(1);
       // empty KeywordContent
       if (tmpNode.getChildren().isEmpty()) {
-         result.addAll(new JMLStoreRefProposer(context).propose(cu, null, false));
+         result.addAll(new JMLStoreRefProposer(context)
+               .propose(cu, null, false));
          return result;
       }
       final IASTNode content = tmpNode.getChildren().get(0);
@@ -86,8 +89,8 @@ public abstract class StoreRefContainerKeyword extends
                   }
                }, false);
 
-         result.addAll(new JMLStoreRefProposer(context).propose(cu, exprInOffset,
-               hasExpr));
+         result.addAll(new JMLStoreRefProposer(context).propose(cu,
+               exprInOffset, hasExpr));
       }
       else if (content.getType() == NodeTypes.KEYWORD) {
          // TODO
@@ -101,5 +104,10 @@ public abstract class StoreRefContainerKeyword extends
          System.out.println("nothing... ");
       }
       return result;
+   }
+
+   @Override
+   public IKeywordContentRefactorer createRefactorer() {
+      return new StoreRefKeywordRefactorer();
    }
 }

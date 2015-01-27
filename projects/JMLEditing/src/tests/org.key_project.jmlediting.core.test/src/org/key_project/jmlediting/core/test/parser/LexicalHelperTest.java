@@ -2,8 +2,8 @@ package org.key_project.jmlediting.core.test.parser;
 
 import static org.junit.Assert.*;
 import static org.key_project.jmlediting.core.dom.Nodes.createString;
+import static org.key_project.jmlediting.core.parser.util.Lexicals.*;
 import static org.key_project.jmlediting.core.test.parser.ParserTestUtils.*;
-import static org.key_project.jmlediting.profile.jmlref.parseutil.Lexicals.*;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.parser.ParseFunction;

@@ -1,7 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression;
 
 import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
-import static org.key_project.jmlediting.profile.jmlref.parseutil.JavaBasicsParser.*;
+import static org.key_project.jmlediting.core.parser.util.JavaBasicsParser.*;
 import static org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes.*;
 import static org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParserUtils.*;
 

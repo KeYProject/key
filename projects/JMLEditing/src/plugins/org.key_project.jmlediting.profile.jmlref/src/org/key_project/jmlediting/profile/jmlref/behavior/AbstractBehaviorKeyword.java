@@ -10,6 +10,7 @@ import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.profile.syntax.EmptyKeywordParser;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordContentRefactorer;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
 import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
@@ -30,7 +31,7 @@ public abstract class AbstractBehaviorKeyword implements IToplevelKeyword {
 
    /**
     * Creates a keyword for an behavior.
-    * 
+    *
     * @param locale
     *           the locale for the keywords
     * @param americanEnglishKeyword
@@ -70,6 +71,11 @@ public abstract class AbstractBehaviorKeyword implements IToplevelKeyword {
    public List<ICompletionProposal> createAutoProposals(final IASTNode node,
          final JavaContentAssistInvocationContext context) {
       return Collections.emptyList();
+   }
+
+   @Override
+   public IKeywordContentRefactorer createRefactorer() {
+      return null;
    }
 
 }

@@ -149,6 +149,21 @@ public final class Nodes {
       }, new LinkedList<IKeywordNode>());
    }
 
+   public static List<IASTNode> getAllNodesOfType(final IASTNode node,
+         final int type) {
+      return node.traverse(new INodeTraverser<List<IASTNode>>() {
+
+         @Override
+         public List<IASTNode> traverse(final IASTNode node,
+               final List<IASTNode> existing) {
+            if (node.getType() == type) {
+               existing.add(node);
+            }
+            return existing;
+         }
+      }, new LinkedList<IASTNode>());
+   }
+
    public static IASTNode getNodeAtPosition(final IASTNode root,
          final int position, final int type) {
       return root.search(new INodeSearcher<IASTNode>() {

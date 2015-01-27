@@ -59,4 +59,6 @@ public interface IKeyword {
    List<ICompletionProposal> createAutoProposals(IASTNode node,
          JavaContentAssistInvocationContext context);
 
+   IKeywordContentRefactorer createRefactorer();
+
 }

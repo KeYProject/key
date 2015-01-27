@@ -17,10 +17,15 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.IKeywordNode;
+import org.key_project.jmlediting.core.dom.NodeTypes;
+import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
+import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordContentRefactorer;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLJavaResolver;
@@ -116,23 +121,41 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
                loc = new CommentLocator(unit.getSource());
                // In each JML Comment
                for (final CommentRange range : loc.findJMLCommentRanges()) {
+                  if (!unit
+                        .getSource()
+                        .substring(range.getBeginOffset(), range.getEndOffset())
+                        .contains(identifier.getName())) {
+                     continue;
+                  }
+
                   final IJMLProfile activeProfile = JMLPreferencesHelper
                         .getProjectActiveJMLProfile(project.getProject());
                   final IJMLParser parser = activeProfile.createParser();
                   IASTNode parseResult;
                   try {
                      parseResult = parser.parse(unit.getSource(), range);
+                     final List<IASTNode> keywords = Nodes.getAllNodesOfType(
+                           parseResult, NodeTypes.KEYWORD_APPL);
+                     for (final IASTNode keywordApplNode : keywords) {
 
+                        final IKeywordNode keywordNode = (IKeywordNode) keywordApplNode
+                              .getChildren().get(0);
+                        final IKeyword keyword = keywordNode.getKeyword();
+
+                        final IASTNode contentNode = keywordApplNode
+                              .getChildren().get(1);
+
+                        final IKeywordContentRefactorer refactorer = keyword
+                              .createRefactorer();
+                        final List<Change> keywordChanged = refactorer
+                              .refactorFieldRename(null, contentNode);
+                     }
                   }
                   catch (final ParserException e) {
                      // Invalid JML Code, do syntax coloring with the recovered
                      // node
                      parseResult = e.getErrorNode();
-
-                  }
-                  if (parseResult == null) {
-                     // No parser recovery, so no highlightinh
-                     return null;
+                     // --> abort
                   }
 
                }

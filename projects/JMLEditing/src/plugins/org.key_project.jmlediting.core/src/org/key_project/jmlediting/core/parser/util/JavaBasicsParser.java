@@ -1,7 +1,7 @@
-package org.key_project.jmlediting.profile.jmlref.parseutil;
+package org.key_project.jmlediting.core.parser.util;
 
 import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
-import static org.key_project.jmlediting.profile.jmlref.parseutil.JavaBasicsNodeTypes.*;
+import static org.key_project.jmlediting.core.parser.util.JavaBasicsNodeTypes.*;
 
 import org.key_project.jmlediting.core.parser.ParseFunction;
 

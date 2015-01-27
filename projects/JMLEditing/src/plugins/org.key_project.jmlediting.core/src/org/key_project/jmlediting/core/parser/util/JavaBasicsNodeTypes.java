@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.profile.jmlref.parseutil;
+package org.key_project.jmlediting.core.parser.util;
 
 import org.key_project.jmlediting.core.dom.NodeTypes;
 
