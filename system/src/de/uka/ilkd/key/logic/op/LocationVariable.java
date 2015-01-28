@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.JoinRule;
 
 /**
  * This class represents proper program variables, which are not program
@@ -26,15 +25,6 @@ import de.uka.ilkd.key.rule.JoinRule;
  */
 public final class LocationVariable extends ProgramVariable
 			            implements UpdateableOperator {
-
-   /**
-    * The name of this variable that is unique for the
-    * branch where the variable resides. Was introduced
-    * for the joining methods. If global namespaces
-    * should be removed in the future, this field becomes
-    * obsolete.
-    */
-   private ProgramElementName branchUniqueName = null;
    
     public LocationVariable(ProgramElementName name,
                         KeYJavaType        t,
@@ -90,26 +80,4 @@ public final class LocationVariable extends ProgramVariable
             return new LocationVariable(new ProgramElementName(name.toString()), sort());
         }
     }
-   
-    /**
-     * @return Branch-unique name for this variable.
-     */
-    public ProgramElementName getBranchUniqueName() {
-       return branchUniqueName;
-    }
-
-   /**
-    * TODO: We will have to remove this setter since it violates the
-    * design decision that {@link LocationVariable}s are immutable.
-    * In {@link JoinRule}, we will have to introduce another method
-    * of getting branchwise unique names.
-    * 
-    * Sets the name of this program variables that it would obtain if
-    * names only had to be unique *per branch*, and not globally.
-    * 
-    * @param branchUniqueName Branch-unique name for this variable.
-    */
-   public void setBranchUniqueName(ProgramElementName branchUniqueName) {
-      this.branchUniqueName = branchUniqueName;
-   }
 }

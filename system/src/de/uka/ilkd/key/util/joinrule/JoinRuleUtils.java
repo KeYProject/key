@@ -16,6 +16,7 @@ package de.uka.ilkd.key.util.joinrule;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -40,6 +41,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
@@ -601,20 +603,24 @@ public class JoinRuleUtils {
     * An equals method that, before the comparison, replaces all program
     * locations in the supplied arguments by their branch-unique versions.
     * 
-    * @param se1 First element to check equality (mod renaming) for
-    * @param se2 Second element to check equality (mod renaming) for
+    * @param se1 First element to check equality (mod renaming) for.
+    * @param se2 Second element to check equality (mod renaming) for.
+    * @param goal The goal of the current branch (for getting branch-unique names).
     * @param services The Services object.
     * @return true iff source elements can be matched, considering
     *    branch-unique location names.
     */
    public static boolean equalsModBranchUniqueRenaming(
          SourceElement se1, SourceElement se2,
+         Goal goal,
          Services services) {
       
+      LocVarReplBranchUniqueMap replMap = new LocVarReplBranchUniqueMap(goal);
+      
       ProgVarReplaceVisitor replVisitor1 =
-            new ProgVarReplaceVisitor((ProgramElement) se1, LocVarReplBranchUniqueMap.instance(), services);
+            new ProgVarReplaceVisitor((ProgramElement) se1, replMap, services);
       ProgVarReplaceVisitor replVisitor2 =
-            new ProgVarReplaceVisitor((ProgramElement) se1, LocVarReplBranchUniqueMap.instance(), services);
+            new ProgVarReplaceVisitor((ProgramElement) se1, replMap, services);
       
       replVisitor1.start();
       replVisitor2.start();
@@ -860,14 +866,16 @@ public class JoinRuleUtils {
                   new SequentFormula(services.getTermBuilder().not(sf.formula())));
          }
       }
-      
+
       ProgramElement programCounter = selected.sub(1).javaBlock().program();
       Term postCondition = selected.sub(1).sub(0);
       
       // Replace location variables in program counter by their
       // branch-unique versions
+      LocVarReplBranchUniqueMap replMap = new LocVarReplBranchUniqueMap(goal);
+      
       ProgVarReplaceVisitor replVisitor =
-            new ProgVarReplaceVisitor(programCounter, LocVarReplBranchUniqueMap.instance(), services);
+            new ProgVarReplaceVisitor(programCounter, replMap, services);
       replVisitor.start();
       programCounter = replVisitor.result();
       Term progCntAndPostCond = services.getTermBuilder().prog(
@@ -884,7 +892,7 @@ public class JoinRuleUtils {
                
          newElementaries = newElementaries.prepend(
                tb.elementary(
-                     (LocationVariable) (LocVarReplBranchUniqueMap.instance().get(lhs)),
+                     (LocationVariable) (replMap.get(lhs)),
                      elementary.sub(0)));
       }
       
@@ -1147,6 +1155,35 @@ public class JoinRuleUtils {
       
       return tb.or(negAntecedentForms.prepend(succedentForms));
    }
+
+   /**
+    * Tells whether a name is unique in the passed list of global variables.
+    * 
+    * @param name The name to check uniqueness for.
+    * @param globals The global variables for the givan branch.
+    * @see VariableNamer#isUniqueInGlobals(String, Globals)
+    */
+   private static boolean isUniqueInGlobals(String name, ImmutableSet<ProgramVariable> globals) {
+      Iterator<ProgramVariable> it = globals.iterator();
+      while (it.hasNext()) {
+         ProgramVariable n = it.next();
+         if (n.toString().equals(name)) {
+            return false;
+         }
+      }
+      return true;
+   }
+   
+   /**
+    * Looks up a program variable by its name in the PV namespace.
+    * 
+    * @param name Name to find a PV for.
+    * @return The PV with the given name in the global namespace,
+    *    or null if there is none.
+    */
+   private static ProgramVariable lookupVarInNS(String name) {
+      return (ProgramVariable) mediator().progVar_ns().lookup(new Name(name));
+   }
    
    /**
     * Visitor for collecting program locations in a Java block.
@@ -1190,15 +1227,12 @@ public class JoinRuleUtils {
     */
    private static class LocVarReplBranchUniqueMap
    extends HashMap<ProgramVariable, ProgramVariable> {
-      private static final long serialVersionUID = -6789836130544430938L;
-
-      private static final LocVarReplBranchUniqueMap INSTANCE =
-            new LocVarReplBranchUniqueMap();
+      private static final long serialVersionUID = 2305410114265133879L;
       
-      private LocVarReplBranchUniqueMap() {}
+      private Goal goal = null;
       
-      public static LocVarReplBranchUniqueMap instance() {
-         return INSTANCE;
+      public LocVarReplBranchUniqueMap(Goal goal) {
+         this.goal = goal;
       }
       
       @Override
@@ -1220,9 +1254,27 @@ public class JoinRuleUtils {
       public ProgramVariable get(Object key) {
          if (key instanceof LocationVariable) {
             LocationVariable var = (LocationVariable) key;
-            return var.getBranchUniqueName() == null ?
-                  var :
-                  (ProgramVariable) mediator().progVar_ns().lookup(var.getBranchUniqueName());
+            
+            // Find the node where the variable was introduced
+            Node intrNode = goal.node();
+            while (!intrNode.root() && intrNode.getGlobalProgVars().contains(var)) {
+               intrNode = intrNode.parent();
+            }
+            
+            String base = stripIndex(var.name().toString());
+            
+            int newCounter = 0;
+            String branchUniqueName = base;
+            while (!isUniqueInGlobals(branchUniqueName.toString(), intrNode.getGlobalProgVars()) ||
+                  (lookupVarInNS(branchUniqueName) != null &&
+                     !lookupVarInNS(branchUniqueName).sort().equals(var.sort()))) {
+               newCounter += 1;
+               branchUniqueName = base + "_" + newCounter;
+            }
+            
+            ProgramVariable branchUniqueVar = lookupVarInNS(branchUniqueName);
+            
+            return branchUniqueVar == null ? var : branchUniqueVar;
          } else {
             return null;
          }

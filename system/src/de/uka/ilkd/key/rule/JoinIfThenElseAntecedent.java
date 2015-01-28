@@ -152,8 +152,8 @@ public class JoinIfThenElseAntecedent extends JoinRule {
                      tb.or (cond, varEqualsElseForm));
             }
             
-            newElementaryUpdates = newElementaryUpdates.prepend(
-                  tb.elementary(vTerm, vTerm));
+//            newElementaryUpdates = newElementaryUpdates.prepend(
+//                  tb.elementary(vTerm, vTerm));
             
          }
       }

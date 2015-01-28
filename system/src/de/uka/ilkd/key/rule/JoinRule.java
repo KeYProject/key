@@ -36,10 +36,6 @@ import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionStateWithProgCnt;
 
-//TODO The implementation of #equalsModBranchUniqueRenaming(...) will
-//     have to be changed, since LocationVariables are not allowed to
-//     have setters - they are immutable by strict design decision.
-
 /**
  * Base for implementing join rules. Extend this class,
  * implement method joinStates(...) and register in
@@ -349,6 +345,7 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
                         equalsModBranchUniqueRenaming(
                            ownProgramElem,
                            partnerProgramElem,
+                           goal,
                            services)) {
                      
                      potentialPartners = potentialPartners.prepend(
