@@ -121,7 +121,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
    /**
     * The used {@link ISEDSourceModel}.
     */
-   private final SEDMemorySourceModel sourceModel = new SEDMemorySourceModel();
+   private final SEDMemorySourceModel sourceModel = new SEDMemorySourceModel(this);
 
    /**
     * Constructor.
@@ -291,6 +291,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public void suspend() throws DebugException {
+      sourceModel.setPossiblyIncomplete();
       ISEDThread[] threads = getSymbolicThreads();
       for (ISEDThread thread : threads) {
          thread.suspend();
