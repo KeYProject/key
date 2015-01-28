@@ -132,10 +132,12 @@ public class GenerateObjectDiagramFromModelCustomFeature extends AbstractGenerat
       diagramState.setName(modelName);
       diagramModel.getStates().add(diagramState);
       // Create objects
-      Map<String, ODObject> objectMap = new HashMap<String, ODObject>();
+      Map<Heap, Map<String, ODObject>> heapObjectMap = new HashMap<Heap, Map<String, ODObject>>();
       Map<AbstractODValueContainer, PictogramElement> containerPEMap = new HashMap<AbstractODValueContainer, PictogramElement>();
       Map<ObjectVal, ODObject> objectValMap = new HashMap<ObjectVal, ODObject>();
       for (Heap heap : model.getHeaps()) {
+         Map<String, ODObject> objectMap = new HashMap<String, ODObject>();
+         heapObjectMap.put(heap, objectMap);
          for (ObjectVal ov : heap.getObjects()) {
             String sortName = CETree.computeSortName(ov);
             ODObject diagramObject = ODFactory.eINSTANCE.createODObject();
@@ -154,6 +156,7 @@ public class GenerateObjectDiagramFromModelCustomFeature extends AbstractGenerat
       // Fill object with fields
       List<Pair<ODAssociation, AbstractODValueContainer>> associations = new LinkedList<Pair<ODAssociation, AbstractODValueContainer>>();
       for (Heap heap : model.getHeaps()) {
+         Map<String, ODObject> objectMap = heapObjectMap.get(heap);
          for (ObjectVal ov : heap.getObjects()) {
             ODObject diagramObject = objectValMap.get(ov);
             String sortName = CETree.computeSortName(ov);
@@ -170,7 +173,7 @@ public class GenerateObjectDiagramFromModelCustomFeature extends AbstractGenerat
       }
       // Fill state with fields
       List<Pair<String, String>> constants = CETree.computeConstantLabels(model);
-      createValuesAndAssociations(objectMap, constants, diagramState, associations);
+      createStateValuesAndAssociations(heapObjectMap, constants, diagramState, associations);
       // Create association PEs
       PictogramElement statePE = addNodeToDiagram(diagramState, 0, 0);
       containerPEMap.put(diagramState, statePE);
@@ -208,5 +211,53 @@ public class GenerateObjectDiagramFromModelCustomFeature extends AbstractGenerat
             containerToFill.getValues().add(diagramValue);
          }
       }
+   }
+   
+   /**
+    * Creates for the given {@link Pair}s {@link ODValue} or {@link ODAssociation}s.
+    * @param heapObjectMap The {@link Map} which maps object name to {@link ODObject}s.
+    * @param contentToAdd The {@link Pair}s to analyze.
+    * @param containerToFill The {@link AbstractODValueContainer} to fill.
+    * @param associations The {@link List} which contains all available {@link ODAssociation}s.
+    */
+   protected void createStateValuesAndAssociations(Map<Heap, Map<String, ODObject>> heapObjectMap, 
+                                                   List<Pair<String, String>> contentToAdd, 
+                                                   AbstractODValueContainer containerToFill, 
+                                                   List<Pair<ODAssociation, AbstractODValueContainer>> associations) {
+      for (Pair<String, String> constant : contentToAdd) {
+         List<ODObject> diagramObjects = searchDiagramObjects(heapObjectMap, constant.second);
+         if (!diagramObjects.isEmpty()) {
+            for (ODObject diagramObject : diagramObjects) {
+               ODAssociation diagramAssociation = ODFactory.eINSTANCE.createODAssociation();
+               diagramAssociation.setName(constant.first);
+               diagramAssociation.setTarget(diagramObject);
+               containerToFill.getAssociations().add(diagramAssociation);
+               associations.add(new Pair<ODAssociation, AbstractODValueContainer>(diagramAssociation, containerToFill));
+            }
+         }
+         else {
+            ODValue diagramValue = ODFactory.eINSTANCE.createODValue();
+            diagramValue.setName(constant.first);
+            diagramValue.setValue(constant.second);
+            containerToFill.getValues().add(diagramValue);
+         }
+      }
+   }
+   
+   /**
+    * Searches all {@link ODObject}s in all {@link Heap}s with the given name.
+    * @param heapObjectMap The {@link Map} which maps object name to {@link ODObject}s.
+    * @param name The name of the {@link ODObject} to search.
+    * @return The found {@link ODObject}s.
+    */
+   protected List<ODObject> searchDiagramObjects(Map<Heap, Map<String, ODObject>> heapObjectMap, String name) {
+      List<ODObject> result = new LinkedList<ODObject>();
+      for (Map<String, ODObject> objectMap : heapObjectMap.values()) {
+         ODObject diagramObject = objectMap.get(name);
+         if (diagramObject != null) {
+            result.add(diagramObject);
+         }
+      }
+      return result;
    }
 }

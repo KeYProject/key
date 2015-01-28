@@ -25,7 +25,7 @@ import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
  * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
  * @author Martin Hentschel
  */
-public class LoopInvariantGraphitiPropertySection extends AbstractPredicateGraphitiPropertySection {
+public class LoopInvariantGraphitiPropertySection extends AbstractTruthValueGraphitiPropertySection {
    /**
     * {@inheritDoc}
     */
@@ -49,7 +49,7 @@ public class LoopInvariantGraphitiPropertySection extends AbstractPredicateGraph
     * {@inheritDoc}
     */
    @Override
-   protected AbstractPredicateComposite createContentComposite(Composite parent) {
+   protected AbstractTruthValueComposite createContentComposite(Composite parent) {
       return new LoopInvariantComposite(parent, getWidgetFactory());
    }
 }

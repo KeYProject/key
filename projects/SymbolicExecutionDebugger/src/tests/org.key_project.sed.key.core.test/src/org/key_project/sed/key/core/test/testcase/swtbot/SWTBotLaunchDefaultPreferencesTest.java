@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
+import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.util.java.ArrayUtil;
@@ -38,6 +39,81 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
  * @author Martin Hentschel
  */
 public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTestCase {
+   /**
+    * Tests the launch where truth value evaluation is enabled.
+    */
+   @Test
+   public void testTruthValueEvaluationEnabled() throws Exception {
+      doTruthValueEvaluationTest("SWTBotLaunchDefaultPreferencesTest_testTruthValueEvaluationEnabled", true);
+   }
+
+   /**
+    * Tests the launch where truth value evaluation is disabled.
+    */
+   @Test
+   public void testTruthValueEvaluationDisabled() throws Exception {
+      doTruthValueEvaluationTest("SWTBotLaunchDefaultPreferencesTest_testTruthValueEvaluationDisabled", false);
+   }
+   
+   /**
+    * Does the test steps of {@link #testTruthValueEvaluationEnabled()}
+    * and {@link #testTruthValueEvaluationDisabled()}.
+    * @param projectName The project name to use.
+    * @param truthValueEvaluationEnabled Is truth value evaluation enabled?
+    * @throws Exception Occurred Exception
+    */
+   protected void doTruthValueEvaluationTest(String projectName, 
+                                             final boolean truthValueEvaluationEnabled) throws Exception {
+      boolean originalTruthValueEvaluationEnabled = KeYSEDPreferences.isTruthValueEvaluationEnabled();
+      try {
+         KeYSEDPreferences.setUsePrettyPrinting(true);
+         // Set preference
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
+         if (truthValueEvaluationEnabled) {
+            preferenceShell.bot().checkBox("Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)").select();
+         }
+         else {
+            preferenceShell.bot().checkBox("Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)").deselect();
+         }
+         preferenceShell.bot().button("OK").click();
+         assertEquals(truthValueEvaluationEnabled, KeYSEDPreferences.isTruthValueEvaluationEnabled());
+         // Launch something
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
+            @Override
+            public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+               // Get debug target TreeItem
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+               // Check launch
+               Object threadObject = TestUtilsUtil.getTreeItemData(item);
+               assertTrue(threadObject instanceof IKeYSEDDebugNode);
+               assertEquals(truthValueEvaluationEnabled, ((IKeYSEDDebugNode<?>) threadObject).isTruthValueEvaluationEnabled());
+            }
+         };
+         doKeYDebugTargetTest(projectName,
+                              "data/unicodeTest/test",
+                              true,
+                              true,
+                              createMethodSelector("UnicodeTest", "magic", "Z", "Z"),
+                              null,
+                              null,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              null,
+                              Boolean.TRUE,
+                              Boolean.TRUE,
+                              8, 
+                              executor);
+      }
+      finally {
+         // Restore original value
+         KeYSEDPreferences.setTruthValueEvaluationEnabled(originalTruthValueEvaluationEnabled);
+         assertEquals(originalTruthValueEvaluationEnabled, KeYSEDPreferences.isTruthValueEvaluationEnabled());
+      }
+   }
+   
    /**
     * Tests the launch where unicode signs are used.
     */

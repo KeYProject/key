@@ -45,7 +45,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDGroupable;
-import org.key_project.sed.core.util.NodeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeCollapseFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeResumeFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStepIntoFeature;
@@ -336,25 +335,21 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
     */
    @Override
    public GraphicsAlgorithm[] getClickArea(PictogramElement pe) {
-      Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pe);
-      if(NodeUtil.canBeGrouped(bo)) {
-         return new GraphicsAlgorithm[] {getFeatureProvider().getAllPictogramElementsForBusinessObject(bo)[1].getGraphicsAlgorithm()};
+      if (isSelectable(pe)) {
+         return super.getClickArea(pe);
       }
-      
-      return super.getClickArea(pe);
+      else {
+         return new GraphicsAlgorithm[0];
+      }
    }
    
    /**
-    * {@inheritDoc}
+    * Checks if the given {@link PictogramElement} is selectable.
+    * @param pe The {@link PictogramElement} to check.
+    * @return {@code true} {@link PictogramElement} is selectable, {@code false} {@link PictogramElement} can be selected.
     */
-   @Override
-   public GraphicsAlgorithm getSelectionBorder(PictogramElement pe) {
-      Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pe);
-      if(NodeUtil.canBeGrouped(bo)) {
-         return getFeatureProvider().getAllPictogramElementsForBusinessObject(bo)[1].getGraphicsAlgorithm();
-      }
-      
-      return super.getSelectionBorder(pe);
+   public boolean isSelectable(PictogramElement pe) {
+      return !(pe.getGraphicsAlgorithm() instanceof Rectangle);
    }
 
    /**

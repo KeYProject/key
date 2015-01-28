@@ -15,13 +15,19 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditPart;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
+import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
+import org.key_project.sed.core.model.memory.SEDMemoryStatement;
+import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.ui.visualization.execution_tree.feature.AbstractDebugNodeUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugTargetConnectFeature;
 import org.key_project.sed.ui.visualization.test.util.TestVisualizationUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests the automatic layout of symbolic execution trees via
@@ -210,11 +216,10 @@ public class SWTBotSymbolicExecutionTreeLayoutTest extends AbstractSymbolicExecu
 //   @Test
 //   public void testBigNodeSmallSubtreeLeft() throws Exception {
 //      IDiagramTestSteps steps = new AbstractDiagramTestSteps() {
-//
 //         @Override
 //         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
 //            assertDiagram(bot, project, "ThesisExampleStart.set", "data/ThesisExample/oracle", null);
-//            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0);
+//            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0);
 //            Object data = TestUtilsUtil.getTreeItemData(item);            
 //            assertTrue(data instanceof ISEDMemoryDebugNode);
 //            
@@ -225,31 +230,16 @@ public class SWTBotSymbolicExecutionTreeLayoutTest extends AbstractSymbolicExecu
 //            leaf.addChild(checkMethod);
 //            leaf.getDebugTarget().suspend();
 //            
-//            leaf = checkMethod;
-//            leaf.getDebugTarget().resume();
-//            SEDMemoryStatement longName = new SEDMemoryStatement(leaf.getDebugTarget(), leaf, leaf.getThread());
-//            checkMethod.setName("int EINWIRKLICHSEHRLANGERNAMEEINWIRKLICHSEHRLANGERNAME2EINWIRKLICHSEHRLANGERNAMEEINWIRKLICHSEHRLANGERNAME2 = i;");
-//            leaf.addChild(longName);
+//            checkMethod.getDebugTarget().resume();
+//            SEDMemoryStatement longName = new SEDMemoryStatement(checkMethod.getDebugTarget(), checkMethod, checkMethod.getThread());
+//            longName.setName("int EINWIRKLICHSEHRLANGERNAMEEINWIRKLICHSEHRLANGERNAME2EINWIRKLICHSEHRLANGERNAMEEINWIRKLICHSEHRLANGERNAME2 = i;");
+//            checkMethod.addChild(longName);
+//            checkMethod.getDebugTarget().suspend();
 //            
 //            assertDiagram(bot, project, "ThesisExampleStart2.set", "data/ThesisExample/oracle", null);
 //         }
-////         @Override
-////         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {           
-////            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0);
-////            Object data = TestUtilsUtil.getTreeItemData(item);
-////            assertTrue(data instanceof ISEDMemoryDebugNode);
-////            
-////            ISEDMemoryDebugNode leaf = (ISEDMemoryDebugNode) data;
-////            leaf.getDebugTarget().resume();
-////            SEDMemoryTermination newLeaf = new SEDMemoryTermination(leaf.getDebugTarget(), leaf, leaf.getThread(), false);
-////            newLeaf.setName("Hello World");
-////            leaf.addChild(newLeaf);
-////            leaf.getDebugTarget().suspend();
-////         }
-//
 //      };
-//      
-//      doDiagramTest("SWTBotSymbolicExecutionTreeLayoutTest_testCollapseExpandGroupWithPrev", 
+//      doDiagramTest("SWTBotSymbolicExecutionTreeLayoutTest_testBigNodeSmallSubtreeLeft", 
 //            "data/ThesisExample/test",
 //            "ThesisExample.set",
 //            steps,

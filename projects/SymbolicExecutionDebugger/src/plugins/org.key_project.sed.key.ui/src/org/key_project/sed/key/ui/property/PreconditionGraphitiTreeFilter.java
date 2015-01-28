@@ -17,6 +17,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.platform.AbstractPropertySectionFilter;
 import org.eclipse.jface.viewers.IFilter;
 import org.eclipse.ui.IWorkbenchPart;
+import org.key_project.sed.key.core.model.KeYMethodContract;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
@@ -34,7 +35,8 @@ public class PreconditionGraphitiTreeFilter extends AbstractPropertySectionFilte
       if (part != null) {
          PreconditionGraphitiPropertySection section = new PreconditionGraphitiPropertySection();
          section.setInput(part, null);
-         return section.getDebugNode(pe) != null;
+         KeYMethodContract node = section.getDebugNode(pe);
+         return node != null && node.isTruthValueEvaluationEnabled();
       }
       else {
          return false;

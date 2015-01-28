@@ -73,6 +73,8 @@ public class KeYLaunchSymbolicDebugPreferencePage extends FieldEditorPreferenceP
       });
       BooleanFieldEditor sigEdit = new BooleanFieldEditor(KeYSEDPreferences.SHOW_SIGNATURE_ON_METHOD_RETURN_NODES, "Show signature instead of only the name on method &return nodes", SWT.NONE, spacer);
       addField(sigEdit);
+      BooleanFieldEditor truthEvaluationEdit = new BooleanFieldEditor(KeYSEDPreferences.TRUTH_VALUE_EVALUATION_ENABLED, "Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)", SWT.NONE, spacer);
+      addField(truthEvaluationEdit);
 
       group = SWTFactory.createGroup(getFieldEditorParent(), "Variables", 1, 1, GridData.FILL_HORIZONTAL);
       final Composite variablesSpacer = SWTFactory.createComposite(group, 2, 1, GridData.FILL_HORIZONTAL);

@@ -2,6 +2,8 @@
 # List most important files first!
 #
 
+standard_key/prop_log/contraposition.txt
+standard_key/prop_log/liarsville.txt
 firstTouch/01-Agatha/README.txt
 firstTouch/02-Subset/README.txt
 # removed duplicate directory!

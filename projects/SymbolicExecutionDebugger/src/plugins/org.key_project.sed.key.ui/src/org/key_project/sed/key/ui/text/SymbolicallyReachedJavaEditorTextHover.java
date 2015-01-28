@@ -3,6 +3,7 @@ package org.key_project.sed.key.ui.text;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.jdt.internal.ui.text.java.hover.AbstractAnnotationHover;
 import org.eclipse.jdt.ui.text.java.hover.IJavaEditorTextHover;
 import org.eclipse.jface.text.ITextViewer;
@@ -12,9 +13,10 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
 import org.key_project.sed.core.sourcesummary.ISEDSourceRange;
 import org.key_project.sed.ui.text.SymbolicallyReachedAnnotation;
-import org.key_project.util.java.CollectionUtil;
+import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 
@@ -54,7 +56,16 @@ public class SymbolicallyReachedJavaEditorTextHover extends AbstractAnnotationHo
             public ICompletionProposal[] getCompletionProposals() {
                List<ISEDDebugNode> nodes = new LinkedList<ISEDDebugNode>();
                for (ISEDSourceRange range : sedAnnotation.getRanges()) {
-                  CollectionUtil.addAll(nodes, range.getDebugNodes());
+                  for (ISEDDebugNode node : range.getDebugNodes()) {
+                     try {
+                        if (SEDDebugNodeContentProvider.getDefaultInstance().isShown(node)) {
+                           nodes.add(node);
+                        }
+                     }
+                     catch (DebugException e) {
+                        LogUtil.getLogger().logError(e);
+                     }
+                  }
                }
                if (nodes.size() >= 2) {
                   ICompletionProposal[] proposals = new ICompletionProposal[nodes.size() + 1];

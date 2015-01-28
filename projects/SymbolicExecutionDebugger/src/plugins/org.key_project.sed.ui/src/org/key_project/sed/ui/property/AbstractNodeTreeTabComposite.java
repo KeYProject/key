@@ -13,6 +13,9 @@
 
 package org.key_project.sed.ui.property;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.PresentationContext;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.TreeModelViewer;
@@ -20,6 +23,7 @@ import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
@@ -30,9 +34,11 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.sed.ui.util.SEDUIUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
  * This composite provides the functionality to show {@link ISEDDebugNode}s
@@ -114,10 +120,38 @@ public abstract class AbstractNodeTreeTabComposite implements ISEDDebugNodeTabCo
     * @param event The event.
     */
    protected void handleDoubleClick(DoubleClickEvent event) {
-      IViewPart debugView = WorkbenchUtil.findView(IDebugUIConstants.ID_DEBUG_VIEW);
-      if (debugView instanceof IDebugView) {
-         SEDUIUtil.selectInDebugView(WorkbenchUtil.getActivePart(), (IDebugView)debugView, viewer.getSelection());
+      try {
+         IViewPart debugView = WorkbenchUtil.findView(IDebugUIConstants.ID_DEBUG_VIEW);
+         if (debugView instanceof IDebugView) {
+            List<ISEDDebugNode> selectableElemenets = computeSelectableElements(viewer.getSelection());
+            if (!selectableElemenets.isEmpty()) {
+               SEDUIUtil.selectInDebugView(WorkbenchUtil.getActivePart(), (IDebugView)debugView, selectableElemenets);
+            }
+         }
       }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(viewerGroup.getShell(), e);
+      }
+   }
+
+   /**
+    * Returns all selected {@link ISEDDebugNode}s which are shown in the debug view.
+    * @param selection The {@link ISelection} to check.
+    * @return The found shown {@link ISEDDebugNode}s.
+    * @throws DebugException Occurred Exception.
+    */
+   protected List<ISEDDebugNode> computeSelectableElements(ISelection selection) throws DebugException {
+      List<ISEDDebugNode> result = new LinkedList<ISEDDebugNode>();
+      for (Object element : SWTUtil.toList(selection)) {
+         if (element instanceof ISEDDebugNode) {
+            ISEDDebugNode node = (ISEDDebugNode) element;
+            if (SEDDebugNodeContentProvider.getDefaultInstance().isShown(node)) {
+               result.add(node);
+            }
+         }
+      }
+      return result;
    }
 
    /**

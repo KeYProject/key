@@ -71,6 +71,11 @@ public class KeYSEDPreferences {
     * Preference key to define how variables are computed.
     */
    public static final String VARIABLES_ARE_COMPUTED_FROM_UPDATES = "org.key_project.sed.key.core.preference.variablesAreOnlyComputedFromUpdates";
+
+   /**
+    * Preference key to enable truth value evaluation.
+    */
+   public static final String TRUTH_VALUE_EVALUATION_ENABLED = "org.key_project.sed.key.core.preference.truthValueEvaluationEnabled";
    
    /**
     * Returns the managed {@link IPreferenceStore}.
@@ -366,5 +371,37 @@ public class KeYSEDPreferences {
     */
    public static void setDefaultVariablesAreOnlyComputedFromUpdates(boolean defaultValue) {
       getStore().setDefault(VARIABLES_ARE_COMPUTED_FROM_UPDATES, defaultValue);
+   }
+   
+   /**
+    * Checks if truth value evaluation is enabled.
+    * @return Is truth value evaluation enabled?
+    */
+   public static boolean isTruthValueEvaluationEnabled() {
+      return getStore().getBoolean(TRUTH_VALUE_EVALUATION_ENABLED);
+   }
+   
+   /**
+    * Checks if truth value evaluation is enabled by default.
+    * @return Is truth value evaluation enabled?
+    */
+   public static boolean isDefaultTruthValueEvaluationEnabled() {
+      return getStore().getDefaultBoolean(TRUTH_VALUE_EVALUATION_ENABLED);
+   }
+   
+   /**
+    * Sets if truth value evaluation is enabled.
+    * @param value Enable truth value evaluation?
+    */
+   public static void setTruthValueEvaluationEnabled(boolean value) {
+      getStore().setValue(TRUTH_VALUE_EVALUATION_ENABLED, value);
+   }
+   
+   /**
+    * Sets if truth value evaluation is enabled by default.
+    * @param defaultValue Enable truth value evaluation?
+    */
+   public static void setDefaultTruthValueEvaluationEnabled(boolean defaultValue) {
+      getStore().setDefault(TRUTH_VALUE_EVALUATION_ENABLED, defaultValue);
    }
 }
