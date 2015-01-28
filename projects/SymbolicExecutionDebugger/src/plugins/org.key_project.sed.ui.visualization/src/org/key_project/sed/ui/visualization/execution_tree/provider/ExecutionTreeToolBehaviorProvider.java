@@ -115,7 +115,8 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
             }
             else {
                try {
-                  if(groupStart.getGroupEndConditions().length > 0){
+                  ISEDDebugNode[] children = NodeUtil.getChildren((ISEDDebugNode) groupStart);
+                  if(groupStart.getGroupEndConditions().length > 0 && !(children.length == 1 && children[0].getGroupStartCondition((ISEDDebugNode) groupStart) != null)){
                      data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeCollapseFeature(getFeatureProvider()), context, "Collapse", null, IPlatformImageConstants.IMG_EDIT_COLLAPSE));
                   }
                }

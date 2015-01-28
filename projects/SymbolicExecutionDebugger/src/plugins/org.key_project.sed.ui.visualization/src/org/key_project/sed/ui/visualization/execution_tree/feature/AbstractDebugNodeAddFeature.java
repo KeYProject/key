@@ -134,7 +134,7 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
          
          GraphicsAlgorithm ga = createNode(context).getGraphicsAlgorithm();
 
-         gaService.setLocationAndSize(rect, context.getX(), context.getY() + ga.getHeight() / 2, ga.getWidth(), ga.getHeight());
+         gaService.setLocationAndSize(rect, context.getX(), context.getY() + ga.getHeight() / 2, ga.getWidth(), ga.getHeight() + ga.getHeight() / 2);
 
          return container;
       }
@@ -207,18 +207,13 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
          ChopboxAnchor anchor = peCreateService.createChopboxAnchor(nodeContainer);
          
          ISEDDebugNode parentNode = NodeUtil.getParent(addedNode);
-         
-//         ISEDDebugNode parentNode = NodeUtil.getParent((ISEDDebugNode) getBusinessObjectForPictogramElement(nodeContainer));
+
          if(parentNode != null)
          {
             // Since the first pe of a group startnode is always the rec
             // we need to get the second pe.
             PictogramElement pe = getFeatureProvider().getAllPictogramElementsForBusinessObject(parentNode)
                   [NodeUtil.canBeGrouped(parentNode) ? 1 : 0];
-//            PictogramElement pe = NodeUtil.canBeGrouped(parentNode) ?
-////            PictogramElement pe = parentNode instanceof ISEDGroupable && ((ISEDGroupable)parentNode).isGroupable() ? 
-//                  getFeatureProvider().getAllPictogramElementsForBusinessObject(parentNode)[1] :
-//                  getFeatureProvider().getPictogramElementForBusinessObject(parentNode);
                
             if (pe == null) {
                throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't find PictogramElement for \"" + pe + "\"."));

@@ -513,6 +513,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                            moveSubTreeHorizontal(leaf, toMove, false, monitor);
                            moveRighterNodes(leaf, toMove, monitor);
                            updateParents(leafPE, monitor);
+                           resizeRectsIfNeeded(NodeUtil.getGroupStartNode(leaf), monitor);
                         }
                      }
                   }
@@ -739,8 +740,13 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             
             int currentWidth = currentPE.getGraphicsAlgorithm().getWidth();
 
+            // Either we add a new group, so we have to center the rect too or
+            // we added a new node outside the group, so we have to re-center the group inc. rect or
+            // we have a group without statements (only Start and Endnode)
             if(NodeUtil.canBeGrouped(current) && 
-                  (next == current && NodeUtil.getChildren(current).length < 2 || next != current && !isParentGroup(next, current))) {
+                  (next == current && NodeUtil.getChildren(current).length < 2 ||
+                  next != current && !isParentGroup(next, current) ||
+                  next != current && next.getGroupStartCondition(current) != null)) {
                PictogramElement rectPE = getPictogramElementForBusinessObject(current , 0);
                currentWidth = rectPE.getGraphicsAlgorithm().getWidth();
                descendantsPE.add(rectPE);
@@ -1149,14 +1155,14 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       ISEDGroupable groupStart = NodeUtil.getGroupStartNode(node);
       boolean isGroupEnd = node.getGroupStartCondition((ISEDDebugNode) groupStart) != null;
       
-      int methodMaxY = ga.getY() + ga.getHeight() + (isGroupEnd ? -ga.getHeight() / 2 : OFFSET);
+      int methodMaxY = ga.getY() + ga.getHeight() + (isGroupEnd ? -ga.getHeight() / 2 : OFFSET + ga.getHeight() / 2);
 
       do
       {
          GraphicsAlgorithm rectGA = getPictogramElementForBusinessObject(groupStart, 0).getGraphicsAlgorithm();
          ISEDBranchCondition[] bcs = groupStart.getGroupEndConditions();
 
-         // Check if an exisiting groupend is already placed depper in the tree
+         // Check if an existing groupend is already placed deeper in the tree
          for(ISEDBranchCondition bc : bcs) {
             ISEDDebugNode groupEnd = bc.getChildren()[0];
             PictogramElement groupEndPE = getPictogramElementForBusinessObject(groupEnd);
@@ -1187,7 +1193,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                if(groupEndPE != null) {
                   GraphicsAlgorithm groupEndGA = groupEndPE.getGraphicsAlgorithm();
                   if(groupEndGA.getY() + groupEndGA.getHeight() / 2 < rectGA.getY() + rectGA.getHeight()) {
-                     moveSubTreeVertical(groupEnd, rectGA.getY() + rectGA.getHeight() - groupEndGA.getY() -  groupEndGA.getHeight() / 2, monitor);
+                     moveSubTreeVertical(groupEnd, rectGA.getY() + rectGA.getHeight() - groupEndGA.getY() - groupEndGA.getHeight() / 2, monitor);
                   }
                }
             }
@@ -1198,7 +1204,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             ga.setY(rectGA.getY() + rectGA.getHeight() - ga.getHeight() / 2);
          }
          
-         // Remove not used space between rects (the bottom lien of different rects
+         // Remove not used space between rects (the bottom line of different rects
          // will be ontop each other in certain situations)
          shrinkRectHeights(groupStart);
          
@@ -1258,9 +1264,11 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             }
          }
          
-         int diff = rectGA.getY() + rectGA.getHeight() - findDeepestYInGroup(groupStart) - OFFSET - height / 2;
+         int deepestY = findDeepestYInGroup(groupStart);
+         
+         int diff = rectGA.getY() + rectGA.getHeight() - deepestY - OFFSET - height / 2;
 
-         if(diff != 0)
+         if(deepestY > -1 && diff > 0)
          {
             rectGA.setHeight(rectGA.getHeight() - diff);
    
