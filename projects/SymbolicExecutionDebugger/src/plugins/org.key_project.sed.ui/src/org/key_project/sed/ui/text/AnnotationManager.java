@@ -344,33 +344,35 @@ public class AnnotationManager implements IDisposable {
          if (editor instanceof ITextEditor) {
             Object editorSource = getEditorSource(editor);
             ISEDSourceModel sourceModel = target.getSourceModel();
-            sourceModel.ensureCompleteness();
-            ISEDSourceSummary summary = sourceModel.getSourceSummary(editorSource);
-            if (summary != null) {
-               ITextEditor te = (ITextEditor)editor;
-               IDocumentProvider provider = te.getDocumentProvider();
-               IAnnotationModel model = provider.getAnnotationModel(editor.getEditorInput());
-               IDocument document = provider.getDocument(editor.getEditorInput());
-               if (editorSource != null) {
-                  Map<Position, SymbolicallyReachedAnnotation> existingAnnotations = createAnnotationRangeMap(model);
-                  // Update existing annotations and add new annotations if not already present.
-                  for (ISEDSourceRange range : summary.getSourceRanges()) {
-                     Position position = computePosition(document, range);
-                     if (position != null) {
-                        SymbolicallyReachedAnnotation annotation = existingAnnotations.remove(position);
-                        if (annotation == null) {
-                           annotation = new SymbolicallyReachedAnnotation(position);
-                           annotation.setRange(target, range);
-                           model.addAnnotation(annotation, position);
-                        }
-                        else {
-                           annotation.setRange(target, range);
+            if (sourceModel != null) {
+               sourceModel.ensureCompleteness();
+               ISEDSourceSummary summary = sourceModel.getSourceSummary(editorSource);
+               if (summary != null) {
+                  ITextEditor te = (ITextEditor)editor;
+                  IDocumentProvider provider = te.getDocumentProvider();
+                  IAnnotationModel model = provider.getAnnotationModel(editor.getEditorInput());
+                  IDocument document = provider.getDocument(editor.getEditorInput());
+                  if (editorSource != null) {
+                     Map<Position, SymbolicallyReachedAnnotation> existingAnnotations = createAnnotationRangeMap(model);
+                     // Update existing annotations and add new annotations if not already present.
+                     for (ISEDSourceRange range : summary.getSourceRanges()) {
+                        Position position = computePosition(document, range);
+                        if (position != null) {
+                           SymbolicallyReachedAnnotation annotation = existingAnnotations.remove(position);
+                           if (annotation == null) {
+                              annotation = new SymbolicallyReachedAnnotation(position);
+                              annotation.setRange(target, range);
+                              model.addAnnotation(annotation, position);
+                           }
+                           else {
+                              annotation.setRange(target, range);
+                           }
                         }
                      }
-                  }
-                  // Remove no longer needed annotations.
-                  for (SymbolicallyReachedAnnotation annotation : existingAnnotations.values()) {
-                     removeTarget(model, annotation, target);
+                     // Remove no longer needed annotations.
+                     for (SymbolicallyReachedAnnotation annotation : existingAnnotations.values()) {
+                        removeTarget(model, annotation, target);
+                     }
                   }
                }
             }

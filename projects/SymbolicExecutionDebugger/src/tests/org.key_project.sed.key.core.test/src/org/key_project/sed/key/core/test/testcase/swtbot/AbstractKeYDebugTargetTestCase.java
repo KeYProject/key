@@ -514,6 +514,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param useUnicode Use unicode characters?
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
+    * @param higlightReachedSourceCode Highlight reached source code?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -532,6 +533,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean useUnicode,
                                        Boolean usePrettyPrinting,
                                        Boolean showSignatureOnMethodReturnNodes,
+                                       Boolean higlightReachedSourceCode,
                                        int timeoutFactor, 
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       doKeYDebugTargetTest(projectName,
@@ -549,6 +551,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            useUnicode,
                            usePrettyPrinting,
                            showSignatureOnMethodReturnNodes,
+                           higlightReachedSourceCode,
                            timeoutFactor, 
                            executor);
    }
@@ -572,6 +575,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param useUnicode Use unicode characters?
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
+    * @param higlightReachedSourceCode Highlight reached source code?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -591,6 +595,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean useUnicode,
                                        Boolean usePrettyPrinting,
                                        Boolean showSignatureOnMethodReturnNodes,
+                                       Boolean higlightReachedSourceCode,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       doKeYDebugTargetTest(projectName, 
@@ -609,6 +614,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            useUnicode,
                            usePrettyPrinting,
                            showSignatureOnMethodReturnNodes,
+                           higlightReachedSourceCode,
                            timeoutFactor, 
                            executor);
    }
@@ -632,6 +638,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param useUnicode Use unicode characters?
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
+    * @param higlightReachedSourceCode Highlight reached source code?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -652,6 +659,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean useUnicode,
                                        Boolean usePrettyPrinting,
                                        Boolean showSignatureOnMethodReturnNodes,
+                                       Boolean higlightReachedSourceCode,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       // Create test project
@@ -661,7 +669,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          projectConfigurator.configure(project);
       }
       // Do test steps
-      doKeYDebugTargetTest(project, closePropertiesView, closeExecutionTreeViews, selector, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, timeoutFactor, executor);
+      doKeYDebugTargetTest(project, closePropertiesView, closeExecutionTreeViews, selector, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, higlightReachedSourceCode, timeoutFactor, executor);
    }
    
    /**
@@ -680,6 +688,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param useUnicode Use unicode characters?
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
+    * @param higlightReachedSourceCode Highlight reached source code?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -697,6 +706,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean useUnicode,
                                        Boolean usePrettyPrinting,
                                        Boolean showSignatureOnMethodReturnNodes,
+                                       Boolean higlightReachedSourceCode,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       // Create bot
@@ -733,7 +743,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          assertEquals(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes);
+         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, higlightReachedSourceCode);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
