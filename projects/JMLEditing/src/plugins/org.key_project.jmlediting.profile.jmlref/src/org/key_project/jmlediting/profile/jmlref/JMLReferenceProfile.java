@@ -15,8 +15,11 @@ import org.key_project.jmlediting.profile.jmlref.behavior.ExceptionalBehaviorKey
 import org.key_project.jmlediting.profile.jmlref.behavior.NormalBehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.bound_mod.NonNullKeyword;
 import org.key_project.jmlediting.profile.jmlref.bound_mod.NullableKeyword;
+import org.key_project.jmlediting.profile.jmlref.loop.DecreasingKeyword;
+import org.key_project.jmlediting.profile.jmlref.loop.LoopInvariantKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.AlsoKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.HelperKeyword;
+import org.key_project.jmlediting.profile.jmlref.other.InvariantKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.PureKeyword;
 import org.key_project.jmlediting.profile.jmlref.primary.KeywordJMLPrimary;
 import org.key_project.jmlediting.profile.jmlref.quantifier.ExistentialQuantifierKeyword;
@@ -83,7 +86,9 @@ public class JMLReferenceProfile implements IJMLProfile {
             new ExistentialQuantifierKeyword(), new MinQuantifierKeyword(),
             new MaxQuantifierKeyword(), new ProductQuantifierKeyword(),
             new SumQuantifierKeyword(), new NumOfQuantifierKeyword(),
-            new NonNullKeyword(), new NullableKeyword()));
+            new NonNullKeyword(), new NullableKeyword(),
+            new InvariantKeyword(), new LoopInvariantKeyword(),
+            new DecreasingKeyword()));
 
       this.supportedPrimaries = new HashSet<IJMLPrimary>(Arrays.asList(
             new KeywordJMLPrimary(), new QuantifierPrimary()));
