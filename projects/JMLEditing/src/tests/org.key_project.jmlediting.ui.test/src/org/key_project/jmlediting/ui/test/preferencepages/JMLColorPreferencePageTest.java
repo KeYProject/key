@@ -91,7 +91,8 @@ public class JMLColorPreferencePageTest {
    }
 
    private void navigateToJMLColorSettings() {
-      bot.tree().getTreeItem("JML").select().expand().getNode("Color").select();
+      bot.tree().getTreeItem("JML").select().expand().getNode("Colors")
+            .select();
    }
 
    /*
@@ -106,6 +107,7 @@ public class JMLColorPreferencePageTest {
             assertTrue(oSelector instanceof ColorSelector);
             final ColorSelector selector = (ColorSelector) oSelector;
             selector.setColorValue(commentColor);
+
          }
       });
    }
@@ -125,6 +127,7 @@ public class JMLColorPreferencePageTest {
                   colorToCheck, selector.getColorValue());
          }
       });
+      bot.sleep(500);
    }
 
    /*
