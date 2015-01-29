@@ -4,9 +4,8 @@
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <loopInvariant name="invariant: i &gt;= 0
-&amp; (  i &lt;= _array.length
-   &amp;   result_1
-     = javaCastInt(bsum{int j;}(0, i, _array[j])));
+&amp; i &lt;= _array.length
+&amp; result_1 = javaCastInt(bsum{int j;}(0, i, _array[j]));
 variant: javaSubInt(_array.length, i)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <branchCondition name="or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="true" branchCondition="or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
