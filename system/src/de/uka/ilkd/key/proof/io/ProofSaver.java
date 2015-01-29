@@ -237,14 +237,18 @@ public class ProofSaver {
     */
    private String makePathsRelative(String header) {
        final String[] search = new String[]{"\\javaSource","\\bootclasspath","\\classpath","\\include"};
-       String basePath = null;
+       final String basePath;
        String tmp = header;
-       final char sep = File.separatorChar;
        try {
-           basePath = (new File(filename)).getCanonicalPath();
-           final int indexOfSep = basePath.lastIndexOf(sep) >= 0 ? basePath.lastIndexOf(sep) : basePath.length();
-           basePath = basePath.substring(0, indexOfSep);
-           // locate filenames in header
+    	   File file = new File(filename).getCanonicalFile();
+
+    	   while (file.isFile()) { // an if should actually do
+    		   file = file.getParentFile();
+    	   }
+    	   
+    	   basePath = file.getCanonicalPath();
+           
+    	   // locate filenames in header
            for (String s: search){
                int i = tmp.indexOf(s);
                if (i == -1) continue; // entry not in file
