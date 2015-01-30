@@ -63,9 +63,9 @@ public abstract class JoinWithLatticeAbstraction extends JoinRule {
             new HashSet<LocationVariable>();
       
       // Collect program variables in Java block
-      progVars.addAll(getProgramLocations(programCounter, services));
+      progVars.addAll(getLocationVariables(programCounter));
       // Collect program variables in update
-      progVars.addAll(getUpdateLocations(state1.first));
+      progVars.addAll(getUpdateLeftSideLocations(state1.first));
       
       ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
       Term newConstraints = tb.tt();

@@ -191,8 +191,8 @@ public class CloseAfterJoin implements BuiltInRule {
       
       final LinkedHashSet<LocationVariable> allLocs =
             new LinkedHashSet<LocationVariable>();
-      allLocs.addAll(getUpdateLocations(thisSEState.getSymbolicState()));
-      allLocs.addAll(getUpdateLocations(joinState.getSymbolicState()));
+      allLocs.addAll(getUpdateLeftSideLocations(thisSEState.getSymbolicState()));
+      allLocs.addAll(getUpdateLeftSideLocations(joinState.getSymbolicState()));
       allLocs.addAll(getTermLocations(thisSEState.getPathCondition()));
       allLocs.addAll(getTermLocations(joinState.getPathCondition()));
       

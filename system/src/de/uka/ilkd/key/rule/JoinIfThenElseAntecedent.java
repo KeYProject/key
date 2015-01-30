@@ -67,10 +67,10 @@ public class JoinIfThenElseAntecedent extends JoinRule {
             new HashSet<LocationVariable>();
       
       // Collect program variables in Java block
-      progVars.addAll(getProgramLocations(programCounter, services));
+      progVars.addAll(getLocationVariables(programCounter));
       // Collect program variables in update
-      progVars.addAll(getUpdateLocations(state1.first));
-      progVars.addAll(getUpdateLocations(state2.first));
+      progVars.addAll(getUpdateLeftSideLocations(state1.first));
+      progVars.addAll(getUpdateLeftSideLocations(state2.first));
       
       ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
       

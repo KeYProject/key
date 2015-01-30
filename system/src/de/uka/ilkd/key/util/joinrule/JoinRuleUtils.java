@@ -132,7 +132,7 @@ public class JoinRuleUtils {
     * @param u The update (in normal form) to extract program locations from.
     * @return All program locations (left sides) in the given update.
     */
-   public static HashSet<LocationVariable> getUpdateLocations(Term u) {
+   public static HashSet<LocationVariable> getUpdateLeftSideLocations(Term u) {
       if (u.op() instanceof ElementaryUpdate) {
          
          HashSet<LocationVariable> result = new HashSet<LocationVariable>();
@@ -143,7 +143,7 @@ public class JoinRuleUtils {
          
          HashSet<LocationVariable> result = new HashSet<LocationVariable>();
          for (Term sub : u.subs()) {
-            result.addAll(getUpdateLocations(sub));
+            result.addAll(getUpdateLeftSideLocations(sub));
          }
          return result;
          
@@ -184,38 +184,11 @@ public class JoinRuleUtils {
       return result;
    }
    
-   
    /**
-    * Returns all used program locations in the given term. The term
-    * must be of the form \<{ ... }\> phi (or \[{ ... }\] phi).
+    * Returns all program variables in the given term.
     * 
-    * @param programCounterTerm The term (program counter) to extract
-    *    locations from.
-    * @param services The Services object.
-    * @return The set of contained program locations.
-    */
-   public static HashSet<LocationVariable> getProgramLocations(
-         Term programCounterTerm, Services services) {
-      CollectLocationVariablesVisitor visitor =
-            new CollectLocationVariablesVisitor(
-               programCounterTerm.javaBlock().program(),
-               true,
-               services);
-      
-      HashSet<LocationVariable> progVars =
-            new HashSet<LocationVariable>();
-      
-      // Collect program variables in Java block
-      visitor.start();
-      progVars.addAll(visitor.getLocationVariables());
-      
-      return progVars;
-   }
-   
-   /**
-    * TODO document; and maybe replace getProgramLocations(...) by this.
-    * @param term
-    * @return
+    * @param term The term to extract program variables from.
+    * @return All program variables of the given term.
     */
    public static HashSet<LocationVariable> getLocationVariables(Term term) {
       HashSet<LocationVariable> result = new HashSet<LocationVariable>();
@@ -1013,6 +986,34 @@ public class JoinRuleUtils {
       }
       
       return result;
+   }
+   
+   
+   /**
+    * Returns all used program locations in the given term. The term
+    * must be of the form \<{ ... }\> phi (or \[{ ... }\] phi).
+    * 
+    * @param programCounterTerm The term (program counter) to extract
+    *    locations from.
+    * @param services The Services object.
+    * @return The set of contained program locations.
+    */
+   private static HashSet<LocationVariable> getProgramLocations(
+         Term programCounterTerm, Services services) {
+      CollectLocationVariablesVisitor visitor =
+            new CollectLocationVariablesVisitor(
+               programCounterTerm.javaBlock().program(),
+               true,
+               services);
+      
+      HashSet<LocationVariable> progVars =
+            new HashSet<LocationVariable>();
+      
+      // Collect program variables in Java block
+      visitor.start();
+      progVars.addAll(visitor.getLocationVariables());
+      
+      return progVars;
    }
    
    /**
