@@ -213,6 +213,29 @@ public class JoinRuleUtils {
    }
    
    /**
+    * TODO document; and maybe replace getProgramLocations(...) by this.
+    * @param term
+    * @return
+    */
+   public static HashSet<LocationVariable> getLocationVariables(Term term) {
+      HashSet<LocationVariable> result = new HashSet<LocationVariable>();
+      
+      if (term.op() instanceof LocationVariable) {
+         result.add((LocationVariable) term.op());
+      } else {
+         if (!term.javaBlock().isEmpty()) {
+            result.addAll(getProgramLocations(term, mediator().getServices()));
+         }
+         
+         for (Term sub : term.subs()) {
+            result.addAll(getLocationVariables(sub));
+         }
+      }
+      
+      return result;
+   }
+   
+   /**
     * Returns the right side for a given location variable in an update
     * (in normal form).
     * 
@@ -615,7 +638,8 @@ public class JoinRuleUtils {
          Goal goal,
          Services services) {
       
-      LocVarReplBranchUniqueMap replMap = new LocVarReplBranchUniqueMap(goal);
+      LocVarReplBranchUniqueMap replMap = new LocVarReplBranchUniqueMap(
+            goal, new HashSet<LocationVariable>());
       
       ProgVarReplaceVisitor replVisitor1 =
             new ProgVarReplaceVisitor((ProgramElement) se1, replMap, services);
@@ -870,9 +894,14 @@ public class JoinRuleUtils {
       ProgramElement programCounter = selected.sub(1).javaBlock().program();
       Term postCondition = selected.sub(1).sub(0);
       
+      // Note: We may not rename variables in the program counter that also
+      //       occur in the post condition. Otherwise, we may render the goal
+      //       unprovable.
+      
       // Replace location variables in program counter by their
       // branch-unique versions
-      LocVarReplBranchUniqueMap replMap = new LocVarReplBranchUniqueMap(goal);
+      LocVarReplBranchUniqueMap replMap = new LocVarReplBranchUniqueMap(
+            goal, getLocationVariables(postCondition));
       
       ProgVarReplaceVisitor replVisitor =
             new ProgVarReplaceVisitor(programCounter, replMap, services);
@@ -1230,9 +1259,11 @@ public class JoinRuleUtils {
       private static final long serialVersionUID = 2305410114265133879L;
       
       private Goal goal = null;
+      private HashSet<LocationVariable> doNotRename = null;
       
-      public LocVarReplBranchUniqueMap(Goal goal) {
+      public LocVarReplBranchUniqueMap(Goal goal, HashSet<LocationVariable> doNotRename) {
          this.goal = goal;
+         this.doNotRename = doNotRename;
       }
       
       @Override
@@ -1254,6 +1285,10 @@ public class JoinRuleUtils {
       public ProgramVariable get(Object key) {
          if (key instanceof LocationVariable) {
             LocationVariable var = (LocationVariable) key;
+            
+            if (doNotRename.contains(var)) {
+               return var;
+            }
             
             // Find the node where the variable was introduced
             Node intrNode = goal.node();
