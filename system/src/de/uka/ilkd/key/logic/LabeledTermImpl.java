@@ -131,9 +131,8 @@ class LabeledTermImpl extends TermImpl {
 		// as labels must not be empty at least one element exists
 		result.append(labels.get(0).toString()); 
 		for (int i = 1; i<labels.size();i++) {
-			result.append(", \"");
-			result.append(labels.get(i).toString());			
-         result.append("\"");
+			result.append(", ");
+			result.append(labels.get(i).toString());
 		}		
 		result.append(">>");
 		return result.toString();
