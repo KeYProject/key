@@ -25,7 +25,6 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
-import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.ui.test.UITestUtils;
 import org.key_project.jmlediting.ui.test.UITestUtils.TestProject;
@@ -109,8 +108,8 @@ public class AllKeywordsHighlightingTest {
    private List<IKeywordNode> getAllCommentsKeywordsInEditor()
          throws ParserException {
       final List<IKeywordNode> nodes = new ArrayList<IKeywordNode>();
-      for (final CommentRange comment : new CommentLocator(
-            this.editor.getText()).findJMLCommentRanges()) {
+      for (final CommentRange comment : UITestUtils
+            .getAllJMLCommentsInEditor(this.editor)) {
          nodes.addAll(Nodes.getAllKeywords(profile.createParser().parse(
                this.editor.getText(), comment)));
       }

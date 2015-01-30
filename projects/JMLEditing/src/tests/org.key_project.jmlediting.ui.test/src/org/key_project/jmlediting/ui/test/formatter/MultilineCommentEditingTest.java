@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.ui.test.highlighting;
+package org.key_project.jmlediting.ui.test.formatter;
 
 import static org.junit.Assert.assertEquals;
 

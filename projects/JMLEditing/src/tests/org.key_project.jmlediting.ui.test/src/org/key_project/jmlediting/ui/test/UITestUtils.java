@@ -30,6 +30,8 @@ import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
+import org.key_project.jmlediting.core.utilities.CommentLocator;
+import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.ui.test.UITestUtils.TestProject.SaveGuarantee;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -419,5 +421,11 @@ public class UITestUtils {
          lineOffset = nextLineOffset;
       }
       throw new IndexOutOfBoundsException("Offset not in text");
+   }
+
+   public static List<CommentRange> getAllJMLCommentsInEditor(
+         final SWTBotEclipseEditor editor) {
+      return new CommentLocator(editor.getText()).findJMLCommentRanges();
+
    }
 }
