@@ -3,6 +3,8 @@ package org.key_project.jmlediting.core.utilities;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.text.IDocument;
+
 /**
  * Class for finding JML Comments in a given String. This class does not take
  * care of changes to the String! If the String changes a new Instance of the
@@ -27,6 +29,16 @@ public class CommentLocator {
          throw new IllegalArgumentException("text must not be null!");
       }
       this.text = text;
+   }
+
+   /**
+    * Creates a new Comment Locator on the content of the given document.
+    *
+    * @param doc
+    *           the document to locate comments in
+    */
+   public CommentLocator(final IDocument doc) {
+      this(doc.get());
    }
 
    /**
@@ -84,12 +96,12 @@ public class CommentLocator {
                state = ScannerState.IN_STRING;
                position += 1;
                break;
-               // char opener found
+            // char opener found
             case '\'':
                state = ScannerState.IN_CHAR;
                position += 1;
                break;
-               // comment opener found
+            // comment opener found
             case '/':
                if (position < content.length - 1) {
                   final char c2 = content[position + 1];
@@ -111,14 +123,14 @@ public class CommentLocator {
                         position = end + 1;
                      }
                      break;
-                     // Multiline Comment Opener found
+                  // Multiline Comment Opener found
                   case '*':
                      begin = position;
                      position += 2;
                      state = ScannerState.IN_COMMENT;
                      break;
-                     // wrong combination of signs, ignore because there will be
-                     // compile errors
+                  // wrong combination of signs, ignore because there will be
+                  // compile errors
                   default:
                      position += 1;
                      state = ScannerState.DEFAULT;
@@ -129,7 +141,7 @@ public class CommentLocator {
                   break mainloop;
                }
                break;
-               // no special sign found
+            // no special sign found
             default:
                position += 1;
                break;
@@ -149,7 +161,7 @@ public class CommentLocator {
                      state = ScannerState.DEFAULT;
                      position += 2;
                      break;
-                     // star found, can be ignored because no / was found after
+                  // star found, can be ignored because no / was found after
                   default:
                      position += 1;
                      break;
@@ -159,7 +171,7 @@ public class CommentLocator {
                   break mainloop;
                }
                break;
-               // no special sign found
+            // no special sign found
             default:
                position += 1;
                break;
@@ -176,7 +188,7 @@ public class CommentLocator {
                state = ScannerState.DEFAULT;
                position += 1;
                break;
-               // Escape sign found
+            // Escape sign found
             case '\\':
                position += 2;
                break;
@@ -192,18 +204,18 @@ public class CommentLocator {
             case '\\':
                position += 2;
                break;
-               // Char Closer found
+            // Char Closer found
             case '\'':
                state = ScannerState.DEFAULT;
                position += 1;
                break;
-               // no specoal sign found
+            // no specoal sign found
             default:
                position += 1;
                break;
             }
             break;
-            // in unexpected state
+         // in unexpected state
          default:
             throw new AssertionError("Invalid Enum State");
          }
