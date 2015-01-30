@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -16,16 +17,16 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
-
+import de.uka.ilkd.key.util.HelperClassForTests;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import junit.framework.TestCase;
+import org.antlr.runtime.RecognitionException;
 
 /**
- * Common code of classes {@link TestTermParser} and {@link TestTermParserHeap}
- * and {@link TestTermParserSequence}.
+ * Scaffold for antlr {@link Parser} testing.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
@@ -35,6 +36,12 @@ public abstract class AbstractTestTermParser extends TestCase {
     protected final TermBuilder tb;
     protected final NamespaceSet nss;
     protected final Services services;
+    
+    static final String javaPath = System.getProperty("key.home")
+            + File.separator + "examples"
+            + File.separator + "_testcase"
+            + File.separator + "termParser"
+            + File.separator + "parserTest.key";
 
     AbstractTestTermParser(String name) {
         super(name);
@@ -63,29 +70,23 @@ public abstract class AbstractTestTermParser extends TestCase {
         new Recoder2KeY(services, nss).parseSpecialClasses();
         return new KeYParserF(ParserMode.DECLARATION,
                 new KeYLexerF(s,
-                        "No file. Call of parser from parser/TestTermParser.java"),
+                        "No file. Call of parser from " + this.getClass().getSimpleName()),
                 services, nss);
     }
 
-    public void parseDecls(String s) {
-        try {
-            KeYParserF stringDeclParser = stringDeclParser(s);
-            stringDeclParser.decls();
-        } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            throw (RuntimeException) new RuntimeException("Exc while Parsing:\n" + sw).initCause(e);
-        }
+    public void parseDecls(String s) throws RecognitionException {
+        KeYParserF stringDeclParser = stringDeclParser(s);
+        stringDeclParser.decls();
     }
 
     public Term parseProblem(String s) {
         try {
             new Recoder2KeY(TacletForTests.services(),
                     nss).parseSpecialClasses();
+            KeYLexerF lexer = new KeYLexerF(s,
+                    "No file. Call of parser from " + this.getClass().getSimpleName());
             return new KeYParserF(ParserMode.PROBLEM,
-                    new KeYLexerF(s,
-                            "No file. Call of parser from parser/TestTermParser.java"),
+                    lexer,
                     new ParserConfig(services, nss),
                     new ParserConfig(services, nss),
                     null,
@@ -107,15 +108,8 @@ public abstract class AbstractTestTermParser extends TestCase {
         return new KeYParserF(ParserMode.TERM, getLexer(s), services, nss);
     }
 
-    public Term parseTerm(String s) {
-        try {
-            return getParser(s).term();
-        } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            throw new RuntimeException("Exc while Parsing:\n" + sw);
-        }
+    public Term parseTerm(String s) throws Exception {
+        return getParser(s).term();
     }
 
     public Term parseFormula(String s) {
@@ -164,7 +158,7 @@ public abstract class AbstractTestTermParser extends TestCase {
         assertEqualsIgnoreWhitespaces(message, expectedPrettySyntax, printedSyntax);
     }
 
-    protected void verifyParsing(Term expectedParseResult, String expectedPrettySyntax) {
+    protected void verifyParsing(Term expectedParseResult, String expectedPrettySyntax) throws Exception {
         // check whether parsing pretty-syntax produces the correct term
         Term parsedPrettySyntax = parseTerm(expectedPrettySyntax);
         String message = "\nAssertion failed while parsing pretty syntax. "
@@ -188,7 +182,7 @@ public abstract class AbstractTestTermParser extends TestCase {
      * @throws IOException
      */
     protected void comparePrettySyntaxAgainstVerboseSyntax(String prettySyntax, String verboseSyntax,
-            String... optionalStringRepresentations) throws IOException {
+            String... optionalStringRepresentations) throws Exception {
         Term expectedParseResult = parseTerm(verboseSyntax);
         compareStringRepresentationAgainstTermRepresentation(prettySyntax, expectedParseResult, optionalStringRepresentations);
     }
@@ -206,7 +200,7 @@ public abstract class AbstractTestTermParser extends TestCase {
      * @throws IOException
      */
     protected void compareStringRepresentationAgainstTermRepresentation(String prettySyntax, Term expectedParseResult,
-            String... optionalStringRepresentations) throws IOException {
+            String... optionalStringRepresentations) throws Exception {
 
         verifyParsing(expectedParseResult, prettySyntax);
         verifyPrettyPrinting(prettySyntax, expectedParseResult);
@@ -219,6 +213,10 @@ public abstract class AbstractTestTermParser extends TestCase {
         }
     }
 
-    protected abstract Services getServices();
+    protected Services getServices() {
+        JavaInfo javaInfo = new HelperClassForTests().parse(
+                new File(javaPath)).getFirstProof().getJavaInfo();
+        return javaInfo.getServices();
+    }
 
 }
