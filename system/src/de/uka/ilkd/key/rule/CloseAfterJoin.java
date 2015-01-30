@@ -193,8 +193,8 @@ public class CloseAfterJoin implements BuiltInRule {
             new LinkedHashSet<LocationVariable>();
       allLocs.addAll(getUpdateLeftSideLocations(thisSEState.getSymbolicState()));
       allLocs.addAll(getUpdateLeftSideLocations(joinState.getSymbolicState()));
-      allLocs.addAll(getTermLocations(thisSEState.getPathCondition()));
-      allLocs.addAll(getTermLocations(joinState.getPathCondition()));
+      allLocs.addAll(getLocationVariables(thisSEState.getPathCondition()));
+      allLocs.addAll(getLocationVariables(joinState.getPathCondition()));
       
       final LinkedList<Term> origQfdVarTerms = new LinkedList<Term>();
       

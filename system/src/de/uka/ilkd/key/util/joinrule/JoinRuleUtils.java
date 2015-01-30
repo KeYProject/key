@@ -42,14 +42,12 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
@@ -152,36 +150,6 @@ public class JoinRuleUtils {
          throw new IllegalStateException("Update should be in normal form!");
          
       }
-   }
-   
-   /**
-    * @param term The term to extract program locations from.
-    * @return All program locations in the given term.
-    */
-   public static HashSet<LocationVariable> getTermLocations(Term term) {
-      final HashSet<LocationVariable> result =
-            new HashSet<LocationVariable>();
-      
-      term.execPreOrder(new Visitor() {
-         
-         @Override
-         public void visit(Term visited) {
-            Operator op = visited.op();
-            
-            if (!op.isRigid() &&
-                  op instanceof LocationVariable) {
-               result.add((LocationVariable) op);
-            }
-         }
-         
-         @Override
-         public void subtreeLeft(Term subtreeRoot) {}
-         
-         @Override
-         public void subtreeEntered(Term subtreeRoot) {}
-      });
-      
-      return result;
    }
    
    /**
@@ -927,7 +895,7 @@ public class JoinRuleUtils {
       ImmutableSet<QuantifiableVariable> freeVars = term.freeVars();
       ImmutableList<Term> elementaries = ImmutableSLList.nil();
       
-      for (LocationVariable loc : getTermLocations(term)) {
+      for (LocationVariable loc : getLocationVariables(term)) {
          final String newName = tb.newName(stripIndex(loc.name().toString()));
          final LogicVariable newVar =
                new LogicVariable(new Name(newName), loc.sort());
