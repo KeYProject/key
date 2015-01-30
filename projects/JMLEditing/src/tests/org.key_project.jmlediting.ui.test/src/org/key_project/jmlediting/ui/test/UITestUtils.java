@@ -20,6 +20,7 @@ import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.utils.Position;
 import org.eclipse.swtbot.swt.finder.utils.TableRow;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
@@ -285,6 +286,13 @@ public class UITestUtils {
             "data/template/" + className + ".java", guarantee);
    }
 
+   public static TestProject createProjectWithFile(final SWTWorkbenchBot bot,
+         final Class<?> testClass, final SaveGuarantee guarantee)
+         throws CoreException, InterruptedException {
+      return createProjectWithFile(bot, testClass.getSimpleName(), testClass
+            .getPackage().getName(), testClass.getSimpleName(), guarantee);
+   }
+
    /**
     * Creates a new Java Projects and copies a class into the project. The it
     * opens to class in the editor. The guarantee with respect to saving the
@@ -385,5 +393,31 @@ public class UITestUtils {
          }
       }
       return lines;
+   }
+
+   public static Position getLineAndColumn(final int offset,
+         final SWTBotEclipseEditor editor) {
+      int lineOffset = 0;
+      for (int line = 0; line < editor.getLineCount(); line++) {
+         int nextLineOffset = lineOffset + editor.getLines().get(line).length();
+         // Check new line characters
+         if (editor.getText().length() > nextLineOffset) {
+            final char newLine1 = editor.getText().charAt(nextLineOffset);
+            final char newLine2 = editor.getText().charAt(nextLineOffset + 1);
+            if (newLine1 == '\n' && newLine2 == 'r') {
+               nextLineOffset += 2;
+            }
+            else {
+               // One new line at least
+               nextLineOffset++;
+            }
+         }
+         // Check whether offset is in line
+         if (offset < nextLineOffset) {
+            return new Position(line, offset - lineOffset);
+         }
+         lineOffset = nextLineOffset;
+      }
+      throw new IndexOutOfBoundsException("Offset not in text");
    }
 }

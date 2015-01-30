@@ -1,6 +1,11 @@
 package org.key_project.jmlediting.ui.test.highlighting;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.custom.StyleRange;
@@ -55,7 +60,7 @@ import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper.ColorProperty;
  */
 public class JMLCommentHighlightingTest {
 
-   static SWTWorkbenchBot bot = new SWTWorkbenchBot();
+   private static SWTWorkbenchBot bot = new SWTWorkbenchBot();
 
    private SWTBotEclipseEditor editor = null;
 
@@ -84,8 +89,11 @@ public class JMLCommentHighlightingTest {
    private final RGB defaultTextRGB = new RGB(0, 0, 0);
    private final RGB string = new RGB(42, 0, 255);
    private final RGB character = new RGB(42, 0, 255);
-   private final RGB jmlComment = JMLUiPreferencesHelper
-         .getWorkspaceJMLColor(ColorProperty.COMMENT);
+   private final Set<RGB> jmlColors = new HashSet<RGB>(Arrays.asList(
+         JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.COMMENT),
+         JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.KEYWORD),
+         JMLUiPreferencesHelper
+               .getWorkspaceJMLColor(ColorProperty.TOPLEVEL_KEYWORD)));
 
    private static TestProject testProject;
 
@@ -125,13 +133,13 @@ public class JMLCommentHighlightingTest {
    @Test
    public void JMLSingleLineTest() {
       this.checkColors(PosJMLCommentSingle.line, PosJMLCommentSingle.column,
-            30, this.jmlComment, "Color did not Match JMLCommentColor");
+            30, this.jmlColors, "Color did not Match JMLCommentColor");
    }
 
    @Test
    public void JMLMultiLineTest() {
       this.checkColors(PosJMLCommentMulti.line, PosJMLCommentMulti.column, 33,
-            this.jmlComment, "Color did not Match JMLCommentColor");
+            this.jmlColors, "Color did not Match JMLCommentColor");
    }
 
    @Test
@@ -183,7 +191,7 @@ public class JMLCommentHighlightingTest {
       this.editor.insertText(PosJCommentMulti.line,
             PosJCommentMulti.column + 2, "@");
       this.checkColors(PosJCommentMulti.line, PosJCommentMulti.column, 50,
-            this.jmlComment, "Color did not Match JMLCommentColor");
+            this.jmlColors, "Color did not Match JMLCommentColor");
    }
 
    @Test
@@ -199,7 +207,7 @@ public class JMLCommentHighlightingTest {
       this.editor.insertText(PosJCommentSingle.line,
             PosJCommentSingle.column + 2, "@");
       this.checkColors(PosJCommentSingle.line, PosJCommentSingle.column, 28,
-            this.jmlComment, "Color did not Match JMLCommentColor");
+            this.jmlColors, "Color did not Match JMLCommentColor");
    }
 
    @Test
@@ -209,7 +217,7 @@ public class JMLCommentHighlightingTest {
       this.editor.insertText(PosJDocComment.line, PosJDocComment.column + 2,
             "@");
       this.checkColors(PosJDocComment.line, PosJDocComment.column, 45,
-            this.jmlComment, "Color did not Match JMLCommentColor");
+            this.jmlColors, "Color did not Match JMLCommentColor");
    }
 
    @Test
@@ -246,8 +254,8 @@ public class JMLCommentHighlightingTest {
       this.checkColors(PublicJavaDoc.line, PublicJavaDoc.column + 3, 6,
             this.javaDocRGB, "Color did not Match JavaDocColor");
 
-      this.checkColors(PublicJML.line, PublicJML.column + 3, 6,
-            this.jmlComment, "Color did not Match JMLCommentColor");
+      this.checkColors(PublicJML.line, PublicJML.column + 3, 6, this.jmlColors,
+            "Color did not Match JMLCommentColor");
 
       this.checkColors(PublicKeyword.line, PublicKeyword.column, 6,
             this.specialWordRGB,
@@ -260,13 +268,13 @@ public class JMLCommentHighlightingTest {
       this.editor.insertText(PublicJavaComment.line,
             PublicJavaComment.column + 2, "@");
       this.checkColors(PublicJavaComment.line, PublicJavaComment.column + 3, 6,
-            this.jmlComment, "Color did not Match JMLColor");
+            this.jmlColors, "Color did not Match JMLColor");
 
       this.removeText(
             new Position(PublicJavaDoc.line, PublicJavaDoc.column + 2), 1);
       this.editor.insertText(PublicJavaDoc.line, PublicJavaDoc.column + 2, "@");
       this.checkColors(PublicJavaDoc.line, PublicJavaDoc.column + 3, 6,
-            this.jmlComment, "Color did not Match JMLColor");
+            this.jmlColors, "Color did not Match JMLColor");
       this.removeText(
             new Position(PublicJavaDoc.line, PublicJavaDoc.column + 2), 1);
       this.editor.insertText(PublicJavaDoc.line, PublicJavaDoc.column + 2, "*");
@@ -281,6 +289,15 @@ public class JMLCommentHighlightingTest {
             "Color did not Match color for the \"public\" Java Keyword");
    }
 
+   /*
+    * Shortcut for checkColors with a single color
+    */
+   private void checkColors(final int line, final int column, final int length,
+         final RGB color, final String message) {
+      this.checkColors(line, column, length, Collections.singleton(color),
+            message);
+   }
+
    /**
     * This Method matches the Textcolor of a given piece of code
     *
@@ -291,17 +308,17 @@ public class JMLCommentHighlightingTest {
     * @param length
     *           the length of text that should be matched
     * @param color
-    *           the color the text should be
+    *           all allowed colors
     * @return true if the text starting at line,column with length length has
     *         the given color, else false
     */
    private void checkColors(final int line, final int column, final int length,
-         final RGB color, final String message) {
+         final Set<RGB> colors, final String message) {
       final StyleRange[] textColors = this.editor.getStyles(line, column,
             length);
       for (final StyleRange r : textColors) {
-         assertEquals(message + " at " + r.start + " with length " + r.length,
-               color, r.foreground.getRGB());
+         assertTrue(message + " at " + r.start + " with length " + r.length,
+               colors.contains(r.foreground.getRGB()));
 
       }
    }
