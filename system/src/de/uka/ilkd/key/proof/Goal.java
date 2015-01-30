@@ -437,7 +437,7 @@ public final class Goal  {
     }
 
     public void addProgramVariable(ProgramVariable pv) {
-        proof().getNamespaces().programVariables().addSafely(pv);
+       proof().getNamespaces().programVariables().addSafely(pv);
 	node.setGlobalProgVars(getGlobalProgVars().add(pv));
     }
 

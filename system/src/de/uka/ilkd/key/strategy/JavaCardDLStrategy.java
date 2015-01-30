@@ -38,7 +38,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
+import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.JoinRule;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
@@ -2553,6 +2555,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 //	    System.out.println("Cost for node " + goal.node().serialNr() + ": " + result);
 //	    return result;
 //	}
+       
         return costComputationF.compute ( app, pio, goal );
     }
 

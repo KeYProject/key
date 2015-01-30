@@ -82,6 +82,7 @@ public class ProofTreeView extends JPanel {
     private static final Color DARK_BLUE_COLOR = new Color(31,77,153);
     private static final Color DARK_GREEN_COLOR = new Color(0,128,51);
     private static final Color DARK_RED_COLOR = new Color(191,0,0);
+    private static final Color PINK_COLOR = new Color(255,0,240);
     private static final Color ORANGE_COLOR = new Color(255,140,0);
 
     /** the mediator is stored here */
@@ -673,6 +674,8 @@ public class ProofTreeView extends JPanel {
                 if ( ((GUIBranchNode)value).getNode().isClosed() ) {
                     // all goals below this node are closed
                     this.setIcon(IconFactory.provedFolderIcon());
+                } else if ( ((GUIBranchNode)value).getNode().isLinked() ) {
+                   this.setIcon(IconFactory.linkedFolderIcon());
                 }
                 return this;
             }
@@ -712,7 +715,12 @@ public class ProofTreeView extends JPanel {
 		    ProofTreeView.this.setToolTipText("Closed Goal");
 		    tree_cell.setToolTipText("A closed goal");
 		} else {
-		    if ( !goal.isAutomatic() ) {
+		   if ( node.isLinked() ) {
+            tree_cell.setForeground(PINK_COLOR);
+            tree_cell.setIcon(IconFactory.keyHoleLinked(20, 20));
+            ProofTreeView.this.setToolTipText("Linked Goal");
+            tree_cell.setToolTipText("Linked goal - no automatic rule application");
+		   } else if ( !goal.isAutomatic() ) {
 		        tree_cell.setForeground(ORANGE_COLOR);
 		        tree_cell.setIcon(IconFactory.keyHoleInteractive(20, 20));
 		        ProofTreeView.this.setToolTipText("Disabled Goal");
