@@ -1,5 +1,8 @@
 package org.key_project.sed.key.core.slicing;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.annotation.impl.SliceAnnotation;
@@ -45,11 +48,14 @@ public abstract class AbstractKeYSlicer implements ISEDSlicer {
             SliceAnnotation annotation = annotationType.createAnnotation();
             annotation.setSeed(seedVariable.getName() + " at " + seedNode.getName());
             keyDebugTarget.registerAnnotation(annotation);
+            Set<IKeYSEDDebugNode<?>> linkedNodes = new HashSet<IKeYSEDDebugNode<?>>();
             for (Node slice : slices) {
                IKeYSEDDebugNode<?> keyTargetNode = keyDebugTarget.getDebugNode(slice);
                if (keyTargetNode != null) {
-                  SliceAnnotationLink link = annotationType.createLink(annotation, keyTargetNode);
-                  annotation.addLink(link);
+                  if (linkedNodes.add(keyTargetNode)) { // Ensure that nodes are linked only once
+                     SliceAnnotationLink link = annotationType.createLink(annotation, keyTargetNode);
+                     annotation.addLink(link);
+                  }
                }
             }
             return annotation;

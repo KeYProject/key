@@ -23,12 +23,24 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
    public static final boolean PRINT_SLICE = false;
    
    /**
+    * Tests slicing on the example {@code simpleStaticFields}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testSimpleStaticFields() throws Exception {
+      doSlicingTest("examples/_testcase/slicing/simpleStaticFields/SimpleStaticFields.proof", 
+                    63,
+                    false,
+                    28, 12, 5);
+   }
+   
+   /**
     * Tests slicing on the example {@code simpleLocalVariables}.
     * @throws Exception Occurred Exception.
     */
    public void testSimpleLocalVariables() throws Exception {
       doSlicingTest("examples/_testcase/slicing/simpleLocalVariables/SimpleLocalVariables.proof", 
                     24,
+                    true,
                     20, 11, 7);
    }
    
@@ -36,11 +48,13 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * Performs a slicing test.
     * @param proofFileInRepository The path to the proof file.
     * @param seedNodeId The serial ID of the seed node.
+    * @param fullSlize {@code true} if the he full slice is given as expected slice and {@code false} if only a part of the slice is given as expected slive.
     * @param expectedSlice The serial IDs of the expected slices.
     * @throws Exception Occurred Exception
     */
    protected void doSlicingTest(String proofFileInRepository,
                                 int seedNodeId,
+                                boolean fullSlize,
                                 int... expectedSlice) throws Exception {
       // Load proof
       File proofFile = new File(keyRepDirectory, proofFileInRepository);
@@ -68,12 +82,30 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
                System.out.println(slice.serialNr());
             }
          }
-         // Compare slice
-         assertEquals(expectedSlice.length, slices.size());
-         for (int i = 0; i < expectedSlice.length; i++) {
-            Node slice = slices.get(i);
-            assertNotNull(slice);
-            assertEquals(expectedSlice[i], slice.serialNr());
+         if (fullSlize) {
+            // Compare all Nodes in the slice
+            assertEquals(expectedSlice.length, slices.size());
+            for (int i = 0; i < expectedSlice.length; i++) {
+               Node slice = slices.get(i);
+               assertNotNull(slice);
+               assertEquals(expectedSlice[i], slice.serialNr());
+            }
+         }
+         else {
+            // Ensure that only given Nodes exist in the slice maintaining the order
+            int currentIndex = 0;
+            for (int expected : expectedSlice) {
+               Node slice = null;
+               while (slice == null && currentIndex < slices.size()) {
+                  Node toCheck = slices.get(currentIndex);
+                  assertNotNull(toCheck);
+                  if (toCheck.serialNr() == expected) {
+                     slice = toCheck;
+                  }
+                  currentIndex++;
+               }
+               assertNotNull(slice);
+            }
          }
       }
       finally {

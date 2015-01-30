@@ -10,7 +10,8 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 
 /**
@@ -22,8 +23,8 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
     * {@inheritDoc}
     */
    @Override
-   public ImmutableArray<Node> slice(Node seedNode, Expression seedLocation) {
-      Set<Expression> relevantLocations = new HashSet<Expression>();
+   public ImmutableArray<Node> slice(Node seedNode, Term seedLocation) {
+      Set<Term> relevantLocations = new HashSet<Term>();
       relevantLocations.add(seedLocation);
       List<Node> result = new LinkedList<Node>();
       while (seedNode != null) {
@@ -41,7 +42,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
     * @param relevantLocations The relevant locations.
     * @return {@code true} {@link Node} should be part of slice, {@code false} {@link Node} should not be part of slice.
     */
-   protected abstract boolean accept(Node node, Set<Expression> relevantLocations);
+   protected abstract boolean accept(Node node, Set<Term> relevantLocations);
 
    /**
     * Updates the relevant locations.
@@ -50,13 +51,13 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
     * @param services The {@link Services} to use.
     */
    protected void updateRelevantLocations(final Expression read, 
-                                          final Set<Expression> relevantLocations, 
+                                          final Set<Term> relevantLocations, 
                                           final Services services) {
       JavaASTVisitor visitor = new JavaASTVisitor(read, services) {
          @Override
          protected void doDefaultAction(SourceElement node) {
-            if (node instanceof LocationVariable) {
-               relevantLocations.add((LocationVariable) node);
+            if (node instanceof ProgramVariable) {
+               relevantLocations.add(toTerm(services, node));
             }
          }
       };
