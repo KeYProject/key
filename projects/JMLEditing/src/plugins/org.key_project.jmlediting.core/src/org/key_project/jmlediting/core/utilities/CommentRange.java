@@ -50,8 +50,8 @@ public class CommentRange {
    }
 
    /**
-    * returns the Comments End Offset (including the closing signs of Multiline
-    * Comments).
+    * returns the inclusive Comments End Offset (including the closing signs of
+    * Multiline Comments).
     *
     * @return the endOffset
     */

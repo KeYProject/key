@@ -10,6 +10,7 @@ import org.eclipse.jdt.ui.text.IColorManager;
 import org.eclipse.jdt.ui.text.IJavaPartitions;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IAutoEditStrategy;
+import org.eclipse.jface.text.formatter.IContentFormatter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
@@ -17,6 +18,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.javaeditor.extension.DefaultJavaSourceViewerConfigurationExtension;
+import org.key_project.jmlediting.ui.format.JMLContentFormatter;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
 
 /**
@@ -120,5 +122,13 @@ public class JMLSourceViewerConfigurationExtension extends
       }
 
       return newStrategys.toArray(new IAutoEditStrategy[0]);
+   }
+
+   @Override
+   public IContentFormatter getContentFormatter(
+         final ISourceViewer sourceViewer, final IContentFormatter currentResult) {
+      System.out.println("Formatter: " + currentResult);
+      return new JMLContentFormatter(super.getContentFormatter(sourceViewer,
+            currentResult));
    }
 }
