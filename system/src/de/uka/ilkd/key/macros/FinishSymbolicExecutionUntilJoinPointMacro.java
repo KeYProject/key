@@ -40,7 +40,7 @@ import de.uka.ilkd.key.strategy.Strategy;
  * This is done by implementing a delegation {@link Strategy} which assigns to
  * any rule application infinite costs if there is no modality on the sequent.
  * 
- * @author mattias ulbrich
+ * @author Mattias Ulbrich
  * @author Dominic Scheurer
  * @see FinishSymbolicExecutionMacro
  */
