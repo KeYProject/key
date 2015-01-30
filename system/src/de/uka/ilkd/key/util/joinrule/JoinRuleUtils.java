@@ -644,7 +644,7 @@ public class JoinRuleUtils {
       ProgVarReplaceVisitor replVisitor1 =
             new ProgVarReplaceVisitor((ProgramElement) se1, replMap, services);
       ProgVarReplaceVisitor replVisitor2 =
-            new ProgVarReplaceVisitor((ProgramElement) se1, replMap, services);
+            new ProgVarReplaceVisitor((ProgramElement) se2, replMap, services);
       
       replVisitor1.start();
       replVisitor2.start();
