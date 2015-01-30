@@ -245,6 +245,8 @@ public class ClassTree extends JTree {
             int numGrandChildren = child.getChildCount();
             if (numGrandChildren == 1) {
                 DefaultMutableTreeNode grandChild = (DefaultMutableTreeNode)child.getFirstChild();
+                //stop compressing at method name
+                if (((Entry)grandChild.getUserObject()).target != null) continue;
                 child.removeFromParent();
                 root.add(grandChild);
                 Entry e1 = (Entry) child.getUserObject();
@@ -346,27 +348,32 @@ public class ClassTree extends JTree {
         DefaultMutableTreeNode node 
                 = (DefaultMutableTreeNode) getModel().getRoot();
         assert node != null;        
+        pathVector.add(node);
         do {
-            //save current node
-            pathVector.add(node);
-            
-            //get next part of the name
-            int lastIndex = index;
-            index = fullClassName.indexOf(".", ++index);
-            if(index == -1) {
-                index = length;
+            if (fullClassName.startsWith(".")) {
+                fullClassName = fullClassName.substring(1);
             }
-            String namePart = fullClassName.substring(lastIndex + 1, index);
-            
-            //get child node, go down to it
-            DefaultMutableTreeNode childNode = getChildByString(node, namePart);
-	    assert childNode != null : "type not found: " + namePart 
-	                               + " (part of " + fullClassName
-	                               + ", for observer " + target + ")";
+            //get next part of the name
+            DefaultMutableTreeNode childNode = null;
+            for (int i=0; i<node.getChildCount(); i++) {
+                childNode = (DefaultMutableTreeNode) node.getChildAt(i);
+                Entry e = (Entry) childNode.getUserObject();
+                if (fullClassName.startsWith(e.string)) {
+                    pathVector.add(childNode);
+                    fullClassName = fullClassName.substring(e.string.length());
+                    break;
+                } else childNode = null;
+            }
+	    if (childNode == null) {
+                System.err.println(
+                    "Cannot find ("+kjt.getFullName()+","+target + ") in dialog. "+
+                    "Unmatched fragment \""+fullClassName+"\"");
+                return;
+            }
             node = childNode;
-        } while(index != length);
-        TreePath incompletePath = new TreePath(pathVector.toArray());
-        TreePath path = incompletePath.pathByAddingChild(node);
+        } while(fullClassName.length() > 0);
+        TreePath path = new TreePath(pathVector.toArray());
+        TreePath incompletePath = null;
         
         //extend tree path to method
         if(target != null) {
@@ -374,6 +381,8 @@ public class ClassTree extends JTree {
             if(methodNode != null) {
         	incompletePath = path;            
         	path = path.pathByAddingChild(methodNode);
+            } else {
+                incompletePath = path.getParentPath();
             }
         }
         

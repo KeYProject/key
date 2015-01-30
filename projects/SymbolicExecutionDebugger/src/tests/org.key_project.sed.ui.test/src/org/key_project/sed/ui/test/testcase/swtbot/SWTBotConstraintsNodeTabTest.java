@@ -22,6 +22,7 @@ import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -69,14 +70,24 @@ public class SWTBotConstraintsNodeTabTest extends AbstractSWTBotPropertyTabTest 
 
          @Override
          public void assertMethodReturn(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDMethodReturn methodReturn) throws Exception {
-            assertTrue(tabs.selectTabItem("Constraints"));
-            assertEquals(0, propertiesView.bot().table().rowCount());
+            if (!ArrayUtil.isEmpty(methodReturn.getConstraints())) {
+               assertTrue(tabs.selectTabItem("Constraints"));
+               assertEquals(0, propertiesView.bot().table().rowCount());
+            }
+            else {
+               assertFalse(tabs.selectTabItem("Constraints"));
+            }
          }
 
          @Override
          public void assertMethodCall(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDMethodCall methodCall) throws Exception {
-            assertTrue(tabs.selectTabItem("Constraints"));
-            assertEquals(0, propertiesView.bot().table().rowCount());
+            if (!ArrayUtil.isEmpty(methodCall.getConstraints())) {
+               assertTrue(tabs.selectTabItem("Constraints"));
+               assertEquals(0, propertiesView.bot().table().rowCount());
+            }
+            else {
+               assertFalse(tabs.selectTabItem("Constraints"));
+            }
          }
       };
    }

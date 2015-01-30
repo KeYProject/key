@@ -276,7 +276,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             ApplyStrategyInfo info = null;
             try {
                // Instantiate proof in which equivalent classes of symbolic objects are computed.
-               ProofStarter equivalentClassesProofStarter = SideProofUtil.createSideProof(sideProofEnv, initialConditionsSequent);
+               ProofStarter equivalentClassesProofStarter = SideProofUtil.createSideProof(sideProofEnv, initialConditionsSequent, null);
                // Apply cut rules to compute equivalent classes
                applyCutRules(equivalentClassesProofStarter, symbolicObjectsResultingInCurrentState);
                // Finish proof automatically

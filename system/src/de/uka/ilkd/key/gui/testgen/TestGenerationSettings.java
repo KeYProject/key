@@ -6,9 +6,9 @@ import java.util.EventObject;
 import java.util.LinkedHashSet;
 import java.util.Properties;
 
-import de.uka.ilkd.key.gui.configuration.Settings;
-import de.uka.ilkd.key.gui.configuration.SettingsConverter;
-import de.uka.ilkd.key.gui.configuration.SettingsListener;
+import de.uka.ilkd.key.settings.Settings;
+import de.uka.ilkd.key.settings.SettingsConverter;
+import de.uka.ilkd.key.settings.SettingsListener;
 
 public class TestGenerationSettings implements Settings, Cloneable {
 	// Default Values for option fields

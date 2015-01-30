@@ -24,6 +24,7 @@ import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.sourcesummary.ISEDSourceModel;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.SEDBreadthFirstIterator;
 import org.key_project.util.java.ArrayUtil;
@@ -155,6 +156,10 @@ public abstract class AbstractSEDThread extends AbstractSEDStackFrameCompatibleD
     */
    @Override
    public void suspend() throws DebugException {
+      ISEDSourceModel sourceModel = getDebugTarget().getSourceModel();
+      if (sourceModel != null) {
+         sourceModel.setPossiblyIncomplete();
+      }
       suspended = true;
       fireSuspendEvent(DebugEvent.CLIENT_REQUEST);
    }

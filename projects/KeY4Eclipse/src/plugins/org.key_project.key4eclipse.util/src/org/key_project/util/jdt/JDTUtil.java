@@ -20,10 +20,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -35,6 +40,7 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaConventions;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
@@ -43,14 +49,24 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.internal.corext.util.CodeFormatterUtil;
+import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.eclipse.jdt.internal.corext.util.JavaModelUtil;
 import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
+import org.eclipse.jdt.internal.ui.util.CoreUtility;
 import org.eclipse.jdt.internal.ui.viewsupport.JavaElementLabelComposer;
 import org.eclipse.jdt.ui.JavaElementLabels;
+import org.eclipse.jdt.ui.PreferenceConstants;
+import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
+import org.eclipse.swt.widgets.Display;
+import org.key_project.util.Activator;
+import org.key_project.util.eclipse.Logger;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithException;
+import org.key_project.util.java.thread.IRunnableWithException;
 
 /**
  * Provides static methods to work with JDT.
@@ -58,12 +74,115 @@ import org.key_project.util.java.ObjectUtil;
  */
 @SuppressWarnings("restriction")
 public class JDTUtil {
+   /**
+    * File extension of Java source files.
+    */
    public static final String JAVA_FILE_EXTENSION = "java";
    
    /**
     * Forbid instances by this private constructor.
     */
    private JDTUtil() {
+   }
+
+   /**
+    * Creates a new {@link IJavaProject} that is an {@link IProject} with a JDT nature.
+    * @param name The project name.
+    * @param referencedProjects Additional {@link IProject}s to include in the build path.
+    * @return The created {@link IJavaProject}.
+    * @throws CoreException Occurred Exception.
+    */
+   public static IJavaProject createJavaProject(String name, 
+                                                IProject... referencedProjects) throws CoreException {
+      return createJavaProject(name, getOutputFolderName(), getSourceFolderName(), referencedProjects);
+   }
+
+   /**
+    * Creates a new {@link IJavaProject} that is an {@link IProject} with a JDT nature.
+    * @param name The project name.
+    * @param outputFolderName The name of the output folder to create.
+    * @param srcFolderName The name of the source folder to create.
+    * @param referencedProjects Additional {@link IProject}s to include in the build path.
+    * @return The created {@link IJavaProject}.
+    * @throws CoreException Occurred Exception.
+    */
+   public static IJavaProject createJavaProject(String name, 
+                                                String outputFolderName,
+                                                String srcFolderName,
+                                                IProject... referencedProjects) throws CoreException {
+      IProject project = ResourceUtil.createProject(name);
+      IFolder bin = project.getFolder(outputFolderName);
+      CoreUtility.createDerivedFolder(bin, true, true, null);
+      IFolder src = project.getFolder(srcFolderName);
+      CoreUtility.createFolder(src, true, true, null);
+      return convertToJavaProject(project, bin, src, referencedProjects);
+   }
+   
+   /**
+    * Returns the default output folder name.
+    * @return The default output folder name.
+    */
+   public static String getOutputFolderName() {
+      return PreferenceConstants.getPreferenceStore().getString(PreferenceConstants.SRCBIN_BINNAME);
+   }
+   
+   /**
+    * Returns the default source folder name.
+    * @return The default source folder name.
+    */
+   public static String getSourceFolderName() {
+      return PreferenceConstants.getPreferenceStore().getString(PreferenceConstants.SRCBIN_SRCNAME);
+   }
+   
+   /**
+    * Converts the given {@link IProject} into an {@link IJavaProject}.
+    * @param project The {@link IProject} to convert.
+    * @param bin The {@link IContainer} to use as output location.
+    * @param src The {@link IContainer} which provides the source files.
+    * @param referencedProjects Additional {@link IProject}s to include in the build path.
+    * @return The created {@link IJavaProject}.
+    * @throws CoreException Occurred Exception.
+    */
+   public static IJavaProject convertToJavaProject(IProject project, 
+                                                   final IContainer bin, 
+                                                   final IContainer src, 
+                                                   final IProject... referencedProjects) throws CoreException {
+      final IJavaProject javaProject = JavaCore.create(project); 
+      IRunnableWithException run = new AbstractRunnableWithException() {
+         @Override
+         public void run() {
+            try {
+               JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
+               IClasspathEntry[] entries = new IClasspathEntry[1 + referencedProjects.length];
+               entries[0] = JavaCore.newSourceEntry(src.getFullPath());
+               for (int i = 0; i < referencedProjects.length; i++) {
+                  entries[i + 1] = JavaCore.newProjectEntry(referencedProjects[i].getFullPath());
+               }
+               entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
+               page.init(javaProject, bin.getFullPath(), entries, false);
+               page.configureJavaProject(null);
+            }
+            catch (Exception e) {
+               setException(e);
+            }
+         }
+      };
+      Display.getDefault().syncExec(run);
+      if (run.getException() instanceof CoreException) {
+         throw (CoreException)run.getException();
+      }
+      else if (run.getException() != null) {
+         throw new CoreException(new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(run.getException()));
+      }
+      return javaProject;
+   }
+   
+   /**
+    * Returns the default JRE library entries.
+    * @return The default JRE library entries.
+    */
+   public static IClasspathEntry[] getDefaultJRELibrary() {
+       return PreferenceConstants.getDefaultJRELibrary();
    }
    
    /**
@@ -497,6 +616,27 @@ public class JDTUtil {
       }
       return inSourceFolder;
    }
+
+   /**
+    * Returns all source {@link IPackageFragmentRoot}s.
+    * @param javaProject The {@link IJavaProject} to read source {@link IPackageFragmentRoot}s from.
+    * @return The found {@link IPackageFragmentRoot}s.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static List<IPackageFragmentRoot> getSourcePackageFragmentRoots(IJavaProject javaProject) throws JavaModelException {
+      List<IPackageFragmentRoot> result = new LinkedList<IPackageFragmentRoot>();
+      if (javaProject != null && javaProject.exists()) {
+         IClasspathEntry[] entries = javaProject.getRawClasspath();
+         for (IClasspathEntry entry : entries) {
+             if (entry.getContentKind() == IPackageFragmentRoot.K_SOURCE &&
+                 entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+                IPackageFragmentRoot[] roots = javaProject.findPackageFragmentRoots(entry);
+                CollectionUtil.addAll(result, roots);
+             }
+         }
+      }
+      return result;
+   }
    
    /**
     * Returns the locations in the local file system of all used
@@ -845,6 +985,52 @@ public class JDTUtil {
          StringBuffer sb = new StringBuffer();
          JavaElementLabelComposerHelper c = new JavaElementLabelComposerHelper(sb, type.getDeclaringType());
          c.appendTypeLabel(type, JavaElementLabels.T_FULLY_QUALIFIED);
+         return sb.toString();
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Builds the given {@link IJavaProject} in the background {@link Job}.
+    * @param project The {@link IJavaProject} to build in background.
+    */
+   public static void buildInBackground(IJavaProject javaProject) {
+      buildInBackground(javaProject.getProject());
+   }
+
+   /**
+    * Builds the given {@link IProject} in the background {@link Job}.
+    * @param project The {@link IProject} to build in background.
+    */
+   public static void buildInBackground(IProject project) {
+      CoreUtility.startBuildInBackground(project.getProject());
+   }
+
+   /**
+    * Ensures that the given name is a valid Java type name by replacing
+    * all invalid characters with {@code '_'}.
+    * @param name The name to validate.
+    * @param project The {@link IJavaProject} in which the name will be used.
+    * @return The validated name.
+    */
+   public static String ensureValidJavaTypeName(String name, IJavaProject project) {
+      if (name != null) {
+         StringBuffer sb = new StringBuffer();
+         char[] characters = name.toCharArray();
+         for (int i = 0; i < characters.length; i++) {
+            String nameToValidate = sb.toString() + characters[i];
+            IStatus status = project != null ?
+                             JavaConventionsUtil.validateJavaTypeName(nameToValidate, project) :
+                             JavaConventions.validateJavaTypeName(nameToValidate, JavaCore.VERSION_1_3, JavaCore.VERSION_1_3);;
+            if (status.isOK()) {
+               sb.append(characters[i]);
+            }
+            else {
+               sb.append("_");
+            }
+         }
          return sb.toString();
       }
       else {

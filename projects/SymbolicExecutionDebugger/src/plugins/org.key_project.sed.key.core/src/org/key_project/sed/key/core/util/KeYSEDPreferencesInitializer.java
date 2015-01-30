@@ -39,5 +39,7 @@ public class KeYSEDPreferencesInitializer extends AbstractPreferenceInitializer 
       KeYSEDPreferences.setDefaultUsePrettyPrinting(true);
       KeYSEDPreferences.setDefaultShowSignatureOnMethodReturnNodes(false);
       KeYSEDPreferences.setDefaultVariablesAreOnlyComputedFromUpdates(false);
+      KeYSEDPreferences.setDefaultTruthValueEvaluationEnabled(false);
+      KeYSEDPreferences.setDefaultHighlightReachedSourceCode(true);
    }
 }

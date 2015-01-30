@@ -20,14 +20,16 @@ import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * This composite provides the content shown in {@link PostconditionPropertySection}
  * and {@link PostconditionGraphitiPropertySection}.
  * @author Martin Hentschel
  */
-public class PostconditionComposite extends AbstractPredicateComposite {
+public class PostconditionComposite extends AbstractTruthValueComposite {
    /**
     * Constructor.
     * @param parent The parent {@link Composite}.
@@ -41,14 +43,21 @@ public class PostconditionComposite extends AbstractPredicateComposite {
     * {@inheritDoc}
     */
    @Override
-   protected Term computeTermToShow(IKeYSEDDebugNode<?> node,
-                                    IExecutionNode<?> executionNode, 
-                                    Node keyNode) {
+   protected Pair<Term, Term> computeTermToShow(IKeYSEDDebugNode<?> node,
+                                                IExecutionNode<?> executionNode, 
+                                                Node keyNode) {
       Term term = keyNode.getAppliedRuleApp().posInOccurrence().subTerm();
       if (term.op() instanceof Modality) {
          term = term.sub(0);
       }
-      term = removeUninterpretedPredicate(keyNode, term);
-      return term;
+      Term uninterpretedPredicate = AbstractOperationPO.getUninterpretedPredicate(executionNode.getProof());
+      if (uninterpretedPredicate != null) {
+         Term predicate = findUninterpretedPredicateTerm(term, uninterpretedPredicate);
+         term = removeUninterpretedPredicate(keyNode, term);
+         return new Pair<Term, Term>(term, predicate);
+      }
+      else {
+         return new Pair<Term, Term>(term, null);
+      }
    }
 }

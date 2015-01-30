@@ -25,7 +25,7 @@ import org.key_project.sed.key.core.model.IKeYTerminationNode;
  * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
  * @author Martin Hentschel
  */
-public class PostconditionGraphitiPropertySection extends AbstractPredicateGraphitiPropertySection {
+public class PostconditionGraphitiPropertySection extends AbstractTruthValueGraphitiPropertySection {
    /**
     * {@inheritDoc}
     */
@@ -49,7 +49,7 @@ public class PostconditionGraphitiPropertySection extends AbstractPredicateGraph
     * {@inheritDoc}
     */
    @Override
-   protected AbstractPredicateComposite createContentComposite(Composite parent) {
+   protected AbstractTruthValueComposite createContentComposite(Composite parent) {
       return new PostconditionComposite(parent, getWidgetFactory());
    }
 }

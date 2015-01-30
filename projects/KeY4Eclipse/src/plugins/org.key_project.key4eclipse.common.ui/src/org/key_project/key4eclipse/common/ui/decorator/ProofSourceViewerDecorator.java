@@ -13,8 +13,6 @@
 
 package org.key_project.key4eclipse.common.ui.decorator;
 
-import java.io.IOException;
-
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.JFaceTextUtil;
 import org.eclipse.jface.text.TextPresentation;
@@ -33,6 +31,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
@@ -177,10 +176,10 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * @param visibleLabels Optional definition of visible {@link TermLabel}s.
     * @return The shown text.
     */
-   public String showTerm(Term term, 
-                          Services services, 
-                          KeYMediator mediator, 
-                          VisibleTermLabels visibleLabels) {
+   public String showSequent(Sequent sequent, 
+                             Services services, 
+                             KeYMediator mediator, 
+                             VisibleTermLabels visibleLabels) {
       this.node = null;
       filter = null;
       if (visibleLabels != null) {
@@ -194,7 +193,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
                                     mediator.getNotationInfo(), 
                                     services);
       }
-      String str = computeText(mediator, term, printer);
+      String str = computeText(mediator, sequent, printer);
       viewer.setDocument(new Document(str));
       return str;
    }
@@ -209,16 +208,11 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * @return The text to show.
     */
    public static String computeText(KeYMediator mediator, 
-                                    Term term, 
+                                    Sequent sequent, 
                                     LogicPrinter printer) {
-      try {
-         printer.printTerm(term);
-         String s = printer.toString();
-         return StringUtil.trimRight(s);
-      }
-      catch (IOException e) {
-         return e.getMessage();
-      }
+      printer.printSequent(sequent);
+      String s = printer.toString();
+      return StringUtil.trimRight(s);
    }
    
    /**
