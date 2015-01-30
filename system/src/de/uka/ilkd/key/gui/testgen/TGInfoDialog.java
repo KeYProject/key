@@ -76,7 +76,7 @@ public class TGInfoDialog extends JDialog implements TestGenerationLog {
 		setModal(false);
 		// this.pack();
 		setTitle("Test Suite Generation");
-		this.setSize(700, 300);
+		this.setSize(1000, 700);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setLocationRelativeTo(MainWindow.getInstance());
 		setVisible(true);
