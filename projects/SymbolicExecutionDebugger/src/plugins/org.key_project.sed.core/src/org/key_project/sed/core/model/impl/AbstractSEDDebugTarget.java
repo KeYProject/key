@@ -34,6 +34,7 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
+import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentProvider;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
@@ -49,6 +50,7 @@ import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.event.ISEDAnnotationListener;
 import org.key_project.sed.core.model.event.SEDAnnotationEvent;
 import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
+import org.key_project.sed.core.slicing.ISEDSlicer;
 import org.key_project.sed.core.sourcesummary.ISEDSourceModel;
 import org.key_project.sed.core.sourcesummary.impl.SEDMemorySourceModel;
 import org.key_project.sed.core.sourcesummary.impl.SEDMemorySourceRange;
@@ -800,6 +802,27 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
             }
          }
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDSlicer getSlicer(ISEDDebugNode seedNode, IVariable seedVariable, final String name) {
+      return ArrayUtil.search(getSlicer(seedNode, seedVariable), new IFilter<ISEDSlicer>() {
+         @Override
+         public boolean select(ISEDSlicer element) {
+            return ObjectUtil.equals(name, element.getName());
+         }
+      });
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDSlicer[] getSlicer(ISEDDebugNode seedNode, IVariable seedVariable) {
+      return null; // Slicing is not supported by default.
    }
 
    /**

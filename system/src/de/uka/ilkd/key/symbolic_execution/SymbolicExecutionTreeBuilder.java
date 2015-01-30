@@ -1439,7 +1439,7 @@ public class SymbolicExecutionTreeBuilder {
     * @param proofNode The {@link Node} in KeY's proof tree.
     * @return The {@link IExecutionNode} representation or {@code null} if no one is available.
     */
-   protected IExecutionNode<?> getExecutionNode(Node proofNode) {
+   public IExecutionNode<?> getExecutionNode(Node proofNode) {
       IExecutionNode<?> result = keyNodeMapping.get(proofNode);
       if (result == null) {
          result = keyNodeBranchConditionMapping.get(proofNode);

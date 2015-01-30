@@ -26,4 +26,5 @@ Bundle-Vendor: KeY Project
 Export-Package: org.key_project.sed.key.core.breakpoints,
  org.key_project.sed.key.core.launch,
  org.key_project.sed.key.core.model,
+ org.key_project.sed.key.core.slicing,
  org.key_project.sed.key.core.util

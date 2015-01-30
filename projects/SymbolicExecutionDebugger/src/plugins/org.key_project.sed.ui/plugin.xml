@@ -87,6 +87,29 @@
                </visibleWhen>
             </command>
          </menuContribution>
+         <menuContribution
+               allPopups="false"
+               locationURI="popup:org.eclipse.debug.ui.VariableView?after=additions">
+            <command
+                  commandId="org.key_project.sed.ui.sliceSET"
+                  icon="icons/slice.gif"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof
+                           value="org.key_project.sed.core.model.ISEDVariable">
+                     </instanceof>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.key_project.sed.core.hasSEDSlicerPropertyTester">
+                     </test>
+                  </iterate>
+               </visibleWhen>
+            </command>
+         </menuContribution>
       </extension>
       <extension
             point="org.eclipse.core.runtime.adapters">
@@ -366,6 +389,10 @@
                annotationTypeID="org.key_project.sed.core.annotationType.breakpoint"
                icon="icons/brkp_obj.gif">
          </image>
+         <image
+               annotationTypeID="org.key_project.sed.core.annotationType.slice"
+               icon="icons/slice.gif">
+         </image>
       </extension>
       <extension
             point="org.eclipse.ui.commands">
@@ -375,12 +402,22 @@
                id="org.key_project.sed.ui.expandAllCommand"
                name="Expand All">
          </command>
+         <command
+               categoryId="org.eclipse.debug.ui.category.run"
+               description="Highlights relevant symbolic execution tree node according to the selected location."
+               id="org.key_project.sed.ui.sliceSET"
+               name="Slice Symbolic Execution Tree">
+         </command>
       </extension>
       <extension
             point="org.eclipse.ui.commandImages">
          <image
                commandId="org.key_project.sed.ui.expandAllCommand"
                icon="icons/expandall.gif">
+         </image>
+         <image
+               commandId="org.key_project.sed.ui.sliceSET"
+               icon="icons/slice.gif">
          </image>
       </extension>
       <extension
@@ -406,6 +443,23 @@
                         </test>
                      </and>
                   </or>
+               </iterate>
+            </enabledWhen>
+         </handler>
+         <handler
+               class="org.key_project.sed.ui.command.SliceCommand"
+               commandId="org.key_project.sed.ui.sliceSET">
+            <enabledWhen>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <instanceof
+                        value="org.key_project.sed.core.model.ISEDVariable">
+                  </instanceof>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.sed.core.hasSEDSlicerPropertyTester">
+                  </test>
                </iterate>
             </enabledWhen>
          </handler>
