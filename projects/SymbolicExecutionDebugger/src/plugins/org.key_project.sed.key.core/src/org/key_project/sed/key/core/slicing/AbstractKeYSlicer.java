@@ -28,7 +28,7 @@ public abstract class AbstractKeYSlicer implements ISEDSlicer {
     * {@inheritDoc}
     */
    @Override
-   public void slice(ISEDDebugNode seedNode, IVariable seedVariable) throws DebugException {
+   public SliceAnnotation slice(ISEDDebugNode seedNode, IVariable seedVariable) throws DebugException {
       // Check if parameters are valid.
       if (seedNode instanceof IKeYSEDDebugNode<?>) {
          if (seedVariable instanceof KeYVariable) {
@@ -52,6 +52,7 @@ public abstract class AbstractKeYSlicer implements ISEDSlicer {
                   annotation.addLink(link);
                }
             }
+            return annotation;
          }
          else {
             throw new DebugException(LogUtil.getLogger().createErrorStatus("Seed variable '" + seedVariable + "' is not supported."));
