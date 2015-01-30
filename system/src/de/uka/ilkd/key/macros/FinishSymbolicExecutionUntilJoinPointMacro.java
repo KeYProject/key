@@ -34,8 +34,10 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.Strategy;
 
 /**
- * The macro FinishSymbolicExecutionMacro continues automatic rule application
- * until there is no more modality on the sequent.<p>
+ * The macro FinishSymbolicExecutionUntilJionPointMacro continues
+ * automatic rule application until a join point is reached (i.e.
+ * a point where a JoinRule can be applied) or there is no more
+ * modality on the sequent.<p>
  * 
  * This is done by implementing a delegation {@link Strategy} which assigns to
  * any rule application infinite costs if there is no modality on the sequent.
@@ -174,8 +176,8 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
                         //      Or is this case interesting anyway?
                      }
                      
-                  } else {
-                     if (blockElems.contains((ProgramElement) theMethodFrame.getBody().getFirstElement()))
+                  } else if (blockElems.contains(
+                        (ProgramElement) theMethodFrame.getBody().getFirstElement())) {
                         return false;
                   }
                }
