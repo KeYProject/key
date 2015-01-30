@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.ui.highlighting;
+package org.key_project.jmlediting.ui.format;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jdt.internal.ui.JavaPlugin;

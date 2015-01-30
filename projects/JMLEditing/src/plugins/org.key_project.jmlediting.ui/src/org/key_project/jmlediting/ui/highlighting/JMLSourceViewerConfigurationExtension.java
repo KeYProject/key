@@ -21,6 +21,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.javaeditor.extension.DefaultJavaSourceViewerConfigurationExtension;
 import org.key_project.jmlediting.ui.Activator;
 import org.key_project.jmlediting.ui.format.JMLContentFormatter;
+import org.key_project.jmlediting.ui.format.JavaJMLMultilineCommentAutoIndentStrategy;
 import org.key_project.jmlediting.ui.format.UnableToInitializeJMLFormatterException;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
 
@@ -107,7 +108,6 @@ public class JMLSourceViewerConfigurationExtension extends
       return currentResult;
    }
 
-   @SuppressWarnings("restriction")
    @Override
    public IAutoEditStrategy[] getAutoEditStrategies(
          final ISourceViewer sourceViewer, final String contentType,
