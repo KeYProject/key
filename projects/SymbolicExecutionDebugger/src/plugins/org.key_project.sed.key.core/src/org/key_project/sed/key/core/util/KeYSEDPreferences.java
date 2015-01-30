@@ -73,9 +73,14 @@ public class KeYSEDPreferences {
    public static final String VARIABLES_ARE_COMPUTED_FROM_UPDATES = "org.key_project.sed.key.core.preference.variablesAreOnlyComputedFromUpdates";
 
    /**
-    * Preference key to enable predicate evaluation.
+    * Preference key to enable truth value evaluation.
     */
-   public static final String PREDICATE_EVALUATION_ENABLED = "org.key_project.sed.key.core.preference.predicateEvaluationEnabled";
+   public static final String TRUTH_VALUE_EVALUATION_ENABLED = "org.key_project.sed.key.core.preference.truthValueEvaluationEnabled";
+
+   /**
+    * Preference key to enable or disable highlighting of reached source code.
+    */
+   public static final String HIGHLIGHT_REACHED_SOURCE_CODE = "org.key_project.sed.key.core.preference.highlightReachedSourceCode";
    
    /**
     * Returns the managed {@link IPreferenceStore}.
@@ -374,34 +379,66 @@ public class KeYSEDPreferences {
    }
    
    /**
-    * Checks if predicate evaluation is enabled.
-    * @return Is predicate evaluation enabled?
+    * Checks if truth value evaluation is enabled.
+    * @return Is truth value evaluation enabled?
     */
-   public static boolean isPredicateEvaluationEnabled() {
-      return getStore().getBoolean(PREDICATE_EVALUATION_ENABLED);
+   public static boolean isTruthValueEvaluationEnabled() {
+      return getStore().getBoolean(TRUTH_VALUE_EVALUATION_ENABLED);
    }
    
    /**
-    * Checks if predicate evaluation is enabled by default.
-    * @return Is predicate evaluation enabled?
+    * Checks if truth value evaluation is enabled by default.
+    * @return Is truth value evaluation enabled?
     */
-   public static boolean isDefaultPredicateEvaluationEnabled() {
-      return getStore().getDefaultBoolean(PREDICATE_EVALUATION_ENABLED);
+   public static boolean isDefaultTruthValueEvaluationEnabled() {
+      return getStore().getDefaultBoolean(TRUTH_VALUE_EVALUATION_ENABLED);
    }
    
    /**
-    * Sets if predicate evaluation is enabled.
-    * @param value Enable predicate evaluation?
+    * Sets if truth value evaluation is enabled.
+    * @param value Enable truth value evaluation?
     */
-   public static void setPredicateEvaluationEnabled(boolean value) {
-      getStore().setValue(PREDICATE_EVALUATION_ENABLED, value);
+   public static void setTruthValueEvaluationEnabled(boolean value) {
+      getStore().setValue(TRUTH_VALUE_EVALUATION_ENABLED, value);
    }
    
    /**
-    * Sets if predicate evaluation is enabled by default.
-    * @param defaultValue Enable predicate evaluation?
+    * Sets if truth value evaluation is enabled by default.
+    * @param defaultValue Enable truth value evaluation?
     */
-   public static void setDefaultPredicateEvaluationEnabled(boolean defaultValue) {
-      getStore().setDefault(PREDICATE_EVALUATION_ENABLED, defaultValue);
+   public static void setDefaultTruthValueEvaluationEnabled(boolean defaultValue) {
+      getStore().setDefault(TRUTH_VALUE_EVALUATION_ENABLED, defaultValue);
+   }
+   
+   /**
+    * Checks if reached source code is highlighted is enabled.
+    * @return Is reached source code highlighting enabled?
+    */
+   public static boolean isHighlightReachedSourceCode() {
+      return getStore().getBoolean(HIGHLIGHT_REACHED_SOURCE_CODE);
+   }
+   
+   /**
+    * Checks if reached source code is highlighted by default.
+    * @return Is reached source code highlighting enabled by default?
+    */
+   public static boolean isDefaultHighlightReachedSourceCode() {
+      return getStore().getDefaultBoolean(HIGHLIGHT_REACHED_SOURCE_CODE);
+   }
+   
+   /**
+    * Sets if truth value evaluation is enabled.
+    * @param value Enable source code highlighting.
+    */
+   public static void setHighlightReachedSourceCode(boolean value) {
+      getStore().setValue(HIGHLIGHT_REACHED_SOURCE_CODE, value);
+   }
+   
+   /**
+    * Sets if reached source code is highlighted by default.
+    * @param defaultValue Enable source code highlighting.
+    */
+   public static void setDefaultHighlightReachedSourceCode(boolean defaultValue) {
+      getStore().setDefault(HIGHLIGHT_REACHED_SOURCE_CODE, defaultValue);
    }
 }

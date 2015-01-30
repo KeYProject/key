@@ -18,8 +18,8 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.label.PredicateTermLabel;
-import de.uka.ilkd.key.logic.label.PredicateTermLabelFactory;
+import de.uka.ilkd.key.logic.label.FormulaTermLabel;
+import de.uka.ilkd.key.logic.label.FormulaTermLabelFactory;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabelFactory;
@@ -33,11 +33,11 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.label.LoopBodyTermLabelUpdate;
 import de.uka.ilkd.key.rule.label.LoopInvariantNormalBehaviorTermLabelUpdate;
-import de.uka.ilkd.key.rule.label.PredicateTermLabelRefactoring;
-import de.uka.ilkd.key.rule.label.PredicateTermLabelUpdate;
+import de.uka.ilkd.key.rule.label.FormulaTermLabelRefactoring;
+import de.uka.ilkd.key.rule.label.FormulaTermLabelUpdate;
 import de.uka.ilkd.key.rule.label.RemoveInCheckBranchesTermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.StayOnOperatorTermLabelPolicy;
-import de.uka.ilkd.key.rule.label.StayOnPredicateTermLabelPolicy;
+import de.uka.ilkd.key.rule.label.StayOnFormulaTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.SymbolicExecutionTermLabelUpdate;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
@@ -63,9 +63,9 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
    private final static StrategyFactory SYMBOLIC_EXECUTION_FACTORY = new SymbolicExecutionStrategy.Factory();
    
    /**
-    * {@code true} predicate evaluation is enabled, {@code false} predicate evaluation is disabled.
+    * {@code true} truth value evaluation is enabled, {@code false} truth value evaluation is disabled.
     */
-   private final Boolean predicateEvaluationEnabled;
+   private final Boolean truthValueEvaluationEnabled;
    
    /**
     * <p>
@@ -89,14 +89,14 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     * use them in different {@link Thread}s (not the UI {@link Thread}).
     * </p>
     */
-   public static SymbolicExecutionJavaProfile defaultInstanceWithPredicateEvaluation; 
+   public static SymbolicExecutionJavaProfile defaultInstanceWithTruthValueEvaluation; 
 
    /**
     * Constructor.
     * @param predicateEvaluationEnabled {@code true} predicate evaluation is enabled, {@code false} predicate evaluation is disabled.
     */
    public SymbolicExecutionJavaProfile(boolean predicateEvaluationEnabled) {
-      this.predicateEvaluationEnabled = predicateEvaluationEnabled;
+      this.truthValueEvaluationEnabled = predicateEvaluationEnabled;
       initTermLabelManager();
    }
 
@@ -105,7 +105,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     */
    @Override
    protected void initTermLabelManager() {
-      if (predicateEvaluationEnabled != null) {
+      if (truthValueEvaluationEnabled != null) {
          // Create TermLabelManager only after predicate evaluation enabled flag is set.
          super.initTermLabelManager();
       }
@@ -117,7 +117,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
    @Override
    protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
       ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
-      result = result.prepend(getSymbolicExecutionTermLabelConfigurations(predicateEvaluationEnabled));
+      result = result.prepend(getSymbolicExecutionTermLabelConfigurations(truthValueEvaluationEnabled));
       return result;
    }
 
@@ -163,11 +163,11 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
                                                          seUps,
                                                          seRefs));
       if (predicateEvaluationEnabled) {
-         ImmutableList<TermLabelPolicy> predPolicies = ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayOnPredicateTermLabelPolicy());
-         ImmutableList<TermLabelUpdate> predUpdates = ImmutableSLList.<TermLabelUpdate>nil().prepend(new PredicateTermLabelUpdate());
-         ImmutableList<TermLabelRefactoring> predRefs = ImmutableSLList.<TermLabelRefactoring>nil().prepend(new PredicateTermLabelRefactoring());
-         result = result.prepend(new TermLabelConfiguration(PredicateTermLabel.NAME,
-                                                            new PredicateTermLabelFactory(),
+         ImmutableList<TermLabelPolicy> predPolicies = ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayOnFormulaTermLabelPolicy());
+         ImmutableList<TermLabelUpdate> predUpdates = ImmutableSLList.<TermLabelUpdate>nil().prepend(new FormulaTermLabelUpdate());
+         ImmutableList<TermLabelRefactoring> predRefs = ImmutableSLList.<TermLabelRefactoring>nil().prepend(new FormulaTermLabelRefactoring());
+         result = result.prepend(new TermLabelConfiguration(FormulaTermLabel.NAME,
+                                                            new FormulaTermLabelFactory(),
                                                             null,
                                                             predPolicies,
                                                             null,
@@ -212,7 +212,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     * @return {@code true} predicate evaluation is enabled, {@code false} predicate evaluation is disabled.
     */
    public boolean isPredicateEvaluationEnabled() {
-      return predicateEvaluationEnabled;
+      return truthValueEvaluationEnabled;
    }
 
    /**
@@ -239,32 +239,32 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     * Other instances of this class are typically only required to 
     * use them in different {@link Thread}s (not the UI {@link Thread}).
     * </p>
-    * @param predicateEvaluationEnabled {@code true} predicate evaluation is enabled, {@code false} predicate evaluation is disabled.
+    * @param truthValueEvaluationEnabled {@code true} truth value evaluation is enabled, {@code false} truth value evaluation is disabled.
     * @return The default instance for usage in the {@link Thread} of the user interface.
     */
-   public static synchronized SymbolicExecutionJavaProfile getDefaultInstance(boolean predicateEvaluationEnabled) {
-      if (!predicateEvaluationEnabled) {
+   public static synchronized SymbolicExecutionJavaProfile getDefaultInstance(boolean truthValueEvaluationEnabled) {
+      if (!truthValueEvaluationEnabled) {
          if (defaultInstance == null) {
             defaultInstance = new SymbolicExecutionJavaProfile(false);
          }
          return defaultInstance;
       }
       else {
-         if (defaultInstanceWithPredicateEvaluation == null) {
-            defaultInstanceWithPredicateEvaluation = new SymbolicExecutionJavaProfile(true);
+         if (defaultInstanceWithTruthValueEvaluation == null) {
+            defaultInstanceWithTruthValueEvaluation = new SymbolicExecutionJavaProfile(true);
          }
-         return defaultInstanceWithPredicateEvaluation;
+         return defaultInstanceWithTruthValueEvaluation;
       }
    }
 
    /**
-    * Checks if predicate evaluation is enabled in the given {@link Proof}.
+    * Checks if truth value evaluation is enabled in the given {@link Proof}.
     * @param proof The {@link Proof} to check.
-    * @return {@code true} predicate evaluation is enabled, {@code false} predicate evaluation is disabled.
+    * @return {@code true} truth value evaluation is enabled, {@code false} truth value evaluation is disabled.
     */
-   public static boolean isPredicateEvaluationEnabled(Proof proof) {
+   public static boolean isTruthValueEvaluationEnabled(Proof proof) {
       if (proof != null && !proof.isDisposed()) {
-         return isPredicateEvaluationEnabled(proof.getInitConfig());
+         return isTruthValueEvaluationEnabled(proof.getInitConfig());
       }
       else {
          return false;
@@ -272,13 +272,13 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
    }
 
    /**
-    * Checks if predicate evaluation is enabled in the given {@link InitConfig}.
+    * Checks if truth value evaluation is enabled in the given {@link InitConfig}.
     * @param initConfig The {@link InitConfig} to check.
-    * @return {@code true} predicate evaluation is enabled, {@code false} predicate evaluation is disabled.
+    * @return {@code true} truth value evaluation is enabled, {@code false} truth value evaluation is disabled.
     */
-   public static boolean isPredicateEvaluationEnabled(InitConfig initConfig) {
+   public static boolean isTruthValueEvaluationEnabled(InitConfig initConfig) {
       if (initConfig != null) {
-         return isPredicateEvaluationEnabled(initConfig.getProfile());
+         return isTruthValueEvaluationEnabled(initConfig.getProfile());
       }
       else {
          return false;
@@ -290,7 +290,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     * @param profile The {@link Profile} to check.
     * @return {@code true} predicate evaluation is enabled, {@code false} predicate evaluation is disabled.
     */
-   public static boolean isPredicateEvaluationEnabled(Profile profile) {
+   public static boolean isTruthValueEvaluationEnabled(Profile profile) {
       if (profile instanceof SymbolicExecutionJavaProfile) {
          return ((SymbolicExecutionJavaProfile) profile).isPredicateEvaluationEnabled();
       }

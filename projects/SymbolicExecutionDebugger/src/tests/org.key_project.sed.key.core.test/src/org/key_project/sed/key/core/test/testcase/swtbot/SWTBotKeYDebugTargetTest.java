@@ -1254,7 +1254,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE, 
-                           6, executor);
+                           Boolean.FALSE,
+                           6, 
+                           executor);
    }
    
    /**
@@ -1421,7 +1423,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE, 
-                           timeoutFactor, executor);
+                           Boolean.FALSE,
+                           timeoutFactor, 
+                           executor);
    }
 
    /**
@@ -1548,7 +1552,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE, 
-                           8, executor);
+                           Boolean.FALSE,
+                           8, 
+                           executor);
    }
 
    /**
@@ -1648,6 +1654,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE, 
-                           8, executor);
+                           Boolean.FALSE,
+                           8, 
+                           executor);
    }
 }

@@ -246,7 +246,7 @@
               </propertySection>
               <propertySection
                     class="org.key_project.sed.ui.property.ConstraintsNodePropertySection"
-                    filter="org.key_project.sed.ui.property.SEDDebugNodeTreeFilter"
+                    filter="org.key_project.sed.ui.property.ConstraintsTreeFilter"
                     id="org.key_project.sed.ui.property.ConstraintsPropertySection"
                     tab="org.key_project.sed.ui.constraints.tab">
               </propertySection>

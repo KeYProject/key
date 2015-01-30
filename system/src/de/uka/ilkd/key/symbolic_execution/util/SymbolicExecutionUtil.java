@@ -2176,76 +2176,90 @@ public final class SymbolicExecutionUtil {
          throw new ProofInputException("Only TacletApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
       }
       TacletApp app = (TacletApp)parent.getAppliedRuleApp();
-      // Find goal template which has created the represented proof node
-      int childIndex = JavaUtil.indexOf(parent.childrenIterator(), node);
-      TacletGoalTemplate goalTemplate = app.taclet().goalTemplates().take(app.taclet().goalTemplates().size() - 1 - childIndex).head();
       Services services = node.proof().getServices();
       // List new sequent formulas in the child node.
       ImmutableList<Term> newAntecedents = listNewSemisequentTerms(parent.sequent().antecedent(), node.sequent().antecedent());
       ImmutableList<Term> newSuccedents = listNewSemisequentTerms(parent.sequent().succedent(), node.sequent().succedent());
-      if (goalTemplate.replaceWithExpressionAsObject() instanceof Sequent) {
-         // Remove replace part of symbolic execution rules
-         if (NodeInfo.isSymbolicExecution(app.taclet())) {
-            Sequent sequent = (Sequent) goalTemplate.replaceWithExpressionAsObject();
-            for (SequentFormula sf : sequent.antecedent()) {
-               Term replaceTerm = instantiateTerm(node, sf.formula(), app, services);
-               replaceTerm = services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), replaceTerm);
-               Term originalTerm = findReplacement(newAntecedents, app.posInOccurrence(), replaceTerm);
-               assert originalTerm != null;
-               newAntecedents = newAntecedents.removeFirst(originalTerm);
-            }
-            for (SequentFormula sf : sequent.succedent()) {
-               Term replaceTerm = instantiateTerm(node, sf.formula(), app, services);
-               replaceTerm = services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), replaceTerm);
-               Term originalTerm = findReplacement(newSuccedents, app.posInOccurrence(), replaceTerm);
-               assert originalTerm != null;
-               newSuccedents = newSuccedents.removeFirst(originalTerm);
-            }
-         }
-      }
-      else if (goalTemplate.replaceWithExpressionAsObject() instanceof Term) {
-         Term replaceTerm = (Term)goalTemplate.replaceWithExpressionAsObject();
-         replaceTerm = instantiateTerm(node, replaceTerm, app, services);
-         Term originalTerm = findReplacement(app.posInOccurrence().isInAntec() ? newAntecedents : newSuccedents,
-                                             app.posInOccurrence(),
-                                             replaceTerm);
-         assert originalTerm != null;
-         if (app.posInOccurrence().isInAntec()) {
-            newAntecedents = newAntecedents.removeFirst(originalTerm);
+      // Find goal template which has created the represented proof node
+      int childIndex = JavaUtil.indexOf(parent.childrenIterator(), node);
+      TacletGoalTemplate goalTemplate;
+      if (app.taclet().goalTemplates().size() + 1 == parent.childrenCount()) {
+         if (childIndex == 0) {
+            goalTemplate = null;
          }
          else {
-            newSuccedents = newSuccedents.removeFirst(originalTerm);
+            goalTemplate = app.taclet().goalTemplates().take(app.taclet().goalTemplates().size() - childIndex).head();
          }
-         if (!NodeInfo.isSymbolicExecution(app.taclet())) {
-            // Make sure that an PosTacletApp was applied
-            if (!(app instanceof PosTacletApp)) {
-               throw new ProofInputException("Only PosTacletApp are allowed with a replace term in branch computation but rule \"" + app + "\" was found.");
-            }
-            // Create new lists
-            ImmutableList<Term> tempAntecedents = ImmutableSLList.nil();
-            ImmutableList<Term> tempSuccedents = ImmutableSLList.nil();
-            // Apply updates on antecedents and add result to new antecedents list
-            for (Term a : newAntecedents) {
-               tempAntecedents = tempAntecedents.append(services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), a));
-            }
-            // Apply updates on succedents and add result to new succedents list
-            for (Term suc : newSuccedents) {
-               tempSuccedents = tempSuccedents.append(services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), suc));
-            }
-            // Add additional equivalenz term to antecedent with the replace object which must be equal to the find term 
-            replaceTerm = followPosInOccurrence(app.posInOccurrence(), originalTerm);
-            replaceTerm = services.getTermBuilder().equals(replaceTerm, app.posInOccurrence().subTerm());
-            replaceTerm = services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), replaceTerm);
-            if (!tempAntecedents.contains(replaceTerm)) {
-               tempAntecedents = tempAntecedents.append(replaceTerm);
-            }
-            // Replace old with new lists
-            newAntecedents = tempAntecedents;
-            newSuccedents = tempSuccedents;
-         }      
       }
-      else if (goalTemplate.replaceWithExpressionAsObject() != null) {
-         throw new ProofInputException("Expected replacement as Sequent or Term during branch condition computation but is \"" + goalTemplate.replaceWithExpressionAsObject() + "\".");
+      else {
+         goalTemplate = app.taclet().goalTemplates().take(app.taclet().goalTemplates().size() - 1 - childIndex).head();
+      }
+      // Instantiate replace object if required
+      if (goalTemplate != null) {
+         if (goalTemplate.replaceWithExpressionAsObject() instanceof Sequent) {
+            // Remove replace part of symbolic execution rules
+            if (NodeInfo.isSymbolicExecution(app.taclet())) {
+               Sequent sequent = (Sequent) goalTemplate.replaceWithExpressionAsObject();
+               for (SequentFormula sf : sequent.antecedent()) {
+                  Term replaceTerm = instantiateTerm(node, sf.formula(), app, services);
+                  replaceTerm = services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), replaceTerm);
+                  Term originalTerm = findReplacement(node.sequent().antecedent(), app.posInOccurrence(), replaceTerm);
+                  assert originalTerm != null;
+                  newAntecedents = newAntecedents.removeFirst(originalTerm);
+               }
+               for (SequentFormula sf : sequent.succedent()) {
+                  Term replaceTerm = instantiateTerm(node, sf.formula(), app, services);
+                  replaceTerm = services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), replaceTerm);
+                  Term originalTerm = findReplacement(node.sequent().succedent(), app.posInOccurrence(), replaceTerm);
+                  assert originalTerm != null;
+                  newSuccedents = newSuccedents.removeFirst(originalTerm);
+               }
+            }
+         }
+         else if (goalTemplate.replaceWithExpressionAsObject() instanceof Term) {
+            Term replaceTerm = (Term)goalTemplate.replaceWithExpressionAsObject();
+            replaceTerm = instantiateTerm(node, replaceTerm, app, services);
+            Term originalTerm = findReplacement(app.posInOccurrence().isInAntec() ? node.sequent().antecedent() : node.sequent().succedent(),
+                                                app.posInOccurrence(),
+                                                replaceTerm);
+            assert originalTerm != null;
+            if (app.posInOccurrence().isInAntec()) {
+               newAntecedents = newAntecedents.removeFirst(originalTerm);
+            }
+            else {
+               newSuccedents = newSuccedents.removeFirst(originalTerm);
+            }
+            if (!NodeInfo.isSymbolicExecution(app.taclet())) {
+               // Make sure that an PosTacletApp was applied
+               if (!(app instanceof PosTacletApp)) {
+                  throw new ProofInputException("Only PosTacletApp are allowed with a replace term in branch computation but rule \"" + app + "\" was found.");
+               }
+               // Create new lists
+               ImmutableList<Term> tempAntecedents = ImmutableSLList.nil();
+               ImmutableList<Term> tempSuccedents = ImmutableSLList.nil();
+               // Apply updates on antecedents and add result to new antecedents list
+               for (Term a : newAntecedents) {
+                  tempAntecedents = tempAntecedents.append(services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), a));
+               }
+               // Apply updates on succedents and add result to new succedents list
+               for (Term suc : newSuccedents) {
+                  tempSuccedents = tempSuccedents.append(services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), suc));
+               }
+               // Add additional equivalenz term to antecedent with the replace object which must be equal to the find term 
+               replaceTerm = followPosInOccurrence(app.posInOccurrence(), originalTerm);
+               replaceTerm = services.getTermBuilder().equals(replaceTerm, app.posInOccurrence().subTerm());
+               replaceTerm = services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), replaceTerm);
+               if (!tempAntecedents.contains(replaceTerm)) {
+                  tempAntecedents = tempAntecedents.append(replaceTerm);
+               }
+               // Replace old with new lists
+               newAntecedents = tempAntecedents;
+               newSuccedents = tempSuccedents;
+            }      
+         }
+         else if (goalTemplate.replaceWithExpressionAsObject() != null) {
+            throw new ProofInputException("Expected replacement as Sequent or Term during branch condition computation but is \"" + goalTemplate.replaceWithExpressionAsObject() + "\".");
+         }
       }
       // Compute branch condition
       Term newLeft = services.getTermBuilder().and(newAntecedents);
@@ -2303,15 +2317,16 @@ public final class SymbolicExecutionUtil {
     * @param replaceTerm The {@link Term} to find.
     * @return The found {@link Term} or {@code null} if not available.
     */
-   private static Term findReplacement(ImmutableList<Term> terms, 
+   private static Term findReplacement(Semisequent semisequent, 
                                        final PosInOccurrence posInOccurrence, 
                                        final Term replaceTerm) {
-      return JavaUtil.search(terms, new IFilter<Term>() {
+      SequentFormula sf = JavaUtil.search(semisequent, new IFilter<SequentFormula>() {
          @Override
-         public boolean select(Term element) {
-            return checkReplaceTerm(element, posInOccurrence, replaceTerm);
+         public boolean select(SequentFormula element) {
+            return checkReplaceTerm(element.formula(), posInOccurrence, replaceTerm);
          }
       });
+      return sf != null ? sf.formula() : null;
    }
 
    /**

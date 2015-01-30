@@ -429,8 +429,10 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
                KeYMethodCall methodCall = getMethodCall();
                methodReturnCondition = new SEDMemoryBranchCondition(getDebugTarget(), methodCall, getThread());
                methodReturnCondition.addChild(this);
+               methodReturnCondition.setCallStack(KeYModelUtil.createCallStack(methodCall.getDebugTarget(), methodCall.getExecutionNode().getCallStack()));
                methodReturnCondition.setName(executionNode.getFormatedMethodReturnCondition());
                methodReturnCondition.setPathCondition(methodCall.getPathCondition());
+               methodReturnCondition.setSourcePath(methodCall.getSourcePath());
             }
             return methodReturnCondition;
          }
@@ -473,7 +475,7 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
     * {@inheritDoc}
     */
    @Override
-   public boolean isPredicateEvaluationEnabled() {
-      return SymbolicExecutionJavaProfile.isPredicateEvaluationEnabled(getExecutionNode().getProof());
+   public boolean isTruthValueEvaluationEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
    }
 }

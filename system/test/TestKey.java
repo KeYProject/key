@@ -49,7 +49,7 @@ public class TestKey extends TestSuite {
 
     static Class<? extends TestCase>[] parserTests = new Class[] {
         de.uka.ilkd.key.parser.TestDeclParser.class,
-        de.uka.ilkd.key.parser.TestParallelParsing.class,
+//        de.uka.ilkd.key.parser.TestParallelParsing.class,
         de.uka.ilkd.key.parser.TestTermParser.class,
         de.uka.ilkd.key.parser.TestTermParserHeap.class,
         de.uka.ilkd.key.parser.TestTermParserSequence.class,
@@ -110,8 +110,8 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.symbolic_execution.TestExecutionNodeWriterAndReader.class,
         de.uka.ilkd.key.symbolic_execution.TestExecutionVariableExtractor.class,
         de.uka.ilkd.key.symbolic_execution.TestParallelSiteProofs.class,
-        de.uka.ilkd.key.symbolic_execution.TestPredicateEvaluationUtil.class,
-        de.uka.ilkd.key.symbolic_execution.TestPredicateValue.class,
+        de.uka.ilkd.key.symbolic_execution.TestTruthValueEvaluationUtil.class,
+        de.uka.ilkd.key.symbolic_execution.TestTruthValueValue.class,
         de.uka.ilkd.key.symbolic_execution.TestSymbolicLayoutExtractor.class,
         de.uka.ilkd.key.symbolic_execution.TestSymbolicLayoutWriterAndReader.class,
         de.uka.ilkd.key.symbolic_execution.TestSymbolicExecutionTreeBuilder.class,

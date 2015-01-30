@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugEvent;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.ILaunch;
@@ -33,6 +34,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.sourcesummary.ISEDSourceModel;
 import org.key_project.sed.core.sourcesummary.ISEDSourceRange;
@@ -310,9 +312,11 @@ public class AnnotationManager implements IDisposable {
       if (annotatedDebugTargets != null) {
          for (DebugEvent event : events) {
             if (DebugEvent.SUSPEND == event.getKind() && 
-                event.getSource() instanceof ISEDDebugTarget &&
-                annotatedDebugTargets.contains(event.getSource())) {
-               updateAnnotations((ISEDDebugTarget)event.getSource());
+                event.getSource() instanceof ISEDDebugElement) {
+               ISEDDebugTarget target = ((ISEDDebugElement) event.getSource()).getDebugTarget();
+               if (annotatedDebugTargets.contains(target)) {
+                  updateAnnotations(target);
+               }
             }
          }
       }
@@ -336,38 +340,46 @@ public class AnnotationManager implements IDisposable {
     * @param target The {@link ISEDDebugTarget} to handle.
     */
    protected void updateAnnotations(IEditorPart editor, ISEDDebugTarget target) {
-      if (editor instanceof ITextEditor) {
-         Object editorSource = getEditorSource(editor);
-         ISEDSourceModel sourceModel = target.getSourceModel();
-         ISEDSourceSummary summary = sourceModel.getSourceSummary(editorSource);
-         if (summary != null) {
-            ITextEditor te = (ITextEditor)editor;
-            IDocumentProvider provider = te.getDocumentProvider();
-            IAnnotationModel model = provider.getAnnotationModel(editor.getEditorInput());
-            IDocument document = provider.getDocument(editor.getEditorInput());
-            if (editorSource != null) {
-               Map<Position, SymbolicallyReachedAnnotation> existingAnnotations = createAnnotationRangeMap(model);
-               // Update existing annotations and add new annotations if not already present.
-               for (ISEDSourceRange range : summary.getSourceRanges()) {
-                  Position position = computePosition(document, range);
-                  if (position != null) {
-                     SymbolicallyReachedAnnotation annotation = existingAnnotations.remove(position);
-                     if (annotation == null) {
-                        annotation = new SymbolicallyReachedAnnotation(position);
-                        annotation.setRange(target, range);
-                        model.addAnnotation(annotation, position);
+      try {
+         if (editor instanceof ITextEditor) {
+            Object editorSource = getEditorSource(editor);
+            ISEDSourceModel sourceModel = target.getSourceModel();
+            if (sourceModel != null) {
+               sourceModel.ensureCompleteness();
+               ISEDSourceSummary summary = sourceModel.getSourceSummary(editorSource);
+               if (summary != null) {
+                  ITextEditor te = (ITextEditor)editor;
+                  IDocumentProvider provider = te.getDocumentProvider();
+                  IAnnotationModel model = provider.getAnnotationModel(editor.getEditorInput());
+                  IDocument document = provider.getDocument(editor.getEditorInput());
+                  if (editorSource != null) {
+                     Map<Position, SymbolicallyReachedAnnotation> existingAnnotations = createAnnotationRangeMap(model);
+                     // Update existing annotations and add new annotations if not already present.
+                     for (ISEDSourceRange range : summary.getSourceRanges()) {
+                        Position position = computePosition(document, range);
+                        if (position != null) {
+                           SymbolicallyReachedAnnotation annotation = existingAnnotations.remove(position);
+                           if (annotation == null) {
+                              annotation = new SymbolicallyReachedAnnotation(position);
+                              annotation.setRange(target, range);
+                              model.addAnnotation(annotation, position);
+                           }
+                           else {
+                              annotation.setRange(target, range);
+                           }
+                        }
                      }
-                     else {
-                        annotation.setRange(target, range);
+                     // Remove no longer needed annotations.
+                     for (SymbolicallyReachedAnnotation annotation : existingAnnotations.values()) {
+                        removeTarget(model, annotation, target);
                      }
                   }
                }
-               // Remove no longer needed annotations.
-               for (SymbolicallyReachedAnnotation annotation : existingAnnotations.values()) {
-                  removeTarget(model, annotation, target);
-               }
             }
          }
+      }
+      catch (DebugException e) {
+         LogUtil.getLogger().logError(e);
       }
    }
    

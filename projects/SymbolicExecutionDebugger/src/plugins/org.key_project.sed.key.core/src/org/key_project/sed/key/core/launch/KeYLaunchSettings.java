@@ -143,9 +143,14 @@ public class KeYLaunchSettings {
    private final boolean variablesAreOnlyComputedFromUpdates;
    
    /**
-    * Is predicate evaluation enabled?
+    * Is truth value evaluation enabled?
     */
-   private final boolean predicateEvaluationEnabled;
+   private final boolean truthValueEvaluationEnabled;
+   
+   /**
+    * Is reached source code highlighted?
+    */
+   private final boolean highlightReachedSourceCode;
    
    /**
     * Constructor.
@@ -168,7 +173,8 @@ public class KeYLaunchSettings {
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
-    * @param predicateEvaluationEnabled Is predicate evaluation enabled?
+    * @param truthValueEvaluationEnabled Is truth value evaluation enabled?
+    * @param highlightReachedSourceCode Is reached source code highlighted?
     * @throws JavaModelException Occurred Exception.
     */
    public KeYLaunchSettings(boolean newDebugSession,
@@ -191,7 +197,8 @@ public class KeYLaunchSettings {
                             boolean usePrettyPrinting,
                             boolean showSignatureOnMethodReturnNodes,
                             boolean variablesAreOnlyComputedFromUpdates,
-                            boolean predicateEvaluationEnabled) throws JavaModelException {
+                            boolean truthValueEvaluationEnabled,
+                            boolean highlightReachedSourceCode) throws JavaModelException {
       this.newDebugSession = newDebugSession;
       this.proofFileToContinue = proofFileToContinue;
       this.method = method;
@@ -213,7 +220,8 @@ public class KeYLaunchSettings {
       this.usePrettyPrinting = usePrettyPrinting;
       this.showSignatureOnMethodReturnNodes = showSignatureOnMethodReturnNodes;
       this.variablesAreOnlyComputedFromUpdates = variablesAreOnlyComputedFromUpdates;
-      this.predicateEvaluationEnabled = predicateEvaluationEnabled;
+      this.truthValueEvaluationEnabled = truthValueEvaluationEnabled;
+      this.highlightReachedSourceCode = highlightReachedSourceCode;
    }
 
    /**
@@ -385,10 +393,18 @@ public class KeYLaunchSettings {
    }
 
    /**
-    * Checks if predicate evaluation is enabled.
+    * Checks if truth value evaluation is enabled.
     * @return {@code true} enabled, {@code false} disabled
     */
-   public boolean isPredicateEvaluationEnabled() {
-      return predicateEvaluationEnabled;
+   public boolean isTruthValueEvaluationEnabled() {
+      return truthValueEvaluationEnabled;
+   }
+
+   /**
+    * Checks if reached source code is highlighted.
+    * @return {@code true} reached source code is higlighted, {@code false} reached source code is not highlighted.
+    */
+   public boolean isHighlightReachedSourceCode() {
+      return highlightReachedSourceCode;
    }
 }

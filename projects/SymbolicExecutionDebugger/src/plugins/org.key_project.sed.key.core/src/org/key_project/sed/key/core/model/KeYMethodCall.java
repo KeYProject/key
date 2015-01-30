@@ -498,7 +498,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     * {@inheritDoc}
     */
    @Override
-   public boolean isPredicateEvaluationEnabled() {
-      return SymbolicExecutionJavaProfile.isPredicateEvaluationEnabled(getExecutionNode().getProof());
+   public boolean isTruthValueEvaluationEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
    }
 }

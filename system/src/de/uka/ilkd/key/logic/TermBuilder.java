@@ -2193,7 +2193,7 @@ public class TermBuilder {
     * @param t2 The right side.
     * @return The created {@link Term}.
     */
-   public Term impMaintainLabels(Term t1, Term t2) {
+   public Term impPreserveLabels(Term t1, Term t2) {
       if (t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
          if (!t1.hasLabels()) {
             return t2;
@@ -2206,7 +2206,7 @@ public class TermBuilder {
          return t2;
       }
       else if (t2.op() == Junctor.FALSE && !t2.hasLabels()) {
-         return notMaintainLabels(t1);
+         return notPreserveLabels(t1);
       }
       else {
          return tf.createTerm(Junctor.IMP, t1, t2);
@@ -2219,7 +2219,7 @@ public class TermBuilder {
     * @param t The child {@link Term}.
     * @return The created {@link Term}.
     */
-   public Term notMaintainLabels(Term t) {
+   public Term notPreserveLabels(Term t) {
       if (t.op() == Junctor.TRUE && !t.hasLabels()) {
          return ff();
       }
@@ -2240,10 +2240,10 @@ public class TermBuilder {
     * @param subTerms The sub {@link Term}s.
     * @return The created {@link Term}.
     */
-   public Term andMaintainLabels(Iterable<Term> subTerms) {
+   public Term andPreserveLabels(Iterable<Term> subTerms) {
       Term result = tt();
       for (Term sub : subTerms) {
-         result = andMaintainLabels(result, sub);
+         result = andPreserveLabels(result, sub);
       }
       return result;
    }
@@ -2255,7 +2255,7 @@ public class TermBuilder {
     * @param t2 The right side.
     * @return The created {@link Term}.
     */
-   public Term andMaintainLabels(Term t1, Term t2) {
+   public Term andPreserveLabels(Term t1, Term t2) {
       if (t1.op() == Junctor.FALSE || t2.op() == Junctor.FALSE) {
          if (!t1.hasLabels() && !t2.hasLabels()) {
             return ff();
@@ -2284,10 +2284,10 @@ public class TermBuilder {
     * @param subTerms The sub {@link Term}s.
     * @return The created {@link Term}.
     */
-   public Term orMaintainLabels(Iterable<Term> subTerms) {
+   public Term orPreserveLabels(Iterable<Term> subTerms) {
       Term result = ff();
       for (Term sub : subTerms) {
-         result = orMaintainLabels(result, sub);
+         result = orPreserveLabels(result, sub);
       }
       return result;
    }
@@ -2299,7 +2299,7 @@ public class TermBuilder {
     * @param t2 The right side.
     * @return The created {@link Term}.
     */
-   public Term orMaintainLabels(Term t1, Term t2) {
+   public Term orPreserveLabels(Term t1, Term t2) {
       if (t1.op() == Junctor.TRUE || t2.op() == Junctor.TRUE) {
          if (!t1.hasLabels() && !t2.hasLabels()) {
             return tt();

@@ -77,9 +77,14 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
    private CCombo variablesAreOnlyComputedFromUpdatesCombo;
    
    /**
-    * Defines if predicate evaluation is enabled or not.
+    * Defines if truth value evaluation is enabled or not.
     */
-   private Button predicateEvaluationEnabledButton;
+   private Button truthValueEvaluationEnabledButton;
+   
+   /**
+    * Defines if reached source code is highlighted or not.
+    */
+   private Button highlightReachedSourceCodeButton;
    
    /**
     * Constructor.
@@ -145,9 +150,9 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
             updateLaunchConfigurationDialog();
          }
       });
-      predicateEvaluationEnabledButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "Predicate evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)", SWT.CHECK);
-      predicateEvaluationEnabledButton.setEnabled(isEditable());
-      predicateEvaluationEnabledButton.addSelectionListener(new SelectionAdapter() {
+      truthValueEvaluationEnabledButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)", SWT.CHECK);
+      truthValueEvaluationEnabledButton.setEnabled(isEditable());
+      truthValueEvaluationEnabledButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
             updateLaunchConfigurationDialog();
@@ -174,6 +179,18 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       variablesAreOnlyComputedFromUpdatesCombo.add("Based on visible type structure");
       variablesAreOnlyComputedFromUpdatesCombo.add("Based on sequent");
       variablesAreOnlyComputedFromUpdatesCombo.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateLaunchConfigurationDialog();
+         }
+      });
+      // Source code
+      Group sourceCodeGroup = widgetFactory.createGroup(composite, "Source Code");
+      sourceCodeGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      sourceCodeGroup.setLayout(new GridLayout(1, false));
+      highlightReachedSourceCodeButton = widgetFactory.createButton(sourceCodeGroup, "Highlight reached source code during symbolic execution", SWT.CHECK);
+      highlightReachedSourceCodeButton.setEnabled(isEditable());
+      highlightReachedSourceCodeButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
             updateLaunchConfigurationDialog();
@@ -231,7 +248,8 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
          usePrettyPrintingButton.setSelection(KeySEDUtil.isUsePrettyPrinting(configuration));
          showSignatureOnMethodReturnNodes.setSelection(KeySEDUtil.isShowSignatureOnMethodReturnNodes(configuration));
          variablesAreOnlyComputedFromUpdatesCombo.setText(KeySEDUtil.isVariablesAreOnlyComputedFromUpdates(configuration) ? "Based on sequent" : "Based on visible type structure");
-         predicateEvaluationEnabledButton.setSelection(KeySEDUtil.isPredicateEvaluationEnabled(configuration));
+         truthValueEvaluationEnabledButton.setSelection(KeySEDUtil.isTruthValueEvaluationEnabled(configuration));
+         highlightReachedSourceCodeButton.setSelection(KeySEDUtil.isHighlightReachedSourceCode(configuration));
          updatePrettyPrintingDependingEnabledStates();
          updateShowVariablesEnabledState();
       } 
@@ -253,7 +271,8 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       usePrettyPrintingButton.setSelection(launchSettings.isUsePrettyPrinting());
       showSignatureOnMethodReturnNodes.setSelection(launchSettings.isShowSignatureOnMethodReturnNodes());
       variablesAreOnlyComputedFromUpdatesCombo.setText(launchSettings.isVariablesAreOnlyComputedFromUpdates() ? "Based on sequent" : "Based on visible type structure");
-      predicateEvaluationEnabledButton.setSelection(launchSettings.isPredicateEvaluationEnabled());
+      truthValueEvaluationEnabledButton.setSelection(launchSettings.isTruthValueEvaluationEnabled());
+      highlightReachedSourceCodeButton.setSelection(launchSettings.isHighlightReachedSourceCode());
       updatePrettyPrintingDependingEnabledStates();
       updateShowVariablesEnabledState();
    }
@@ -271,6 +290,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrintingButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, showSignatureOnMethodReturnNodes.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_VARIABLES_ARE_COMPUTED_FROM_UPDATES, "Based on sequent".equals(variablesAreOnlyComputedFromUpdatesCombo.getText()));
-      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PREDICATE_EVALUATION_ENABLED, predicateEvaluationEnabledButton.getSelection());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, truthValueEvaluationEnabledButton.getSelection());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, highlightReachedSourceCodeButton.getSelection());
    }
 }

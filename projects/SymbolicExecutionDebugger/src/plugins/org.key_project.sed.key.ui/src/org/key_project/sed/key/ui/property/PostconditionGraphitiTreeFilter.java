@@ -36,7 +36,7 @@ public class PostconditionGraphitiTreeFilter extends AbstractPropertySectionFilt
          PostconditionGraphitiPropertySection section = new PostconditionGraphitiPropertySection();
          section.setInput(part, null);
          IKeYTerminationNode<?> node = section.getDebugNode(pe);
-         return node != null && node.isPredicateEvaluationEnabled();
+         return node != null && node.isTruthValueEvaluationEnabled();
       }
       else {
          return false;

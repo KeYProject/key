@@ -47,7 +47,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.label.PredicateTermLabel;
+import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -62,7 +62,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil;
+import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 
 /**
@@ -712,7 +712,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                           atPreVars.keySet().contains(getSavedHeap(services)), sb);
 
       // create program term
-      if (SymbolicExecutionJavaProfile.isPredicateEvaluationEnabled(proofConfig)) {
+      if (SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(proofConfig)) {
          postTerm = labelPostTerm(services, postTerm);
       }
       Term programTerm = tb.prog(getTerminationMarker(), jb, postTerm);
@@ -731,7 +731,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
    /**
     * Labels all predicates in the given {@link Term} and its children with
-    * a {@link PredicateTermLabel}.
+    * a {@link FormulaTermLabel}.
     * @param services The {@link Services} to use.
     * @param term The {@link Term} to label.
     * @return The labeled {@link Term}.
@@ -740,7 +740,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
       if (term != null) {
          final TermFactory tf = services.getTermFactory();
          // Label children of operator
-         if (PredicateEvaluationUtil.isLogicOperator(term)) {
+         if (TruthValueEvaluationUtil.isLogicOperator(term)) {
             Term[] newSubs = new Term[term.arity()];
             boolean subsChanged = false;
             for (int i = 0; i < newSubs.length; i++) {
@@ -756,9 +756,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
          }
          ImmutableArray<TermLabel> oldLabels = term.getLabels();
          TermLabel[] newLabels = oldLabels.toArray(new TermLabel[oldLabels.size() + 1]);
-         int labelID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
-         int labelSubID = PredicateTermLabel.newLabelSubID(services, labelID);
-         newLabels[oldLabels.size()] = new PredicateTermLabel(labelID, labelSubID);
+         int labelID = services.getCounter(FormulaTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
+         int labelSubID = FormulaTermLabel.newLabelSubID(services, labelID);
+         newLabels[oldLabels.size()] = new FormulaTermLabel(labelID, labelSubID);
          return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(), new ImmutableArray<TermLabel>(newLabels));
       }
       else {

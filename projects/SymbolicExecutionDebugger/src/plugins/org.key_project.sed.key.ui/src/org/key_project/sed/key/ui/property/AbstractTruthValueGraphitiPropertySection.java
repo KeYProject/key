@@ -26,14 +26,14 @@ import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 
 /**
  * Basic {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s
- * in a {@link AbstractPredicateComposite}.
+ * in a {@link AbstractTruthValueComposite}.
  * @author Martin Hentschel
  */
-public abstract class AbstractPredicateGraphitiPropertySection extends GFPropertySection {
+public abstract class AbstractTruthValueGraphitiPropertySection extends GFPropertySection {
    /**
     * The shown content.
     */
-   private AbstractPredicateComposite contentComposite;
+   private AbstractTruthValueComposite contentComposite;
    
    /**
     * {@inheritDoc}
@@ -45,11 +45,11 @@ public abstract class AbstractPredicateGraphitiPropertySection extends GFPropert
    }
    
    /**
-    * Creates the {@link AbstractPredicateComposite} to show.
+    * Creates the {@link AbstractTruthValueComposite} to show.
     * @param parent The parent {@link Composite}.
-    * @return The created {@link AbstractPredicateComposite}.
+    * @return The created {@link AbstractTruthValueComposite}.
     */
-   protected abstract AbstractPredicateComposite createContentComposite(Composite parent);
+   protected abstract AbstractTruthValueComposite createContentComposite(Composite parent);
 
    /**
     * {@inheritDoc}

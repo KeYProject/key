@@ -28,6 +28,6 @@ public class LoopInvariantTreeFilter implements IFilter {
    @Override
    public boolean select(Object toTest) {
       IKeYSEDDebugNode<?> node = LoopInvariantPropertySection.getDebugNode(toTest);
-      return node != null && node.isPredicateEvaluationEnabled();
+      return node != null && node.isTruthValueEvaluationEnabled();
    }
 }

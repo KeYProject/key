@@ -79,9 +79,9 @@ public class SWTBotLoopInvariantTabTest extends AbstractSWTBotKeYPropertyTabTest
             TestUtilsUtil.waitForJobs();
             assertEquals(" true\n" +
             		       "==>\n" +
-                         "   (i >= 0)<<P(\"8.0\")>>\n" +
-            				 " & (i <= 1)<<P(\"9.0\")>>\n" +
-                         " & wellFormed(heap)<<P(\"10.0\")>>", propertiesView.bot().styledText(0).getText());
+                         "   (i >= 0)<<F(\"8.0\")>>\n" +
+            				 " & (i <= 1)<<F(\"9.0\")>>\n" +
+                         " & wellFormed(heap)<<F(\"10.0\")>>", propertiesView.bot().styledText(0).getText());
          }
 
          @Override
@@ -90,12 +90,12 @@ public class SWTBotLoopInvariantTabTest extends AbstractSWTBotKeYPropertyTabTest
             TestUtilsUtil.waitForJobs();
             assertEquals(" true\n" +
                          "==>\n" +
-                         "   (i >= 0)<<P(\"11.0\")>>\n" +
-                         " & (i <= 1)<<P(\"12.0\")>>\n" +
+                         "   (i >= 0)<<F(\"11.0\")>>\n" +
+                         " & (i <= 1)<<F(\"12.0\")>>\n" +
                          " & (\\forall Field f;\n" +
                          "      (\\forall java.lang.Object o;\n" +
-                         "         (o.f@heapBefore_LOOP = o.f)<<P(\"13.0\")>>)<<P(\"14.0\")>>)<<P(\"15.0\")>>\n" +
-                         " & prec(2 + i * -1, variant)<<P(\"16.0\")>>", propertiesView.bot().styledText(0).getText());
+                         "         (o.f@heapBefore_LOOP = o.f)<<F(\"13.0\")>>)<<F(\"14.0\")>>)<<F(\"15.0\")>>\n" +
+                         " & prec(2 + i * -1, variant)<<F(\"16.0\")>>", propertiesView.bot().styledText(0).getText());
          }
       };
    }
