@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.IDocument;
+import org.key_project.jmlediting.core.utilities.CommentRange.CommentType;
 
 /**
  * Class for finding JML Comments in a given String. This class does not take
@@ -115,7 +116,7 @@ public class CommentLocator {
                         commentEnd = content.length - 1;
                      }
                      comments.add(new CommentRange(position, commentEnd,
-                           position + 2, commentEnd));
+                           position + 2, commentEnd, CommentType.SINGLE_LINE));
                      if (end == -1) {
                         break mainloop;
                      }
@@ -157,7 +158,7 @@ public class CommentLocator {
                   // MultiLine Comment Closer found
                   case '/':
                      comments.add(new CommentRange(begin, position + 1,
-                           begin + 2, position - 1));
+                           begin + 2, position - 1, CommentType.MULTI_LINE));
                      state = ScannerState.DEFAULT;
                      position += 2;
                      break;
@@ -178,7 +179,7 @@ public class CommentLocator {
             }
             if (position == content.length) {
                comments.add(new CommentRange(begin, position - 1, begin + 2,
-                     position - 1));
+                     position - 1, CommentType.MULTI_LINE));
             }
             break;
          case IN_STRING:

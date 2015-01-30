@@ -4,10 +4,14 @@ package org.key_project.jmlediting.core.utilities;
  * A Class for containing offsets of Comments. with offsets for comment begin,
  * comment end, content begin, content end
  *
- * @author David Giessing
+ * @author David Giessing, Moritz Lichter
  *
  */
 public class CommentRange {
+
+   public static enum CommentType {
+      SINGLE_LINE, MULTI_LINE;
+   }
 
    /**
     * The Comments begin offset including begin sign.
@@ -29,6 +33,11 @@ public class CommentRange {
    private final int contentEndOffset;
 
    /**
+    * The type of the comment.
+    */
+   private final CommentType type;
+
+   /**
     * Creates a new CommentRange Object.
     *
     * @param offset
@@ -39,14 +48,21 @@ public class CommentRange {
     *           The begin offset of the Content of the Comment
     * @param contentEndOffset
     *           The end offset of the Content of the Comment
+    * @param type
+    *           the type of the comment, not allowed to be null
     */
    public CommentRange(final int offset, final int end,
-         final int contentOffset, final int contentEndOffset) {
+         final int contentOffset, final int contentEndOffset,
+         final CommentType type) {
       super();
+      if (type == null) {
+         throw new IllegalArgumentException("type is not allowed to be null");
+      }
       this.beginOffset = offset;
       this.endOffset = end;
       this.contentBeginOffset = contentOffset;
       this.contentEndOffset = contentEndOffset;
+      this.type = type;
    }
 
    /**
@@ -103,5 +119,14 @@ public class CommentRange {
     */
    public int getContentLength() {
       return this.getContentEndOffset() - this.getContentBeginOffset() + 1;
+   }
+
+   /**
+    * Returns the type of the comment
+    *
+    * @return the type
+    */
+   public CommentType getType() {
+      return this.type;
    }
 }

@@ -136,8 +136,7 @@ public class JMLFormattingStrategy<T extends IFormattingStrategy & IFormattingSt
             // Remember to range to replace, the dummy content to insert and the
             // original text
             jmlCommentRanges.add(comment);
-            final String dummyComment = dummyComment(comment.getLength(),
-                  marker);
+            final String dummyComment = dummyComment(comment, marker);
             jmlCommentMarker.add(dummyComment);
             jmlComments.add(content.substring(comment.getBeginOffset(),
                   comment.getEndOffset() + 1));
@@ -302,20 +301,40 @@ public class JMLFormattingStrategy<T extends IFormattingStrategy & IFormattingSt
     * the same length as the original comment. Is is guaranteed not to be
     * shorter.
     *
-    * @param length
-    *           the desired length
+    * @param comment
+    *           the comment to create a dummy for
     * @param marker
     *           the marker string
     * @return a dummy comment containing the marker string which is as least as
     *         long as length
     */
-   private static String dummyComment(final int length, final String marker) {
+   private static String dummyComment(final CommentRange comment,
+         final String marker) {
       // The minimum length of comment start and end sign
-      final int minLength = 4;
-      String str = "/*" + marker;
+      // Create a multi or single line comment depending on the give one
+      final int minLength;
+      String prefix;
+      String suffix;
+      switch (comment.getType()) {
+      case MULTI_LINE:
+         prefix = "/*";
+         suffix = "*/";
+         break;
+      case SINGLE_LINE:
+         prefix = "//";
+         suffix = "";
+         break;
+      default:
+         throw new AssertionError("Illegal state");
+      }
+      minLength = prefix.length() + suffix.length();
+
+      // BUild the string
+      String str = prefix + marker;
       // Insert whitespaces to fill up to the given length
-      str += whiteSpaces(Math.max(0, length - minLength - marker.length()));
-      str += "*/";
+      str += whiteSpaces(Math.max(0,
+            comment.getLength() - minLength - marker.length()));
+      str += suffix;
       return str;
    }
 
