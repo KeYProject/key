@@ -3,6 +3,7 @@ package org.key_project.sed.key.core.slicing;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.annotation.impl.SliceAnnotation;
@@ -31,7 +32,9 @@ public abstract class AbstractKeYSlicer implements ISEDSlicer {
     * {@inheritDoc}
     */
    @Override
-   public SliceAnnotation slice(ISEDDebugNode seedNode, IVariable seedVariable) throws DebugException {
+   public SliceAnnotation slice(ISEDDebugNode seedNode, 
+                                IVariable seedVariable, 
+                                IProgressMonitor monitor) throws DebugException {
       // Check if parameters are valid.
       if (seedNode instanceof IKeYSEDDebugNode<?>) {
          if (seedVariable instanceof KeYVariable) {

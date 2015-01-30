@@ -1,5 +1,6 @@
 package org.key_project.sed.key.core.test.testcase.swtbot;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IVariable;
@@ -38,7 +39,7 @@ public class SWTBotKeYThinBackwardSlicerTest extends AbstractKeYDebugTargetTestC
             resume(bot, launchTreeItem, target);
             assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/simpleLocalVariables/oracle/SimpleLocalVariables.xml", true, false, false);
             // Find seed
-            ISEDDebugNode thread = target.getSymbolicThreads()[0];;
+            ISEDDebugNode thread = target.getSymbolicThreads()[0];
             ISEDDebugNode call = thread.getChildren()[0];
             ISEDDebugNode xDecl = call.getChildren()[0];
             ISEDDebugNode yDecl = xDecl.getChildren()[0];
@@ -49,7 +50,7 @@ public class SWTBotKeYThinBackwardSlicerTest extends AbstractKeYDebugTargetTestC
             // Perform slicing
             ISEDSlicer slicer = target.getSlicer(resultReturn, seedVariable, KeYThinBackwardSlicer.NAME);
             assertNotNull(slicer);
-            SliceAnnotation annotation = slicer.slice(resultReturn, seedVariable);
+            SliceAnnotation annotation = slicer.slice(resultReturn, seedVariable, new NullProgressMonitor());
             // Check slicing result
             assertEquals(1, target.getRegisteredAnnotations().length);
             assertSame(annotation, target.getRegisteredAnnotations()[0]);
