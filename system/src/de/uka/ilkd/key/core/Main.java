@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,21 +11,26 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.core;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.util.List;
+import java.util.ServiceLoader;
 
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.WindowUserInterface;
 import de.uka.ilkd.key.gui.RecentFileMenu.RecentFileEntry;
-import de.uka.ilkd.key.gui.configuration.GeneralSettings;
-import de.uka.ilkd.key.gui.configuration.PathConfig;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
+import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
+import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.CommandLine;
@@ -45,23 +50,27 @@ public final class Main {
  * Command line options
  */
     private static final String HELP = "--help";
+    private static final String SHOW_PROPERTIES = "--show-properties";
     private static final String AUTO = "--auto";
     private static final String LAST = "--last";
     private static final String AUTO_LOADONLY = "--auto-loadonly";
     private static final String AUTOSAVE = "--autosave";
     private static final String EXPERIMENTAL = "--experimental";
     private static final String DEBUG = "--debug";
+    private static final String MACRO = "--macro";
     private static final String NO_DEBUG = "--no_debug";
     private static final String ASSERTION = "--assertion";
     private static final String NO_ASSERTION = "--no-assertion";
     private static final String NO_JMLSPECS = "--no-jmlspecs";
     public static final String JUSTIFY_RULES ="--justify-rules";
     private static final String PRINT_STATISTICS ="--print-statistics";
+    private static final String SAVE_ALL_CONTRACTS = "--save-all";
     private static final String TIMEOUT ="--timeout";
     private static final String EXAMPLES = "--examples";
     public static final String JKEY_PREFIX = "--jr-";
     public static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
-    public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
+//    deprecated
+//    public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
     public static final String JPATH_OF_RESULT = JKEY_PREFIX + "pathOfResult";
     public static final String JTIMEOUT = JKEY_PREFIX + "timeout";
     public static final String JPRINT = JKEY_PREFIX + "print";
@@ -97,9 +106,10 @@ public final class Main {
             " (internal: "+INTERNAL_VERSION+")";
 
     public static final String COPYRIGHT=UnicodeHelper.COPYRIGHT
-            +" Copyright 2001"+UnicodeHelper.ENDASH+"2013 "
+            +" Copyright 2001"+UnicodeHelper.ENDASH+"2014 "
             +"Karlsruhe Institute of Technology, "
             +"Chalmers University of Technology, and Technische Universit\u00e4t Darmstadt";
+    
 
     /** Level of verbosity for command line outputs. */
     private static byte verbosity = Verbosity.NORMAL;
@@ -124,6 +134,7 @@ public final class Main {
      * <code>AUTO_LOADONLY</code> instead of <code>AUTO</code>.
      */
     private static boolean loadOnly = false;
+
     /**
      * Object handling the parsing of commandline options
      */
@@ -142,6 +153,13 @@ public final class Main {
     private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES =
         {de.uka.ilkd.key.proof.delayedcut.DelayedCut.FEATURE};
 
+    /**
+     * Save all contracts in selected location to automate the creation
+     * of multiple ".key"-files
+     */
+    private static boolean saveAllContracts = false;
+
+    private static ProofMacro autoMacro = new SkipMacro();
 
     /**
      * <p>
@@ -171,12 +189,12 @@ public final class Main {
             cl = createCommandLine();
             cl.parse(args);
             evaluateOptions(cl);
-            
-            //arguments not assigned to a command line option may be files
             fileArguments = cl.getFileArguments();
-            
             UserInterface userInterface = createUserInterface(fileArguments);
             loadCommandLineFiles(userInterface, fileArguments);
+        } catch (ExceptionInInitializerError e) {
+            System.err.println("D'oh! It seems that KeY was not built properly!");
+            System.exit(777);
         } catch (CommandLineException e) {
             printHeader(); // exception before verbosity option could be read
             if (Debug.ENABLE_DEBUG) {
@@ -188,17 +206,18 @@ public final class Main {
     }
 
     public static void loadCommandLineFiles(UserInterface ui, List<File> fileArguments) {
-
-        for (int i = 0; i < fileArguments.size(); i++) {
-            File f = fileArguments.get(i);
-            ui.loadProblem(f);
-        }
-
-        if (fileArguments.isEmpty()
-                && Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
+        if (!fileArguments.isEmpty()) {
+            ui.setMacro(autoMacro);
+            ui.setSaveOnly(saveAllContracts);
+            for (int i = 0; i < fileArguments.size(); i++) {
+                File f = fileArguments.get(i);
+                ui.loadProblem(f);
+            }
+        } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
             ui.openExamples();
         }
     }
+    
 
     /**
      * Register commandline options with command line object
@@ -208,10 +227,11 @@ public final class Main {
         CommandLine cl = new CommandLine();
         cl.setIndentation(3);
         cl.addSection("Using KeY");
-        cl.addText("Usage: ./runProver [options] [filename]\n\n", false);
+        cl.addText("Usage: ./key [options] [filename]\n\n", false);
         cl.addSection("Options for the KeY-Prover");
         cl.addOption(HELP, null, "display this text");
         cl.addTextPart("--K-help", "display help for technical/debug parameters\n", true);
+        cl.addOption(SHOW_PROPERTIES, null, "list all Java properties and exit");
         cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
         cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
@@ -222,7 +242,9 @@ public final class Main {
         cl.addOption(VERBOSITY, "<number>", "verbosity (default: "+Verbosity.NORMAL+")");
         cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
         cl.addOption(EXAMPLES, "<directory>", "load the directory containing the example files on startup");
+        cl.addOption(MACRO, "<proofMacro>", "apply automatic proof macro");
         cl.addOption(PRINT_STATISTICS, "<filename>",  "output nr. of rule applications and time spent on proving");
+        cl.addOption(SAVE_ALL_CONTRACTS, null, "save all selected contracts for automatic execution");
         cl.addOption(TIMEOUT, "<timeout>", "timeout for each automatic proof of a problem in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +", i.e., no timeout)");
         cl.addSection("Options for justify rules:");
         cl.addOption(JUSTIFY_RULES, "<filename>", "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument" );
@@ -259,6 +281,17 @@ public final class Main {
         if (verbosity > Verbosity.SILENT) {
             printHeader();
         }
+        
+        if (cl.isSet(SHOW_PROPERTIES)) {
+            try {
+                java.util.Properties props = System.getProperties();
+                for (Object o: props.keySet()) {
+                    System.out.println(""+o+"=\""+props.get(o)+"\"");
+                }
+            } finally {
+                System.exit(0);
+            }
+        }
 
         if(cl.isSet(AUTO)){
         	uiMode = UiMode.AUTO;
@@ -274,7 +307,7 @@ public final class Main {
                 if (eachSteps < 0) {
                     printUsageAndExit(false, "Illegal autosave period (must be a number >= 0)", -5);
                 }
-                AutoSaver.init(eachSteps, uiMode == UiMode.INTERACTIVE);
+                AutoSaver.setDefaultValues(eachSteps, uiMode == UiMode.INTERACTIVE);
             } catch (CommandLineException e) {
                 if(Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
@@ -353,6 +386,32 @@ public final class Main {
             Debug.ENABLE_DEBUG = true;
         }
 
+        if (cl.isSet(MACRO)) {
+            String macro = cl.getString(MACRO, "");
+            for (ProofMacro m: ServiceLoader.load(ProofMacro.class)) {
+                if (macro.equals(m.getClass().getSimpleName())) {
+                    // memorize macro for later
+                    try {
+                        autoMacro = m.getClass().newInstance();
+                    } catch (InstantiationException e) {
+                        System.err.println("Automatic proof macro can not be instantiated!");
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        System.err.println("Automatic proof macro can not be accessed!");
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+            }
+            if (macro.equals("") || autoMacro instanceof SkipMacro) {
+                System.err.println("No automatic proof macro specified.");
+            }
+        }
+
+        if (cl.isSet(SAVE_ALL_CONTRACTS)) {
+            saveAllContracts = true;
+        }
+
     }
 
     /** Deactivate experimental features. */
@@ -386,15 +445,17 @@ public final class Main {
                 @Override
                 public void uncaughtException(Thread t, Throwable e) {
                     if (verbosity > Verbosity.SILENT) {
-                        System.out.println("Auto mode was terminated by an exception:");
-//                        if (Debug.ENABLE_DEBUG) 
-                            e.printStackTrace();
+                        System.out.println("Auto mode was terminated by an exception:"
+                                            + e.getClass().toString().substring(5));
+                        if (verbosity >= Verbosity.DEBUG) e.printStackTrace();
                         final String msg = e.getMessage();
                         if (msg!=null) System.out.println(msg);
                     }
                     System.exit(-1);
                 }
             });
+            if (fileArguments.isEmpty())
+                printUsageAndExit(true, "Error: No file to load from.", -4);
 
             return new ConsoleUserInterface(verbosity, loadOnly);
         } else {
@@ -402,18 +463,18 @@ public final class Main {
             MainWindow mainWindow = MainWindow.getInstance();
 
             if (loadRecentFile) {
-                RecentFileEntry mostRecent
-                        = mainWindow.getRecentFiles().getMostRecent();
+                RecentFileEntry mostRecent =
+                        mainWindow.getRecentFiles().getMostRecent();
 
                 if (mostRecent != null) {
-                    File tmpFile = new File(mostRecent.getAbsolutePath());
-                    if (tmpFile.exists()) {
-                        fileArguments.add(tmpFile);
+                    File mostRecentFile = new File(mostRecent.getAbsolutePath());
+                    if (mostRecentFile.exists()) {
+                        fileArguments.add(mostRecentFile);
                     } else {
-                        System.out.println("File does not exist anymore: " + tmpFile.toString());
+                        System.out.println("File does not exist anymore: " + mostRecentFile.toString());
                     }
                 }
-            }            
+            }
             return mainWindow.getUserInterface();
         }
 
@@ -496,4 +557,7 @@ public final class Main {
         public static final byte HIGH = 2;
         public static final byte DEBUG = 4;
     }
+
+    public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 }
+
