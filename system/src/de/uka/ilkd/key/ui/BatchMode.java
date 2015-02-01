@@ -24,7 +24,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 
 public class BatchMode {
 
-    private String fileName;
+    private final String fileName;
 
     // flag to indicate that a file should merely be loaded not proved. (for
     // "reload" testing)
@@ -35,10 +35,6 @@ public class BatchMode {
         this.loadOnly = loadOnly;
     }
 
-//    public void autoRun() {
-//    }
-
-
    public void finishedBatchMode (Object result,
             Proof proof) {
 
@@ -46,10 +42,9 @@ public class BatchMode {
             printStatistics ( Main.getStatisticsFile(), result.toString(),
                               proof.statistics(), proof.closed() );
 
-        if (result instanceof Throwable) {
-            // Error in batchMode. Terminate with status -1.
-            System.exit ( -1 );
-        }
+       if (result instanceof Throwable) {
+           throw new Error("Error in batchmode: " + (Throwable) result);
+       }
 
         // Save the proof before exit.
 
@@ -74,21 +69,19 @@ public class BatchMode {
             // save current proof under common name as well
             saveProof (proof, baseName + ".auto.proof" );
         } catch (IOException e) {
-            System.exit( 1 );
+            e.printStackTrace();
+            return;
         }
 
 
-        if (proof.openGoals ().size () == 0) {
+        if (proof.openGoals().size() == 0) {
             // Says that all Proofs have succeeded
-            if (proof.getBasicTask() != null &&
-            		proof.getBasicTask().getStatus().getProofClosedButLemmasLeft()) {
-                // Says that the proof is closed by depends on (unproved) lemmas
-                System.exit ( 0 ); //XXX, was: 2
+            if (proof.getBasicTask() != null
+                    && proof.getBasicTask().getStatus().getProofClosedButLemmasLeft()) {
+                System.out.println("Proof is closed but depends on (unproved) lemmas.");
             }
-            System.exit ( 0 );
         } else {
-            // Says that there is at least one open Proof
-            System.exit ( 1 );
+            System.out.println("Terminated proof but there is at least one open Proof.");
         }
     }
 

@@ -47,7 +47,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     */
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
-    private final BatchMode batchMode;
     private final byte verbosity;
 	private ProofStarter ps;
 	private KeYMediator mediator;
@@ -56,19 +55,18 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 	// for a progress bar
 	private int progressMax = 0;
 
+    private final boolean loadOnly;
+    private BatchMode batchMode;
+
     public boolean isAutoMode() {
       return autoMode;
    }
 
-   public ConsoleUserInterface(BatchMode batchMode, byte verbosity) {
-    	this.batchMode = batchMode;
+   public ConsoleUserInterface(byte verbosity, boolean loadOnly) {
+    	this.loadOnly = loadOnly;
     	this.verbosity = verbosity;
         this.mediator  = new KeYMediator(this);
     }
-
-   public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
-       this(batchMode, verbose? DEBUG: NORMAL);
-   }
 
     public void taskFinished(TaskFinishedInfo info) {
         progressMax = 0; // reset progress bar marker
@@ -92,7 +90,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                 System.out.flush();
             }
             batchMode.finishedBatchMode ( result2, info.getProof() );
-            Debug.fail ( "Control flow should not reach this point." );
         } else if (info.getSource() instanceof ProblemLoader) {
             if (verbosity > SILENT) System.out.println("[ DONE ... loading ]");
             if (result2 != null) {
@@ -248,15 +245,17 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 	    return true;
     }
 
-	@Override
+    @Override
     public void loadProblem(File file) {
-		super.loadProblem(file, null, null, mediator);
-	}
+        batchMode = new BatchMode(file.toString(), loadOnly);
+        super.loadProblem(file, null, null, mediator);
+    }
 
-   @Override
-   public void loadProblem(File file, List<File> classPath, File bootClassPath) {
-      super.loadProblem(file, classPath, bootClassPath, mediator);
-   }
+    @Override
+    public void loadProblem(File file, List<File> classPath, File bootClassPath) {
+        batchMode = new BatchMode(file.toString(), loadOnly);
+        super.loadProblem(file, classPath, bootClassPath, mediator);
+    }
 
 	@Override
     public void openExamples() {

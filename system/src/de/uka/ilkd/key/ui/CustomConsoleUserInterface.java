@@ -15,6 +15,8 @@ package de.uka.ilkd.key.ui;
 
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import static de.uka.ilkd.key.gui.Main.Verbosity.DEBUG;
+import static de.uka.ilkd.key.gui.Main.Verbosity.NORMAL;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -51,7 +53,7 @@ public class CustomConsoleUserInterface extends ConsoleUserInterface {
     * @param verbose Verbose?
     */
    public CustomConsoleUserInterface(boolean verbose) {
-      super(null, verbose);
+      super(verbose? DEBUG: NORMAL, true);
    }
 
    /**

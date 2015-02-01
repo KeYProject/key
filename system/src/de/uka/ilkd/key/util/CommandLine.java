@@ -14,10 +14,11 @@
 
 package de.uka.ilkd.key.util;
 
+import de.uka.ilkd.key.gui.Main;
+import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -323,8 +324,23 @@ public final class CommandLine {
      *
      * @return a read-only list of strings.
      */
-    public List<String> getArguments() {
-        return Collections.unmodifiableList(arguments);
+    public ArrayList<File> getFileArguments() {
+
+        ArrayList<File> ret = new ArrayList<File>();
+        List<String> FileNameList = Collections.unmodifiableList(arguments);
+
+        for (int i = 0; i < FileNameList.size(); i++) {
+
+            String fileArg = FileNameList.get(i);
+            File tmp = new File(fileArg);
+            if (tmp.exists()) {
+                ret.add(tmp);
+            } else {
+                Main.printUsageAndExit(false, "File not found: " + fileArg, -4);
+            }
+        }
+        return ret;
+
     }
 
     /**

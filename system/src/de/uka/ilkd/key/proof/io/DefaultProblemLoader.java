@@ -60,7 +60,7 @@ public class DefaultProblemLoader {
    /**
     * The file or folder to load.
     */
-   private File file;
+   File file;
 
    /**
     * The optional class path entries to use.

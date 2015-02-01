@@ -26,7 +26,6 @@ import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
-import de.uka.ilkd.key.ui.BatchMode;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.CommandLine;
@@ -125,8 +124,6 @@ public final class Main {
      * <code>AUTO_LOADONLY</code> instead of <code>AUTO</code>.
      */
     private static boolean loadOnly = false;
-
-    private static String fileNameOnStartUp = null;
     /**
      * Object handling the parsing of commandline options
      */
@@ -135,6 +132,8 @@ public final class Main {
      * flag whether recent loaded file should be loaded on startup
      */
     private static boolean loadRecentFile=false;
+    
+    public static List<File> fileArguments;
 
     /** Lists all features currently marked as experimental.
      * Unless invoked with command line option --experimental ,
@@ -172,8 +171,12 @@ public final class Main {
             cl = createCommandLine();
             cl.parse(args);
             evaluateOptions(cl);
-            UserInterface userInterface = createUserInterface();
-            loadCommandLineFile(userInterface);
+            
+            //arguments not assigned to a command line option may be files
+            fileArguments = cl.getFileArguments();
+            
+            UserInterface userInterface = createUserInterface(fileArguments);
+            loadCommandLineFiles(userInterface, fileArguments);
         } catch (CommandLineException e) {
             printHeader(); // exception before verbosity option could be read
             if (Debug.ENABLE_DEBUG) {
@@ -184,11 +187,15 @@ public final class Main {
 
     }
 
-    public static void loadCommandLineFile(UserInterface ui) {
-        if (Main.getFileNameOnStartUp() != null) {
-            ui.loadProblem(new File(Main.getFileNameOnStartUp()));
+    public static void loadCommandLineFiles(UserInterface ui, List<File> fileArguments) {
 
-        } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
+        for (int i = 0; i < fileArguments.size(); i++) {
+            File f = fileArguments.get(i);
+            ui.loadProblem(f);
+        }
+
+        if (fileArguments.isEmpty()
+                && Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
             ui.openExamples();
         }
     }
@@ -338,25 +345,12 @@ public final class Main {
             loadRecentFile=true;
         }
 
-        List<String> fileArguments = cl.getArguments();
-
         if (cl.isSet(JUSTIFY_RULES)) {
             evaluateLemmataOptions(cl);
         }
 
         if (cl.isSet(DEBUG)) {
             Debug.ENABLE_DEBUG = true;
-        }
-
-        //arguments not assigned to a command line option may be files
-
-        if(!fileArguments.isEmpty()){
-            String fileArg = fileArguments.get(0);
-            if(new File(fileArg).exists()) {
-                fileNameOnStartUp = fileArg;
-            } else {
-                printUsageAndExit(false, "File not found: " + fileArg, -4);
-            }
         }
 
     }
@@ -384,45 +378,44 @@ public final class Main {
      * @return a <code>UserInterface</code> based on the value of
      *         <code>uiMode</code>
      */
-    private static UserInterface createUserInterface() {
-        UserInterface ui;
+    private static UserInterface createUserInterface(List<File> fileArguments) {
 
-        if (uiMode == UiMode.AUTO) {
+        if (isAutoMode()) {
             // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see bug #1216
             Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                 @Override
                 public void uncaughtException(Thread t, Throwable e) {
                     if (verbosity > Verbosity.SILENT) {
                         System.out.println("Auto mode was terminated by an exception:");
-                        if (Debug.ENABLE_DEBUG) e.printStackTrace();
+//                        if (Debug.ENABLE_DEBUG) 
+                            e.printStackTrace();
                         final String msg = e.getMessage();
                         if (msg!=null) System.out.println(msg);
                     }
                     System.exit(-1);
                 }
             });
-            BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
-            ui = new ConsoleUserInterface(batch, verbosity);
+            return new ConsoleUserInterface(verbosity, loadOnly);
         } else {
             updateSplashScreen();
             MainWindow mainWindow = MainWindow.getInstance();
 
             if (loadRecentFile) {
-                RecentFileEntry mostRecent =
-                        mainWindow.getRecentFiles().getMostRecent();
+                RecentFileEntry mostRecent
+                        = mainWindow.getRecentFiles().getMostRecent();
 
                 if (mostRecent != null) {
-                    fileNameOnStartUp = mostRecent.getAbsolutePath();
+                    File tmpFile = new File(mostRecent.getAbsolutePath());
+                    if (tmpFile.exists()) {
+                        fileArguments.add(tmpFile);
+                    } else {
+                        System.out.println("File does not exist anymore: " + tmpFile.toString());
+                    }
                 }
-            }
-
-            ui = mainWindow.getUserInterface();
-	    if (fileNameOnStartUp != null && verbosity > Verbosity.SILENT)
-	        System.out.println("Loading: "+fileNameOnStartUp);
+            }            
+            return mainWindow.getUserInterface();
         }
-
-        return ui;
 
     }
 
@@ -455,7 +448,7 @@ public final class Main {
 
     }
 
-    private static void printUsageAndExit(boolean printUsage, String offending, int exitValue) {
+    public static void printUsageAndExit(boolean printUsage, String offending, int exitValue) {
         PrintStream ps = exitValue==0 ? System.out : System.err;
         if(offending != null) {
             ps.println(offending);
@@ -487,16 +480,13 @@ public final class Main {
         return statisticsFile;
     }
 
-    /**
-     * @return the fileNameOnStartUp
-     */
-    public static String getFileNameOnStartUp() {
-        return fileNameOnStartUp;
-    }
-
     /** Returns the time of the program start in millis. */
     public static long getStartTime() {
         return startTime;
+    }
+    
+    public static boolean isAutoMode(){
+        return uiMode == UiMode.AUTO;
     }
 
     /** Command line output verbosity levels. */

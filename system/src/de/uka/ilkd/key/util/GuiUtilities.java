@@ -143,9 +143,9 @@ public class GuiUtilities {
      */
     public static KeYFileChooser getFileChooser(String title) {
         if (fileChooser == null) {
-            String initDir = Main.getFileNameOnStartUp() == null 
+            String initDir = Main.fileArguments.isEmpty()
                              ? System.getProperty("user.dir")
-                             : Main.getFileNameOnStartUp();
+                             : Main.fileArguments.get(0).toString();
                              
             fileChooser = new KeYFileChooser(initDir);
         }

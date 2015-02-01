@@ -19,7 +19,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.SwingWorker;
@@ -36,8 +35,8 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
  * a proof configured by the opened file.
  * @author Martin Hentschel
  */
-public final class ProblemLoader extends DefaultProblemLoader implements Runnable {
-   private SwingWorker worker;
+public class ProblemLoader extends DefaultProblemLoader {
+
    private ProverTaskListener ptl;
 
    public ProblemLoader(File file, List<File> classPath, File bootClassPath, Profile profileOfNewProofs, KeYMediator mediator) {
@@ -48,40 +47,26 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
       this.ptl = ptl;
    }
 
-   public void run() {
-      /*
-       * Invoking start() on the SwingWorker causes a new Thread to be created
-       * that will call construct(), and then finished(). Note that finished()
-       * is called even if the worker is interrupted because we catch the
-       * InterruptedException in doWork().
-       */
-      worker = new SwingWorker() {
-         private long time;
+    public void run() {
 
-         @Override
-         public Object construct() {
-            time = System.currentTimeMillis();
-            Object res = doWork();
-            time = System.currentTimeMillis() - time;
-            return res;
-         }
+        getMediator().stopInterface(true);
+        if (ptl != null) {
+            ptl.taskStarted("Loading problem ...", 0);
+        }
 
-         @Override
-         public void finished() {
-            getMediator().startInterface(true);
-            final Object msg = get();
-            if (ptl != null) {
-               final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, msg, getProof(), time, (getProof() != null ? getProof().countNodes() : 0), (getProof() != null ? getProof().countBranches() - getProof().openGoals().size() : 0));
-               ptl.taskFinished(tfi);
-            }
-         }
-      };
-      getMediator().stopInterface(true);
-      if (ptl != null) {
-         ptl.taskStarted("Loading problem ...", 0);
-      }
-      worker.start();
-   }
+        long time;
+
+        System.out.println("Loading: " + file);
+        time = System.currentTimeMillis();
+        final Object msg = doWork();
+        time = System.currentTimeMillis() - time;
+
+        getMediator().startInterface(true);
+        if (ptl != null) {
+            final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, msg, getProof(), time, (getProof() != null ? getProof().countNodes() : 0), (getProof() != null ? getProof().countBranches() - getProof().openGoals().size() : 0));
+            ptl.taskFinished(tfi);
+        }
+    }
 
    private Throwable doWork() {
       Throwable status = null;
