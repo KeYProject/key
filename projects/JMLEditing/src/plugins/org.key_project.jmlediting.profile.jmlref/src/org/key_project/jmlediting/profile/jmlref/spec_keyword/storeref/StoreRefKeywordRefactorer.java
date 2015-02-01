@@ -10,10 +10,16 @@ import org.key_project.jmlediting.core.utilities.JavaElementIdentifier;
 
 public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
 
+   public StoreRefKeywordRefactorer() {
+      // TODO Auto-generated constructor stub
+   }
+
    @Override
    public List<Change> refactorFieldRename(final JavaElementIdentifier elem,
          final IASTNode contentNode) {
-
+      if (contentNode != null) {
+         System.out.println(contentNode.getType());
+      }
       return Collections.emptyList();
    }
 }

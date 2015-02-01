@@ -1,5 +1,6 @@
 package org.key_project.jmlediting.core.refactoring;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -30,7 +31,6 @@ import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLJavaResolver;
 import org.key_project.jmlediting.core.utilities.JavaElementIdentifier;
-import org.key_project.jmlediting.core.utilities.Range;
 import org.key_project.jmlediting.core.utilities.TypeDeclarationFinder;
 import org.key_project.util.jdt.JDTUtil;
 
@@ -95,7 +95,7 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
       final JavaElementIdentifier refGoal = new JavaElementIdentifier(
             elem.getElementName(), resolver.getTypeForName(elem
                   .getElementName()), elem.getDeclaringType());
-      final Range[] occurences = this.getJMLOccurences(refGoal);
+      final List<Change> occurences = this.getJMLOccurences(refGoal);
       // final ReplaceEdit edit = new ReplaceEdit(offset,
       // refGoal.getName().length(), this
       // .getArguments().getNewName());
@@ -108,8 +108,9 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
     * @return a Range Array that contains all occurences of the Keyword. NULL if
     *         no occurences were found.
     */
-   private Range[] getJMLOccurences(final JavaElementIdentifier identifier)
+   private List<Change> getJMLOccurences(final JavaElementIdentifier identifier)
          throws CoreException {
+      final List<Change> changes = Collections.EMPTY_LIST;
       CommentLocator loc = null;
       final IJavaProject[] projects = JDTUtil.getAllJavaProjects();
       // In each Project
@@ -147,8 +148,17 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
 
                         final IKeywordContentRefactorer refactorer = keyword
                               .createRefactorer();
-                        final List<Change> keywordChanged = refactorer
-                              .refactorFieldRename(null, contentNode);
+                        if (refactorer == null) {
+                           System.out.println("Refactorer is null");
+                        }
+                        List<Change> changesForContentNode;
+                        changesForContentNode = refactorer.refactorFieldRename(
+                              identifier, contentNode);
+                        if (!changesForContentNode.isEmpty()) {
+                           changes.addAll(refactorer.refactorFieldRename(
+                                 identifier, contentNode));
+
+                        }
                      }
                   }
                   catch (final ParserException e) {
@@ -161,6 +171,6 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
             }
          }
       }
-      return null;
+      return changes;
    }
 }
