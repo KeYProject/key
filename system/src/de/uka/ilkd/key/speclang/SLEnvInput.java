@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.speclang;
 
@@ -41,8 +40,6 @@ import javax.swing.WindowConstants;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.GeneralSettings;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaReduxFileCollection;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -58,10 +55,10 @@ import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.AbstractEnvInput;
-import de.uka.ilkd.key.proof.io.KeYFile;
-import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -98,17 +95,11 @@ public final class SLEnvInput extends AbstractEnvInput {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private static String getLanguage() {
-//        GeneralSettings gs 
-//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();        
+    private static String getLanguage() {      
     	GeneralSettings gs 
         = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-        if(gs.useJML() && gs.useOCL()) {
-            return "JML/OCL";
-        } else if(gs.useJML()) {
+        if(gs.useJML()) {
             return "JML";
-        } else if(gs.useOCL()) {
-            return "OCL";
         } else {
             return "no";
         }
@@ -127,9 +118,10 @@ public final class SLEnvInput extends AbstractEnvInput {
         return kjts;
     }
     
+    // TODO : move GUI stuff somewhere else
     
     private void showWarningDialog(ImmutableSet<PositionedString> warnings) {
-        if(!MainWindow.visible) {
+        if(java.awt.GraphicsEnvironment.isHeadless()) {
             return;
         }
                 
@@ -201,17 +193,15 @@ public final class SLEnvInput extends AbstractEnvInput {
                 RuleSource rs = null;
                 
                 //external or internal path?
-                if(filePath.startsWith("/")) {
-                    File file = new File(filePath);
-                    if(file.exists()) {
-                	rs = RuleSource.initRuleFile(file);
-                    }
+                File file = new File(filePath);
+                if(file.isFile()) {
+                	rs = RuleSourceFactory.initRuleFile(file);
                 } else {
                     URL url = KeYResourceManager.getManager().getResourceFile(
                 				Recoder2KeY.class, 
                 				filePath);
                     if(url != null) {
-                	rs = RuleSource.initRuleFile(url);
+                	rs = RuleSourceFactory.initRuleFile(url);
                     }
                 }
                 
@@ -261,9 +251,9 @@ public final class SLEnvInput extends AbstractEnvInput {
             = initConfig.getServices().getJavaInfo();
         final SpecificationRepository specRepos 
             = initConfig.getServices().getSpecificationRepository();
-        
+
         //read DL library specs before any other specs
-        createDLLibrarySpecs();        
+        createDLLibrarySpecs();
        
         //sort types alphabetically (necessary for deterministic names)
         final Set<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
@@ -276,12 +266,12 @@ public final class SLEnvInput extends AbstractEnvInput {
         	  || kjt.getJavaType() instanceof InterfaceDeclaration)) {
         	continue;
             }
-            
+
             //class invariants, represents clauses, ...
             final ImmutableSet<SpecificationElement> classSpecs 
             	= specExtractor.extractClassSpecs(kjt);
             specRepos.addSpecs(classSpecs);
-            
+
             // Check whether a static invariant is present.
             // Later, we will only add static invariants to contracts per default if
             // there is an explicit static invariant present.
@@ -292,7 +282,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                     break;
                 }
             }
-            
+
             //contracts, loop invariants
             final ImmutableList<IProgramMethod> pms 
                 = javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
@@ -301,40 +291,44 @@ public final class SLEnvInput extends AbstractEnvInput {
         	final ImmutableSet<SpecificationElement> methodSpecs
         	    = specExtractor.extractMethodSpecs(pm,staticInvPresent);
         	specRepos.addSpecs(methodSpecs);
-                
+
                 //loop invariants
                 final JavaASTCollector collector 
                     = new JavaASTCollector(pm.getBody(), LoopStatement.class);
                 collector.start();
                 for(ProgramElement loop : collector.getNodes()) {
-                    LoopInvariant inv = specExtractor.extractLoopInvariant(
-                	    			pm, 
-                        			(LoopStatement) loop);
+                    LoopInvariant inv =
+                            specExtractor.extractLoopInvariant(pm,
+                        			               (LoopStatement) loop);
                     if(inv != null) {
-                        specRepos.addLoopInvariant(inv);
+                        specRepos.addLoopInvariant(inv.setTarget(kjt, pm));
                     }
                 }
-                
+
                 //block contracts
-                final JavaASTCollector blockCollector = new JavaASTCollector(pm.getBody(), StatementBlock.class);
+                final JavaASTCollector blockCollector =
+                        new JavaASTCollector(pm.getBody(), StatementBlock.class);
                 blockCollector.start();
                 for (ProgramElement block : blockCollector.getNodes()) {
-                    final ImmutableSet<BlockContract> blockContracts = specExtractor.extractBlockContracts(pm, (StatementBlock) block);
+                    final ImmutableSet<BlockContract> blockContracts =
+                            specExtractor.extractBlockContracts(pm, (StatementBlock) block);
                     for (BlockContract specification : blockContracts) {
                     	specRepos.addBlockContract(specification);
                     }
                 }
 
-                final JavaASTCollector labeledCollector = new JavaASTCollector(pm.getBody(), LabeledStatement.class);
+                final JavaASTCollector labeledCollector =
+                        new JavaASTCollector(pm.getBody(), LabeledStatement.class);
                 labeledCollector.start();
                 for (ProgramElement labeled : labeledCollector.getNodes()) {
-                    final ImmutableSet<BlockContract> blockContracts = specExtractor.extractBlockContracts(pm, (LabeledStatement) labeled);
+                    final ImmutableSet<BlockContract> blockContracts =
+                            specExtractor.extractBlockContracts(pm, (LabeledStatement) labeled);
                     for (BlockContract specification : blockContracts) {
                         specRepos.addBlockContract(specification);
                     }
                 }
             }
-            
+
             //constructor contracts
             final ImmutableList<IProgramMethod> constructors 
             	= javaInfo.getConstructors(kjt);
@@ -344,11 +338,12 @@ public final class SLEnvInput extends AbstractEnvInput {
 			= specExtractor.extractMethodSpecs(constructor, staticInvPresent);
         	specRepos.addSpecs(constructorSpecs);
             }
+            specRepos.addRepresentsTermToWdChecksForModelFields(kjt);
         }
 
         //add initially clauses to constructor contracts
         specRepos.createContractsFromInitiallyClauses();
-        
+
         //show warnings to user
         ImmutableSet<PositionedString> warnings = specExtractor.getWarnings();
         if(warnings != null && warnings.size() > 0) {
@@ -371,9 +366,13 @@ public final class SLEnvInput extends AbstractEnvInput {
         final GeneralSettings gs
         = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
-//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
         if(gs.useJML()) {
             createSpecs(new JMLSpecExtractor(initConfig.getServices()));
         }
+    }
+
+    @Override
+    public File getInitialFile() {
+       return null;
     }
 }

@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.util.pp;
 
@@ -20,8 +20,13 @@ import java.io.Writer;
  * The {@link #mark(Object o)} method does nothing in this implementation.
  * There is a method {@link #count()} which returns the number of characters
  * written by this so far.
+ * 
+ * This class is the cause for numerous unnecessary "throws IOException" clauses
+ * throughout the entire project. It should be removed and replaced by StringBackend.
+ * (Kai Wallisch 09/2014)
  */
 
+@Deprecated
 public class WriterBackend implements Backend {
 
     protected Writer out;

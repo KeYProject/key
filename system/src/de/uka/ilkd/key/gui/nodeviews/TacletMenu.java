@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,27 +11,45 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
-import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
+import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.NameCreationInfo;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -41,13 +59,22 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.join.JoinIsApplicable;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
-import de.uka.ilkd.key.util.GuiUtilities;
 
 
 /**
@@ -56,9 +83,20 @@ import de.uka.ilkd.key.util.GuiUtilities;
  * that hands over the selected Taclet. The class is used to get all
  * Taclet that are applicable at a selected position in a sequent.
  */
-class TacletMenu extends JMenu {
+public class TacletMenu extends JMenu {
 
-    /**
+    private static final String MORE_RULES = "More rules";
+	private static final String COPY_TO_CLIPBOARD = "Copy to clipboard";
+	private static final String CREATE_ABBREVIATION = "Create abbreviation";
+	private static final String ENABLE_ABBREVIATION = "Enable abbreviation";
+	private static final String DISABLE_ABBREVIATION = "Disable abbreviation";
+	private static final String CHANGE_ABBREVIATION = "Change abbreviation";
+	private static final String APPLY_CONTRACT = "Apply Contract";
+	private static final String CHOOSE_AND_APPLY_CONTRACT = "Choose and Apply Contract";
+	private static final String ENTER_LOOP_SPECIFICATION = "Enter Loop Specification";
+	private static final String APPLY_RULE = "Apply Rule";
+	private static final String NO_RULES_APPLICABLE = "No rules applicable.";
+	/**
      *
      */
     private static final long serialVersionUID = -4659105575090816693L;
@@ -69,6 +107,7 @@ class TacletMenu extends JMenu {
 
     static {
         CLUTTER_RULESETS.add(new Name("notHumanReadable"));
+        CLUTTER_RULESETS.add(new Name("obsolete"));
         CLUTTER_RULESETS.add(new Name("pullOutQuantifierAll"));
         CLUTTER_RULESETS.add(new Name("pullOutQuantifierEx"));
     }
@@ -87,6 +126,13 @@ class TacletMenu extends JMenu {
         CLUTTER_RULES.add(new Name("typeStatic"));
         CLUTTER_RULES.add(new Name("less_is_total"));
         CLUTTER_RULES.add(new Name("less_zero_is_total"));
+        CLUTTER_RULES.add(new Name("applyEqReverse"));
+        
+        
+        // the following are used for drag'n'drop interactions
+        CLUTTER_RULES.add(new Name("eqTermCut"));
+        CLUTTER_RULES.add(new Name("instAll"));
+        CLUTTER_RULES.add(new Name("instEx"));
     }
 
     private TacletAppComparator comp = new TacletAppComparator();
@@ -114,41 +160,19 @@ class TacletMenu extends JMenu {
 	this.sequentView = sequentView;
 	this.mediator = sequentView.getMediator();
  	this.pos = pos;
- 	findList = removeObsolete(findList);
-    rewriteList = removeObsolete(rewriteList);
-    noFindList = removeObsolete(noFindList);
 	// delete RewriteTaclet from findList because they will be in
 	// the rewrite list and concatenate both lists
 	createTacletMenu(removeRewrites(findList).prepend(rewriteList),
 			 noFindList, builtInList, new MenuControl());
     }
 
-    /** Remove rules which belong to rule set "obsolete".
-     * Obsolete rules are sound, but are discouraged to use in
-     * both automated and interactive proofs, mostly because of proof complexity issues.
-     */
-    private ImmutableList<TacletApp> removeObsolete(ImmutableList<TacletApp> list) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
-        for (TacletApp ta: list) {
-            boolean isObsolete = false;
-            for (RuleSet rs: ta.taclet().getRuleSets()) {
-                if (rs.name().equals(new Name("obsolete"))) {
-                    isObsolete = true;
-                    break;
-                }
-            }
-            if (!isObsolete)
-                result = result.append(ta);
-        }
-        return result;
-    }
 
     /** removes RewriteTaclet from list
      * @param list the IList<Taclet> from where the RewriteTaclet are
      * removed
      * @return list without RewriteTaclets
      */
-    private ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
+    public static ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
 	ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
 	Iterator<TacletApp> it = list.iterator();
 
@@ -162,14 +186,14 @@ class TacletMenu extends JMenu {
     }
 
 
-    /** creates the menu by adding all submenus and items */
+    /** creates the menu by adding all sub-menus and items */
     private void createTacletMenu(ImmutableList<TacletApp> find,
 				  ImmutableList<TacletApp> noFind,
 				  ImmutableList<BuiltInRule> builtInList,
 				  MenuControl control) {
 	addActionListener(control);
 
-        ImmutableList<TacletApp> toAdd = sort(find);
+        ImmutableList<TacletApp> toAdd = sort(find, comp);
         boolean rulesAvailable =  find.size() > 0;
 
         if (pos != null && pos.isSequent()) {
@@ -185,7 +209,7 @@ class TacletMenu extends JMenu {
 	if (rulesAvailable) {
             createMenuItems(toAdd, control);
         } else {
-	    createSection("No rules applicable.");
+	    createSection(NO_RULES_APPLICABLE);
 	}
 
 	createBuiltInRuleMenu(builtInList, control);
@@ -273,21 +297,21 @@ class TacletMenu extends JMenu {
         if (builtInRule == WhileInvariantRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(builtInRule.displayName(),
-                    "Apply Rule", "Applies a known and complete loop specification immediately.",
-                    "Enter Loop Specification", "Allows to modify an existing or to enter a new loop specification.", builtInRule);
+                    APPLY_RULE, "Applies a known and complete loop specification immediately.",
+                    ENTER_LOOP_SPECIFICATION, "Allows to modify an existing or to enter a new loop specification.", builtInRule);
             item.addActionListener(control);
             add(item);
         } else if (builtInRule == BlockContractRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(builtInRule.displayName(),
-                    "Apply Rule", "Applies a known and complete block specification immediately.",
-                    "Choose and Apply Contract", "Asks to select the contract to be applied.", builtInRule);
+                    APPLY_RULE, "Applies a known and complete block specification immediately.",
+                    CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.", builtInRule);
             item.addActionListener(control);
             add(item);
         } else if (builtInRule == UseOperationContractRule.INSTANCE) {
             item = new MenuItemForTwoModeRules(builtInRule.displayName(),
-                    "Apply Contract", "All available contracts of the method are combined and applied.",
-                    "Choose and Apply Contract", "Asks to select the contract to be applied.", builtInRule);
+                    APPLY_CONTRACT, "All available contracts of the method are combined and applied.",
+                    CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.", builtInRule);
             item.addActionListener(control);
             add(item);
         } else {
@@ -306,7 +330,10 @@ class TacletMenu extends JMenu {
     }
 
 
-    private ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds) {
+    /**
+     * This method is also used by the KeYIDE has to be static and public.
+     */
+    public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds, TacletAppComparator comp) {
 	ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
 
 	List<TacletApp> list = new ArrayList<TacletApp>(finds.size());
@@ -329,16 +356,16 @@ class TacletMenu extends JMenu {
 	AbbrevMap scm = mediator.getNotationInfo().getAbbrevMap();
 	JMenuItem sc = null;
 	if(scm.containsTerm(t)){
-	    sc = new JMenuItem("Change abbreviation");
+	    sc = new JMenuItem(CHANGE_ABBREVIATION);
 	    sc.addActionListener(control);
 	    add(sc);
 	    if(scm.isEnabled(t)){
-		sc = new JMenuItem("Disable abbreviation");
+		sc = new JMenuItem(DISABLE_ABBREVIATION);
 	    }else{
-		sc = new JMenuItem("Enable abbreviation");
+		sc = new JMenuItem(ENABLE_ABBREVIATION);
 	    }
 	}else{
-	    sc = new JMenuItem("Create abbreviation");
+	    sc = new JMenuItem(CREATE_ABBREVIATION);
 	}
 	sc.addActionListener(control);
 	add(sc);
@@ -363,7 +390,7 @@ class TacletMenu extends JMenu {
 
     private void addClipboardItem(MenuControl control) {
 	addSeparator();
-	JMenuItem item = new JMenuItem("copy to clipboard");
+	JMenuItem item = new JMenuItem(COPY_TO_CLIPBOARD);
 	item.addActionListener(control);
 	add(item);
     }
@@ -406,7 +433,7 @@ class TacletMenu extends JMenu {
             insSystemInvItem.addActionListener(control);
         }
 
-        JMenu more = new JMenu("More rules");
+        JMenu more = new JMenu(MORE_RULES);
 
         for (final TacletApp app : taclets) {
             final Taclet taclet = app.taclet();
@@ -418,7 +445,7 @@ class TacletMenu extends JMenu {
                 !insSystemInvItem.isResponsible(taclet)) {
                 final DefaultTacletMenuItem item =
                     new DefaultTacletMenuItem(this, app,
-                        mediator.getNotationInfo());
+                        mediator.getNotationInfo(), mediator.getServices());
                 item.addActionListener(control);
                 boolean rareRule = false;
                 for (RuleSet rs : taclet.getRuleSets()) {
@@ -475,7 +502,7 @@ class TacletMenu extends JMenu {
 	            SMTSettings settings = new SMTSettings(goal.proof().getSettings().getSMTSettings(),
 	                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),goal.proof());
 	            SolverLauncher launcher = new SolverLauncher(settings);
-	            launcher.addListener(new SolverListener(settings));
+	            launcher.addListener(new SolverListener(settings, goal.proof()));
 	            Collection<SMTProblem> list = new LinkedList<SMTProblem>();
 	            list.add(new SMTProblem(goal));
 	           	launcher.launch(solverUnion.getTypes(),
@@ -499,21 +526,19 @@ class TacletMenu extends JMenu {
 	            .startFocussedAutoMode ( pos.getPosInOccurrence (),
 	                                     mediator.getSelectedGoal () );
 	    } else {
+		// TODO: change to switch statement once development switches to Java7
 		if (((JMenuItem)e.getSource()).getText()
-		    .startsWith("copy to clipboard")){
+		    .startsWith(COPY_TO_CLIPBOARD)){
                     GuiUtilities.copyHighlightToClipboard(sequentView, pos);
 		} else if(((JMenuItem)e.getSource()).getText().
-			  startsWith("Pop method frame")){
-		    //                        mediator.popMethodFrame();
-		} else if(((JMenuItem)e.getSource()).getText().
-			  startsWith("Disable abbreviation")){
+			  startsWith(DISABLE_ABBREVIATION)){
 		    PosInOccurrence occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
 			mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(),false);
 			sequentView.printSequent();
 		    }
 		}else if(((JMenuItem)e.getSource()).getText().
-			 startsWith("Enable abbreviation")){
+			 startsWith(ENABLE_ABBREVIATION)){
 		    PosInOccurrence occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
 			mediator.getNotationInfo().
@@ -521,12 +546,15 @@ class TacletMenu extends JMenu {
 			sequentView.printSequent();
 		    }
 		}else if(((JMenuItem)e.getSource()).getText().
-			 startsWith("Create abbreviation")){
+			 startsWith(CREATE_ABBREVIATION)){
 		    PosInOccurrence occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
+		        // trim string, otherwise window gets too large (bug #1430)
+		        final String oldTerm = occ.subTerm().toString();
+		        final String term = oldTerm.length()>200? oldTerm.substring(0, 200): oldTerm;
 			String abbreviation = (String)JOptionPane.showInputDialog
 			    (new JFrame(),
-			     "Enter abbreviation for term: \n"+occ.subTerm().toString(),
+			     "Enter abbreviation for term: \n"+term,
 			     "New Abbreviation",
 			     JOptionPane.QUESTION_MESSAGE,
 			     null,
@@ -553,7 +581,7 @@ class TacletMenu extends JMenu {
 		    }
 
 		}else if(((JMenuItem)e.getSource()).getText().
-			 startsWith("Change abbreviation")){
+			 startsWith(CHANGE_ABBREVIATION)){
 		    PosInOccurrence occ = pos.getPosInOccurrence();
 		    if (occ != null && occ.posInTerm() != null) {
 			String abbreviation = (String)JOptionPane.showInputDialog
@@ -607,13 +635,14 @@ class TacletMenu extends JMenu {
 
 
     static class FocussedRuleApplicationMenuItem extends JMenuItem {
-        /**
+        private static final String APPLY_RULES_AUTOMATICALLY_HERE = "Apply rules automatically here";
+		/**
          *
          */
         private static final long serialVersionUID = -6486650015103963268L;
 
         public FocussedRuleApplicationMenuItem () {
-            super("Apply rules automatically here");
+            super(APPLY_RULES_AUTOMATICALLY_HERE);
             setToolTipText("<html>Initiates and restricts automatic rule applications on the " +
                         "highlighted formula, term or sequent.<br> "+
                         "'Shift + left mouse click' on the highlighted " +
@@ -623,7 +652,7 @@ class TacletMenu extends JMenu {
     }
 
 
-    static class TacletAppComparator implements Comparator<TacletApp> {
+   public static class TacletAppComparator implements Comparator<TacletApp> {
 
 	private int countFormulaSV(TacletSchemaVariableCollector c) {
 	    int formulaSV = 0;

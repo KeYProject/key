@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.speclang;
 
@@ -83,6 +82,29 @@ public final class ClassAxiomImpl extends ClassAxiom {
 
 
     @Override
+    public boolean equals(Object o) {
+       if (o == null || this.getClass() != o.getClass()) return false;
+       final ClassAxiomImpl other = (ClassAxiomImpl) o;
+       
+       if (isStatic != other.isStatic) return false;
+       if (!name.equals(other.name)) return false;
+       if (!kjt.equals(other.kjt)) return false;
+       if (originalSelfVar != null) {
+          if (other.originalSelfVar == null)  return false;
+          else if (!originalSelfVar.getKeYJavaType().equals(other.originalSelfVar.getKeYJavaType())) { // not interested in names
+             return false;                
+          }
+       }
+       
+       return true;
+    }
+    
+    @Override
+    public int hashCode() {
+       return 17*(name.hashCode() + 17 * kjt.hashCode()) + (isStatic ? 13 : 7);
+    }
+    
+    @Override
     public String getName() {
 	return name;
     }
@@ -112,7 +134,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
         if (!isStatic) {
             replaceVars = replaceVars.append(originalSelfVar);
         }
-        Term rep = TB.convertToFormula(originalRep, services);
+        Term rep = services.getTermBuilder().convertToFormula(originalRep);
         TacletGenerator TG = TacletGenerator.getInstance();
         DefaultImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
         final int c = services.getCounter("classAxiom").getCountPlusPlus();

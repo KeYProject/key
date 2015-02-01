@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 /** tests the TacletIndex class.*/
 package de.uka.ilkd.key.proof;
@@ -27,6 +26,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -119,7 +119,7 @@ public class TestTacletIndex extends TestCase{
 	ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
         listofHeuristic=listofHeuristic.prepend(h3);
         PosInOccurrence pos = new PosInOccurrence(new SequentFormula(term_p1),
-                PosInTerm.TOP_LEVEL, true);
+                PosInTerm.getTopLevel(), true);
   	assertTrue("Noninteractive antecrule is not in list, but none of its"+
 		   "heuristics is active.",
 		   isRuleIn(variante_one.getAntecedentTaclet(pos,
@@ -153,7 +153,7 @@ public class TestTacletIndex extends TestCase{
 
         SequentFormula cfma = new SequentFormula(term_p1);
         
-        PosInOccurrence posSucc  = new PosInOccurrence(cfma, PosInTerm.TOP_LEVEL, false);
+        PosInOccurrence posSucc  = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), false);
         
   	assertTrue("ruleSucc has no heuristics, but is"+
 		   " not in succ list.",
@@ -186,9 +186,9 @@ public class TestTacletIndex extends TestCase{
 	Term term_p2 = TacletForTests.parseTerm("\\forall nat z; p(z, one)").sub(0);
 	
         PosInOccurrence posAntec = new PosInOccurrence(new SequentFormula(term_p2),
-                PosInTerm.TOP_LEVEL, true);
+                PosInTerm.getTopLevel(), true);
         PosInOccurrence posSucc = new PosInOccurrence(new SequentFormula(term_p2),
-                PosInTerm.TOP_LEVEL, true);
+                PosInTerm.getTopLevel(), true);
 
         
  	assertTrue("rule matched, but no match possible",
@@ -219,7 +219,7 @@ public class TestTacletIndex extends TestCase{
 
 	ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
         PosInOccurrence posAntec = new PosInOccurrence(new SequentFormula(term_p4),
-                PosInTerm.TOP_LEVEL, true);
+                PosInTerm.getTopLevel(), true);
 	
  	assertTrue("rule matched, but no match possible",
 		   !isRuleIn(ruleIdx.getAntecedentTaclet(posAntec,
@@ -237,7 +237,7 @@ public class TestTacletIndex extends TestCase{
 	Sequent seq_p5 = Sequent.createAnteSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p5).semisequent());
 	PosInOccurrence pio_p5 = new PosInOccurrence
-	    (cfma_p5, PosInTerm.TOP_LEVEL, true);
+	    (cfma_p5, PosInTerm.getTopLevel(), true);
         RuleAppIndex appIdx = createGoalFor(seq_p5, ruleIdx);
 		  
 	assertTrue("No rule should match",
@@ -253,7 +253,7 @@ public class TestTacletIndex extends TestCase{
 	Sequent seq_p6 = Sequent.createAnteSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p6).semisequent());
 	PosInOccurrence pio_p6 = new PosInOccurrence
-	    (cfma_p6, PosInTerm.TOP_LEVEL, true);
+	    (cfma_p6, PosInTerm.getTopLevel(), true);
 	appIdx = createGoalFor(seq_p6, ruleIdx);
 
 	assertTrue("One rule should match", isRuleIn
@@ -266,11 +266,11 @@ public class TestTacletIndex extends TestCase{
 
     private RuleAppIndex createGoalFor(Sequent seq_p5, TacletIndex ruleIdx) {
         final Node node_p5 =
-            new Node (new Proof (new Services(AbstractProfile.getDefaultProfile())), seq_p5);
+            new Node (new Proof ("TestTacletIndex", new InitConfig(new Services(AbstractProfile.getDefaultProfile()))), seq_p5);
         final BuiltInRuleAppIndex builtinIdx =
             new BuiltInRuleAppIndex (new BuiltInRuleIndex ());
         final Goal goal_p5 =
-            new Goal (node_p5, new RuleAppIndex (ruleIdx, builtinIdx));
+            new Goal (node_p5, new RuleAppIndex (ruleIdx, builtinIdx, node_p5.proof().getServices()));
 	return goal_p5.ruleAppIndex ();
     }
 

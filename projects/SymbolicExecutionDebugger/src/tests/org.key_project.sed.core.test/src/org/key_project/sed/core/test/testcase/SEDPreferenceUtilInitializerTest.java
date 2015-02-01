@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,17 +13,16 @@
 
 package org.key_project.sed.core.test.testcase;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
 import org.key_project.sed.core.util.SEDPreferenceUtilInitializer;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 /**
  * Tests for {@link SEDPreferenceUtilInitializer}.
  * @author Martin Hentschel
  */
-public class SEDPreferenceUtilInitializerTest extends TestCase {
+public class SEDPreferenceUtilInitializerTest extends AbstractSetupTestCase {
    /**
     * Tests the defined default values.
     */

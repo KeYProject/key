@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -16,8 +16,9 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.ExampleChooser;
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 
 /**
@@ -32,13 +33,16 @@ public final class OpenExampleAction extends MainWindowAction {
 
     public OpenExampleAction(MainWindow mainWindow) {
 	super(mainWindow);
-        setName("Load Example...");
+        setName("Load Example");
         setTooltip("Browse and load included examples.");
     }
     
     public void actionPerformed(ActionEvent e) {
+        KeYFileChooser keYFileChooser =
+                KeYFileChooser.getFileChooser("Select file to load proof or problem");
         File file = ExampleChooser.showInstance(Main.getExamplesDir());
         if(file != null) {
+            keYFileChooser.selectFile(file);
             mainWindow.loadProblem(file);
         }
     }

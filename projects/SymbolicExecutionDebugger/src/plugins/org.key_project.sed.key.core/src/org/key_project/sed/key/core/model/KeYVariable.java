@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -15,6 +15,7 @@ package org.key_project.sed.key.core.model;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IValue;
 import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDVariable;
@@ -34,7 +35,7 @@ public class KeYVariable extends AbstractSEDVariable {
    /**
     * The {@link IExecutionVariable} to represent in debug model.
     */
-   private IExecutionVariable executionVariable;
+   private final IExecutionVariable executionVariable;
    
    /**
     * The contained {@link IValue}.
@@ -44,10 +45,11 @@ public class KeYVariable extends AbstractSEDVariable {
    /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this element is contained.
+    * @param stackFrame The parent {@link IStackFrame} in which this {@link ISEDVariable} is shown.
     * @param executionVariable The {@link IExecutionVariable} to represent in debug model.
     */
-   public KeYVariable(KeYDebugTarget target, IExecutionVariable executionVariable) {
-      super(target);
+   public KeYVariable(KeYDebugTarget target, IStackFrame stackFrame, IExecutionVariable executionVariable) {
+      super(target, stackFrame);
       Assert.isNotNull(executionVariable);
       this.executionVariable = executionVariable;
    }
@@ -102,16 +104,16 @@ public class KeYVariable extends AbstractSEDVariable {
    public IValue getValue() throws DebugException {
       synchronized (this) {
          try {
-            if (value == null) {
+            if (value == null && !executionVariable.isDisposed()) {
                IExecutionValue[] values = executionVariable.getValues();
                if (values.length == 0) {
                   throw new DebugException(LogUtil.getLogger().createErrorStatus("An IExecutionVariable must provide at least one IExecutionValue."));
                }
                else if (values.length == 1) {
-                  value = new KeYValue(getDebugTarget(), values[0]);
+                  value = new KeYValue(getDebugTarget(), this, values[0]);
                }
                else {
-                  value = new KeYConditionalValues(getDebugTarget(), values);
+                  value = new KeYConditionalValues(getDebugTarget(), this, values);
                }
             }
             return value;

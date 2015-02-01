@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,6 +13,7 @@
 
 package org.key_project.sed.core.model;
 
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.key_project.sed.core.model.impl.AbstractSEDMethodCall;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
@@ -33,6 +34,14 @@ import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
  * @author Martin Hentschel
  * @see ISEDDebugNode
  */
-public interface ISEDMethodCall extends ISEDDebugNode, IStackFrame {
-
+public interface ISEDMethodCall extends ISEDDebugNode, IStackFrame, ISEDGroupable {
+   /**
+    * Returns the up to know discovered conditions when this {@link ISEDMethodCall} returns.
+    * @return The up to know discovered conditions when this {@link ISEDMethodCall} returns.
+    * @exception DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public ISEDBranchCondition[] getMethodReturnConditions() throws DebugException;
 }

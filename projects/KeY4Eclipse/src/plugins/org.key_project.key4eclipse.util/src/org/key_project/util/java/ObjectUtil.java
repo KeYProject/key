@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -444,5 +444,32 @@ public final class ObjectUtil {
     */
    public static Class<?> getClass(Object obj) {
       return obj != null ? obj.getClass() : null;
+   }
+
+   /**
+    * Waits until the given {@link Thread}s have terminated.
+    * @param threads The {@link Thread}s to wait for.
+    */
+   public static void waitForThreads(Thread[] threads) {
+      if (threads != null) {
+         for (Thread thread : threads) {
+            while (thread.isAlive()) {
+               sleep(100);
+            }
+         }
+      }
+   }
+   
+   /**
+    * Sleeps the current {@link Thread} for the given time.
+    * @param time The time to sleep.
+    */
+   public static void sleep(int time) {
+      try {
+         Thread.sleep(time);
+      }
+      catch (InterruptedException e) {
+         // Nothing to do.
+      }
    }
 }

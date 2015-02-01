@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -29,13 +29,14 @@ import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
 import org.key_project.sed.core.util.ISEDIterator;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 /**
  * Provides the basic methods a {@link TestCase} of an
  * {@link ISEDIterator} implementation needs.
  * @author Martin Hentschel
  */
-public abstract class AbstractSEDIteratorTest extends TestCase {
+public abstract class AbstractSEDIteratorTest extends AbstractSetupTestCase {
    /**
     * Tests one empty {@link ISEDDebugNode} only for debugging purpose.
     */
@@ -155,7 +156,8 @@ public abstract class AbstractSEDIteratorTest extends TestCase {
       ExpectedNode[] level2c = createExpectedNodes("T1S3a", "T1S3b");
       ExpectedNode[] level1 = createExpectedNodes(new String[] {"T1S1", "T1S2", "T1S3"}, null, level2b, level2c);
       ExpectedNode[] threads = createExpectedNodes(new String[] {"T1"}, level1);
-      assertTarget(target, createExpectedNode("target", threads));
+      ExpectedNode expected = createExpectedNode("target", threads);
+      assertTarget(target, expected);
    }
    
    /**
@@ -175,9 +177,38 @@ public abstract class AbstractSEDIteratorTest extends TestCase {
       ExpectedNode[] level1T1 = createExpectedNodes("T1S1", "T1S2", "T1S3");
       ExpectedNode[] level1T2 = createExpectedNodes("T2S1");
       ExpectedNode[] threads = createExpectedNodes(new String[] {"T1", "T2"}, level1T1, level1T2);
-      assertTarget(target, createExpectedNode("target", threads));
+      ExpectedNode expected = createExpectedNode("target", threads);
+      assertTarget(target, expected);
+   }
+   
+   /**
+    * Prints the tree starting at the given {@link ExpectedNode}.
+    * @param root The root to print.
+    */
+   protected void printTree(ExpectedNode root) {
+      printTree(root, 0);
    }
 
+   /**
+    * Prints the subtree starting at the given {@link ExpectedNode}.
+    * @param node the {@link ExpectedNode} to print.
+    * @param level The current level.
+    */
+   protected void printTree(ExpectedNode node, int level) {
+      if (node != null) {
+         for (int i = 0; i < level; i++) {
+            System.out.print('\t');
+         }
+         System.out.println(node.expectedName);
+         ExpectedNode[] children = node.getExpectedChildren();
+         if (children != null) {
+            for (ExpectedNode child : children) {
+               printTree(child, level + 1);
+            }
+         }
+      }
+   }
+   
    /**
     * Tests a tree which contains some {@link ISEDThread}s but
     * no {@link ISEDDebugNode}s.
@@ -376,7 +407,7 @@ public abstract class AbstractSEDIteratorTest extends TestCase {
     * @return The instantiated {@link SEDMemoryDebugTarget}.
     */
    protected static SEDMemoryDebugTarget appendDebugTarget(String name) {
-      SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null);
+      SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null, false);
       target.setName(name);
       return target;
    }
@@ -389,7 +420,7 @@ public abstract class AbstractSEDIteratorTest extends TestCase {
     * @return The instantiated {@link SEDMemoryThread}.
     */
    protected static SEDMemoryThread appendThread(SEDMemoryDebugTarget target, String name) {
-      SEDMemoryThread thread = new SEDMemoryThread(target);
+      SEDMemoryThread thread = new SEDMemoryThread(target, false);
       thread.setName(name);
       target.addSymbolicThread(thread);
       return thread;

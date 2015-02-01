@@ -1,17 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
@@ -34,21 +32,24 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
             = null;
 
     private Map<String, ImmutableList<PositionedString>>
-      assignables = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+        assignables = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+    
+    private ImmutableList<PositionedString>
+        infFlowSpecs = ImmutableSLList.<PositionedString>nil();
 
     private Map<String, ImmutableList<PositionedString>>
-      invariants = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+        invariants = new LinkedHashMap<String, ImmutableList<PositionedString>>();
     
     
     public TextualJMLLoopSpec(ImmutableList<String> mods) {
         super(mods);
         for(Name heap : HeapLDT.VALID_HEAP_NAMES) {
           assignables.put(heap.toString(), ImmutableSLList.<PositionedString>nil());
-          invariants.put(heap.toString(), ImmutableSLList.<PositionedString>nil());          
+          invariants.put(heap.toString(), ImmutableSLList.<PositionedString>nil());
         }
     }
 
-       
+
     public void addInvariant(PositionedString ps) {
         addGeneric(invariants, ps);
     }
@@ -56,21 +57,29 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     public void addAssignable(PositionedString ps) {
         addGeneric(assignables, ps);
     }
-    
-    
+
+    public void addInfFlowSpecs(PositionedString ps) {
+        infFlowSpecs = infFlowSpecs.append(ps);
+    }
+
+    public void addInfFlowSpecs(ImmutableList<PositionedString> l) {
+        infFlowSpecs = infFlowSpecs.append(l);
+    }
+
     public void setVariant(PositionedString ps) {
         assert variant == null;
         variant = ps;
+        setPosition(ps);
     }
 
     public ImmutableList<PositionedString> getInvariant(String hName) {
         return invariants.get(hName);
-    }    
-    
+    }
+
     public ImmutableList<PositionedString> getInvariant() {
         return invariants.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
-    
+
     public ImmutableList<PositionedString> getAssignable() {
         return assignables.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
@@ -81,6 +90,10 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     public Map<String,ImmutableList<PositionedString>> getAssignables() {
         return assignables;
+    }
+
+    public ImmutableList<PositionedString> getInfFlowSpecs() {
+        return infFlowSpecs;
     }
 
     public Map<String,ImmutableList<PositionedString>> getInvariants() {
@@ -109,6 +122,12 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
             sb.append("assignable<"+heap+">: " + it.next() + "\n");
           }
         }
+        for(Name heap : HeapLDT.VALID_HEAP_NAMES) {
+            it = infFlowSpecs.iterator();
+            while(it.hasNext()) {
+              sb.append("determines<"+heap+">: " + it.next() + "\n");
+            }
+          }
         if(variant != null) {
             sb.append("decreases: " + variant);
         }
@@ -126,6 +145,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return mods.equals(ls.mods)
                && invariants.equals(ls.invariants)
                && assignables.equals(ls.assignables)
+               && infFlowSpecs.equals(ls.infFlowSpecs)
                && (variant == null && ls.variant == null
                    || variant != null && variant.equals(ls.variant));
     }
@@ -134,6 +154,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     public int hashCode() {
         return mods.hashCode()
                 + invariants.hashCode() 
-                + assignables.hashCode();
+                + assignables.hashCode()
+                + infFlowSpecs.hashCode();
     }
 }

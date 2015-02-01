@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.ldt;
 
@@ -24,8 +23,8 @@ import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.ExtList;
 
 
@@ -69,7 +68,7 @@ public final class CharListLDT extends LDT {
     //constructors
     //------------------------------------------------------------------------- 
     
-    public CharListLDT(Services services) {
+    public CharListLDT(TermServices services) {
 	super(NAME, services);
 	clEmpty           = addFunction(services, "clEmpty");
 	clCat             = addFunction(services, "clCat");
@@ -240,7 +239,7 @@ public final class CharListLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
 	    			 Term sub, 
-	    			 Services services, 
+	    			 TermServices services, 
 	    			 ExecutionContext ec) {
 	return false;
     }
@@ -248,7 +247,7 @@ public final class CharListLDT extends LDT {
 
     @Override
     public Term translateLiteral(Literal lit, Services services) {
-	final Term term_empty = TermBuilder.DF.func(clEmpty);
+	final Term term_empty = services.getTermBuilder().func(clEmpty);
 
 	char[] charArray;
 	Term result = term_empty;
@@ -266,7 +265,7 @@ public final class CharListLDT extends LDT {
 	}
 
 	for (int i = charArray.length - 2; i >= 1; i--) {
-	    result = TermBuilder.DF.func(clCons,
+	    result = services.getTermBuilder().func(clCons,
 		    intLDT.translateLiteral(new CharLiteral(charArray[i]), 
 			                    services),
 		    result);

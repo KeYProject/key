@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.rule;
 
@@ -29,15 +29,14 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 	protected final PosInOccurrence pio;
 	protected ImmutableList<PosInOccurrence> ifInsts;
 
-	protected AbstractBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts) {
+	protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
+	                                 ImmutableList<PosInOccurrence> ifInsts) {
         this.builtInRule = rule;
 	    this.pio     = pio;
 	    this.ifInsts = (ifInsts == null ? ImmutableSLList.<PosInOccurrence>nil() : ifInsts);
 	}
 
-	protected AbstractBuiltInRuleApp(BuiltInRule rule,
-	        PosInOccurrence pio) {
+	protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio) {
 	    this(rule, pio, null);
 	}
 
@@ -47,7 +46,6 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     public void setMutable(ImmutableList<PosInOccurrence> ifInsts) {
         this.ifInsts = ifInsts;
     }
-
 
     /**
      * returns the rule of this rule application
@@ -102,6 +100,11 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
      */
     @Override
     public abstract AbstractBuiltInRuleApp tryToInstantiate(Goal goal);
+
+    @Override
+    public AbstractBuiltInRuleApp forceInstantiate(Goal goal) {
+	return tryToInstantiate(goal);
+    }
 
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.rule.IBuiltInRuleApp#isSufficientlyComplete()

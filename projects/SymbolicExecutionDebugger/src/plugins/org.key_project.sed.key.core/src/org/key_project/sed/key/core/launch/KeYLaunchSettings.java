@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -19,10 +19,13 @@ import java.util.List;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
+import org.key_project.sed.key.core.util.KeySEDUtil;
 
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
  * Contains the settings used in an {@link ILaunch} which contains a
@@ -35,84 +38,119 @@ public class KeYLaunchSettings {
    /**
     * {@code true} new debug session, {@code false} continue existing *.proof file.
     */
-   private boolean newDebugSession;
+   private final boolean newDebugSession;
    
    /**
     * The path to the proof file to continue.
     */
-   private String proofFileToContinue;
+   private final String proofFileToContinue;
 
    /**
     * The {@link IMethod} to debug.
     */
-   private IMethod method;
+   private final IMethod method;
+   
+   /**
+    * The signature of {@link #method} computed via {@link KeySEDUtil#getMethodValue(IMethod)}.
+    */
+   private final String methodSignature;
    
    /**
     * Use an existing contract or generate default contract?
     */
-   private boolean useExistingContract;
+   private final boolean useExistingContract;
    
    /**
     * The ID of the existing contract to use.
     */
-   private String existingContract;
+   private final String existingContract;
    
    /**
     * The precondition.
     */
-   private String precondition;
+   private final String precondition;
    
    /**
     * If this is {@code true} an {@link ISEDMethodReturn} will contain the return value,
     * but the performance will suffer.
     * If it is {@code false} only the name of the returned method is shown in an {@link ISEDMethodReturn}.
     */
-   private boolean showMethodReturnValues;
+   private final boolean showMethodReturnValues;
    
    /**
     * Show variables of selected debug node?
     */
-   private boolean showVariablesOfSelectedDebugNode;
+   private final boolean showVariablesOfSelectedDebugNode;
    
    /**
     * Show KeY's main window?
     */
-   private boolean showKeYMainWindow;
+   private final boolean showKeYMainWindow;
    
    /**
     * Merge branch conditions?
     */
-   private boolean mergeBranchConditions;
+   private final boolean mergeBranchConditions;
    
    /**
     * {@code true} execute method range, {@code false} execute complete method body.
     */
-   private boolean executeMethodRange;
+   private final boolean executeMethodRange;
    
    /**
     * The start of the method range to execute.
     */
-   private Position methodRangeStart;
+   private final Position methodRangeStart;
    
    /**
     * The end of the method range to execute.
     */
-   private Position methodRangeEnd;
+   private final Position methodRangeEnd;
 
    /**
     * The launched location.
     */
-   private File location;
+   private final File location;
    
    /**
     * The used class path entries.
     */
-   private List<File> classPaths;
+   private final List<File> classPaths;
    
    /**
     * The used boot class path.
     */
-   private File bootClassPath;
+   private final File bootClassPath;
+
+   /**
+    * {@code true} use unicode characters, {@code false} do not use unicode characters.
+    */
+   private final boolean useUnicode;
+   
+   /**
+    * Use pretty printing?
+    */
+   private final boolean usePrettyPrinting;
+   
+   /**
+    * Show signature on method return nodes?
+    */
+   private final boolean showSignatureOnMethodReturnNodes;
+   
+   /**
+    * Are variables computed based on updates or on the visible type structure instead?
+    */
+   private final boolean variablesAreOnlyComputedFromUpdates;
+   
+   /**
+    * Is truth value evaluation enabled?
+    */
+   private final boolean truthValueEvaluationEnabled;
+   
+   /**
+    * Is reached source code highlighted?
+    */
+   private final boolean highlightReachedSourceCode;
    
    /**
     * Constructor.
@@ -132,6 +170,12 @@ public class KeYLaunchSettings {
     * @param location The launched location.
     * @param classPaths The used class path entries.
     * @param bootClassPath The used boot class path.
+    * @param usePrettyPrinting Use pretty printing?
+    * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
+    * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
+    * @param truthValueEvaluationEnabled Is truth value evaluation enabled?
+    * @param highlightReachedSourceCode Is reached source code highlighted?
+    * @throws JavaModelException Occurred Exception.
     */
    public KeYLaunchSettings(boolean newDebugSession,
                             String proofFileToContinue,
@@ -148,10 +192,17 @@ public class KeYLaunchSettings {
                             Position methodRangeEnd,
                             File location,
                             List<File> classPaths,
-                            File bootClassPath) {
+                            File bootClassPath,
+                            boolean useUnicode,
+                            boolean usePrettyPrinting,
+                            boolean showSignatureOnMethodReturnNodes,
+                            boolean variablesAreOnlyComputedFromUpdates,
+                            boolean truthValueEvaluationEnabled,
+                            boolean highlightReachedSourceCode) throws JavaModelException {
       this.newDebugSession = newDebugSession;
       this.proofFileToContinue = proofFileToContinue;
       this.method = method;
+      this.methodSignature = KeySEDUtil.getMethodValue(method); // It can't be done later because the method might be renamed and JDT throws than an exception. But now the method exists definitively.
       this.useExistingContract = useExistingContract;
       this.existingContract = existingContract;
       this.precondition = precondition;
@@ -165,8 +216,14 @@ public class KeYLaunchSettings {
       this.location = location;
       this.classPaths = classPaths;
       this.bootClassPath = bootClassPath;
+      this.useUnicode = useUnicode;
+      this.usePrettyPrinting = usePrettyPrinting;
+      this.showSignatureOnMethodReturnNodes = showSignatureOnMethodReturnNodes;
+      this.variablesAreOnlyComputedFromUpdates = variablesAreOnlyComputedFromUpdates;
+      this.truthValueEvaluationEnabled = truthValueEvaluationEnabled;
+      this.highlightReachedSourceCode = highlightReachedSourceCode;
    }
-   
+
    /**
     * Checks if a new debug session should be started or an existing one continued.
     * @return {@code true} new debug session, {@code false} continue existing *.proof file.
@@ -189,6 +246,14 @@ public class KeYLaunchSettings {
     */
    public IMethod getMethod() {
       return method;
+   }
+   
+   /**
+    * Returns the signature of {@link #getMethod()} computed via {@link KeySEDUtil#getMethodValue(IMethod)}.
+    * @return The signature of {@link #getMethod()} computed via {@link KeySEDUtil#getMethodValue(IMethod)}.
+    */
+   public String getMethodSignature() {
+      return methodSignature;
    }
 
    /**
@@ -293,5 +358,53 @@ public class KeYLaunchSettings {
     */
    public File getBootClassPath() {
       return bootClassPath;
+   }
+
+   /**
+    * Checks if unicode characters are used.
+    * @return {@code true} use unicode characters, {@code false} do not use unicode characters.
+    */
+   public boolean isUseUnicode() {
+      return useUnicode;
+   }
+
+   /**
+    * Checks if pretty printing should be used.
+    * @return {@code true} use pretty printing, {@code false} do not use pretty printing.
+    */
+   public boolean isUsePrettyPrinting() {
+      return usePrettyPrinting;
+   }
+
+   /**
+    * Checks if signature is shown on method return nodes.
+    * @return Show signature on method return nodes?
+    */
+   public boolean isShowSignatureOnMethodReturnNodes() {
+      return showSignatureOnMethodReturnNodes;
+   }
+   
+   /**
+    * Checks how variables are computed.
+    * @return {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
+    */
+   public boolean isVariablesAreOnlyComputedFromUpdates() {
+      return variablesAreOnlyComputedFromUpdates;
+   }
+
+   /**
+    * Checks if truth value evaluation is enabled.
+    * @return {@code true} enabled, {@code false} disabled
+    */
+   public boolean isTruthValueEvaluationEnabled() {
+      return truthValueEvaluationEnabled;
+   }
+
+   /**
+    * Checks if reached source code is highlighted.
+    * @return {@code true} reached source code is higlighted, {@code false} reached source code is not highlighted.
+    */
+   public boolean isHighlightReachedSourceCode() {
+      return highlightReachedSourceCode;
    }
 }

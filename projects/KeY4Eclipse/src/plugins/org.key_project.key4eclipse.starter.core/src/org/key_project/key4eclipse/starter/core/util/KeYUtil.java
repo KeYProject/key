@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -19,7 +19,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JOptionPane;
 
@@ -37,10 +42,13 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -60,7 +68,7 @@ import org.key_project.util.jdt.JDTUtil;
 import recoder.parser.JavaCharStream;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.notification.NotificationEventID;
@@ -69,18 +77,20 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -224,15 +234,14 @@ public final class KeYUtil {
             else {
                 // Make sure that the location is contained in a Java project
                 IProject project = locationToLoad.getProject();
-                Assert.isTrue(JDTUtil.isJavaProject(locationToLoad.getProject()), "The project \"" + project + "\" is no Java project.");
-                // Get source paths from class path
-                List<File> sourcePaths = JDTUtil.getSourceLocations(project);
-                Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
+                if (!JDTUtil.isJavaProject(project)) {
+                   throw new IllegalArgumentException("The project \"" + project.getName() + "\" is no Java project.");
+                }
+                // Get local file for the eclipse resource
+                location = KeYResourceProperties.getSourceClassPathLocation(project);
                 // Get KeY project settings
                 bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
                 classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
-                // Get local file for the eclipse resource
-                location = sourcePaths.get(0);
             }
             Assert.isNotNull(location, "The resource \"" + locationToLoad + "\" is not local.");
             IRunnableWithException run = new AbstractRunnableWithException() {
@@ -287,7 +296,7 @@ public final class KeYUtil {
                             EnvNode envChild = (EnvNode)child;
                             String srcPath = envChild.getProofEnv().getJavaModel().getModelDir();
                             if (srcPath != null && location.equals(new File(srcPath))) {
-                                result = envChild.getProofEnv().getInitConfig();
+                                result = envChild.getProofEnv().getInitConfigForEnvironment();
                             }
                         }
                         i++;
@@ -339,15 +348,11 @@ public final class KeYUtil {
             Assert.isNotNull(method.getResource(), "Method \"" + method + "\" is not part of a workspace resource.");
             // Make sure that the location is contained in a Java project
             IProject project = method.getResource().getProject();
-            Assert.isTrue(JDTUtil.isJavaProject(project), " The project \"" + project + "\" is no Java project.");
-            // Get source paths from class path
-            List<File> sourcePaths = JDTUtil.getSourceLocations(project);
-            Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
+            // Get local file for the eclipse resource
+            final File location = KeYResourceProperties.getSourceClassPathLocation(project);
             // Get KeY project settings
             final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
             final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
-            // Get local file for the eclipse resource
-            final File location = sourcePaths.get(0);
             Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
             // Open main window to avoid repaint bugs
             openMainWindow();
@@ -359,7 +364,13 @@ public final class KeYUtil {
                         // Make sure that main window is available.
                         Assert.isTrue(MainWindow.hasInstance(), "KeY main window is not available.");
                         // Load location
-                        InitConfig initConfig = internalLoad(null, location, classPaths, bootClassPath, true);
+                        MainWindow main = MainWindow.getInstance();
+                        if (!main.isVisible()) {
+                            main.setVisible(true);
+                        }
+                        // Check if location is already loaded
+                        AbstractProblemLoader loader = main.getUserInterface().load(null, location, classPaths, bootClassPath, null, false);
+                        InitConfig initConfig = loader.getInitConfig();
                         // Get method to proof in KeY
                         IProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());
                         Assert.isNotNull(pm, "Can't find method \"" + method + "\" in KeY.");
@@ -376,53 +387,6 @@ public final class KeYUtil {
                 throw run.getException();
             }
         }
-    }
-    
-    /**
-     * Loads the given location in KeY and returns the opened {@link InitConfig}.
-     * @param profile The {@link Profile} to use.
-     * @param location The location to load.
-     * @param classPaths The class path entries to use.
-     * @param bootClassPath The boot class path to use.
-     * @param showKeYMainWindow Show KeY {@link MainWindow}? <b>Attention: </b> The {@link InitConfig} is not available in the proof tree, because no proof is started.
-     * @return The opened {@link InitConfig}.
-     * @throws Exception Occurred Exception.
-     */
-    private static InitConfig internalLoad(final Profile profile,
-                                           final File location,
-                                           final List<File> classPaths,
-                                           final File bootClassPath,
-                                           final boolean showKeYMainWindow) throws Exception {
-        IRunnableWithResult<InitConfig> run = new AbstractRunnableWithResult<InitConfig>() {
-            @Override
-            public void run() {
-                try {
-                    MainWindow main = MainWindow.getInstance();
-                    if (showKeYMainWindow) {
-                       main.setVisible(true);
-                    }
-                    if (showKeYMainWindow && !main.isVisible()) {
-                        main.setVisible(true);
-                    }
-                    // Check if location is already loaded
-                    InitConfig initConfig = getInitConfig(location);
-                    if (initConfig == null) {
-                        // Load local file
-                        DefaultProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath);
-                        initConfig = loader.getInitConfig();
-                    }
-                    setResult(initConfig);
-                }
-                catch (Exception e) {
-                    setException(e);
-                }
-            }
-        };
-        SwingUtil.invokeAndWait(run);
-        if (run.getException() != null) {
-            throw run.getException();
-        }
-        return run.getResult();
     }
     
     /**
@@ -488,7 +452,7 @@ public final class KeYUtil {
                                               "! This is probably a syntax problem, " + 
                                               " check your import statements.");
             }
-            KeYJavaType kjt = javaInfo.getKeYJavaTypeByClassName(javaTypeName);
+            KeYJavaType kjt = javaInfo.getKeYJavaType(javaTypeName);
             result = result.append(kjt);
         }
         return result;
@@ -521,10 +485,16 @@ public final class KeYUtil {
           Object child = model.getChild(model.getRoot(), 0);
           if (child instanceof EnvNode) {
              EnvNode envChild = (EnvNode)child;
+             for (Proof proof : envChild.allProofs()) {
+                main.getUserInterface().removeProof(proof);
+             }
              for (int j = 0; j < envChild.getChildCount(); j++) {
                 Object envTaskChild = envChild.getChildAt(j);
                 if (envTaskChild instanceof TaskTreeNode) {
-                   main.getProofList().removeTask((TaskTreeNode)envTaskChild);
+                   TaskTreeNode ttn = (TaskTreeNode)envTaskChild;
+                   for (Proof proof : ttn.allProofs()) {
+                      main.getUserInterface().removeProof(proof);
+                   }
                 }
              }
           }
@@ -1023,6 +993,78 @@ public final class KeYUtil {
    }
    
    /**
+    * Collects all {@link IMethod}s in the given {@link IResource}.
+    * @param res - the given {@link IResource}
+    * @return - the {@link LinkedList<IMethod>} with all {@link IMethod}s
+    * @throws JavaModelException
+    */
+   public static LinkedList<IMethod> getResourceMethods(IResource res) throws JavaModelException{
+      ICompilationUnit unit = (ICompilationUnit) JavaCore.create(res);
+      LinkedList<IMethod> methods = new LinkedList<IMethod>();
+      IType[] types = unit.getAllTypes();
+      for(IType type : types){
+         IMethod[] tmp = type.getMethods();
+         for(IMethod method : tmp){
+            methods.add(method);
+         }
+      }
+      return methods;
+   }
+   
+   /**
+    * Collects all {@link IMethod}s in the given {@link IResource}.
+    * @param res - the given {@link IResource}
+    * @return - the {@link LinkedList<IMethod>} with all {@link IMethod}s
+    * @throws JavaModelException
+    */
+   public static IType getType(IResource res) throws JavaModelException{
+      ICompilationUnit unit = (ICompilationUnit) JavaCore.create(res);
+      IType[] types = unit.getAllTypes();
+      return types[0];
+   }
+   
+   /**
+    * Returns the lineNumber of the given {@link IMethod}.
+    * @param method - the {@link IMethod} to use
+    * @return the lineNumber of the {@link IMethod}
+    * @throws CoreException
+    */
+   public static int getLineNumberOfMethod(IMethod method, int offset) throws CoreException {
+      Position pos = KeYUtil.getCursorPositionForOffset(method, offset);
+      return pos.getLine();
+   }
+
+   public static IMethod getContainingMethodForMethodStart(int charStart, IResource resource) throws CoreException {
+      ICompilationUnit unit = (ICompilationUnit) JavaCore.create(resource);
+      IJavaElement javaElement = unit.getElementAt(charStart);
+      if(javaElement instanceof IMethod){
+         return (IMethod) javaElement;
+      }
+      return null;
+   } 
+   
+   public static LinkedList<IProgramMethod> getProgramMethods(LinkedList<IMethod> methods, JavaInfo javaInfo) throws ProofInputException{
+      LinkedList<IProgramMethod> programMethods = new LinkedList<IProgramMethod>();
+      for(IMethod method : methods){
+         programMethods.add(getProgramMethod(method, javaInfo));
+      }
+      return programMethods;
+   }
+   
+
+   public static IMethod getContainingMethod(int lineNumber, IResource resource) throws CoreException {
+      LinkedList<IMethod>methods = getResourceMethods(resource);
+      for(IMethod method : methods){
+         int start = getLineNumberOfMethod(method, method.getSourceRange().getOffset());
+         int end = getLineNumberOfMethod(method, method.getSourceRange().getOffset()+method.getSourceRange().getLength());
+         if(lineNumber>start&&lineNumber<end){
+            return method;
+         }
+      }
+      return null;
+   }
+   
+   /**
     * Computes the offset for the given cursor position (line, column)
     * in the source document of the given {@link IJavaElement}.
     * @param element The given {@link IJavaElement}.
@@ -1263,4 +1305,98 @@ public final class KeYUtil {
          throw new CoreException(LogUtil.getLogger().createErrorStatus(e.getMessage(), e));
       }
    }
+   
+   /**
+    * Returns for the given {@link SourceLocation} of a method in the given {@link IFile}
+    * the {@link SourceLocation} of the method name if available or the initial location otherwise.
+    * @param file The {@link IFile} which contains the method location.
+    * @param methodLocation The location of the method in the given {@link IFile}.
+    * @return The location of the method name or the initial location if not available.
+    * @throws CoreException Occurred Exception.
+    */
+   public static SourceLocation updateToMethodNameLocation(IFile file, SourceLocation methodLocation) throws CoreException {
+      try {
+         if (file != null && methodLocation.getCharEnd() >= 0) {
+            ICompilationUnit compilationUnit = null;
+            IJavaElement element = JavaCore.create(file);
+            if (element instanceof ICompilationUnit) {
+               compilationUnit = (ICompilationUnit)element;
+            }
+            if (compilationUnit != null) {
+               IMethod method = JDTUtil.findJDTMethod(compilationUnit, methodLocation.getCharEnd());
+               if (method != null) {
+                  ISourceRange range = method.getNameRange();
+                  Position cursorStartPosition = getCursorPositionForOffset(element, range.getOffset()); 
+                  methodLocation = new SourceLocation(cursorStartPosition != null ? cursorStartPosition.getLine() : -1, 
+                                                      range.getOffset(), 
+                                                      range.getOffset() + range.getLength());
+               }
+            }
+         }
+         return methodLocation;
+      }
+      catch (IOException e) {
+         throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
+      }
+   }
+
+   /**
+    * Returns for the given {@link SourceLocation} of a type in the given {@link IFile}
+    * the {@link SourceLocation} of the type name if available or the initial location otherwise.
+    * @param file The {@link IFile} which contains the type location.
+    * @param typeLocation The location of the type in the given {@link IFile}.
+    * @return The location of the type name or the initial location if not available.
+    * @throws CoreException Occurred Exception.
+    */
+   public static SourceLocation updateToTypeNameLocation(IFile file, SourceLocation typeLocation) throws CoreException {
+      try {
+         if (file != null && typeLocation.getCharEnd() >= 0) {
+            ICompilationUnit compilationUnit = null;
+            IJavaElement element = JavaCore.create(file);
+            if (element instanceof ICompilationUnit) {
+               compilationUnit = (ICompilationUnit)element;
+            }
+            if (compilationUnit != null) {
+               IType type = JDTUtil.findJDTType(compilationUnit, typeLocation.getCharEnd());
+               if (type != null) {
+                  ISourceRange range = type.getNameRange();
+                  Position cursorStartPosition = getCursorPositionForOffset(element, range.getOffset()); 
+                  typeLocation = new SourceLocation(cursorStartPosition != null ? cursorStartPosition.getLine() : -1, 
+                                                      range.getOffset(), 
+                                                      range.getOffset() + range.getLength());
+               }
+            }
+         }
+         return typeLocation;
+      }
+      catch (IOException e) {
+         throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
+      }
+   }
+   
+   /**
+    * Filters the given {@link Set} of {@link KeYJavaType}s and sorts them.
+    * @param kjts - the {@link KeYJavaType}s to filter and sort
+    * @return the filtered and sorted {@link KeYJavaType[]}
+    */
+   public static KeYJavaType[] sortKeYJavaTypes(Set<KeYJavaType> kjts){
+      Iterator<KeYJavaType> it = kjts.iterator();
+      while (it.hasNext()) {
+         KeYJavaType kjt = it.next();
+         if (!(kjt.getJavaType() instanceof ClassDeclaration || 
+               kjt.getJavaType() instanceof InterfaceDeclaration) || 
+               KeYTypeUtil.isLibraryClass(kjt)) {
+            it.remove();
+         }
+      }
+      KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
+      Arrays.sort(kjtsarr, new Comparator<KeYJavaType>() {
+         public int compare(KeYJavaType o1, KeYJavaType o2) {
+            return o1.getFullName().compareTo(o2.getFullName());
+         }
+      });
+      return kjtsarr;
+   }
+   
+   
 }

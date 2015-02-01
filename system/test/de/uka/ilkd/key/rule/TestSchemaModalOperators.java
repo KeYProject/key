@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 /**
  * tests if match checks the variable conditions in Taclets. 
@@ -23,21 +22,31 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
+import de.uka.ilkd.key.proof.BuiltInRuleIndex;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.RuleAppIndex;
+import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -49,6 +58,8 @@ public class TestSchemaModalOperators extends TestCase {
                    "i=3", "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3" };
     Proof[] proof;
     Proof   mvProof;
+   private TermBuilder TB;
+   private Services services;
    
     private static Semisequent parseTermForSemisequent(String t) {
 	if ("".equals(t)) { 
@@ -67,10 +78,13 @@ public class TestSchemaModalOperators extends TestCase {
 	    Semisequent antec = parseTermForSemisequent(strs[2*i]);
 	    Semisequent succ = parseTermForSemisequent(strs[2*i+1]);
 	    Sequent s = Sequent.createSequent(antec, succ);	    
-	    proof[i]=new Proof(TacletForTests.services());
+	    proof[i]=new Proof("TestSchemaModalOperators", TacletForTests.initConfig());
 	    proof[i].setRoot(new Node(proof[i], s));
 	}
 
+        services = TacletForTests.services();
+        TB = TacletForTests.services().getTermBuilder();
+        
 	// proof required to test application with mv
 	/*
        TermFactory tf=TermFactory.DEFAULT;
@@ -125,24 +139,23 @@ public class TestSchemaModalOperators extends TestCase {
 	//	Debug.ENABLE_DEBUG = true;
 	
 	RewriteTacletBuilder rtb = new RewriteTacletBuilder();
-	TermFactory tf = TermFactory.DEFAULT;
 
 	SchemaVariable fsv = SchemaVariableFactory.createFormulaSV(new Name("post"), true);
 	ImmutableSet<Modality> modalities = DefaultImmutableSet.<Modality>nil();
 	modalities = modalities.add(Modality.DIA).add(Modality.BOX);
 	SchemaVariable osv = SchemaVariableFactory.createModalOperatorSV(
 	      new Name("diabox"), Sort.FORMULA, modalities);
-	Term tpost = tf.createTerm(fsv, new Term[0]);
+	Term tpost = TB.tf().createTerm(fsv, new Term[0]);
 
-	Term find = tf.createTerm(
+	Term find = TB.tf().createTerm(
 	    osv,
 	    new Term[]{tpost},
 	    null,
             JavaBlock.EMPTY_JAVABLOCK);
 
-	Term replace = tf.createTerm(
+	Term replace = TB.tf().createTerm(
 	    osv,
-	    new Term[]{TermBuilder.DF.tt()},
+	    new Term[]{TB.tt()},
 	    null,
             JavaBlock.EMPTY_JAVABLOCK);
 
@@ -155,10 +168,10 @@ public class TestSchemaModalOperators extends TestCase {
 
 	RewriteTaclet t = rtb.getRewriteTaclet();
 
-	Term goal = TermBuilder.DF.prog(
+	Term goal = TB.prog(
 	    Modality.DIA, 
             JavaBlock.EMPTY_JAVABLOCK,
-            TermBuilder.DF.ff());
+            TB.ff());
          MatchConditions mc=(t.match                                                   
                             (goal,                                                        
                              find,                                                
@@ -169,8 +182,8 @@ public class TestSchemaModalOperators extends TestCase {
 	 Debug.out("Find: ", find);
 	 Debug.out("Replace: ", replace);
 	 Debug.out("Goal: ", goal);
-	 Term instreplace = t.syntacticalReplace(replace, null, mc, null);
-	 Term instfind = t.syntacticalReplace(replace, null, mc, null);
+	 Term instreplace = t.syntacticalReplace(new TermLabelState(), replace, services, mc, null, null, null, NoPosTacletApp.createNoPosTacletApp(t));
+	 Term instfind = t.syntacticalReplace(new TermLabelState(), replace, services, mc, null, null, null, NoPosTacletApp.createNoPosTacletApp(t));
 	 Debug.out("Instantiated replace: ", instreplace);
 	 Debug.out("Instantiated find: ", instfind);
     }
@@ -183,14 +196,14 @@ public class TestSchemaModalOperators extends TestCase {
 	Goal goal = createGoal ( proof[0].root(), tacletIndex );
 	PosInOccurrence applyPos= new 
 			PosInOccurrence(goal.sequent().succedent().getFirst(), 
-					PosInTerm.TOP_LEVEL,
+					PosInTerm.getTopLevel(),
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
 	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
 	assertTrue("Rule App should be complete", rApp.complete());
-	ImmutableList<Goal> goals=rApp.execute(goal, TacletForTests.services());
+	ImmutableList<Goal> goals=rApp.execute(goal, services);
 	assertTrue("There should be 1 goal for testSchemaModal1 taclet, was "+goals.size(), goals.size()==1);	
 	Sequent seq=goals.head().sequent();
         Semisequent antec0 = parseTermForSemisequent("\\<{ i--; }\\> i=0");
@@ -217,7 +230,7 @@ public class TestSchemaModalOperators extends TestCase {
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
 	PosInOccurrence applyPos= new 
 			PosInOccurrence(goal.sequent().succedent().getFirst(), 
-					PosInTerm.TOP_LEVEL,
+					PosInTerm.getTopLevel(),
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
@@ -247,7 +260,7 @@ public class TestSchemaModalOperators extends TestCase {
 	Goal goal = createGoal ( proof[1].root(), tacletIndex );
 	PosInOccurrence applyPos= new 
 			PosInOccurrence(goal.sequent().succedent().getFirst(), 
-					PosInTerm.TOP_LEVEL,
+					PosInTerm.getTopLevel(),
 					false);
 	ImmutableList<TacletApp> rApplist=goal.ruleAppIndex().
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);	
@@ -288,7 +301,7 @@ public class TestSchemaModalOperators extends TestCase {
 	final BuiltInRuleAppIndex birIndex = new BuiltInRuleAppIndex
 	    ( new BuiltInRuleIndex () );
 	final RuleAppIndex ruleAppIndex = new RuleAppIndex
-	    ( tacletIndex, birIndex );
+	    ( tacletIndex, birIndex, n.proof().getServices() );
 	final Goal goal = new Goal ( n, ruleAppIndex );
 	return goal;
     }

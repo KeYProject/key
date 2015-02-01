@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,7 +13,7 @@
 
 package org.key_project.sed.core.model;
 
-import org.eclipse.debug.core.model.ITerminate;
+import org.eclipse.debug.core.model.IStackFrame;
 import org.key_project.sed.core.model.impl.AbstractSEDBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 
@@ -29,6 +29,6 @@ import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
  * @author Martin Hentschel
  * @see ISEDDebugNode
  */
-public interface ISEDBranchCondition extends ISEDDebugNode, ITerminate {
+public interface ISEDBranchCondition extends ISEDDebugNode, IStackFrame {
 
 }

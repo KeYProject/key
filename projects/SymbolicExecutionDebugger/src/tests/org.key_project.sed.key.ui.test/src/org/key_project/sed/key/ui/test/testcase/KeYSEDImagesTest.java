@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,17 +13,16 @@
 
 package org.key_project.sed.key.ui.test.testcase;
 
-import junit.framework.TestCase;
-
 import org.eclipse.swt.graphics.Image;
 import org.junit.Test;
 import org.key_project.sed.key.ui.util.KeYSEDImages;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 /**
  * Contains tests for {@link KeYSEDImages}.
  * @author Martin Hentschel
  */
-public class KeYSEDImagesTest extends TestCase {
+public class KeYSEDImagesTest extends AbstractSetupTestCase {
     /**
      * Tests {@link KeYSEDImages#getImage(String)}
      */

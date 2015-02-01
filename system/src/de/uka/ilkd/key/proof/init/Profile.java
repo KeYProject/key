@@ -1,21 +1,21 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -32,6 +32,7 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
  * <li> the rule base to be used </li>
  * <li> the available strategies </li>
  * <li> the goal selection strategy </li>
+ * <li> the way how term labels are maintained </li>
  * </ul>
  *
  * Currently this is only rudimentary: possible extensions are
@@ -44,7 +45,10 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
  * etc.
  * </p>
  * <p>
- * Each {@link Profile} has a unique name {@link #name()}. It is recommended
+ * Each {@link Profile} has a unique name {@link #name()}.
+ * </p> 
+ * <p>
+ * It is recommended
  * to have only one instance of each {@link Profile}. The default instances
  * for usage in the {@link Thread} of the user interface
  * are available via {@link JavaProfile#getDefaultInstance()} and
@@ -55,8 +59,8 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
  * because some rules might have a state (at the moment this is only the {@link OneStepSimplifier}).
  * </p>
  * <p>
- * The default {@link Profile} which is used if no profile is programmatically
- * or via a custom problem file defined is {@link AbstractProfile#getDefaultProfile()}.
+ * The default {@link Profile} which is used if no profile is programatically
+ * (or via a custom problem file) defined is {@link AbstractProfile#getDefaultProfile()}.
  * It can be changed via {@link AbstractProfile#setDefaultProfile(Profile)}.
  * </p>
  */
@@ -129,4 +133,6 @@ public interface Profile {
      * @return the file name of the internal class list
      */
     String getInternalClasslistFilename();
+    
+    TermLabelManager getTermLabelManager();
 }

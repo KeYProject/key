@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.gui;
 
@@ -22,7 +21,15 @@ import java.awt.event.MouseListener;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -37,7 +44,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 /**
  * A panel for selecting contracts.
  */
-class ContractSelectionPanel extends JPanel {
+public class ContractSelectionPanel extends JPanel {
 
     /**
      *
@@ -90,20 +97,19 @@ class ContractSelectionPanel extends JPanel {
             private static final long serialVersionUID = 9066658130231994408L;
             private final Font PLAINFONT = getFont().deriveFont(Font.PLAIN);
 
-	    public Component getListCellRendererComponent(
-                                		    JList list,
-                                		    Object value,
-                                		    int index,
-                                		    boolean isSelected,
-                                		    boolean cellHasFocus) {
+	    public Component getListCellRendererComponent(JList list,
+	                                                  Object value,
+	                                                  int index,
+	                                                  boolean isSelected,
+	                                                  boolean cellHasFocus) {
 	        assert value != null;
 		Contract contract = (Contract) value;
 		Component supComp
-		    	= super.getListCellRendererComponent(list,
-		    					     value,
-		    					     index,
-		    					     isSelected,
-		    					     cellHasFocus);
+		        = super.getListCellRendererComponent(list,
+		                                             value,
+		                                             index,
+		                                             isSelected,
+		                                             cellHasFocus);
 
 		//create label and enclosing panel
 		JLabel label = new JLabel();
@@ -161,12 +167,20 @@ class ContractSelectionPanel extends JPanel {
 
 
     public void setContracts(Contract[] contracts, String title) {
-        if (contracts == null || contracts.length == 0) return;
+        if (contracts == null || contracts.length == 0) {
+            contractList.setListData(new Contract[0]);
+            updateUI();
+            return;
+        }
 
         //sort contracts by id (for the user's convenience)
         Arrays.sort(contracts, new Comparator<Contract> () {
             public int compare(Contract c1, Contract c2) {
-                return c1.id() - c2.id();
+                int res = c1.id() - c2.id();
+                if (res == 0) {
+                    return c2.getName().compareTo(c1.getName());
+                }
+                return res;
             }
         });
 
@@ -186,18 +200,33 @@ class ContractSelectionPanel extends JPanel {
 
     public Contract getContract() {
         final Object[] selection = contractList.getSelectedValues();
-        if(selection.length == 0) {
-            return null;
-        } else if(selection.length == 1) {
-            return (Contract) selection[0];
-        } else {
-            ImmutableSet<FunctionalOperationContract> contracts
-            	= DefaultImmutableSet.<FunctionalOperationContract>nil();
-            for(Object contract : selection) {
-        	contracts = contracts.add((FunctionalOperationContract) contract);
-            }
-            return services.getSpecificationRepository()
-                           .combineOperationContracts(contracts);
-        }
+        return computeContract(services, selection);
+    }
+    
+    /**
+     * <p>
+     * Computes the selected {@link Contract}.
+     * </p>
+     * <p>
+     * This method is also used by the KeYIDE (Eclipse) to ensure the same behavior.
+     * </p>
+     * @param services The {@link Services}
+     * @param selection The selected contracts.
+     * @return The selected {@link Contract} or {@code null} if not available.
+     */
+    public static Contract computeContract(Services services, Object[] selection) {
+       if(selection.length == 0) {
+          return null;
+      } else if(selection.length == 1) {
+          return (Contract) selection[0];
+      } else {
+          ImmutableSet<FunctionalOperationContract> contracts
+             = DefaultImmutableSet.<FunctionalOperationContract>nil();
+          for(Object contract : selection) {
+       contracts = contracts.add((FunctionalOperationContract) contract);
+          }
+          return services.getSpecificationRepository()
+                         .combineOperationContracts(contracts);
+      }
     }
 }

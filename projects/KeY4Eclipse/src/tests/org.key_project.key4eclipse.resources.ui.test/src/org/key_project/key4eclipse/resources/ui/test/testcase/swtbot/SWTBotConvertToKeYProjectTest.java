@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,8 +13,6 @@
 
 package org.key_project.key4eclipse.resources.ui.test.testcase.swtbot;
 
-import junit.framework.TestCase;
-
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -22,15 +20,17 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IViewPart;
 import org.junit.Test;
-import org.key_project.key4eclipse.resources.ui.handlers.ConvertJavaToKeYProjectHandler;
+import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
+import org.key_project.key4eclipse.resources.ui.handler.ConvertJavaToKeYProjectHandler;
 import org.key_project.key4eclipse.resources.ui.test.util.KeY4EclipseResourcesUiTestUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests for {@link ConvertJavaToKeYProjectHandler}.
  * @author Martin Hentschel
  */
-public class SWTBotConvertToKeYProjectTest extends TestCase {   
+public class SWTBotConvertToKeYProjectTest extends AbstractSetupTestCase {   
    /**
     * Creates a new {@link IJavaProject} and converts it into a KeYProject. The used view is the ProjectExplorer.
     * @throws Exception Occurred Exception.
@@ -80,7 +80,7 @@ public class SWTBotConvertToKeYProjectTest extends TestCase {
          SWTBotView view = bot.viewById(viewId);
          TestUtilsUtil.selectInTree(view.bot().tree(), project.getProject().getName());
          TestUtilsUtil.clickContextMenu(view.bot().tree(), "Convert to KeY Project");
-         TestUtilsUtil.waitForBuild();
+         KeY4EclipseResourcesTestUtil.waitBuild();
          KeY4EclipseResourcesUiTestUtil.assertKeYNature(project.getProject());
       }
       finally {

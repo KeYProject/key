@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,8 +13,6 @@
 
 package org.key_project.sed.core.test.testcase.swtbot;
 
-import junit.framework.TestCase;
-
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -23,6 +21,7 @@ import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
@@ -30,7 +29,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * shown in the debug view of the Eclipse debug API.
  * @author Martin Hentschel
  */
-public class SWTBotDebugViewHierarchyTest extends TestCase {
+public class SWTBotDebugViewHierarchyTest extends AbstractSetupTestCase {
    /**
     * Makes sure that the tree is updated when the user switches between
     * normal and compact view.

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -75,9 +75,7 @@ public class KeYGraphitiDebugNodePropertySection extends GFPropertySection {
             IFeatureProvider featureProvider = diagramProvider.getFeatureProvider();
             if (featureProvider != null) {
                Object bo = diagramProvider.getFeatureProvider().getBusinessObjectForPictogramElement(pe);
-               if (bo instanceof IKeYSEDDebugNode<?>) {
-                  node = (IKeYSEDDebugNode<?>)bo;
-               }
+               node = KeYDebugNodePropertySection.getDebugNode(bo);
             }
          }
       }

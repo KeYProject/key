@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -23,12 +23,31 @@ import de.uka.ilkd.key.symbolic_execution.util.IFilter;
  */
 public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractProofReferenceTestCase {
    /**
+    * Tests "InvariantInOperationContractOfArgument".
+    */
+   public void testInvariantInOperationContractOfArgument() throws Exception {
+      doReferenceMethodTest(keyRepDirectory, 
+                            "examples/_testcase/proofReferences/InvariantInOperationContractOfArgument/InvariantInOperationContractOfArgument.java", 
+                            "InvariantInOperationContractOfArgument",
+                            "main", 
+                            false,
+                            new ClassAxiomAndInvariantProofReferencesAnalyst(),
+                            new IFilter<IProofReference<?>>() {
+                              @Override
+                              public boolean select(IProofReference<?> element) {
+                                 return IProofReference.USE_INVARIANT.equals(element.getKind());
+                              }
+                            },
+                            new ExpectedProofReferences(IProofReference.USE_INVARIANT, "and(geq(int::select(heap,self,Child::$x),Z(0(#))),leq(int::select(heap,self,Child::$x),Z(0(1(#)))))"));
+   }
+   
+   /**
     * Tests "InvariantInOperationContract".
     */
    public void testInvariantInOperationContract() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/InvariantInOperationContract/InvariantInOperationContract.java", 
-                            "InvariantInOperationContract", 
+                            "InvariantInOperationContract",
                             "main", 
                             false,
                             new ClassAxiomAndInvariantProofReferencesAnalyst(),
@@ -47,7 +66,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
    public void testNestedInvariantInOperationContract() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/NestedInvariantInOperationContract/NestedInvariantInOperationContract.java", 
-                            "NestedInvariantInOperationContract", 
+                            "NestedInvariantInOperationContract",
                             "main", 
                             false,
                             new ClassAxiomAndInvariantProofReferencesAnalyst(),
@@ -66,7 +85,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
    public void testModelFieldTest_doubleX() throws Exception {
       doReferenceMethodTest(keyRepDirectory, 
                             "examples/_testcase/proofReferences/ModelFieldTest/ModelFieldTest.java", 
-                            "ModelFieldTest", 
+                            "test.ModelFieldTest",
                             "doubleX", 
                             false,
                             new ClassAxiomAndInvariantProofReferencesAnalyst(),
@@ -80,7 +99,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
    public void testModelFieldTest_f() throws Exception {
       doReferenceFunctionTest(keyRepDirectory, 
                               "examples/_testcase/proofReferences/ModelFieldTest/ModelFieldTest.java", 
-                              "ModelFieldTest", 
+                              "test.ModelFieldTest",
                               "test.ModelFieldTest::$f", 
                               false,
                               new ClassAxiomAndInvariantProofReferencesAnalyst(),
@@ -94,11 +113,12 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
    public void testAccessibleTest() throws Exception {
       doReferenceFunctionTest(keyRepDirectory, 
                               "examples/_testcase/proofReferences/AccessibleTest/AccessibleTest.java", 
-                              "B", 
+                              "test.B",
                               "java.lang.Object::<inv>", 
                               false,
                               new ClassAxiomAndInvariantProofReferencesAnalyst(),
                               new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),java.lang.Object::<inv>(heap,test.AccessibleTest::select(heap,self,test.B::$c)))"),
-                              new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"));
+                              new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),true)"),
+                              new ExpectedProofReferences(IProofReference.USE_AXIOM, "equiv(java.lang.Object::<inv>(heap,self),not(equals(java.lang.Class::select(heap,null,java.lang.Integer::$TYPE),null)))"));
    }
 }

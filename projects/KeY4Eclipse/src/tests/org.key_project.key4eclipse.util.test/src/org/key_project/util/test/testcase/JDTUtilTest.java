@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -19,6 +19,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -35,6 +36,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.junit.Test;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -47,7 +49,90 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * Tests for {@link JDTUtil}
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public class JDTUtilTest extends TestCase {
+   /**
+    * Tests {@link JDTUtil#ensureValidJavaTypeName(String, IJavaProject)}
+    */
+   @Test
+   public void testEnsureValidJavaTypeName() throws Exception {
+      IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testEnsureValidJavaTypeName");
+      TestUtilsUtil.createFile(javaProject.getProject().getFolder(JDTUtil.getSourceFolderName()), "MyClass", "public class MyClass {}");
+      // Validate null
+      assertNull(JDTUtil.ensureValidJavaTypeName(null, null));
+      assertNull(JDTUtil.ensureValidJavaTypeName(null, javaProject));
+      // Validate empty String
+      assertEquals("MyClass", JDTUtil.ensureValidJavaTypeName("MyClass", null));
+      assertEquals("MyClass", JDTUtil.ensureValidJavaTypeName("MyClass", javaProject));
+      assertTrue(JavaConventionsUtil.validateJavaTypeName("MyClass", javaProject).isOK());
+      // Validate invalid name
+      assertEquals("_M_y_C_lass__", JDTUtil.ensureValidJavaTypeName("(M)y[C]lass{}", null));
+      assertEquals("_M_y_C_lass__", JDTUtil.ensureValidJavaTypeName("(M)y[C]lass{}", javaProject));
+      assertTrue(JavaConventionsUtil.validateJavaTypeName("_M_y_C_lass__", javaProject).isOK());
+   }
+   
+   /**
+    * Tests {@link JDTUtil#isInSourceFolder(IResource)}.
+    */
+   @Test
+   public void testIsInSourceFolder() throws CoreException, InterruptedException {
+      // Test general Project
+      IProject generalProject = TestUtilsUtil.createProject("JDTUtilTest_testIsInSourceFolder_general");
+      IFolder generalSrcFolder = TestUtilsUtil.createFolder(generalProject, "src");
+      IFile generalJavaFile = TestUtilsUtil.createFile(generalProject, "MyClass.java", "public class MyClass {}");
+      IFile generalSoureJavaFile = TestUtilsUtil.createFile(generalSrcFolder, "MyClass.java", "public class MyClass {}");
+      IFolder generalPackageFolder = TestUtilsUtil.createFolder(generalSrcFolder, "aPackage");
+      IFile generalPackageJavaFile = TestUtilsUtil.createFile(generalPackageFolder, "MyClass.java", "package aPackage;\npublic class MyClass {}");
+      assertFalse(JDTUtil.isInSourceFolder(null));
+      assertFalse(JDTUtil.isInSourceFolder(generalProject));
+      assertFalse(JDTUtil.isInSourceFolder(generalSrcFolder));
+      assertFalse(JDTUtil.isInSourceFolder(generalJavaFile));
+      assertFalse(JDTUtil.isInSourceFolder(generalSoureJavaFile));
+      assertFalse(JDTUtil.isInSourceFolder(generalPackageFolder));
+      assertFalse(JDTUtil.isInSourceFolder(generalPackageJavaFile));
+      // Test Java Project
+      IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testIsInSourceFolder_java");
+      IFolder javaProjectSrcFolder = javaProject.getProject().getFolder("src");
+      IFile javaJavaFile = TestUtilsUtil.createFile(javaProject.getProject(), "MyClass.java", "public class MyClass {}");
+      IFile javaSoureJavaFile = TestUtilsUtil.createFile(javaProjectSrcFolder, "MyClass.java", "public class MyClass {}");
+      IFolder javaPackageFolder = TestUtilsUtil.createFolder(javaProjectSrcFolder, "aPackage");
+      IFile javaPackageJavaFile = TestUtilsUtil.createFile(javaPackageFolder, "MyClass.java", "package aPackage;\npublic class MyClass {}");
+      assertFalse(JDTUtil.isInSourceFolder(null));
+      assertFalse(JDTUtil.isInSourceFolder(javaProject.getProject()));
+      assertTrue(JDTUtil.isInSourceFolder(javaProjectSrcFolder));
+      assertFalse(JDTUtil.isInSourceFolder(javaJavaFile));
+      assertTrue(JDTUtil.isInSourceFolder(javaSoureJavaFile));
+      assertTrue(JDTUtil.isInSourceFolder(javaPackageFolder));
+      assertTrue(JDTUtil.isInSourceFolder(javaPackageJavaFile));
+      // Test Java Project (no bin/src folders)
+      IJavaProject noBinSrcJavaProject = TestUtilsUtil.createJavaProjectNoBinSourceFolders("JDTUtilTest_testIsInSourceFolder_javaNoBinSrc");
+      IFile noBinSrcJavaJavaFile = TestUtilsUtil.createFile(noBinSrcJavaProject.getProject(), "MyClass.java", "public class MyClass {}");
+      IFolder noBinSrcJavaPackageFolder = TestUtilsUtil.createFolder(noBinSrcJavaProject.getProject(), "aPackage");
+      IFile noBinSrcJavaPackageJavaFile = TestUtilsUtil.createFile(noBinSrcJavaPackageFolder, "MyClass.java", "package aPackage;\npublic class MyClass {}");
+      assertFalse(JDTUtil.isInSourceFolder(null));
+      assertTrue(JDTUtil.isInSourceFolder(noBinSrcJavaProject.getProject()));
+      assertTrue(JDTUtil.isInSourceFolder(noBinSrcJavaJavaFile));
+      assertTrue(JDTUtil.isInSourceFolder(noBinSrcJavaPackageFolder));
+      assertTrue(JDTUtil.isInSourceFolder(noBinSrcJavaPackageJavaFile));
+   }
+   
+   /**
+    * Tests {@link JDTUtil#isJavaFile(org.eclipse.core.resources.IFile)}.
+    */
+   @Test
+   public void testIsJavaFile() throws CoreException {
+      IProject project = TestUtilsUtil.createProject("JDTUtilTest_testIsJavaFile");
+      IFile file = TestUtilsUtil.createFile(project, "noExtension", "noExtension");
+      IFile txtFile = TestUtilsUtil.createFile(project, "txtFile.txt", "txtFile");
+      IFile javaFile = TestUtilsUtil.createFile(project, "javaFile.java", "javaFile");
+      IFile javaDifferentCasesFile = TestUtilsUtil.createFile(project, "javaDifferentCasesFile.jAVa", "javaDifferentCasesFile");
+      assertFalse(JDTUtil.isJavaFile(null));
+      assertFalse(JDTUtil.isJavaFile(file));
+      assertFalse(JDTUtil.isJavaFile(txtFile));
+      assertTrue(JDTUtil.isJavaFile(javaFile));
+      assertTrue(JDTUtil.isJavaFile(javaDifferentCasesFile));
+   }
+
    /**
     * Tests {@link JDTUtil#getTabWidth(IJavaElement)}.
     */
@@ -269,7 +354,7 @@ public class JDTUtilTest extends TestCase {
         // Create initial java project
         IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testAddClasspathEntry");
         IFolder src = javaProject.getProject().getFolder("src");
-        IClasspathEntry[] defaultEntries = TestUtilsUtil.getDefaultJRELibrary();
+        IClasspathEntry[] defaultEntries = JDTUtil.getDefaultJRELibrary();
         IClasspathEntry[] entries = javaProject.getRawClasspath();
         assertEquals(1 + defaultEntries.length, entries.length);
         assertEquals(src.getFullPath(), entries[0].getPath());
@@ -370,6 +455,77 @@ public class JDTUtilTest extends TestCase {
         assertEquals(ResourceUtil.getLocation(refSrc), locations.get(0));
         assertEquals(ResourceUtil.getLocation(src), locations.get(1));
         assertEquals(ResourceUtil.getLocation(secondSrc), locations.get(2));
+    }
+    
+    /**
+     * Tests {@link JDTUtil#getSourceResources(IProject)}
+     */
+    @Test
+    public void testGetSourceResources() throws CoreException, InterruptedException {
+        // Test null
+        List<IResource> locations = JDTUtil.getSourceResources(null);
+        assertNotNull(locations);
+        assertEquals(0, locations.size());
+        // Test general project
+        IProject project = TestUtilsUtil.createProject("JDTUtilTest_testGetSourceResources_general");
+        locations = JDTUtil.getSourceResources(project);
+        assertNotNull(locations);
+        assertEquals(0, locations.size());
+        // Test Java project with one source location in project
+        IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testGetSourceResources_Java");
+        project = javaProject.getProject();
+        IFolder src = project.getFolder("src");
+        assertNotNull(src);
+        assertTrue(src.exists());
+        locations = JDTUtil.getSourceResources(project);
+        assertNotNull(locations);
+        assertEquals(1, locations.size());
+        assertEquals(src, locations.get(0));
+        // Add second source location in project
+        IFolder secondSrc = project.getFolder("secondSrc");
+        if (!secondSrc.exists()) {
+            secondSrc.create(true, true, null);
+        }
+        JDTUtil.addClasspathEntry(javaProject, JavaCore.newSourceEntry(secondSrc.getFullPath()));
+        // Test Java project with two source location in project
+        locations = JDTUtil.getSourceResources(project);
+        assertNotNull(locations);
+        assertEquals(2, locations.size());
+        assertEquals(src, locations.get(0));
+        assertEquals(secondSrc, locations.get(1));
+        // Add class path entry for a different java project
+        IJavaProject refJavaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testGetSourceResources_Java_Refereneed");
+        IProject refProject = refJavaProject.getProject();
+        IFolder refSrc = refProject.getFolder("src");
+        assertNotNull(refSrc);
+        assertTrue(refSrc.exists());
+        JDTUtil.addClasspathEntry(javaProject, JavaCore.newSourceEntry(refJavaProject.getPath()));
+        // Test Java project with two source location in project and project reference
+        locations = JDTUtil.getSourceResources(project);
+        assertNotNull(locations);
+        assertEquals(3, locations.size());
+        assertEquals(src, locations.get(0));
+        assertEquals(secondSrc, locations.get(1));
+        assertEquals(refSrc, locations.get(2));
+        locations = JDTUtil.getSourceResources(refProject);
+        assertNotNull(locations);
+        assertEquals(1, locations.size());
+        assertEquals(refSrc, locations.get(0));
+        // Create cycle by also referencing javaProject in refJavaProject
+        JDTUtil.addClasspathEntry(refJavaProject, JavaCore.newSourceEntry(javaProject.getPath()));
+        // Test Java project with two source location in project and cyclic project reference
+        locations = JDTUtil.getSourceResources(project);
+        assertNotNull(locations);
+        assertEquals(3, locations.size());
+        assertEquals(src, locations.get(0));
+        assertEquals(secondSrc, locations.get(1));
+        assertEquals(refSrc, locations.get(2));
+        locations = JDTUtil.getSourceResources(refProject);
+        assertNotNull(locations);
+        assertEquals(3, locations.size());
+        assertEquals(refSrc, locations.get(0));
+        assertEquals(src, locations.get(1));
+        assertEquals(secondSrc, locations.get(2));
     }
     
     /**

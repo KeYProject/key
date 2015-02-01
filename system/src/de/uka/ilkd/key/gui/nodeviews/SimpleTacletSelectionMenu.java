@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 /*
  * Created on Apr 18, 2005
@@ -22,6 +21,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JMenu;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.PosTacletApp;
 
@@ -54,10 +54,10 @@ public class SimpleTacletSelectionMenu extends JMenu {
      * menu item 
      */
     public SimpleTacletSelectionMenu(ImmutableList<PosTacletApp> apps, 
-            NotationInfo info, ActionListener listener) {
+            NotationInfo info, ActionListener listener, Services services) {
         super("Select Rule to Apply");        
                     
-        addMenuEntries(apps, info, listener);           
+        addMenuEntries(apps, info, listener, services);
     }
 
     /**
@@ -69,10 +69,10 @@ public class SimpleTacletSelectionMenu extends JMenu {
      * menu item 
      */
     private void addMenuEntries(ImmutableList<PosTacletApp> apps, 
-            NotationInfo info, ActionListener listener) {
+            NotationInfo info, ActionListener listener, Services services) {
         for (PosTacletApp app : apps) {
             final DefaultTacletMenuItem item =
-                    new DefaultTacletMenuItem(this, app, info);
+                    new DefaultTacletMenuItem(this, app, info, services);
             item.addActionListener(listener);
             add(item);
         }

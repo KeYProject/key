@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -15,6 +15,7 @@ package org.key_project.sed.ui.adapter;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.debug.internal.ui.views.launch.LaunchView;
+import org.eclipse.debug.internal.ui.views.variables.VariablesView;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -37,7 +38,8 @@ public class AdapterFactory implements IAdapterFactory {
    @Override
    public Object getAdapter(Object adaptableObject, Class adapterType) {
       if (IPropertySheetPage.class.equals(adapterType)){
-         if (adaptableObject instanceof LaunchView) {
+         if (adaptableObject instanceof LaunchView ||
+             adaptableObject instanceof VariablesView) {
             ITabbedPropertySheetPageContributor contributor = new ITabbedPropertySheetPageContributor() {
                @Override
                public String getContributorId() {

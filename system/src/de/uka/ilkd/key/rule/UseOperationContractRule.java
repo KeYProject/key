@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.rule;
 
@@ -47,7 +46,6 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.AnonHeapTermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -56,39 +54,52 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.InfFlowMethodContractTacletBuilder;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 
 
 /**
  * Implements the rule which inserts operation contracts for a method call.
  */
 public final class UseOperationContractRule implements BuiltInRule {
+    /**
+     * Hint to refactor the final pre term.
+     */
+    public static final String FINAL_PRE_TERM_HINT = "finalPreTerm";
 
     public static final UseOperationContractRule INSTANCE
                                             = new UseOperationContractRule();
 
     private static final Name NAME = new Name("Use Operation Contract");
-    private static final TermBuilder TB = TermBuilder.DF;
 
-    private Term lastFocusTerm;
-    private Instantiation lastInstantiation;
+    private static Term lastFocusTerm;
+    private static Instantiation lastInstantiation;
 
 
     //-------------------------------------------------------------------------
@@ -301,37 +312,49 @@ public final class UseOperationContractRule implements BuiltInRule {
     /**
      * @return (assumption, anon update, anon heap)
      */
-    private static Triple<Term,Term,Term> createAnonUpdate(LocationVariable heap, IProgramMethod pm,
-	                                     	    	   Term mod,
-	                                     	    	   Services services) {
+    private static AnonUpdateData createAnonUpdate(LocationVariable heap,
+                                                   IProgramMethod pm, 
+	                                     	   Term mod, 
+	                                     	   Services services) {
 	assert pm != null;
 	assert mod != null;
+	final TermBuilder TB = services.getTermBuilder();
 
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final Name methodHeapName = new Name(TB.newName(services, heap+"After_" + pm.getName()));
-	final Function methodHeapFunc = new Function(methodHeapName, heapLDT.targetSort());
+	final Name methodHeapName = new Name(TB.newName(heap+"After_" + pm.getName()));
+	final Function methodHeapFunc = new Function(methodHeapName, heapLDT.targetSort(), true);
 	services.getNamespaces().functions().addSafely(methodHeapFunc);
-	final Name anonHeapName = new Name(TB.newName(services, "anon_" + heap + "_" + pm.getName()));
+	final Term methodHeap = TB.func(methodHeapFunc);
+	final Name anonHeapName = new Name(TB.newName("anon_" + heap + "_" + pm.getName()));
 	final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-	final Term anonHeap = TB.label(TB.func(anonHeapFunc), AnonHeapTermLabel.INSTANCE);
-	final Term assumption = TB.equals(TB.anon(services,
-                                                  TB.var(heap),
-                                                  mod,
-                                                  anonHeap),
-                                          TB.func(methodHeapFunc));
-	final Term anonUpdate = TB.elementary(services, heap, TB.func(methodHeapFunc));
+	final Term anonHeap = TB.label(TB.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
+	final Term assumption =
+	        TB.equals(TB.anon(TB.var(heap), mod, anonHeap),
+                          methodHeap); 
+	final Term anonUpdate = TB.elementary(heap, methodHeap);
 
-	return new Triple<Term,Term,Term>(assumption, anonUpdate, anonHeap);
+	return new AnonUpdateData(assumption, anonUpdate, methodHeap,
+	                          TB.getBaseHeap(), anonHeap);
     }
 
-
+    /**
+     * Construct a free postcondition for the given method,
+     * i.e., a postcondition that is always true as guaranteed by the Java language
+     * and is not required to be checked by the callee.
+     * For constructors, it states that the self term is created and not null in the poststate
+     * and it has not been created in the prestate.
+     * For regular methods, it states that the return value is in range,
+     * meaning created or null for reference types, inInt(), etc., for integer types,
+     * and for location sets containing only locations that belong to created objects.
+     */
     private static Term getFreePost(List<LocationVariable> heapContext, IProgramMethod pm,
 	    		     	    KeYJavaType kjt,
 	    		     	    Term resultTerm,
 	    		     	    Term selfTerm,
 	    		     	    Map<LocationVariable, Term> heapAtPres,
 	    		     	    Services services) {
+        final TermBuilder TB = services.getTermBuilder();
         final Term result;
         if(pm.isConstructor()) {
             assert resultTerm == null;
@@ -343,22 +366,20 @@ public final class UseOperationContractRule implements BuiltInRule {
             	}
             	final Term cr = TB.and(OpReplacer.replace(TB.var(heap),
 	                  	 heapAtPres.get(heap),
-	                   	 TB.not(TB.created(services, TB.var(heap),
-	                   	                   selfTerm))),
-                         TB.created(services, TB.var(heap), selfTerm));
+	                   	 TB.not(TB.created(TB.var(heap), selfTerm)), 
+	                   	 services.getTermFactory()),
+                         TB.created(TB.var(heap), selfTerm));
             	if(createdForm == null) {
             		createdForm = cr;
             	}else{
             		createdForm = TB.and(createdForm, cr);
             	}
             }
-            result = TB.and(new Term[]{
-        	      TB.not(TB.equals(selfTerm, TB.NULL(services))),
-                      createdForm,
-                      TB.exactInstance(services, kjt.getSort(), selfTerm)});
+            result = TB.and(TB.not(TB.equals(selfTerm, TB.NULL())),
+                    createdForm,
+                    TB.exactInstance(kjt.getSort(), selfTerm));
         } else if(resultTerm != null) {
-            result = TB.reachableValue(services,
-        	                       resultTerm,
+            result = TB.reachableValue(resultTerm,
         	                       pm.getReturnType());
         } else {
             result = TB.tt();
@@ -425,7 +446,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
 
-    private Instantiation instantiate(Term focusTerm, Services services) {
+    private static Instantiation instantiate(Term focusTerm, Services services) {
 	//result cached?
 	if(focusTerm == lastFocusTerm) {
 	    return lastInstantiation;
@@ -440,6 +461,78 @@ public final class UseOperationContractRule implements BuiltInRule {
 	return result;
     }
 
+    private static void applyInfFlow(Goal goal,
+                                     final FunctionalOperationContract contract,
+                                     final Instantiation inst,
+                                     final Term self,
+                                     final ImmutableList<Term> params,
+                                     final Term result,
+                                     final Term exception,
+                                     final Term mby,
+                                     final Term atPreUpdates,
+                                     final Term finalPreTerm,
+                                     final ImmutableList<AnonUpdateData> anonUpdateDatas,
+                                     Services services) {
+        if (!InfFlowCheckInfo.isInfFlow(goal)) {
+            return;
+        }
+
+        // prepare information flow analysis
+        assert anonUpdateDatas.size() == 1 : "information flow extension " +
+                                             "is at the moment not " +
+                                             "compatible with the " +
+                                             "non-base-heap setting";
+        AnonUpdateData anonUpdateData = anonUpdateDatas.head();
+
+        final Term heapAtPre = anonUpdateData.methodHeapAtPre;
+        final Term heapAtPost = anonUpdateData.methodHeap;
+
+        // generate proof obligation variables
+        final boolean hasSelf = self != null;
+        final boolean hasRes = result != null;
+        final boolean hasExc = exception != null;
+
+        final StateVars preVars =
+                new StateVars(hasSelf ? self : null,
+                              params,
+                              hasRes ? result : null,
+                              hasExc ? exception : null,
+                              heapAtPre, mby);
+        final StateVars postVars =
+                new StateVars(hasSelf ? self : null,
+                              params,
+                              hasRes ? result : null,
+                              hasExc ? exception : null,
+                              heapAtPost, mby);
+        final ProofObligationVars poVars =
+                new ProofObligationVars(preVars, postVars, services);
+
+        // generate information flow contract application predicate
+        // and associated taclet
+        InfFlowMethodContractTacletBuilder ifContractBuilder =
+                new InfFlowMethodContractTacletBuilder(services);
+        ifContractBuilder.setContract(contract);
+        ifContractBuilder.setContextUpdate(atPreUpdates, inst.u);
+        ifContractBuilder.setProofObligationVars(poVars);
+
+        Term contractApplPredTerm = ifContractBuilder.buildContractApplPredTerm();
+        Taclet informationFlowContractApp = ifContractBuilder.buildTaclet();
+
+        // add term and taclet to post goal
+        goal.addFormula(new SequentFormula(contractApplPredTerm),
+                true,
+                false);
+        goal.addTaclet(informationFlowContractApp,
+                SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+
+        // information flow proofs might get easier if we add the (proved)
+        // method contract precondition as an assumption to the post goal
+        // (in case the precondition cannot be proved easily)
+        goal.addFormula(new SequentFormula(finalPreTerm), true, false);
+        goal.proof().addIFSymbol(contractApplPredTerm);
+        goal.proof().addIFSymbol(informationFlowContractApp);
+        goal.proof().addGoalTemplates(informationFlowContractApp);
+    }
 
 
     //-------------------------------------------------------------------------
@@ -454,6 +547,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	//leading update?
 	final Term u;
 	final Term progPost;
+   final TermBuilder TB = services.getTermBuilder();
 	if(focusTerm.op() instanceof UpdateApplication) {
 	    u = UpdateApplication.getUpdate(focusTerm);
 	    progPost = UpdateApplication.getTarget(focusTerm);
@@ -496,7 +590,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 	        staticType,
 	        ec,
 	        services);
-	assert pm != null : "Getting program method failed.\nReference: "+mr+", static type: "+staticType+", execution context: "+ec;
+	assert pm != null : "Getting program method failed.\nReference: " + mr +
+	                    ", static type: "+staticType+", execution context: " + ec;
 	final Term actualSelf = getActualSelf(mr, pm, ec, services);
 	final ImmutableList<Term> actualParams  = getActualParams(mr, ec, services);
 
@@ -509,7 +604,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 	        staticType,
 	        mr,
 	        pm,
-	        actualParams);
+	        actualParams,
+	        mod == Modality.DIA_TRANSACTION || mod == Modality.BOX_TRANSACTION);
 	return result;
     }
 
@@ -529,6 +625,11 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    return false;
 	}
 
+	// abort if inside of transformer
+        if (Transformer.inTransformer(pio)) {
+            return false;
+        }
+
         //there must be applicable contracts for the operation
         final ImmutableSet<FunctionalOperationContract> contracts
                 = getApplicableContracts(goal.proof().getServices(),
@@ -537,6 +638,13 @@ public final class UseOperationContractRule implements BuiltInRule {
                 	                 inst.mod);
         if(contracts.isEmpty()) {
             return false;
+        }
+
+        // contract can be applied if modality is box and needs no termination
+        // argument
+        // see #1417, BOX_TRANSACTION added according to Wojciech's proposal.
+        if(inst.mod == Modality.BOX || inst.mod == Modality.BOX_TRANSACTION) {
+            return true;
         }
 
         //applying a contract here must not create circular dependencies
@@ -549,15 +657,16 @@ public final class UseOperationContractRule implements BuiltInRule {
         return false;
     }
 
-
     @Override
     public ImmutableList<Goal> apply(Goal goal,
 	    			     Services services,
 	    			     RuleApp ruleApp) {
+       final TermLabelState termLabelState = new TermLabelState();
 	//get instantiation
 	final Instantiation inst
 		= instantiate(ruleApp.posInOccurrence().subTerm(), services);
         final JavaBlock jb = inst.progPost.javaBlock();
+        final TermBuilder tb = services.getTermBuilder();
 
         //configure contract
         final FunctionalOperationContract contract =
@@ -565,76 +674,66 @@ public final class UseOperationContractRule implements BuiltInRule {
                 .getInstantiation();
         assert contract.getTarget().equals(inst.pm);
 
-        Modality md = (Modality)TermBuilder.DF.goBelowUpdates(ruleApp.posInOccurrence().subTerm()).op();
-        boolean transaction = (md == Modality.DIA_TRANSACTION || md == Modality.BOX_TRANSACTION);
-        final List<LocationVariable> heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
+        final List<LocationVariable> heapContext =
+                HeapContext.getModHeaps(goal.proof().getServices(), inst.transaction);
 
 	//prepare heapBefore_method
-
-        Map<LocationVariable,LocationVariable> atPreVars = HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
+        Map<LocationVariable,LocationVariable> atPreVars =
+                computeAtPreVars(heapContext, services, inst);
         for(LocationVariable v : atPreVars.values()) {
      	  goal.addProgramVariable(v);
         }
 
-
         Map<LocationVariable,Term> atPres = HeapContext.getAtPres(atPreVars, services);
 
         //create variables for result and exception
-        final ProgramVariable resultVar
-        	= inst.pm.isConstructor()
-        	  ? TB.selfVar(services, inst.staticType, true)
-                  : TB.resultVar(services, inst.pm, true);
+        final ProgramVariable resultVar = computeResultVar(inst, services); 
         if(resultVar != null) {
             goal.addProgramVariable(resultVar);
         }
         assert inst.pm.isConstructor()
                || !(inst.actualResult != null && resultVar == null);
-        final ProgramVariable excVar = TB.excVar(services, inst.pm, true);
+        final ProgramVariable excVar = tb.excVar(inst.pm, true);
         assert excVar != null;
         goal.addProgramVariable(excVar);
 
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         //translate the contract
-        final Term baseHeapTerm = TB.getBaseHeap(services);
-        final Term contractSelf
-        	= OpReplacer.replace(baseHeapTerm,
-        		             atPres.get(baseHeap),
-        		             inst.pm.isConstructor()
-        		               ? TB.var(resultVar)
-        		               : inst.actualSelf);
-        final ImmutableList<Term> contractParams
-        	= OpReplacer.replace(baseHeapTerm,
-        			    atPres.get(baseHeap),
-        			    inst.actualParams);
+        final Term baseHeapTerm = tb.getBaseHeap();
+        final ImmutableList<Term> contractParams = computeParams(baseHeapTerm, atPres, baseHeap, inst, tb.tf());
         final Term contractResult
         	= inst.pm.isConstructor() || resultVar == null
         	  ? null
-                  : TB.var(resultVar);
+                  : tb.var(resultVar);
+        final Term contractSelf = computeSelf(baseHeapTerm, atPres, baseHeap, 
+                inst, contractResult == null && resultVar != null ? tb.var(resultVar) : contractResult,
+                services.getTermFactory());
         Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable h : heapContext) {
-           heapTerms.put(h, TB.var(h));
+           heapTerms.put(h, tb.var(h));
         }
-        final Term globalDefs = contract.getGlobalDefs(baseHeap, baseHeapTerm, contractSelf, contractParams, services);
+        final Term globalDefs = contract.getGlobalDefs(baseHeap, baseHeapTerm, contractSelf,
+                                                       contractParams, services);
         final Term originalPre  = contract.getPre(heapContext,
                                           heapTerms,
         				  contractSelf,
         				  contractParams,
                                           atPres,
         				  services);
-        final Term pre = globalDefs==null? originalPre: TB.apply(globalDefs, originalPre);
+        final Term pre = globalDefs==null? originalPre: tb.apply(globalDefs, originalPre);
         final Term originalPost = contract.getPost(heapContext,
                                            heapTerms,
         	                               contractSelf,
         				                   contractParams,
                                            contractResult,
-                                           TB.var(excVar),
+                                           tb.var(excVar),
                                            atPres,
                                            services);
-        final Term post = globalDefs==null? originalPost: TB.apply(globalDefs, originalPost);
+        final Term post = globalDefs==null? originalPost: tb.apply(globalDefs, originalPost);
         final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
 
         for(LocationVariable heap : heapContext) {
-           final Term m = contract.getMod(heap, TB.var(heap),
+           final Term m = contract.getMod(heap, tb.var(heap),
                 contractSelf,contractParams, services);
            mods.put(heap, m);
         }
@@ -681,44 +780,47 @@ public final class UseOperationContractRule implements BuiltInRule {
         Term wellFormedAnon = null;
         Term atPreUpdates = null;
         Term reachableState = null;
+        ImmutableList<AnonUpdateData> anonUpdateDatas =
+                ImmutableSLList.<AnonUpdateData>nil();
 
         for(LocationVariable heap : heapContext) {
-           final Triple<Term,Term,Term> tAnon;
-           if(!contract.hasModifiesClause(heap)) {
-             tAnon = new Triple<Term,Term,Term>(TB.tt(), TB.skip(), TB.var(heap));
-           }else{
+           final AnonUpdateData tAnon;
+           if (!contract.hasModifiesClause(heap)) {
+             tAnon = new AnonUpdateData(tb.tt(), tb.skip(), tb.var(heap), tb.var(heap), tb.var(heap));
+           } else {
              tAnon = createAnonUpdate(heap, inst.pm, mods.get(heap), services);
            }
-           if(anonAssumption == null) {
-             anonAssumption = tAnon.first;
-           }else{
-             anonAssumption = TB.and(anonAssumption, tAnon.first);
+           anonUpdateDatas = anonUpdateDatas.append(tAnon);
+           if (anonAssumption == null) {
+             anonAssumption = tAnon.assumption;
+           } else {
+             anonAssumption = tb.and(anonAssumption, tAnon.assumption);
            }
-           if(anonUpdate == null) {
-             anonUpdate = tAnon.second;
-           }else{
-             anonUpdate = TB.parallel(anonUpdate, tAnon.second);
+           if (anonUpdate == null) {
+             anonUpdate = tAnon.anonUpdate;
+           } else {
+             anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);
            }
-           if(wellFormedAnon == null) {
-             wellFormedAnon = TB.wellFormed(tAnon.third,services);
-           }else{
-             wellFormedAnon = TB.and(wellFormedAnon, TB.wellFormed(tAnon.third,services));
+           if (wellFormedAnon == null) {
+             wellFormedAnon = tb.wellFormed(tAnon.anonHeap);
+           } else {
+             wellFormedAnon = tb.and(wellFormedAnon, tb.wellFormed(tAnon.anonHeap));
            }
-           final Term up = TB.elementary(services, atPreVars.get(heap), TB.var(heap));
+           final Term up = tb.elementary(atPreVars.get(heap), tb.var(heap));
            if(atPreUpdates == null) {
              atPreUpdates = up;
            }else{
-             atPreUpdates = TB.parallel(atPreUpdates, up);
+             atPreUpdates = tb.parallel(atPreUpdates, up);
            }
            if(reachableState == null) {
-             reachableState = TB.wellFormed(heap, services);
+             reachableState = tb.wellFormed(heap);
            }else{
-             reachableState = TB.and(reachableState, TB.wellFormed(heap, services));
+             reachableState = tb.and(reachableState, tb.wellFormed(heap));
            }
         }
 
-        final Term excNull = TB.equals(TB.var(excVar), TB.NULL(services));
-        final Term excCreated = TB.created(services, TB.var(excVar));
+        final Term excNull = tb.equals(tb.var(excVar), tb.NULL());
+        final Term excCreated = tb.created(tb.var(excVar));
         final Term freePost = getFreePost(heapContext,
                               inst.pm,
 	    		     		  inst.staticType,
@@ -728,47 +830,64 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    		     		  services);
         final Term freeExcPost = inst.pm.isConstructor()
                                  ? freePost
-                                 : TB.tt();
+                                 : tb.tt();
         final Term postAssumption
-        	= TB.applySequential(new Term[]{inst.u, atPreUpdates},
-        		   	     TB.and(anonAssumption,
-        		   		    TB.apply(anonUpdate, TB.and(new Term[]{excNull,
-                          freePost,
-                          post}), null)));
+        	= tb.applySequential(new Term[]{inst.u, atPreUpdates},
+        		   	     tb.and(anonAssumption,
+        		   		    tb.apply(anonUpdate, tb.and(excNull,
+                                    freePost,
+                                    post), null)));
         final Term excPostAssumption
-        	= TB.applySequential(new Term[]{inst.u, atPreUpdates},
-        		   TB.and(anonAssumption,
-                                  TB.apply(anonUpdate, TB.and(new Term[]{TB.not(excNull),
-                                  excCreated,
-                                  freeExcPost,
-                                  post}), null)));
+        	= tb.applySequential(new Term[]{inst.u, atPreUpdates},
+        		   tb.and(anonAssumption,
+                                  tb.apply(anonUpdate, tb.and(tb.not(excNull),
+                                          excCreated,
+                                          freeExcPost,
+                                          post), null)));
 
         //create "Pre" branch
 	int i = 0;
 	for(Term arg : contractParams) {
 	    KeYJavaType argKJT = contract.getTarget().getParameterType(i++);
-	    reachableState = TB.and(reachableState,
-		                    TB.reachableValue(services, arg, argKJT));
+	    reachableState = tb.and(reachableState,
+		                    tb.reachableValue(arg, argKJT));
 	}
-	final ContractPO po
-		= services.getSpecificationRepository()
-		          .getPOForProof(goal.proof());
-	final Term mbyOk;
-	if(po != null && po.getMbyAtPre() != null && mby != null ) {
-    	mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
-    			       TB.lt(mby, po.getMbyAtPre(), services));
-	} else {
-	    mbyOk = TB.tt();
-	}
-        preGoal.changeFormula(new SequentFormula(
-        			TB.applySequential(new Term[]{inst.u, atPreUpdates},
-        	                                   TB.and(new Term[]{pre,
-        	                                	   	     reachableState,
-        	                                	   	     mbyOk}))),
-                              ruleApp.posInOccurrence());
-        if (TermLabelWorkerManagement.hasInstantiators(services)) {
-           TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, preGoal);
+
+        Term finalPreTerm;
+        if(!InfFlowCheckInfo.isInfFlow(goal)) {
+            final ContractPO po
+                    = services.getSpecificationRepository()
+                              .getPOForProof(goal.proof());
+
+            final Term mbyOk;
+         // see #1417
+            if(inst.mod != Modality.BOX && inst.mod != Modality.BOX_TRANSACTION && po != null && mby != null ) {
+//          mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
+//                                 TB.lt(mby, po.getMbyAtPre(), services));
+//              mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
+                mbyOk = tb.measuredByCheck(mby);
+            } else {
+                mbyOk = tb.tt();
+            }
+            finalPreTerm =
+                    tb.applySequential(new Term[]{inst.u, atPreUpdates},
+                                       tb.and(new Term[]{pre,
+                                                         reachableState,
+                                                         mbyOk}));
+        } else {
+            // termination has already been shown in the functional proof,
+            // thus we do not need to show it again in information flow proofs.
+            finalPreTerm =
+                    tb.applySequential(new Term[]{inst.u, atPreUpdates},
+                                                  tb.and(new Term[]{pre,
+                                                                    reachableState}));
         }
+
+        finalPreTerm = TermLabelManager.refactorTerm(termLabelState, services, null, finalPreTerm, this, preGoal, FINAL_PRE_TERM_HINT, null);
+        preGoal.changeFormula(new SequentFormula(finalPreTerm),
+                              ruleApp.posInOccurrence());
+
+        TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this, preGoal, null, null);
 
         //create "Post" branch
 	final StatementBlock resultAssign;
@@ -782,36 +901,47 @@ public final class UseOperationContractRule implements BuiltInRule {
         final StatementBlock postSB
         	= replaceStatement(jb, resultAssign);
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
-        final Term normalPost = TB.apply(anonUpdate,
-                                         TB.prog(inst.mod,
+        final Term normalPost = tb.apply(anonUpdate,
+                                         tb.prog(inst.mod,
                                                  postJavaBlock,
                                                  inst.progPost.sub(0),
-                                                 TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, postGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock)),
+                                                 TermLabelManager.instantiateLabels(termLabelState,
+                                                         services, ruleApp.posInOccurrence(), this,
+                                                         postGoal, "PostModality", null, inst.mod,
+                                                         new ImmutableArray<Term>(inst.progPost.sub(0)),
+                                                         null, postJavaBlock, inst.progPost.getLabels())
+                                                 ),
                                          null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon),
         	            true,
         	            false);
-        postGoal.changeFormula(new SequentFormula(TB.apply(inst.u, normalPost, null)),
+        postGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),
         	               ruleApp.posInOccurrence());
         postGoal.addFormula(new SequentFormula(postAssumption),
         	            true,
         	            false);
 
+        applyInfFlow(postGoal, contract, inst, contractSelf, contractParams, contractResult,
+                     tb.var(excVar), mby, atPreUpdates,finalPreTerm, anonUpdateDatas, services);
+
         //create "Exceptional Post" branch
         final StatementBlock excPostSB
             = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
         JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
-        final Term originalExcPost = TB.apply(anonUpdate,
-                                      TB.prog(inst.mod,
-                                              excJavaBlock,
-                                              inst.progPost.sub(0),
-                                              TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, excPostGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock)),
-                                      null);
-        final Term excPost = globalDefs==null? originalExcPost: TB.apply(globalDefs, originalExcPost);
+        final Term originalExcPost = tb.apply(anonUpdate,
+                                              tb.prog(inst.mod, excJavaBlock, inst.progPost.sub(0),
+                                                      TermLabelManager.instantiateLabels(termLabelState, services, 
+                                                              ruleApp.posInOccurrence(), this,
+                                                              excPostGoal, "ExceptionalPostModality",
+                                                              null, inst.mod,
+                                                              new ImmutableArray<Term>(
+                                                                      inst.progPost.sub(0)),
+                                                              null, excJavaBlock, inst.progPost.getLabels())), null);
+        final Term excPost = globalDefs==null? originalExcPost: tb.apply(globalDefs, originalExcPost);
         excPostGoal.addFormula(new SequentFormula(wellFormedAnon),
                 	       true,
                 	       false);
-        excPostGoal.changeFormula(new SequentFormula(TB.apply(inst.u, excPost, null)),
+        excPostGoal.changeFormula(new SequentFormula(tb.apply(inst.u, excPost, null)),
         	                  ruleApp.posInOccurrence());
         excPostGoal.addFormula(new SequentFormula(excPostAssumption),
         	               true,
@@ -821,23 +951,29 @@ public final class UseOperationContractRule implements BuiltInRule {
         //create "Null Reference" branch
         if(nullGoal != null) {
             final Term actualSelfNotNull
-            	= TB.not(TB.equals(inst.actualSelf, TB.NULL(services)));
-            nullGoal.changeFormula(new SequentFormula(TB.apply(inst.u, actualSelfNotNull, null)),
+            	= tb.not(tb.equals(inst.actualSelf, tb.NULL()));
+            nullGoal.changeFormula(new SequentFormula(tb.apply(inst.u, 
+        					               actualSelfNotNull,
+        					               null)),
         	                   ruleApp.posInOccurrence());
         }
+
+        TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this, nullGoal, null, null);
+
+
 
         //create justification
         final RuleJustificationBySpec just
         	= new RuleJustificationBySpec(contract);
         final ComplexRuleJustificationBySpec cjust
             	= (ComplexRuleJustificationBySpec)
-            	    goal.proof().env().getJustifInfo().getJustification(this);
+            	    goal.proof().getInitConfig().getJustifInfo().getJustification(this);
         cjust.add(ruleApp, just);
         return result;
     }
 
 
-    @Override
+   @Override
     public Name name() {
         return NAME;
     }
@@ -870,6 +1006,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	public final MethodOrConstructorReference mr;
 	public final IProgramMethod pm;
 	public final ImmutableList<Term> actualParams;
+	public final boolean transaction;
 
 	public Instantiation(Term u,
 			     Term progPost,
@@ -879,7 +1016,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 			     KeYJavaType staticType,
 			     MethodOrConstructorReference mr,
 			     IProgramMethod pm,
-			     ImmutableList<Term> actualParams) {
+			     ImmutableList<Term> actualParams,
+			     boolean transaction) {
 	    assert u != null;
 	    assert u.sort() == Sort.UPDATE;
 	    assert progPost != null;
@@ -897,16 +1035,64 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    this.mr = mr;
 	    this.pm = pm;
 	    this.actualParams = actualParams;
+	    this.transaction = transaction;
 	}
     }
 
-
-
-	@Override
     public ContractRuleApp createApp(PosInOccurrence pos) {
+       return createApp(pos, null);
+    }
+
+    @Override
+    public ContractRuleApp createApp(PosInOccurrence pos, TermServices services) {
 		return new ContractRuleApp(this, pos);
     }
 
+   public static Map<LocationVariable, LocationVariable> computeAtPreVars(List<LocationVariable> heapContext, 
+                                                                          TermServices services, 
+                                                                          Instantiation inst) {
+      return HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
+   }
+
+   public static Term computeSelf(Term baseHeapTerm, 
+                                  Map<LocationVariable,Term> atPres, 
+                                  LocationVariable baseHeap, 
+                                  Instantiation inst, 
+                                  Term resultTerm, TermFactory tf) {
+      return OpReplacer.replace(baseHeapTerm,
+                                atPres.get(baseHeap),
+                                inst.pm.isConstructor() ? resultTerm : inst.actualSelf, tf);
+   }
+
+   public static ImmutableList<Term> computeParams(Term baseHeapTerm, 
+                                                   Map<LocationVariable,Term> atPres, 
+                                                   LocationVariable baseHeap, 
+                                                   Instantiation inst,
+                                                   TermFactory tf) {
+      return OpReplacer.replace(baseHeapTerm, atPres.get(baseHeap), inst.actualParams, tf);
+   }
+
+   public static ProgramVariable computeResultVar(Instantiation inst, TermServices services) {
+      final TermBuilder TB = services.getTermBuilder();
+      return inst.pm.isConstructor() ? 
+             TB.selfVar(inst.staticType, true) : 
+             TB.resultVar(inst.pm, true);
+   }
+
+   private static class AnonUpdateData {
+        public final Term assumption, anonUpdate, methodHeap, methodHeapAtPre, anonHeap;
 
 
+        public AnonUpdateData(Term assumption,
+                              Term anonUpdate,
+                              Term methodHeap,
+                              Term methodHeapAtPre,
+                              Term anonHeap) {
+            this.assumption = assumption;
+            this.anonUpdate = anonUpdate;
+            this.methodHeap = methodHeap;
+            this.methodHeapAtPre = methodHeapAtPre;
+            this.anonHeap = anonHeap;
+        }
+    }
 }

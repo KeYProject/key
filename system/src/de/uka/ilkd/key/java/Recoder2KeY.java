@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.java;
 
@@ -47,7 +46,6 @@ import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
@@ -342,9 +340,7 @@ public class Recoder2KeY implements JavaReader {
                     fr = new BufferedReader(new FileReader(filename));
                     cu = servConf.getProgramFactory().parseCompilationUnit(fr);
                 } catch (Exception e) {
-                    throw (ParseException) 
-                       new ParseException("Error in file " + 
-                               filename + ": " + e.getMessage()).initCause(e); 
+                    throw new ParseExceptionInFile(filename, e);
                 } finally {
                     if (fr != null) {
                 	fr.close();
@@ -512,14 +508,8 @@ public class Recoder2KeY implements JavaReader {
                 rcu.setDataLocation(loc);
                 // done by parser : rcu.makeAllParentRolesValid();
                 rcuList.add(rcu);
-            } catch(ParseException ex) {
-                ParseException e2 = new ParseException("Error while parsing " + loc);
-                e2.initCause(ex);
-                throw e2;
-            } catch(Exception ex){
-    	        ConvertException e2 = new ConvertException("While parsing "+loc+"\n"+ex.getMessage());
-                e2.initCause(ex);
-                throw e2;
+            } catch(Exception ex) {
+                throw new ParseExceptionInFile(loc.toString(), ex);
             } finally {        
         	    f.close();
             }

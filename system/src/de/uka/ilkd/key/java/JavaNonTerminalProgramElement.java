@@ -1,17 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.java;
 
@@ -103,19 +101,7 @@ public abstract class JavaNonTerminalProgramElement
     
     @Override    
     public int hashCode(){
-	if (hashCode == 0) {
-	    int result = 17;
-	    result = 37 * result + getChildCount();
-	    for (int i = 0, cc = getChildCount(); i<cc; i++) {
-	        result = 37 * result + getChildAt(i).hashCode();
-	    }
-	    if (result == 0) { 
-		hashCode = 1;
-	    } else {
-		hashCode = result;
-	    }
-	}
-    	return hashCode;
+	return super.hashCode();
     }
     
   
@@ -124,7 +110,7 @@ public abstract class JavaNonTerminalProgramElement
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         
-        Debug.out("Program match start (template, source)", this, src);
+        Debug.out("Program match start (template, source)", this, src); // this.toString().equals("e")
         
         if (src == null) {
             return null;

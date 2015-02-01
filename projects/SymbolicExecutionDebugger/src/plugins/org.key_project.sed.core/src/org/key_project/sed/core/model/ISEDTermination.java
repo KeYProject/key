@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -14,7 +14,6 @@
 package org.key_project.sed.core.model;
 
 import org.eclipse.debug.core.model.IStackFrame;
-import org.eclipse.debug.core.model.ITerminate;
 import org.key_project.sed.core.model.impl.AbstractSEDTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryTermination;
 
@@ -34,6 +33,10 @@ import org.key_project.sed.core.model.memory.SEDMemoryTermination;
  * @author Martin Hentschel
  * @see ISEDDebugNode
  */
-public interface ISEDTermination extends ISEDDebugNode, ITerminate {
-
+public interface ISEDTermination extends ISEDDebugNode, IStackFrame {
+   /**
+    * Checks if this branch is verified.
+    * @return {@code true} verified, {@code false} not verified.
+    */
+   public boolean isVerified();
 }

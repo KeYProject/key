@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -20,8 +20,7 @@ import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -60,21 +59,21 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
         private Term               rhs1;
         private Term               rhs2;
         
-        public ElementaryUpdateWrapper(UpdateableOperator op) {
+        public ElementaryUpdateWrapper(UpdateableOperator op, TermServices services) {
             super();
             this.op = op;
-            Term identity = TermFactory.DEFAULT.createTerm(op);
+            Term identity = services.getTermFactory().createTerm(op);
              
             rhs1 = identity;
             rhs2 = identity;
         }
         
-        public Term createIfElseTerm(Term phi, Services services){
+        public Term createIfElseTerm(Term phi, TermServices services){
             if(rhs1.equals(rhs2)){
-                return TermBuilder.DF.elementary(services, op, rhs1);
+                return services.getTermBuilder().elementary(op, rhs1);
             }
-            Term ifThenElse = TermBuilder.DF.ife(phi, rhs1, rhs2);
-            return TermBuilder.DF.elementary(services,op,ifThenElse);
+            Term ifThenElse = services.getTermBuilder().ife(phi, rhs1, rhs2);
+            return services.getTermBuilder().elementary(op, ifThenElse);
             
         }
         
@@ -112,11 +111,11 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
     }
     
     private void collectSingleTerm(final TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map, 
-            Term update,final boolean firstTerm){
+            Term update,final boolean firstTerm, TermServices services){
                 ElementaryUpdate eu = (ElementaryUpdate) update.op();
                 ElementaryUpdateWrapper euw= null;
                 if(!map.containsKey(eu.lhs())){
-                    euw = new ElementaryUpdateWrapper( eu.lhs());
+                    euw = new ElementaryUpdateWrapper( eu.lhs(), services);
                     map.put(eu.lhs(), euw);
                 }else{
                     euw = map.get(eu.lhs());
@@ -130,8 +129,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     
     private boolean collect(final TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map, 
-                         Term update,final boolean firstTerm
-                         ){
+                         Term update,final boolean firstTerm, TermServices services){
         LinkedList<Term> updates = new LinkedList<Term>();
         TreeSet<UpdateableOperator> collected = createTree();
         updates.add(update);
@@ -150,7 +148,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
                      return false;
                  }
                  collected.add(eu.lhs());
-                 collectSingleTerm(map, next, firstTerm);
+                 collectSingleTerm(map, next, firstTerm, services);
             }else{
                 return false;
             }
@@ -159,23 +157,23 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     }
 
-    private Term simplify(Term phi, Term u1, Term u2, Term t, Services services){
+    private Term simplify(Term phi, Term u1, Term u2, Term t, TermServices services){
 
         TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map = createMap();
         
-        if(!collect(map,u1,true)){
+        if(!collect(map,u1,true, services)){
             
             return null;
         }
-        if(!collect(map,u2,false)){
+        if(!collect(map,u2,false, services)){
             return null;
         }
-        Term result = TermBuilder.DF.skip();
+        Term result = services.getTermBuilder().skip();
         for(ElementaryUpdateWrapper euw : map.values()){
-            result = TermBuilder.DF.parallel(result, euw.createIfElseTerm(phi, services));
+            result = services.getTermBuilder().parallel(result, euw.createIfElseTerm(phi, services));
         }
         
-        result = TermBuilder.DF.apply(result, t, null);
+        result = services.getTermBuilder().apply(result, t, null);
         return result;
     }
     
@@ -196,8 +194,8 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
             return mc;
         }
         
-        u1Inst = u1Inst == null ? TermBuilder.DF.skip() : u1Inst;
-        u2Inst = u2Inst == null ? TermBuilder.DF.skip() : u2Inst;
+        u1Inst = u1Inst == null ? services.getTermBuilder().skip() : u1Inst;
+        u2Inst = u2Inst == null ? services.getTermBuilder().skip() : u2Inst;
 
         Term properResultInst = simplify(phiInst, u1Inst, u2Inst, tInst, services);
         if(properResultInst == null) {

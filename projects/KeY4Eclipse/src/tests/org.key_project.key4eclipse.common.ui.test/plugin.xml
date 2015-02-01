@@ -61,4 +61,19 @@
             name="Second Project Starter">
       </starter>
    </extension>
+   <extension
+         point="org.key_project.key4eclipse.common.ui.proofStarter">
+      <starter
+            class="org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingProofStarter"
+            description="Description of First Proof Starter"
+            id="org.key_project.key4eclipse.common.ui.test.starter.FirstLoggingProofStarterID"
+            name="First Proof Starter">
+      </starter>
+      <starter
+            class="org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingProofStarter"
+            description="Description of Second Proof Starter"
+            id="org.key_project.key4eclipse.common.ui.test.starter.SecondLoggingProofStarterID"
+            name="Second Proof Starter">
+      </starter>
+   </extension>
 </plugin>

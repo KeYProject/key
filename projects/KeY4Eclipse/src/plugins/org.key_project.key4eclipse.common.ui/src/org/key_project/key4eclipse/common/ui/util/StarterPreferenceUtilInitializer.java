@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -18,6 +18,7 @@ import org.key_project.key4eclipse.common.ui.starter.IFileStarter;
 import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
 import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
 import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
+import org.key_project.key4eclipse.common.ui.starter.IProofStarter;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 
@@ -59,5 +60,12 @@ public class StarterPreferenceUtilInitializer extends AbstractPreferenceInitiali
       }
       StarterPreferenceUtil.setDefaultDontAskForProjectStarter(projectStarters.size() == 1);
       StarterPreferenceUtil.setDefaultProjectStarterDisabled(false);
+      // Proof starter
+      ImmutableList<StarterDescription<IProofStarter>> proofStarters = StarterUtil.getProofStarters();
+      if (!proofStarters.isEmpty()) {
+         StarterPreferenceUtil.setDefaultSelectedProofStarterID(proofStarters.head().getId());
+      }
+      StarterPreferenceUtil.setDefaultDontAskForProofStarter(proofStarters.size() == 1);
+      StarterPreferenceUtil.setDefaultProofStarterDisabled(false);
    }
 }

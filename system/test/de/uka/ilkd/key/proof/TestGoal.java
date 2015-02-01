@@ -1,17 +1,20 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.proof;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -20,6 +23,7 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 /** class tests the goal, especially the split and set back mechanism. */
@@ -34,8 +38,7 @@ public class TestGoal extends TestCase {
 
         public void setUp() {
                 TacletForTests.parse();
-                proof = new Proof(new Services(AbstractProfile.getDefaultProfile()));
-
+                proof = new Proof("", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));     
         }
 
         public void tearDown() {
@@ -50,11 +53,16 @@ public class TestGoal extends TestCase {
                                                                                 TacletForTests.parseTerm("A")))
                                                 .semisequent());
 
-                Node root = new Node(proof, seq);
-                proof.setRoot(root);
-                Goal g = new Goal(root, new RuleAppIndex(new TacletAppIndex(
-                                new TacletIndex()), new BuiltInRuleAppIndex(
-                                new BuiltInRuleIndex())));
+                final InitConfig initConfig = new InitConfig(new Services(AbstractProfile.getDefaultProfile()));
+				proof = new Proof("", 
+                                  seq,
+                                  "",
+                                  initConfig.createTacletIndex(),
+                                  initConfig.createBuiltInRuleIndex(),                      
+                                  initConfig);     
+                
+                                
+                Goal g = proof.openGoals().head();//new Goal(proof.root(), new RuleAppIndex(new TacletAppIndex(new TacletIndex(), proof.getServices()), new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));
                 ImmutableList<Goal> lg = g.split(3);
                 lg.head().addNoPosTacletApp(
                                 TacletForTests.getRules().lookup("imp_right"));
@@ -93,7 +101,7 @@ public class TestGoal extends TestCase {
 
         }
 
-        public void testSetBack1() {
+        public void testSetBack1() throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
                 Sequent seq = Sequent
                                 .createSuccSequent(Semisequent.EMPTY_SEMISEQUENT
                                                 .insert(0,
@@ -106,9 +114,11 @@ public class TestGoal extends TestCase {
                                 root,
                                 new RuleAppIndex(
                                                 new TacletAppIndex(
-                                                                new TacletIndex()),
+                                                                new TacletIndex(),
+                                                                proof.getServices()),
                                                 new BuiltInRuleAppIndex(
-                                                                new BuiltInRuleIndex())));
+                                                                new BuiltInRuleIndex()),
+                                                proof.getServices()));
                 ImmutableList<Goal> lg = g.split(3);
                 lg.head().addNoPosTacletApp(
                                 TacletForTests.getRules().lookup("imp_right"));
@@ -144,23 +154,30 @@ public class TestGoal extends TestCase {
                  assertTrue(proof.openGoals().contains(lg1.head()));
                  assertNotNull(lg1.head().indexOfTaclets().lookup("or_right"));
                  //
+                 
+                 // use reflection as method has private access
+                 Method remove = proof.getClass().getDeclaredMethod("remove", 
+                		 Goal.class);
+                 remove.setAccessible(true);
+
                  assertTrue(lg1.head().indexOfTaclets().lookup("or_left")==null);
-                 proof.remove2(lg1.head());
+                 remove.invoke(proof, lg1.head());
 
 
                  assertTrue(proof.openGoals().contains(lg1.tail().head()));
                  assertNotNull(lg1.tail().head().indexOfTaclets().lookup("or_right"));
                  //
                  assertTrue(lg1.tail().head().indexOfTaclets().lookup("or_left")==null);
-                 proof.remove2(lg1.tail().head());
+                 // use reflection as method has private access
+                 remove.invoke(proof, lg1.tail().head());
 
                  if (proof.openGoals().head().indexOfTaclets().lookup("imp_right")!=null) {
                  assertNotNull
                  (proof.openGoals().tail().head().indexOfTaclets().lookup("imp_left"));
                  } else {
-                 assertNotNull
+                 assertNull
                  (proof.openGoals().head().indexOfTaclets().lookup("imp_left"));
-                 assertNotNull
+                 assertNull
                  (proof.openGoals().tail().head().indexOfTaclets().lookup("imp_right"));
                  }
                  assertNull(proof.openGoals().head().indexOfTaclets().lookup("or_left"));

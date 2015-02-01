@@ -6,7 +6,7 @@
       <sourceLocator
             class="org.key_project.sed.key.core.launch.KeYSourceLookupDirector"
             id="org.key_project.sed.key.core.launch.sed.key.sourceLocator"
-            name="Example Source Locator">
+            name="KeY Source Locator">
       </sourceLocator>
    </extension>
    <extension
@@ -42,5 +42,11 @@
             properties="keySedDebugNodeHasExecutionStateNode"
             type="org.key_project.sed.key.core.model.IKeYSEDDebugNode">
       </propertyTester>
+   </extension>
+   <extension
+         point="org.key_project.util.setupParticipants">
+      <participant
+            class="org.key_project.sed.key.core.setup.StrategyPropertiesSetupParticipant">
+      </participant>
    </extension>
 </plugin>

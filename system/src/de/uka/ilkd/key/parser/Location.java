@@ -1,18 +1,19 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.parser;
+
+import org.antlr.runtime.RecognitionException;
 
 
 /** 
@@ -28,11 +29,17 @@ public final class Location {
 
     /* --- constructors --- */
 
-    /** @param filename the filename may be null. */
+    /**
+     * @param filename the filename may be null.
+     */
     public Location(String filename, int line, int column) {
         this.filename = filename;
         this.line = line;
         this.column = column;
+    }
+
+    public Location(RecognitionException re) {
+        this(re.input.getSourceName(), re.line, re.charPositionInLine);
     }
 
 
@@ -52,6 +59,7 @@ public final class Location {
     }
 
     /** Internal string representation. Do not rely on format! */
+    @Override
     public String toString() {
         return "[" + filename + ":" + line + "," + column + "]";
     }

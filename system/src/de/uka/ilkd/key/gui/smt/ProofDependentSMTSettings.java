@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -15,21 +15,20 @@ package de.uka.ilkd.key.gui.smt;
 
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.EventObject;
 import java.util.LinkedHashSet;
 import java.util.Properties;
 
 
 
 
-import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.configuration.SettingsConverter;
-import de.uka.ilkd.key.gui.configuration.SettingsListener;
+import de.uka.ilkd.key.settings.SettingsConverter;
+import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
 
 
-public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configuration.Settings, Cloneable {
+public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Settings, Cloneable {
 	
 
 
@@ -51,7 +50,8 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configurat
         
         private static final String INTEGERS_MAXIMUM = "[SMTSettings]integersMaximum";
         private static final String INTEGERS_MINIMUM = "[SMTSettings]integersMinimum";
-  
+        
+        private static final String INVARIANT_FORALL = "[SMTSettings]invariantForall";
 
         private Collection<SettingsListener> listeners = new LinkedHashSet<SettingsListener>();
 
@@ -60,6 +60,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configurat
         public boolean useBuiltInUniqueness          = false;
         public boolean useUIMultiplication          = true;
         public boolean useConstantsForIntegers     = true;
+        public boolean invariantForall             = false;
         public int     maxGenericSorts               = 2;
         public long    maxInteger                   =2147483645;
         public long    minInteger                   =-2147483645;
@@ -71,9 +72,9 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configurat
         private ProofDependentSMTSettings(){
  
                 supportedTaclets =  SupportedTaclets.REFERENCE;
-        };
+        }
 
-        private ProofDependentSMTSettings(ProofDependentSMTSettings data) {            
+    private ProofDependentSMTSettings(ProofDependentSMTSettings data) {
                 copy(data);                
         }
         
@@ -87,7 +88,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configurat
                 this.useConstantsForIntegers       = data.useConstantsForIntegers; 
                 this.maxInteger                    = data.maxInteger;
                 this.minInteger                    = data.minInteger;
-     
+                this.invariantForall               = data.invariantForall;
              
         }
 
@@ -122,6 +123,8 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configurat
                 maxInteger = SettingsConverter.read(props,INTEGERS_MAXIMUM,maxInteger);
                 minInteger = SettingsConverter.read(props,INTEGERS_MINIMUM,minInteger);
                 
+                invariantForall = SettingsConverter.read(props,INVARIANT_FORALL,invariantForall);
+                
                 supportedTaclets.selectTaclets(SettingsConverter.read(props, TACLET_SELECTION,
                                 supportedTaclets.getNamesOfSelectedTaclets()));
      
@@ -137,12 +140,13 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configurat
                 SettingsConverter.store(props,USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,useConstantsForIntegers);
                 SettingsConverter.store(props,INTEGERS_MAXIMUM,maxInteger);
                 SettingsConverter.store(props,INTEGERS_MINIMUM,minInteger);
+                SettingsConverter.store(props, INVARIANT_FORALL, invariantForall);
         }
         
         
         public void fireSettingsChanged() {
                 for (SettingsListener aListenerList : listeners) {
-                        aListenerList.settingsChanged(new GUIEvent(this));
+                        aListenerList.settingsChanged(new EventObject(this));
                 }
    
         }

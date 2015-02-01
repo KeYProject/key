@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -26,7 +26,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
@@ -42,6 +41,8 @@ import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.ui.view.SymbolicExecutionSettingsView;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
+
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 
 /**
  * SWTBot tests for {@link KeYSourceLookupParticipant}.
@@ -70,7 +71,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             KeYResourceProperties.setClassPathEntries(project, entries);
          }
       };
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             IFolder srcFolder = project.getProject().getFolder("src");
@@ -79,11 +80,12 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             IFile aFile = srcFolder.getFolder("a").getFile("SameName.java");
             IFile aSubFile = srcFolder.getFolder("a").getFolder("sub").getFile("SameName.java");
             IFile bFile = srcFolder.getFolder("b").getFile("SameName.java");
-            IFile cFile = project.getProject().getFolder("boot").getFolder("c").getFile("SameName.java");
-            IFile dFile = project.getProject().getFolder("specs").getFolder("d").getFile("SameName.java");
+            //IFile cFile = project.getProject().getFolder("boot").getFolder("c").getFile("SameName.java");
+            //IFile dFile = project.getProject().getFolder("specs").getFolder("d").getFile("SameName.java");
             List<IFile> expectedResources = new LinkedList<IFile>();
             expectedResources.add(mainFile);
             expectedResources.add(mainFile);
+            expectedResources.add(mainFile);
             expectedResources.add(defaultFile);
             expectedResources.add(defaultFile);
             expectedResources.add(defaultFile);
@@ -100,18 +102,17 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             expectedResources.add(bFile);
             expectedResources.add(bFile);
             expectedResources.add(mainFile);
-            expectedResources.add(cFile);
-            expectedResources.add(cFile);
-            expectedResources.add(cFile);
+            //expectedResources.add(cFile); // API files are not included in symbolic execution tree.
+            //expectedResources.add(cFile); // API files are not included in symbolic execution tree.
+            //expectedResources.add(cFile); // API files are not included in symbolic execution tree.
             expectedResources.add(mainFile);
-            expectedResources.add(dFile);
+            //expectedResources.add(dFile); // API files are not included in symbolic execution tree.
             expectedResources.add(mainFile);
             expectedResources.add(mainFile);
-            // Configure operation contract usage
+            expectedResources.add(mainFile);
+            // Configure method contract usage
             SWTBotView symbolicSettingsView = bot.viewById(SymbolicExecutionSettingsView.VIEW_ID);
-            SWTBotCombo methodTreatmentCombo = symbolicSettingsView.bot().comboBox();
-            assertTrue(methodTreatmentCombo.isEnabled());
-            methodTreatmentCombo.setSelection(SymbolicExecutionSettingsView.METHOD_TREATMENT_CONTRACT);
+            TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.METHOD_TREATMENT_CONTRACT));
             // Get debug target TreeItem
             SWTBotTreeItem launchTreeItem = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select first thread
             // Resume execution
@@ -143,6 +144,10 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
                            Boolean.FALSE, 
                            Boolean.FALSE,
                            Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.TRUE,
                            Boolean.FALSE,
                            14, 
                            executor);

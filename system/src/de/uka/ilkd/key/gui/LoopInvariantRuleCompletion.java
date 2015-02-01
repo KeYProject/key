@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -15,9 +15,9 @@ package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
@@ -38,12 +38,11 @@ public class LoopInvariantRuleCompletion implements
         InteractiveRuleApplicationCompletion {
 
     @Override
-    public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal,
-            boolean forced) {
+    public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
         Services services = goal.proof().getServices();
 
-        LoopInvariantBuiltInRuleApp loopApp = (LoopInvariantBuiltInRuleApp) app
-                .tryToInstantiate(goal);
+        LoopInvariantBuiltInRuleApp loopApp =
+                ((LoopInvariantBuiltInRuleApp) app).tryToInstantiate(goal);
 
         // leading update?
         Term progPost = loopApp.programTerm();
@@ -51,12 +50,18 @@ public class LoopInvariantRuleCompletion implements
 
         LoopInvariant inv = loopApp.getInvariant();
         if (inv == null) { // no invariant present, get it interactively
+            MethodFrame mf = JavaTools.getInnermostMethodFrame(progPost.javaBlock(),
+                                                               services);
             inv = new LoopInvariantImpl(loop,
-                    JavaTools.getInnermostMethodFrame(progPost.javaBlock(),
-                            services) == null ? null : MiscTools
-                                    .getSelfTerm(JavaTools.getInnermostMethodFrame(
-                                            progPost.javaBlock(), services),
-                                            services), null);
+                                        mf == null ?
+                                                null : mf.getProgramMethod(),
+                                        mf == null || mf.getProgramMethod() == null ?
+                                                null : mf.getProgramMethod().getContainerType(),
+                                        mf == null ? null : MiscTools
+                                                .getSelfTerm(JavaTools.getInnermostMethodFrame(
+                                                                progPost.javaBlock(), services),
+                                                             services),
+                                        null);
             try {
                 inv = InvariantConfigurator.getInstance().getLoopInvariant(inv,
                         services, false, loopApp.getHeapContext());
@@ -64,7 +69,7 @@ public class LoopInvariantRuleCompletion implements
                 return null;
             }
         } else { // in interactive mode and there is an invariant in the
-                 // repository            
+            // repository            
             boolean requiresVariant = loopApp.variantRequired()
                     && !loopApp.variantAvailable();
             // Check if a variant is required
@@ -89,7 +94,14 @@ public class LoopInvariantRuleCompletion implements
 
     @Override
     public boolean canComplete(IBuiltInRuleApp app) {
-        return app.rule() instanceof WhileInvariantRule;
+        return checkCanComplete(app);
     }
 
+    /**
+     * Checks if the app is supported. 
+     * This functionality is also used by the Eclipse plug-ins like the KeYIDE.
+     */
+    public static boolean checkCanComplete(final IBuiltInRuleApp app) {
+        return app.rule() instanceof WhileInvariantRule;
+   }
 }

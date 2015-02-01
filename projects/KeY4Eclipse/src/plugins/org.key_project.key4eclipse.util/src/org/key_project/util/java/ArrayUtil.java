@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -92,6 +92,50 @@ public final class ArrayUtil {
    
    /**
     * <p>
+    * Adds the given elements to the existing array. The result is a new
+    * array that contains the other elements in the end.
+    * </p>
+    * <p>
+    * <b>Attention: </b> It is not possible to use this method with
+    * two {@code null} parameters. In this case is an {@link IllegalArgumentException}
+    * thrown.
+    * </p>
+    * @param array The array to add to.
+    * @param toAdd The elements to add.
+    * @param newArrayType The type of the new array.
+    * @return The new created array.
+    * @throws IllegalArgumentException Both parameters are {@code null}.
+    */
+   @SuppressWarnings("unchecked")
+   public static <T> T[] addAll(T[] array, T[] toAdd, Class<?> newArrayType) {
+       if (array != null) {
+           if (toAdd != null) {
+               T[] result = (T[])java.lang.reflect.Array.newInstance(newArrayType, array.length + toAdd.length);
+               System.arraycopy(array, 0, result, 0, array.length);
+               System.arraycopy(toAdd, 0, result, array.length, toAdd.length);
+               return result;
+           }
+           else {
+               T[] result = (T[])java.lang.reflect.Array.newInstance(newArrayType, array.length);
+               System.arraycopy(array, 0, result, 0, array.length);
+               return result;
+           }
+       }
+       else {
+           if (toAdd != null) {
+               T[] result = (T[])java.lang.reflect.Array.newInstance(newArrayType, toAdd.length);
+               System.arraycopy(toAdd, 0, result, 0, toAdd.length);
+               return result;
+           }
+           else {
+              T[] result = (T[])java.lang.reflect.Array.newInstance(newArrayType, 0);
+              return result;
+           }
+       }
+   }
+   
+   /**
+    * <p>
     * Adds the given element to the existing array. The result is a new
     * array that contains one more element.
     * </p>
@@ -143,6 +187,39 @@ public final class ArrayUtil {
        }
        else {
            return new int[] {toAdd};
+       }
+   }
+   
+   /**
+    * <p>
+    * Inserts the given element at the given index to the existing array. 
+    * The result is a new array that contains one more element.
+    * </p>
+    * @param array The array to extend.
+    * @param toInsert The element to insert.
+    * @param index The index to insert the element at.
+    * @return The new created array with one more element.
+    */
+   @SuppressWarnings("unchecked")
+   public static <T> T[] insert(T[] array, T toInsert, int index) {
+       if (array != null) {
+           T[] result = (T[])java.lang.reflect.Array.newInstance(array.getClass().getComponentType(), array.length + 1);
+           if (index >= 1) {
+              System.arraycopy(array, 0, result, 0, index);
+           }
+           result[index] = toInsert;
+           System.arraycopy(array, index, result, index + 1, array.length - index);
+           return result;
+       }
+       else {
+          if (toInsert != null) {
+             T[] result = (T[])java.lang.reflect.Array.newInstance(toInsert.getClass(), 1);
+             result[0] = toInsert;
+             return result;
+         }
+         else {
+             throw new IllegalArgumentException("Can not create an array if array and element to insert are null.");
+         }
        }
    }
 

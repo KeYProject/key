@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof.io;
 
@@ -24,9 +23,10 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
 
+import javax.swing.event.EventListenerList;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -43,8 +43,12 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
+import de.uka.ilkd.key.proof.init.InfFlowCompositePO;
+import de.uka.ilkd.key.proof.init.InfFlowPO;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.event.ProofSaverEvent;
+import de.uka.ilkd.key.proof.io.event.ProofSaverListener;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -56,10 +60,10 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.rule.inst.NameInstantiationEntry;
-import de.uka.ilkd.key.rule.inst.ProgramInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.TermInstantiation;
+import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.settings.StrategySettings;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -68,26 +72,37 @@ import de.uka.ilkd.key.util.MiscTools;
  */
 public class ProofSaver {
 
-   //protected IMain main;
-   //protected KeYMediator mediator;
    final protected String filename;
-   final protected Proof proof;
+   protected Proof proof;
    final protected String internalVersion;
-   
+   public static final String PROOF_SUBDIRECTORY = "/proof";
+
    LogicPrinter printer;
+
+   /**
+    * <p>
+    * Contains all listener. 
+    * </p>
+    * <p>
+    * They are used for instance by the Eclipse integration to refresh the
+    * workspace when a proof file was saved.
+    * </p>.
+    */
+   private static final EventListenerList listeners = new EventListenerList();
    
    public ProofSaver(Proof proof, String filename, String internalVersion) {
-      //this.main = main;
-      //this.mediator = main.mediator();
       this.filename = filename;
-      this.proof = proof;//mediator.getSelectedProof();
+      this.proof = proof;
       this.internalVersion = internalVersion;
-      
+   }
+
+   public void setProof(Proof p) {
+       proof = p;
    }
 
    public StringBuffer writeLog(Proof p){
     StringBuffer logstr=new StringBuffer();
-    //Advance the Logentries
+    //Advance the Log entries
     if(p.userLog==null)
         p.userLog = new Vector<String>();
     if(p.keyVersionLog==null)
@@ -110,33 +125,61 @@ public class ProofSaver {
    public String writeSettings(ProofSettings ps){
     	return "\\settings {\n\""+escapeCharacters(ps.settingsToString())+"\"\n}\n";
    }
-   
+
    public String save() throws IOException {
-      return save(new FileOutputStream(filename));
+      String errorMsg = save(new FileOutputStream(filename));
+      fireProofSaved(new ProofSaverEvent(this, filename, errorMsg));
+      return errorMsg;
    }
-   
+
    public String save(OutputStream out) throws IOException {
       String errorMsg = null;
       PrintWriter ps = null;
       
       try {
           ps = new PrintWriter(out, true);
+          final ProofOblInput po =
+                  proof.getServices().getSpecificationRepository().getProofOblInput(proof);
           printer = createLogicPrinter(proof.getServices(), false);
-          
+
           //profile
           ps.println(writeProfile(proof.getServices().getProfile()));
           
           //settings
+          final StrategySettings strategySettings = proof.getSettings().getStrategySettings();
+          final StrategyProperties strategyProperties = strategySettings.getActiveStrategyProperties();
+          if (po instanceof InfFlowPO
+                  && (po instanceof InfFlowCompositePO || !proof.getIFSymbols().isFreshContract())) {
+              strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
+                                     StrategyProperties.INF_FLOW_CHECK_TRUE);
+              strategySettings.setActiveStrategyProperties(strategyProperties);
+              for (SequentFormula s: proof.root().sequent().succedent().toList()) {
+                  proof.addLabeledTotalTerm(s.formula());
+              }
+          } else {
+              strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
+                                     StrategyProperties.INF_FLOW_CHECK_FALSE);
+              strategySettings.setActiveStrategyProperties(strategyProperties);
+          }
           ps.println(writeSettings(proof.getSettings()));
-          
+
+          if (po instanceof InfFlowPO
+                  && (po instanceof InfFlowCompositePO || !proof.getIFSymbols().isFreshContract())) {
+              strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
+                                     StrategyProperties.INF_FLOW_CHECK_FALSE);
+              strategySettings.setActiveStrategyProperties(strategyProperties);
+          }
+
           //declarations of symbols, sorts
           String header = proof.header();
           header = makePathsRelative(header);
           ps.print(header);
 
           //\problem or \proofObligation
-          ProofOblInput po = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-          if(po instanceof IPersistablePO) {
+          if(po instanceof IPersistablePO &&
+                  (!(po instanceof InfFlowPO)
+                          || (!(po instanceof InfFlowCompositePO)
+                                  && proof.getIFSymbols().isFreshContract()))) {
               Properties properties = new Properties();
               ((IPersistablePO)po).fillSaveProperties(properties);
               StringWriter writer = new StringWriter();
@@ -148,7 +191,14 @@ public class ProofSaver {
                 writer.close();
               }
           } else {
-              Sequent problemSeq = proof.root().sequent();
+              if (po instanceof InfFlowPO
+                      && (po instanceof InfFlowCompositePO
+                              || !proof.getIFSymbols().isFreshContract())) {
+                  Properties properties = new Properties();
+                  ((IPersistablePO)po).fillSaveProperties(properties);
+                  ps.print(proof.printIFSymbols());
+              }
+              final Sequent problemSeq = proof.root().sequent();
               ps.println("\\problem {");
               printer.printSemisequent(problemSeq.succedent());
               ps.println(printer.result());
@@ -173,15 +223,11 @@ public class ProofSaver {
           errorMsg = e.toString();
           e.printStackTrace();
       } finally {
-          //try {
 	      if (out != null) out.close();
 	      if (ps != null) {
 		  ps.flush();
 		  ps.close();
-	      }
-          //} catch (IOException ioe) {
-	    //  mediator.notify(new GeneralFailureEvent(ioe.toString()));
-          //}          
+	      }      
       }	  
       return errorMsg; // null if success
    }
@@ -218,8 +264,8 @@ public class ProofSaver {
 
                    // add new relative path
                    final String absPath = tmp.substring(k,j);
-                   final String relPath = MiscTools.makeFilenameRelative(absPath, basePath);
-                   relPathString = relPathString+" \"" + relPath +"\"";
+                   final String relPath = tryToMakeFilenameRelative(absPath, basePath);
+                   relPathString = relPathString+" \"" + escapeCharacters(relPath) +"\"";
                    i = j+1;
                }
                tmp2 = tmp2 + s + relPathString + ";";
@@ -231,6 +277,19 @@ public class ProofSaver {
            e.printStackTrace();
        }
        return tmp;
+   }
+   
+   /**
+    * Try to create a relative path, but return the absolute path
+    * if a relative path cannot be found.
+    * This may happen on Windows systems (bug #1480).
+    */
+   private static String tryToMakeFilenameRelative(String absPath, String basePath) {
+       try {
+           return MiscTools.makeFilenameRelative(absPath, basePath);
+       } catch (RuntimeException e) {
+           return absPath;
+       }
    }
 
     private String newNames2Proof(Node n) {
@@ -281,7 +340,7 @@ public class ProofSaver {
          userInteraction2Proof(node, tree);
          tree.append(")\n");
       }      
-        
+
       if (appliedRuleApp instanceof IBuiltInRuleApp) {
         tree.append(prefix); 
       	tree.append("(builtin \"");
@@ -289,6 +348,7 @@ public class ProofSaver {
       	tree.append("\"");        
         tree.append(posInOccurrence2Proof(node.sequent(), 
                                           appliedRuleApp.posInOccurrence()));
+                
         tree.append(newNames2Proof(node));
         tree.append(builtinRuleIfInsts(node, 
         	                       ((IBuiltInRuleApp)appliedRuleApp).ifInsts()));
@@ -296,13 +356,13 @@ public class ProofSaver {
         if (appliedRuleApp.rule() instanceof UseOperationContractRule 
             || appliedRuleApp.rule() instanceof UseDependencyContractRule) {
             RuleJustification ruleJusti = 
-                            proof.env().getJustifInfo()
+                            proof.getInitConfig().getJustifInfo()
                                        .getJustification(appliedRuleApp, 
                                                          proof.getServices());
-            
+
             assert ruleJusti instanceof RuleJustificationBySpec : 
                 "Please consult bug #1111 if this fails.";
-            
+
             RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
             tree.append(" (contract \"");
             tree.append(ruleJustiBySpec.getSpec().getName());
@@ -315,7 +375,7 @@ public class ProofSaver {
 
 
    private StringBuffer collectProof(Node node, String prefix, 
-                                     StringBuffer tree) {       
+                                     StringBuffer tree) {
 
       printSingleNode(node, prefix, tree);
       Iterator<Node> childrenIt = null;
@@ -325,7 +385,6 @@ public class ProofSaver {
           node = childrenIt.next();
           printSingleNode(node, prefix, tree);
       }
-
 
       if (node.childrenCount() == 0) return tree;
 
@@ -351,7 +410,7 @@ public class ProofSaver {
       return tree;
    }
 
-  
+
    private void userInteraction2Proof(Node node, StringBuffer tree) {
        if (node.getNodeInfo().getInteractiveRuleApplication()) 
            tree.append(" (userinteraction)");
@@ -365,65 +424,51 @@ public class ProofSaver {
    }
 
 
-    public String posInOccurrence2Proof(Sequent seq, PosInOccurrence pos) {
+    public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence pos) {
         if (pos == null) return "";
         return " (formula \""+seq.formulaNumberInSequent(pos.isInAntec(),
                 pos.constrainedFormula())+"\")"+
                 posInTerm2Proof(pos.posInTerm());
     }
 
-   
 
-   public String posInTerm2Proof(PosInTerm pos) {
-      if (pos == PosInTerm.TOP_LEVEL) return "";
+   public static String posInTerm2Proof(PosInTerm pos) {
+      if (pos == PosInTerm.getTopLevel()) return "";
       String s = " (term \"";
       String list = pos.integerList(pos.reverseIterator()); // cheaper to read in
       s = s + list.substring(1,list.length()-1); // chop off "[" and "]"
       s = s + "\")";
       return s;
    }
-   
-   
 
 
    public String getInteresting(SVInstantiations inst) {
 //System.err.println(inst);   
       String s = "";
-      Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> pairIt =
+      Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> pairIt =
          inst.interesting().entryIterator();
 
       while (pairIt.hasNext()) {
-         ImmutableMapEntry<SchemaVariable,InstantiationEntry> pair = pairIt.next();
+         ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> pair = pairIt.next();
          SchemaVariable var = pair.key();
 	 
-         String singleInstantiation = var.name()+ "="; 
-	 Object value = pair.value();
-	 if (value instanceof TermInstantiation) {
-	     singleInstantiation += printTerm(((TermInstantiation) value).getTerm(), 
-	                    proof.getServices());
-	 }
-         else
-	 if (value instanceof ProgramInstantiation) {
-	     ProgramElement pe = 
-		 ((ProgramInstantiation) value).getProgramElement();
-	     singleInstantiation += printProgramElement(pe);
-	 }
-         else
-	 if (value instanceof NameInstantiationEntry) {
-	     singleInstantiation += ((NameInstantiationEntry) value).getInstantiation();
-	 }
-         else 
-             throw new RuntimeException("Saving failed.\n"+
-           "FIXME: Unhandled instantiation type: " +  value.getClass());
+         final Object value = pair.value().getInstantiation();
 	 
-	 singleInstantiation = escapeCharacters(singleInstantiation);
+         if (!(value instanceof Term || value instanceof ProgramElement || value instanceof Name)) {
+             throw new RuntimeException("Saving failed.\n"+
+                         "FIXME: Unhandled instantiation type: " +  value.getClass());
+         }
+
+         StringBuffer singleInstantiation =
+                 new StringBuffer(var.name().toString()).
+                    append("=").append(printAnything(value, proof.getServices(), false));
 	
-	 s += " (inst \"" + singleInstantiation + "\")";
+	 s += " (inst \"" + escapeCharacters(singleInstantiation.toString()) + "\")";
       }
       
       return s;
    }
-   
+
 
    public String ifFormulaInsts(Node node, ImmutableList<IfFormulaInstantiation> l) {
       String s ="";
@@ -446,8 +491,8 @@ public class ProofSaver {
       
         return s;
     }
-   
-   
+
+
    public String builtinRuleIfInsts(Node node, 
 	   			    ImmutableList<PosInOccurrence> ifInsts) {
        String s = "";
@@ -477,13 +522,13 @@ public class ProofSaver {
 	return result;
     }
 
-    public static String printProgramElement(ProgramElement pe) {
+    public static StringBuffer printProgramElement(ProgramElement pe) {
         java.io.StringWriter sw = new java.io.StringWriter();
         ProgramPrinter prgPrinter = new ProgramPrinter(sw);
         try{
             pe.prettyPrint(prgPrinter);
         } catch(IOException ioe) {System.err.println(ioe);}
-        return sw.toString();
+        return sw.getBuffer();
     }
 
 
@@ -507,32 +552,36 @@ public class ProofSaver {
         return result;
     }
 
-
     public static String printAnything(Object val, Services services) {
+        return printAnything(val, services, true).toString();
+    }
+
+    public static StringBuffer printAnything(Object val, Services services, boolean shortAttrNotation) {
         if (val instanceof ProgramElement) {
             return printProgramElement((ProgramElement) val);
         }
         else
             if (val instanceof Term) {
-                return printTerm((Term) val, services, true).toString();
-            }
-            else if (val instanceof Sequent) {
+                return printTerm((Term) val, services, shortAttrNotation);
+            } else if (val instanceof Sequent) {
                 return printSequent((Sequent) val, services);
+            } else if (val instanceof Name) {
+                return new StringBuffer(val.toString());
             } else if (val==null){
                     return null;
             }
             else {
                 System.err.println("Don't know how to prettyprint "+val.getClass());
                 // try to String by chance
-                return val.toString();
+                return new StringBuffer(val.toString());
             }
     }
 
 
-    private static String printSequent(Sequent val, Services services) {
+    private static StringBuffer printSequent(Sequent val, Services services) {
         LogicPrinter printer = createLogicPrinter(services, services == null);
         printer.printSequent(val);
-        return printer.toString();
+        return printer.result();
     }
 
     private static LogicPrinter createLogicPrinter(Services serv, 
@@ -543,5 +592,36 @@ public class ProofSaver {
 
         p =  new LogicPrinter(new ProgramPrinter(null), ni, (shortAttrNotation ? serv : null), true);
         return p;
+    }
+    
+    /**
+     * Adds the {@link ProofSaverListener}.
+     * @param l The {@link ProofSaverListener} to add.
+     */
+    public static void addProofSaverListener(ProofSaverListener l) {
+       if (l != null) {
+          listeners.add(ProofSaverListener.class, l);
+       }
+    }
+    
+    /**
+     * Removes the {@link ProofSaverListener}.
+     * @param l The {@link ProofSaverListener} to remove.
+     */
+    public static void removeProofSaverListener(ProofSaverListener l) {
+       if (l != null) {
+          listeners.remove(ProofSaverListener.class, l);
+       }
+    }
+    
+    /**
+     * Informs all listener about the event {@link ProofSaverListener#proofSaved(ProofSaverEvent)}.
+     * @param e The event.
+     */
+    protected static void fireProofSaved(ProofSaverEvent e) {
+       ProofSaverListener[] toInform = listeners.getListeners(ProofSaverListener.class);
+       for (ProofSaverListener l : toInform) {
+          l.proofSaved(e);
+       }
     }
 }

@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.gui.nodeviews;
 
@@ -33,9 +32,8 @@ import javax.swing.JPopupMenu;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -44,6 +42,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
  * <p>
@@ -96,24 +95,22 @@ public class DragNDropInstantiator extends DropTargetAdapter {
 
         try {
             Transferable transferable = event.getTransferable();
-            if (transferable
-                    .isDataFlavorSupported(PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER)) {
-                interpreteDragAndDropInstantiation(event, dropLocation,
-                        transferable);
-            } else if (transferable
-	                    .isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-	        	try {
-	                	event.acceptDrop(event.getSourceActions());
-	        	List files = (List) transferable.getTransferData(DataFlavor.javaFileListFlavor);
-	        	for (Iterator i = files.iterator(); i.hasNext(); ) {
-	        	    File f = (File) i.next();
-	        	    MainWindow.getInstance().loadProblem(f);
-	        	}
-	        	event.dropComplete(true);
-	        	}
-	        	catch (ClassCastException ex) {
-	        	    event.rejectDrop();
-	        	}
+            if (transferable.isDataFlavorSupported(PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER)) {
+                interpreteDragAndDropInstantiation(event, dropLocation, transferable);
+            } else if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                try {
+                    event.acceptDrop(event.getSourceActions());
+                    List<?> files =
+                            (List<?>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+                    for (Iterator<?> i = files.iterator(); i.hasNext(); ) {
+                        File f = (File) i.next();
+                        MainWindow.getInstance().loadProblem(f);
+                    }
+                    event.dropComplete(true);
+                }
+                catch (ClassCastException ex) {
+                    event.rejectDrop();
+                }
             } else {
                 event.rejectDrop();
             }
@@ -162,7 +159,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                
         
         if (applicableApps.isEmpty() && !targetPos.isSequent() &&
-                targetPos.getPosInOccurrence().posInTerm() != PosInTerm.TOP_LEVEL) {
+                targetPos.getPosInOccurrence().posInTerm() != PosInTerm.getTopLevel()) {
             // if no applicable taclet is found we relax the target position a bit
             applicableApps = 
                 getAllApplicableApps(sourcePos, 
@@ -183,7 +180,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             // open a pop up menu for user selection
             SimpleTacletSelectionMenu menu = new SimpleTacletSelectionMenu(
                     applicableApps, seqView.getMediator().getNotationInfo(),
-                    new PopupListener());
+                    new PopupListener(), services);
 
             JPopupMenu pm = menu.getPopupMenu();
             pm.show(seqView, (int) dropLocation.getX(), (int) dropLocation
@@ -683,4 +680,3 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         }
     }
 }
-

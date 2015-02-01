@@ -1,23 +1,30 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.logic.FormulaChangeInfo;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.QueryExpand;
+import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 
 public class BuiltInRuleAppIndex {
@@ -51,7 +58,7 @@ public class BuiltInRuleAppIndex {
         for (BuiltInRule builtInRule : index.rules()) {
             BuiltInRule bir = builtInRule;
             if (bir.isApplicable(goal, pos)) {
-                IBuiltInRuleApp app = bir.createApp(pos);
+                IBuiltInRuleApp app = bir.createApp(pos, goal.proof().getServices());
                 result = result.prepend(app);
             }
         }
@@ -85,16 +92,14 @@ public class BuiltInRuleAppIndex {
     private void scanSimplificationRule ( Goal       goal,
 					  NewRuleListener listener ) {
         for (BuiltInRule builtInRule : index.rules()) {
-            final BuiltInRule bir = builtInRule;
-            
-            if(bir.isApplicable(goal, null)) {
-                IBuiltInRuleApp app = bir.createApp( null );                            
+            if(builtInRule.isApplicable(goal, null)) {
+                IBuiltInRuleApp app = builtInRule.createApp( null, goal.proof().getServices() );                            
                 listener.ruleAdded ( app, null );
             }
             
             
-            scanSimplificationRule(bir, goal, false, listener);
-            scanSimplificationRule(bir, goal, true, listener);
+            scanSimplificationRule(builtInRule, goal, false, listener);
+            scanSimplificationRule(builtInRule, goal, true, listener);
         }
     }
 
@@ -113,18 +118,18 @@ public class BuiltInRuleAppIndex {
         }
     }
 
-
     private void scanSimplificationRule ( BuiltInRule rule, 
                                           Goal goal, 
                                           boolean antec, 
                                           SequentFormula cfma, 
                                           NewRuleListener listener ) {
-        final PosInOccurrence    pos = new PosInOccurrence 
-		( cfma, PosInTerm.TOP_LEVEL, antec );
-        if(rule instanceof UseDependencyContractRule || rule instanceof QueryExpand || rule instanceof QuerySideProofRule) {//HACK
+        final PosInOccurrence pos = new PosInOccurrence( cfma, PosInTerm.getTopLevel(), antec );
+        if(rule instanceof UseDependencyContractRule
+                || rule instanceof QueryExpand
+                || rule instanceof QuerySideProofRule) {//HACK
             scanSimplificationRule(rule, goal, pos, listener);
         } else if (rule.isApplicable ( goal, pos ) ) {
-            IBuiltInRuleApp app = rule.createApp( pos );                            
+            IBuiltInRuleApp app = rule.createApp( pos, goal.proof().getServices() );
             listener.ruleAdded ( app, pos );
         }
     }
@@ -135,7 +140,7 @@ public class BuiltInRuleAppIndex {
                                           PosInOccurrence pos,
                                           NewRuleListener listener ) {
         if (rule.isApplicable ( goal, pos ) ) {
-            IBuiltInRuleApp app = rule.createApp( pos );                            
+            IBuiltInRuleApp app = rule.createApp( pos, goal.proof().getServices() );                            
             listener.ruleAdded ( app, pos );
         }
         for(int i = 0, n = pos.subTerm().arity(); i < n; i++) {

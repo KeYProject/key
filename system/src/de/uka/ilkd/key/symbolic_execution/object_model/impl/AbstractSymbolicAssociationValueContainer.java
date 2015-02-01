@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -17,6 +17,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociationValueContainer;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
@@ -27,7 +28,7 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
  * Default implementation of {@link ISymbolicAssociationValueContainer}.
  * @author Martin Hentschel
  */
-public abstract class AbstractSymbolicAssociationValueContainer implements ISymbolicAssociationValueContainer {
+public abstract class AbstractSymbolicAssociationValueContainer extends AbstractElement implements ISymbolicAssociationValueContainer {
    /**
     * The contained {@link ISymbolicAssociation}s.
     */
@@ -37,6 +38,14 @@ public abstract class AbstractSymbolicAssociationValueContainer implements ISymb
     * The contained {@link ISymbolicValue}s.
     */
    private ImmutableList<ISymbolicValue> values = ImmutableSLList.nil();
+
+   /**
+    * Constructor.
+    * @param settings The {@link IModelSettings} to use.
+    */
+   public AbstractSymbolicAssociationValueContainer(IModelSettings settings) {
+      super(settings);
+   }
 
    /**
     * {@inheritDoc}
@@ -60,15 +69,15 @@ public abstract class AbstractSymbolicAssociationValueContainer implements ISymb
    @Override
    public ISymbolicAssociation getAssociation(final IProgramVariable programVariable, 
                                               final boolean isArrayIndex, 
-                                              final int arrayIndex,
+                                              final Term arrayIndex,
                                               final Term condition) {
       return JavaUtil.search(associations, new IFilter<ISymbolicAssociation>() {
          @Override
          public boolean select(ISymbolicAssociation element) {
             return element.getProgramVariable() == programVariable &&
                    element.isArrayIndex() == isArrayIndex &&
-                   element.getArrayIndex() == arrayIndex &&
-                   element.getCondition() == condition;
+                   JavaUtil.equals(element.getArrayIndex(), arrayIndex)  &&
+                   JavaUtil.equals(element.getCondition(), condition);
          }
       });
    }
@@ -95,15 +104,15 @@ public abstract class AbstractSymbolicAssociationValueContainer implements ISymb
    @Override
    public ISymbolicValue getValue(final IProgramVariable programVariable, 
                                   final boolean isArrayIndex, 
-                                  final int arrayIndex,
+                                  final Term arrayIndex,
                                   final Term condition) {
       return JavaUtil.search(values, new IFilter<ISymbolicValue>() {
          @Override
          public boolean select(ISymbolicValue element) {
             return element.getProgramVariable() == programVariable &&
                    element.isArrayIndex() == isArrayIndex &&
-                   element.getArrayIndex() == arrayIndex &&
-                   element.getCondition() == condition;
+                   JavaUtil.equals(element.getArrayIndex(), arrayIndex)  &&
+                   JavaUtil.equals(element.getCondition(), condition);
          }
       });
    }

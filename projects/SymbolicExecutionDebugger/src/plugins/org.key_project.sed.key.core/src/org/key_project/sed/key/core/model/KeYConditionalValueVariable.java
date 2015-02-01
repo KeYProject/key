@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -15,6 +15,7 @@ package org.key_project.sed.key.core.model;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IValue;
 import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDVariable;
@@ -35,7 +36,7 @@ public class KeYConditionalValueVariable extends AbstractSEDVariable {
    /**
     * The conditional {@link IExecutionValue} to represent in debug model.
     */
-   private IExecutionValue executionValue;
+   private final IExecutionValue executionValue;
    
    /**
     * The contained {@link IValue}.
@@ -45,10 +46,11 @@ public class KeYConditionalValueVariable extends AbstractSEDVariable {
    /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this element is contained.
+    * @param stackFrame The parent {@link IStackFrame} in which this {@link ISEDVariable} is shown.
     * @param executionValue The conditional {@link IExecutionValue} to represent in debug model.
     */
-   public KeYConditionalValueVariable(KeYDebugTarget target, IExecutionValue executionValue) {
-      super(target);
+   public KeYConditionalValueVariable(KeYDebugTarget target, IStackFrame stackFrame, IExecutionValue executionValue) {
+      super(target, stackFrame);
       Assert.isNotNull(executionValue);
       this.executionValue = executionValue;
    }
@@ -103,7 +105,7 @@ public class KeYConditionalValueVariable extends AbstractSEDVariable {
    public IValue getValue() throws DebugException {
       synchronized (this) {
          if (value == null) {
-            value = new KeYValue(getDebugTarget(), executionValue);
+            value = new KeYValue(getDebugTarget(), this, executionValue);
          }
          return value;
       }

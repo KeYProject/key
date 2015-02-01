@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.logic;
 
 import java.io.File;
@@ -12,11 +25,13 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 public class TestTermBuilder extends TestCase {
 
     private Services services;
+    private TermBuilder tb;
     
     public void setUp() {
         HelperClassForTests helper =  new HelperClassForTests();
         final ProofAggregate agg = helper.parse(new File(TestJavaInfo.testfile));
         services = agg.getFirstProof().getServices();
+        tb = services.getTermBuilder(); 
     }
     
     
@@ -49,7 +64,7 @@ public class TestTermBuilder extends TestCase {
                {9,2,2,3,3,7,2,0,3,6,8,5,4,7,7,5,8,0,8}               
        };
        for (int i = 0; i<numbers.length; i++) {
-           checkDigits(TermBuilder.DF.zTerm(services, numbers[i]), 
+           checkDigits(tb.zTerm(numbers[i]), 
                    expected[i], services.getTypeConverter().getIntegerLDT(), false);
        }
     }
@@ -63,7 +78,7 @@ public class TestTermBuilder extends TestCase {
                 {9,2,2,3,3,7,2,0,3,6,8,5,4,7,7,5,8,0,7}               
         };
         for (int i = 0; i<numbers.length; i++) {
-            checkDigits(TermBuilder.DF.zTerm(services, numbers[i]), 
+            checkDigits(tb.zTerm(numbers[i]), 
                     expected[i], services.getTypeConverter().getIntegerLDT(), true);
         }        
     }
@@ -75,7 +90,7 @@ public class TestTermBuilder extends TestCase {
                 9,2,6,1,3,4,9,6,1,2,7,4,6,9,8,7,1,2,6,4,3,2,6,1,4,8,9,7,6,2,8,9,7,3,6,4
                 };               
         
-        checkDigits(TermBuilder.DF.zTerm(services, number), expected, services.getTypeConverter().getIntegerLDT(), true);
+        checkDigits(tb.zTerm(number), expected, services.getTypeConverter().getIntegerLDT(), true);
     }
     
 
@@ -85,7 +100,7 @@ public class TestTermBuilder extends TestCase {
                 1,6,5,7,6,1,5,2,3,7,6,5,2,4,2,3,1,8,6,4,9,3,6,7,4,9,6,2,1,4,3,6,
                 9,2,6,1,3,4,9,6,1,2,7,4,6,9,8,7,1,2,6,4,3,2,6,1,4,8,9,7,6,2,8,9,7,3,6,4
                 };               
-        checkDigits(TermBuilder.DF.zTerm(services, number), expected, services.getTypeConverter().getIntegerLDT(), false);
+        checkDigits(tb.zTerm(number), expected, services.getTypeConverter().getIntegerLDT(), false);
     }
 
     

@@ -1,41 +1,40 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.util.LRUCache;
 
 public abstract class AbstractMonomialSmallerThanFeature
                                          extends SmallerThanFeature {
     
     private static final Name newSymRuleSetName = new Name ( "polySimp_newSmallSym" );
-    private static final LRUCache<Operator, Integer> introductionTimeCache = 
-        new LRUCache<Operator, Integer> ( 10000 );
     private final Function add, mul, Z;
 
     private Goal currentGoal = null;
@@ -46,12 +45,12 @@ public abstract class AbstractMonomialSmallerThanFeature
         this.Z = numbers.getNumberSymbol ();
     }
 
-    protected int introductionTime(Operator op) {
+    protected int introductionTime(Operator op, ServiceCaches caches) {
         if ( op == add || op == mul || op == Z ) return -1;
-        Integer res = introductionTimeCache.get ( op );
+        Integer res = caches.getIntroductionTimeCache().get ( op );
         if ( res == null ) {
             res = Integer.valueOf ( introductionTimeHelp ( op ) );
-            introductionTimeCache.put ( op, res );
+            caches.getIntroductionTimeCache().put ( op, res );
         }
         return res.intValue ();
     }
@@ -75,10 +74,10 @@ public abstract class AbstractMonomialSmallerThanFeature
     }
 
     private boolean introducesSkolemSymbol(TacletApp tapp, Operator op) {
-        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it =
+        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it =
             tapp.instantiations().pairIterator();
         while ( it.hasNext () ) {
-            final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry = it.next ();
+            final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> entry = it.next ();
             if ( !(entry.key () instanceof SkolemTermSV) ) continue;
             if ( op == ( (Term)entry.value ().getInstantiation () ).op () )
                 return true;

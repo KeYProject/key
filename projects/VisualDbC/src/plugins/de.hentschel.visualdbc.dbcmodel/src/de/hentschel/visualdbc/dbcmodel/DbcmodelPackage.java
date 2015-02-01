@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -696,13 +696,22 @@ public interface DbcmodelPackage extends EPackage {
    int ABSTRACT_DBC_CLASS__IMPLEMENTS = ABSTRACT_DBC_INTERFACE_FEATURE_COUNT + 1;
 
    /**
+    * The feature id for the '<em><b>Implements Full Names</b></em>' attribute list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int ABSTRACT_DBC_CLASS__IMPLEMENTS_FULL_NAMES = ABSTRACT_DBC_INTERFACE_FEATURE_COUNT + 2;
+
+   /**
     * The number of structural features of the '<em>Abstract Dbc Class</em>' class.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_CLASS_FEATURE_COUNT = ABSTRACT_DBC_INTERFACE_FEATURE_COUNT + 2;
+   int ABSTRACT_DBC_CLASS_FEATURE_COUNT = ABSTRACT_DBC_INTERFACE_FEATURE_COUNT + 3;
 
    /**
     * The feature id for the '<em><b>Proofs</b></em>' containment reference list.
@@ -831,6 +840,15 @@ public interface DbcmodelPackage extends EPackage {
    int DBC_CLASS__IMPLEMENTS = ABSTRACT_DBC_CLASS__IMPLEMENTS;
 
    /**
+    * The feature id for the '<em><b>Implements Full Names</b></em>' attribute list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DBC_CLASS__IMPLEMENTS_FULL_NAMES = ABSTRACT_DBC_CLASS__IMPLEMENTS_FULL_NAMES;
+
+   /**
     * The feature id for the '<em><b>Abstract</b></em>' attribute.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -867,13 +885,22 @@ public interface DbcmodelPackage extends EPackage {
    int DBC_CLASS__ANONYMOUS = ABSTRACT_DBC_CLASS_FEATURE_COUNT + 3;
 
    /**
+    * The feature id for the '<em><b>Extends Full Names</b></em>' attribute list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DBC_CLASS__EXTENDS_FULL_NAMES = ABSTRACT_DBC_CLASS_FEATURE_COUNT + 4;
+
+   /**
     * The number of structural features of the '<em>Dbc Class</em>' class.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int DBC_CLASS_FEATURE_COUNT = ABSTRACT_DBC_CLASS_FEATURE_COUNT + 4;
+   int DBC_CLASS_FEATURE_COUNT = ABSTRACT_DBC_CLASS_FEATURE_COUNT + 5;
 
    /**
     * The meta object id for the '{@link de.hentschel.visualdbc.dbcmodel.impl.DbcMethodImpl <em>Dbc Method</em>}' class.
@@ -1629,13 +1656,22 @@ public interface DbcmodelPackage extends EPackage {
    int DBC_INTERFACE__EXTENDS = ABSTRACT_DBC_INTERFACE_FEATURE_COUNT + 0;
 
    /**
+    * The feature id for the '<em><b>Extends Full Names</b></em>' attribute list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DBC_INTERFACE__EXTENDS_FULL_NAMES = ABSTRACT_DBC_INTERFACE_FEATURE_COUNT + 1;
+
+   /**
     * The number of structural features of the '<em>Dbc Interface</em>' class.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int DBC_INTERFACE_FEATURE_COUNT = ABSTRACT_DBC_INTERFACE_FEATURE_COUNT + 1;
+   int DBC_INTERFACE_FEATURE_COUNT = ABSTRACT_DBC_INTERFACE_FEATURE_COUNT + 2;
 
    /**
     * The feature id for the '<em><b>Proofs</b></em>' containment reference list.
@@ -1762,6 +1798,15 @@ public interface DbcmodelPackage extends EPackage {
     * @ordered
     */
    int ABSTRACT_DBC_ENUM__IMPLEMENTS = ABSTRACT_DBC_CLASS__IMPLEMENTS;
+
+   /**
+    * The feature id for the '<em><b>Implements Full Names</b></em>' attribute list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int ABSTRACT_DBC_ENUM__IMPLEMENTS_FULL_NAMES = ABSTRACT_DBC_CLASS__IMPLEMENTS_FULL_NAMES;
 
    /**
     * The feature id for the '<em><b>Literals</b></em>' containment reference list.
@@ -1906,6 +1951,15 @@ public interface DbcmodelPackage extends EPackage {
     * @ordered
     */
    int DBC_ENUM__IMPLEMENTS = ABSTRACT_DBC_ENUM__IMPLEMENTS;
+
+   /**
+    * The feature id for the '<em><b>Implements Full Names</b></em>' attribute list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DBC_ENUM__IMPLEMENTS_FULL_NAMES = ABSTRACT_DBC_ENUM__IMPLEMENTS_FULL_NAMES;
 
    /**
     * The feature id for the '<em><b>Literals</b></em>' containment reference list.
@@ -2391,6 +2445,17 @@ public interface DbcmodelPackage extends EPackage {
    EAttribute getDbcClass_Anonymous();
 
    /**
+    * Returns the meta object for the attribute list '{@link de.hentschel.visualdbc.dbcmodel.DbcClass#getExtendsFullNames <em>Extends Full Names</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the attribute list '<em>Extends Full Names</em>'.
+    * @see de.hentschel.visualdbc.dbcmodel.DbcClass#getExtendsFullNames()
+    * @see #getDbcClass()
+    * @generated
+    */
+   EAttribute getDbcClass_ExtendsFullNames();
+
+   /**
     * Returns the meta object for class '{@link de.hentschel.visualdbc.dbcmodel.AbstractDbcProofContainer <em>Abstract Dbc Proof Container</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -2702,6 +2767,17 @@ public interface DbcmodelPackage extends EPackage {
    EReference getAbstractDbcClass_Implements();
 
    /**
+    * Returns the meta object for the attribute list '{@link de.hentschel.visualdbc.dbcmodel.AbstractDbcClass#getImplementsFullNames <em>Implements Full Names</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the attribute list '<em>Implements Full Names</em>'.
+    * @see de.hentschel.visualdbc.dbcmodel.AbstractDbcClass#getImplementsFullNames()
+    * @see #getAbstractDbcClass()
+    * @generated
+    */
+   EAttribute getAbstractDbcClass_ImplementsFullNames();
+
+   /**
     * Returns the meta object for class '{@link de.hentschel.visualdbc.dbcmodel.AbstractDbcInterface <em>Abstract Dbc Interface</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -2753,6 +2829,17 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     */
    EReference getDbcInterface_Extends();
+
+   /**
+    * Returns the meta object for the attribute list '{@link de.hentschel.visualdbc.dbcmodel.DbcInterface#getExtendsFullNames <em>Extends Full Names</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the attribute list '<em>Extends Full Names</em>'.
+    * @see de.hentschel.visualdbc.dbcmodel.DbcInterface#getExtendsFullNames()
+    * @see #getDbcInterface()
+    * @generated
+    */
+   EAttribute getDbcInterface_ExtendsFullNames();
 
    /**
     * Returns the meta object for class '{@link de.hentschel.visualdbc.dbcmodel.AbstractDbcType <em>Abstract Dbc Type</em>}'.
@@ -3344,6 +3431,14 @@ public interface DbcmodelPackage extends EPackage {
       EAttribute DBC_CLASS__ANONYMOUS = eINSTANCE.getDbcClass_Anonymous();
 
       /**
+       * The meta object literal for the '<em><b>Extends Full Names</b></em>' attribute list feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EAttribute DBC_CLASS__EXTENDS_FULL_NAMES = eINSTANCE.getDbcClass_ExtendsFullNames();
+
+      /**
        * The meta object literal for the '{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcProofContainerImpl <em>Abstract Dbc Proof Container</em>}' class.
        * <!-- begin-user-doc -->
        * <!-- end-user-doc -->
@@ -3592,6 +3687,14 @@ public interface DbcmodelPackage extends EPackage {
       EReference ABSTRACT_DBC_CLASS__IMPLEMENTS = eINSTANCE.getAbstractDbcClass_Implements();
 
       /**
+       * The meta object literal for the '<em><b>Implements Full Names</b></em>' attribute list feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EAttribute ABSTRACT_DBC_CLASS__IMPLEMENTS_FULL_NAMES = eINSTANCE.getAbstractDbcClass_ImplementsFullNames();
+
+      /**
        * The meta object literal for the '{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcInterfaceImpl <em>Abstract Dbc Interface</em>}' class.
        * <!-- begin-user-doc -->
        * <!-- end-user-doc -->
@@ -3634,6 +3737,14 @@ public interface DbcmodelPackage extends EPackage {
        * @generated
        */
       EReference DBC_INTERFACE__EXTENDS = eINSTANCE.getDbcInterface_Extends();
+
+      /**
+       * The meta object literal for the '<em><b>Extends Full Names</b></em>' attribute list feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EAttribute DBC_INTERFACE__EXTENDS_FULL_NAMES = eINSTANCE.getDbcInterface_ExtendsFullNames();
 
       /**
        * The meta object literal for the '{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcTypeImpl <em>Abstract Dbc Type</em>}' class.

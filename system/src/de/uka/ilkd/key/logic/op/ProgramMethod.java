@@ -1,17 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.logic.op;
 
@@ -44,6 +42,7 @@ import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -149,6 +148,11 @@ public final class ProgramMethod extends ObserverFunction
     @Override
     public SourceElement getFirstElement(){
 	return this;
+    }
+
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       return getFirstElement();
     }
 
     @Override
@@ -334,13 +338,26 @@ public final class ProgramMethod extends ObserverFunction
    public ProgramElementName getProgramElementName() {
 	return getMethodDeclaration().getProgramElementName();
     }
-    
+
+   /* (non-Javadoc)
+    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getUniqueName()
+    */
+   @Override
+   public String getUniqueName() {
+       return getName() + "_" +
+              Math.abs(ContractFactory.generateContractTypeName("",
+                                                                getContainerType(),
+                                                                this,
+                                                                getContainerType()
+                                                                ).hashCode());
+    } // Included HashCode to make IF-Predicates unique and still reproducible
+
     /* (non-Javadoc)
     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getFullName()
     */
    @Override
    public String getFullName() {
-    	return getMethodDeclaration().getFullName();
+       return getMethodDeclaration().getFullName();
     }
 
     /* (non-Javadoc)

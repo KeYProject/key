@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -16,14 +16,13 @@ package org.key_project.sed.ui.visualization.test.testcase;
 import org.eclipse.graphiti.features.context.IMultiDeleteInfo;
 import org.junit.Test;
 import org.key_project.sed.ui.visualization.util.EditableMultiDeleteInfo;
-
-import junit.framework.TestCase;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 /**
  * Tests for {@link EditableMultiDeleteInfo}.
  * @author Martin Hentschel
  */
-public class EditableMultiDeleteInfoTest extends TestCase {
+public class EditableMultiDeleteInfoTest extends AbstractSetupTestCase {
    /**
     * Tests the defined number via {@link EditableMultiDeleteInfo#getNumber()}
     * and {@link EditableMultiDeleteInfo#setNumber(int)}.

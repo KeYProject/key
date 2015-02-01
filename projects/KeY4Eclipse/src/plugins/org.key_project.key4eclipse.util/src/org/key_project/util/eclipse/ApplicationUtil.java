@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -36,6 +36,27 @@ public final class ApplicationUtil {
    private ApplicationUtil() {
    }
    
+   /**
+    * Returns the path and name of the java launcher in which this program is executed.
+    * @return The path and name of the java launcher in which this program is executed.
+    */
+   public static String getJavaLauncher() {
+      final String launcher = "java";
+      String java = System.getProperty("sun.boot.library.path");
+      if (java != null && !java.isEmpty()) {
+         File folder = new File(java);
+         if (folder.isDirectory()) {
+            return new File(folder, launcher).getAbsolutePath();
+         }
+         else {
+            return launcher;
+         }
+      }
+      else {
+         return launcher;
+      }
+   }
+
    /**
     * Returns the path to the launcher which has started this application.
     * @return The path to the launcher which has started this application.

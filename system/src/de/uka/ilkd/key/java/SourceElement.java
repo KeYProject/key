@@ -1,17 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.java;
 
@@ -37,6 +35,15 @@ public interface SourceElement extends SVSubstitute {
      *        @see #getStartPosition()
     */
     SourceElement getFirstElement();
+
+
+    /**
+     *        Finds the source element that occurs first in the source. 
+     *        @return the first source element in the syntactical representation of
+     *        this element, may be equals to this element.
+     *        @see #getStartPosition()
+    */
+    SourceElement getFirstElementIncludingBlocks();
 
 
     /**

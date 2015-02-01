@@ -1,26 +1,33 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
+
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
+import java.awt.Insets;
 import java.util.Iterator;
 
+import javax.swing.JTextArea;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -35,10 +42,10 @@ import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
@@ -49,35 +56,35 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
-import java.awt.Insets;
-import javax.swing.JTextArea;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.MatteBorder;
-import javax.swing.text.DefaultHighlighter;
 
 public class InnerNodeView extends SequentView {
-    
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = -6542881446084654358L;
     private InitialPositionTable posTable;
     public final JTextArea tacletInfo;
     Node node;
-    
-    public InnerNodeView(Node node, KeYMediator mediator, MainWindow mainWindow) {
+
+    public InnerNodeView(Node node, MainWindow mainWindow) {
         super(mainWindow);
         this.node = node;
         filter = new IdentitySequentPrintFilter(node.sequent());
-        printer = new LogicPrinter(new ProgramPrinter(),
-                mediator.getNotationInfo(),
-                mediator.getServices());
-        setSelectionColor(new Color(10,180,50));
-        
-        tacletInfo = new JTextArea(getTacletDescription(mediator, node, filter));
+        setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(),
+                        mainWindow.getMediator().getNotationInfo(),
+                        mainWindow.getMediator().getServices(),
+                        getVisibleTermLabels()));
+        setSelectionColor(new Color(10, 180, 50));
+        setBackground(INACTIVE_BACKGROUND_COLOR);
+
+        tacletInfo = new JTextArea(getTacletDescription(mainWindow.getMediator(), node, filter));
         tacletInfo.setBackground(getBackground());
         tacletInfo.setBorder(new CompoundBorder(
-                new MatteBorder(3,0,0,0,Color.black),
-                new EmptyBorder(new Insets(4,0,0,0))));
-        
-        updateUI();
+                new MatteBorder(3, 0, 0, 0, Color.black),
+                new EmptyBorder(new Insets(4, 0, 0, 0))));
+
+//        updateUI();
         printSequent();
     }
 
@@ -115,7 +122,7 @@ public class InnerNodeView extends SequentView {
                 out.append(op.name());
                 sep = ", ";
             }
-            out.append(" } " + modalOpSV.name());
+            out.append(" } ").append(modalOpSV.name());
         } else if (schemaVar instanceof TermSV) {
             out.append("\\term");
         } else if (schemaVar instanceof FormulaSV) {
@@ -133,12 +140,12 @@ public class InnerNodeView extends SequentView {
         }
         writeSVModifiers(out, schemaVar);
         if (!(schemaVar instanceof FormulaSV || schemaVar instanceof UpdateSV)) {
-            out.append(" " + schemaVar.sort().declarationString());
+            out.append(" ").append(schemaVar.sort().declarationString());
         }
-        out.append(" " + schemaVar.name());
+        out.append(" ").append(schemaVar.name());
     }
 
-    public static void writeTacletSchemaVariablesHelper(StringBuffer out,
+    private static void writeTacletSchemaVariablesHelper(StringBuffer out,
             final Taclet t) {
         ImmutableSet<SchemaVariable> schemaVars = t.getIfFindVariables();
         ImmutableList<NewVarcond> lnew = t.varsNew();
@@ -179,10 +186,9 @@ public class InnerNodeView extends SequentView {
      * @param mediator The {@link KeYMediator} to use.
      * @param node The {@link Node} to use.
      * @param filter The {@link SequentPrintFilter} to use.
-     * @param printer The {@link LogicPrinter} to use.
      * @return The text to show.
      */
-    public static String getTacletDescription(KeYMediator mediator,
+    public final String getTacletDescription(KeYMediator mediator,
             Node node,
             SequentPrintFilter filter) {
 
@@ -192,10 +198,11 @@ public class InnerNodeView extends SequentView {
         if (app != null) {
             s += "The following rule was applied on this node: \n\n";
             if (app.rule() instanceof Taclet) {
-                LogicPrinter tacPrinter = new LogicPrinter(new ProgramPrinter(null),
+                SequentViewLogicPrinter tacPrinter = new SequentViewLogicPrinter(new ProgramPrinter(null),
                         mediator.getNotationInfo(),
                         mediator.getServices(),
-                        true);
+                        true,
+                        getVisibleTermLabels());
                 tacPrinter.printTaclet((Taclet) (app.rule()));
                 s += tacPrinter;
             } else {
@@ -218,23 +225,23 @@ public class InnerNodeView extends SequentView {
 
 //                  s = s + "\n\nApplication justified by: ";
 //                  s = s + mediator.getSelectedProof().env().getJustifInfo()
-//                                      .getJustification(app, mediator.getServices())+"\n";            
+//                                      .getJustification(app, mediator.getServices())+"\n";
         } else {
             // Is this case possible?
             s += "No rule was applied on this node.";
         }
         return s;
     }
-    
-    static final HighlightPainter RULEAPP_HIGHLIGHTER =
-            new DefaultHighlighter.DefaultHighlightPainter(new Color(0.5f, 1.0f, 0.5f, 0.4f));
-    static final HighlightPainter IF_FORMULA_HIGHLIGHTER =
-            new DefaultHighlighter.DefaultHighlightPainter(new Color(0.8f, 1.0f, 0.8f, 0.5f));
+
+    static final HighlightPainter RULEAPP_HIGHLIGHTER
+            = new DefaultHighlighter.DefaultHighlightPainter(new Color(0.5f, 1.0f, 0.5f, 0.4f));
+    static final HighlightPainter IF_FORMULA_HIGHLIGHTER
+            = new DefaultHighlighter.DefaultHighlightPainter(new Color(0.8f, 1.0f, 0.8f, 0.5f));
 
     private void highlightRuleAppPosition(RuleApp app) {
         try {
             // Set the find highlight first and then the if highlights
-            // This seems to make cause the find one to be painted 
+            // This seems to make cause the find one to be painted
             // over the if one.
 
             final Range r;
@@ -275,9 +282,9 @@ public class InnerNodeView extends SequentView {
                 continue;
             }
             final IfFormulaInstSeq inst = (IfFormulaInstSeq) inst2;
-            final PosInOccurrence pos =
-                    new PosInOccurrence(inst.getConstrainedFormula(),
-                    PosInTerm.TOP_LEVEL,
+            final PosInOccurrence pos
+                    = new PosInOccurrence(inst.getConstrainedFormula(),
+                    PosInTerm.getTopLevel(),
                     inst.inAntec());
             final Range r = highlightPos(pos, IF_FORMULA_HIGHLIGHTER);
         }
@@ -306,21 +313,23 @@ public class InnerNodeView extends SequentView {
         return r;
     }
 
+    @Override
     public String getTitle() {
         return "Inner Node";
     }
-    
-    public synchronized void printSequent() {
-        
+
+    @Override
+    public final synchronized void printSequent() {
+
         setLineWidth(computeLineWidth());
-        printer.update(filter, getLineWidth());
-        setText(printer.toString());
-        posTable = printer.getInitialPositionTable();
-        
+        getLogicPrinter().update(filter, getLineWidth());
+        setText(getLogicPrinter().toString());
+        posTable = getLogicPrinter().getInitialPositionTable();
+
         RuleApp app = node.getAppliedRuleApp();
         if (app != null) {
             highlightRuleAppPosition(app);
         }
     }
-    
+
 }

@@ -1,19 +1,19 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic.op;
 
+import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.java.Services;
@@ -31,8 +31,8 @@ import de.uka.ilkd.key.util.Debug;
 public final class ElementaryUpdate extends AbstractSortedOperator {
     
     private static final WeakHashMap<UpdateableOperator, 
-                                     ElementaryUpdate> instances 
-    	= new WeakHashMap<UpdateableOperator, ElementaryUpdate>();
+                                     WeakReference<ElementaryUpdate>> instances 
+    	= new WeakHashMap<UpdateableOperator, WeakReference<ElementaryUpdate>>();
     
     
     private final UpdateableOperator lhs;
@@ -52,12 +52,12 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
      * Returns the elementary update operator for the passed left hand side.
      */
     public static ElementaryUpdate getInstance(UpdateableOperator lhs) {
-	ElementaryUpdate result = instances.get(lhs);
-	if(result == null) {
-	    result = new ElementaryUpdate(lhs);
+	WeakReference<ElementaryUpdate> result = instances.get(lhs);
+	if(result == null || result.get() == null) {
+	    result = new WeakReference<ElementaryUpdate>(new ElementaryUpdate(lhs));
 	    instances.put(lhs, result);
 	}
-	return result;
+	return result.get();
     }
     
     

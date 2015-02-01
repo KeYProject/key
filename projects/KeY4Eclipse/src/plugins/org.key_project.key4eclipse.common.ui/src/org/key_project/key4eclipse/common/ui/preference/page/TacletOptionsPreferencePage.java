@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -14,18 +14,19 @@
 package org.key_project.key4eclipse.common.ui.preference.page;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.ui.IWorkbench;
 import org.key_project.key4eclipse.util.KeYExampleUtil;
 
-import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Preference page to edit the taclet options.
@@ -72,7 +73,7 @@ public class TacletOptionsPreferencePage extends AbstractChoicePreferencePage {
     * @throws ProblemLoaderException
     */
    public static void loadChoiceSettings() throws ProblemLoaderException {
-      KeYEnvironment<CustomConsoleUserInterface> env = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null);
+      KeYEnvironment<CustomUserInterface> env = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null);
       env.dispose();
    }
    
@@ -82,5 +83,21 @@ public class TacletOptionsPreferencePage extends AbstractChoicePreferencePage {
    @Override
    protected ChoiceSettings getChoiceSettings() {
       return ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Map<String, String> getDefaults() {
+      return getDefaultTacletOptions();
+   }
+   
+   /**
+    * Returns the default taclet options.
+    * @return The default taclet options.
+    */
+   public static Map<String, String> getDefaultTacletOptions() {
+      return SymbolicExecutionUtil.getDefaultTacletOptions();
    }
 }

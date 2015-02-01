@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -14,6 +14,7 @@
 package org.key_project.util.java;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,6 +22,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,6 +33,7 @@ import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Display;
@@ -47,6 +53,51 @@ public final class IOUtil {
     * Forbid instances by this private constructor.
     */
    private IOUtil() {
+   }
+
+   /**
+    * Computes the MD5 checksum of the given {@link File}.
+    * @param file The {@link File} to compute its MD5 checksum.
+    * @return The computed MD5 checksum.
+    * @throws IOException Occurred Exception.
+    */
+   public static String computeMD5(File file) throws IOException {
+      if (file == null) {
+         throw new IOException("Can't compute MD5 without a File.");
+      }
+      if (!file.isFile()) {
+         throw new IOException("Can't compute MD5, because \"" + file + "\" is not an existing file.");
+      }
+      return computeMD5(new FileInputStream(file));
+   }
+
+   /**
+    * Computes the MD5 checksum of the given {@link InputStream} and closes it.
+    * @param in The {@link InputStream} which provides the content to compute its MD5 checksum. The {@link InputStream} will be closed.
+    * @return The computed MD5 checksum.
+    * @throws IOException Occurred Exception.
+    */
+   public static String computeMD5(InputStream in) throws IOException {
+      if (in == null) {
+         throw new IOException("Can't compute MD5 without an InputStream.");
+      }
+      try {
+         MessageDigest digest = MessageDigest.getInstance("MD5");
+         byte[] buffer = new byte[8192];
+         int read = 0;
+         while( (read = in.read(buffer)) > 0) {
+            digest.update(buffer, 0, read);
+         }
+         byte[] md5sum = digest.digest();
+         BigInteger bigInt = new BigInteger(1, md5sum);
+         return bigInt.toString(16);
+      }
+      catch (NoSuchAlgorithmException e) {
+         throw new IOException("Algorithm MD5 is not available.");
+      }
+      finally {
+         in.close();
+      }
    }
    
    /**
@@ -557,5 +608,133 @@ public final class IOUtil {
        * @throws IOException Occurred Exception
        */
       public void visit(File file) throws IOException;
+   }
+   
+   /**
+    * Replaces all line breaks ({@code \r}, {@code \r\n}) in the given InputStream with {@code \n}.
+    * @param in The {@link InputStream} to replace line breaks in.
+    * @return A new {@link InputStream} with with the replaced line breaks.
+    * @throws IOException Occurred Exception.
+    */
+   public static InputStream unifyLineBreaks(InputStream in) throws IOException {
+      if (in != null) {
+         String text = IOUtil.readFrom(in);
+         text = text.replace("\r\n", "\n");
+         text = text.replace("\r", "\n");
+         return new ByteArrayInputStream(text.getBytes());
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Checks if at least one given parent {@link File} contains (recursive) the child {@link File}.
+    * @param parents The parent {@link File}.
+    * @param child The child {@link File} to check for containment in parents.
+    * @return {@code true} child is contained (recursive) in at least one parent, {@code false} child is not contained in any parent.
+    */
+   public static boolean contains(Iterable<File> parents, File child) {
+      boolean contains = false;
+      if (parents != null) {
+         Iterator<File> iter = parents.iterator();
+         while (!contains && iter.hasNext()) {
+            contains = contains(iter.next(), child);
+         }
+      }
+      return contains;
+   }
+
+   /**
+    * Checks if the given parent {@link File} contains (recursive) the child {@link File}.
+    * @param parent The parent {@link File}.
+    * @param child The child {@link File} to check for containment in parent.
+    * @return {@code true} child is contained (recursive) in parent, {@code false} child is not contained in parent.
+    */
+   public static boolean contains(File parent, File child) {
+      boolean contains = false;
+      if (parent != null && child != null) {
+         while (!contains && child != null) {
+            if (parent.equals(child)) {
+               contains = true;
+            }
+            child = child.getParentFile();
+         }
+      }
+      return contains;
+   }
+
+   /**
+    * Copies the content from the {@link InputStream} to the {@link OutputStream}
+    * and closes both streams.
+    * @param source The {@link InputStream} to read from.
+    * @param target The {@link OutputStream} to write to.
+    * @return {@code true} if copy was performed and {@code false} if not performed.
+    * @throws IOException Occurred Exception.
+    */
+   public static boolean copy(InputStream source, OutputStream target) throws IOException {
+      try {
+         if (source != null && target != null) {
+            byte[] buffer = new byte[BUFFER_SIZE];
+            int read;
+            while ((read = source.read(buffer)) >= 1) {
+               target.write(buffer, 0, read);
+            }
+            return true;
+         }
+         else {
+            return false;
+         }
+      }
+      finally {
+         if (source != null) {
+            source.close();
+         }
+         if (target != null) {
+            target.close();
+         }
+      }   
+   }
+   
+   /**
+    * Encodes the given path as URI path by escaping special characters
+    * like spaces.
+    * @param path The path to encode.
+    * @return The encoded URI path.
+    */
+   public static String encodeURIPath(String path) {
+      if (path != null) {
+         URI uri = URI.createFileURI(path);
+         return uri.devicePath();
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Decodes the given URI path by interpreting three-digit escape sequences as 
+    * the bytes of a UTF-8 encoded character and replacing them with the 
+    * characters they represent. Incomplete escape sequences are ignored and 
+    * invalid UTF-8 encoded bytes are treated as extended ASCII characters.
+    * @param uriPath The URI path to decode.
+    * @return The decoded URI path.
+    */
+   public static String decodeURIPath(String uriPath) {
+      if (uriPath != null) {
+         return URI.decode(uriPath);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Checks if the given {@link File} exists.
+    * @param file The {@link File} to check.
+    * @return {@code true} {@link File} is not {@code null} and exists, {@code false} otherwise.
+    */
+   public static boolean exists(File file) {
+      return file != null && file.exists();
    }
 }

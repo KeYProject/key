@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -23,7 +23,7 @@ import org.key_project.sed.core.model.ISEDThread;
  * @author Martin Hentschel
  * @see ISEDTermination
  */
-public abstract class AbstractSEDTermination extends AbstractSEDTerminateCompatibleDebugNode implements ISEDTermination {
+public abstract class AbstractSEDTermination extends AbstractSEDStackFrameCompatibleDebugNode implements ISEDTermination {
    /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this termination is contained.
@@ -41,6 +41,10 @@ public abstract class AbstractSEDTermination extends AbstractSEDTerminateCompati
     */
    @Override
    public String getNodeType() {
-      return "Termination";
+      String kind = "Termination";
+      if (!isVerified()) {
+         kind += " (not verified)";
+      }
+      return kind;
    }
 }

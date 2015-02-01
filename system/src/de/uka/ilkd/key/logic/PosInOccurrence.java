@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic;
 
@@ -19,7 +18,7 @@ package de.uka.ilkd.key.logic;
  * SequentFormula and a PosInTerm determine an object of this 
  * class exactly. 
  */
-public class PosInOccurrence {
+public final class PosInOccurrence {
 
     public static PosInOccurrence findInSequent(Sequent seq, 
                                                 int formulaNumber, 
@@ -33,7 +32,7 @@ public class PosInOccurrence {
      */
     private final SequentFormula cfma;
 
-    // saves 8 bytes (due to allignment issues) per instance if we use a 
+    // saves 8 bytes (due to alignment issues) per instance if we use a
     // short here instead of an int
     private final short hashCode;
     
@@ -50,9 +49,10 @@ public class PosInOccurrence {
      */
     private Term subTermCache = null;
 
-    public PosInOccurrence(SequentFormula cfma, 
-            PosInTerm posInTerm,
-            boolean inAntec) {	
+    public PosInOccurrence(SequentFormula cfma,
+                           PosInTerm posInTerm,
+                           boolean inAntec) {
+        assert posInTerm != null;
 	this.inAntec=inAntec;
 	this.cfma=cfma;	
 	this.posInTerm=posInTerm;	
@@ -61,7 +61,15 @@ public class PosInOccurrence {
        
     
     private int computeHash () {
-        return constrainedFormula().hashCode() * 13 + posInTerm().hashCode();	
+        if (constrainedFormula() != null && posInTerm() != null) {
+            return constrainedFormula().hashCode() * 13 + posInTerm().hashCode();
+        } else if (constrainedFormula() != null) {
+            return constrainedFormula().hashCode() * 13;
+        } else if (posInTerm() != null) {
+            return posInTerm().hashCode();
+        } else {
+            return 0;
+        }
     }
     
     
@@ -158,7 +166,7 @@ public class PosInOccurrence {
     }
 
     public boolean isTopLevel () {
-	return posInTerm == PosInTerm.TOP_LEVEL;
+	return posInTerm == PosInTerm.getTopLevel();
     }
 
     /**
@@ -176,7 +184,7 @@ public class PosInOccurrence {
     /**
      * The usage of this method is strongly discouraged, use 
      * {@link PosInOccurrence#iterator} instead.     
-     * describes the exact occurence of the refered term inside 
+     * describes the exact occurrence of the referred term inside
      * {@link SequentFormula#formula()} 
      * @returns the position in the formula of the SequentFormula of
      * this PosInOccurrence. 
@@ -196,9 +204,10 @@ public class PosInOccurrence {
      *         It is not tested whether this position exists within <code>p_newFormula</code>
      */
     public PosInOccurrence replaceConstrainedFormula (SequentFormula p_newFormula) {
+        assert p_newFormula != null;
         final PIOPathIterator it = iterator ();
         Term newTerm = p_newFormula.formula ();
-        PosInTerm newPosInTerm = PosInTerm.TOP_LEVEL;
+        PosInTerm newPosInTerm = PosInTerm.getTopLevel();
 
         while ( true ) {
             final int subNr = it.next ();
@@ -234,7 +243,7 @@ public class PosInOccurrence {
         if (isTopLevel()) {
             return this;
         }
-	return new PosInOccurrence(cfma, PosInTerm.TOP_LEVEL, 
+	return new PosInOccurrence(cfma, PosInTerm.getTopLevel(), 
 				   inAntec);    	
     }
 
@@ -262,7 +271,7 @@ public class PosInOccurrence {
     }
 
     
-    private class PIOPathIteratorImpl implements PIOPathIterator {	
+    private final class PIOPathIteratorImpl implements PIOPathIterator {	
 	int               child;
 	int               count             = 0;
 	IntIterator       currentPathIt;
@@ -270,17 +279,6 @@ public class PosInOccurrence {
 	
 	private PIOPathIteratorImpl               () {
 	    currentPathIt = posInTerm ().iterator ();
-	}
-
-	private PosInTerm firstN ( PosInTerm p_pit,
-				   int       p_n ) {
-	    IntIterator it  = p_pit.iterator ();
-	    PosInTerm         res = PosInTerm.TOP_LEVEL;
-
-	    while ( p_n-- != 0 )
-		res = res.down ( it.next () );
-
-	    return res;
 	}
 
 	/**
@@ -302,7 +300,7 @@ public class PosInOccurrence {
 
 	    final PosInOccurrence pio;	   
 	    pio = new PosInOccurrence ( cfma,
-		    firstN ( posInTerm, count - 1 ),
+		    posInTerm.firstN(count - 1),
 		    inAntec );            
 
         

@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -19,44 +19,48 @@ import java.util.LinkedHashSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Term;
 
-public class TermLabelOperationsInterpreter {
+/**
+ * A collection of static methods to deal with {@link TermLabel}.
+ *
+ * @author Richard Bubel
+ */
+class TermLabelOperationsInterpreter {
 
-   public static ImmutableArray<ITermLabel> intersection(
-           ImmutableArray<ITermLabel> left, ImmutableArray<ITermLabel> right) {
-       final HashSet<ITermLabel> set = new LinkedHashSet<ITermLabel>();
-       for (ITermLabel r : right) {
+   public static ImmutableArray<TermLabel> intersection(
+           ImmutableArray<TermLabel> left, ImmutableArray<TermLabel> right) {
+       final HashSet<TermLabel> set = new LinkedHashSet<TermLabel>();
+       for (TermLabel r : right) {
            if (left.contains(r)) {
               set.add(r);
            }
        }
-       return new ImmutableArray<ITermLabel>(set.toArray(new ITermLabel[set.size()]));
+       return new ImmutableArray<TermLabel>(set.toArray(new TermLabel[set.size()]));
    }
    
-    public static ImmutableArray<ITermLabel> union(
-            ImmutableArray<ITermLabel> left, ImmutableArray<ITermLabel> right) {
-        final HashSet<ITermLabel> set = new LinkedHashSet<ITermLabel>();
-        for (ITermLabel l : left) { 
+    public static ImmutableArray<TermLabel> union(
+            ImmutableArray<TermLabel> left, ImmutableArray<TermLabel> right) {
+        final HashSet<TermLabel> set = new LinkedHashSet<TermLabel>();
+        for (TermLabel l : left) {
             set.add(l);
         }
-        for (ITermLabel l : right) { 
+        for (TermLabel l : right) {
             set.add(l);
         }
-        return new ImmutableArray<ITermLabel>(set.toArray(new ITermLabel[set.size()]));
+        return new ImmutableArray<TermLabel>(set.toArray(new TermLabel[set.size()]));
     }
 
-    public static ImmutableArray<ITermLabel> sub(
-            ImmutableArray<ITermLabel> left, ImmutableArray<ITermLabel> right) {
-        final HashSet<ITermLabel> set = new LinkedHashSet<ITermLabel>();
-        for (ITermLabel l : left) { 
+    public static ImmutableArray<TermLabel> sub(
+            ImmutableArray<TermLabel> left, ImmutableArray<TermLabel> right) {
+        final HashSet<TermLabel> set = new LinkedHashSet<TermLabel>();
+        for (TermLabel l : left) {
             set.add(l);
         }
-        for (ITermLabel l : right) { 
+        for (TermLabel l : right) {
             set.remove(l);
         }
-        return new ImmutableArray<ITermLabel>(set.toArray(new ITermLabel[set.size()]));
+        return new ImmutableArray<TermLabel>(set.toArray(new TermLabel[set.size()]));
     }
 
     /**

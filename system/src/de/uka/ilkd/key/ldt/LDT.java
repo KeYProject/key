@@ -1,21 +1,18 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.ldt;
 
-
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -25,10 +22,13 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * An "LDT" or "language data type" class corresponds to a standard rule file 
@@ -45,14 +45,12 @@ public abstract class LDT implements Named {
     
     /** the namespace of functions this LDT feels responsible for */
     private final Namespace functions = new Namespace();
-
-    
     
     //-------------------------------------------------------------------------
-    //constructors
+    // constructors
     //-------------------------------------------------------------------------
     
-    protected LDT(Name name, Services services) {
+    protected LDT(Name name, TermServices services) {
         sort = (Sort) services.getNamespaces().sorts().lookup(name);
 	    if (sort == null)
 	        throw new RuntimeException("LDT "+name+" not found.\n"+
@@ -60,28 +58,25 @@ public abstract class LDT implements Named {
         this.name = name;
     }
     
-    
     //-------------------------------------------------------------------------
-    //internal methods
+    // protected methods
     //-------------------------------------------------------------------------
-    
 
     /**
      * adds a function to the LDT 
      * @return the added function (for convenience reasons)
      */
     protected final Function addFunction(Function f) {
-	functions.add(f);
+	functions.addSafely(f);
 	return f;
     }
-    
     
     /**
      * looks up a function in the namespace and adds it to the LDT 
      * @param funcName the String with the name of the function to look up
      * @return the added function (for convenience reasons)
      */
-    protected final Function addFunction(Services services, String funcName) {
+    protected final Function addFunction(TermServices services, String funcName) {
 	final Namespace funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name(funcName));
         if (f == null)
@@ -90,9 +85,8 @@ public abstract class LDT implements Named {
         return addFunction(f);
     }
     
-    
     protected final SortDependingFunction addSortDependingFunction(
-	    					Services services, 
+	    					TermServices services, 
 	    					String kind) {	
 	final SortDependingFunction f 
 		= SortDependingFunction.getFirstInstance(new Name(kind), 
@@ -103,8 +97,6 @@ public abstract class LDT implements Named {
 	return f;
     }
 
-    
-    
     /** returns the basic functions of the model
      * @return the basic functions of the model
      */
@@ -112,25 +104,45 @@ public abstract class LDT implements Named {
 	return functions;
     }
 
-    
-    
-    
     //-------------------------------------------------------------------------
-    //internal methods
+    // public methods
     //-------------------------------------------------------------------------
     
+    /*
+     * Use this method to instantiate all LDTs. It returns a map that takes
+     * as input the name of an LDT and returns an instance of the corresponding LDT.
+     * 
+     * Is it possible to implement LDTs as singletons? (Kai Wallisch 04/2014)
+     */
+    public static Map<Name, LDT> getNewLDTInstances(Services s) {
+        
+        // TreeMap ensures the map is sorted according to the natural order of its keys.
+        Map ret = new TreeMap<Name, LDT>();
+        
+        ret.put(IntegerLDT.NAME, new IntegerLDT(s));
+        ret.put(BooleanLDT.NAME, new BooleanLDT(s));
+        ret.put(LocSetLDT.NAME, new LocSetLDT(s));
+        ret.put(HeapLDT.NAME, new HeapLDT(s));
+        ret.put(SeqLDT.NAME, new SeqLDT(s));
+        ret.put(FreeLDT.NAME, new FreeLDT(s));
+        ret.put(MapLDT.NAME, new MapLDT(s));
+        ret.put(FloatLDT.NAME, new FloatLDT(s));
+        ret.put(DoubleLDT.NAME, new DoubleLDT(s));
+        ret.put(RealLDT.NAME, new RealLDT(s));
+        ret.put(CharListLDT.NAME, new CharListLDT(s));
+        
+        return ret;
+    }
 
     @Override
     public final Name name() {
 	return name;
     }
 
-
     @Override
     public final String toString() {
 	return "LDT "+name()+" ("+targetSort() + ")";
     }
-
     
     /** 
      * Returns the sort associated with the LDT.
@@ -138,19 +150,15 @@ public abstract class LDT implements Named {
     public final Sort targetSort() {
 	return sort;
     }
-
-    /**
-     *  Called each time proof settings are updated in case the LDT
-     *  wants to change its behaviour based on new settings
-     */
-    public void proofSettingsUpdated(ProofSettings settings) {    	
-    }
     
     public boolean containsFunction(Function op) {
 	Named n=functions.lookup(op.name());
 	return (n==op);
     }
     
+    //-------------------------------------------------------------------------
+    // abstract methods
+    //-------------------------------------------------------------------------
         
     /** returns true if the LDT offers an operation for the given java
      * operator and the logic subterms 
@@ -200,7 +208,7 @@ public abstract class LDT implements Named {
     public abstract boolean isResponsible(
 	    		de.uka.ilkd.key.java.expression.Operator op, 
 	    		Term sub, 
-	    		Services services, 
+	    		TermServices services, 
 	    		ExecutionContext ec);
 
 

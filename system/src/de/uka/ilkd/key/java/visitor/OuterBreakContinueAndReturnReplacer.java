@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -43,7 +43,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     private StatementBlock result;
 
     public OuterBreakContinueAndReturnReplacer(final StatementBlock block,
-                                               final List<Label> alwaysInnerLabels,
+                                               final Iterable<Label> alwaysInnerLabels,
                                                final Label breakOutLabel,
                                                final Map<Label, ProgramVariable> breakFlags,
                                                final Map<Label, ProgramVariable> continueFlags,
@@ -52,7 +52,9 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
                                                final Services services)
     {
         super(block, services);
-        this.labels.addAll(alwaysInnerLabels);
+        for (Label label : alwaysInnerLabels) {
+            this.labels.add(label);
+        }
         this.breakOut = new Break(breakOutLabel);
         this.breakFlags = breakFlags;
         this.continueFlags = continueFlags;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -18,8 +18,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -44,13 +42,14 @@ import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTre
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.test.util.TestVisualizationUtil;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests for {@link ExecutionTreeUtil}
  * @author Martin Hentschel
  */
-public class ExecutionTreeUtilTest extends TestCase {
+public class ExecutionTreeUtilTest extends AbstractSetupTestCase {
    /**
     * Tests {@link ExecutionTreeUtil#getAllDebugTargets(org.eclipse.graphiti.dt.IDiagramTypeProvider)}
     */
@@ -84,7 +83,7 @@ public class ExecutionTreeUtilTest extends TestCase {
       targets = ExecutionTreeUtil.getAllDebugTargets(typeProvider);
       assertDebugTargets(targets);
       // Test one linked debug target
-      SEDMemoryDebugTarget firstTarget = new SEDMemoryDebugTarget(null);
+      SEDMemoryDebugTarget firstTarget = new SEDMemoryDebugTarget(null, false);
       final ISEDDebugTarget[] expectedTargetsOne = {firstTarget};
       domain.getCommandStack().execute(new RecordingCommand(domain) {
          @Override
@@ -95,7 +94,7 @@ public class ExecutionTreeUtilTest extends TestCase {
       targets = ExecutionTreeUtil.getAllDebugTargets(typeProvider);
       assertDebugTargets(targets, firstTarget);
       // Test two linked debug targets
-      SEDMemoryDebugTarget secondTarget = new SEDMemoryDebugTarget(null);
+      SEDMemoryDebugTarget secondTarget = new SEDMemoryDebugTarget(null, false);
       final ISEDDebugTarget[] expectedTargetsTwo = {firstTarget, secondTarget};
       domain.getCommandStack().execute(new RecordingCommand(domain) {
          @Override

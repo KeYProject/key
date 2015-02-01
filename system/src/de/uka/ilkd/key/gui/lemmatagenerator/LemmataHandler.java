@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -71,19 +71,16 @@ public class LemmataHandler implements TacletFilter {
                 println(options.toString());
 
                 File file = new File(options.getPathOfRuleFile());
-                File fileForDefinitions =  options.getPathOfRuleFile() != "" ? new File(options.getPathOfDefinitionFile()) :file;
                 Collection<File> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
                 
                 final ProblemInitializer problemInitializer = new ProblemInitializer(null,
-                                new Services(profile,
-                                                new KeYRecoderExcHandler()),
-                                false, new Listener());
+                                new Services(profile),
+                                new Listener());
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(null,
                                                       new Listener(),
                                                       problemInitializer,
                                                       profile,
-                                                      fileForDefinitions ,
                                                       file,
                                                       filesForAxioms);
                 
@@ -136,7 +133,7 @@ public class LemmataHandler implements TacletFilter {
                         }
                 };
       
-                TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(loaderListener,this,true,tacletLoader);
+                TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(loaderListener,this,true,tacletLoader, tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(), true);
                 
                 loader.start();
         }

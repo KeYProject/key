@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -16,6 +16,7 @@ package org.key_project.sed.core.test.suite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.sed.core.test.testcase.LogUtilTest;
+import org.key_project.sed.core.test.testcase.SEDBreadthFirstIteratorTest;
 import org.key_project.sed.core.test.testcase.SEDPostorderIteratorTest;
 import org.key_project.sed.core.test.testcase.SEDPreferenceUtilInitializerTest;
 import org.key_project.sed.core.test.testcase.SEDPreferenceUtilTest;
@@ -28,6 +29,7 @@ import org.key_project.sed.core.test.testcase.SEDPreorderIteratorTest;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
    LogUtilTest.class,
+   SEDBreadthFirstIteratorTest.class,
    SEDPostorderIteratorTest.class,
    SEDPreferenceUtilInitializerTest.class,
    SEDPreferenceUtilTest.class,

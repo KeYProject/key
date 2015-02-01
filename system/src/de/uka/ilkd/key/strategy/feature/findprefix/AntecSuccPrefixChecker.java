@@ -3,13 +3,14 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
+
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -30,7 +31,7 @@ class AntecSuccPrefixChecker implements Checker {
 
         ANTECEDENT, SUCCEDENT
 
-    };
+    }
 
     // checks, whether the position in occurrence has antecedent polarity
     public static final AntecSuccPrefixChecker ANTE_POLARITY_CHECKER =

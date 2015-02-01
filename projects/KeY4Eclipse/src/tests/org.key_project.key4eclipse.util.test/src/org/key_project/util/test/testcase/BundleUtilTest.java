@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -21,6 +21,7 @@ import java.io.InputStream;
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -28,6 +29,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -37,6 +39,47 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class BundleUtilTest extends TestCase {
+   /**
+    * Tests {@link BundleUtil#computeMD5(String, String)}.
+    */
+   @Test
+   public void testComputeMD5() throws IOException {
+      // Test null plugin
+      try {
+         BundleUtil.computeMD5(null, "data/HelloWorld.txt");
+         fail("Should not be possible.");
+      }
+      catch (IOException e) {
+         assertEquals("No plug-in defined.", e.getMessage());
+      }
+      // Test null file
+      try {
+         BundleUtil.computeMD5(Activator.PLUGIN_ID, null);
+         fail("Should not be possible.");
+      }
+      catch (IOException e) {
+         assertEquals("No path in plug-in \"org.key_project.util.test\" defined.", e.getMessage());
+      }
+      // Test not existing bundle
+      try {
+         BundleUtil.computeMD5("NOT_EXISTING_BUNDLE", "data/HelloWorld.txt");
+         fail("Should not be possible.");
+      }
+      catch (IOException e) {
+         assertEquals("Can't find plug-in \"NOT_EXISTING_BUNDLE\".", e.getMessage());
+      }
+      // Test not existing file
+      try {
+         BundleUtil.computeMD5(Activator.PLUGIN_ID, "data/NOT_EXISTING_FILE.txt");
+         fail("Should not be possible.");
+      }
+      catch (IOException e) {
+         assertEquals("Can't find resource \"data/NOT_EXISTING_FILE.txt\" in plug-in \"org.key_project.util.test\".", e.getMessage());
+      }
+      // Test content
+      assertEquals("b10a8db164e0754105b7a99be72e3fe5", BundleUtil.computeMD5(Activator.PLUGIN_ID, "data/HelloWorld.txt"));
+   }
+
    /**
     * Tests {@link BundleUtil#extractFromBundleToFilesystem(String, String, java.io.File)}
     */
@@ -255,12 +298,22 @@ public class BundleUtilTest extends TestCase {
       }
       // Test null target
       try {
-          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/extractTest", null);
+          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/extractTest", (IContainer)null);
           fail("Exception expected.");
       }
       catch (CoreException e) {
           assertEquals("No target is defined.", e.getMessage());
       }
+      // Test single file
+      IProject project4 = TestUtilsUtil.createProject("BundleUtilTest_testExtractFromBundleToWorkspace_4");
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/extractTest/File.txt", project4);
+      IFile singleFile = project4.getFile("File.txt");
+      assertTrue(singleFile.exists());
+      assertEquals(IOUtil.readFrom(BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/extractTest/File.txt")), ResourceUtil.readFrom(singleFile));
+      // Test not existing file
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/extractTest/NotExistingFile.txt", project4);
+      IFile notExistingFile = project4.getFile("NotExistingFile.txt");
+      assertTrue(notExistingFile == null || !notExistingFile.exists());
    }
 
    /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -29,8 +29,7 @@ import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.StringUtil;
 
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Node;
 
@@ -107,17 +106,17 @@ public class KeYTabComposite extends Composite {
       String name = null;
       Node keyNode = null;
       KeYMediator mediator = null;
-      PosInOccurrence pio = null;
       if (node != null) {
          keyNode = node.getExecutionNode().getProofNode();
-         pio = keyNode.getAppliedRuleApp() != null ? keyNode.getAppliedRuleApp().posInOccurrence() : null;
          mediator = node.getExecutionNode().getMediator();
          name = keyNode.serialNr() + ": " + keyNode.name(); // Copied from ProofRenderer
       }
       SWTUtil.setText(nodeText, name);
-      sequentViewerDecorator.setDocumentForNode(keyNode, mediator);
-      if (pio != null) {
-         sequentViewerDecorator.setGreenBackground(pio);
+      if (keyNode != null && !keyNode.proof().isDisposed()) {
+         sequentViewerDecorator.showNode(keyNode, mediator);
+      }
+      else {
+         sequentViewerDecorator.showNode(null, mediator);
       }
    }
 }

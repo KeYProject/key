@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_4660d55a-e6bc-4d1f-87a3-b347e49c8cd2" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_1d0dbb26-904e-48e9-b010-721f1b4019fa" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_aeab11f5-b399-463e-8505-6227c7b9477b" name="self.main(a);" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56">
-            <sedBranchStatement xml:id="_9d8b3ba1-6c1d-4309-8675-9c8f1cc99a4b" name="if (a==0) {int i = 2;int j = 3;int x = valueLonger(i);int y = value(j);int z = valueLonger(x)+valueLonger(y);int zz = value(-3)+value(-4);return value(z+zz); }else  {int i = 2;int j = 3;int x = value(i);int y = valueLonger(j);int z = value(x)+value(y);int zz = valueLonger(-3)+valueLonger(-4);return valueLonger(z+zz); }" pathCondition="true" lineNumber="-1" charStart="69" charEnd="497">
-               <sedBranchCondition xml:id="_f8d4f542-8da8-4770-a513-5a10a9d006e4" name="a = 0" pathCondition="a = 0">
-                  <sedStatement xml:id="_65a0ed4d-d699-42a3-91c1-547b259763b1" name="int i = 2;" pathCondition="a = 0" lineNumber="-1" charStart="87" charEnd="97">
-                     <sedStatement xml:id="_155d6879-b745-4d2f-a31c-2c60d4ad7c48" name="int j = 3;" pathCondition="a = 0" lineNumber="-1" charStart="102" charEnd="112">
+   <sedTarget xml:id="_15f933fe-428a-402d-b555-f22687110b99" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_aa7ae952-3853-4940-837b-f97bd1ace4d1" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotStepOverTest_testStepOverOnTwoBranches\src\StepOverOnTwoBranches.java">
+         <sedMethodCall xml:id="_d4ccb185-64a2-421b-883f-ec43746e1527" name="&lt;call self.main(a)&gt;" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotStepOverTest_testStepOverOnTwoBranches\src\StepOverOnTwoBranches.java" groupable="true">
+            <sedBranchStatement xml:id="_537253bf-1151-42db-a2af-667ffd050e71" name="if (a==0)" pathCondition="true" lineNumber="-1" charStart="69" charEnd="81" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotStepOverTest_testStepOverOnTwoBranches\src\StepOverOnTwoBranches.java" groupable="true">
+               <sedBranchCondition xml:id="_a468323b-c214-42c4-ad36-3df3f518cda2" name="equals(a,Z(0(#)))" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotStepOverTest_testStepOverOnTwoBranches\src\StepOverOnTwoBranches.java">
+                  <sedStatement xml:id="_4a83bd19-5778-404b-92b2-4e82d8030f91" name="int i = 2;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="87" charEnd="97" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotStepOverTest_testStepOverOnTwoBranches\src\StepOverOnTwoBranches.java">
+                     <sedStatement xml:id="_2cc8f871-09ff-4ae6-b5f5-1f60acaf521d" name="int j = 3;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="102" charEnd="112" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotStepOverTest_testStepOverOnTwoBranches\src\StepOverOnTwoBranches.java">
                      </sedStatement>
                   </sedStatement>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_e349a89a-82a9-4d17-8366-2c8f839f7d00" name="!a = 0" pathCondition="!a = 0">
-                  <sedStatement xml:id="_e5659920-c9b5-4a17-b76a-5dfe93bad41e" name="int i = 2;" pathCondition="!a = 0" lineNumber="-1" charStart="297" charEnd="307">
-                     <sedStatement xml:id="_a96d2ba5-5029-4a26-82f0-407912a77a7d" name="int j = 3;" pathCondition="!a = 0" lineNumber="-1" charStart="312" charEnd="322">
+               <sedBranchCondition xml:id="_7fd6340e-56f4-4f3f-a28e-8ef5f1090dc6" name="not(equals(a,Z(0(#))))" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotStepOverTest_testStepOverOnTwoBranches\src\StepOverOnTwoBranches.java">
+                  <sedStatement xml:id="_d6117ad4-fc11-4542-8b0b-d8703130acf6" name="int i = 2;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="297" charEnd="307" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotStepOverTest_testStepOverOnTwoBranches\src\StepOverOnTwoBranches.java">
+                     <sedStatement xml:id="_dffd7707-033c-4cb3-bb63-b7e8fa88de2a" name="int j = 3;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="312" charEnd="322" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotStepOverTest_testStepOverOnTwoBranches\src\StepOverOnTwoBranches.java">
                      </sedStatement>
                   </sedStatement>
                </sedBranchCondition>

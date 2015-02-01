@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.strategy;
 
@@ -19,6 +18,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 /**
  * Trivial implementation of the Strategy interface
@@ -43,7 +43,7 @@ public class FIFOStrategy implements Strategy {
     public RuleAppCost computeCost ( RuleApp         app,
 	                             PosInOccurrence pio,
 	                             Goal            goal ) {
-	return LongRuleAppCost.create ( goal.getTime () );
+	return NumberRuleAppCost.create ( goal.getTime () );
     }
 
     /**
@@ -68,13 +68,18 @@ public class FIFOStrategy implements Strategy {
     
     public static Strategy INSTANCE = new FIFOStrategy ();
     
-    public static class Factory extends StrategyFactory {
+    public static class Factory implements StrategyFactory {
         public Name name () {
             return NAME;
         }
         
         public Strategy create ( Proof proof, StrategyProperties properties ) {
             return INSTANCE;
+        }
+
+        @Override
+        public StrategySettingsDefinition getSettingsDefinition() {
+            return null;
         }
     }
 

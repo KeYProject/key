@@ -1,29 +1,31 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.AutoModeListener;
+import de.uka.ilkd.key.core.AutoModeListener;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.IconFactory;
-import de.uka.ilkd.key.gui.KeYSelectionEvent;
-import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -34,6 +36,8 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 
 public final class AutoModeAction extends MainWindowAction {
 
+    private static final KeyStroke START_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK);
+    private static final KeyStroke STOP_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
     /**
      * 
      */
@@ -77,7 +81,7 @@ public final class AutoModeAction extends MainWindowAction {
         setName(getStartCommand());
         setTooltip(MainWindow.AUTO_MODE_TEXT);
         setIcon(startLogo);
-        setAcceleratorLetter(KeyEvent.VK_A);
+        setAcceleratorKey(START_KEY);
     
         enable();
     
@@ -120,6 +124,7 @@ public final class AutoModeAction extends MainWindowAction {
         	}
         	putValue(Action.NAME, "Stop");
         	putValue(Action.SMALL_ICON, stopLogo);
+                putValue(Action.ACCELERATOR_KEY, STOP_KEY);
             }
     
             /**
@@ -132,6 +137,7 @@ public final class AutoModeAction extends MainWindowAction {
         	}
         	putValue(Action.NAME, getStartCommand());
         	putValue(Action.SMALL_ICON, startLogo);
+                putValue(Action.ACCELERATOR_KEY, START_KEY);
             }
     
         });

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -41,6 +41,6 @@ public abstract class AbstractSEDExceptionalTermination extends AbstractSEDTermi
     */
    @Override
    public String getNodeType() {
-      return "Exceptional Termination";
+      return "Exceptional " + super.getNodeType();
    }
 }

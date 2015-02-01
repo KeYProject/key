@@ -1,31 +1,31 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.gui.ApplyStrategy;
-import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
-import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
+import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
+import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -66,7 +66,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
    /**
     * Maps a {@link Goal} to the number of executed symbolic execution tree nodes.
     */
-   private Map<Goal, Integer> executedNumberOfSetNodesPerGoal = new LinkedHashMap<Goal, Integer>();
+   private final Map<Goal, Integer> executedNumberOfSetNodesPerGoal = new LinkedHashMap<Goal, Integer>();
    
    /**
     * Stores for each {@link Node} which is a symbolic execution tree node the computed result
@@ -74,7 +74,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
     * sure that it is only computed once and that the number of executed set statements is
     * not increased multiple times for the same {@link Node}.
     */
-   private Map<Node, Boolean> goalAllowedResultPerSetNode = new LinkedHashMap<Node, Boolean>();
+   private final Map<Node, Boolean> goalAllowedResultPerSetNode = new LinkedHashMap<Node, Boolean>();
    
    /**
     * Constructor to stop after one executed symbolic execution tree node.
@@ -130,14 +130,14 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
                }
                // Check if limit of set nodes of the current goal is exceeded
                if (executedNumberOfSetNodes.intValue() + 1 > maximalNumberOfSetNodesToExecutePerGoal) {
-                  goalAllowedResultPerSetNode.put(node, Boolean.FALSE);
+                  handleNodeLimitExceeded(maxApplications, timeout, proof, goalChooser, startTime, countApplied, goal, node, ruleApp, executedNumberOfSetNodes);
                   return false; // Limit of set nodes of this goal exceeded
                }
                else {
                   // Increase number of set nodes on this goal and allow rule application
                   executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
                   executedNumberOfSetNodesPerGoal.put(goal, executedNumberOfSetNodes);
-                  goalAllowedResultPerSetNode.put(node, Boolean.TRUE);
+                  handleNodeLimitNotExceeded(maxApplications, timeout, proof, goalChooser, startTime, countApplied, goal, node, ruleApp, executedNumberOfSetNodes);
                   return true;
                }
             }
@@ -153,6 +153,58 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
       else {
          return true; // Allowed, because ApplyStrategy will handle the null case
       }
+   }
+
+   /**
+    * Handles the state that the node limit is exceeded.
+    * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
+    * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
+    * @param proof The current {@link Proof}.
+    * @param goalChooser The current {@link IGoalChooser}.
+    * @param startTime The timestamp when the apply strategy has started, computed via {@link System#currentTimeMillis()}
+    * @param countApplied The number of already applied rules.
+    * @param goal The current {@link Goal} on which the next rule will be applied.
+    * @param node The {@link Node} of the current {@link Goal}.
+    * @param ruleApp The current {@link RuleApp}.
+    * @param executedNumberOfSetNodes The executed number of SET nodes.
+    */
+   protected void handleNodeLimitExceeded(int maxApplications, 
+                                          long timeout, 
+                                          Proof proof, 
+                                          IGoalChooser goalChooser, 
+                                          long startTime, 
+                                          int countApplied, 
+                                          Goal goal,
+                                          Node node,
+                                          RuleApp ruleApp,
+                                          Integer executedNumberOfSetNodes) {
+      goalAllowedResultPerSetNode.put(node, Boolean.FALSE);
+   }
+   
+   /**
+    * Handles the state that the node limit is not exceeded.
+    * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
+    * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
+    * @param proof The current {@link Proof}.
+    * @param goalChooser The current {@link IGoalChooser}.
+    * @param startTime The timestamp when the apply strategy has started, computed via {@link System#currentTimeMillis()}
+    * @param countApplied The number of already applied rules.
+    * @param goal The current {@link Goal} on which the next rule will be applied.
+    * @param node The {@link Node} of the current {@link Goal}.
+    * @param ruleApp The current {@link RuleApp}.
+    * @param executedNumberOfSetNodes The executed number of SET nodes.
+    */
+   protected void handleNodeLimitNotExceeded(int maxApplications, 
+                                             long timeout, 
+                                             Proof proof, 
+                                             IGoalChooser goalChooser, 
+                                             long startTime, 
+                                             int countApplied, 
+                                             Goal goal,
+                                             Node node,
+                                             RuleApp ruleApp,
+                                             Integer executedNumberOfSetNodes) {
+      goalAllowedResultPerSetNode.put(node, Boolean.TRUE);
    }
 
    /**
@@ -198,7 +250,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
             Integer executedValue = executedNumberOfSetNodesPerGoal.get(goal);
             if (executedValue != null) {
                // Reuse number of set nodes for new created goals
-               NodeIterator childIter = updatedNode.childrenIterator();
+                Iterator<Node> childIter = updatedNode.childrenIterator();
                while (childIter.hasNext()) {
                   Node next = childIter.next();
                   Goal nextGoal = next.proof().getGoal(next);

@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
@@ -124,10 +123,10 @@ public class MethodCall extends ProgramTransformer {
 
     private KeYJavaType getStaticPrefixType(ReferencePrefix refPrefix, Services services) {
 	if (refPrefix==null || refPrefix instanceof ThisReference && 
-	        ((ThisReference) refPrefix).getReferencePrefix()==null){ 
+	        refPrefix.getReferencePrefix()==null){
 	    return execContext.getTypeReference().getKeYJavaType();
 	} else if(refPrefix instanceof ThisReference){
-	    return ((TypeReference) ((ThisReference) refPrefix).getReferencePrefix()).getKeYJavaType();
+	    return ((TypeReference) refPrefix.getReferencePrefix()).getKeYJavaType();
 	    //((ProgramVariable) services.getTypeConverter().convertToLogicElement(refPrefix).op()).getKeYJavaType();
 	}else if (refPrefix instanceof TypeRef) {
 	    KeYJavaType t = ((TypeRef)refPrefix).getKeYJavaType();
@@ -145,7 +144,7 @@ public class MethodCall extends ProgramTransformer {
                 (execContext.getTypeReference().getKeYJavaType());
 	    return st; 	
 	} else {
-	    throw new de.uka.ilkd.key.util.NotSupported
+	    throw new IllegalArgumentException
 		("Unsupported method invocation mode\n"+
 		 refPrefix.getClass());
 	}			    
@@ -317,7 +316,7 @@ public class MethodCall extends ProgramTransformer {
 	return KeYJavaASTFactory.methodBody(pvar, newContext, meth, arguments);
     }
 
-    public Expression makeIOf(Type t) {
+    private Expression makeIOf(Type t) {
 	Debug.assertTrue(newContext!=null);
 	return KeYJavaASTFactory.instanceOf((Expression) newContext,
 		(KeYJavaType) t);
@@ -335,7 +334,7 @@ public class MethodCall extends ProgramTransformer {
     }
 
 
-    public VariableSpecification[] createParamSpecs(Services services){
+    private VariableSpecification[] createParamSpecs(Services services){
 	
 	MethodDeclaration methDecl    = pm.getMethodDeclaration();
 	int params                    = methDecl.getParameterDeclarationCount();
@@ -434,7 +433,7 @@ public class MethodCall extends ProgramTransformer {
     }
 
 
-    public Statement[] createParamAssignments(VariableSpecification[] specs) {
+    private Statement[] createParamAssignments(VariableSpecification[] specs) {
 	MethodDeclaration methDecl    = pm.getMethodDeclaration();
 	Statement[] paramDecl = new Statement[specs.length];
 	for (int i=0; i<specs.length; i++) {

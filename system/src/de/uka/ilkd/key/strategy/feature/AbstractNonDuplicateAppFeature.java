@@ -1,21 +1,21 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -76,23 +76,26 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         // compare the position of application
         if ( newPio != null ) {
             if ( ! ( cmp instanceof PosTacletApp ) ) return false;
-            final PosInOccurrence oldPio = ((PosTacletApp)cmp).posInOccurrence ();
+            final PosInOccurrence oldPio = cmp.posInOccurrence();
             if ( !comparePio ( newApp, cmp, newPio, oldPio ) ) return false;
         }
 
         
         // compare the if-sequent instantiations
-        if ( newApp.ifFormulaInstantiations () == null
-                || cmp.ifFormulaInstantiations () == null ) {  
-            if ( newApp.ifFormulaInstantiations () != null
-                    || cmp.ifFormulaInstantiations () != null ) { 
+       final ImmutableList<IfFormulaInstantiation> newAppIfFmlInstantiations = newApp.ifFormulaInstantiations ();
+       final ImmutableList<IfFormulaInstantiation> cmpIfFmlInstantiations = cmp.ifFormulaInstantiations ();
+       if ( newAppIfFmlInstantiations == null
+                || cmpIfFmlInstantiations == null ) {  
+            if ( newAppIfFmlInstantiations != null
+                    || cmpIfFmlInstantiations != null ) { 
                 return false;
             } 
         } else { 
-            final Iterator<IfFormulaInstantiation> it0 =
-                newApp.ifFormulaInstantiations ().iterator ();
+
+           final Iterator<IfFormulaInstantiation> it0 =
+                newAppIfFmlInstantiations.iterator ();
             final Iterator<IfFormulaInstantiation> it1 =
-                cmp.ifFormulaInstantiations ().iterator ();
+                cmpIfFmlInstantiations.iterator ();
 
             while ( it0.hasNext () ) {
                 // this test should be improved
@@ -110,26 +113,26 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         if ( !inst0.getUpdateContext ().equals ( inst1.getUpdateContext () ) )
             return false;
         
-        final ImmutableMap<SchemaVariable,InstantiationEntry> interesting0 =
+        final ImmutableMap<SchemaVariable,InstantiationEntry<?>> interesting0 =
             inst0.interesting ();
-        final ImmutableMap<SchemaVariable,InstantiationEntry> interesting1 =
+        final ImmutableMap<SchemaVariable,InstantiationEntry<?>> interesting1 =
             inst1.interesting ();
         return subset ( interesting0, interesting1 )
                && subset ( interesting1, interesting0 );
     }
     
-    private boolean subset(ImmutableMap<SchemaVariable,InstantiationEntry> insts0,
-                           ImmutableMap<SchemaVariable,InstantiationEntry> insts1) {
-        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> it =
+    private boolean subset(ImmutableMap<SchemaVariable,InstantiationEntry<?>> insts0,
+                           ImmutableMap<SchemaVariable,InstantiationEntry<?>> insts1) {
+        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it =
             insts0.entryIterator ();
 
         while ( it.hasNext () ) {
-            final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry0 = it.next ();
+            final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> entry0 = it.next ();
 
             if ( entry0.key () instanceof SkolemTermSV || entry0.key() instanceof VariableSV)
                 continue;
                 
-            final InstantiationEntry instEntry1 = insts1.get ( entry0.key () );
+            final InstantiationEntry<?> instEntry1 = insts1.get ( entry0.key () );
             
             if ( instEntry1 == null
                  || !entry0.value ().getInstantiation ()

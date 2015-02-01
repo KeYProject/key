@@ -1,24 +1,22 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.parser;
 
 
+import java.io.IOException;
 import java.io.Reader;
 
-import antlr.RecognitionException;
-import antlr.TokenStreamException;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
@@ -26,6 +24,9 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+
+import org.antlr.runtime.RecognitionException;
 
 
 /** This class wraps the default KeY-Term-Parser.
@@ -79,12 +80,10 @@ public final class DefaultTermParser {
                       AbbrevMap scm)
         throws ParserException
     {
+        KeYParserF parser = null;
         try{
-            KeYParser parser
-                = new KeYParser(ParserMode.TERM, new KeYLexer(
-		                in,
-		                services.getExceptionHandler()), 
-		                "",
+            parser
+                = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""),
 				new Recoder2KeY (services, nss),
                                 services, 
                                 nss, 
@@ -95,11 +94,10 @@ public final class DefaultTermParser {
 	        throw new ParserException("Expected sort "+sort+", but parser returns sort "+result.sort()+".", null);
         return result;
         } catch (RecognitionException re) {
-            throw new ParserException(re.getMessage(),
-                                      new Location(re.getFilename(),
-                                                   re.getLine(),
-                                                   re.getColumn()));
-        } catch (TokenStreamException tse) {
+            // problemParser cannot be null since exception is thrown during parsing.
+            String message = parser.getErrorMessage(re);
+            throw new ParserException(message, new Location(re));
+        } catch (IOException tse) {
             throw new ParserException(tse.getMessage(), null);
         }
     }

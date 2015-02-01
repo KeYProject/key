@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -27,10 +27,14 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 public class MenuItemForTwoModeRules extends JMenu implements
         BuiltInRuleMenuItem {
 
+    private static final int EXPAND_DELAY = 200;
     private static final long serialVersionUID = 2183229438545523499L;
+
+    // without selecting one the options above take unforced mode as default
+    private static final boolean DEFAULT_FORCE = true;
     
     private final BuiltInRule rule;
-    private boolean forcedMode = true;
+    private boolean forcedMode = DEFAULT_FORCE;
     // we support only one listener
     private ActionListener listener;
     
@@ -81,19 +85,19 @@ public class MenuItemForTwoModeRules extends JMenu implements
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                forcedMode = true;
+                forcedMode = DEFAULT_FORCE;
                 listener.actionPerformed(new ActionEvent(MenuItemForTwoModeRules.this, 
                         ActionEvent.ACTION_PERFORMED, e.getActionCommand()));
             }
         });
 
         // wait a bit longer before expanding submenus
-        setDelay(getDelay() + 500);
+        setDelay(getDelay() + EXPAND_DELAY);
         
         super.addMouseListener(new MouseAdapter() {            
             @Override
             public void mouseClicked(MouseEvent e) {
-                forcedMode = true;
+                forcedMode = DEFAULT_FORCE;
                 
                 listener.actionPerformed(new ActionEvent(MenuItemForTwoModeRules.this, 
                         ActionEvent.ACTION_PERFORMED, getText()));                

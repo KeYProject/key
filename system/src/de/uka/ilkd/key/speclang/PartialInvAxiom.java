@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.speclang;
 
@@ -39,7 +38,7 @@ import de.uka.ilkd.key.util.Pair;
  * that the invariants of the objects of a particular class imply a particular
  * formula. These axioms are logically weaker than the full definitions of <inv>
  * expressed as RepresentsAxioms, but they may have higher visibility, making
- * them available in proofs where the corresponing full definition is not.
+ * them available in proofs where the corresponding full definition is not.
  */
 public final class PartialInvAxiom extends ClassAxiom {
     
@@ -58,6 +57,8 @@ public final class PartialInvAxiom extends ClassAxiom {
 	assert !isStatic || inv.isStatic();
 	this.target = isStatic? services.getJavaInfo().getStaticInv(inv.getKJT())
 	            : services.getJavaInfo().getInv();
+	
+	
 	assert target != null;
     }
     
@@ -66,6 +67,21 @@ public final class PartialInvAxiom extends ClassAxiom {
         this.displayName = displayName;
     }
     
+    
+    @Override
+    public boolean equals(Object o) {
+       if (o == null || this.getClass() != o.getClass()) return false;
+       final PartialInvAxiom other = (PartialInvAxiom) o;
+       
+       if (!target.equals(other.target)) return false;
+       if (!inv.equals(other.inv)) return false;
+       return true;
+    }
+    
+    @Override
+    public int hashCode() {
+       return 17*(inv.hashCode() + 17 * target.hashCode());
+    }
     @Override
     public String getName() {
 	return inv.getName();
@@ -98,7 +114,7 @@ public final class PartialInvAxiom extends ClassAxiom {
 
         for (int i = 0; i < 2; i++) {
             TacletGenerator TG = TacletGenerator.getInstance();
-            Name name = MiscTools.toValidTacletName("Partial inv axiom for "
+            final Name name = MiscTools.toValidTacletName("Partial inv axiom for "
                                                     + (target.isStatic()? "static ": "")
                                                     + inv.getName()
                                                     + (i == 0 ? "" : " EQ"));
@@ -151,7 +167,7 @@ public final class PartialInvAxiom extends ClassAxiom {
     public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
 	    						Services services) {
 	final ProgramVariable dummySelfVar 
-		= TB.selfVar(services, inv.getKJT(), false);
+		= services.getTermBuilder().selfVar(inv.getKJT(), false);
 	return MiscTools.collectObservers(inv.getInv(dummySelfVar, services));
     }
     

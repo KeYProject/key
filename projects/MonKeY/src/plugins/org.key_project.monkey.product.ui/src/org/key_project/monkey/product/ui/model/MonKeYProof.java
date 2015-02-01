@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -16,30 +16,33 @@ package org.key_project.monkey.product.ui.model;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 
 import org.eclipse.core.runtime.Assert;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.monkey.product.ui.util.MonKeYUtil;
 import org.key_project.util.bean.Bean;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.SwingUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.symbolic_execution.util.ProofUserManager;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -74,14 +77,19 @@ public class MonKeYProof extends Bean {
     public static final String PROP_REUSE_STATUS = "reuseStatus";
 
     /**
-     * The {@link UserInterface} to do proofs in.
+     * Bean property {@link #isHasGoalWithApplicableRules()}.
      */
-    private UserInterface ui;
+    public static final String PROP_HAS_GOAL_WITH_APPLICABLE_RULES = "hasGoalWithApplicableRules";
+
+    /**
+     * Bean property {@link #isHasGoalWithoutApplicableRules()}.
+     */
+    public static final String PROP_HAS_GOAL_WITHOUT_APPLICABLE_RULES = "hasGoalWithoutApplicableRules";
     
     /**
-     * The {@link InitConfig} which provides the code to prove.
+     * The {@link KeYEnvironment} to use.
      */
-    private InitConfig initConfig;
+    private KeYEnvironment<?> environment;
 
     /**
      * The {@link Contract} to proof.
@@ -137,30 +145,36 @@ public class MonKeYProof extends Bean {
      * The reuse status.
      */
     private String reuseStatus;
+    
+    /**
+     * If true at least one {@link Goal} has applicable rules left.
+     */
+    private boolean hasGoalWithApplicableRules;
+    
+    /**
+     * If true at least one {@link Goal} has no applicable rules.
+     */
+    private boolean hasGoalWithoutApplicableRules;
 
    /**
      * Constructor.
      * @param typeName The type.
      * @param targetName The target. 
      * @param contractName The contract.
-     * @param ui The {@link UserInterface} to do proofs in.
-     * @param initConfig The {@link InitConfig} which provides the code to prove.
+     * @param environment The {@link KeYEnvironment} to use.
      * @param contract The {@link Contract} to proof.
      */
     public MonKeYProof(String typeName, 
                        String targetName, 
                        String contractName,
-                       UserInterface ui,
-                       InitConfig initConfig,
+                       KeYEnvironment<?> environment,
                        Contract contract) {
-        Assert.isNotNull(ui);
-        Assert.isNotNull(initConfig);
+        Assert.isNotNull(environment);
         Assert.isNotNull(contract);
         this.typeName = typeName;
         this.targetName = targetName;
         this.contractName = contractName;
-        this.ui = ui;
-        this.initConfig = initConfig;
+        this.environment = environment;
         this.contract = contract;
     }
 
@@ -200,16 +214,18 @@ public class MonKeYProof extends Bean {
      * Starts the proof in KeY and tries to fulfill it automatically.
      * @throws Exception Occurred Exception.
      */
-    public void startProof(final boolean expandMethods,
+    public void startProof(final int maxRuleApplications,
+                           final boolean expandMethods,
                            final boolean useDependencyContracts,
                            final boolean useQuery,
-                           final boolean useDefOps) throws Exception {
+                           final boolean useDefOps,
+                           final boolean stopAtUnclosable) throws Exception {
        // Start auto mode only if proof is not already closed.
        if (!MonKeYProofResult.CLOSED.equals(getResult())) {
           // Check if the proof is still valid
           if (proof != null && !proof.isDisposed()) {
              // proof is invalid, reset this automatic proof instance
-             proof = null; 
+             removeProof(); 
              setResult(MonKeYProofResult.UNKNOWN);
              updateStatistics();
           }
@@ -219,10 +235,11 @@ public class MonKeYProof extends Bean {
                   @Override
                   public void run() {
                       try {
-                          ProofOblInput input = contract.createProofObl(initConfig, contract);
+                          ProofOblInput input = contract.createProofObl(environment.getInitConfig(), contract);
                           Assert.isNotNull(input);
-                          Proof proof = ui.createProof(initConfig, input);
+                          Proof proof = environment.getUi().createProof(environment.getInitConfig(), input);
                           Assert.isNotNull(proof);
+                          ProofUserManager.getInstance().addUser(proof, environment, MonKeYProof.this);
                           setResult(proof);
                       }
                       catch (Exception e) {
@@ -255,33 +272,27 @@ public class MonKeYProof extends Bean {
                    sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, useDependencyContracts ? StrategyProperties.DEP_ON : StrategyProperties.DEP_OFF);
                    sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, useQuery ? StrategyProperties.QUERY_ON : StrategyProperties.QUERY_OFF);
                    sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, useDefOps ? StrategyProperties.NON_LIN_ARITH_DEF_OPS : StrategyProperties.NON_LIN_ARITH_NONE);
+                   sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, stopAtUnclosable ? StrategyProperties.STOPMODE_NONCLOSE : StrategyProperties.STOPMODE_DEFAULT);
                    proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
                    // Make sure that the new options are used
+                   ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(maxRuleApplications);
                    ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
-                   proof.setActiveStrategy(ui.getMediator().getProfile().getDefaultStrategyFactory().create(proof, sp));
+                   proof.getSettings().getStrategySettings().setMaxSteps(maxRuleApplications);
+                   proof.setActiveStrategy(environment.getMediator().getProfile().getDefaultStrategyFactory().create(proof, sp));
                 }
              });
              // Start interactive proof automatically
              proofStartTime = System.currentTimeMillis();
-             if (isMainWindowEnvironment()) {
+             if (MonKeYUtil.isMainWindowEnvironment(environment)) {
                 KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof); // Run auto mode without result dialog
              }
              else {
-                ui.startAndWaitForAutoMode(proof); // Run auto mode outside of MainWindow where no result dialog exist
+                environment.getUi().startAndWaitForAutoMode(proof); // Run auto mode outside of MainWindow where no result dialog exist
              }
              // Update statistics
              updateStatistics();
           }
        }
-    }
-    
-    /**
-     * Checks if the {@link KeYEnvironment} is shown in KeY's {@link MainWindow}.
-     * @return {@code true} {@link KeYEnvironment} is shown in {@link MainWindow}, {@code false} {@link KeYEnvironment} is not shown in {@link MainWindow}.
-     */
-    protected boolean isMainWindowEnvironment() {
-       return MainWindow.hasInstance() && 
-              MainWindow.getInstance().getUserInterface() == ui;
     }
 
     /**
@@ -300,6 +311,20 @@ public class MonKeYProof extends Bean {
         setTime((proof != null && !proof.isDisposed()) ? getTime() + (System.currentTimeMillis() - proofStartTime) : 0l);
         setNodes((proof != null && !proof.isDisposed()) ? proof.countNodes() : 0);
         setBranches((proof != null && !proof.isDisposed()) ? proof.countBranches() : 0);
+        boolean hasGoalWithApplicableRules = false;
+        boolean hasGoalWithoutApplicableRules = false;
+        Iterator<Goal> iter = proof.openGoals().iterator();
+        while ((!hasGoalWithApplicableRules || !hasGoalWithoutApplicableRules) && iter.hasNext()) {
+           Goal next = iter.next();
+           if (SymbolicExecutionUtil.hasApplicableRules(next)) {
+              hasGoalWithApplicableRules = true;
+           }
+           else {
+              hasGoalWithoutApplicableRules = true;
+           }
+        }
+        setHasGoalWithApplicableRules(hasGoalWithApplicableRules);
+        setHasGoalWithoutApplicableRules(hasGoalWithoutApplicableRules);
     }
 
     /**
@@ -324,7 +349,7 @@ public class MonKeYProof extends Bean {
      * Sets the number of proof nodes.
      * @param nodes The number of proof nodes to set.
      */
-    public void setNodes(int nodes) {
+    protected void setNodes(int nodes) {
         int oldValue = getNodes();
         this.nodes = nodes;
         firePropertyChange(PROP_NODES, oldValue, getNodes());
@@ -342,7 +367,7 @@ public class MonKeYProof extends Bean {
      * Sets the reuse status.
      * @param reuseStatus The reuse status to set.
      */
-    public void setReuseStatus(String reuseStatus) {
+    protected void setReuseStatus(String reuseStatus) {
         String oldValue = getReuseStatus();
         this.reuseStatus = reuseStatus;
         firePropertyChange(PROP_REUSE_STATUS, oldValue, getReuseStatus());
@@ -360,7 +385,7 @@ public class MonKeYProof extends Bean {
      * Sets the number of branches.
      * @param branches The number of branches to set.
      */
-    public void setBranches(int branches) {
+    protected void setBranches(int branches) {
         int oldValue = getBranches();
         this.branches = branches;
         firePropertyChange(PROP_BRANCHES, oldValue, getBranches());
@@ -378,13 +403,49 @@ public class MonKeYProof extends Bean {
      * Sets the elapsed time.
      * @param time The elapsed time to set.
      */
-    public void setTime(long time) {
+    protected void setTime(long time) {
         long oldValue = getTime();
         this.time = time;
         firePropertyChange(PROP_TIME, oldValue, getTime());
     }
 
-    /**
+   /**
+    * Checks if at least one goal with applicable rules is available.
+    * @return {@code true} available, {@code false} not available.
+    */
+   public boolean isHasGoalWithApplicableRules() {
+      return hasGoalWithApplicableRules;
+   }
+
+   /**
+    * Defines if at least one goal with applicable rules is available.
+    * @param hasGoalWithApplicableRules {@code true} available, {@code false} not available.
+    */
+   protected void setHasGoalWithApplicableRules(boolean hasGoalWithApplicableRules) {
+      boolean oldValue = isHasGoalWithApplicableRules();
+      this.hasGoalWithApplicableRules = hasGoalWithApplicableRules;
+      firePropertyChange(PROP_HAS_GOAL_WITH_APPLICABLE_RULES, oldValue, isHasGoalWithApplicableRules());
+   }
+
+   /**
+    * Checks if at least one goal without applicable rules is available.
+    * @return {@code true} available, {@code false} not available.
+    */
+   public boolean isHasGoalWithoutApplicableRules() {
+      return hasGoalWithoutApplicableRules;
+   }
+
+   /**
+    * Defines if at least one goal without applicable rules is available.
+    * @param hasGoalWithoutApplicableRules {@code true} available, {@code false} not available.
+    */
+   protected void setHasGoalWithoutApplicableRules(boolean hasGoalWithoutApplicableRules) {
+      boolean oldValue = isHasGoalWithoutApplicableRules();
+      this.hasGoalWithoutApplicableRules = hasGoalWithoutApplicableRules;
+      firePropertyChange(PROP_HAS_GOAL_WITHOUT_APPLICABLE_RULES, oldValue, isHasGoalWithoutApplicableRules());
+   }
+
+   /**
      * Checks if a proof result is available.
      * @return {@code true} proof result is available, {@code false} no proof result available.
      */
@@ -413,10 +474,10 @@ public class MonKeYProof extends Bean {
           Runnable run = new Runnable() {
              @Override
              public void run() {
-                ui.removeProof(proofToRemove);
+                ProofUserManager.getInstance().removeUserAndDispose(proofToRemove, MonKeYProof.this);
              }
           };
-          if (isMainWindowEnvironment()) {
+          if (MonKeYUtil.isMainWindowEnvironment(environment)) {
              SwingUtil.invokeAndWait(run);
           }
           else {
@@ -502,17 +563,17 @@ public class MonKeYProof extends Bean {
                public void run() {
                    try {
                        final File bootClassPathFile = !StringUtil.isTrimmedEmpty(bootClassPath) ? new File(bootClassPath) : null;
-                       if (isMainWindowEnvironment()) {
+                       if (MonKeYUtil.isMainWindowEnvironment(environment)) {
                           KeYUtil.runWithoutResultDialog(new KeYUtil.IRunnableWithMainWindow() {
                              @Override
                              public void run(MainWindow main) throws Exception {
-                                DefaultProblemLoader loader = main.getUserInterface().load(null, new File(proofDirectory, getProofFileName()), null, bootClassPathFile);
+                                AbstractProblemLoader loader = main.getUserInterface().load(null, new File(proofDirectory, getProofFileName()), null, bootClassPathFile, null, false);
                                 setResult(loader.getProof());
                              }
                           });
                        }
                        else {
-                          DefaultProblemLoader loader = ui.load(null, new File(proofDirectory, getProofFileName()), null, bootClassPathFile);
+                          AbstractProblemLoader loader = environment.getUi().load(null, new File(proofDirectory, getProofFileName()), null, bootClassPathFile, null, false);
                           setResult(loader.getProof());
                        }
                    }
@@ -571,10 +632,10 @@ public class MonKeYProof extends Bean {
    }
 
    /**
-    * Returns the {@link UserInterface} in which {@link #getProof()} lives.
-    * @return The {@link UserInterface} in which {@link #getProof()} lives.
+    * Returns the used {@link KeYEnvironment}.
+    * @return The used {@link KeYEnvironment}.
     */
-   public UserInterface getUi() {
-      return ui;
+   public KeYEnvironment<?> getEnvironment() {
+      return environment;
    }
 }

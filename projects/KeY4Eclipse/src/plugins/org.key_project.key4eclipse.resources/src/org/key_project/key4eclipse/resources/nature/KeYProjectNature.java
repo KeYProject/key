@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -20,6 +20,10 @@ import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 import org.key_project.util.java.ArrayUtil;
 
+/**
+ * The KeYProject nature.
+ * @author Stefan Käsdorf
+ */
 public class KeYProjectNature implements IProjectNature  {
    
    public final static String NATURE_ID = "org.key_project.key4eclipse.resources.KeYProjectNature";

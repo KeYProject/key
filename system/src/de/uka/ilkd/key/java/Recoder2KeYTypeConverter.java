@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.java;
 
@@ -36,7 +35,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -415,7 +413,7 @@ public class Recoder2KeYTypeConverter {
                         	     integerType, 
                         	     superArrayType, 
                         	     false,
-                        	     false));
+                        	     false, false, true));
         FieldDeclaration f = new FieldDeclaration(new Modifier[] {
                 new Public(), new Final() }, new TypeRef(integerType),
                 new FieldSpecification[] { specLength }, false);
@@ -457,8 +455,9 @@ public class Recoder2KeYTypeConverter {
                     initArrayMethodBuilder();
                 }	
 
-                final IProgramMethod prepare = arrayMethodBuilder.getPrepareArrayMethod(
-										       parentReference, length, defaultValue, fields);
+                final IProgramMethod prepare =
+                        arrayMethodBuilder.getPrepareArrayMethod(parentReference, length,
+                                                                 defaultValue, fields);
 
                 members.add(arrayMethodBuilder
                         .getArrayInstanceAllocatorMethod(parentReference));

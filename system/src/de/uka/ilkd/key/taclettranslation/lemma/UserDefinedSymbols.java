@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -15,12 +15,16 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -28,7 +32,9 @@ import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -43,7 +49,7 @@ public class UserDefinedSymbols {
                 public int compare(Named o1, Named o2) {
                         return o1.name().compareTo(o2.name());
                 }
-                
+
         }
         final UserDefinedSymbols parent;
         final Set<Named> usedExtraFunctions = new TreeSet<Named>(
@@ -59,7 +65,7 @@ public class UserDefinedSymbols {
         final ImmutableSet<Taclet> axioms;
         private final NamespaceSet referenceNamespaces;
         private String ruleHeader = null;
-      
+
 
         public UserDefinedSymbols(NamespaceSet referenceNamespaces,
                         ImmutableSet<Taclet> axioms) {
@@ -155,7 +161,7 @@ public class UserDefinedSymbols {
                         }
                         return ruleHeader;
                 } else {
-                        return parent.ruleHeader;
+                        return parent.getRuleHeader(services);
                 }
         }
 
@@ -175,15 +181,30 @@ public class UserDefinedSymbols {
         }
         
         private StringBuffer createHeaderFor(Taclet taclet, Services services){
-                NotationInfo info = new NotationInfo();
-                StringBackend backend = new StringBackend(80);
-              LogicPrinter printer = new LogicPrinter(new ProgramPrinter(),info, backend,services,true);
-              printer.printTaclet(taclet);
-           
-              return new StringBuffer(backend.getString()+";");
+            NotationInfo info = new NotationInfo();
+            StringBackend backend = new StringBackend(80);
+            LogicPrinter printer = new LogicPrinter(new ProgramPrinter(),info, backend,services,true);
+            printer.printTaclet(taclet);
+
+            return new StringBuffer(backend.getString()+";");
         }
 
 
+        public void replaceGenericByProxySorts() {
+            Set<Named> result = new HashSet<Named>();
+            for (Named sort : usedExtraSorts) {
+                if (sort instanceof GenericSort) {
+                    GenericSort genSort = (GenericSort) sort;
+                    ProxySort proxySort = new ProxySort(genSort.name(), genSort.extendsSorts());
+                    result.add(proxySort);
+                } else {
+                    result.add(sort);
+                }
+            }
+
+            usedExtraSorts.clear();
+            usedExtraSorts.addAll(result);
+        }
 
 
         public String createHeader(Services services) {
@@ -247,6 +268,14 @@ public class UserDefinedSymbols {
                
         }
         
+        public Map<Name, Sort> getExtraSorts() {
+            Map<Name, Sort> result = new HashMap<Name, Sort>();
+            for (Named sort : usedExtraSorts) {
+                result.put(sort.name(), (Sort) sort);
+            }
+            return result;
+        }
+
         private void createHeaderForSorts(StringBuffer result){
                 LinkedList<Named> sorts  = new LinkedList<Named>();              
                 getAllSorts(sorts);
@@ -262,7 +291,7 @@ public class UserDefinedSymbols {
                                      if(sortParent !=    Sort.ANY){
                                              res += sortParent.name()+", ";
                                              extendsAtLeastOneSort = true;
-                                     }                                    
+                                     }
                              }
                              if(extendsAtLeastOneSort){
                                      int index = res.lastIndexOf(", ");
@@ -271,7 +300,7 @@ public class UserDefinedSymbols {
                              }
                         }
                         result.append(";\n");
-                }                
+                }
         }
         
         private void createHeaderForFunctions(StringBuffer result){
@@ -284,7 +313,7 @@ public class UserDefinedSymbols {
                         result.append(symbol.name());
                         result.append(createSignature(op));
                         result.append(";\n");
-                }                
+                }
         }
         
         private void createHeaderForPredicates(StringBuffer result){
@@ -296,7 +325,7 @@ public class UserDefinedSymbols {
                         result.append(symbol.name());
                         result.append(createSignature(op));
                         result.append(";\n");
-                }                
+                }
         }
         
         private void createHeaderForSchemaVariables(StringBuffer result){
@@ -311,7 +340,7 @@ public class UserDefinedSymbols {
                         result.append(sv.sort().name()+" ");
                         result.append(symbol.name());
                         result.append(";\n");
-                }                
+                }
         }
         
         private String createSignature(Function op){

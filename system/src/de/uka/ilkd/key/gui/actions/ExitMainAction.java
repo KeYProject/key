@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -17,15 +17,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowListener;
+import java.util.EventObject;
 
-import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.PathConfig;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ViewSettings;
+import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 
 public class ExitMainAction extends MainWindowAction {
    /**
@@ -43,26 +43,25 @@ public class ExitMainAction extends MainWindowAction {
    public ExitMainAction(MainWindow mainWindow) {
        super(mainWindow);
        setName("Exit");
+       setIcon(IconFactory.quit(16));
        setTooltip("Leave KeY.");
        setAcceleratorLetter(KeyEvent.VK_Q);
    }
 
    public final WindowListener windowListener = new WindowAdapter() {
+       @Override
        public void windowClosing(java.awt.event.WindowEvent e) {
            exitMain();
-       };
+       }
    };
 
    protected void exitMain() {
        final ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
        if (vs.confirmExit()) {
-           final JCheckBox checkbox = new JCheckBox("Don't ask me again");
-           final Object[] message = new Object[]{"Really Quit?\n\n",checkbox};
            final int option = JOptionPane.showConfirmDialog
-                   (mainWindow, message, "Exit",
+                   (mainWindow, "Really Quit?\n", "Exit",
                            JOptionPane.YES_NO_OPTION);
            if (option == JOptionPane.YES_OPTION) {
-               vs.setConfirmExit(!checkbox.isSelected());
                exitMainWithoutInteraction();
            }
        } else {
@@ -83,10 +82,11 @@ public class ExitMainAction extends MainWindowAction {
      */
     public void exitMainWithoutInteraction() {
         mainWindow.getRecentFiles().store(PathConfig.getRecentFileStorage());
-        getMediator().fireShutDown(new GUIEvent(this));
+        getMediator().fireShutDown(new EventObject(this));
 
         System.out.println("Have a nice day.");
-        mainWindow.savePreferences();
+        mainWindow.savePreferences(mainWindow);
+        mainWindow.syncPreferences();
         if (exitSystem) {
             // TODO: why -1 and not 0 ???
            System.exit(-1);

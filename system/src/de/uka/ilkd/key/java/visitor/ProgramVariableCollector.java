@@ -1,19 +1,19 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.java.visitor;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
  * Walks through a java AST in depth-left-fist-order.
@@ -86,7 +87,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     @Override
     public void performActionOnLoopInvariant(LoopInvariant x) {
         TermProgramVariableCollector tpvc =
-            new TermProgramVariableCollector(services);
+            services.getFactory().create(services);
         Term selfTerm = x.getInternalSelfTerm();
 
         Map<LocationVariable,Term> atPres = x.getInternalAtPres();
@@ -107,6 +108,25 @@ public class ProgramVariableCollector extends JavaASTVisitor {
            }
         }
 
+       //information flow (TODO: does this really belong here?)
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            ImmutableList<InfFlowSpec> infFlowSpecs =
+                   x.getInfFlowSpecs(heap, selfTerm, atPres, services);
+            if (infFlowSpecs != null) {
+                for (InfFlowSpec infFlowSpec : infFlowSpecs) {
+                    for (Term t: infFlowSpec.preExpressions) {
+                        t.execPostOrder(tpvc);
+                    }
+                    for (Term t: infFlowSpec.postExpressions) {
+                        t.execPostOrder(tpvc);
+                    }
+                    for (Term t: infFlowSpec.newObjects) {
+                        t.execPostOrder(tpvc);
+                    }
+                }
+            }
+        }
+
         //variant
         Term v = x.getVariant(selfTerm, atPres, services);
         if(v != null) {
@@ -119,7 +139,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 
     @Override
     public void performActionOnBlockContract(BlockContract x) {
-        TermProgramVariableCollector collector = new TermProgramVariableCollector(services);
+        TermProgramVariableCollector collector = services.getFactory().create(services);
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             Term precondition = x.getPrecondition(heap, services);
             if (precondition != null) {
@@ -136,6 +156,18 @@ public class ProgramVariableCollector extends JavaASTVisitor {
             Term modifiesClause = x.getModifiesClause(heap, services);
             if (modifiesClause != null) {
                 modifiesClause.execPostOrder(collector);
+            }
+        }
+        ImmutableList<InfFlowSpec> infFlowSpecs = x.getInfFlowSpecs();
+        for (InfFlowSpec ts : infFlowSpecs) {
+            for (Term t : ts.preExpressions) {
+                t.execPostOrder(collector);
+            }
+            for (Term t : ts.postExpressions) {
+                t.execPostOrder(collector);
+            }
+            for (Term t : ts.newObjects) {
+                t.execPostOrder(collector);
             }
         }
         result.addAll(collector.result());

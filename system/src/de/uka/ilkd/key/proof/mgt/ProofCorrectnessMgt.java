@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof.mgt;
 
@@ -22,8 +21,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.RuleAppListener;
+import de.uka.ilkd.key.core.RuleAppListener;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Proof;
@@ -33,6 +31,7 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.util.Debug;
 
 
 public final class ProofCorrectnessMgt {
@@ -44,7 +43,6 @@ public final class ProofCorrectnessMgt {
     private final DefaultMgtProofTreeListener proofTreeListener
 	= new DefaultMgtProofTreeListener();
 
-    private KeYMediator mediator;
     private Set<RuleApp> cachedRuleApps = new LinkedHashSet<RuleApp>();
     private ProofStatus proofStatus = ProofStatus.OPEN;
     
@@ -57,6 +55,7 @@ public final class ProofCorrectnessMgt {
 	this.proof = p;
         this.specRepos = p.getServices().getSpecificationRepository();
 	proof.addProofTreeListener(proofTreeListener);
+	proof.addRuleAppListener(proofListener);
     }
     
 
@@ -82,7 +81,7 @@ public final class ProofCorrectnessMgt {
     //-------------------------------------------------------------------------
     
     public RuleJustification getJustification(RuleApp r) {
-	return proof.env()
+	return proof.getInitConfig()
 	            .getJustifInfo()
 	            .getJustification(r, proof.getServices());
     }
@@ -94,7 +93,7 @@ public final class ProofCorrectnessMgt {
      */
     public boolean isContractApplicable(Contract contract) {
         //get the contract which is being verified in our current proof
-	final ContractPO po = specRepos.getPOForProof(proof);
+	final ContractPO po = specRepos.getContractPOForProof(proof);
         if(po == null) {
             return true;
         }
@@ -243,7 +242,7 @@ public final class ProofCorrectnessMgt {
     public void ruleApplied(RuleApp r) {
 	RuleJustification rj = getJustification(r);
 	if(rj==null) {
-	    System.err.println("No justification found for rule " 
+	    Debug.out("No justification found for rule " 
 		               + r.rule().name());
 	    return;
 	}
@@ -276,25 +275,9 @@ public final class ProofCorrectnessMgt {
         }
 	return result;
     }
-
-    
-    public void setMediator(KeYMediator p_mediator) {
-	if(mediator != null) {
-	    mediator.removeRuleAppListener(proofListener);
-	}
-
-	mediator = p_mediator;
-
-	if(mediator != null) {
-	    mediator.addRuleAppListener(proofListener);
-	}
-    }
-    
     
     public void removeProofListener(){
-        if(mediator != null) {
-          mediator.removeRuleAppListener(proofListener);
-        }
+       proof.removeRuleAppListener(proofListener);
     }
 
         
@@ -302,11 +285,10 @@ public final class ProofCorrectnessMgt {
 	return proofStatus;
     }
     
-    
-    public void finalize() {
-        if(mediator != null) {
-            mediator.removeRuleAppListener(proofListener);
-        }
+    @Override
+    protected void finalize() throws Throwable {
+       removeProofListener();
+       super.finalize();
     }
 
     
@@ -317,12 +299,9 @@ public final class ProofCorrectnessMgt {
     
     private class DefaultMgtProofListener implements RuleAppListener {
 	public void ruleApplied(ProofEvent e) {
-	    if(proof == e.getSource()) {
-                //%% actually I only want to listen to events of one proof
 		ProofCorrectnessMgt.this.ruleApplied
 		    (e.getRuleAppInfo().getRuleApp());
 	    }
-	}
     }
 
     

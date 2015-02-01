@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.collection;
 
@@ -39,8 +38,6 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 	return (DefaultImmutableSet<T>) NILSet.NIL;
     }
 
-
-    private int hashCode = -1;
 
     protected DefaultImmutableSet() {
 	elementList = ImmutableSLList.<T>nil();
@@ -175,13 +172,35 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     }
 
     public int hashCode() {
-	if ( hashCode == -1 ) {
-	    hashCode = elementList.hashCode() * 7;
-	    if (hashCode == -1) {
-		hashCode = 2;
-	    }
-	}
-	return hashCode;
+        int hashCode = 0;
+        ImmutableList<T> crt = this.elementList;
+
+        while (!crt.isEmpty()) {
+            final T element = crt.head();
+            hashCode = 17*(element == null ? 0 : element.hashCode()) + hashCode;                
+            crt = crt.tail();
+        }
+        return hashCode;
+    }
+
+    /**
+     * Get the underlying immutable list.
+     *
+     * @return an immutable list with the same iteration order as this set.
+     */
+    public ImmutableList<T> toImmutableList() {
+        return elementList;
+    }
+
+    /**
+     * Create an immutable set from an immutable list.
+     *
+     * @param list
+     *            a non-null immutable list
+     * @return a fresh immutable set with the same iteration order.
+     */
+    public static<T> ImmutableSet<T> fromImmutableList(ImmutableList<T> list) {
+        return new DefaultImmutableSet<T>(list);
     }
 
 
@@ -205,7 +224,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
          * 
          */
         private static final long serialVersionUID = -8055357307337694419L;
-    static final NILSet<?> NIL = new NILSet();
+        static final NILSet<?> NIL = new NILSet();
 
 	private NILSet() {}
 

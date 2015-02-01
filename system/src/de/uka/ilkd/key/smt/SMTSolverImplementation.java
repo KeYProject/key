@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.smt;
 
@@ -21,7 +20,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
+import de.uka.ilkd.key.testgen.ProofInfo;
 
 interface SolverListener {
         void processStarted(SMTSolver solver, SMTProblem problem);
@@ -37,19 +38,31 @@ interface SolverListener {
 }
 
 final class SMTSolverImplementation implements SMTSolver, Runnable{
-
+ 
         private static int IDCounter = 0;
         private final int ID = IDCounter++;
+        
+        private AbstractSolverSocket socket;
+        
+        private ModelExtractor query;
 
 
-        /** The SMT problem that is related to this solver */
+        public ModelExtractor getQuery() {
+			return query;
+		}
+
+		public void setQuery(ModelExtractor query) {
+			this.query = query;
+		}
+
+		/** The SMT problem that is related to this solver */
         private SMTProblem problem;
         /** It is possible that a solver has a listener. */
         private SolverListener listener;
 
         /** starts a external process and returns the result */
         private ExternalProcessLauncher<SolverCommunication> processLauncher;
-
+   
         /**
          * The services object is stored in order to have the possibility to
          * access it in every method
@@ -60,7 +73,13 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
          * it also contains the final result.
          */
         private SolverCommunication solverCommunication = SolverCommunication.EMPTY;
-
+        
+        /**
+         * This holds information relevant for retrieving information on a model
+         * from an SMT instance.
+         * null in the beginning, is created at translation time.
+         */
+        private ProblemTypeInformation problemTypeInformation = null;
 
         /**
          * This lock variable is responsible for the state variable
@@ -100,10 +119,10 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
          * this attribute
          */
         private Throwable exception;
-
+        
         private Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<Throwable>();
 
-
+ 
 
 
         SMTSolverImplementation(SMTProblem problem, SolverListener listener,
@@ -112,6 +131,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 this.listener = listener;
                 this.services = services;
                 this.type = myType;
+                this.socket = AbstractSolverSocket.createSocket(type, query);
                 processLauncher = new ExternalProcessLauncher<SolverCommunication>(new SolverCommunication(),type.getDelimiters());
 
         }
@@ -120,7 +140,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
          * Starts a solver process. This method should be accessed only by an
          * instance of <code>SolverLauncher</code>. If you want to start a
          * solver please have a look at <code>SolverLauncher</code>.
-         *
+         * 
          * @param timeout
          * @param settings
          */
@@ -220,10 +240,11 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
         @Override
         public void run() {
+        		
                 // Firstly: Set the state to running and inform the listener.
                 setSolverState(SolverState.Running);
                 listener.processStarted(this, problem);
-
+                                
                 // Secondly: Translate the given problem
                 String commands[];
                 try {
@@ -235,20 +256,20 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                         solverTimeout.cancel();
                         return;
                 }
-
+     
 
                 // start the external process.
                 try {
-                        processLauncher.launch(commands,type.modifyProblem(problemString),type);
-
+                        processLauncher.launch(commands,type.modifyProblem(problemString),socket);
+                 
                         solverCommunication = processLauncher.getCommunication();
-                        if(solverCommunication.exceptionHasOccurred() &&
-                          !solverCommunication.resultHasBeenSet()){
-                        	// if the result has already been set, the exceptions
+                        if(solverCommunication.exceptionHasOccurred() && 
+                          !solverCommunication.resultHasBeenSet()){ 
+                        	// if the result has already been set, the exceptions 
                         	// must have occurred while doing the remaining communication, which is not that important.
                         	throw new AccumulatedException(solverCommunication.getExceptions());
                         }
-
+                                      
                         // uncomment for testing
                       //  Thread.sleep(3000);
                         // uncomment for testing
@@ -290,7 +311,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         }
 
 
-
+        
         private static String indent(String string) {
 
             StringBuilder sb = new StringBuilder();
@@ -318,24 +339,36 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         }
 
 
-       private String[] translateToCommand(Term term)
-                        throws IllegalFormulaException, IOException {
+        private String[] translateToCommand(Term term)
+        		throws IllegalFormulaException, IOException {
 
-                SMTTranslator trans = getType().createTranslator(services);
-                // instantiateTaclets(trans);
 
-                problemString = indent(trans.translateProblem(term, services,
-                                smtSettings).toString());
+        	if(getType() == SolverType.Z3_CE_SOLVER){
+        		ProofInfo info = new ProofInfo(problem.getGoal().proof());
+        		SMTObjTranslator objTrans = new SMTObjTranslator(smtSettings, services,info);
+        		problemString = objTrans.translateProblem(term, services, smtSettings).toString();
+        		problemTypeInformation = objTrans.getTypes();
+        		ModelExtractor query = objTrans.getQuery();
+        		getSocket().setQuery(query);
+        		tacletTranslation = null;
+        		
+        		exceptionsForTacletTranslation.addAll(objTrans.getExceptionsOfTacletTranslation());
 
-                tacletTranslation = ((AbstractSMTTranslator) trans)
-                                .getTacletSetTranslation();
-                exceptionsForTacletTranslation.addAll(trans.getExceptionsOfTacletTranslation());
-                String parameters [] = this.type.getSolverParameters().split(" ");
-                String result [] = new String[parameters.length+1];
-                for(int i=0; i < result.length; i++){
-                    result[i] = i==0? type.getSolverCommand() : parameters[i-1];
-                }
-                return result;
+        	}
+        	else{
+        		SMTTranslator trans = getType().createTranslator(services);
+            	//instantiateTaclets(trans);
+            	problemString = indent(trans.translateProblem(term, services, smtSettings).toString());
+            	tacletTranslation = ((AbstractSMTTranslator) trans).getTacletSetTranslation();
+            	exceptionsForTacletTranslation.addAll(trans.getExceptionsOfTacletTranslation());
+        	}
+        	
+        	String parameters [] = this.type.getSolverParameters().split(" "); 
+        	String result [] = new String[parameters.length+1];
+        	for(int i=0; i < result.length; i++){
+        		result[i] = i==0? type.getSolverCommand() : parameters[i-1];
+        	}
+        	return result;
         }
 
         @Override
@@ -376,21 +409,46 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         }
 
         @Override
-        public String getSolverOutput() {
+        public String getSolverOutput() {       	
+        	
          		String output = "";
         		output+= "Result: "+ solverCommunication.getFinalResult().toString()+"\n\n";
-
-
+        		
         		for(String s : solverCommunication.getMessages()){
-        			output += s+"\n";
+        			
+        			if(s.equals("endmodel")){
+        				break;
+        			}
+        			
+        			output += s+"\n";	
+        			
         		}
+        		
+        		if(getSocket().getQuery()!=null){
+        			ModelExtractor mq = getSocket().getQuery();
+        			Model m = mq.getModel();
+        			if(m!=null){
+        				output += "\n\n";
+        				output += m.toString();
+        			}
+        			
+        			
+        			
+        		}		
+        		
                 return output;
         }
 
         @Override
         public Collection<Throwable> getExceptionsOfTacletTranslation() {
-
+                
                 return exceptionsForTacletTranslation;
+        }
+
+		@Override
+        public AbstractSolverSocket getSocket() {
+	        
+	        return socket;
         }
 
 

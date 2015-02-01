@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -31,7 +31,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Provides static methods that makes testing easier.
@@ -57,17 +57,14 @@ public final class TestStarterCoreUtil {
       // Make sure that the location is contained in a Java project
       IProject project = method.getResource().getProject();
       Assert.isTrue(JDTUtil.isJavaProject(project), " The project \"" + project + "\" is no Java project.");
-      // Get source paths from class path
-      List<File> sourcePaths = JDTUtil.getSourceLocations(project);
-      Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
       // Get KeY project settings
       final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
       final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
       // Get local file for the eclipse resource
-      final File location = sourcePaths.get(0);
+      final File location = KeYResourceProperties.getSourceClassPathLocation(project);
       Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
       // Load environment
-      KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
+      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
       IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getJavaInfo());
       ProofOblInput input = new ProgramMethodPO(environment.getInitConfig(), pm.getFullName(), pm, null, addUninterpretedPredicate, false);
       Proof proof = environment.createProof(input);

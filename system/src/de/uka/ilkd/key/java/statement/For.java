@@ -1,17 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.java.statement;
 
@@ -29,9 +27,8 @@ import de.uka.ilkd.key.util.ExtList;
 
 public class For extends LoopStatement implements VariableScope {
 
-    private static final 
-    ImmutableArray<VariableSpecification> EMPTY_VARSPECS=
-    new ImmutableArray<VariableSpecification>(new VariableSpecification[0]);
+    private static final ImmutableArray<VariableSpecification> EMPTY_VARSPECS=
+            new ImmutableArray<VariableSpecification>(new VariableSpecification[0]);
 
     /**
      *      For.
@@ -46,28 +43,28 @@ public class For extends LoopStatement implements VariableScope {
      *      @param body a statement.
      */
     public For(LoopInitializer[] inits, Expression guard,
-               Expression[] updates, Statement body) {	
+               Expression[] updates, Statement body) {
         super(inits, guard, updates, body);
     }
 
     public For(ILoopInit inits, IGuard guard,
-               IForUpdates updates, Statement body, ExtList comments) {	
+               IForUpdates updates, Statement body, ExtList comments) {
         super(inits, guard, updates, body, comments);
     }
 
     public For(ILoopInit inits, IGuard guard,
-               IForUpdates updates, Statement body, 
-	       ExtList comments, PositionInfo pos) {	
+               IForUpdates updates, Statement body,
+	       ExtList comments, PositionInfo pos) {
         super(inits, guard, updates, body, comments, pos);
     }
 
     public For(ILoopInit inits, IGuard guard,
-               IForUpdates updates, Statement body) {	
+               IForUpdates updates, Statement body) {
         super(inits, guard, updates, body);
     }
 
     public For(ExtList children) {
-	super(children.get(ILoopInit.class), 
+	super(children.get(ILoopInit.class),
 	      children.get(IGuard.class),
 	      children.get(IForUpdates.class),
 	      children.get(Statement.class),
@@ -129,5 +126,4 @@ public class For extends LoopStatement implements VariableScope {
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printFor(this);
     }
-
 }

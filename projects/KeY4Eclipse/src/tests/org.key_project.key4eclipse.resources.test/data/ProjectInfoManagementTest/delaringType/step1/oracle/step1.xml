@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<project name="ProjectInfoManagementTest_testDeclaringTypes">
+   <package name="(default package)" path="/ProjectInfoManagementTest_testDeclaringTypes/src">
+      <type name="Parent" path="/ProjectInfoManagementTest_testDeclaringTypes/src/Parent.java">
+         <method displayName="Parent()" name="Parent" declaringType="Parent" declaringFilePath="/ProjectInfoManagementTest_testDeclaringTypes/src/Parent.java" parameterTypes="">
+            <contract name="Parent[Parent::Parent()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Parent.java/Parent[Parent__Parent()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Parent.java/Parent[Parent__Parent()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+         </method>
+         <method displayName="magic()" name="magic" declaringType="Parent" declaringFilePath="/ProjectInfoManagementTest_testDeclaringTypes/src/Parent.java" parameterTypes="">
+            <contract name="Parent[Parent::magic()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Parent.java/Parent[Parent__magic()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Parent.java/Parent[Parent__magic()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+         </method>
+         <obsererFunction displayName="ofm" declaringType="Parent" declaringFilePath="/ProjectInfoManagementTest_testDeclaringTypes/src/Parent.java">
+            <contract name="Parent[Parent::$ofm()].JML accessible clause.0" proofFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Parent.java/Parent[Parent__$ofm()]_JML_accessible_clause_0.proof" metaFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Parent.java/Parent[Parent__$ofm()]_JML_accessible_clause_0.proofmeta"/>
+         </obsererFunction>
+         <type name="ParentInner" path="/ProjectInfoManagementTest_testDeclaringTypes/src/Parent.java">
+            <method displayName="ParentInner()" name="ParentInner" declaringType="Parent.ParentInner" declaringFilePath="/ProjectInfoManagementTest_testDeclaringTypes/src/Parent.java" parameterTypes="">
+            </method>
+            <method displayName="innerMagic()" name="innerMagic" declaringType="Parent.ParentInner" declaringFilePath="/ProjectInfoManagementTest_testDeclaringTypes/src/Parent.java" parameterTypes="">
+               <contract name="Parent.ParentInner[Parent.ParentInner::innerMagic()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Parent.java/Parent_ParentInner[Parent_ParentInner__innerMagic()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Parent.java/Parent_ParentInner[Parent_ParentInner__innerMagic()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+            </method>
+            <obsererFunction displayName="ofm" declaringType="Parent.ParentInner" declaringFilePath="/ProjectInfoManagementTest_testDeclaringTypes/src/Parent.java">
+               <contract name="Parent.ParentInner[Parent.ParentInner::$ofm()].JML accessible clause.0" proofFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Parent.java/Parent_ParentInner[Parent_ParentInner__$ofm()]_JML_accessible_clause_0.proof" metaFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Parent.java/Parent_ParentInner[Parent_ParentInner__$ofm()]_JML_accessible_clause_0.proofmeta"/>
+            </obsererFunction>
+         </type>
+      </type>
+      <type name="Sub" path="/ProjectInfoManagementTest_testDeclaringTypes/src/Sub.java">
+         <method displayName="Sub()" name="Sub" declaringType="Sub" declaringFilePath="/ProjectInfoManagementTest_testDeclaringTypes/src/Sub.java" parameterTypes="">
+         </method>
+         <method displayName="magic()" name="magic" declaringType="Parent" declaringFilePath="/ProjectInfoManagementTest_testDeclaringTypes/src/Parent.java" parameterTypes="">
+            <contract name="Sub[Parent::magic()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Sub.java/Sub[Parent__magic()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Sub.java/Sub[Parent__magic()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+         </method>
+         <obsererFunction displayName="ofm" declaringType="Parent" declaringFilePath="/ProjectInfoManagementTest_testDeclaringTypes/src/Parent.java">
+            <contract name="Sub[Parent::$ofm()].JML accessible clause.0" proofFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Sub.java/Sub[Parent__$ofm()]_JML_accessible_clause_0.proof" metaFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Sub.java/Sub[Parent__$ofm()]_JML_accessible_clause_0.proofmeta"/>
+         </obsererFunction>
+         <type name="SubInner" path="/ProjectInfoManagementTest_testDeclaringTypes/src/Sub.java">
+            <method displayName="SubInner()" name="SubInner" declaringType="Sub.SubInner" declaringFilePath="/ProjectInfoManagementTest_testDeclaringTypes/src/Sub.java" parameterTypes="">
+            </method>
+            <method displayName="innerMagic()" name="innerMagic" declaringType="Parent.ParentInner" declaringFilePath="/ProjectInfoManagementTest_testDeclaringTypes/src/Parent.java" parameterTypes="">
+               <contract name="Sub.SubInner[Parent.ParentInner::innerMagic()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Sub.java/Sub_SubInner[Parent_ParentInner__innerMagic()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Sub.java/Sub_SubInner[Parent_ParentInner__innerMagic()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+            </method>
+            <obsererFunction displayName="ofm" declaringType="Parent.ParentInner" declaringFilePath="/ProjectInfoManagementTest_testDeclaringTypes/src/Parent.java">
+               <contract name="Sub.SubInner[Parent.ParentInner::$ofm()].JML accessible clause.0" proofFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Sub.java/Sub_SubInner[Parent_ParentInner__$ofm()]_JML_accessible_clause_0.proof" metaFilePath="/ProjectInfoManagementTest_testDeclaringTypes/proofs/Sub.java/Sub_SubInner[Parent_ParentInner__$ofm()]_JML_accessible_clause_0.proofmeta"/>
+            </obsererFunction>
+         </type>
+      </type>
+   </package>
+</project>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,6 +13,9 @@
 
 package org.key_project.sed.key.core.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
@@ -21,16 +24,24 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
+import org.key_project.sed.core.model.ISEDBranchCondition;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDMethodCall;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.jdt.JDTUtil;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -42,7 +53,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
    /**
     * The {@link IExecutionMethodCall} to represent by this debug node.
     */
-   private IExecutionMethodCall executionNode;
+   private final IExecutionMethodCall executionNode;
 
    /**
     * The contained children.
@@ -63,26 +74,51 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     * The contained KeY variables.
     */
    private KeYVariable[] variables;
+   
+   /**
+    * The constraints
+    */
+   private KeYConstraint[] constraints;
 
    /**
     * The method call stack.
     */
    private IKeYSEDDebugNode<?>[] callStack;
+   
+   /**
+    * The up to know discovered {@link IKeYBaseMethodReturn} nodes.
+    */
+   private final Map<IExecutionBaseMethodReturn<?>, IKeYBaseMethodReturn> knownMethodReturns = new HashMap<IExecutionBaseMethodReturn<?>, IKeYBaseMethodReturn>();
+   
+   /**
+    * The conditions under which a group ending in this node starts.
+    */
+   private SEDMemoryBranchCondition[] groupStartConditions;
 
    /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param parent The parent in that this node is contained as child.
-    * @param thread The {@link ISEDThread} in that this node is contained.
+    * @param thread The {@link KeYThread} in that this node is contained.
     * @param executionNode The {@link IExecutionMethodCall} to represent by this debug node.
     */
    public KeYMethodCall(KeYDebugTarget target, 
                         IKeYSEDDebugNode<?> parent, 
-                        ISEDThread thread, 
-                        IExecutionMethodCall executionNode) {
+                        KeYThread thread, 
+                        IExecutionMethodCall executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      target.registerDebugNode(this);
+      initializeAnnotations();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYThread getThread() {
+      return (KeYThread)super.getThread();
    }
    
    /**
@@ -107,7 +143,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
    @Override
    public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
-         IExecutionNode[] executionChildren = executionNode.getChildren();
+         IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
             children = KeYModelUtil.createChildren(this, executionChildren);
          }
@@ -199,7 +235,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
          if (location.getCharEnd() >= 0) {
             ICompilationUnit compilationUnit = KeYModelUtil.findCompilationUnit(this);
             if (compilationUnit != null) {
-               IMethod method = KeYModelUtil.findJDTMethod(compilationUnit, location.getCharEnd());
+               IMethod method = JDTUtil.findJDTMethod(compilationUnit, location.getCharEnd());
                if (method != null) {
                   ISourceRange range = method.getNameRange();
                   location = new SourceLocation(-1, range.getOffset(), range.getOffset() + range.getLength());
@@ -225,6 +261,27 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
          return variables;
       }
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasConstraints() throws DebugException {
+      return !isTerminated() && super.hasConstraints();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYConstraint[] getConstraints() throws DebugException {
+      synchronized (this) {
+         if (constraints == null) {
+            constraints = KeYModelUtil.createConstraints(this, executionNode);
+         }
+         return constraints;
+      }
+   }
 
    /**
     * {@inheritDoc}
@@ -233,7 +290,8 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
    public boolean hasVariables() throws DebugException {
       try {
          return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
-                SymbolicExecutionUtil.canComputeVariables(executionNode) &&
+                !executionNode.isDisposed() && 
+                SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
                 super.hasVariables();
       }
       catch (ProofInputException e) {
@@ -259,7 +317,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     */
    @Override
    public boolean canStepInto() {
-      return getDebugTarget().canStepInto(this);
+      return getThread().canStepInto(this);
    }
 
    /**
@@ -267,7 +325,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     */
    @Override
    public void stepInto() throws DebugException {
-      getDebugTarget().stepInto(this);
+      getThread().stepInto(this);
    }
 
    /**
@@ -275,7 +333,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     */
    @Override
    public boolean canStepOver() {
-      return getDebugTarget().canStepOver(this);
+      return getThread().canStepOver(this);
    }
 
    /**
@@ -283,7 +341,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     */
    @Override
    public void stepOver() throws DebugException {
-      getDebugTarget().stepOver(this);
+      getThread().stepOver(this);
    }
 
    /**
@@ -291,7 +349,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     */
    @Override
    public boolean canStepReturn() {
-      return getDebugTarget().canStepReturn(this);
+      return getThread().canStepReturn(this);
    }
 
    /**
@@ -299,7 +357,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     */
    @Override
    public void stepReturn() throws DebugException {
-      getDebugTarget().stepReturn(this);
+      getThread().stepReturn(this);
    }
    
    /**
@@ -307,7 +365,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     */
    @Override
    public boolean canResume() {
-      return getDebugTarget().canResume(this);
+      return getThread().canResume(this);
    }
    
    /**
@@ -315,7 +373,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     */
    @Override
    public void resume() throws DebugException {
-      getDebugTarget().resume(this);
+      getThread().resume(this);
    }
 
    /**
@@ -323,7 +381,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     */
    @Override
    public boolean canSuspend() {
-      return getDebugTarget().canSuspend(this);
+      return getThread().canSuspend(this);
    }
 
    /**
@@ -331,7 +389,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     */
    @Override
    public void suspend() throws DebugException {
-      getDebugTarget().suspend(this);
+      getThread().suspend(this);
    }
 
    /**
@@ -345,5 +403,102 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
          }
          return callStack;
       }
+   }
+   
+   /**
+    * Registers the given {@link IKeYBaseMethodReturn} of this node.
+    * @param methodReturn The {@link IKeYBaseMethodReturn} to register.
+    */
+   public void addMehodReturn(IKeYBaseMethodReturn methodReturn) {
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         Assert.isNotNull(methodReturn);
+         Assert.isTrue(methodReturn.getMethodCall() == this);
+         IKeYBaseMethodReturn oldReturn = knownMethodReturns.put(methodReturn.getExecutionNode(), methodReturn);
+         Assert.isTrue(oldReturn == null);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition[] getMethodReturnConditions() throws DebugException {
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         ImmutableList<IExecutionBaseMethodReturn<?>> executionReturns = executionNode.getMethodReturns();
+         ISEDBranchCondition[] result = new ISEDBranchCondition[executionReturns.size()];
+         int i = 0;
+         for (IExecutionBaseMethodReturn<?> executionReturn : executionReturns) {
+            IKeYBaseMethodReturn keyReturn = getMethodReturn(executionReturn);
+            if (keyReturn == null) {
+               // Create new method return, its parent will be set later when the full child hierarchy is explored.
+               if (executionReturn instanceof IExecutionMethodReturn) {
+                  keyReturn = KeYModelUtil.createMethodReturn(getDebugTarget(), getThread(), null, this, (IExecutionMethodReturn)executionReturn);
+               }
+               else if (executionReturn instanceof IExecutionExceptionalMethodReturn) {
+                  keyReturn = KeYModelUtil.createExceptionalMethodReturn(getDebugTarget(), getThread(), null, this, (IExecutionExceptionalMethodReturn)executionReturn);
+               }
+               else {
+                  throw new DebugException(LogUtil.getLogger().createErrorStatus("Unsupported execution return: " + executionReturn));
+               }
+            }
+            result[i] = keyReturn.getMethodReturnCondition();
+            i++;
+         }
+         return result;
+      }
+   }
+   
+   /**
+    * Returns the {@link IKeYBaseMethodReturn} with the given {@link IExecutionMethodReturn} if available.
+    * @param executionReturn The {@link IExecutionMethodReturn} to search its {@link IKeYBaseMethodReturn}.
+    * @return The found {@link IKeYBaseMethodReturn} or {@code null} if not available.
+    */
+   public IKeYBaseMethodReturn getMethodReturn(final IExecutionBaseMethodReturn<?> executionReturn) {
+      return knownMethodReturns.get(executionReturn);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition[] getGroupEndConditions() throws DebugException {
+      return getMethodReturnConditions();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         if (groupStartConditions == null) {
+            groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
+         }
+         return groupStartConditions;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setParent(ISEDDebugNode parent) {
+      super.setParent(parent);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isGroupable() {
+      return true;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isTruthValueEvaluationEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
    }
 }

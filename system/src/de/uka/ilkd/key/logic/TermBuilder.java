@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -33,6 +33,8 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -50,6 +52,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SubstOp;
+import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
@@ -63,6 +66,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -76,13 +80,20 @@ import de.uka.ilkd.key.util.Pair;
  */
 public class TermBuilder {
 
-    public static final TermBuilder DF = new TermBuilder();
+    private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
 
-    private static final TermFactory tf = TermFactory.DEFAULT;
-    private static final Term tt = TermFactory.DEFAULT.createTerm(Junctor.TRUE);
-    private static final Term ff = TermFactory.DEFAULT.createTerm(Junctor.FALSE);
+    private final TermFactory tf;
+    private final Term tt;
+    private final Term ff;
 
-    public TermBuilder() {
+    protected final Services services; // TODO; Make private
+    
+    public TermBuilder(TermFactory tf, Services services) {
+       assert services != null;
+       this.services = services;
+       this.tf = tf;
+       this.tt = tf.createTerm(Junctor.TRUE);
+       this.ff = tf.createTerm(Junctor.FALSE);
     }
 
 
@@ -101,13 +112,11 @@ public class TermBuilder {
      *
      * @param s
      *            the String to parse
-     * @param services
-     *            the services to be used for parsing
      */
-    public Term parseTerm(String s, Services services)
+    public Term parseTerm(String s)
         throws ParserException
     {
-    return parseTerm(s, services, services.getNamespaces());
+    return parseTerm(s, services.getNamespaces());
     }
 
     /**
@@ -116,12 +125,11 @@ public class TermBuilder {
      *
      * @param s
      *            the String to parse
-     * @param services
-     *            the services to be used for parsing
      * @param namespaces
      *            the namespaces used for name lookup.
+     * @throws de.uka.ilkd.key.parser.ParserException
      */
-    public Term parseTerm(String s, Services services, NamespaceSet namespaces)
+    public Term parseTerm(String s, NamespaceSet namespaces)
         throws ParserException
     {
         AbbrevMap abbr = (services.getProof() == null)
@@ -150,17 +158,23 @@ public class TermBuilder {
      * Returns an available name constructed by affixing a counter to the passed
      * base name.
      */
-    public String newName(Services services, String baseName) {
-    final Name savedName = services.getNameRecorder().getProposal();
-    if(savedName != null) {
-        return savedName.toString();
-    }
+    public String newName(String baseName) {
+        final Name savedName = services.getNameRecorder().getProposal();
+        if (savedName != null) {
+            // CS: bugfix -- saving name proposals.
+            // getProposal() removes the name proposal form the name recorder,
+            // but we need to have it again for saving. Therefore I appended
+            // the proposal at the and of the list again.
+            services.getNameRecorder().addProposal(savedName);
+
+            return savedName.toString();
+        }
 
         final NamespaceSet namespaces = services.getNamespaces();
 
         int i = 0;
         String result = baseName;
-        while(namespaces.lookup(new Name(result)) != null) {
+        while (namespaces.lookup(new Name(result)) != null) {
             result = baseName + "_" + i++;
         }
 
@@ -174,8 +188,8 @@ public class TermBuilder {
      * Returns an available name constructed by affixing a counter to a self-
      * chosen base name for the passed sort.
      */
-    public String newName(Services services, Sort sort) {
-    return newName(services, shortBaseName(sort));
+    public String newName(Sort sort) {
+        return newName(shortBaseName(sort));
     }
 
 
@@ -189,14 +203,9 @@ public class TermBuilder {
      * Creates a program variable for "self". Take care to register it
      * in the namespaces!
      */
-    public LocationVariable selfVar(Services services,
-                                    KeYJavaType kjt,
+    public LocationVariable selfVar(KeYJavaType kjt,
                                     boolean makeNameUnique) {
-    String name = "self";
-    if(makeNameUnique) {
-        name = newName(services, name);
-    }
-    return new LocationVariable(new ProgramElementName(name), kjt);
+        return selfVar(kjt, makeNameUnique, "");
     }
 
 
@@ -204,14 +213,43 @@ public class TermBuilder {
      * Creates a program variable for "self". Take care to register it
      * in the namespaces!
      */
-    public LocationVariable selfVar(Services services,
-                                    IProgramMethod pm,
+    public LocationVariable selfVar(KeYJavaType kjt,
+                                    boolean makeNameUnique,
+                                    String postfix) {
+        String name = "self" + postfix;
+        if(makeNameUnique) {
+            name = newName(name);
+        }
+        return new LocationVariable(new ProgramElementName(name), kjt);
+    }
+
+
+    /**
+     * Creates a program variable for "self". Take care to register it
+     * in the namespaces!
+     */
+    public LocationVariable selfVar(IProgramMethod pm,
+                                    KeYJavaType kjt,
+                                    boolean makeNameUnique,
+                                    String postfix) {
+        if(pm.isStatic()) {
+            return null;
+        } else {
+            return selfVar(kjt, makeNameUnique, postfix);
+        }
+    }
+
+    /**
+     * Creates a program variable for "self". Take care to register it
+     * in the namespaces!
+     */
+    public LocationVariable selfVar(IProgramMethod pm,
                                     KeYJavaType kjt,
                                     boolean makeNameUnique) {
         if(pm.isStatic()) {
             return null;
         } else {
-            return selfVar(services, kjt, makeNameUnique);
+            return selfVar(kjt, makeNameUnique);
         }
     }
 
@@ -220,8 +258,7 @@ public class TermBuilder {
      * Creates program variables for the parameters. Take care to register them
      * in the namespaces!
      */
-    public ImmutableList<ProgramVariable> paramVars(Services services,
-                                                    IObserverFunction obs,
+    public ImmutableList<ProgramVariable> paramVars(IObserverFunction obs,
                                                     boolean makeNamesUnique) {
         ImmutableList<ProgramVariable> result
             = ImmutableSLList.<ProgramVariable>nil();
@@ -236,7 +273,7 @@ public class TermBuilder {
             name = paramType.getSort().name().toString().charAt(0) + "";
             }
             if(makeNamesUnique) {
-            name = newName(services, name);
+            name = newName(name);
             }
             final LocationVariable paramVar
                 = new LocationVariable(new ProgramElementName(name), paramType);
@@ -250,10 +287,10 @@ public class TermBuilder {
      * Creates program variables for the parameters. Take care to register them
      * in the namespaces!
      */
-    public ImmutableList<ProgramVariable> paramVars(Services services,
-        String postfix, IObserverFunction obs, boolean makeNamesUnique) {
+    public ImmutableList<ProgramVariable> paramVars(String postfix,
+        IObserverFunction obs, boolean makeNamesUnique) {
     final ImmutableList<ProgramVariable> paramVars
-        = paramVars(services, obs, true);
+        = paramVars(obs, true);
     ImmutableList<ProgramVariable> result
             = ImmutableSLList.<ProgramVariable>nil();
         for(ProgramVariable paramVar : paramVars) {
@@ -271,10 +308,9 @@ public class TermBuilder {
      * Creates a program variable for the result. Take care to register it
      * in the namespaces.
      */
-    public LocationVariable resultVar(Services services,
-                                      IProgramMethod pm,
+    public LocationVariable resultVar(IProgramMethod pm,
                                       boolean makeNameUnique) {
-    return resultVar(services, "result", pm, makeNameUnique);
+    return resultVar("result", pm, makeNameUnique);
     }
 
 
@@ -282,13 +318,13 @@ public class TermBuilder {
      * Creates a program variable for the result with passed name. Take care to
      * register it in the namespaces.
      */
-    public LocationVariable resultVar(Services services, String name,
-        IProgramMethod pm, boolean makeNameUnique) {
+    public LocationVariable resultVar(String name, IProgramMethod pm,
+        boolean makeNameUnique) {
     if(pm.isVoid() || pm.isConstructor()) {
         return null;
     } else {
         if(makeNameUnique) {
-        name = newName(services, name);
+        name = newName(name);
         }
         return new LocationVariable(new ProgramElementName(name),
                         pm.getReturnType());
@@ -300,10 +336,9 @@ public class TermBuilder {
      * Creates a program variable for the thrown exception. Take care to
      * register it in the namespaces.
      */
-    public LocationVariable excVar(Services services,
-                                   IProgramMethod pm,
+    public LocationVariable excVar(IProgramMethod pm,
                                    boolean makeNameUnique) {
-    return excVar(services, "exc", pm, makeNameUnique);
+    return excVar("exc", pm, makeNameUnique);
     }
 
 
@@ -311,16 +346,14 @@ public class TermBuilder {
      * Creates a program variable for the thrown exception. Take care to
      * register it in the namespaces.
      */
-    public LocationVariable excVar(Services services,
-                       String name,
-                                   IProgramMethod pm,
+    public LocationVariable excVar(String name,
+                       IProgramMethod pm,
                                    boolean makeNameUnique) {
     if(makeNameUnique) {
-        name = newName(services, name);
+        name = newName(name);
     }
         return new LocationVariable(new ProgramElementName(name),
-                                    services.getJavaInfo().getTypeByClassName(
-                                                   "java.lang.Exception"));
+                                    services.getJavaInfo().getTypeByClassName(JAVA_LANG_THROWABLE));
     }
 
 
@@ -328,17 +361,27 @@ public class TermBuilder {
      * Creates a program variable for the atPre heap. Take care to register it
      * in the namespaces.
      */
-    public LocationVariable heapAtPreVar(Services services,
-                         String baseName,
+    public LocationVariable heapAtPreVar(String baseName,
+                                         boolean makeNameUnique) {
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        return heapAtPreVar(baseName, heapLDT.getHeap().sort(), makeNameUnique);
+    }
+
+    /**
+     * Creates a program variable for the atPre heap. Take care to register it
+     * in the namespaces.
+     */
+    public LocationVariable heapAtPreVar(String baseName,
                                          Sort sort,
-                             boolean makeNameUnique) {
+                                         boolean makeNameUnique) {
         assert sort != null;
-    if(makeNameUnique) {
-        baseName = newName(services, baseName);
+        if(makeNameUnique) {
+            baseName = newName(baseName);
+        }
+        return new LocationVariable(new ProgramElementName(baseName),
+                                    new KeYJavaType(sort));
     }
-    return new LocationVariable(new ProgramElementName(baseName),
-                            new KeYJavaType(sort));
-    }
+
 
     //-------------------------------------------------------------------------
     //constructors for special classes of term operators
@@ -423,7 +466,7 @@ public class TermBuilder {
     }
 
 
-    public Term prog(Modality mod, JavaBlock jb, Term t, ImmutableArray<ITermLabel> labels) {
+    public Term prog(Modality mod, JavaBlock jb, Term t, ImmutableArray<TermLabel> labels) {
     return tf.createTerm(mod, new Term[]{t}, null, jb, labels);
     }
 
@@ -461,7 +504,7 @@ public class TermBuilder {
         }
     }
 
-    public Term cast(Services services, Sort s, Term t) {
+    public Term cast(Sort s, Term t) {
     return tf.createTerm(s.getCastSymbol(services), t);
     }
 
@@ -530,14 +573,23 @@ public class TermBuilder {
     public Term bsum(QuantifiableVariable qv,
                      Term a,
                      Term b,
-                     Term t,
-                     Services services) {
+                     Term t) {
         Function bsum = services.getTypeConverter().getIntegerLDT().getBsum();
         return func(bsum,
                     new Term[]{a, b, t},
                     new ImmutableArray<QuantifiableVariable>(qv));
     }
 
+    /** General (unbounded) sum */
+    public Term sum (ImmutableList<QuantifiableVariable> qvs, Term range, Term t) {
+        final Function sum = (Function)services.getNamespaces().functions().lookup("sum");
+        final Iterator<QuantifiableVariable> it = qvs.iterator();
+        Term res = func(sum, new Term[]{convertToBoolean(range), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        while (it.hasNext()) {
+            res = func(sum, new Term[]{TRUE(), res}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        }
+        return res;
+    }
 
 
     /** Constructs a bounded product comprehension expression. */
@@ -553,156 +605,136 @@ public class TermBuilder {
     }
 
 
-    /** Translation of JML's \min operator using \ifEx operator. */
-    public Term min(ImmutableList<QuantifiableVariable> qvs, Term guard, Term t, KeYJavaType type, Services services) {
-        final TypeConverter tc = services.getTypeConverter();
-        final KeYJavaType longType = tc.getKeYJavaType(PrimitiveType.JAVA_LONG);
-        final KeYJavaType bigintType = tc.getKeYJavaType(PrimitiveType.JAVA_BIGINT);
-
-
-        final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-        Term origGuard = guard;
-        ImmutableList<QuantifiableVariable> xs = ImmutableSLList.nil();
-        ImmutableList<Term> xvars = ImmutableSLList.nil();
-        Term body = tt();
-        Term qvsInInt = tt();
-        Term tx = t;
-
-        for (QuantifiableVariable qv: qvs){
-            // prepare forall part
-            final QuantifiableVariable x = new LogicVariable(
-                    new Name("_"+qv.name().toString()),qv.sort());
-            xs = xs.append(x);
-            final Term xvar = var(x);
-            xvars = xvars.append(xvar);
-            guard = subst(qv, xvar, guard);
-            tx = subst(qv, xvar, tx);
-            if (type == longType) {
-                body = and(inLong(xvar,services),body);
-            } else if (type != bigintType && qv.sort() == tc.getIntegerLDT().targetSort()) {
-                body = and(inInt(xvar,services),body);
-            }
-
-            // prepare terms for quantified variables
-            final Term qvar = var(qv);
-            if (type == longType) {
-                origGuard = and(inLong(qvar,services),origGuard);
-            } else if (type != bigintType && qv.sort() == tc.getIntegerLDT().targetSort()) {
-                origGuard = and(inInt(qvar,services),origGuard);
-            }
+    /** General (unbounded) product */
+    public Term prod (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, TermServices services) {
+        final Function prod = (Function)services.getNamespaces().functions().lookup("prod");
+        final Iterator<QuantifiableVariable> it = qvs.iterator();
+        Term res = func(prod, new Term[]{convertToBoolean(range), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        while (it.hasNext()) {
+            res = func(prod, new Term[]{TRUE(), res}, new ImmutableArray<QuantifiableVariable>(it.next()));
         }
-        body = and(body,guard);
-        final Term forall = all(xs, imp(body, leq(t, tx, services)));
-        final Term minForm = and(qvsInInt, origGuard, forall);
-
-        final Term undef = func(new Function(new Name("undefMin"), intSort));
-        return ifEx(qvs, minForm, t, undef);
+        return res;
     }
 
 
-    /** Translation of JML's \max operator using \ifEx operator. */
-    public Term max(ImmutableList<QuantifiableVariable> qvs, Term guard, Term t, KeYJavaType type, Services services) {
-        final TypeConverter tc = services.getTypeConverter();
-        final KeYJavaType longType = tc.getKeYJavaType(PrimitiveType.JAVA_LONG);
-        final KeYJavaType bigintType = tc.getKeYJavaType(PrimitiveType.JAVA_BIGINT);
-
-
-        final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-        Term origGuard = guard;
-        ImmutableList<QuantifiableVariable> xs = ImmutableSLList.nil();
-        ImmutableList<Term> xvars = ImmutableSLList.nil();
-        Term body = tt();
-        Term qvsInInt = tt();
-        Term tx = t;
-
-        for (QuantifiableVariable qv: qvs){
-            // prepare forall part
-            final QuantifiableVariable x = new LogicVariable(
-                    new Name("_"+qv.name().toString()),qv.sort());
-            xs = xs.append(x);
-            final Term xvar = var(x);
-            xvars = xvars.append(xvar);
-            guard = subst(qv, xvar, guard);
-            tx = subst(qv, xvar, tx);
-            if (type == longType) {
-                body = and(inLong(xvar,services),body);
-            } else if (type != bigintType && qv.sort() == tc.getIntegerLDT().targetSort()) {
-                body = and(inInt(xvar,services),body);
-            }
-
-            // prepare terms for quantified variables
-            final Term qvar = var(qv);
-            if (type == longType) {
-                origGuard = and(inLong(qvar,services),origGuard);
-            } else if (type != bigintType && qv.sort() == tc.getIntegerLDT().targetSort()) {
-                origGuard = and(inInt(qvar,services),origGuard);
-            }
+    /** minimum operator */
+    public Term min (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, TermServices services) {
+        final Function min = (Function)services.getNamespaces().functions().lookup("min");
+        final Iterator<QuantifiableVariable> it = qvs.iterator();
+        Term res = func(min, new Term[]{convertToBoolean(range), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        while (it.hasNext()) {
+            res = func(min, new Term[]{TRUE(), res}, new ImmutableArray<QuantifiableVariable>(it.next()));
         }
-        body = and(body,guard);
-        final Term forall = all(xs, imp(body, geq(t, tx, services)));
-        final Term maxForm = and(qvsInInt, origGuard, forall);
+        return res;
+    }
 
-        final Term undef = func(new Function(new Name("undefMax"), intSort));
-        return ifEx(qvs, maxForm, t, undef);
+
+    /** minimum operator */
+    public Term max (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, TermServices services) {
+        final Function max = (Function)services.getNamespaces().functions().lookup("max");
+        final Iterator<QuantifiableVariable> it = qvs.iterator();
+        Term res = func(max, new Term[]{convertToBoolean(range), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        while (it.hasNext()) {
+            res = func(max, new Term[]{TRUE(), res}, new ImmutableArray<QuantifiableVariable>(it.next()));
+        }
+        return res;
     }
 
 
     public Term not(Term t) {
-    if(t.op() == Junctor.TRUE) {
-        return ff();
-    } else if(t.op() == Junctor.FALSE) {
-        return tt();
-    } else if(t.op() == Junctor.NOT) {
-        return t.sub(0);
-    } else {
-        return tf.createTerm(Junctor.NOT, t);
-    }
+        if(t.op() == Junctor.TRUE) {
+            return ff();
+        } else if(t.op() == Junctor.FALSE) {
+            return tt();
+        } else if(t.op() == Junctor.NOT) {
+            return t.sub(0);
+        } else {
+            return tf.createTerm(Junctor.NOT, t);
+        }
     }
 
 
     public Term and(Term t1, Term t2) {
-    if(t1.op() == Junctor.FALSE || t2.op() == Junctor.FALSE) {
-        return ff();
-    } else if(t1.op() == Junctor.TRUE) {
-        return t2;
-    } else if(t2.op() == Junctor.TRUE) {
-        return t1;
-    } else {
-        return tf.createTerm(Junctor.AND, t1, t2);
-    }
+        if(t1.op() == Junctor.FALSE || t2.op() == Junctor.FALSE) {
+            return ff();
+        } else if(t1.op() == Junctor.TRUE) {
+            return t2;
+        } else if(t2.op() == Junctor.TRUE) {
+            return t1;
+        } else {
+            return tf.createTerm(Junctor.AND, t1, t2);
+        }
     }
 
+    public Term andSC(Term t1, Term t2) {
+        if(t1.op() == Junctor.TRUE || t1.op() == Junctor.FALSE
+                || t2.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
+            return and(t1, t2);
+        } else {
+            return shortcut(and(t1, t2));
+        }
+    }
 
     public Term and(Term ... subTerms) {
         Term result = tt();
         for(Term sub : subTerms) {
-        result = and(result, sub);
-    }
+            result = and(result, sub);
+        }
         return result;
     }
 
+    public Term andSC(Term ... subTerms) {
+        Term result = tt();
+        if (subTerms.length == 1) {
+            return and(subTerms);
+        }
+        for(Term sub : subTerms) {
+            result = andSC(result, sub);
+        }
+        return result;
+    }
 
     public Term and(Iterable<Term> subTerms) {
-    Term result = tt();
-    for(Term sub : subTerms) {
-        result = and(result, sub);
-    }
-    return result;
+        Term result = tt();
+        for(Term sub : subTerms) {
+            result = and(result, sub);
+        }
+        return result;
     }
 
+    public Term andSC(Iterable<Term> subTerms) {
+        Term result = tt();
+        int i = 0;
+        for(Term sub : subTerms) {
+            result = andSC(result, sub);
+            i++;
+        }
+        if (i == 1) {
+            return and(subTerms);
+        }
+        return result;
+    }
 
     public Term or(Term t1, Term t2) {
-    if(t1.op() == Junctor.TRUE || t2.op() == Junctor.TRUE) {
-        return tt();
-    } else if(t1.op() == Junctor.FALSE) {
-        return t2;
-    } else if(t2.op() == Junctor.FALSE) {
-        return t1;
-    } else {
-        return tf.createTerm(Junctor.OR, t1, t2);
-    }
+        if(t1.op() == Junctor.TRUE || t2.op() == Junctor.TRUE) {
+            return tt();
+        } else if(t1.op() == Junctor.FALSE) {
+            return t2;
+        } else if(t2.op() == Junctor.FALSE) {
+            return t1;
+        } else {
+            return tf.createTerm(Junctor.OR, t1, t2);
+        }
     }
 
+    public Term orSC(Term t1, Term t2) {
+        if(t1.op() == Junctor.TRUE || t1.op() == Junctor.FALSE
+                || t2.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
+            return or(t1, t2);
+        } else {
+            return shortcut(or(t1, t2));
+        }
+    }
 
     public Term or(Term... subTerms) {
         Term result = ff();
@@ -712,31 +744,53 @@ public class TermBuilder {
         return result;
     }
 
+    public Term orSC(Term... subTerms) {
+        Term result = ff();
+        if (subTerms.length == 1) {
+            return or(subTerms);
+        }
+        for(Term sub : subTerms) {
+            result = orSC(result, sub);
+        }
+        return result;
+    }
 
     public Term or(Iterable<Term> subTerms) {
-    Term result = ff();
-    for(Term sub : subTerms) {
-        result = or(result, sub);
-    }
-    return result;
+        Term result = ff();
+        for(Term sub : subTerms) {
+            result = or(result, sub);
+        }
+        return result;
     }
 
+    public Term orSC(Iterable<Term> subTerms) {
+        Term result = ff();
+        int i = 0;
+        for(Term sub : subTerms) {
+            result = orSC(result, sub);
+            i++;
+        }
+        if (i == 1) {
+            return or(subTerms);
+        }
+        return result;
+    }
 
     public Term imp(Term t1, Term t2) {
-       return imp(t1, t2, null);
+        return imp(t1, t2, null);
     }
 
 
-    public Term imp(Term t1, Term t2, ImmutableArray<ITermLabel> labels) {
-    if(t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
-        return tt();
-    } else if(t1.op() == Junctor.TRUE) {
-        return t2;
-    } else if(t2.op() == Junctor.FALSE) {
-        return not(t1);
-    } else {
-        return tf.createTerm(Junctor.IMP, t1, t2, labels);
-    }
+    public Term imp(Term t1, Term t2, ImmutableArray<TermLabel> labels) {
+        if(t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
+            return tt();
+        } else if(t1.op() == Junctor.TRUE) {
+            return t2;
+        } else if(t2.op() == Junctor.FALSE) {
+            return not(t1);
+        } else {
+            return tf.createTerm(Junctor.IMP, t1, t2, labels);
+        }
     }
 
 
@@ -745,21 +799,21 @@ public class TermBuilder {
      * the sorts involved
      */
     public Term equals(Term t1, Term t2) {
-    if(t1.sort() == Sort.FORMULA) {
+        if(t1.sort() == Sort.FORMULA) {
             if(t1.op() == Junctor.TRUE) {
-            return t2;
+                return t2;
             } else if(t2.op() == Junctor.TRUE) {
-            return t1;
+                return t1;
             } else if(t1.op() == Junctor.FALSE) {
                 return not(t2);
             } else if(t2.op() == Junctor.FALSE) {
                 return not(t1);
             } else {
-            return tf.createTerm(Equality.EQV, t1, t2);
+                return tf.createTerm(Equality.EQV, t1, t2);
             }
-    } else {
-        return tf.createTerm(Equality.EQUALS, t1, t2);
-    }
+        } else {
+            return tf.createTerm(Equality.EQUALS, t1, t2);
+        }
     }
 
 
@@ -770,41 +824,91 @@ public class TermBuilder {
      * @param origTerm the Term that is substituted
      */
     public Term subst(SubstOp op,
-                  QuantifiableVariable substVar,
-                  Term substTerm,
-                  Term origTerm) {
-    return tf.createTerm(op,
-                     new ImmutableArray<Term>(new Term[]{substTerm, origTerm}),
-                     new ImmutableArray<QuantifiableVariable>(substVar),
-                     null);
+                      QuantifiableVariable substVar,
+                      Term substTerm,
+                      Term origTerm) {
+        return tf.createTerm(op,
+                             new ImmutableArray<Term>(new Term[]{substTerm, origTerm}),
+                             new ImmutableArray<QuantifiableVariable>(substVar),
+                             null);
     }
 
     public Term subst(QuantifiableVariable substVar,
                   Term substTerm,
                   Term origTerm) {
-    return tf.createTerm(WarySubstOp.SUBST,
-                     new ImmutableArray<Term>(new Term[]{substTerm, origTerm}),
-                     new ImmutableArray<QuantifiableVariable>(substVar),
-                     null);
+        return subst(WarySubstOp.SUBST,
+                     substVar,
+                     substTerm,
+                     origTerm);
     }
 
 
-    public Term instance(Services services, Sort s, Term t) {
+    public Term instance(Sort s, Term t) {
     return equals(func(s.getInstanceofSymbol(services), t),
-              TRUE(services));
+              TRUE());
     }
 
 
-    public Term exactInstance(Services services, Sort s, Term t) {
+    public Term exactInstance(Sort s, Term t) {
     return equals(func(s.getExactInstanceofSymbol(services), t),
-              TRUE(services));
+              TRUE());
     }
 
+    // Functions for wellfoundedness
+    //------------------------------
+
+    public Term pair(Term first, Term second) {
+        final Namespace funcNS = services.getNamespaces().functions();
+        final Function f = (Function)funcNS.lookup(new Name("pair"));
+        if (f == null)
+            throw new RuntimeException("LDT: Function pair not found.\n" +
+                    "It seems that there are definitions missing from the .key files.");
+
+        return func(f, first, second);
+
+    }
+
+    public Term prec(Term mby, Term mbyAtPre) {
+        final Namespace funcNS = services.getNamespaces().functions();
+        final Function f = (Function)funcNS.lookup(new Name("prec"));
+        if (f == null)
+                throw new RuntimeException("LDT: Function prec not found.\n" +
+                                "It seems that there are definitions missing from the .key files.");
+
+        return func(f, mby, mbyAtPre);
+    }
+
+    public Term measuredByCheck(Term mby) {
+        final Namespace funcNS = services.getNamespaces().functions();
+        final Function f = (Function)funcNS.lookup(new Name("measuredByCheck"));
+        if (f == null)
+                throw new RuntimeException("LDT: Function measuredByCheck not found.\n" +
+                                "It seems that there are definitions missing from the .key files.");
+        return func(f, mby);
+    }
+
+    public Term measuredBy(Term mby) {
+        final Namespace funcNS = services.getNamespaces().functions();
+        final Function f = (Function)funcNS.lookup(new Name("measuredBy"));
+        if (f == null)
+                throw new RuntimeException("LDT: Function measuredBy not found.\n" +
+                                "It seems that there are definitions missing from the .key files.");
+        return func(f, mby);
+    }
+
+    public Term measuredByEmpty() {
+        final Namespace funcNS = services.getNamespaces().functions();
+        final Function f = (Function)funcNS.lookup(new Name("measuredByEmpty"));
+        if (f == null)
+                throw new RuntimeException("LDT: Function measuredByEmpty not found.\n" +
+                                "It seems that there are definitions missing from the .key files.");
+        return func(f);
+    }
 
     /**
      * If a is a boolean literal, the method returns the literal as a Formula.
      */
-    public Term convertToFormula(Term a, Services services) {
+    public Term convertToFormula(Term a) {
         BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
         if (a.sort() == Sort.FORMULA) {
             return a;
@@ -813,12 +917,12 @@ public class TermBuilder {
             if (a.op() == IfThenElse.IF_THEN_ELSE) {
                 assert a.subs().size() == 3;
                 assert a.sub(0).sort() == Sort.FORMULA;
-                if (a.sub(1) == booleanLDT.getTrueTerm() && a.sub(2) == booleanLDT.getFalseTerm())
+                if (a.sub(1).op() == booleanLDT.getTrueConst() && a.sub(2).op() == booleanLDT.getFalseConst())
                     return a.sub(0);
-                else if (a.sub(1) == booleanLDT.getFalseTerm() && a.sub(2) == booleanLDT.getTrueTerm())
+                else if (a.sub(1).op() == booleanLDT.getFalseConst() && a.sub(2).op() == booleanLDT.getTrueConst())
                     return not(a.sub(0));
             }
-            return equals(a, TRUE(services));
+            return equals(a, TRUE());
         } else {
             throw new TermCreationException("Term " + a + " cannot be converted"
                                             + " into a formula.");
@@ -826,16 +930,16 @@ public class TermBuilder {
     }
 
     /** For a formula a, convert it to a boolean expression. */
-    public Term convertToBoolean(Term a, Services services){
+    public Term convertToBoolean(Term a){
         BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
         if (a.sort() == booleanLDT.targetSort()) {
             return a;
         } else if (a.sort() == Sort.FORMULA) {
             // special case where a is the result of convertToFormula
-            if (a.op() == Equality.EQUALS && a.sub(1) == booleanLDT.getTrueTerm() ) {
+            if (a.op() == Equality.EQUALS && a.sub(1).op() == booleanLDT.getTrueConst() ) {
                 return a.sub(0);
             }
-            return ife(a, TRUE(services), FALSE(services));
+            return ife(a, TRUE(), FALSE());
         } else {
             throw new TermCreationException("Term " + a + " cannot be converted"
                     + " into a boolean.");
@@ -847,46 +951,37 @@ public class TermBuilder {
     //updates
     //-------------------------------------------------------------------------
 
-    public Term elementary(Services services,
-                       UpdateableOperator lhs,
-                       Term rhs) {
+    public Term elementary(UpdateableOperator lhs, Term rhs) {
     ElementaryUpdate eu = ElementaryUpdate.getInstance(lhs);
     return tf.createTerm(eu, rhs);
     }
 
 
-    public Term elementary(Services services, Term lhs, Term rhs) {
+    public Term elementary(Term lhs, Term rhs) {
     HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
     if(lhs.op() instanceof UpdateableOperator) {
         assert lhs.arity() == 0 : "uh oh: " + lhs;
-        return elementary(services, (UpdateableOperator)lhs.op(), rhs);
+        return elementary((UpdateableOperator)lhs.op(), rhs);
     } else if(heapLDT.getSortOfSelect(lhs.op()) != null
           && lhs.sub(0).op().equals(heapLDT.getHeap())) {
         final Term heapTerm   = lhs.sub(0);
         final Term objectTerm = lhs.sub(1);
         final Term fieldTerm  = lhs.sub(2);
 
-        final Term fullRhs = store(services,
-                                   heapTerm,
-                               objectTerm,
+        final Term fullRhs = store(heapTerm,
+                                   objectTerm,
                                fieldTerm,
                                rhs);
-        return elementary(services, heapLDT.getHeap(), fullRhs);
+        return elementary(heapLDT.getHeap(), fullRhs);
     } else {
         throw new TermCreationException("Not a legal lhs: " + lhs);
     }
     }
 
 
-    public Term elementary(Services services, Term heapTerm) {
-        return elementary(services, getBaseHeap(services), heapTerm);
+    private Term elementary(Term heapTerm) {
+        return elementary(getBaseHeap(), heapTerm);
     }
-
-
-    public Term elementary(Services services, LocationVariable heap) {
-        return elementary(services, var(heap));
-    }
-
 
     public Term skip() {
     return tf.createTerm(UpdateJunctor.SKIP);
@@ -922,7 +1017,7 @@ public class TermBuilder {
     }
 
 
-    public Term parallel(Services services, Term[] lhss, Term[] values) {
+    public Term parallel(Term[] lhss, Term[] values) {
     if(lhss.length != values.length) {
         throw new TermCreationException(
             "Tried to create parallel update with "
@@ -930,22 +1025,20 @@ public class TermBuilder {
     }
     Term[] updates = new Term[lhss.length];
     for(int i = 0; i < updates.length; i++) {
-        updates[i] = elementary(services, lhss[i], values[i]);
+        updates[i] = elementary(lhss[i], values[i]);
     }
     return parallel(updates);
     }
 
 
-    public Term parallel(Services services,
-                         Iterable<Term> lhss,
+    public Term parallel(Iterable<Term> lhss,
                          Iterable<Term> values) {
         ImmutableList<Term> updates = ImmutableSLList.<Term>nil();
         Iterator<Term> lhssIt = lhss.iterator();
         Iterator<Term> rhssIt = values.iterator();
         while (lhssIt.hasNext()) {
             assert rhssIt.hasNext();
-            updates = updates.append(elementary(services, lhssIt.next(),
-                                                rhssIt.next()));
+            updates = updates.append(elementary(lhssIt.next(), rhssIt.next()));
         }
         return parallel(updates);
     }
@@ -970,56 +1063,62 @@ public class TermBuilder {
 
 
     public Term sequential(ImmutableList<Term> updates) {
-    if(updates.isEmpty()) {
-        return skip();
-    } else if(updates.size() == 1) {
-        return updates.head();
-    } else {
-        return sequential(updates.head(), sequential(updates.tail()));
-    }
+        if(updates.isEmpty()) {
+            return skip();
+        } else if(updates.size() == 1) {
+            return updates.head();
+        } else {
+            return sequential(updates.head(), sequential(updates.tail()));
+        }
     }
 
     public Term apply(Term update, Term target) {
         return apply(update,target,null);
     }
 
-    public Term apply(Term update, Term target, ImmutableArray<ITermLabel> labels) {
-    if(update.sort() != Sort.UPDATE) {
-        throw new TermCreationException("Not an update: " + update);
-    } else if(update.op() == UpdateJunctor.SKIP) {
-        return target;
-    } else if(target.equals(tt())) {
+    public ImmutableList<Term> apply(Term update,
+            ImmutableList<Term> targets) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (Term target : targets) {
+            result = result.append(apply(update, target));
+        }
+        return result;
+    }
+
+    public Term apply(Term update, Term target, ImmutableArray<TermLabel> labels) {
+        if(update.sort() != Sort.UPDATE) {
+            throw new TermCreationException("Not an update: " + update);
+        } else if(update.op() == UpdateJunctor.SKIP) {
+            return target;
+        } else if(target.equals(tt())) {
             return tt();
         } else {
-        return tf.createTerm(UpdateApplication.UPDATE_APPLICATION,
-                     update,
-                     target,
-                     labels);
-    }
+            return tf.createTerm(UpdateApplication.UPDATE_APPLICATION,
+                    update,
+                    target,
+                    labels);
+        }
     }
 
 
-    public Term applyElementary(Services services,
-                            Term loc,
+    public Term applyElementary(Term loc,
                             Term value,
                             Term target) {
-    return apply(elementary(services, loc, value), target, null);
+    return apply(elementary(loc, value), target, null);
     }
 
 
-    public Term applyElementary(Services services,
-                            Term heap,
+    public Term applyElementary(Term heap,
                             Term target) {
-    return apply(elementary(services, heap), target, null);
+    return apply(elementary(heap), target, null);
     }
 
 
-    public ImmutableList<Term> applyElementary(Services services,
-                            Term heap,
+    public ImmutableList<Term> applyElementary(Term heap,
                             Iterable<Term> targets) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         for (Term target : targets) {
-            result = result.append(apply(elementary(services, heap), target, null));
+            result = result.append(apply(elementary(heap), target, null));
         }
     return result;
     }
@@ -1035,11 +1134,10 @@ public class TermBuilder {
     }
 
 
-    public Term applyParallel(Services services,
-                          Term[] lhss,
+    public Term applyParallel(Term[] lhss,
                           Term[] values,
                           Term target) {
-    return apply(parallel(services, lhss, values), target, null);
+    return apply(parallel(lhss, values), target, null);
     }
 
 
@@ -1078,12 +1176,12 @@ public class TermBuilder {
     //boolean operators
     //-------------------------------------------------------------------------
 
-    public Term TRUE(Services services) {
+    public Term TRUE() {
         return services.getTypeConverter().getBooleanLDT().getTrueTerm();
     }
 
 
-    public Term FALSE(Services services) {
+    public Term FALSE() {
         return services.getTypeConverter().getBooleanLDT().getFalseTerm();
     }
 
@@ -1093,46 +1191,45 @@ public class TermBuilder {
     //integer operators
     //-------------------------------------------------------------------------
 
-    public Term geq(Term t1, Term t2, Services services) {
+    public Term geq(Term t1, Term t2) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         return func(integerLDT.getGreaterOrEquals(), t1, t2);
     }
 
 
-    public Term gt(Term t1, Term t2, Services services) {
+    public Term gt(Term t1, Term t2) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         return func(integerLDT.getGreaterThan(), t1, t2);
     }
 
 
-    public Term lt(Term t1, Term t2, Services services) {
+    public Term lt(Term t1, Term t2) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         return func(integerLDT.getLessThan(), t1, t2);
     }
 
 
-    public Term leq(Term t1, Term t2, Services services) {
+    public Term leq(Term t1, Term t2) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         return func(integerLDT.getLessOrEquals(), t1, t2);
     }
 
 
-    public Term zero(Services services) {
+    public Term zero() {
     return services.getTypeConverter().getIntegerLDT().zero();
     }
 
 
-    public Term one(Services services) {
+    public Term one() {
         return services.getTypeConverter().getIntegerLDT().one();
     }
 
     /**
-     * @param services Services which contains the number-functions
      * @param numberString String representing an integer
      * @return Term in Z-Notation representing the given number
      * @throws NumberFormatException if <code>numberString</code> is not a number
      */
-    public Term zTerm(Services services, String numberString) {
+    public Term zTerm(String numberString) {
 
         if (numberString == null || numberString.isEmpty()) {
             throw new NumberFormatException(numberString + " is not a number.");
@@ -1151,8 +1248,7 @@ public class TermBuilder {
         numberLiteralTerm = func(intLDT.getNumberTerminator());
 
         int digit;
-        for(int i = j, sz = numberString.length(); i<sz; i++){
-
+        for (int i = j, sz = numberString.length(); i<sz; i++) {
             switch(numberString.charAt(i)) {
                 case '0' : digit = 0; break;
                 case '1' : digit = 1; break;
@@ -1177,8 +1273,16 @@ public class TermBuilder {
         return numberLiteralTerm;
     }
 
+    /**
+     * @param number an integer
+     * @return Term in Z-Notation representing the given number
+     */
+    public Term zTerm(int number) {
+        return zTerm(""+number);
+    }
 
-    public Term add(Services services, Term t1, Term t2) {
+
+    public Term add(Term t1, Term t2) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         final Term zero = integerLDT.zero();
         if(t1.equals(zero)) {
@@ -1190,9 +1294,28 @@ public class TermBuilder {
         }
     }
 
+    public Term inByte(Term var) {
+        Function f =
+                (Function) services.getNamespaces().functions().lookup(
+                new Name("inByte"));
+        return func(f, var);
+    }
 
-    public Term inInt(Term var,
-                      Services services) {
+    public Term inShort(Term var) {
+        Function f =
+                (Function) services.getNamespaces().functions().lookup(
+                new Name("inShort"));
+        return func(f, var);
+    }
+
+    public Term inChar(Term var) {
+        Function f =
+                (Function) services.getNamespaces().functions().lookup(
+                new Name("inChar"));
+        return func(f, var);
+    }
+
+    public Term inInt(Term var) {
         Function f =
                 (Function) services.getNamespaces().functions().lookup(
                 new Name("inInt"));
@@ -1201,15 +1324,14 @@ public class TermBuilder {
 
 
 
-    public Term inLong(Term var,
-                      Services services) {
+    public Term inLong(Term var) {
         Function f =
                 (Function) services.getNamespaces().functions().lookup(
                 new Name("inLong"));
         return func(f, var);
     }
 
-    public Term index(Services services){
+    public Term index(){
         return func(services.getTypeConverter().getIntegerLDT().getIndex());
     }
 
@@ -1230,221 +1352,256 @@ public class TermBuilder {
         return ff();
     }
 
-    public Term empty(Services services) {
+    public Term empty() {
     return func(services.getTypeConverter().getLocSetLDT().getEmpty());
     }
 
 
-    public Term allLocs(Services services) {
+    public Term allLocs() {
     return func(services.getTypeConverter().getLocSetLDT().getAllLocs());
     }
 
 
-    public Term singleton(Services services, Term o, Term f) {
+    public Term singleton(Term o, Term f) {
     return func(services.getTypeConverter().getLocSetLDT().getSingleton(),
             o,
             f);
     }
 
 
-    public Term union(Services services, Term s1, Term s2) {
-    final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
-    if(s1.op() == ldt.getEmpty()) {
-        return s2;
-    } else if(s2.op() == ldt.getEmpty()) {
-        return s1;
-    } else {
-        return func(ldt.getUnion(), s1, s2);
-    }
+    public Term union(Term s1, Term s2) {
+        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        if(s1.op() == ldt.getEmpty()) {
+            return s2;
+        } else if(s2.op() == ldt.getEmpty()) {
+            return s1;
+        } else {
+            return func(ldt.getUnion(), s1, s2);
+        }
     }
 
 
-    public Term union(Services services, Term ... subTerms) {
-        Term result = empty(services);
+    public Term union(Term ... subTerms) {
+        Term result = empty();
         for(Term sub : subTerms) {
-        result = union(services, result, sub);
-    }
+        result = union(result, sub);
+        }
         return result;
     }
 
 
-    public Term union(Services services, Iterable<Term> subTerms) {
-        Term result = empty(services);
+    public Term union(Iterable<Term> subTerms) {
+        Term result = empty();
         for(Term sub : subTerms) {
-        result = union(services, result, sub);
-    }
+        result = union(result, sub);
+        }
         return result;
     }
 
 
-    public Term intersect(Services services, Term s1, Term s2) {
-    final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
-    if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
-        return empty(services);
-    } else {
-        return func(ldt.getIntersect(), s1, s2);
-    }
+    public Term intersect(Term s1, Term s2) {
+        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
+            return empty();
+        } else {
+            return func(ldt.getIntersect(), s1, s2);
+        }
     }
 
 
-    public Term intersect(Services services, Term ... subTerms) {
-        Term result = empty(services);
+    public Term intersect(Term ... subTerms) {
+        Term result = empty();
         for(Term sub : subTerms) {
-        result = intersect(services, result, sub);
-    }
+            result = intersect(result, sub);
+        }
         return result;
     }
 
 
-    public Term intersect(Services services, Iterable<Term> subTerms) {
-        Term result = empty(services);
+    public Term intersect(Iterable<Term> subTerms) {
+        Term result = empty();
         for(Term sub : subTerms) {
-        result = intersect(services, result, sub);
-    }
+            result = intersect(result, sub);
+        }
         return result;
     }
 
 
-    public Term setMinus(Services services, Term s1, Term s2) {
-    final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
-    if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
-        return s1;
-    } else {
-        return func(ldt.getSetMinus(), s1, s2);
-    }
-    }
-
-
-    public Term infiniteUnion(Services services,
-                          QuantifiableVariable[] qvs,
-                          Term s) {
-    final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
-    return tf.createTerm(ldt.getInfiniteUnion(),
-                     new Term[]{s},
-                     new ImmutableArray<QuantifiableVariable>(qvs),
-                     null);
+    public Term setMinus(Term s1, Term s2) {
+        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
+            return s1;
+        } else {
+            return func(ldt.getSetMinus(), s1, s2);
+        }
     }
 
 
-    public Term guardedInfiniteUnion(Services services,
-                         QuantifiableVariable[] qvs,
+    public Term infiniteUnion(QuantifiableVariable[] qvs,
+                              Term s) {
+        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        return tf.createTerm(ldt.getInfiniteUnion(),
+                new Term[]{s},
+                new ImmutableArray<QuantifiableVariable>(qvs),
+                null);
+    }
+
+
+    public Term infiniteUnion(QuantifiableVariable[] qvs,
                          Term guard,
                          Term s) {
-    return infiniteUnion(services,
-                     qvs,
-                     ife(guard, s, empty(services)));
+        return infiniteUnion(qvs,
+                             ife(guard, s, empty()));
     }
 
 
-    public Term setComprehension(Services services,
-                             QuantifiableVariable[] qvs,
-                             Term o,
-                             Term f) {
-    return infiniteUnion(services, qvs, singleton(services, o, f));
+    public Term setComprehension(QuantifiableVariable[] qvs,
+                                 Term o,
+                                 Term f) {
+        return infiniteUnion(qvs, singleton(o, f));
     }
 
 
-    public Term guardedSetComprehension(Services services,
-                                QuantifiableVariable[] qvs,
+    public Term setComprehension(QuantifiableVariable[] qvs,
                                 Term guard,
                                 Term o,
                                 Term f) {
-    return guardedInfiniteUnion(services,
-                            qvs,
-                            guard,
-                            singleton(services, o, f));
+        return infiniteUnion(qvs,
+                                    guard,
+                                    singleton(o, f));
     }
 
 
-    public Term allFields(Services services, Term o) {
-    return func(services.getTypeConverter().getLocSetLDT().getAllFields(), o);
+    public Term allFields(Term o) {
+        return func(services.getTypeConverter().getLocSetLDT().getAllFields(), o);
     }
 
 
-    public Term allObjects(Services services, Term f) {
-    return func(services.getTypeConverter().getLocSetLDT().getAllObjects(), f);
+    public Term allObjects(Term f) {
+        return func(services.getTypeConverter().getLocSetLDT().getAllObjects(), f);
     }
 
 
-    public Term arrayRange(Services services, Term o, Term lower, Term upper) {
-    return func(services.getTypeConverter().getLocSetLDT().getArrayRange(),
-            new Term[]{o, lower, upper});
+    public Term arrayRange(Term o, Term lower, Term upper) {
+        return func(services.getTypeConverter().getLocSetLDT().getArrayRange(),
+                o, lower, upper);
     }
 
 
-    public Term freshLocs(Services services, Term h) {
-    return func(services.getTypeConverter().getLocSetLDT().getFreshLocs(), h);
+    public Term freshLocs(Term h) {
+        return func(services.getTypeConverter().getLocSetLDT().getFreshLocs(), h);
     }
 
 
-    public Term elementOf(Services services, Term o, Term f, Term s) {
-    final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
-    if(s.op() == ldt.getEmpty()) {
-        return ff();
-    } else {
-        return func(ldt.getElementOf(), new Term[]{o, f, s});
-    }
-    }
-
-
-    public Term subset(Services services, Term s1, Term s2) {
-    final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
-    if(s1.op() == ldt.getEmpty()) {
-        return tt();
-    } else {
-        return func(ldt.getSubset(), s1, s2);
-    }
+    public Term elementOf(Term o, Term f, Term s) {
+        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        if(s.op() == ldt.getEmpty()) {
+            return ff();
+        } else {
+            return func(ldt.getElementOf(), o, f, s);
+        }
     }
 
 
-    public Term disjoint(Services services, Term s1, Term s2) {
-    final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
-    if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
-        return tt();
-    } else {
-        return func(ldt.getDisjoint(), s1, s2);
-    }
-    }
-
-
-    public Term createdInHeap(Services services, Term s, Term h) {
-    final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
-    if(s.op() == ldt.getEmpty()) {
-        return tt();
-    } else {
-        return func(ldt.getCreatedInHeap(), s, h);
-    }
+    public Term subset(Term s1, Term s2) {
+        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        if(s1.op() == ldt.getEmpty()) {
+            return tt();
+        } else {
+            return func(ldt.getSubset(), s1, s2);
+        }
     }
 
 
-    public Term createdLocs(Services services) {
-        return setMinus(services,
-                    allLocs(services),
-                        freshLocs(services, getBaseHeap(services)));
+    public Term disjoint(Term s1, Term s2) {
+        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        if(s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
+            return tt();
+        } else {
+            return func(ldt.getDisjoint(), s1, s2);
+        }
     }
 
+
+    public Term createdInHeap(Term s, Term h) {
+        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        if(s.op() == ldt.getEmpty()) {
+            return tt();
+        } else {
+            return func(ldt.getCreatedInHeap(), s, h);
+        }
+    }
+
+
+    public Term createdLocs() {
+        return setMinus(allLocs(),
+                    freshLocs(getBaseHeap()));
+    }
+
+    // The template of the well-definedness transformer for terms.
+    public static final Transformer WD_ANY =
+            new Transformer(new Name("wd"), Sort.ANY);
+
+    // The template of the well-definedness transformer for formulas.
+    public static final Transformer WD_FORMULA =
+            new Transformer(new Name("WD"), Sort.FORMULA);
+
+    public Term wd(Term t) {
+        if(t.op() == Junctor.FALSE || t.op() == Junctor.TRUE) {
+            return tt();
+        } else if (t.sort().equals(Sort.FORMULA)) {
+            return func(Transformer.getTransformer(WD_FORMULA, services), t);
+        } else {
+            return func(Transformer.getTransformer(WD_ANY, services), t);
+        }
+    }
+
+    public ImmutableList<Term> wd(Iterable<Term> l) {
+        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
+        for (Term t: l) {
+            res = res.append(wd(t));
+        }
+        return res;
+    }
+
+    public Term[] wd(Term[] l) {
+        Term[] res = new Term[l.length];
+        for(int i = 0; i < l.length; i++) {
+            res[i] = wd(l[i]);
+        }
+        return res;
+    }
 
 
     //-------------------------------------------------------------------------
     //heap operators
     //-------------------------------------------------------------------------
 
-    public Term NULL(Services services) {
+    public Term NULL() {
         return func(services.getTypeConverter().getHeapLDT().getNull());
     }
+    
+    /** The "deep non null" predicate arising from JML non_null types.
+     * Deep non null means that it is recursively defined for arrays.
+     * See bug #1392.
+     */
+    public Term deepNonNull(Term o, Term d) {
+        final Function nonNull = (Function) services.getNamespaces().functions().lookup("nonNull");
+        final Term heap = getBaseHeap();
+        return func(nonNull, heap, o, d);
+    }
 
-    public Term wellFormed(Term heap, Services services) {
+    public Term wellFormed(Term heap) {
         return func(services.getTypeConverter().getHeapLDT().getWellFormed(heap.sort()),
                 heap);
     }
 
-
-    public Term wellFormed(LocationVariable heap, Services services) {
-        return wellFormed(var(heap), services);
+    public Term wellFormed(LocationVariable heap) {
+        return wellFormed(var(heap));
     }
 
 
-    public Term inv(Services services, Term[] h, Term o) {
+    public Term inv(Term[] h, Term o) {
         Term[] p = new Term[h.length + 1];
         System.arraycopy(h, 0, p, 0, h.length);
         p[h.length] = o;
@@ -1452,21 +1609,21 @@ public class TermBuilder {
     }
 
 
-    public Term inv(Services services, Term o) {
+    public Term inv(Term o) {
         List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
         Term[] hs = new Term[heaps.size()];
         int i=0;
         for(LocationVariable heap : heaps) {
             hs[i++] = var(heap);
         }
-        return inv(services, hs,  o);
+        return inv(hs, o);
     }
 
-    public Term staticInv(Services services, Term[] h, KeYJavaType t){
+    public Term staticInv(Term[] h, KeYJavaType t){
         return func(services.getJavaInfo().getStaticInv(t), h);
     }
 
-    public Term staticInv(Services services, KeYJavaType t){
+    public Term staticInv(KeYJavaType t){
         List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
         Term[] hs = new Term[heaps.size()];
         int i=0;
@@ -1477,67 +1634,147 @@ public class TermBuilder {
     }
 
 
-    public Term select(Services services, Sort asSort, Term h, Term o, Term f) {
+    public Term select(Sort asSort, Term h, Term o, Term f) {
     return func(services.getTypeConverter().getHeapLDT().getSelect(
             asSort,
             services),
-            new Term[]{h, o, f});
+            h, o, f);
+    }
+    
+    /**
+     * Get the select expression for a location variabe
+     * representing the field.
+     */
+    public Term select(Sort asSort, Term h, Term o, LocationVariable field) {
+        final Function f = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(field, services);
+        return select(asSort, h, o, func(f));
     }
 
 
-    public Term dot(Services services, Sort asSort, Term o, Term f) {
-        return select(services, asSort, getBaseHeap(services), o, f);
+    public Term dot(Sort asSort, Term o, Term f) {
+        return select(asSort, getBaseHeap(), o, f);
     }
 
-    public Term getBaseHeap(Services services) {
+    public Term getBaseHeap() {
         return var(services.getTypeConverter().getHeapLDT().getHeap());
     }
 
-    public Term dot(Services services, Sort asSort, Term o, Function f) {
+    public Term dot(Sort asSort, Term o, Function f) {
     final Sort fieldSort
         = services.getTypeConverter().getHeapLDT().getFieldSort();
         return f.sort() == fieldSort
-               ? dot(services, asSort, o, func(f))
-               : func(f, getBaseHeap(services), o);
+               ? dot(asSort, o, func(f))
+               : func(f, getBaseHeap(), o);
+    }
+    
+    public Term dot (Sort asSort, Term o, LocationVariable field) {
+        final Function f = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(field, services);
+        return dot(asSort, o, f);
     }
 
 
-    public Term staticDot(Services services, Sort asSort, Term f) {
-        return dot(services, asSort, NULL(services), f);
+    public Term staticDot(Sort asSort, Term f) {
+        return dot(asSort, NULL(), f);
     }
 
 
-    public Term staticDot(Services services, Sort asSort, Function f) {
+    public Term staticDot(Sort asSort, Function f) {
     final Sort fieldSort
         = services.getTypeConverter().getHeapLDT().getFieldSort();
     return f.sort() == fieldSort
-           ? staticDot(services, asSort, func(f))
-           : func(f, getBaseHeap(services));
+           ? staticDot(asSort, func(f))
+           : func(f, getBaseHeap());
     }
 
 
-    public Term arr(Services services, Term idx) {
+    public Term arr(Term idx) {
     return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
     }
 
-    public Term label(Term term, ImmutableArray<ITermLabel> labels) {
-        if ((labels == null || labels.isEmpty())) {
+    public Term addLabel(Term term, ImmutableArray<TermLabel> labels) {
+        if ((labels == null || labels.isEmpty())
+                && !term.hasLabels()) {
             return term;
-        } else {
-            return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(),
+        } else if (!term.hasLabels()) {
+            return tf.createTerm(term.op(), term.subs(), term.boundVars(),
                     term.javaBlock(), labels);
+        } else {
+            ImmutableList<TermLabel> newLabelList = ImmutableSLList.<TermLabel>nil();
+            for (TermLabel l: labels) {
+                if (!term.getLabels().contains(l)) {
+                    newLabelList = newLabelList.append(l);
+                }
+            }
+            TermLabel[] newLabelArr = new TermLabel[newLabelList.size()];
+            Iterator<TermLabel> it = newLabelList.iterator();
+            for (int i = 0; i < newLabelArr.length; i++) {
+                assert it.hasNext();
+                newLabelArr[i] = it.next();
+            }
+            TermLabel[] newLabels = new TermLabel[labels.size() + newLabelArr.length];
+            labels.arraycopy(0, newLabels, 0, labels.size());
+            new ImmutableArray<TermLabel>(newLabelArr).arraycopy(0, newLabels, labels.size(),
+                                                                  newLabelArr.length);
+            return tf.createTerm(term.op(), term.subs(),
+                                                  term.boundVars(), term.javaBlock(),
+                                                  new ImmutableArray<TermLabel>(newLabels));
         }
     }
 
-    public Term label(Term term, ITermLabel label) {
+    public Term addLabel(Term term, TermLabel label) {
+        if (label == null && !term.hasLabels()) {
+            return term;
+        } else {
+            return addLabel(term, new ImmutableArray<TermLabel>(label));
+        }
+    }
+
+    public Term label(Term term, ImmutableArray<TermLabel> labels) {
+        if ((labels == null || labels.isEmpty())) {
+            return term;
+        } else if (labels.size() == 1
+                && (labels.contains(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)
+                        || labels.contains(ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL)
+                        || labels.contains(ParameterlessTermLabel.UNDEFINED_VALUE_LABEL))
+                && !WellDefinednessCheck.isOn()) {
+            return term; // FIXME: This case is only for SET Tests
+        } else {
+            return tf.createTerm(term.op(), term.subs(), term.boundVars(),
+                                 term.javaBlock(), labels);
+        }
+    }
+
+    public Term label(Term term, TermLabel label) {
         if (label == null) {
             return term;
         } else {
-            return label(term, new ImmutableArray<ITermLabel>(label));
+            return label(term, new ImmutableArray<TermLabel>(label));
         }
     }
 
-    public Term dotArr(Services services, Term ref, Term idx) {
+    public Term shortcut(Term term) {
+        if ((term.op().equals(Junctor.AND)
+                        || term.op().equals(Junctor.OR))
+            && WellDefinednessCheck.isOn()) { // FIXME: Last condition is only for SET Tests
+            return addLabel(term, ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL);
+        } else {
+            return term;
+        }
+    }
+
+    public Term unlabel(Term term) {
+        return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock());
+    }
+
+    public Term unlabelRecursive(Term term) {
+        Term[] subs = new Term[term.subs().size()];
+        for (int i = 0; i < subs.length; i++) {
+            subs[i] = unlabelRecursive(term.sub(i));
+        }
+        return tf.createTerm(term.op(), subs, term.boundVars(), term.javaBlock());
+    }
+
+    public Term dotArr(Term ref, Term idx) {
         if(ref == null || idx == null) {
             throw new TermCreationException("Tried to build an array access "+
                     "term without providing an " +
@@ -1554,220 +1791,202 @@ public class TermBuilder {
                     "("+ref+"["+idx+"])");
         }
 
-        return select(services,
-                  elementSort,
-                  getBaseHeap(services),
+        return select(elementSort,
+                  getBaseHeap(),
                   ref,
-                  arr(services, idx));
+                  arr(idx));
     }
 
 
-    public Term dotLength(Services services, Term a) {
-    final TypeConverter tc = services.getTypeConverter();
-    return func(tc.getHeapLDT().getLength(), a);
+    public Term dotLength(Term a) {
+        final TypeConverter tc = services.getTypeConverter();
+        return func(tc.getHeapLDT().getLength(), a);
     }
 
 
-    public Term created(Services services, Term h, Term o) {
-    final TypeConverter tc = services.getTypeConverter();
-    return equals(select(services,
-                      tc.getBooleanLDT().targetSort(),
-                  h,
-                      o,
-                      func(tc.getHeapLDT().getCreated())),
-               TRUE(services));
+    public Term created(Term h, Term o) {
+        final TypeConverter tc = services.getTypeConverter();
+        return equals(select(tc.getBooleanLDT().targetSort(),
+                             h,
+                             o,
+                             func(tc.getHeapLDT().getCreated())),
+                      TRUE());
     }
 
 
-    public Term created(Services services, Term o) {
-    return created(services, getBaseHeap(services), o);
+    public Term created(Term o) {
+        return created(getBaseHeap(), o);
+    }
+
+    public Term initialized(Term o) {
+        final TypeConverter tc = services.getTypeConverter();
+        return equals(dot(tc.getBooleanLDT().targetSort(),
+                o,
+                tc.getHeapLDT().getInitialized()),
+                TRUE());
     }
 
 
+    public Term classPrepared(Sort classSort) {
+        final TypeConverter tc = services.getTypeConverter();
+        return equals(staticDot(tc.getBooleanLDT().targetSort(),
+                tc.getHeapLDT().getClassPrepared(classSort,
+                        services)),
+                        TRUE());
+    }
 
-    public Term initialized(Services services, Term o) {
-    final TypeConverter tc = services.getTypeConverter();
-    return equals(dot(services,
-                  tc.getBooleanLDT().targetSort(),
-                  o,
-                  tc.getHeapLDT().getInitialized()),
-              TRUE(services));
+    public Term classInitialized(Sort classSort) {
+        final TypeConverter tc = services.getTypeConverter();
+        return equals(staticDot(tc.getBooleanLDT().targetSort(),
+                tc.getHeapLDT().getClassInitialized(classSort,
+                        services)),
+                        TRUE());
+    }
+
+    public Term classInitializationInProgress(Sort classSort) {
+        final TypeConverter tc = services.getTypeConverter();
+        return equals(staticDot(tc.getBooleanLDT().targetSort(),
+                tc.getHeapLDT()
+                .getClassInitializationInProgress(classSort,
+                        services)),
+                        TRUE());
     }
 
 
-    public Term classPrepared(Services services, Sort classSort) {
-    final TypeConverter tc = services.getTypeConverter();
-    return equals(staticDot(services,
-                        tc.getBooleanLDT().targetSort(),
-                        tc.getHeapLDT().getClassPrepared(classSort,
-                                         services)),
-              TRUE(services));
-    }
-
-    public Term classInitialized(Services services, Sort classSort) {
-    final TypeConverter tc = services.getTypeConverter();
-    return equals(staticDot(services,
-                        tc.getBooleanLDT().targetSort(),
-                        tc.getHeapLDT().getClassInitialized(classSort,
-                                            services)),
-              TRUE(services));
-    }
-
-    public Term classInitializationInProgress(Services services,
-                              Sort classSort) {
-    final TypeConverter tc = services.getTypeConverter();
-    return equals(staticDot(services,
-                        tc.getBooleanLDT().targetSort(),
-                        tc.getHeapLDT()
-                          .getClassInitializationInProgress(classSort,
-                                            services)),
-              TRUE(services));
+    public Term classErroneous(Sort classSort) {
+        final TypeConverter tc = services.getTypeConverter();
+        return equals(staticDot(tc.getBooleanLDT().targetSort(),
+                tc.getHeapLDT().getClassErroneous(classSort,
+                        services)),
+                        TRUE());
     }
 
 
-    public Term classErroneous(Services services, Sort classSort) {
-    final TypeConverter tc = services.getTypeConverter();
-    return equals(staticDot(services,
-                        tc.getBooleanLDT().targetSort(),
-                        tc.getHeapLDT().getClassErroneous(classSort,
-                                          services)),
-              TRUE(services));
-    }
-
-
-    public Term store(Services services, Term h, Term o, Term f, Term v) {
+    public Term store(Term h, Term o, Term f, Term v) {
         return func(services.getTypeConverter().getHeapLDT().getStore(),
-                new Term[]{h, o, f, v});
+                h, o, f, v);
     }
 
 
-    public Term create(Services services, Term h, Term o) {
+    public Term create(Term h, Term o) {
         return func(services.getTypeConverter().getHeapLDT().getCreate(),
                  new Term[]{h, o});
     }
 
 
-    public Term anon(Services services, Term h1, Term s, Term h2) {
+    public Term anon(Term h1, Term s, Term h2) {
     return func(services.getTypeConverter().getHeapLDT().getAnon(),
-            new Term[]{h1, s, h2});
+            h1, s, h2);
     }
 
 
-    public Term fieldStore(Services services, Term o, Function f, Term v) {
-        return store(services, getBaseHeap(services), o, func(f), v);
+    public Term fieldStore(TermServices services, Term o, Function f, Term v) {
+        return store(getBaseHeap(), o, func(f), v);
     }
 
 
-    public Term staticFieldStore(Services services, Function f, Term v) {
-    return fieldStore(services, NULL(services), f, v);
+    public Term staticFieldStore(Function f, Term v) {
+    return fieldStore(services, NULL(), f, v);
     }
 
 
-    public Term arrayStore(Services services, Term o, Term i, Term v) {
-        return store(services,
-                getBaseHeap(services),
-                 o,
+    public Term arrayStore(Term o, Term i, Term v) {
+        return store(getBaseHeap(),
+                o,
                  func(services.getTypeConverter().getHeapLDT().getArr(), i),
                  v);
     }
 
 
-    public Term reachableValue(Services services,
-                       Term h,
-                       Term t,
-                       KeYJavaType kjt) {
-    assert t.sort().extendsTrans(kjt.getSort())
-           || t.sort() instanceof ProgramSVSort;
-    final Sort s = t.sort() instanceof ProgramSVSort ? kjt.getSort() : t.sort();
-    final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
-    final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
-    if(s.extendsTrans(services.getJavaInfo().objectSort())) {
-        return or(created(services, h, t), equals(t, NULL(services)));
-    } else if(s.equals(setLDT.targetSort())) {
-        return createdInHeap(services, t, h);
-    } else if(s.equals(intLDT.targetSort()) && kjt.getJavaType() != PrimitiveType.JAVA_BIGINT) {
-        return func(intLDT.getInBounds(kjt.getJavaType()), t);
-    } else {
-        return tt();
-    }
+    public Term reachableValue(Term h,
+                               Term t,
+                               KeYJavaType kjt) {
+        assert t.sort().extendsTrans(kjt.getSort()) || t.sort() instanceof ProgramSVSort;
+        final Sort s = t.sort() instanceof ProgramSVSort ? kjt.getSort() : t.sort();
+        final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
+        final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+        if(s.extendsTrans(services.getJavaInfo().objectSort())) {
+            return orSC(equals(t, NULL()), created(h, t));
+        } else if(s.equals(setLDT.targetSort())) {
+            return createdInHeap(t, h);
+        } else if(s.equals(intLDT.targetSort()) && kjt.getJavaType() != PrimitiveType.JAVA_BIGINT) {
+            return func(intLDT.getInBounds(kjt.getJavaType()), t);
+        } else {
+            return tt();
+        }
     }
 
 
-    public Term reachableValue(Services services, Term t, KeYJavaType kjt) {
-    return reachableValue(services, getBaseHeap(services), t, kjt);
+    public Term reachableValue(Term t, KeYJavaType kjt) {
+        return reachableValue(getBaseHeap(), t, kjt);
     }
 
 
-    public Term reachableValue(Services services, ProgramVariable pv) {
-    return reachableValue(services, var(pv), pv.getKeYJavaType());
+    public Term reachableValue(ProgramVariable pv) {
+        return reachableValue(var(pv), pv.getKeYJavaType());
     }
 
 
-    public Term frame(Services services, Term heapTerm,
-                  Map<Term,Term> normalToAtPre,
+    public Term frame(Term heapTerm, Map<Term,Term> normalToAtPre,
                   Term mod) {
-    final Sort objectSort = services.getJavaInfo().objectSort();
-    final Sort fieldSort = services.getTypeConverter()
-                                   .getHeapLDT()
-                                   .getFieldSort();
+        final Sort objectSort = services.getJavaInfo().objectSort();
+        final Sort fieldSort = services.getTypeConverter()
+                .getHeapLDT()
+                .getFieldSort();
 
-    final Name objVarName   = new Name(newName(services, "o"));
-    final Name fieldVarName = new Name(newName(services, "f"));
-    final LogicVariable objVar
+        final Name objVarName   = new Name(newName("o"));
+        final Name fieldVarName = new Name(newName("f"));
+        final LogicVariable objVar
         = new LogicVariable(objVarName, objectSort);
-    final LogicVariable fieldVar
+        final LogicVariable fieldVar
         = new LogicVariable(fieldVarName, fieldSort);
-    final Term objVarTerm = var(objVar);
-    final Term fieldVarTerm = var(fieldVar);
+        final Term objVarTerm = var(objVar);
+        final Term fieldVarTerm = var(fieldVar);
 
-    final OpReplacer or = new OpReplacer(normalToAtPre);
-    final Term modAtPre = or.replace(mod);
-    final Term createdAtPre = or.replace(created(services, heapTerm, objVarTerm));
+        final OpReplacer or = new OpReplacer(normalToAtPre, tf);
+        final Term modAtPre = or.replace(mod);
+        final Term createdAtPre = or.replace(created(heapTerm, objVarTerm));
 
         ImmutableList<QuantifiableVariable> quantVars =
                 ImmutableSLList.<QuantifiableVariable>nil();
         quantVars = quantVars.append(objVar);
         quantVars = quantVars.append(fieldVar);
-    return all(quantVars,
-           or(elementOf(services,
-                                objVarTerm,
-                                fieldVarTerm,
-                                modAtPre),
-                      and(not(equals(objVarTerm, NULL(services))),
-                      not(createdAtPre)),
-                      equals(select(services,
-                                    Sort.ANY,
-                                    heapTerm,
-                                    objVarTerm,
-                                    fieldVarTerm),
-                             select(services,
-                                    Sort.ANY,
-                                    or.replace(heapTerm),
-                                    objVarTerm,
-                                    fieldVarTerm))));
+        return all(quantVars,
+                or(elementOf(objVarTerm,
+                        fieldVarTerm,
+                        modAtPre),
+                        and(not(equals(objVarTerm, NULL())),
+                                not(createdAtPre)),
+                                equals(select(Sort.ANY,
+                                        heapTerm,
+                                        objVarTerm,
+                                        fieldVarTerm),
+                                        select(Sort.ANY,
+                                                or.replace(heapTerm),
+                                                objVarTerm,
+                                                fieldVarTerm))));
     }
 
     /**
      * Returns the framing condition that the resulting heap is identical (i.e.
      * has the same value in all locations) to the before-heap.
      *
-     * @see #frame(Services, Term, Map, Term)
+     * @see #frame(Term, Map, Term)
      */
-    public Term frameStrictlyEmpty(Services services, Term heapTerm,
-            Map<Term,Term> normalToAtPre) {
+    public Term frameStrictlyEmpty(Term heapTerm, Map<Term,Term> normalToAtPre) {
         final Sort objectSort = services.getJavaInfo().objectSort();
         final Sort fieldSort = services.getTypeConverter()
                 .getHeapLDT()
                 .getFieldSort();
 
-        final Name objVarName   = new Name(newName(services, "o"));
-        final Name fieldVarName = new Name(newName(services, "f"));
+        final Name objVarName   = new Name(newName("o"));
+        final Name fieldVarName = new Name(newName("f"));
         final LogicVariable objVar = new LogicVariable(objVarName, objectSort);
         final LogicVariable fieldVar = new LogicVariable(fieldVarName, fieldSort);
         final Term objVarTerm = var(objVar);
         final Term fieldVarTerm = var(fieldVar);
 
-        final OpReplacer or = new OpReplacer(normalToAtPre);
+        final OpReplacer or = new OpReplacer(normalToAtPre, tf);
 
         ImmutableList<QuantifiableVariable> quantVars =
                 ImmutableSLList.<QuantifiableVariable>nil();
@@ -1775,60 +1994,51 @@ public class TermBuilder {
         quantVars = quantVars.append(fieldVar);
 
         return all(quantVars,
-                equals(select(services,
-                        Sort.ANY,
+                equals(select(Sort.ANY,
                         heapTerm,
                         objVarTerm,
                         fieldVarTerm),
-                        select(services,
-                                Sort.ANY,
+                        select(Sort.ANY,
                                 or.replace(heapTerm),
                                 objVarTerm,
                                 fieldVarTerm)));
     }
 
-    public Term anonUpd(LocationVariable heap, Services services, Term mod, Term anonHeap) {
-    return elementary(services,
-                  heap,
-                  anon(services,
-                       var(heap),
-                       mod,
-                       anonHeap));
+    public Term anonUpd(LocationVariable heap, Term mod, Term anonHeap) {
+        return elementary(heap, anon(var(heap), mod, anonHeap));
     }
 
 
     public Term forallHeaps(Services services, Term t) {
-    final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-    final LogicVariable heapLV
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final LogicVariable heapLV
         = new LogicVariable(new Name("h"), heapLDT.targetSort());
-    final Map<LocationVariable, LogicVariable> map
+        final Map<LocationVariable, LogicVariable> map
         = new LinkedHashMap<LocationVariable, LogicVariable>();
-    map.put(heapLDT.getHeap(), heapLV);
-    final OpReplacer or = new OpReplacer(map);
-    t = or.replace(t);
-    return all(heapLV, t);
+        map.put(heapLDT.getHeap(), heapLV);
+        final OpReplacer or = new OpReplacer(map, tf);
+        t = or.replace(t);
+        return all(heapLV, t);
     }
-
 
 
     //-------------------------------------------------------------------------
     //reachability operators
     //-------------------------------------------------------------------------
 
-    public Term acc(Services services, Term h, Term s, Term o1, Term o2) {
+    public Term acc(Term h, Term s, Term o1, Term o2) {
     return func(services.getTypeConverter().getHeapLDT().getAcc(),
-            new Term[]{h, s, o1, o2});
+            h, s, o1, o2);
     }
 
 
-    public Term reach(Services services,
-                  Term h,
+    public Term reach(Term h,
                   Term s,
                   Term o1,
                   Term o2,
                   Term n) {
     return func(services.getTypeConverter().getHeapLDT().getReach(),
-            new Term[]{h, s, o1, o2, n});
+            h, s, o1, o2, n);
     }
 
 
@@ -1836,49 +2046,65 @@ public class TermBuilder {
     //sequence operators
     //-------------------------------------------------------------------------
 
-    public Term seqGet(Services services, Sort asSort, Term s, Term idx) {
-    return func(services.getTypeConverter().getSeqLDT().getSeqGet(asSort,
-                                          services),
-            s,
-            idx);
+    public Term seqGet(Sort asSort, Term s, Term idx) {
+        return func(services.getTypeConverter().getSeqLDT().getSeqGet(asSort, services),
+                    s,
+                    idx);
     }
 
 
-    public Term seqLen(Services services, Term s) {
-    return func(services.getTypeConverter().getSeqLDT().getSeqLen(), s);
+    public Term seqLen(Term s) {
+        return func(services.getTypeConverter().getSeqLDT().getSeqLen(), s);
     }
 
     /** Function representing the least index of an element x in a sequence s (or underspecified) */
-    public Term indexOf(Services services, Term s, Term x){
-    return func(services.getTypeConverter().getSeqLDT().getSeqIndexOf(),s,x);
+    public Term indexOf(Term s, Term x){
+        return func(services.getTypeConverter().getSeqLDT().getSeqIndexOf(),s,x);
     }
 
 
-    public Term seqEmpty(Services services) {
-    return func(services.getTypeConverter().getSeqLDT().getSeqEmpty());
+    public Term seqEmpty() {
+        return func(services.getTypeConverter().getSeqLDT().getSeqEmpty());
+    }
+
+    public Term seqSingleton(Term x) {
+        return func(services.getTypeConverter().getSeqLDT().getSeqSingleton(), x);
+    }
+
+    public Term seqConcat(Term s, Term s2) {
+        if (s == seqEmpty()) {
+            return s2;
+        } else if (s2 == seqEmpty()) {
+            return s;
+        } else {
+            return func(services.getTypeConverter().getSeqLDT().getSeqConcat(),
+                        s,
+                        s2);
+        }
+    }
+
+    public Term seq(Term... terms) {
+        Term result = seqEmpty();
+        for (Term term : terms) {
+            result = seqConcat(result, seqSingleton(term));
+        }
+        return result;
     }
 
 
-    public Term seqSingleton(Services services, Term x) {
-    return func(services.getTypeConverter().getSeqLDT().getSeqSingleton(),
-            x);
+    public Term seq(ImmutableList<Term> terms) {
+        Term result = seqEmpty();
+        for (Term term : terms) {
+            result = seqConcat(result, seqSingleton(term));
+        }
+        return result;
     }
 
-
-    public Term seqConcat(Services services, Term s, Term s2) {
-    return func(services.getTypeConverter().getSeqLDT().getSeqConcat(),
-            s,
-            s2);
+    public Term seqSub(Term s, Term from, Term to) {
+    return func(services.getTypeConverter().getSeqLDT().getSeqSub(), s, from, to);
     }
 
-
-    public Term seqSub(Services services, Term s, Term from, Term to) {
-    return func(services.getTypeConverter().getSeqLDT().getSeqSub(),
-            new Term[]{s, from, to});
-    }
-
-
-    public Term seqReverse(Services services, Term s) {
+    public Term seqReverse(Term s) {
     return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
     }
 
@@ -1888,7 +2114,7 @@ public class TermBuilder {
 
 
 
-    public ImmutableSet<Term> unionToSet(Term s, Services services) {
+    public ImmutableSet<Term> unionToSet(Term s) {
     final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
     assert s.sort().equals(setLDT.targetSort());
     final Function union = setLDT.getUnion();
@@ -1911,7 +2137,7 @@ public class TermBuilder {
     /**
      * Removes leading updates from the passed term.
      */
-    public Term goBelowUpdates(Term term) {
+    public static Term goBelowUpdates(Term term) {
         while(term.op() instanceof UpdateApplication) {
             term = UpdateApplication.getTarget(term);
         }
@@ -1923,7 +2149,7 @@ public class TermBuilder {
     /**
      * Removes leading updates from the passed term.
      */
-    public Pair<ImmutableList<Term>,Term> goBelowUpdates2(Term term) {
+    public static Pair<ImmutableList<Term>,Term> goBelowUpdates2(Term term) {
     ImmutableList<Term> updates = ImmutableSLList.<Term>nil();
         while(term.op() instanceof UpdateApplication) {
             updates = updates.append(UpdateApplication.getUpdate(term));
@@ -1937,14 +2163,13 @@ public class TermBuilder {
     public Term seqDef(QuantifiableVariable qv,
                        Term a,
                        Term b,
-                       Term t,
-                       Services services) {
+                       Term t) {
         return func(services.getTypeConverter().getSeqLDT().getSeqDef(),
                     new Term[]{a, b, t},
                     new ImmutableArray<QuantifiableVariable>(qv));
     }
 
-    public Term values(Services services){
+    public Term values(){
         return func(services.getTypeConverter().getSeqLDT().getValues());
     }
 
@@ -1961,102 +2186,172 @@ public class TermBuilder {
        return result;
     }
 
-    public static class Serviced extends TermBuilder {
+   /**
+    * Similar behavior as {@link #imp(Term, Term)} but simplifications are not
+    * performed if {@link TermLabel}s would be lost.
+    * @param t1 The left side.
+    * @param t2 The right side.
+    * @return The created {@link Term}.
+    */
+   public Term impPreserveLabels(Term t1, Term t2) {
+      if (t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
+         if (!t1.hasLabels()) {
+            return t2;
+         }
+         else {
+            return tf.createTerm(Junctor.IMP, t1, t2);
+         }
+      }
+      else if (t1.op() == Junctor.TRUE && !t1.hasLabels()) {
+         return t2;
+      }
+      else if (t2.op() == Junctor.FALSE && !t2.hasLabels()) {
+         return notPreserveLabels(t1);
+      }
+      else {
+         return tf.createTerm(Junctor.IMP, t1, t2);
+      }
+   }
+    
+   /**
+    * Similar behavior as {@link #not(Term)} but simplifications are not
+    * performed if {@link TermLabel}s would be lost.
+    * @param t The child {@link Term}.
+    * @return The created {@link Term}.
+    */
+   public Term notPreserveLabels(Term t) {
+      if (t.op() == Junctor.TRUE && !t.hasLabels()) {
+         return ff();
+      }
+      else if (t.op() == Junctor.FALSE && !t.hasLabels()) {
+         return tt();
+      }
+      else if (t.op() == Junctor.NOT && !t.hasLabels()) {
+         return t.sub(0);
+      }
+      else {
+         return tf.createTerm(Junctor.NOT, t);
+      }
+   }
 
-        protected final Services services;
+   /**
+    * Similar behavior as {@link #and(Iterable)} but simplifications are not
+    * performed if {@link TermLabel}s would be lost.
+    * @param subTerms The sub {@link Term}s.
+    * @return The created {@link Term}.
+    */
+   public Term andPreserveLabels(Iterable<Term> subTerms) {
+      Term result = tt();
+      for (Term sub : subTerms) {
+         result = andPreserveLabels(result, sub);
+      }
+      return result;
+   }
 
-        public Serviced(final Services services)
-        {
-            assert services != null;
-            this.services = services;
-        }
+   /**
+    * Similar behavior as {@link #and(Term, Term)} but simplifications are not
+    * performed if {@link TermLabel}s would be lost.
+    * @param t1 The left side.
+    * @param t2 The right side.
+    * @return The created {@link Term}.
+    */
+   public Term andPreserveLabels(Term t1, Term t2) {
+      if (t1.op() == Junctor.FALSE || t2.op() == Junctor.FALSE) {
+         if (!t1.hasLabels() && !t2.hasLabels()) {
+            return ff();
+         }
+         else if (!t1.hasLabels()) {
+            return t2;
+         }
+         else {
+            return t1;
+         }
+      }
+      else if (t1.op() == Junctor.TRUE && !t1.hasLabels()) {
+         return t2;
+      }
+      else if (t2.op() == Junctor.TRUE && !t2.hasLabels()) {
+         return t1;
+      }
+      else {
+         return tf.createTerm(Junctor.AND, t1, t2);
+      }
+   }
 
-        public String newName(final String baseName)
-        {
-            return newName(services, baseName);
-        }
+   /**
+    * Similar behavior as {@link #or(Iterable)} but simplifications are not
+    * performed if {@link TermLabel}s would be lost.
+    * @param subTerms The sub {@link Term}s.
+    * @return The created {@link Term}.
+    */
+   public Term orPreserveLabels(Iterable<Term> subTerms) {
+      Term result = ff();
+      for (Term sub : subTerms) {
+         result = orPreserveLabels(result, sub);
+      }
+      return result;
+   }
 
-        public LocationVariable selfVar(final IProgramMethod method, final KeYJavaType type, final boolean makeNameUnique)
-        {
-            return selfVar(services, method, type, makeNameUnique);
-        }
+   /**
+    * Similar behavior as {@link #or(Term, Term)} but simplifications are not
+    * performed if {@link TermLabel}s would be lost.
+    * @param t1 The left side.
+    * @param t2 The right side.
+    * @return The created {@link Term}.
+    */
+   public Term orPreserveLabels(Term t1, Term t2) {
+      if (t1.op() == Junctor.TRUE || t2.op() == Junctor.TRUE) {
+         if (!t1.hasLabels() && !t2.hasLabels()) {
+            return tt();
+         }
+         else if (!t1.hasLabels()) {
+            return t2;
+         }
+         else {
+            return t1;
+         }
+      }
+      else if (t1.op() == Junctor.FALSE && !t1.hasLabels()) {
+         return t2;
+      }
+      else if (t2.op() == Junctor.FALSE && !t2.hasLabels()) {
+         return t1;
+      }
+      else {
+         return tf.createTerm(Junctor.OR, t1, t2);
+      }
+   }
 
-        public LocationVariable resultVar(final IProgramMethod method, final boolean makeNameUnique)
-        {
-            return resultVar(services, method, makeNameUnique);
-        }
+    //-------------------------------------------------------------------------
+    // information flow operators
+    //-------------------------------------------------------------------------
 
-        public LocationVariable excVar(final IProgramMethod method, final boolean makeNameUnique)
-        {
-            return excVar(services, method, makeNameUnique);
-        }
-
-        public LocationVariable heapAtPreVar(final String baseName, final Sort sort, final boolean makeNameUnique)
-        {
-            return heapAtPreVar(services, baseName, sort, makeNameUnique);
-        }
-
-        public Term convertToFormula(final Term term)
-        {
-            return convertToFormula(term, services);
-        }
-
-        public Term elementary(final UpdateableOperator leftHandSide, final Term rightHandSide) {
-            return elementary(services, leftHandSide, rightHandSide);
-        }
-
-        public Term TRUE()
-        {
-            return TRUE(services);
-        }
-
-        public Term FALSE()
-        {
-            return FALSE(services);
-        }
-
-        public Term NULL()
-        {
-            return NULL(services);
-        }
-
-        public Term wellFormed(final Term heap)
-        {
-            return wellFormed(heap, services);
-        }
-
-        public Term wellFormed(final LocationVariable heap)
-        {
-            return wellFormed(heap, services);
-        }
-
-        public Term reachableValue(final ProgramVariable variable)
-        {
-            return reachableValue(services, variable);
-        }
-
-        public Term frame(final Term heapTerm, final Map<Term, Term> normalToAtPre, final Term modifiesClause)
-        {
-            return frame(services, heapTerm, normalToAtPre, modifiesClause);
-        }
-
-        public Term frameStrictlyEmpty(final Term heapTerm, final Map<Term, Term> normalToAtPre)
-        {
-            return frameStrictlyEmpty(services, heapTerm, normalToAtPre);
-        }
-
-        public Term anonUpd(final LocationVariable heap, final Term modifiesClause, final Term anonymisationHeap)
-        {
-            return anonUpd(heap, services, modifiesClause, anonymisationHeap);
-        }
-
-        public Term union(final Term firstLocationSet, final Term secondLocationSet)
-        {
-            return union(services, firstLocationSet, secondLocationSet);
-        }
-
+    public Term eqAtLocs(Services services,
+                         Term heap1,
+                         Term locset1,
+                         Term heap2,
+                         Term locset2) {
+        return (locset1.equals(empty())
+                && locset2.equals(empty()))
+                ? tt
+                        : func((Function) services.getNamespaces().functions().lookup(new Name(
+                                "__EQUALS__LOCS__")), // TODO: define string constant elsewhere
+                                heap1, locset1, heap2, locset2);
     }
 
 
-
+    public Term eqAtLocsPost(Services services,
+                             Term heap1_pre,
+                             Term heap1_post,
+                             Term locset1,
+                             Term heap2_pre,
+                             Term heap2_post,
+                             Term locset2) {
+        return (locset1.equals(empty())
+                && locset2.equals(empty()))
+                ? tt
+                        : func((Function) services.getNamespaces().functions().lookup(new Name(
+                                "__EQUALS__LOCS__POST__")), // TODO: define string constant elsewhere
+                                heap1_pre, heap1_post, locset1, heap2_pre, heap2_post, locset2);
+    }
 }

@@ -1,18 +1,19 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -34,7 +35,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionTermination
  */
-public interface IExecutionTermination extends IExecutionNode {
+public interface IExecutionTermination extends IExecutionNode<SourceElement> {
    /**
     * The default name of a termination node with {@link TerminationKind#NORMAL}.
     */
@@ -66,6 +67,13 @@ public interface IExecutionTermination extends IExecutionNode {
    public TerminationKind getTerminationKind();
    
    /**
+    * Checks if this branch would be closed without the uninterpreted predicate
+    * and thus be treated as valid/closed in a regular proof.
+    * @return {@code true} verified/closed, {@code false} not verified/still open
+    */
+   public boolean isBranchVerified();
+   
+   /**
     * Defines the possible termination kinds.
     * @author Martin Hentschel
     */
@@ -83,6 +91,6 @@ public interface IExecutionTermination extends IExecutionNode {
       /**
        * Partial termination of a loop body.
        */
-      LOOP_BODY;
+      LOOP_BODY
    }
 }

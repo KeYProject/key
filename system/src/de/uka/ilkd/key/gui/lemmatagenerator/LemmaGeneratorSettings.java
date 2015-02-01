@@ -1,26 +1,26 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
+import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.Properties;
 
-import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.configuration.SettingsConverter;
-import de.uka.ilkd.key.gui.configuration.SettingsListener;
+import de.uka.ilkd.key.settings.SettingsConverter;
+import de.uka.ilkd.key.settings.SettingsListener;
 
-public class LemmaGeneratorSettings implements de.uka.ilkd.key.gui.configuration.Settings, Cloneable {
+public class LemmaGeneratorSettings implements de.uka.ilkd.key.settings.Settings, Cloneable {
         private LinkedList<SettingsListener> listeners = new LinkedList<SettingsListener>();
         private boolean showDialogAddingAxioms = true;
         private boolean showDialogUsingAxioms = true;
@@ -31,7 +31,7 @@ public class LemmaGeneratorSettings implements de.uka.ilkd.key.gui.configuration
  
         private void fireSettingsChanged(){
                 for(SettingsListener listener : listeners){
-                        listener.settingsChanged(new GUIEvent(this));
+                        listener.settingsChanged(new EventObject(this));
                 }
         }
 

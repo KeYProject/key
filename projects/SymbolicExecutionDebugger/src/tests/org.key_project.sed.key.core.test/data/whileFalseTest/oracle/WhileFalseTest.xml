@@ -1,21 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_1161ef1c-f6c6-45f9-b2e9-5bfb10ce2298" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_8e25204f-2741-466a-ba52-f8e30f949ca9" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_098f2077-ef1b-4835-b9f7-cd93540f2197" name="self.main();" pathCondition="true" lineNumber="-1" charStart="94" charEnd="98">
-            <sedStatement xml:id="_8e228ef6-33d9-4f37-b479-ae738c102e0c" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="106" charEnd="121">
-               <sedLoopStatement xml:id="_34d9509c-dc9c-44cc-9b1e-ed0cec71e2ed" name="while ( false ) {   result_1++; }" pathCondition="true" lineNumber="-1" charStart="125" charEnd="160">
-                  <sedLoopCondition xml:id="_544c4bab-97cd-4db1-9e97-15a2d82ff46e" name="false" pathCondition="true" lineNumber="-1" charStart="132" charEnd="137">
-                     <sedStatement xml:id="_7ef2fbdd-a882-4de2-aff4-8e7826c96132" name="return result_1;" pathCondition="true" lineNumber="-1" charStart="164" charEnd="178">
-                        <sedMethodReturn xml:id="_e26ccb6d-ebeb-4cf9-ab22-bc4824fb46c4" name="&lt;return 0 as result of self.main();&gt;" pathCondition="true" lineNumber="-1" charStart="94" charEnd="98">
-                           <sedTermination xml:id="_e656b891-b4a6-4cb0-87d8-fd7a9238d3ef" name="&lt;end&gt;" pathCondition="true">
+   <sedTarget xml:id="_f21517eb-213e-45e7-beb0-0cbeb04b168c" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_f170632f-a32c-469a-bff2-a8797add1a70" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testWhileFalse\src\WhileFalseTest.java">
+         <sedMethodCall xml:id="_8fac4818-5c39-4ff8-a57d-208eaa825735" name="&lt;call self.main()&gt;" pathCondition="true" lineNumber="-1" charStart="94" charEnd="98" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testWhileFalse\src\WhileFalseTest.java" groupable="true">
+            <sedStatement xml:id="_270b82cd-bcc2-4c3e-a39f-a92308384448" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="106" charEnd="121" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testWhileFalse\src\WhileFalseTest.java">
+               <sedLoopStatement xml:id="_a8b8cc09-fcaa-4df3-9706-67289c56e889" name="while ( false )" pathCondition="true" lineNumber="-1" charStart="125" charEnd="130" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testWhileFalse\src\WhileFalseTest.java" groupable="false">
+                  <sedLoopCondition xml:id="_3194522d-034a-4275-b49f-d1b1de2d594f" name="false" pathCondition="true" lineNumber="-1" charStart="132" charEnd="137" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testWhileFalse\src\WhileFalseTest.java" groupable="false">
+                     <sedStatement xml:id="_a146f3fa-97fe-4623-baa3-174a3254094f" name="return result_1;" pathCondition="true" lineNumber="-1" charStart="164" charEnd="178" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testWhileFalse\src\WhileFalseTest.java">
+                        <sedMethodReturn xml:id="_0d1f39a5-3385-488f-a16f-a809f9e17622" name="&lt;return Z(0(#)) as result of self.main()&gt;" pathCondition="true" lineNumber="-1" charStart="94" charEnd="98" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testWhileFalse\src\WhileFalseTest.java" methodReturnConditionRef="_e0c5463c-4759-429b-9295-bb78b0e74178">
+                           <sedTermination xml:id="_33e8d9c8-cfc6-4761-a116-d7c2481c2900" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testWhileFalse\src\WhileFalseTest.java" verified="true">
                            </sedTermination>
+                           <sedGroupEndConditionReference nodeIdRef="_e0c5463c-4759-429b-9295-bb78b0e74178"/>
                         </sedMethodReturn>
                      </sedStatement>
                   </sedLoopCondition>
                </sedLoopStatement>
             </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_e0c5463c-4759-429b-9295-bb78b0e74178" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_0d1f39a5-3385-488f-a16f-a809f9e17622"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_e0c5463c-4759-429b-9295-bb78b0e74178" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_0d1f39a5-3385-488f-a16f-a809f9e17622"/>
+            </sedGroupEndCondition>
          </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_33e8d9c8-cfc6-4761-a116-d7c2481c2900"/>
       </sedThread>
    </sedTarget>
 </launch>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -23,9 +23,9 @@ import org.eclipse.ui.IPageLayout;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.key.ui.test.Activator;
-import org.key_project.sed.ui.test.util.SWTBotTabbedPropertyList;
 import org.key_project.sed.ui.visualization.test.util.TestVisualizationUtil;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
@@ -73,11 +73,47 @@ public class AbstractSWTBotGraphitiKeYPropertyTabTest extends AbstractSWTBotKeYP
     * {@inheritDoc}
     */
    @Override
+   protected void selectMethodContract(SWTBotTree debugTree) {
+      super.selectMethodContract(debugTree);
+      TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    protected void selectLaunch(SWTBotTree debugTree) {
       super.selectLaunch(debugTree);
       TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
    }
    
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void selectTermination(SWTBotTree debugTree) throws Exception {
+      super.selectTermination(debugTree);
+      TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void selectLoopInvariant(SWTBotTree debugTree) throws Exception {
+      super.selectLoopInvariant(debugTree);
+      TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void selectLoopBodyTermination(SWTBotTree debugTree) throws Exception {
+      super.selectLoopBodyTermination(debugTree);
+      TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
+   }
+
    /**
     * Does some test steps on an opened diagram in an editable editor.
     * @param steps The test steps to execute.

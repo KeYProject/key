@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -29,6 +29,7 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ClassTree;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
@@ -43,9 +44,29 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
  */
 public final class MonKeYUtil {
    /**
+    * The default value of maximal rule applications used by MonKeY.
+    */
+   public static final int DEFAULT_MAX_RULE_APPLICATIONS = 10000;
+   
+   /**
     * Forbid instances.
     */
    private MonKeYUtil() {
+   }
+
+   /**
+    * Checks if the {@link KeYEnvironment} is shown in KeY's {@link MainWindow}.
+    * @param environment The {@link KeYEnvironment} to check.
+    * @return {@code true} {@link KeYEnvironment} is shown in {@link MainWindow}, {@code false} {@link KeYEnvironment} is not shown in {@link MainWindow}.
+    */
+   public static boolean isMainWindowEnvironment(KeYEnvironment<?> environment) {
+      if (environment != null) {
+         return MainWindow.hasInstance() && 
+                MainWindow.getInstance().getUserInterface() == environment.getUi();
+      }
+      else {
+         return false;
+      }
    }
 
    /**
@@ -111,7 +132,7 @@ public final class MonKeYUtil {
              for (IObserverFunction target : targets) {
                  ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(type, target);
                  for (Contract contract : contracts) {
-                     proofs.add(new MonKeYProof(type.getFullName(), ClassTree.getDisplayName(environment.getServices(), contract.getTarget()), contract.getDisplayName(), environment.getUi(), environment.getInitConfig(), contract));
+                     proofs.add(new MonKeYProof(type.getFullName(), ClassTree.getDisplayName(environment.getServices(), contract.getTarget()), contract.getDisplayName(), environment, contract));
                  }
              }
              monitor.worked(1);
@@ -256,5 +277,14 @@ public final class MonKeYUtil {
       public int getReusedProofsCount() {
          return reusedProofsCount;
       }
+   }
+
+   /**
+    * Converts the given value into a human readable {@link String}.
+    * @param value The value to convert.
+    * @return The human readable representation of the value.
+    */
+   public static String toString(boolean value) {
+     return value ? "Yes" : "No";
    }
 }

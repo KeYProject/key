@@ -3,15 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
-
 
 package de.uka.ilkd.key.java.expression.literal;
 
@@ -23,6 +21,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.ldt.RealLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -119,6 +119,11 @@ public class RealLiteral extends Literal {
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
 	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
+    }
+    
+    @Override
+    public Name getLDTName() {
+        return RealLDT.NAME;
     }
 
 }

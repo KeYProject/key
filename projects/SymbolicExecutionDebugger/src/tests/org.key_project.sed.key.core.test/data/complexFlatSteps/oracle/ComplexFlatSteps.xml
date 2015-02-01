@@ -1,19 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_63792bf3-0184-4370-9edd-3c0395a4fe48" name="doSomething()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_782b8ecb-5282-42c7-af49-52dda5054a30" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_4f3fac62-a47a-4e66-a6d3-37f7f2f57f56" name="self.doSomething();" pathCondition="true" lineNumber="-1" charStart="244" charEnd="255">
-            <sedStatement xml:id="_8e01a905-5ca5-4601-92ae-936efd022773" name="int x = 1+2;" pathCondition="true" lineNumber="-1" charStart="263" charEnd="277">
-               <sedStatement xml:id="_b340f730-2111-4c91-b64a-71d2b0bbd281" name="int y = 2*4*9;" pathCondition="true" lineNumber="-1" charStart="281" charEnd="299">
-                  <sedStatement xml:id="_1cc89db7-1c5b-4fa8-b6b6-f2c39750ea1b" name="int z = 3*(4/(2-3));" pathCondition="true" lineNumber="-1" charStart="303" charEnd="329">
-                     <sedMethodReturn xml:id="_8c8a1eb5-6386-4e92-8199-99fd0d66a1fe" name="&lt;return of self.doSomething();&gt;" pathCondition="true" lineNumber="-1" charStart="244" charEnd="255">
-                        <sedTermination xml:id="_2b2452ae-fa06-49a3-a4db-262f9b219d10" name="&lt;end&gt;" pathCondition="true">
+   <sedTarget xml:id="_88bcc43b-48d6-4975-8cba-aa6fbe005694" name="doSomething()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_fdd0cf46-12bd-4ce4-9b79-9e152b45a152" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexFlatSteps\src\ComplexFlatSteps.java">
+         <sedMethodCall xml:id="_ed8d9c63-0f4d-4ec9-b742-b0d2c2291087" name="&lt;call self.doSomething()&gt;" pathCondition="true" lineNumber="-1" charStart="244" charEnd="255" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexFlatSteps\src\ComplexFlatSteps.java" groupable="true">
+            <sedStatement xml:id="_8bf8c39c-df90-470e-b436-f1a0e8602910" name="int x = 1+2;" pathCondition="true" lineNumber="-1" charStart="263" charEnd="277" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexFlatSteps\src\ComplexFlatSteps.java">
+               <sedStatement xml:id="_c822c760-aacb-47ad-9e1b-b9eeb8b1eeb2" name="int y = 2*4*9;" pathCondition="true" lineNumber="-1" charStart="281" charEnd="299" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexFlatSteps\src\ComplexFlatSteps.java">
+                  <sedStatement xml:id="_697e1a59-1949-4476-bda9-3d7d56067f29" name="int z = 3*(4/(2-3));" pathCondition="true" lineNumber="-1" charStart="303" charEnd="329" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexFlatSteps\src\ComplexFlatSteps.java">
+                     <sedMethodReturn xml:id="_e327090a-cfd5-4a3d-a403-22b940bd2dd6" name="&lt;return of self.doSomething()&gt;" pathCondition="true" lineNumber="-1" charStart="244" charEnd="255" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexFlatSteps\src\ComplexFlatSteps.java" methodReturnConditionRef="_304e823b-45f4-4be6-b1f6-7cc1575e1ebe">
+                        <sedTermination xml:id="_d1b37a70-914f-4686-ab10-9c2351578de2" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexFlatSteps\src\ComplexFlatSteps.java" verified="true">
                         </sedTermination>
+                        <sedGroupEndConditionReference nodeIdRef="_304e823b-45f4-4be6-b1f6-7cc1575e1ebe"/>
                      </sedMethodReturn>
                   </sedStatement>
                </sedStatement>
             </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_304e823b-45f4-4be6-b1f6-7cc1575e1ebe" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_e327090a-cfd5-4a3d-a403-22b940bd2dd6"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_304e823b-45f4-4be6-b1f6-7cc1575e1ebe" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_e327090a-cfd5-4a3d-a403-22b940bd2dd6"/>
+            </sedGroupEndCondition>
          </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_d1b37a70-914f-4686-ab10-9c2351578de2"/>
       </sedThread>
    </sedTarget>
 </launch>

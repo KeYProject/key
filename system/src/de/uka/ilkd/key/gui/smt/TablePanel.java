@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -38,24 +38,29 @@ public abstract class TablePanel extends JPanel{
         private static final int STRUT = 5;
         
         private JTextArea infoText;
+        private boolean showInfo;
         
         protected  TablePanel() {
                 this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
        
         }
         
-        protected void updateOptions(){};
+        protected void updateOptions(){}
         
         protected final void createTable(){
                 createComponents();
                 finalizeAddingComponents();
         }
         
+        public void setShowInfo(boolean showInfo){
+        	this.showInfo = showInfo;
+        }
+        
         private void addInfo(JButton infoButton, String info){
          
                 final JTextArea infoBox = addInfoArea(info);
                
-                infoBox.setVisible(false);
+                infoBox.setVisible(showInfo);
             
                 infoButton.addActionListener(new ActionListener() {
                         
@@ -115,7 +120,7 @@ public abstract class TablePanel extends JPanel{
         
         protected FileChooserPanel addFileChooserPanel(String title, String file, String info,
                         boolean selected,boolean enabled, ActionListener changeListener){
-              FileChooserPanel fileChooserPanel =  new FileChooserPanel(selected,enabled,title);
+              FileChooserPanel fileChooserPanel =  new FileChooserPanel(selected,enabled,title,file);
               fileChooserPanel.addActionListener(changeListener);
               setMaximumHeight(fileChooserPanel, fileChooserPanel.getPreferredSize().height);
               addComponent(info,fileChooserPanel);

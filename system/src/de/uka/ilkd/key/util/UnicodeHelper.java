@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -17,9 +17,11 @@ package de.uka.ilkd.key.util;
  * Contains commonly (at least in the context of KeY) used Unicode symbols.
  * The names for the constants mostly derive from the common names in LaTeX,
  * such as the bottom symbol is noted as "BOT".
- * Some symbols are however refered to by their common name within KeY,
+ * Some symbols are however referred to by their common name within KeY,
  * such as the equivalence arrow (aka. left-right arrow) is named "EQV".
  * In doubt, it is not a bad idea to give several names.
+ * See <a href="http://www.fileformat.info/info/unicode/category/Sm/list.htm">
+ * this list</a> for more symbols.
  * @author bruns
  *
  */
@@ -63,6 +65,11 @@ public final class UnicodeHelper {
     public static final char LLBRACKET = '\u27E6';
     public static final char RRBRACKET = '\u27E7';
 
+    // sequences
+    public static final char SEQ_SINGLETON_L = '\u2329';
+    public static final char SEQ_SINGLETON_R = '\u232A';
+    public static final char SEQ_CONCAT = '\u2218';
+
     // greek alphabet
     public static final char ALPHA = '\u03B1';
     public static final char BETA = '\u03B2';
@@ -95,6 +102,7 @@ public final class UnicodeHelper {
     public static final char BOT = '\u22A5';
     public static final char TURNSTILE = '\u22A6';
     public static final char MODELS = '\u22A7';
+    public static final char PRECEDES = '\u227A';
 
 
     // non-logic symbols
@@ -102,6 +110,8 @@ public final class UnicodeHelper {
     public static final char ENSPACE = '\u2002';
     public static final char EMSPACE = '\u2003';
     public static final char ENDASH = '\u2013';
+    public static final char FLQQ = '\u00ab';
+    public static final char FRQQ = '\u00bb';
 
 
     /**

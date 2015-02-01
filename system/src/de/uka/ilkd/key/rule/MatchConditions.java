@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.rule;
 
@@ -29,13 +28,18 @@ public class MatchConditions {
 	new MatchConditions ( SVInstantiations.EMPTY_SVINSTANTIATIONS,
 			      RenameTable.EMPTY_TABLE);
 
-    private SVInstantiations   instantiations   = SVInstantiations.EMPTY_SVINSTANTIATIONS;
- 
-    private RenameTable renameTable = RenameTable.EMPTY_TABLE;
+    private final SVInstantiations instantiations;
+    private final RenameTable renameTable;
 
+    public MatchConditions() {
+        this.instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+        this.renameTable = RenameTable.EMPTY_TABLE;
+    }
     
     public MatchConditions ( SVInstantiations   p_instantiations,
 			     RenameTable        p_renameTable) {
+        assert p_instantiations != null;
+        assert p_renameTable != null;
 	instantiations   = p_instantiations;	
         renameTable      = p_renameTable; 
     }

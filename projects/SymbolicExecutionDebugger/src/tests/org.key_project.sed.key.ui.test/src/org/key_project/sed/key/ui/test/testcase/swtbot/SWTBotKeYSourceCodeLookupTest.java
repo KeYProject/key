@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -14,8 +14,6 @@
 package org.key_project.sed.key.ui.test.testcase.swtbot;
 
 import java.io.File;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunch;
@@ -48,6 +46,7 @@ import org.key_project.sed.key.core.test.util.TestSEDKeyCoreUtil;
 import org.key_project.sed.key.ui.presentation.KeYDebugModelPresentation;
 import org.key_project.sed.key.ui.test.Activator;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
@@ -56,7 +55,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * which involves the {@link KeYDebugModelPresentation}.
  * @author Martin Hentschel
  */
-public class SWTBotKeYSourceCodeLookupTest extends TestCase {
+public class SWTBotKeYSourceCodeLookupTest extends AbstractSetupTestCase {
    /**
     * {@inheritDoc}
     */
@@ -67,6 +66,8 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
       // Close welcome view
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       TestUtilsUtil.closeWelcomeView(bot);
+      // Make sure that all editors are closed
+      bot.closeAllEditors();
    }
    
    /**
@@ -93,14 +94,14 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 8;
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, null, null, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE);
+         TestSEDKeyCoreUtil.launchKeY(method, null, null, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
          ISEDDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Click on "Resume" and wait until step was executed.
          final SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
-         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+         DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
                SWTBotMenu menuItem = item.contextMenu("Resume"); 
@@ -110,7 +111,8 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
          // Test the execution tree
          TestSEDKeyCoreUtil.assertFlatStepsExample(target);
          // Make sure that no editor is opened
-         assertEquals(0, bot.editors().size());
+         assertEquals(1, bot.editors().size());
+         assertEquals("FlatSteps.java", bot.activeEditor().getTitle());
          // Test statements
          assertSelectedStatement(bot, debugTree, new int[] {0, 0, 0, 1}, method, target, true);
          assertSelectedStatement(bot, debugTree, new int[] {0, 0, 0, 2}, method, target, false);
@@ -189,7 +191,7 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 8;
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, null, null, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE);
+         TestSEDKeyCoreUtil.launchKeY(method, null, null, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.FALSE);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
@@ -197,7 +199,7 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
          ILaunch launch = target.getLaunch();
          // Click on "Resume" and wait until step was executed.
          final SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
-         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+         DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
                SWTBotMenu menuItem = item.contextMenu("Resume"); 

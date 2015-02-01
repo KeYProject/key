@@ -1,22 +1,20 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
@@ -25,7 +23,6 @@ import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
@@ -50,7 +47,7 @@ public class TestTacletParser extends TestCase {
     public NamespaceSet nss;
     public Services services;
 
-    TermFactory tf=TermFactory.DEFAULT;
+    TermFactory tf;
 
     public TestTacletParser(String name) {
 	super(name);
@@ -64,7 +61,7 @@ public class TestTacletParser extends TestCase {
     public void setUp() {
 	nss =new NamespaceSet();
 	services = TacletForTests.services();
-
+	tf = services.getTermFactory();
 	parseDecls("\\sorts { s; }\n" +
 		   "\\functions {\n" +
 		   "  s f(s);\n" +
@@ -97,15 +94,16 @@ public class TestTacletParser extends TestCase {
     }
     
 
-    private KeYParser stringDeclParser(String s) {
-	return new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(s), null),
-			      "No file. parser/TestTacletParser.stringDeclParser("+s+")",  
-			       services, nss);
+    private KeYParserF stringDeclParser(String s) {
+	return new KeYParserF(ParserMode.DECLARATION,
+		new KeYLexerF(s,
+			"No file. parser/TestTacletParser.stringDeclParser(" + s + ")"),
+		services, nss);
     }
 
     public void parseDecls(String s) {
 	try {
-	    KeYParser p = stringDeclParser(s);
+	    KeYParserF p = stringDeclParser(s);
 	    p.decls();
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
@@ -118,16 +116,16 @@ public class TestTacletParser extends TestCase {
     //
     // Utility Methods for test cases.
     //
-    private KeYParser stringTacletParser(String s) {
-	return new KeYParser
-	    (ParserMode.TACLET,new KeYLexer(new StringReader(s), null), 
-	     "No file. parser/TestTacletParser.stringTacletParser("+s+")",  
-	     services, nss);
+    private KeYParserF stringTacletParser(String s) {
+	return new KeYParserF(ParserMode.TACLET,
+		new KeYLexerF(s,
+			"No file. parser/TestTacletParser.stringTacletParser(" + s + ")"),
+		services, nss);
     }
 
     public Term parseTerm(String s) {
 	try {
-	    KeYParser p = stringTacletParser(s);
+	    KeYParserF p = stringTacletParser(s);
 	    return p.term();
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
@@ -140,7 +138,7 @@ public class TestTacletParser extends TestCase {
 
     public Term parseFma(String s) {
 	try {
-	    KeYParser p = stringTacletParser(s);
+	    KeYParserF p = stringTacletParser(s);
 	    
 	    return p.formula();
 	} catch (Exception e) {
@@ -173,7 +171,7 @@ public class TestTacletParser extends TestCase {
     
     Taclet parseTaclet(String s) {
 	try {
-	    KeYParser p = stringTacletParser(s);
+	    KeYParserF p = stringTacletParser(s);
 	    
 	    return p.taclet(DefaultImmutableSet.<Choice>nil());
 	} catch (Exception e) {

@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -28,7 +28,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicAssociation;
  * @author Martin Hentschel
  * @see SymbolicAssociation
  */
-public interface ISymbolicAssociation {
+public interface ISymbolicAssociation extends ISymbolicElement {
    /**
     * Returns a human readable name.
     * @return A human readable name.
@@ -42,10 +42,16 @@ public interface ISymbolicAssociation {
    public boolean isArrayIndex();
    
    /**
-    * Returns the represented array index or {@code -1} if a program variable is represented..
-    * @return The represented array index or {@code -1} if a program variable is represented..
+    * Returns the represented array index or {@code null} if a program variable is represented..
+    * @return The represented array index or {@code null} if a program variable is represented..
     */
-   public int getArrayIndex();
+   public Term getArrayIndex();
+   
+   /**
+    * Returns the human readable array index or {@code null} if a program variable is represented..
+    * @return The human readable array index or {@code null} if a program variable is represented..
+    */
+   public String getArrayIndexString();
    
    /**
     * Returns the represented {@link IProgramVariable}.

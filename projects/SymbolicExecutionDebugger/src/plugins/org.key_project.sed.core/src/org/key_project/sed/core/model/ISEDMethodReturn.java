@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -33,6 +33,5 @@ import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
  * @author Martin Hentschel
  * @see ISEDDebugNode
  */
-public interface ISEDMethodReturn extends ISEDDebugNode, IStackFrame {
-
+public interface ISEDMethodReturn extends ISEDBaseMethodReturn {
 }

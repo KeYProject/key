@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -61,7 +61,7 @@ public final class TestVisualizationUtil {
       TestCase.assertNotNull(modelFile);
       // Create model file
       SEDXMLWriter writer = new SEDXMLWriter();
-      String modelContent = writer.toXML(new ISEDDebugTarget[0], "UTF-8", false, false);
+      String modelContent = writer.toXML(new ISEDDebugTarget[0], "UTF-8", false, false, false, null);
       if (!modelFile.exists()) {
          modelFile.create(new ByteArrayInputStream(modelContent.getBytes(Charset.forName("UTF-8"))), true, null);
       }

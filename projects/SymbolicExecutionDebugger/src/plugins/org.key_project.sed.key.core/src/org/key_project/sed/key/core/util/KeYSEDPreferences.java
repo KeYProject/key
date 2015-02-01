@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -51,6 +51,36 @@ public class KeYSEDPreferences {
     * Preference key to define that branch conditions are merged or not.
     */
    public static final String MERGE_BRANCH_CONDITIONS = "org.key_project.sed.key.core.preference.mergeBranchConditions";
+
+   /**
+    * Preference key to define that unicode characters are used or not.
+    */
+   public static final String USE_UNICODE = "org.key_project.sed.key.core.preference.useUnicode";
+
+   /**
+    * Preference key to define that pretty printing is used or not.
+    */
+   public static final String USE_PRETTY_PRINTING = "org.key_project.sed.key.core.preference.usePrettyPrinting";
+
+   /**
+    * Preference key to define that the full signature will be shown on method return nodes.
+    */
+   public static final String SHOW_SIGNATURE_ON_METHOD_RETURN_NODES = "org.key_project.sed.key.core.preference.showSignatureOnMethodReturnNodes";
+
+   /**
+    * Preference key to define how variables are computed.
+    */
+   public static final String VARIABLES_ARE_COMPUTED_FROM_UPDATES = "org.key_project.sed.key.core.preference.variablesAreOnlyComputedFromUpdates";
+
+   /**
+    * Preference key to enable truth value evaluation.
+    */
+   public static final String TRUTH_VALUE_EVALUATION_ENABLED = "org.key_project.sed.key.core.preference.truthValueEvaluationEnabled";
+
+   /**
+    * Preference key to enable or disable highlighting of reached source code.
+    */
+   public static final String HIGHLIGHT_REACHED_SOURCE_CODE = "org.key_project.sed.key.core.preference.highlightReachedSourceCode";
    
    /**
     * Returns the managed {@link IPreferenceStore}.
@@ -218,5 +248,197 @@ public class KeYSEDPreferences {
     */
    public static void setDefaultMergeBranchConditions(boolean defaultValue) {
       getStore().setDefault(MERGE_BRANCH_CONDITIONS, defaultValue);
+   }
+   
+   /**
+    * Checks if pretty printing is used or not.
+    * @return Use pretty printing?
+    */
+   public static boolean isUseUnicode() {
+      return getStore().getBoolean(USE_UNICODE);
+   }
+   
+   /**
+    * Checks if pretty printing is used or not by default.
+    * @return Use pretty printing?
+    */
+   public static boolean isDefaultUseUnicode() {
+      return getStore().getDefaultBoolean(USE_UNICODE);
+   }
+   
+   /**
+    * Sets if pretty printing is used or not.
+    * @param value Use pretty printing?
+    */
+   public static void setUseUnicode(boolean value) {
+      getStore().setValue(USE_UNICODE, value);
+   }
+   
+   /**
+    * Sets if pretty printing is used or not by default.
+    * @param defaultValue Use pretty printing?
+    */
+   public static void setDefaultUseUnicode(boolean defaultValue) {
+      getStore().setDefault(USE_UNICODE, defaultValue);
+   }
+   
+   /**
+    * Checks if pretty printing is used or not.
+    * @return Use pretty printing?
+    */
+   public static boolean isUsePrettyPrinting() {
+      return getStore().getBoolean(USE_PRETTY_PRINTING);
+   }
+   
+   /**
+    * Checks if pretty printing is used or not by default.
+    * @return Use pretty printing?
+    */
+   public static boolean isDefaultUsePrettyPrinting() {
+      return getStore().getDefaultBoolean(USE_PRETTY_PRINTING);
+   }
+   
+   /**
+    * Sets if pretty printing is used or not.
+    * @param value Use pretty printing?
+    */
+   public static void setUsePrettyPrinting(boolean value) {
+      getStore().setValue(USE_PRETTY_PRINTING, value);
+   }
+   
+   /**
+    * Sets if pretty printing is used or not by default.
+    * @param defaultValue Use pretty printing?
+    */
+   public static void setDefaultUsePrettyPrinting(boolean defaultValue) {
+      getStore().setDefault(USE_PRETTY_PRINTING, defaultValue);
+   }
+   
+   /**
+    * Checks if the full signature will be shown or not.
+    * @return Use pretty printing?
+    */
+   public static boolean isShowSignatureOnMethodReturnNodes() {
+      return getStore().getBoolean(SHOW_SIGNATURE_ON_METHOD_RETURN_NODES);
+   }
+   
+   /**
+    * Checks if the full signature will be shown or not by default.
+    * @return Use pretty printing?
+    */
+   public static boolean isDefaultShowSignatureOnMethodReturnNodes() {
+      return getStore().getDefaultBoolean(SHOW_SIGNATURE_ON_METHOD_RETURN_NODES);
+   }
+   
+   /**
+    * Sets if the full signature will be shown or not.
+    * @param value Use pretty printing?
+    */
+   public static void setShowSignatureOnMethodReturnNodes(boolean value) {
+      getStore().setValue(SHOW_SIGNATURE_ON_METHOD_RETURN_NODES, value);
+   }
+   
+   /**
+    * Sets the full signature will be shown or not by default.
+    * @param defaultValue Use pretty printing?
+    */
+   public static void setDefaultShowSignatureOnMethodReturnNodes(boolean defaultValue) {
+      getStore().setDefault(SHOW_SIGNATURE_ON_METHOD_RETURN_NODES, defaultValue);
+   }
+   
+   /**
+    * Checks if variables are computed from sequent or visible type structure.
+    * @return Use pretty printing?
+    */
+   public static boolean isVariablesAreOnlyComputedFromUpdates() {
+      return getStore().getBoolean(VARIABLES_ARE_COMPUTED_FROM_UPDATES);
+   }
+   
+   /**
+    * Checks if variables are computed from sequent or visible type structure by default.
+    * @return Use pretty printing?
+    */
+   public static boolean isDefaultVariablesAreOnlyComputedFromUpdates() {
+      return getStore().getDefaultBoolean(VARIABLES_ARE_COMPUTED_FROM_UPDATES);
+   }
+   
+   /**
+    * Sets if variables are computed from sequent or visible type structure.
+    * @param value Use pretty printing?
+    */
+   public static void setVariablesAreOnlyComputedFromUpdates(boolean value) {
+      getStore().setValue(VARIABLES_ARE_COMPUTED_FROM_UPDATES, value);
+   }
+   
+   /**
+    * Sets if variables are computed from sequent or visible type structure by default.
+    * @param defaultValue Use pretty printing?
+    */
+   public static void setDefaultVariablesAreOnlyComputedFromUpdates(boolean defaultValue) {
+      getStore().setDefault(VARIABLES_ARE_COMPUTED_FROM_UPDATES, defaultValue);
+   }
+   
+   /**
+    * Checks if truth value evaluation is enabled.
+    * @return Is truth value evaluation enabled?
+    */
+   public static boolean isTruthValueEvaluationEnabled() {
+      return getStore().getBoolean(TRUTH_VALUE_EVALUATION_ENABLED);
+   }
+   
+   /**
+    * Checks if truth value evaluation is enabled by default.
+    * @return Is truth value evaluation enabled?
+    */
+   public static boolean isDefaultTruthValueEvaluationEnabled() {
+      return getStore().getDefaultBoolean(TRUTH_VALUE_EVALUATION_ENABLED);
+   }
+   
+   /**
+    * Sets if truth value evaluation is enabled.
+    * @param value Enable truth value evaluation?
+    */
+   public static void setTruthValueEvaluationEnabled(boolean value) {
+      getStore().setValue(TRUTH_VALUE_EVALUATION_ENABLED, value);
+   }
+   
+   /**
+    * Sets if truth value evaluation is enabled by default.
+    * @param defaultValue Enable truth value evaluation?
+    */
+   public static void setDefaultTruthValueEvaluationEnabled(boolean defaultValue) {
+      getStore().setDefault(TRUTH_VALUE_EVALUATION_ENABLED, defaultValue);
+   }
+   
+   /**
+    * Checks if reached source code is highlighted is enabled.
+    * @return Is reached source code highlighting enabled?
+    */
+   public static boolean isHighlightReachedSourceCode() {
+      return getStore().getBoolean(HIGHLIGHT_REACHED_SOURCE_CODE);
+   }
+   
+   /**
+    * Checks if reached source code is highlighted by default.
+    * @return Is reached source code highlighting enabled by default?
+    */
+   public static boolean isDefaultHighlightReachedSourceCode() {
+      return getStore().getDefaultBoolean(HIGHLIGHT_REACHED_SOURCE_CODE);
+   }
+   
+   /**
+    * Sets if truth value evaluation is enabled.
+    * @param value Enable source code highlighting.
+    */
+   public static void setHighlightReachedSourceCode(boolean value) {
+      getStore().setValue(HIGHLIGHT_REACHED_SOURCE_CODE, value);
+   }
+   
+   /**
+    * Sets if reached source code is highlighted by default.
+    * @param defaultValue Enable source code highlighting.
+    */
+   public static void setDefaultHighlightReachedSourceCode(boolean defaultValue) {
+      getStore().setDefault(HIGHLIGHT_REACHED_SOURCE_CODE, defaultValue);
    }
 }

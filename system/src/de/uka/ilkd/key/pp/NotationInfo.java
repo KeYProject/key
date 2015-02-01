@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.pp;
 
@@ -18,11 +17,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.CharListLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.ldt.*;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -143,16 +139,18 @@ public final class NotationInfo {
     static final int PRIORITY_CAST = 120;
     static final int PRIORITY_ATOM = 130;
     static final int PRIORITY_BOTTOM = 140;
+    static final int PRIORITY_LABEL = 140; // TODO: find appropriate value
 
 
-    public static boolean PRETTY_SYNTAX = true;
+    public static boolean DEFAULT_PRETTY_SYNTAX = true;
     /**
      * Whether the very fancy notation is enabled
      * in which Unicode characters for logical operators
      * are printed.
      */
-    public static boolean UNICODE_ENABLED = false;
-        
+    public static boolean DEFAULT_UNICODE_ENABLED = false;
+    
+    public static boolean DEFAULT_HIDE_PACKAGE_PREFIX = false;
     
     /** This maps operators and classes of operators to {@link
      * Notation}s.  The idea is that we first look whether the operator has
@@ -161,28 +159,24 @@ public final class NotationInfo {
      */
     private HashMap<Object, Notation> notationTable;
 
-    /**
-     * Caches for the different kinds of notations.
-     * If a cache is yet unused, a shallow clone
-     * of the current notation table is produced and assigned to it.
-     */
-    private HashMap<Object, Notation> defaultNotationCache = null;
-    private HashMap<Object, Notation> fancyNotationCache = null;
-    private HashMap<Object, Notation> veryFancyNotationCache = null;
-    
+ 
     /**
      * Maps terms to abbreviations and reverse.
      */
     private AbbrevMap scm = new AbbrevMap();
     
+    private boolean prettySyntax = DEFAULT_PRETTY_SYNTAX;
     
-
+    private boolean unicodeEnabled = DEFAULT_UNICODE_ENABLED;
+    
+    private boolean hidePackagePrefix = DEFAULT_HIDE_PACKAGE_PREFIX;
+    
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------    
 
     public NotationInfo() {
-    	createDefaultNotationTable();
+    	this.notationTable = createDefaultNotation();
     }
     
     
@@ -195,13 +189,9 @@ public final class NotationInfo {
     /** Register the standard set of notations (that can be defined without
      * a services object).
      */
-    private void createDefaultNotationTable() {
-        if (defaultNotationCache != null){
-            notationTable = defaultNotationCache;
-            return;
-        }
-    defaultNotationCache = new LinkedHashMap<Object,Notation>();
-    HashMap<Object,Notation> tbl = defaultNotationCache;
+    private HashMap<Object, Notation> createDefaultNotation() {
+
+    HashMap<Object,Notation> tbl = new LinkedHashMap<Object,Notation>();;
 	
 	tbl.put(Junctor.TRUE ,new Notation.Constant("true", PRIORITY_ATOM));
 	tbl.put(Junctor.FALSE,new Notation.Constant("false", PRIORITY_ATOM));
@@ -234,7 +224,8 @@ public final class NotationInfo {
 	tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
 	
 	tbl.put(Sort.CAST_NAME, new Notation.CastFunction("(",")",PRIORITY_CAST, PRIORITY_BOTTOM));
-	this.notationTable = tbl;
+	tbl.put(TermLabel.class, new Notation.LabelNotation("<<", ">>", PRIORITY_LABEL));
+	return tbl;
     }
         
     
@@ -242,14 +233,9 @@ public final class NotationInfo {
      * Adds notations that can only be defined when a services object is 
      * available.
      */
-    @SuppressWarnings("unchecked")
-    private void addFancyNotations(Services services) {
-        if (fancyNotationCache != null){
-            notationTable = fancyNotationCache;
-            return;
-        }
-        fancyNotationCache = (HashMap<Object,Notation>) defaultNotationCache.clone();
-    HashMap<Object,Notation> tbl = fancyNotationCache; 
+    private HashMap<Object,Notation> createPrettyNotation(Services services) {
+
+    HashMap<Object,Notation> tbl = createDefaultNotation();
      
 	//arithmetic operators
 	final IntegerLDT integerLDT 
@@ -271,19 +257,29 @@ public final class NotationInfo {
 	//heap operators
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
+	tbl.put(heapLDT.getStore(), new Notation.StoreNotation());
+        tbl.put(heapLDT.getAnon(), new Notation.HeapConstructorNotation());
+        tbl.put(heapLDT.getCreate(), new Notation.HeapConstructorNotation());
+        tbl.put(heapLDT.getMemset(), new Notation.HeapConstructorNotation());
 	tbl.put(IObserverFunction.class, new Notation.ObserverNotation());
 	tbl.put(IProgramMethod.class, new Notation.ObserverNotation());
-	tbl.put(heapLDT.getLength(), new Notation.LengthNotation());
+	tbl.put(heapLDT.getLength(), new Notation.Postfix(".length"));
+
+        // sequence operators
+        final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
+	tbl.put(seqLDT.getSeqLen(), new Notation.Postfix(".length"));
+        tbl.put(SeqLDT.SEQGET_NAME, new Notation.SeqGetNotation());
 	
 	//set operators
 	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
-	tbl.put(setLDT.getEmpty(), new Notation.Constant("{}", PRIORITY_ATOM));
 	tbl.put(setLDT.getSingleton(), new Notation.SingletonNotation());
 	tbl.put(setLDT.getUnion(), new Notation.Infix("\\cup", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
 	tbl.put(setLDT.getIntersect(), new Notation.Infix("\\cap", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
 	tbl.put(setLDT.getSetMinus(), new Notation.Infix("\\setMinus", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
 	tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation());
-    tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(setLDT.getEmpty(), new Notation.Constant("{}", PRIORITY_ATOM));
+        tbl.put(setLDT.getAllFields(), new Notation.Postfix(".*"));
 	
 	//string operators
 	final CharListLDT charListLDT 
@@ -291,22 +287,17 @@ public final class NotationInfo {
 	tbl.put(charListLDT.getClConcat(), new Notation.Infix("+",PRIORITY_CAST,PRIORITY_ATOM,PRIORITY_ATOM));
 	tbl.put(charListLDT.getClCons(), new CharListNotation());
 	tbl.put(charListLDT.getClEmpty(), new Notation.Constant("\"\"",PRIORITY_BOTTOM));
-	
-	    this.notationTable = tbl;
+
+	return tbl;
     }
     
     /**
      * Add notations with Unicode symbols.
      * @param services
      */
-    @SuppressWarnings("unchecked")
-    private void addVeryFancyNotations(Services services){
-        if (veryFancyNotationCache != null){
-            notationTable = veryFancyNotationCache;
-            return;
-        }
-        veryFancyNotationCache = (HashMap<Object, Notation>) fancyNotationCache.clone();
-        HashMap<Object,Notation> tbl = veryFancyNotationCache;
+    private HashMap<Object,Notation> createUnicodeNotation(Services services){
+    
+        HashMap<Object,Notation> tbl = createPrettyNotation(services);
         
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();  
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
@@ -327,7 +318,16 @@ public final class NotationInfo {
         tbl.put(setLDT.getSetMinus(), new Notation.Infix(""+UnicodeHelper.SETMINUS, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation(" " + UnicodeHelper.IN + " "));
         tbl.put(setLDT.getSubset(), new Notation.Infix(""+UnicodeHelper.SUBSET, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-        this.notationTable = tbl;
+        tbl.put(services.getTypeConverter().getHeapLDT().getPrec(), new Notation.Infix(""+UnicodeHelper.PRECEDES, PRIORITY_ATOM,PRIORITY_TOP, PRIORITY_TOP));
+
+        //seq operators
+        final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
+        tbl.put(seqLDT.getSeqConcat(), new Notation.Infix(""+UnicodeHelper.SEQ_CONCAT, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
+        tbl.put(seqLDT.getSeqEmpty(), new Notation.Constant(""+UnicodeHelper.SEQ_SINGLETON_L+UnicodeHelper.SEQ_SINGLETON_R, PRIORITY_BOTTOM));
+        tbl.put(seqLDT.getSeqSingleton(), new Notation.SeqSingletonNotation(""+UnicodeHelper.SEQ_SINGLETON_L,""+UnicodeHelper.SEQ_SINGLETON_R));
+
+        tbl.put(TermLabel.class, new Notation.LabelNotation(""+UnicodeHelper.FLQQ, ""+UnicodeHelper.FRQQ, PRIORITY_LABEL));
+        return tbl;
     }
 
 
@@ -336,15 +336,25 @@ public final class NotationInfo {
     //-------------------------------------------------------------------------
     
     public void refresh(Services services) {
-	createDefaultNotationTable();
-	assert defaultNotationCache != null;
-	if(PRETTY_SYNTAX && services != null) {
-	    addFancyNotations(services);
-	    if (UNICODE_ENABLED)
-	        addVeryFancyNotations(services);
-	}
-    }    
-        
+       refresh(services, DEFAULT_PRETTY_SYNTAX, DEFAULT_UNICODE_ENABLED);
+    }
+
+    public void refresh(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+        this.unicodeEnabled = useUnicodeSymbols;
+        this.prettySyntax = usePrettyPrinting;
+        if (usePrettyPrinting && services != null) {
+            if (useUnicodeSymbols) {
+               this.notationTable = createUnicodeNotation(services);
+            }
+            else {
+               this.notationTable = createPrettyNotation(services);
+            }
+        }
+        else {
+           this.notationTable = createDefaultNotation();
+        }
+        hidePackagePrefix = DEFAULT_HIDE_PACKAGE_PREFIX;
+    }
     
     public AbbrevMap getAbbrevMap(){
 	return scm;
@@ -355,11 +365,14 @@ public final class NotationInfo {
 	scm = am;
     }
 
+    Notation getNotation(Class<?> c) {
+        return notationTable.get(c);
+    }
     
     /** Get the Notation for a given Operator.  
      * If no notation is registered, a Function notation is returned.
      */
-    public Notation getNotation(Operator op, Services services) {
+    Notation getNotation(Operator op) {
         Notation result = notationTable.get(op);
         if(result != null) {
             return result;
@@ -400,4 +413,21 @@ public final class NotationInfo {
 
         return new Notation.FunctionNotation();
     }
+
+    public boolean isPrettySyntax() {
+        return prettySyntax;
+    }
+
+    public boolean isUnicodeEnabled() {
+        return unicodeEnabled;
+    }
+
+    public boolean isHidePackagePrefix() {
+        return hidePackagePrefix;
+    }
+
+    public void setHidePackagePrefix(boolean b) {
+        hidePackagePrefix = b;
+    }
+
 }

@@ -1,29 +1,33 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.util.InfFlowSpec;
 
 
 /**
@@ -32,44 +36,47 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
  * replace in java blocks.
  */
 public class OpReplacer {
-    private static final TermFactory TF = TermFactory.DEFAULT;
-    
+    private TermFactory tf;
     private final Map<? extends SVSubstitute, ? extends SVSubstitute> map;
-    
-    
+
+
     /**
      * @param map mapping from the operators/terms to be replaced to the ones to 
      * replace them with
+     * @param tf TODO
+     * @param services TODO
      */
-    public OpReplacer(Map<? extends SVSubstitute, ? extends SVSubstitute> map) {
+    public OpReplacer(Map<? extends SVSubstitute, ? extends SVSubstitute> map, TermFactory tf) {
 	assert map != null;
         this.map = map;
+        this.tf = tf;
     }
     
     
-    public static Term replace(Term toReplace, Term with, Term in) {
+    public static Term replace(Term toReplace, Term with, Term in, TermFactory tf) {
 	Map<Term,Term> map = new LinkedHashMap<Term,Term>();
 	map.put(toReplace, with);
-	OpReplacer or = new OpReplacer(map);
+	OpReplacer or = new OpReplacer(map, tf);
 	return or.replace(in);
     }
     
     
     public static ImmutableList<Term> replace(Term toReplace, 
 	                                      Term with, 
-	                                      ImmutableList<Term> in) {
+	                                      ImmutableList<Term> in, 
+	                                      TermFactory tf) {
 	Map<Term,Term> map = new LinkedHashMap<Term,Term>();
 	map.put(toReplace, with);
-	OpReplacer or = new OpReplacer(map);
+	OpReplacer or = new OpReplacer(map, tf);
 	return or.replace(in);
     }    
     
     
     
-    public static Term replace(Operator toReplace, Operator with, Term in) {
+    public static Term replace(Operator toReplace, Operator with, Term in, TermFactory tf) {
 	Map<Operator,Operator> map = new LinkedHashMap<Operator,Operator>();
 	map.put(toReplace, with);
-	OpReplacer or = new OpReplacer(map);
+	OpReplacer or = new OpReplacer(map, tf);
 	return or.replace(in);
     }    
     
@@ -94,7 +101,6 @@ public class OpReplacer {
         if(term == null) {
             return null;
         }
-        
         final Term newTerm = (Term) map.get(term); 
         if(newTerm != null) {
             return newTerm;
@@ -112,19 +118,19 @@ public class OpReplacer {
             if(newSubTerms[i] != subTerm) {
                 changedSubTerm = true;
             }
-        }
-        
+        }        
         final ImmutableArray<QuantifiableVariable> newBoundVars 
         	= replace(term.boundVars());
-    
+        
         final Term result;
         if(newOp != term.op()  
            || changedSubTerm
            || newBoundVars != term.boundVars()) {
-            result = TF.createTerm(newOp,
+            result = tf.createTerm(newOp,
                                    newSubTerms,
                                    newBoundVars,
-                                   term.javaBlock());
+                                   term.javaBlock(),
+                                   term.getLabels());
         } else {
             result = term;
         }
@@ -142,6 +148,25 @@ public class OpReplacer {
         }
         return result;
     }    
+    
+    /**
+     * Replaces in a list of triples of lists of terms.
+     */
+    public ImmutableList<InfFlowSpec> replaceInfFlowSpec(ImmutableList<InfFlowSpec> terms) {
+        ImmutableList<InfFlowSpec>
+                result = ImmutableSLList.<InfFlowSpec>nil();
+        if (terms == null) {
+            return result;
+        }
+        
+        for(final InfFlowSpec infFlowSpec : terms) {
+            final ImmutableList<Term> preExpressions = replace(infFlowSpec.preExpressions);
+            final ImmutableList<Term> postExpressions = replace(infFlowSpec.postExpressions);
+            final ImmutableList<Term> newObjects = replace(infFlowSpec.newObjects);
+            result = result.append(new InfFlowSpec(preExpressions, postExpressions, newObjects));
+        }
+        return result;
+    }
     
     
     /**

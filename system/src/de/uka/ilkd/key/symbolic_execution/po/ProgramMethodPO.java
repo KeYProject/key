@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -30,7 +30,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -145,7 +145,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
    @Override
    protected ImmutableList<StatementBlock> buildOperationBlocks(ImmutableList<LocationVariable> formalParVars,
                                                 ProgramVariable selfVar,
-                                                ProgramVariable resultVar) {
+                                                ProgramVariable resultVar, Services services) {
       // Get program method to execute
       IProgramMethod pm = getProgramMethod();
       // Extracts code parts of the method
@@ -160,8 +160,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
     */
    @Override
    protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-                                      ImmutableList<ProgramVariable> paramVars) {
-      return TB.tt();
+                                      ImmutableList<ProgramVariable> paramVars, Services services) {
+      return tb.tt();
    }
 
    /**
@@ -187,7 +187,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
             return parser.parseExpression();
          }
          else {
-            return TB.tt();
+            return tb.tt();
          }
       }
       catch (SLTranslationException e) {
@@ -206,7 +206,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
                           ProgramVariable exceptionVar,
                           Map<LocationVariable, LocationVariable> atPreVars,
                           Services services) {
-      return TB.tt();
+      return tb.tt();
    }
 
    /**
@@ -214,10 +214,10 @@ public class ProgramMethodPO extends AbstractOperationPO {
     */
    @Override
    protected Term buildFrameClause(List<LocationVariable> modHeaps,
-                                   Map<LocationVariable, Map<Term, Term>> heapToAtPre,
+                                   Map<Term, Term> heapToAtPre,
                                    ProgramVariable selfVar,
-                                   ImmutableList<ProgramVariable> paramVars) {
-      return TB.tt();
+                                   ImmutableList<ProgramVariable> paramVars, Services services) {
+      return tb.tt();
    }
 
    /**
@@ -369,7 +369,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
          throw new IOException("Method signature has not valid order of chracters \"(\" and \")\".");
       }
       String name = signature.substring(0, breaketsStart);
-      String[] types = signature.substring(breaketsStart + 1, breaketsEnd).split(",");
+      String parameters = signature.substring(breaketsStart + 1, breaketsEnd);
+      String[] types = parameters.isEmpty() ? new String[0] : parameters.split(",");
       // Find container and parameter types
       KeYJavaType type = javaInfo.getKeYJavaType(className.trim());
       if (type == null) {

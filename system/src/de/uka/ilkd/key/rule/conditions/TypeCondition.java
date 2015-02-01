@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.rule.conditions;
 
@@ -19,6 +18,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -65,18 +65,41 @@ public final class TypeCondition extends VariableConditionAdapter {
 			 SVSubstitute candidate, 
 			 SVInstantiations svInst,
 			 Services services) {
-        
+
         if (!resolver.isComplete(p_var, candidate, svInst, services)) {
             // instantiation not yet complete
             return true;
         }
         final Sort s = resolver.resolveSort(p_var, candidate, svInst, services);
-        
-        if (isReference) {        
-            return (s.extendsTrans(services.getJavaInfo().objectSort()) 
-        	    && !(nonNull && s instanceof NullSort));
+
+        Sort objectSort = services.getJavaInfo().objectSort();
+
+        boolean isProxySort = s instanceof ProxySort;
+        if(!isProxySort) {
+            // for normal sorts this is ...
+            if (isReference) {
+                return (s.extendsTrans(objectSort)
+                        && !(nonNull && s instanceof NullSort));
+            } else {
+                return !(s.extendsTrans(objectSort));
+            }
         } else {
-            return !(s.extendsTrans(services.getJavaInfo().objectSort()));
+            // for proxy sorts this is ...
+            if(isReference && nonNull) {
+                // non-null cannot be guaranteed since there is no lower bound to type var
+                return false;
+            }
+            if(isReference) {
+                // one extended sort must have the property and we are fine
+                for (Sort extSort : s.extendsSorts()) {
+                    // same as:
+                    // extends && isReference  ||  !extends && !isReference
+                    if(extSort.extendsTrans(objectSort) == isReference) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 

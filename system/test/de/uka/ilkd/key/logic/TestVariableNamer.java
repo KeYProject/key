@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic;
 
@@ -39,6 +38,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
@@ -48,9 +48,9 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
 
 public class TestVariableNamer extends TestCase {
     
-    private static final TermBuilder TB = TermBuilder.DF;
 
-    private final Proof proof = new Proof(new Services(AbstractProfile.getDefaultProfile()));
+    private final Proof proof = new Proof("TestVariableNamer", 
+    		new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
     private final Services services = proof.getServices();
     private final ProgramVariable x     = constructProgramVariable("x");
     private final ProgramVariable xx    = constructProgramVariable("x");
@@ -90,14 +90,14 @@ public class TestVariableNamer extends TestCase {
     	StatementBlock statementBlock = new StatementBlock(statement);
     	JavaBlock javaBlock = JavaBlock.createJavaBlock(statementBlock);
 
-	Term term = TB.dia(javaBlock, TB.tt());
+	Term term = services.getTermBuilder().dia(javaBlock, services.getTermBuilder().tt());
 
 	return new SequentFormula(term);
     }
 
     
     private PosInOccurrence constructPIO(SequentFormula formula) {
-    	return new PosInOccurrence(formula, PosInTerm.TOP_LEVEL, true);
+    	return new PosInOccurrence(formula, PosInTerm.getTopLevel(), true);
     }
 
 
@@ -112,7 +112,7 @@ public class TestVariableNamer extends TestCase {
 	TacletIndex tacletIndex = new TacletIndex();
 	BuiltInRuleAppIndex builtInRuleAppIndex = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
 	RuleAppIndex ruleAppIndex = new RuleAppIndex(tacletIndex,
-						     builtInRuleAppIndex);
+						     builtInRuleAppIndex, proof.getServices());
 
 	return new Goal(node, ruleAppIndex);
     }
@@ -134,7 +134,7 @@ public class TestVariableNamer extends TestCase {
     }
     
     private void addTacletApp(Goal goal, ProgramVariable containedVar) {
-	Term findTerm = TB.tt();
+	Term findTerm = services.getTermBuilder().tt();
    	AntecTacletBuilder builder = new AntecTacletBuilder();
 	builder.setFind(findTerm);
     	AntecTaclet taclet = builder.getAntecTaclet();
@@ -160,10 +160,10 @@ public class TestVariableNamer extends TestCase {
 
         for (NoPosTacletApp noPosTacletApp : noPosTacletApps) {
             SVInstantiations insts = noPosTacletApp.instantiations();
-            Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry>> it2;
+            Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it2;
             it2 = insts.pairIterator();
             while (it2.hasNext()) {
-                ImmutableMapEntry<SchemaVariable, InstantiationEntry> e = it2.next();
+                ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it2.next();
                 Object inst = e.value().getInstantiation();
                 if (inst instanceof PostIncrement
                         && ((PostIncrement) inst).getFirstElement() == containedVar) {

@@ -1,19 +1,19 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.gui;
 import java.util.EventListener;
+import java.util.EventObject;
 
 /** 
  * GUIListener defines the interface for an object that listens to
@@ -23,12 +23,12 @@ import java.util.EventListener;
 public interface GUIListener extends EventListener {
 
     /** invoked if a frame that wants modal access is opened */
-    void modalDialogOpened(GUIEvent e);
+    void modalDialogOpened(EventObject e);
 
     /** invoked if the frame holding modal access has been closed */
-    void modalDialogClosed(GUIEvent e);
+    void modalDialogClosed(EventObject e);
 
     /** invoked if the user wants to abort the proving session */
-    void shutDown(GUIEvent e);
+    void shutDown(EventObject e);
 
-} 
+}

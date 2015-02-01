@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -34,7 +34,7 @@ public class FunctionalOperationContractCompletion implements InteractiveRuleApp
         Services services = goal.proof().getServices();
 
         if (forced) {
-            app = app.tryToInstantiate(goal);
+            app = app.forceInstantiate(goal);
             if (app.complete()) {
                 return app;
             }
@@ -64,7 +64,14 @@ public class FunctionalOperationContractCompletion implements InteractiveRuleApp
 
     @Override
     public boolean canComplete(IBuiltInRuleApp app) {
-        return app.rule() instanceof UseOperationContractRule;
+        return checkCanComplete(app);
     }
-
+    
+    /**
+     * Checks if the app is supported. 
+     * This functionality is also used by the Eclipse plug-ins like the KeYIDE.
+     */
+    public static boolean checkCanComplete(final IBuiltInRuleApp app) {
+       return app.rule() instanceof UseOperationContractRule;
+   }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -34,6 +34,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -44,9 +46,12 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.PlatformUI;
+import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
@@ -59,12 +64,16 @@ import org.key_project.monkey.product.ui.util.LogUtil;
 import org.key_project.monkey.product.ui.util.MonKeYUtil;
 import org.key_project.monkey.product.ui.util.MonKeYUtil.MonKeYProofSums;
 import org.key_project.monkey.product.ui.view.MonKeYView;
+import org.key_project.util.eclipse.swt.IntegerVerifyListener;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.XMLUtil;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.UserInterface;
 
@@ -110,9 +119,19 @@ public class MonKeYComposite extends Composite implements IProofProvider {
     public static final String MEMENTO_KEY_USE_DEF_OPS = "useDefOps";
 
     /**
+     * Key to store the use stop at option in an {@link IMemento}.
+     */
+    public static final String MEMENTO_KEY_STOP_AT = "stopAt";
+
+    /**
      * Key to store the proof directory value in an {@link IMemento}.
      */
     public static final String MEMENTO_KEY_PROOF_DIRECTORY = "proofDirectory";
+
+    /**
+     * KeY to store the maximal rule applications in an {@link IMemento}.
+     */
+    public static final String MEMENTO_KEY_MAX_RULES = "maxRuleApplications";
     
     /**
      * Defines the location.
@@ -178,6 +197,16 @@ public class MonKeYComposite extends Composite implements IProofProvider {
      * {@link TableViewerColumn} of {@link #proofViewer} which shows the time.
      */
     private TableViewerColumn proofTimeColumn;
+
+    /**
+     * {@link TableViewerColumn} of {@link #proofViewer} which shows the flag {@link MonKeYProof#isHasGoalWithApplicableRules()}.
+     */
+    private TableViewerColumn hasGoalWithApplicableRulesColumn;
+
+    /**
+     * {@link TableViewerColumn} of {@link #proofViewer} which shows the flag {@link MonKeYProof#isHasGoalWithoutApplicableRules()}.
+     */
+    private TableViewerColumn hasGoalWithoutApplicableRulesColumn;
     
     /**
      * Defines the proof search strategy option "Method Treatment" with option "Contract".
@@ -218,6 +247,21 @@ public class MonKeYComposite extends Composite implements IProofProvider {
      * Defines the proof search strategy option "Arithmetic treatment" with option "DefOps".
      */
     private Button arithmeticTreatmentDefOpsButton;
+    
+    /**
+     * Defines the proof search strategy option "Stop at" with option "Default".
+     */
+    private Button stopAtDefaultButton;
+    
+    /**
+     * Defines the proof search strategy option "Stop at" with option "Unclosable".
+     */
+    private Button stopAtUnclosableButton;
+    
+    /**
+     * Limits the maximal number of applied rules.
+     */
+    private Text maxRuleText;
     
     /**
      * Label for {@link #loadTimeText}.
@@ -301,16 +345,26 @@ public class MonKeYComposite extends Composite implements IProofProvider {
         // Proof search strategy
         Composite proofSearchStrategyOptionComposite = new Composite(proofGroup, SWT.NONE);
         proofSearchStrategyOptionComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        proofSearchStrategyOptionComposite.setLayout(new GridLayout(4, true));
+        proofSearchStrategyOptionComposite.setLayout(new GridLayout(6, true));
+        Group maxRuleGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
+        maxRuleGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        maxRuleGroup.setLayout(new GridLayout(1, false));
+        maxRuleGroup.setText("Max. Rule Applications");
+        maxRuleText = new Text(maxRuleGroup, SWT.BORDER);
+        maxRuleText.setText(MonKeYUtil.DEFAULT_MAX_RULE_APPLICATIONS + StringUtil.EMPTY_STRING);
+        maxRuleText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        maxRuleText.addVerifyListener(new IntegerVerifyListener(0, Integer.MAX_VALUE, true));
         Group methodTreatmentGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
         methodTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         methodTreatmentGroup.setLayout(new GridLayout(2, false));
         methodTreatmentGroup.setText("Method Treatment");
         methodTreatmentContractButton = new Button(methodTreatmentGroup, SWT.RADIO);
         methodTreatmentContractButton.setText("&Contract");
+        methodTreatmentContractButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_METHOD_CONTRACT));
         methodTreatmentExpandButton = new Button(methodTreatmentGroup, SWT.RADIO);
         methodTreatmentExpandButton.setSelection(true);
         methodTreatmentExpandButton.setText("E&xpand");
+        methodTreatmentExpandButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_METHOD_EXPAND));
         Group dependencyContractsGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
         dependencyContractsGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         dependencyContractsGroup.setLayout(new GridLayout(2, false));
@@ -318,8 +372,10 @@ public class MonKeYComposite extends Composite implements IProofProvider {
         dependencyContractsOnButton = new Button(dependencyContractsGroup, SWT.RADIO);
         dependencyContractsOnButton.setText("O&n");
         dependencyContractsOnButton.setSelection(true);
+        dependencyContractsOnButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_DEPENDENCY_ON));
         dependencyContractsOffButton = new Button(dependencyContractsGroup, SWT.RADIO);
         dependencyContractsOffButton.setText("O&ff");
+        dependencyContractsOffButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_DEPENDENCY_OFF));
         Group queryTreatmentGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
         queryTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         queryTreatmentGroup.setLayout(new GridLayout(2, false));
@@ -327,17 +383,32 @@ public class MonKeYComposite extends Composite implements IProofProvider {
         queryTreatmentOnButton = new Button(queryTreatmentGroup, SWT.RADIO);
         queryTreatmentOnButton.setText("On");
         queryTreatmentOnButton.setSelection(true);
+        queryTreatmentOnButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_QUERY_ON));
         queryTreatmentOffButton = new Button(queryTreatmentGroup, SWT.RADIO);
         queryTreatmentOffButton.setText("Off");
+        queryTreatmentOffButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_QUERY_OFF));
         Group arithmeticTreatmentGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
         arithmeticTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         arithmeticTreatmentGroup.setLayout(new GridLayout(2, false));
         arithmeticTreatmentGroup.setText("Arithmetic Treatment");
         arithmeticTreatmentBaseButton = new Button(arithmeticTreatmentGroup, SWT.RADIO);
         arithmeticTreatmentBaseButton.setText("&Base");
+        arithmeticTreatmentBaseButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_ARITHMETIC_BASE));
         arithmeticTreatmentDefOpsButton = new Button(arithmeticTreatmentGroup, SWT.RADIO);
         arithmeticTreatmentDefOpsButton.setText("DefO&ps");
+        arithmeticTreatmentDefOpsButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_ARITHMETIC_DEF_OPS));
         arithmeticTreatmentDefOpsButton.setSelection(true);
+        Group stopAtGroup = new Group(proofSearchStrategyOptionComposite, SWT.NONE);
+        stopAtGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        stopAtGroup.setLayout(new GridLayout(2, false));
+        stopAtGroup.setText("Stop at");
+        stopAtDefaultButton = new Button(stopAtGroup, SWT.RADIO);
+        stopAtDefaultButton.setText("Def&ault");
+        stopAtDefaultButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_STOP_AT_DEFAULT));
+        stopAtUnclosableButton = new Button(stopAtGroup, SWT.RADIO);
+        stopAtUnclosableButton.setText("&Unclosable");
+        stopAtUnclosableButton.setSelection(true);
+        stopAtUnclosableButton.setToolTipText(formatToolTip(JavaCardDLStrategy.Factory.TOOL_TIP_STOP_AT_UNCLOSABLE));
         // Proof viewer
         Composite proofViewerComposite = new Composite(proofGroup, SWT.NONE);
         proofViewerComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -377,6 +448,14 @@ public class MonKeYComposite extends Composite implements IProofProvider {
         proofTimeColumn.getColumn().setText("Time (milliseconds)");
         proofTimeColumn.getColumn().setMoveable(true);
         proofViewerLayout.setColumnData(proofTimeColumn.getColumn(), new ColumnWeightData(5));
+        hasGoalWithApplicableRulesColumn = new TableViewerColumn(proofViewer, style);
+        hasGoalWithApplicableRulesColumn.getColumn().setText("Goal with applicable rules");
+        hasGoalWithApplicableRulesColumn.getColumn().setMoveable(true);
+        proofViewerLayout.setColumnData(hasGoalWithApplicableRulesColumn.getColumn(), new ColumnWeightData(2));
+        hasGoalWithoutApplicableRulesColumn = new TableViewerColumn(proofViewer, style);
+        hasGoalWithoutApplicableRulesColumn.getColumn().setText("Goal without applicable rules");
+        hasGoalWithoutApplicableRulesColumn.getColumn().setMoveable(true);
+        proofViewerLayout.setColumnData(hasGoalWithoutApplicableRulesColumn.getColumn(), new ColumnWeightData(2));
         
         SWTUtil.makeTableColumnsSortable(proofViewer);
         proofViewer.setContentProvider(ArrayContentProvider.getInstance());
@@ -390,6 +469,27 @@ public class MonKeYComposite extends Composite implements IProofProvider {
               handleSelectedProofChanged(event);
            }
         });
+        // Proof viewer menu
+        Menu menu = new Menu(proofViewer.getControl());
+        final MenuItem openProofMenuItem = new MenuItem(menu, SWT.NONE);
+        openProofMenuItem.setText("Open selected Proofs");
+        openProofMenuItem.addSelectionListener(new SelectionAdapter() {
+           @Override
+           public void widgetSelected(SelectionEvent e) {
+              openSelectedProofs();
+           }
+        });
+        menu.addMenuListener(new MenuListener() {
+           @Override
+           public void menuShown(MenuEvent e) {
+              openProofMenuItem.setEnabled(canOpenSelectedProofs());
+           }
+         
+           @Override
+           public void menuHidden(MenuEvent e) {
+           }
+        });
+        proofViewer.getControl().setMenu(menu);
         // Accumulated values
         Composite sumComposite = new Composite(proofGroup, SWT.NONE);
         sumComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -420,7 +520,7 @@ public class MonKeYComposite extends Composite implements IProofProvider {
             }
         });
         Button startProofsButton = new Button(buttonComposite, SWT.PUSH);
-        startProofsButton.setText("&Start selected proofs");
+        startProofsButton.setText("&Start selected Proofs");
         startProofsButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         startProofsButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -453,6 +553,61 @@ public class MonKeYComposite extends Composite implements IProofProvider {
             }
         });
     }
+    
+    /**
+     * Formats a tool tip so that it can be shown in the user interface.
+     * @param text The text to format.
+     * @return The formated tool tip.
+     */
+    protected String formatToolTip(String text) {
+       return XMLUtil.replaceTags(text, new XMLUtil.HTMLRendererReplacer());
+    }
+
+    /**
+     * Checks if it is possible to open selected {@link Proof}s
+     * via {@link StarterUtil#openProofStarter(org.eclipse.swt.widgets.Shell, Proof, KeYEnvironment, org.eclipse.jdt.core.IMethod, boolean, boolean, boolean, boolean)}.
+     * @return {@code true} can open proofs, {@code false} can not open proofs.
+     */
+   protected boolean canOpenSelectedProofs() {
+      boolean canOpen = false;
+      if (StarterUtil.areProofStartersAvailable() &&
+          !MonKeYUtil.isMainWindowEnvironment(getEnvironment())) {
+         Object[] objects = SWTUtil.toArray(proofViewer.getSelection());
+         for (Object obj : objects) {
+            if (obj instanceof MonKeYProof) {
+               MonKeYProof proof = (MonKeYProof)obj;
+               if (proof.getProof() != null) {
+                  canOpen = true;
+               }
+            }
+         }
+      }
+      return canOpen;
+   }
+
+   /**
+    * Opens the selected {@link Proof}s via 
+    * {@link StarterUtil#openProofStarter(org.eclipse.swt.widgets.Shell, Proof, KeYEnvironment, org.eclipse.jdt.core.IMethod, boolean, boolean, boolean, boolean)}.
+    */
+   protected void openSelectedProofs() {
+      try {
+         if (!MonKeYUtil.isMainWindowEnvironment(getEnvironment())) {
+            Object[] objects = SWTUtil.toArray(proofViewer.getSelection());
+            for (Object obj : objects) {
+               if (obj instanceof MonKeYProof) {
+                  MonKeYProof proof = (MonKeYProof)obj;
+                  if (proof.getProof() != null) {
+                     StarterUtil.openProofStarter(getShell(), proof.getProof(), proof.getEnvironment(), null, true, true, true, true);
+                  }
+               }
+            }
+         }
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+      }
+   }
 
    /**
      * {@inheritDoc}
@@ -461,7 +616,23 @@ public class MonKeYComposite extends Composite implements IProofProvider {
     public void dispose() {
        // Dispose proofs
        try {
-           removeProofs();
+           if (MonKeYUtil.isMainWindowEnvironment(getEnvironment())) {
+               new AbstractKeYMainWindowJob("Remove Proofs from KeY") {
+                  @Override
+                  protected IStatus run(IProgressMonitor monitor) {
+                      try {
+                          removeProofs();
+                          return Status.OK_STATUS;
+                      }
+                      catch (Exception e) {
+                          return LogUtil.getLogger().createErrorStatus(e);
+                      }
+                  }
+               }.schedule();
+           }
+           else {
+               removeProofs();
+           }
        }
        catch (Exception e) {
            LogUtil.getLogger().logError(e);
@@ -557,6 +728,9 @@ public class MonKeYComposite extends Composite implements IProofProvider {
           queryTreatmentOffButton.setEnabled(enabled);
           arithmeticTreatmentBaseButton.setEnabled(enabled);
           arithmeticTreatmentDefOpsButton.setEnabled(enabled);
+          stopAtDefaultButton.setEnabled(enabled);
+          stopAtUnclosableButton.setEnabled(enabled);
+          maxRuleText.setEnabled(enabled);
        }
     }
 
@@ -569,10 +743,12 @@ public class MonKeYComposite extends Composite implements IProofProvider {
             // Get selected proofs
             final List<?> selectedProofs = SWTUtil.toList(proofViewer.getSelection());
             // Get strategy properties
+            final int maxRuleApplications = Integer.parseInt(maxRuleText.getText());
             final boolean expandMethods = methodTreatmentExpandButton.getSelection();
             final boolean useDependencyContracts = dependencyContractsOnButton.getSelection();
             final boolean useQuery = queryTreatmentOnButton.getSelection();
             final boolean useDefOps = arithmeticTreatmentDefOpsButton.getSelection();
+            final boolean stopAtUnclosable = stopAtUnclosableButton.getSelection();
             new AbstractKeYMainWindowJob("Proving") {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
@@ -582,7 +758,7 @@ public class MonKeYComposite extends Composite implements IProofProvider {
                         for (Object obj : selectedProofs) {
                             SWTUtil.checkCanceled(monitor);
                             if (obj instanceof MonKeYProof) {
-                                ((MonKeYProof)obj).startProof(expandMethods, useDependencyContracts, useQuery, useDefOps);
+                                ((MonKeYProof)obj).startProof(maxRuleApplications, expandMethods, useDependencyContracts, useQuery, useDefOps, stopAtUnclosable);
                                 getDisplay().syncExec(new Runnable() {
                                  @Override
                                  public void run() {
@@ -861,10 +1037,20 @@ public class MonKeYComposite extends Composite implements IProofProvider {
             Boolean useQuery = memento.getBoolean(MEMENTO_KEY_USE_QUERY);
             queryTreatmentOnButton.setSelection(useQuery == null || useQuery.booleanValue());
             queryTreatmentOffButton.setSelection(useQuery != null && !useQuery.booleanValue());
-            Boolean useDefOpy = memento.getBoolean(MEMENTO_KEY_USE_DEF_OPS);
-            arithmeticTreatmentBaseButton.setSelection(useDefOpy != null && !useDefOpy.booleanValue());
-            arithmeticTreatmentDefOpsButton.setSelection(useDefOpy == null || useDefOpy.booleanValue());
+            Boolean useDefOps = memento.getBoolean(MEMENTO_KEY_USE_DEF_OPS);
+            arithmeticTreatmentBaseButton.setSelection(useDefOps != null && !useDefOps.booleanValue());
+            arithmeticTreatmentDefOpsButton.setSelection(useDefOps == null || useDefOps.booleanValue());
+            Boolean stopAt = memento.getBoolean(MEMENTO_KEY_STOP_AT);
+            stopAtDefaultButton.setSelection(stopAt != null && !stopAt.booleanValue());
+            stopAtUnclosableButton.setSelection(stopAt == null || stopAt.booleanValue());
             proofDirectory = memento.getString(MEMENTO_KEY_PROOF_DIRECTORY);
+            String maxRules = memento.getString(MEMENTO_KEY_MAX_RULES);
+            if (StringUtil.isTrimmedEmpty(maxRules)) {
+               maxRuleText.setText(MonKeYUtil.DEFAULT_MAX_RULE_APPLICATIONS + StringUtil.EMPTY_STRING);
+            }
+            else {
+               SWTUtil.setText(maxRuleText, maxRules);                
+            }
         }
     }
 
@@ -881,7 +1067,9 @@ public class MonKeYComposite extends Composite implements IProofProvider {
             memento.putBoolean(MEMENTO_KEY_USE_DEPENDENCY_CONTRACTS, dependencyContractsOnButton.getSelection());
             memento.putBoolean(MEMENTO_KEY_USE_QUERY, queryTreatmentOnButton.getSelection());
             memento.putBoolean(MEMENTO_KEY_USE_DEF_OPS, arithmeticTreatmentDefOpsButton.getSelection());
+            memento.putBoolean(MEMENTO_KEY_STOP_AT, stopAtUnclosableButton.getSelection());
             memento.putString(MEMENTO_KEY_PROOF_DIRECTORY, proofDirectory);
+            memento.putString(MEMENTO_KEY_MAX_RULES, maxRuleText.getText());
         }
     }
 
@@ -912,13 +1100,17 @@ public class MonKeYComposite extends Composite implements IProofProvider {
     */
    @Override
    public UserInterface getUI() {
-      Object selectedProof = SWTUtil.getFirstElement(proofViewer.getSelection());
-      if (selectedProof instanceof MonKeYProof) {
-         return ((MonKeYProof) selectedProof).getUi();
-      }
-      else {
-         return null;
-      }
+      KeYEnvironment<?> environment = getEnvironment();
+      return environment != null ? environment.getUi() : null;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYMediator getMediator() {
+      KeYEnvironment<?> environment = getEnvironment();
+      return environment != null ? environment.getMediator() : null;
    }
 
    /**
@@ -926,7 +1118,12 @@ public class MonKeYComposite extends Composite implements IProofProvider {
     */
    @Override
    public KeYEnvironment<?> getEnvironment() {
-      return null;
+      if (proofs != null && !proofs.isEmpty()) {
+         return proofs.get(0).getEnvironment();
+      }
+      else {
+         return null;
+      }
    }
 
    /**

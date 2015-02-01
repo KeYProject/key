@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -53,7 +53,7 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
@@ -61,8 +61,7 @@ import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -92,8 +91,14 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           boolean showMethodReturnValues = KeySEDUtil.isShowMethodReturnValuesInDebugNodes(configuration);
           boolean showVariablesOfSelectedDebugNode = KeySEDUtil.isShowVariablesOfSelectedDebugNode(configuration);
           boolean executeMethodRange = KeySEDUtil.isExecuteMethodRange(configuration);
+          boolean usePrettyPrinting = KeySEDUtil.isUsePrettyPrinting(configuration);
+          boolean useUnicode = usePrettyPrinting && KeySEDUtil.isUseUnicode(configuration);
+          boolean showSignatureOnMethodReturnNodes = KeySEDUtil.isShowSignatureOnMethodReturnNodes(configuration);
+          boolean variablesAreOnlyComputedFromUpdates = KeySEDUtil.isVariablesAreOnlyComputedFromUpdates(configuration);
           Position methodRangeStart = new KeYUtil.CursorPosition(KeySEDUtil.getMethodRangeStartLine(configuration), KeySEDUtil.getMethodRangeStartColumn(configuration));
           Position methodRangeEnd = new KeYUtil.CursorPosition(KeySEDUtil.getMethodRangeEndLine(configuration), KeySEDUtil.getMethodRangeEndColumn(configuration));
+          boolean truthValueEvaluationEnabled = KeySEDUtil.isTruthValueEvaluationEnabled(configuration);
+          boolean highlightReachedSourceCode = KeySEDUtil.isHighlightReachedSourceCode(configuration);
           // Determine location and class path entries
           File location = null;
           List<File> classPaths = null;
@@ -104,14 +109,11 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
              // Make sure that the location is contained in a Java project
              IProject project = method.getResource().getProject();
              Assert.isTrue(JDTUtil.isJavaProject(project), " The project \"" + project + "\" is no Java project.");
-             // Get source paths from class path
-             List<File> sourcePaths = JDTUtil.getSourceLocations(project);
-             Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
              // Get KeY project settings
              bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
              classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
              // Get local file for the eclipse resource
-             location = sourcePaths.get(0);
+             location = KeYResourceProperties.getSourceClassPathLocation(project);
              Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
           }
           else {
@@ -125,7 +127,28 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
              Assert.isTrue(location.exists());
           }
           // Instantiate proof settings
-          KeYLaunchSettings settings = new KeYLaunchSettings(newDebugSession, proofFileToContinue, method, useExistingContract, existingContract, precondition, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, executeMethodRange, methodRangeStart, methodRangeEnd, location, classPaths, bootClassPath); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
+          KeYLaunchSettings settings = new KeYLaunchSettings(newDebugSession, 
+                                                             proofFileToContinue, 
+                                                             method, 
+                                                             useExistingContract, 
+                                                             existingContract, 
+                                                             precondition, 
+                                                             showMethodReturnValues, 
+                                                             showVariablesOfSelectedDebugNode, 
+                                                             showKeYMainWindow, 
+                                                             mergeBranchConditions, 
+                                                             executeMethodRange, 
+                                                             methodRangeStart, 
+                                                             methodRangeEnd, 
+                                                             location, 
+                                                             classPaths, 
+                                                             bootClassPath, 
+                                                             useUnicode,
+                                                             usePrettyPrinting,
+                                                             showSignatureOnMethodReturnNodes,
+                                                             variablesAreOnlyComputedFromUpdates,
+                                                             truthValueEvaluationEnabled,
+                                                             highlightReachedSourceCode); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
           // Validate proof settings
           if (newDebugSession) {
              if (method == null) {
@@ -188,7 +211,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
     
     protected SymbolicExecutionEnvironment<?> instantiateProofWithoutUserInterface(String launchConfigurationName,
                                                                                    KeYLaunchSettings settings) throws Exception {
-       UserInterface ui = new CustomConsoleUserInterface(false);
+       UserInterface ui = new CustomUserInterface(false);
        return instantiateProof(ui, launchConfigurationName, settings);
     }
     
@@ -206,7 +229,8 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                    MainWindow main = MainWindow.getInstance();
                    Assert.isNotNull(main, "KeY main window is not available.");
                    // Load proof in user interface
-                   setResult(instantiateProof(main.getUserInterface(), launchConfigurationName, settings));
+                   SymbolicExecutionEnvironment<?> env = instantiateProof(main.getUserInterface(), launchConfigurationName, settings); 
+                   setResult(env);
                }
                catch (Exception e) {
                    setException(e);
@@ -224,7 +248,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                                String launchConfigurationName, 
                                                                KeYLaunchSettings settings) throws Exception {
        // Load location
-       DefaultProblemLoader loader = ui.load(SymbolicExecutionJavaProfile.getDefaultInstance(), settings.getLocation(), settings.getClassPaths(), settings.getBootClassPath()); 
+       AbstractProblemLoader loader = ui.load(SymbolicExecutionJavaProfile.getDefaultInstance(settings.isTruthValueEvaluationEnabled()), settings.getLocation(), settings.getClassPaths(), settings.getBootClassPath(), SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), true);
        InitConfig initConfig = loader.getInitConfig();
        // Try to reuse already instantiated proof
        Proof proof = loader.getProof();
@@ -234,9 +258,8 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           // Create proof
           proof = ui.createProof(initConfig, input);
        }
-       SymbolicExecutionUtil.configureProof(proof);
        // Create symbolic execution tree builder
-       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, settings.isMergeBranchConditions());
+       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, settings.isMergeBranchConditions(), settings.isUseUnicode(), settings.isUsePrettyPrinting(), settings.isVariablesAreOnlyComputedFromUpdates());
        builder.analyse();
        // Create environment used for symbolic execution
        return new SymbolicExecutionEnvironment<UserInterface>(ui, initConfig, builder);

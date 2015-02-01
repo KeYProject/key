@@ -1,17 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.logic;
 
@@ -28,6 +26,8 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
  */
 public class SequentChangeInfo {
 
+ 
+   
   /** change information related to the antecedent, this means the
    * there added and removed formulas*/
   private SemisequentChangeInfo antecedent;
@@ -131,7 +131,7 @@ public class SequentChangeInfo {
    * @return true iff the sequent has been changed by the operation 
    */    
   public boolean hasChanged() {
-    return antecedent.hasChanged() || succedent.hasChanged();
+    return (antecedent == null || antecedent.hasChanged()) || (succedent == null || succedent.hasChanged());
   }
 
   /** 
@@ -255,7 +255,36 @@ public class SequentChangeInfo {
         rejectedFormulas(true).prepend(rejectedFormulas(false));
   }
   
-  
+  /**
+   * This method combines this change information from this info and its successor. 
+   * ATTENTION: it takes over ownership over {@link succ} and does not release it. This means
+   * when invoking the method it must be snsured that succ is never used afterwards.
+   */
+  public void combine(SequentChangeInfo succ) {         
+     final SequentChangeInfo antec = this;
+     if (antec == succ) {
+        return;
+     }     
+     
+     antec.resultingSequent  = succ.resultingSequent;
+     
+     if (antec.antecedent != succ.antecedent) {
+        if (antec.antecedent == null) {
+           antec.antecedent = succ.antecedent;            
+        } else if (succ.antecedent != null){         
+           antec.antecedent.combine(succ.antecedent);
+        }
+     }
+
+     if (antec.succedent != succ.succedent) {
+        if (antec.succedent == null) {
+           antec.succedent = succ.succedent;            
+        } else if (succ.succedent != null){         
+           antec.succedent.combine(succ.succedent);
+        }
+     }    
+  }
+
 
   /**
    * @return the original sequent
@@ -298,5 +327,5 @@ public class SequentChangeInfo {
     return result;
   }
 
+
 }
-	

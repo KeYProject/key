@@ -1,24 +1,26 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.java.visitor;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -29,13 +31,19 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramConstant;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.util.ExtList;
+import de.uka.ilkd.key.util.InfFlowSpec;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Walks through a java AST in depth-left-first-order. This visitor
@@ -63,7 +71,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * @param st the statement where the prog vars are replaced
      * @param map the HashMap with the replacements
      */
-    public ProgVarReplaceVisitor(ProgramElement st, Map<ProgramVariable, ProgramVariable> map, Services services) {
+    public ProgVarReplaceVisitor(ProgramElement st,
+                                 Map<ProgramVariable, ProgramVariable> map,
+                                 Services services) {
     super(st, true, services);
     this.replaceMap = map;
         assert services != null;
@@ -101,30 +111,30 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         ProgramElementName name = pv.getProgramElementName();
         //%%% HACK: final local variables are not renamed since they can occur in an
         // anonymous class declared in their scope of visibility.
-/*      if(pv.isFinal()){
+        /*      if(pv.isFinal()){
             return pv;
         }*/
-    return new LocationVariable
-        (VariableNamer.parseName(name.toString() + postFix,
-                         name.getCreationInfo()),
-         pv.getKeYJavaType(), pv.isFinal());
+        return new LocationVariable
+                (VariableNamer.parseName(name.toString() + postFix,
+                        name.getCreationInfo()),
+                        pv.getKeYJavaType(), pv.isFinal());
     }
 
 
     protected void walk(ProgramElement node) {
-    if (node instanceof LocalVariableDeclaration && replaceallbynew) {
-        LocalVariableDeclaration vd= (LocalVariableDeclaration)node;
-        ImmutableArray<VariableSpecification> vspecs=vd.getVariableSpecifications();
-        for (int i=0; i<vspecs.size(); i++) {
-        ProgramVariable pv
-            = (ProgramVariable)
-                 vspecs.get(i).getProgramVariable();
-        if (!replaceMap.containsKey(pv)) {
-            replaceMap.put(pv, copy(pv));
+        if (node instanceof LocalVariableDeclaration && replaceallbynew) {
+            LocalVariableDeclaration vd= (LocalVariableDeclaration)node;
+            ImmutableArray<VariableSpecification> vspecs=vd.getVariableSpecifications();
+            for (int i=0; i<vspecs.size(); i++) {
+                ProgramVariable pv
+                = (ProgramVariable)
+                vspecs.get(i).getProgramVariable();
+                if (!replaceMap.containsKey(pv)) {
+                    replaceMap.put(pv, copy(pv));
+                }
+            }
         }
-        }
-    }
-    super.walk(node);
+        super.walk(node);
     }
 
 
@@ -138,24 +148,24 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     /** starts the walker*/
     public void start() {
-    stack.push(new ExtList());
-    walk(root());
-    ExtList el= stack.peek();
-    int i=0;
-    while (!(el.get(i) instanceof ProgramElement)) {
-        i++;
-    }
-    result=(ProgramElement) stack.peek().get(i);
+        stack.push(new ExtList());
+        walk(root());
+        ExtList el= stack.peek();
+        int i=0;
+        while (!(el.get(i) instanceof ProgramElement)) {
+            i++;
+        }
+        result=(ProgramElement) stack.peek().get(i);
     }
 
 
     public ProgramElement result() {
-    return result;
+        return result;
     }
 
 
     public void performActionOnProgramVariable(ProgramVariable pv) {
-    ProgramElement newPV = (ProgramElement) replaceMap.get(pv);
+    ProgramElement newPV = replaceMap.get(pv);
     if (newPV!=null) {
         addChild(newPV);
         changed();
@@ -168,38 +178,59 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         if(t==null) {
             return null;
         }
-    if(t.op() instanceof ProgramVariable) {
-        if(replaceMap.containsKey(t.op())) {
-            ProgramVariable replacement = replaceMap.get(t.op());
-            return TermFactory.DEFAULT.createTerm(replacement);
+        if(t.op() instanceof ProgramVariable) {
+            if(replaceMap.containsKey(t.op())) {
+                ProgramVariable replacement = replaceMap.get(t.op());
+                return services.getTermFactory().createTerm(replacement);
+            } else {
+                return t;
+            }
         } else {
-            return t;
+            Term subTerms[] = new Term[t.arity()];
+            for(int i = 0, n = t.arity(); i < n; i++) {
+                subTerms[i] = replaceVariablesInTerm(t.sub(i));
+            }
+            Operator op = t.op();
+            if(op instanceof ElementaryUpdate) {
+                ElementaryUpdate uop = (ElementaryUpdate) t.op();
+                if(replaceMap.containsKey(uop.lhs())) {
+                    UpdateableOperator replacedLhs
+                    = (UpdateableOperator) replaceMap.get(uop.lhs());
+                    op = ElementaryUpdate.getInstance(replacedLhs);
+                }
+            }
+            return services.getTermFactory().createTerm(op,
+                                                        subTerms,
+                                                        t.boundVars(),
+                                                        t.javaBlock(),
+                                                        t.getLabels());
         }
-    } else {
-        Term subTerms[] = new Term[t.arity()];
-        for(int i = 0, n = t.arity(); i < n; i++) {
-        subTerms[i] = replaceVariablesInTerm(t.sub(i));
-        }
-        Operator op = t.op();
-        if(op instanceof ElementaryUpdate) {
-        ElementaryUpdate uop = (ElementaryUpdate) t.op();
-        if(replaceMap.containsKey(uop.lhs())) {
-            UpdateableOperator replacedLhs
-                = (UpdateableOperator) replaceMap.get(uop.lhs());
-            op = ElementaryUpdate.getInstance(replacedLhs);
-        }
-        }
-        return TermFactory.DEFAULT.createTerm(op,
-                              subTerms,
-                              t.boundVars(),
-                              t.javaBlock());
-    }
     }
 
-    private ImmutableSet<Term> replaceVariablesInTerms(ImmutableSet<Term> terms) {
-        ImmutableSet<Term> res = DefaultImmutableSet.nil();
+    private ImmutableList<Term> replaceVariablesInTerms(ImmutableList<Term> terms) {
+        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
         for (final Term term : terms) {
-            res = res.add(replaceVariablesInTerm(term));
+            res = res.append(replaceVariablesInTerm(term));
+        }
+        return res;
+    }
+
+
+    private ImmutableList<InfFlowSpec>
+    replaceVariablesInTermListTriples(ImmutableList<InfFlowSpec> terms) {
+        ImmutableList<InfFlowSpec>
+                    res = ImmutableSLList.<InfFlowSpec>nil();
+        for (final InfFlowSpec innerTerms : terms) {
+            final ImmutableList<Term> renamedPreExpressions =
+                    replaceVariablesInTerms(innerTerms.preExpressions);
+            final ImmutableList<Term> renamedPostExpressions =
+                    replaceVariablesInTerms(innerTerms.postExpressions);
+            final ImmutableList<Term> renamedNewObjects =
+                    replaceVariablesInTerms(innerTerms.newObjects);
+            res = res.append(
+                    new InfFlowSpec(renamedPreExpressions,
+                                    renamedPostExpressions,
+                                    renamedNewObjects));
         }
         return res;
     }
@@ -214,29 +245,45 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         performActionOnProgramVariable(x);
     }
 
-    public void performActionOnBlockContract(final StatementBlock oldBlock, final StatementBlock newBlock) {
-        ImmutableSet<BlockContract> oldContracts = services.getSpecificationRepository().getBlockContracts(oldBlock);
+    public void performActionOnBlockContract(final StatementBlock oldBlock,
+                                             final StatementBlock newBlock) {
+        ImmutableSet<BlockContract> oldContracts =
+                services.getSpecificationRepository().getBlockContracts(oldBlock);
         for (BlockContract oldContract : oldContracts) {
-            services.getSpecificationRepository().addBlockContract(createNewBlockContract(oldContract, newBlock));
+            services.getSpecificationRepository().addBlockContract(
+                    createNewBlockContract(oldContract, newBlock));
         }
     }
 
-    private BlockContract createNewBlockContract(final BlockContract oldContract, final StatementBlock newBlock)
-    {
-       final BlockContract.Variables newVariables = replaceBlockContractVariables(oldContract.getPlaceholderVariables());
-        final Map<LocationVariable, Term> newPreconditions = new LinkedHashMap<LocationVariable, Term>();
-        final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<LocationVariable, Term>();
-        final Map<LocationVariable, Term> newModifiesClauses = new LinkedHashMap<LocationVariable, Term>();
+    private BlockContract createNewBlockContract(final BlockContract oldContract,
+                                                 final StatementBlock newBlock) {
+        final BlockContract.Variables newVariables =
+                replaceBlockContractVariables(oldContract.getPlaceholderVariables());
+        final Map<LocationVariable, Term> newPreconditions =
+                new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> newPostconditions =
+                new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> newModifiesClauses =
+                new LinkedHashMap<LocationVariable, Term>();
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            newPreconditions.put(heap, replaceVariablesInTerm(oldContract.getPrecondition(heap, services)));
-            newPostconditions.put(heap, replaceVariablesInTerm(oldContract.getPostcondition(heap, services)));
-            newModifiesClauses.put(heap, replaceVariablesInTerm(oldContract.getModifiesClause(heap, services)));
+            newPreconditions.put(heap,
+                                 replaceVariablesInTerm(
+                                         oldContract.getPrecondition(heap, services)));
+            newPostconditions.put(heap,
+                                  replaceVariablesInTerm(
+                                          oldContract.getPostcondition(heap, services)));
+            newModifiesClauses.put(heap,
+                                   replaceVariablesInTerm(
+                                           oldContract.getModifiesClause(heap, services)));
         }
-        return oldContract.update(newBlock, newPreconditions, newPostconditions, newModifiesClauses, newVariables);
+        final ImmutableList<InfFlowSpec> newInfFlowSpecs =
+                replaceVariablesInTermListTriples(oldContract.getInfFlowSpecs());
+        return oldContract.update(newBlock, newPreconditions, newPostconditions,
+                                  newModifiesClauses, newInfFlowSpecs, newVariables);
     }
 
-    private BlockContract.Variables replaceBlockContractVariables(final BlockContract.Variables variables)
-    {
+    private BlockContract.Variables replaceBlockContractVariables(
+            final BlockContract.Variables variables) {
         return new BlockContract.Variables(
             replaceVariable(variables.self),
             replaceFlags(variables.breakFlags),
@@ -245,21 +292,21 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             replaceVariable(variables.result),
             replaceVariable(variables.exception),
             replaceRemembranceHeaps(variables.remembranceHeaps),
-            replaceRemembranceLocalVariables(variables.remembranceLocalVariables)
+            replaceRemembranceLocalVariables(variables.remembranceLocalVariables),
+            services
         );
     }
 
-    private ProgramVariable replaceVariable(final ProgramVariable variable)
-    {
+    private ProgramVariable replaceVariable(final ProgramVariable variable) {
         if (variable != null) {
             if (replaceMap.containsKey(variable)) {
                 // TODO Can we really safely assume that replaceMap contains a program variable?
-                return (ProgramVariable) replaceMap.get(variable);
+                return replaceMap.get(variable);
             }
             else {
                 if (replaceallbynew) {
                     replaceMap.put(variable, copy(variable));
-                    return (ProgramVariable) replaceMap.get(variable);
+                    return replaceMap.get(variable);
                 }
                 else {
                     return variable;
@@ -271,8 +318,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
     }
 
-    private Map<Label, ProgramVariable> replaceFlags(final Map<Label, ProgramVariable> flags)
-    {
+    private Map<Label, ProgramVariable> replaceFlags(final Map<Label, ProgramVariable> flags) {
         final Map<Label, ProgramVariable> result = new LinkedHashMap<Label, ProgramVariable>();
         for (Map.Entry<Label, ProgramVariable> flag : flags.entrySet()) {
             result.put(flag.getKey(), replaceVariable(flag.getValue()));
@@ -280,9 +326,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return result;
     }
 
-    private Map<LocationVariable, LocationVariable> replaceRemembranceHeaps(final Map<LocationVariable, LocationVariable> remembranceHeaps) {
-        final Map<LocationVariable, LocationVariable> result = new LinkedHashMap<LocationVariable, LocationVariable>();
-        for (Map.Entry<LocationVariable, LocationVariable> remembranceHeap: remembranceHeaps.entrySet()) {
+    private Map<LocationVariable, LocationVariable>
+                    replaceRemembranceHeaps(
+                            final Map<LocationVariable, LocationVariable> remembranceHeaps) {
+        final Map<LocationVariable, LocationVariable> result =
+                new LinkedHashMap<LocationVariable, LocationVariable>();
+        for (Map.Entry<LocationVariable, LocationVariable> remembranceHeap
+                : remembranceHeaps.entrySet()) {
             // TODO Can we really safely assume that replaceVariable returns a location variable?
             result.put(
                 remembranceHeap.getKey(),
@@ -292,9 +342,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return result;
     }
 
-    private Map<LocationVariable, LocationVariable> replaceRemembranceLocalVariables(final Map<LocationVariable, LocationVariable> remembranceLocalVariables) {
-        final Map<LocationVariable, LocationVariable> result = new LinkedHashMap<LocationVariable, LocationVariable>();
-        for (Map.Entry<LocationVariable, LocationVariable> remembranceLocalVariable: remembranceLocalVariables.entrySet()) {
+    private Map<LocationVariable, LocationVariable>
+                    replaceRemembranceLocalVariables(
+                            final Map<LocationVariable, LocationVariable> remembranceLocalVariables) {
+        final Map<LocationVariable, LocationVariable> result =
+                new LinkedHashMap<LocationVariable, LocationVariable>();
+        for (Map.Entry<LocationVariable, LocationVariable> remembranceLocalVariable
+                : remembranceLocalVariables.entrySet()) {
             result.put(
                 (LocationVariable) replaceVariable(remembranceLocalVariable.getKey()),
                 (LocationVariable) replaceVariable(remembranceLocalVariable.getValue())
@@ -305,6 +359,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     public void performActionOnLoopInvariant(LoopStatement oldLoop,
                                              LoopStatement newLoop) {
+        final TermBuilder tb = services.getTermBuilder();
         LoopInvariant inv
             = services.getSpecificationRepository().getLoopInvariant(oldLoop);
         if(inv == null) {
@@ -315,16 +370,27 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
         Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
         Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
+        Map<LocationVariable,
+            ImmutableList<InfFlowSpec>> newInfFlowSpecs
+            = new LinkedHashMap<LocationVariable,
+                                ImmutableList<InfFlowSpec>>();
 
-        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-           final Term m = replaceVariablesInTerm(inv.getModifies(heap, selfTerm,
-                                     atPres,
-                                     services));
-           newMods.put(heap, m);
-           final Term i = replaceVariablesInTerm(inv.getInvariant(heap, selfTerm,
-                                     atPres,
-                                     services));
-           newInvariants.put(heap, i);
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            final Term m =
+                    replaceVariablesInTerm(inv.getModifies(heap, selfTerm,
+                                                           atPres,
+                                                           services));
+            newMods.put(heap, m);
+            final ImmutableList<InfFlowSpec> infFlowSpecs =
+                    replaceVariablesInTermListTriples(inv.getInfFlowSpecs(heap, selfTerm,
+                                                                          atPres,
+                                                                          services));
+            newInfFlowSpecs.put(heap, infFlowSpecs);
+            final Term i =
+                    replaceVariablesInTerm(inv.getInvariant(heap, selfTerm,
+                                                            atPres,
+                                                            services));
+            newInvariants.put(heap, i);
         }
 
         //variant
@@ -335,19 +401,24 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
         Term newSelfTerm = replaceVariablesInTerm(selfTerm);
 
-        for(Entry<LocationVariable, Term> h : atPres.entrySet()) {
-           final Term t = h.getValue();
-           if(t == null) continue;
-           atPres.put(h.getKey(), replaceVariablesInTerm(t));
+        Map<LocationVariable, Term> saveCopy = new HashMap<LocationVariable, Term>(atPres);
+        for(Entry<LocationVariable, Term> h : saveCopy.entrySet()) {
+            LocationVariable pv = h.getKey();
+            final Term t = h.getValue();
+            if(t == null) continue;
+            if(replaceMap.containsKey(pv)) {
+                atPres.remove(pv);
+                pv = (LocationVariable) replaceMap.get(pv);
+            }
+            atPres.put(pv, replaceVariablesInTerm(t));
         }
 
-        LoopInvariant newInv
-            = new LoopInvariantImpl(newLoop,
-                                    newInvariants,
-                                    newMods,
-                                    newVariant,
-                                    newSelfTerm,
-                                    atPres);
+        ImmutableList<Term> newLocalIns = tb.var(MiscTools.getLocalIns(newLoop, services));
+        ImmutableList<Term> newLocalOuts = tb.var(MiscTools.getLocalOuts(newLoop, services));
+
+        LoopInvariant newInv = inv.create(newLoop, newInvariants, newMods, newInfFlowSpecs,
+                                          newVariant, newSelfTerm, newLocalIns,
+                                          newLocalOuts, atPres);
         services.getSpecificationRepository().addLoopInvariant(newInv);
     }
 }

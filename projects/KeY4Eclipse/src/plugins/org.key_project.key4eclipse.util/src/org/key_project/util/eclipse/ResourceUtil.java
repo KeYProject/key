@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -16,10 +16,14 @@ package org.key_project.util.eclipse;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Target;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Deque;
+import java.util.LinkedList;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -50,6 +54,31 @@ public class ResourceUtil {
    private ResourceUtil() {
    }
    
+   /**
+    * Ensures that the segment is a valid workspace path segment meaning
+    * that it is a valid file/folder name. Each invalid sign will be replaced
+    * by {@code '_'}.
+    * @param segment The segment to validate.
+    * @return The validated workspace path segment in which each invalid sign is replaced.
+    */
+   public static String validateWorkspaceFileName(String name) {
+      if (name != null) {
+         for (int i = 1; i <= name.length(); i++) {
+            String tmp = name.substring(0, i);
+            IStatus status = ResourcesPlugin.getWorkspace().validateName(tmp, IResource.FILE);
+            if (!status.isOK()) {
+               StringBuilder strbuilder = new StringBuilder(name);
+               strbuilder.setCharAt(i - 1, '_');
+               name = strbuilder.toString();
+            }
+         }
+         return name;
+      }
+      else {
+         return name;
+      }
+   }
+
    /**
     * Returns the file name without file extension for the given {@link IFile}.
     * @param file The {@link IFile} for that the file name without extension is needed.
@@ -147,9 +176,9 @@ public class ResourceUtil {
     * @param source The {@link File} to copy.
     * @throws CoreException Occurred Exception.
     */
-   public static void copyIntoWorkspace(IContainer target, IFileOpener opener, Collection<File> source) throws CoreException {
+   public static void copyIntoWorkspace(IContainer target, IFileOpener opener, File startDirectory, Collection<File> source) throws CoreException {
       if (source != null) {
-         copyIntoWorkspace(target, opener, source.toArray(new File[source.size()]));
+         copyIntoWorkspace(target, opener, startDirectory, source.toArray(new File[source.size()]));
       }
    }
 
@@ -165,7 +194,7 @@ public class ResourceUtil {
     * @param source The {@link File} to copy.
     * @throws CoreException Occurred Exception.
     */
-   public static void copyIntoWorkspace(IContainer target, IFileOpener opener, File... source) throws CoreException {
+   public static void copyIntoWorkspace(IContainer target, IFileOpener opener, File startDirectory, File... source) throws CoreException {
       try {
          if (source != null) {
             if (target == null) {
@@ -179,16 +208,32 @@ public class ResourceUtil {
             }
             for (File file : source) {
                if (file != null) {
+                  IContainer fileTarget = target;
+                  if (IOUtil.contains(startDirectory, file)) {
+                     Deque<File> parentsBelowStartDirectory = new LinkedList<File>();
+                     File parentFile = file.getParentFile();
+                     while (!startDirectory.equals(parentFile)) {
+                        parentsBelowStartDirectory.addFirst(parentFile);
+                        parentFile = parentFile.getParentFile();
+                     }
+                     for (File parentDirectory : parentsBelowStartDirectory) {
+                        IFolder subFolder = fileTarget.getFolder(new Path(parentDirectory.getName()));
+                        if (!subFolder.exists()) {
+                           subFolder.create(true, true, null);
+                        }
+                        fileTarget = subFolder;
+                     }
+                  }
                   if (file.isFile()) {
-                     IFile targetFile = target.getFile(new Path(file.getName()));
+                     IFile targetFile = fileTarget.getFile(new Path(file.getName()));
                      createFile(targetFile, opener.open(file), null);
                   }
                   else {
-                     IFolder targetFolder = target.getFolder(new Path(file.getName()));
+                     IFolder targetFolder = fileTarget.getFolder(new Path(file.getName()));
                      if (!targetFolder.exists()) {
                         targetFolder.create(true, true, null);
                      }
-                     copyIntoWorkspace(targetFolder, opener, file.listFiles());
+                     copyIntoWorkspace(targetFolder, opener, file, file.listFiles());
                   }
                }
             }
@@ -284,6 +329,85 @@ public class ResourceUtil {
       }
       catch (IOException e) {
          throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+      }
+   }
+   
+   /**
+    * Computes the MD5 Sum for the given {@link IFile} content.
+    * @param iFile - the {@link IFile} to use
+    * @return the MD5 Sum as {@link String}
+    * @throws CoreException 
+    * @throws IOException 
+    */
+   public static String computeContentMD5(IFile iFile) throws IOException, CoreException{
+      return IOUtil.computeMD5(iFile.getContents());
+   }
+
+   /**
+    * Copies the {@link IFile} to the given {@link Target}.
+    * @param source The {@link IFile} to copy.
+    * @param target The target {@link File} to copy to.
+    * @return {@code true} if copy was performed and {@code false} if not performed.
+    * @throws CoreException Occurred Exception
+    */
+   public static boolean copyIntoFileSystem(IFile source, File target) throws CoreException {
+      try {
+         if (source != null && target != null) {
+            return IOUtil.copy(source.getContents(), new FileOutputStream(target));
+         }
+         else {
+            return false;
+         }
+      }
+      catch (IOException e) {
+         throw new CoreException(new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(e));
+      }
+   }
+   
+   /**
+    * Returns the location of the workspace.
+    * @return The location of the workspace.
+    */
+   public static File getWorkspaceLocation() {
+      return getLocation(ResourcesPlugin.getWorkspace().getRoot());
+   }
+
+   /**
+    * Creates an {@link IProject} with the given name and ensures that it is open.
+    * @param projectName The Name of the {@link IProject} to create.
+    * @return The open {@link IProject}.
+    * @throws CoreException Occurred Exception.
+    */
+   public static IProject createProject(String projectName) throws CoreException {
+      IProject project = getProject(projectName);
+      if (project != null) {
+         if (!project.exists()) {
+            project.create(null);
+         }
+         if (!project.isOpen()) {
+            project.open(null);
+         }
+      }
+      return project;
+   }
+   
+   /**
+    * Creates an {@link IFolder} in the {@link IContainer} with the given folder name.
+    * @param parent The {@link IContainer} to create folder in.
+    * @param folderName The name of the folder to create.
+    * @return The created or existing folder.
+    * @throws CoreException Occurred Exception.
+    */
+   public static IFolder createFolder(IContainer parent, String folderName) throws CoreException {
+      if (parent != null && !StringUtil.isTrimmedEmpty(folderName)) {
+         IFolder folder = parent.getFolder(new Path(folderName));
+         if (!folder.exists()) {
+            folder.create(true, true, null);
+         }
+         return folder;
+      }
+      else {
+         return null;
       }
    }
 }

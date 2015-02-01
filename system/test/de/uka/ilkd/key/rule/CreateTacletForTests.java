@@ -1,34 +1,43 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.rule;
 
 
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
@@ -77,7 +86,7 @@ public class CreateTacletForTests extends TestCase {
     static SchemaVariable b;
     static LogicVariable z;
     static Sort sort1;
-    static TermFactory tf=TermFactory.DEFAULT;
+    static TermFactory tf;
 
     static NamespaceSet nss;
 
@@ -86,6 +95,7 @@ public class CreateTacletForTests extends TestCase {
     public CreateTacletForTests(String name) {
 	super(name);
 	services = new Services(AbstractProfile.getDefaultProfile());
+	tf = services.getTermFactory();
     }
 
 
@@ -119,11 +129,10 @@ public class CreateTacletForTests extends TestCase {
 	//decls for nat
 	func_0=new Function(new Name("zero"),nat,new Sort[]{});
 	func_eq=new Function(new Name("="),Sort.FORMULA,
-				      new Sort[]{nat,nat});
-	func_plus=new Function(new Name("+"),nat,
-					new Sort[]{nat,nat});
-	func_min1=new Function(new Name("pred"),nat,new Sort[]{nat});
-	func_plus1=new Function(new Name("succ"),nat,new Sort[]{nat});
+            nat,nat);
+	func_plus=new Function(new Name("+"),nat,nat,nat);
+	func_min1=new Function(new Name("pred"),nat, nat);
+	func_plus1=new Function(new Name("succ"),nat, nat);
 
 	nss.functions().add(func_0);
 	nss.functions().add(func_eq);
@@ -288,9 +297,9 @@ public class CreateTacletForTests extends TestCase {
 	String test1="\\predicates {A; B; } (A -> B) -> (!(!(A -> B)))";
 	Term t_test1=null;
 	try{
-	    StringReader fr = new StringReader(test1);
-	    KeYParser parser=
-		new KeYParser(ParserMode.PROBLEM,new KeYLexer(fr,null));
+	    KeYParserF parser=
+		new KeYParserF(ParserMode.PROBLEM,new KeYLexerF(test1,
+			"No file. CreateTacletForTests.setUp(" + test1 + ")"));
 	    t_test1=parser.problem();
 	} catch (Exception e) {
 	    System.err.println("Parser Error or Input Error");
@@ -309,7 +318,7 @@ public class CreateTacletForTests extends TestCase {
 	
 	
 	func_p=new Function(new Name("P"),Sort.FORMULA,
-				new Sort[]{sort1});
+            sort1);
 	nss.functions().add(func_p);
 
 	//nat problem:
@@ -349,7 +358,7 @@ public class CreateTacletForTests extends TestCase {
 
 	z = new LogicVariable(new Name("z"),sort1);
        	Term t_z=tf.createTerm(z,new Term[0]);
-	Term t_allzpz=TermBuilder.DF.all(z, tf.createTerm(func_p,new Term[]{t_z}));
+	Term t_allzpz=services.getTermBuilder().all(z, tf.createTerm(func_p,new Term[]{t_z}));
  	SequentFormula cf3=new SequentFormula(t_allzpz);
  	seq_testAll=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT, 
  					  Semisequent.EMPTY_SEMISEQUENT
@@ -359,15 +368,15 @@ public class CreateTacletForTests extends TestCase {
 
     }
     
-    private KeYParser stringDeclParser(String s) {
-	return new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(s),null),
-			      "No file. CreateTacletForTests.stringParser("+s+")",
-			      services, nss);
+    private KeYParserF stringDeclParser(String s) {
+	return new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s,
+			"No file. CreateTacletForTests.stringDeclParser(" + s + ")"),
+		services, nss);
     }
 
     public void parseDecls(String s) {
 	try {
-	    KeYParser p = stringDeclParser(s);
+	    KeYParserF p = stringDeclParser(s);
 	    p.decls();
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
@@ -377,17 +386,16 @@ public class CreateTacletForTests extends TestCase {
 	}
     }
      
-    private KeYParser stringTacletParser(String s) {
-	return new KeYParser(ParserMode.TACLET, 
-		             new KeYLexer(new StringReader(s),null),
-			     "No file. CreateTacletForTests.stringParser("+s+")",
-			     services, 
-			     nss);
+    private KeYParserF stringTacletParser(String s) {
+	return new KeYParserF(ParserMode.TACLET, new KeYLexerF(s,
+			"No file. CreateTacletForTests.stringTacletParser(" + s + ")"),
+		services,
+		nss);
     }
     
     Taclet parseTaclet(String s) {
    	try {
-	    KeYParser p = stringTacletParser(s);
+	    KeYParserF p = stringTacletParser(s);
 	    
 	    return p.taclet(DefaultImmutableSet.<Choice>nil());
 	} catch (Exception e) {

@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.ldt;
 
@@ -22,7 +21,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -35,7 +34,7 @@ public final class FloatLDT extends LDT {
 
     public static final Name NAME = new Name("float");
 
-    public FloatLDT(Services services) {
+    public FloatLDT(TermServices services) {
 	super(NAME, services);
     }
 
@@ -62,7 +61,7 @@ public final class FloatLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
 	    		         Term sub,
-	    		         Services services,
+	    		         TermServices services,
 	    		         ExecutionContext ec) {
 	return false;
     }
@@ -72,7 +71,7 @@ public final class FloatLDT extends LDT {
     public Term translateLiteral(Literal lit, Services services) {
 	    // return skolem term
         final Function sk = new Function(new Name(""+NAME+lit),targetSort());
-        return TermBuilder.DF.func(sk);
+        return services.getTermBuilder().func(sk);
     }
 
 

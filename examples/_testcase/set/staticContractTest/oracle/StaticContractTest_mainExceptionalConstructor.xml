@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call StaticContractTest.mainExceptionalConstructor()&gt;" pathCondition="true" pathConditionChanged="false">
+      <operationContract name="self = new IntWrapper() catch(exc_0)
+pre: true
+post: !exc_0 = null
+&amp; (  (   java.lang.Throwable::instance(exc_0) = TRUE
+      -&gt; self.&lt;inv&gt;)
+   &amp; java.lang.Exception::instance(exc_0) = TRUE)
+mod: allLocs
+termination: diamond" pathCondition="true" pathConditionChanged="false" exceptionTerm="exc_0" selfTerm="self" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+         <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call StaticContractTest.mainExceptionalConstructor()&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
+            <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+            </termination>
+         </exceptionalMethodReturn>
+      </operationContract>
+      <methodReturnEntry path="/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0"/>
+</start>

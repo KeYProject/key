@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -16,7 +16,6 @@ package org.key_project.key4eclipse.common.ui.test.suite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.key4eclipse.common.ui.test.testcase.ImmutableCollectionContentProviderTest;
-import org.key_project.key4eclipse.common.ui.test.testcase.ProofUserManagerTest;
 import org.key_project.key4eclipse.common.ui.test.testcase.StarterUtilTest;
 
 /**
@@ -26,7 +25,6 @@ import org.key_project.key4eclipse.common.ui.test.testcase.StarterUtilTest;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     ImmutableCollectionContentProviderTest.class,
-    ProofUserManagerTest.class,
     StarterUtilTest.class
 })
 public class AllCommonUiTests {

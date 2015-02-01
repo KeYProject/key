@@ -1,17 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.proof;
 
@@ -24,6 +22,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.rulefilter.AnyRuleSetTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.NotRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
@@ -63,15 +62,17 @@ public final class RuleAppIndex  {
                
 
     public RuleAppIndex(TacletAppIndex      p_tacletAppIndex, 
-			BuiltInRuleAppIndex p_builtInRuleAppIndex) {
-	this ( p_tacletAppIndex.tacletIndex(), p_builtInRuleAppIndex );
+			BuiltInRuleAppIndex p_builtInRuleAppIndex,
+			Services            services) {
+	this ( p_tacletAppIndex.tacletIndex(), p_builtInRuleAppIndex, services );
     }
 
     public RuleAppIndex ( TacletIndex         p_tacletIndex,
-			  BuiltInRuleAppIndex p_builtInRuleAppIndex ) {
+			  BuiltInRuleAppIndex p_builtInRuleAppIndex,
+			  Services            services) {
 	tacletIndex               = p_tacletIndex;
-	automatedTacletAppIndex   = new TacletAppIndex ( tacletIndex );
-	interactiveTacletAppIndex = new TacletAppIndex ( tacletIndex );
+	automatedTacletAppIndex   = new TacletAppIndex ( tacletIndex, services );
+	interactiveTacletAppIndex = new TacletAppIndex ( tacletIndex, services );
 	builtInRuleAppIndex       = p_builtInRuleAppIndex;
 	// default to false to keep compatibility with old code
 	autoMode                  = false;
@@ -232,7 +233,7 @@ public final class RuleAppIndex  {
      */
     public ImmutableList<NoPosTacletApp> getFindTaclet(TacletFilter    filter,
 					      PosInOccurrence pos,
-					      Services        services) { 
+					      TermServices        services) { 
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
@@ -286,7 +287,7 @@ public final class RuleAppIndex  {
      */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet (TacletFilter    filter,
 						  PosInOccurrence pos,
-						  Services        services) { 
+						  TermServices        services) { 
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
 	    result = result.prepend 

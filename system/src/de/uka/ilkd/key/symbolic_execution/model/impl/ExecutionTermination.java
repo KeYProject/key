@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -17,7 +17,8 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -27,20 +28,25 @@ import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 
 /**
  * The default implementation of {@link IExecutionTermination}.
  * @author Martin Hentschel
  */
-public class ExecutionTermination extends AbstractExecutionNode implements IExecutionTermination {
+public class ExecutionTermination extends AbstractExecutionNode<SourceElement> implements IExecutionTermination {
    /**
     * Contains the exception variable which is used to check if the executed program in proof terminates normally.
     */
-   private IProgramVariable exceptionVariable;
+   private final IProgramVariable exceptionVariable;
    
    /**
     * The {@link Sort} of the uncaught exception.
@@ -53,14 +59,24 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
    private TerminationKind terminationKind;
    
    /**
+    * Is the branch verified?
+    */
+   private Boolean branchVerified;
+   
+   /**
     * Constructor.
+    * @param settings The {@link ITreeSettings} to use.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param exceptionVariable Contains the exception variable which is used to check if the executed program in proof terminates normally.
     * @param terminationKind The {@link TerminationKind} or {@code null} to compute it when it is requested the first time (normal or exceptional termination only).
     */
-   public ExecutionTermination(KeYMediator mediator, Node proofNode, IProgramVariable exceptionVariable, TerminationKind terminationKind) {
-      super(mediator, proofNode);
+   public ExecutionTermination(ITreeSettings settings,
+                               KeYMediator mediator, 
+                               Node proofNode, 
+                               IProgramVariable exceptionVariable, 
+                               TerminationKind terminationKind) {
+      super(settings, mediator, proofNode);
       this.exceptionVariable = exceptionVariable;
       this.terminationKind = terminationKind;
    }
@@ -127,7 +143,7 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
          // Search final value of the exceptional variable which is used to check if the verified program terminates normally
          ImmutableArray<Term> value = null;
          for (SequentFormula f : getProofNode().sequent().succedent()) {
-            Pair<ImmutableList<Term>,Term> updates = TermBuilder.DF.goBelowUpdates2(f.formula());
+            Pair<ImmutableList<Term>,Term> updates = TermBuilder.goBelowUpdates2(f.formula());
             Iterator<Term> iter = updates.first.iterator();
             while (value == null && iter.hasNext()) {
                value = extractValueFromUpdate(iter.next(), exceptionVariable);
@@ -152,8 +168,8 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
                                                          IProgramVariable variable) {
       ImmutableArray<Term> result = null;
       if (term.op() instanceof ElementaryUpdate) {
-         ElementaryUpdate update = (ElementaryUpdate)term.op();;
-         if (JavaUtil.equals(variable, update.lhs())) {
+         ElementaryUpdate update = (ElementaryUpdate)term.op();
+          if (JavaUtil.equals(variable, update.lhs())) {
             result = term.subs();
          }
       }
@@ -165,6 +181,14 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
       }
       return result;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected IExecutionConstraint[] lazyComputeConstraints() {
+      return SymbolicExecutionUtil.createExecutionConstraints(this);
+   }
    
    /**
     * {@inheritDoc}
@@ -175,6 +199,55 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
          case EXCEPTIONAL : return "Exceptional Termination";
          case LOOP_BODY : return "Loop Body Termination";
          default : return "Termination";
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isBranchVerified() {
+      if (branchVerified == null) {
+         branchVerified = Boolean.valueOf(lazyComputeBranchVerified());
+      }
+      return branchVerified.booleanValue();
+   }
+   
+   /**
+    * Computes the value of {@link #isBranchVerified()} lazily.
+    * @return The branch verified state.
+    */
+   protected boolean lazyComputeBranchVerified() {
+      if (!isDisposed()) {
+         // Find uninterpreted predicate
+         Term predicate = AbstractOperationPO.getUninterpretedPredicate(getProof());
+         // Check if node can be treated as verified/closed
+         if (predicate != null) {
+            boolean verified = true;
+            Iterator<Node> leafsIter = getProofNode().leavesIterator();
+            while (verified && leafsIter.hasNext()) {
+               Node leaf = leafsIter.next();
+               if (!leaf.isClosed()) {
+                  final Term toSearch = predicate;
+                  SequentFormula topLevelPredicate = JavaUtil.search(leaf.sequent().succedent(), new IFilter<SequentFormula>() {
+                     @Override
+                     public boolean select(SequentFormula element) {
+                        return toSearch.op() == element.formula().op();
+                     }
+                  });
+                  if (topLevelPredicate == null) {
+                     verified = false;
+                  }
+               }
+            }
+            return verified;
+         }
+         else {
+            return getProofNode().isClosed();
+         }
+      }
+      else {
+         return false;
       }
    }
 }

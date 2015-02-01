@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -28,12 +28,16 @@ public interface IBuiltInRuleApp extends RuleApp {
     BuiltInRule rule();
 
     /**
-     * tries to complete the rule application from the available information
+     * Tries to complete the rule application from the available information.
      * Attention: Do neither add GUI code to the rules nor use this method directly 
-     * Instead ask the implementation of the {@link de.uka.ilkd.key.ui.UserInterface} to complete a built-in rule
+     * Instead ask the implementation of the {@link de.uka.ilkd.key.ui.UserInterface} to complete a built-in rule.
+     * Returns a complete app only if there is exactly one contract.
+     * If you want a complete app for combined contracts, use <code>forceInstantiate</code> instead.
      * For an example implementation see e.g. {@link UseOperationContractRule} or {@link UseDependencyContractRule}.    
      */
     IBuiltInRuleApp tryToInstantiate(Goal goal);
+
+    IBuiltInRuleApp forceInstantiate(Goal goal);
 
     List<LocationVariable> getHeapContext();
 

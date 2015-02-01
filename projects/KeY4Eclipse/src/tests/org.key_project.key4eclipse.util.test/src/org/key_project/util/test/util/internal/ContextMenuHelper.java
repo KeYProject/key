@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.results.WidgetResult;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
@@ -85,13 +86,20 @@ public class ContextMenuHelper {
                + Arrays.asList(texts));
       }
 
+      final Menu parentMenu = UIThreadRunnable.syncExec(new Result<Menu>() {
+         @Override
+         public Menu run() {
+            return menuItem.getParent();
+         }
+      });
+      
       // click
       click(menuItem, x, y);
 
       // hide
       UIThreadRunnable.syncExec(new VoidResult() {
          public void run() {
-            hide(menuItem.getParent(), x, y);
+            hide(parentMenu, x, y);
          }
       });
    }

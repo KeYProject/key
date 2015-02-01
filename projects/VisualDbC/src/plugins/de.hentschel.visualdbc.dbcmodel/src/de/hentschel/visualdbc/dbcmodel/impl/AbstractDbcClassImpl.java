@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -26,6 +26,7 @@ import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.util.EDataTypeUniqueEList;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
@@ -44,6 +45,7 @@ import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
  * <ul>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcClassImpl#getConstructors <em>Constructors</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcClassImpl#getImplements <em>Implements</em>}</li>
+ *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcClassImpl#getImplementsFullNames <em>Implements Full Names</em>}</li>
  * </ul>
  * </p>
  *
@@ -69,6 +71,16 @@ public abstract class AbstractDbcClassImpl extends AbstractDbcInterfaceImpl impl
     * @ordered
     */
    protected EList<DbcInterface> implements_;
+
+   /**
+    * The cached value of the '{@link #getImplementsFullNames() <em>Implements Full Names</em>}' attribute list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getImplementsFullNames()
+    * @generated
+    * @ordered
+    */
+   protected EList<String> implementsFullNames;
 
    /**
     * <!-- begin-user-doc -->
@@ -116,6 +128,18 @@ public abstract class AbstractDbcClassImpl extends AbstractDbcInterfaceImpl impl
    /**
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
+    * @generated
+    */
+   public EList<String> getImplementsFullNames() {
+      if (implementsFullNames == null) {
+         implementsFullNames = new EDataTypeUniqueEList<String>(String.class, this, DbcmodelPackage.ABSTRACT_DBC_CLASS__IMPLEMENTS_FULL_NAMES);
+      }
+      return implementsFullNames;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
     * @generated NOT
     */
    public DbcConstructor getConstructor(String signature) {
@@ -156,6 +180,8 @@ public abstract class AbstractDbcClassImpl extends AbstractDbcInterfaceImpl impl
             return getConstructors();
          case DbcmodelPackage.ABSTRACT_DBC_CLASS__IMPLEMENTS:
             return getImplements();
+         case DbcmodelPackage.ABSTRACT_DBC_CLASS__IMPLEMENTS_FULL_NAMES:
+            return getImplementsFullNames();
       }
       return super.eGet(featureID, resolve, coreType);
    }
@@ -177,6 +203,10 @@ public abstract class AbstractDbcClassImpl extends AbstractDbcInterfaceImpl impl
             getImplements().clear();
             getImplements().addAll((Collection<? extends DbcInterface>)newValue);
             return;
+         case DbcmodelPackage.ABSTRACT_DBC_CLASS__IMPLEMENTS_FULL_NAMES:
+            getImplementsFullNames().clear();
+            getImplementsFullNames().addAll((Collection<? extends String>)newValue);
+            return;
       }
       super.eSet(featureID, newValue);
    }
@@ -195,6 +225,9 @@ public abstract class AbstractDbcClassImpl extends AbstractDbcInterfaceImpl impl
          case DbcmodelPackage.ABSTRACT_DBC_CLASS__IMPLEMENTS:
             getImplements().clear();
             return;
+         case DbcmodelPackage.ABSTRACT_DBC_CLASS__IMPLEMENTS_FULL_NAMES:
+            getImplementsFullNames().clear();
+            return;
       }
       super.eUnset(featureID);
    }
@@ -211,8 +244,26 @@ public abstract class AbstractDbcClassImpl extends AbstractDbcInterfaceImpl impl
             return constructors != null && !constructors.isEmpty();
          case DbcmodelPackage.ABSTRACT_DBC_CLASS__IMPLEMENTS:
             return implements_ != null && !implements_.isEmpty();
+         case DbcmodelPackage.ABSTRACT_DBC_CLASS__IMPLEMENTS_FULL_NAMES:
+            return implementsFullNames != null && !implementsFullNames.isEmpty();
       }
       return super.eIsSet(featureID);
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   @Override
+   public String toString() {
+      if (eIsProxy()) return super.toString();
+
+      StringBuffer result = new StringBuffer(super.toString());
+      result.append(" (implementsFullNames: ");
+      result.append(implementsFullNames);
+      result.append(')');
+      return result.toString();
    }
 
 } //AbstractDbcClassImpl

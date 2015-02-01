@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -67,6 +68,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
     private static PosInOccurrence letUserChooseStep(
     		List<LocationVariable> heapContext,
             List<PosInOccurrence> steps, boolean forced, Services services) {
+        assert heapContext != null;
 
         if (steps.size() == 0) {
             return null;
@@ -74,28 +76,11 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
         // prepare array of possible base heaps
         final TermStringWrapper[] heaps = new TermStringWrapper[steps.size()];
-        int i = 0;
         final LogicPrinter lp = new LogicPrinter(null, new NotationInfo(),
                 services);
         lp.setLineWidth(120);
 
-        for (PosInOccurrence step : steps) {
-        	final Term[] heapTerms = new Term[((IObserverFunction)step.subTerm().op()).getStateCount()*heapContext.size()];
-        	String prettyprint = "<html><tt>" + (heapTerms.length > 1 ? "[" : "");
-        	for(int j =0 ; j < heapTerms.length; j++) {
-              final Term heap = step.subTerm().sub(j);
-              heapTerms[j] = heap;
-              lp.reset();
-              try {
-                  lp.printTerm(heap);
-              } catch (IOException e) {
-                  throw new RuntimeException(e);
-              }
-              prettyprint += (j>0 ? ", " : "") + LogicPrinter.escapeHTML(lp.toString().trim(), true);
-        	}
-        	prettyprint += (heapTerms.length > 1 ? "]" : "")+"</tt></html>";
-            heaps[i++] = new TermStringWrapper(heapTerms, prettyprint);
-        }
+        extractHeaps(heapContext, steps, heaps, lp);
 
         final Term[] resultHeaps;
         if (!forced) {
@@ -114,29 +99,63 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
             resultHeaps = heaps[0].terms;
         }
 
-        // find corresponding step
-        for (PosInOccurrence step : steps) {
-            boolean match = true;
-            for(int j = 0; j<resultHeaps.length; j++) {
-               if (!step.subTerm().sub(j).equals(resultHeaps[j])) {
-                  match = false;
-                  break;
-               }
+        return findCorrespondingStep(steps, resultHeaps);
+    }
+    
+    public static PosInOccurrence findCorrespondingStep(List<PosInOccurrence> steps, Term[] resultHeaps) {
+       // find corresponding step
+       for (PosInOccurrence step : steps) {
+           boolean match = true;
+           for(int j = 0; j<resultHeaps.length; j++) {
+              if (!step.subTerm().sub(j).equals(resultHeaps[j])) {
+                 match = false;
+                 break;
+              }
+           }
+           if(match) {
+               return step;
             }
-            if(match) {
-                return step;
-             }
-        }
-
-        assert false;
-        return null;
+       }
+       assert false;
+       return null;
     }
 
-    private static final class TermStringWrapper {
-        final Term[] terms;
+    public static void extractHeaps(List<LocationVariable> heapContext,
+            List<PosInOccurrence> steps, final TermStringWrapper[] heaps,
+            final LogicPrinter lp) {
+        int i = 0;
+        for (PosInOccurrence step : steps) {
+            Operator op = step.subTerm().op();
+            // necessary distinction (see bug #1232)
+            // subterm may either be an observer or a heap term already
+            int size = (op instanceof IObserverFunction)?
+                ((IObserverFunction)op).getStateCount()*heapContext.size(): 1;
+            final Term[] heapTerms = new Term[size];
+            String prettyprint = "<html><tt>" + (size > 1 ? "[" : "");
+            for(int j =0 ; j < size; j++) {
+                // TODO: there may still be work to do
+                // what if we have a heap term, where the base heap lies deeper?
+                final Term heap = step.subTerm().sub(j);
+                heapTerms[j] = heap;
+                lp.reset();
+                try {
+                    lp.printTerm(heap);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                prettyprint += (j>0 ? ", " : "")
+                + LogicPrinter.escapeHTML(lp.toString().trim(), true);
+            }
+            prettyprint += (size > 1 ? "]" : "")+"</tt></html>";
+            heaps[i++] = new TermStringWrapper(heapTerms, prettyprint);
+        }
+    }
+
+    public static final class TermStringWrapper {
+        public final Term[] terms;
         final String string;
 
-        TermStringWrapper(Term[] terms, String string) {
+        public TermStringWrapper(Term[] terms, String string) {
             this.terms = terms;
             this.string = string;
         }
@@ -149,6 +168,14 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
     @Override
     public boolean canComplete(IBuiltInRuleApp app) {
-        return app.rule() instanceof UseDependencyContractRule;
+        return checkCanComplete(app);
     }
+    
+    /**
+     * Checks if the app is supported. 
+     * This functionality is also used by the Eclipse plug-ins like the KeYIDE.
+     */
+    public static boolean checkCanComplete(final IBuiltInRuleApp app) {
+       return app.rule() instanceof UseDependencyContractRule;
+   }
 }

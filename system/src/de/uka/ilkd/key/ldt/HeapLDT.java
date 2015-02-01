@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.ldt;
 
@@ -20,7 +19,6 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -34,6 +32,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
@@ -91,6 +90,7 @@ public final class HeapLDT extends LDT {
     private final Map<Sort,Function> wellFormed;    
     private final Function acc;
     private final Function reach;
+    private final Function prec;
     
     //heap pv
     private ImmutableList<LocationVariable> heaps;
@@ -101,7 +101,7 @@ public final class HeapLDT extends LDT {
     //constructors
     //------------------------------------------------------------------------- 
     
-    public HeapLDT(Services services) {
+    public HeapLDT(TermServices services) {
 	super(NAME, services);
 	final Namespace sorts    = services.getNamespaces().sorts();
 	final Namespace progVars = services.getNamespaces().programVariables();
@@ -124,6 +124,7 @@ public final class HeapLDT extends LDT {
         nullFunc          = addFunction(services, "null");
         acc               = addFunction(services, "acc");
         reach             = addFunction(services, "reach");
+        prec		  = addFunction(services, "prec");
         heaps = ImmutableSLList.<LocationVariable>nil()
         		 .append((LocationVariable) progVars.lookup(BASE_HEAP_NAME))
         		 .append((LocationVariable) progVars.lookup(SAVED_HEAP_NAME));
@@ -158,7 +159,7 @@ public final class HeapLDT extends LDT {
      * Given a constant symbol representing a field, this method returns a
      * simplified name of the constant symbol to be used for pretty printing.
      */
-    public String getPrettyFieldName(Named fieldSymbol) {
+    public static String getPrettyFieldName(Named fieldSymbol) {
 	String name = fieldSymbol.name().toString();
 	int index = name.indexOf("::");
 	if(index == -1) {
@@ -177,7 +178,7 @@ public final class HeapLDT extends LDT {
      * Extracts the name of the enclosing class from the name of a constant
      * symbol representing a field.
      */
-    public String getClassName(Function fieldSymbol) {
+    public static String getClassName(Function fieldSymbol) {
 	String name = fieldSymbol.name().toString();
 	int index = name.indexOf("::");
 	if(index == -1) {
@@ -199,7 +200,7 @@ public final class HeapLDT extends LDT {
     /**
      * Returns the select function for the given sort.
      */
-    public Function getSelect(Sort instanceSort, Services services) {
+    public Function getSelect(Sort instanceSort, TermServices services) {
 	return select.getInstanceFor(instanceSort, services);
     }
     
@@ -210,15 +211,19 @@ public final class HeapLDT extends LDT {
      * returns null.
      */
     public Sort getSortOfSelect(Operator op) {
-	if(op instanceof SortDependingFunction 
-           && ((SortDependingFunction)op).isSimilar(select)) {
-	   return ((SortDependingFunction)op).getSortDependingOn(); 
-	} else {
-	    return null;
-	}
+        if(isSelectOp(op)) {
+            return ((SortDependingFunction)op).getSortDependingOn();
+        } else {
+            return null;
+        }
     }
-    
-    
+
+    public boolean isSelectOp(Operator op) {
+        return op instanceof SortDependingFunction
+                && ((SortDependingFunction)op).isSimilar(select);
+    }
+
+
     public Function getStore() {
 	return store;
     }
@@ -254,24 +259,24 @@ public final class HeapLDT extends LDT {
     }
     
         
-    public Function getClassPrepared(Sort instanceSort, Services services) {
+    public Function getClassPrepared(Sort instanceSort, TermServices services) {
 	return classPrepared.getInstanceFor(instanceSort, services);
     }
     
     
-    public Function getClassInitialized(Sort instanceSort, Services services) {
+    public Function getClassInitialized(Sort instanceSort, TermServices services) {
 	return classInitialized.getInstanceFor(instanceSort, services);
     }
     
     
     public Function getClassInitializationInProgress(Sort instanceSort, 
-	    					     Services services) {
+	    					     TermServices services) {
 	return classInitializationInProgress.getInstanceFor(instanceSort, 
 							    services);
     }
     
     
-    public Function getClassErroneous(Sort instanceSort, Services services) {
+    public Function getClassErroneous(Sort instanceSort, TermServices services) {
 	return classErroneous.getInstanceFor(instanceSort, services);
     }
     
@@ -300,6 +305,10 @@ public final class HeapLDT extends LDT {
 	return reach;
     }
     
+    public Function getPrec() {
+	return prec;
+    }
+
     
     public LocationVariable getHeap() {
 	return heaps.head();
@@ -426,7 +435,7 @@ public final class HeapLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
 	    			 Term sub, 
-	    			 Services services, 
+	    			 TermServices services, 
 	    			 ExecutionContext ec) {
 	return false;
     }

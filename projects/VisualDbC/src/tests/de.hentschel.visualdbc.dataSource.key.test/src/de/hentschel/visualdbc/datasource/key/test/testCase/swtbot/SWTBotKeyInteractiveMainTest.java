@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -26,6 +26,7 @@ import org.key_project.swtbot.swing.bot.SwingBotJFrame;
 import org.key_project.swtbot.swing.bot.finder.waits.Conditions;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
@@ -43,7 +44,7 @@ import de.uka.ilkd.key.gui.MainWindow;
  * Tests for the interactive mode of a {@link KeyConnection}.
  * @author Martin Hentschel
  */
-public class SWTBotKeyInteractiveMainTest extends TestCase {
+public class SWTBotKeyInteractiveMainTest extends AbstractSetupTestCase {
    /**
     * Makes sure that the {@link IDSConnection} closes the opened 
     * {@link MainWindow} {@link JFrame} when the connection is
@@ -56,7 +57,7 @@ public class SWTBotKeyInteractiveMainTest extends TestCase {
       try {
          // Create project and fill it with test data
          IProject project = TestUtilsUtil.createProject("SWTBotInteractiveKeyMainTest_testDisconnectingConnection");
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour/paycard", project);
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour/test/paycard", project);
          // Open connection
          File location = ResourceUtil.getLocation(project); 
          TestCase.assertNotNull(location);
@@ -103,7 +104,7 @@ public class SWTBotKeyInteractiveMainTest extends TestCase {
       try {
          // Create project and fill it with test data
          IProject project = TestUtilsUtil.createProject("SWTBotInteractiveKeyMainTest_testClosingEvent");
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour/paycard", project);
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour/test/paycard", project);
          // Open connection
          File location = ResourceUtil.getLocation(project); 
          TestCase.assertNotNull(location);

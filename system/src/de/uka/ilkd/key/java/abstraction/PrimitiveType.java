@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,17 +11,17 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-
 package de.uka.ilkd.key.java.abstraction;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
@@ -35,6 +35,7 @@ import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.FreeLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.MapLDT;
 import de.uka.ilkd.key.ldt.RealLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -48,11 +49,11 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 public final class PrimitiveType implements Type {
 
     // must be first in file.
-    private static final HashMap<String,PrimitiveType> typeMap = 
-            new LinkedHashMap<String, PrimitiveType>(); 
+    private static final Map<String,PrimitiveType> typeMap = 
+            new LinkedHashMap<String, PrimitiveType>();
     // must be first in file.
-    private static final HashMap<Name,PrimitiveType> ldtMap = 
-            new LinkedHashMap<Name, PrimitiveType>(); 
+    private static final Map<Name,PrimitiveType> ldtMap = 
+            new LinkedHashMap<Name, PrimitiveType>();
 
     public static final PrimitiveType JAVA_BYTE  =
 	new PrimitiveType("byte", new IntLiteral(0), IntegerLDT.NAME);
@@ -80,8 +81,10 @@ public final class PrimitiveType implements Type {
 	new PrimitiveType("\\seq", EmptySeqLiteral.INSTANCE, SeqLDT.NAME);
     public static final PrimitiveType JAVA_FREE_ADT =
             new PrimitiveType("\\free", FreeLiteral.INSTANCE, FreeLDT.NAME);
+    public static final PrimitiveType JAVA_MAP =
+            new PrimitiveType("\\map", EmptyMapLiteral.INSTANCE, MapLDT.NAME);
 
-    public static final PrimitiveType PROGRAM_SV   = new PrimitiveType("SV", null, null);
+    public static final PrimitiveType PROGRAM_SV = new PrimitiveType("SV", null, null);
 
     private ProgramElementName arrayElementName = null;
 
@@ -96,7 +99,7 @@ public final class PrimitiveType implements Type {
 
     private final String name;
     private final Literal defaultValue;
-    private Name ldtName;
+    private final Name ldtName;
 
     private PrimitiveType(String name, Literal defaultValue, Name ldtName) {
 	this.defaultValue = defaultValue;
@@ -113,10 +116,12 @@ public final class PrimitiveType implements Type {
        Returns the name of this type.
        @return the name of this type.
      */
+    @Override
     public String getName() {
 	return name;
     }
 
+    @Override
     public boolean equals(Object o) {
 	if (o instanceof PrimitiveType &&
 	    ((PrimitiveType)o).getName().equals(name)) {
@@ -125,6 +130,7 @@ public final class PrimitiveType implements Type {
 	return false;
     }
 
+    @Override
     public int hashCode() {
 	return getName().hashCode();
     }
@@ -137,6 +143,7 @@ public final class PrimitiveType implements Type {
      * @return the default value of the given type
      * according to JLS ???4.5.5
      */
+    @Override
     public Literal getDefaultValue() {
 	return defaultValue;
     }
@@ -145,6 +152,7 @@ public final class PrimitiveType implements Type {
        Returns the name of type.
        @return the full name of this program model element.
      */
+    @Override
     public String getFullName() {
 	return name;
     }
@@ -153,6 +161,7 @@ public final class PrimitiveType implements Type {
        Returns the name of type.
        @return the full name of this program model element.
      */
+    @Override
     public String toString() {
 	return name;
     }
@@ -189,6 +198,28 @@ public final class PrimitiveType implements Type {
 	}
 	assert arrayElementName != null;
 	return arrayElementName;
+    }
+
+    /**
+     * Returns whether this is a Java type which translates to int in DL.
+     */
+    public boolean isIntegerType () {
+        return this == JAVA_BYTE
+            || this == JAVA_CHAR
+            || this == JAVA_SHORT
+            || this == JAVA_INT
+            || this == JAVA_LONG
+            || this == JAVA_BIGINT;
+    }
+
+    /**
+     * Returns true if this is an integer or floating point type.
+     */
+    public boolean isArithmeticType () {
+        return isIntegerType()
+            || this == JAVA_FLOAT
+            || this == JAVA_DOUBLE
+            || this == JAVA_REAL;
     }
 
     /**

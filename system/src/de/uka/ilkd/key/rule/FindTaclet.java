@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.rule;
 
@@ -25,7 +24,10 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -75,15 +77,44 @@ public abstract class FindTaclet extends Taclet {
      * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the
      * prefix for each SchemaVariable in the Taclet
      */
+    public FindTaclet(Name name,
+                      TacletApplPart applPart,
+                      ImmutableList<TacletGoalTemplate> goalTemplates,
+                      ImmutableList<RuleSet> ruleSets,
+                      TacletAttributes attrs,
+                      Term find,
+                      ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+                      ImmutableSet<Choice> choices,
+                      boolean surviveSymbExec) {
+        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,
+              choices, surviveSymbExec);
+        this.find = find;
+    }
+    
+    /** creates a FindTaclet 
+     * @param name the Name of the taclet
+     * @param applPart the TacletApplPart that contains the if-sequent, the
+     * not-free and new-vars conditions 
+     * @param goalTemplates a IList<TacletGoalTemplate> that contains all goaltemplates of
+     * the taclet (these are the instructions used to create new goals when
+     * applying the Taclet)
+     * @param ruleSets a IList<RuleSet> that contains all rule sets the Taclet
+     *      is attached to
+     * @param attrs the TacletAttributes encoding if the Taclet is non-interactive,
+     * recursive or something like that
+     * @param find the Term that is the pattern that has to be found in a
+     * sequent and the places where it matches the Taclet can be applied
+     * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the
+     * prefix for each SchemaVariable in the Taclet
+     */
     public FindTaclet(Name name, TacletApplPart applPart,  
 		      ImmutableList<TacletGoalTemplate> goalTemplates, 
 		      ImmutableList<RuleSet> ruleSets,
 		      TacletAttributes attrs, Term find,
 		      ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
 		      ImmutableSet<Choice> choices){
-	super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,
-	      choices);
-	this.find = find;
+	this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
+             choices, false);
     }
     
     /** returns the find term of the taclet to be matched */
@@ -100,7 +131,7 @@ public abstract class FindTaclet extends Taclet {
      * @return a pair of updated match conditions and the unwrapped term without the ignored updates (Which have been added to the update context in the match conditions)
      */
     private IgnoreUpdateMatchResult matchAndIgnoreUpdatePrefix(final Term term,
-            final Term template, MatchConditions matchCond, final Services services) {
+            final Term template, MatchConditions matchCond, final TermServices services) {
 
         final Operator sourceOp   = term.op ();
         final Operator templateOp = template.op ();
@@ -150,32 +181,37 @@ public abstract class FindTaclet extends Taclet {
 
     /** CONSTRAINT NOT USED 
      * applies the replacewith part of Taclets
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param gt TacletGoalTemplate used to get the replaceexpression 
      * in the Taclet
-     * @param goal the Goal where the rule is applied
+     * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
      * @param posOfFind the PosInOccurrence belonging to the find expression
      * @param services the Services encapsulating all java information
      * @param matchCond the MatchConditions with all required instantiations 
      */
-    protected abstract void applyReplacewith(TacletGoalTemplate gt, Goal goal,
+    protected abstract void applyReplacewith(Goal goal, TermLabelState termLabelState, TacletGoalTemplate gt, SequentChangeInfo currentSequent,
 					     PosInOccurrence posOfFind,
 					     Services services,
-					     MatchConditions matchCond);
+					     MatchConditions matchCond,
+					     TacletApp tacletApp);
 
 
     /**
      * adds the sequent of the add part of the Taclet to the goal sequent
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param add the Sequent to be added
-     * @param goal the Goal to be updated
+     * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
      * @param posOfFind the PosInOccurrence describes the place where to add
      * the semisequent 
      * @param services the Services encapsulating all java information
      * @param matchCond the MatchConditions with all required instantiations 
      */
-    protected abstract void applyAdd(Sequent add, Goal goal,
+    protected abstract void applyAdd(TermLabelState termLabelState, Sequent add, SequentChangeInfo sequentChangeInfo,
 				     PosInOccurrence posOfFind,
 				     Services services,
-				     MatchConditions matchCond);
+				     MatchConditions matchCond,
+				     Goal goal,
+				     TacletApp tacletApp);
 
 
     /**  
@@ -188,53 +224,76 @@ public abstract class FindTaclet extends Taclet {
     public ImmutableList<Goal> apply(Goal     goal,
 			    Services services,
 			    RuleApp  ruleApp) {
-
+   final TermLabelState termLabelState = new TermLabelState();
 	// Number without the if-goal eventually needed
 	int                          numberOfNewGoals = goalTemplates().size();
 
 	TacletApp                    tacletApp        = (TacletApp) ruleApp;
 	MatchConditions              mc               = tacletApp.matchConditions ();
 
-	ImmutableList<Goal>                   newGoals         =
+	ImmutableList<SequentChangeInfo>                   newSequentsForGoals         =
 	    checkIfGoals ( goal,
 			   tacletApp.ifFormulaInstantiations (),
 			   mc,
 			   numberOfNewGoals );
 	
-	Iterator<TacletGoalTemplate> it               = goalTemplates().iterator();
+	ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
+	
+	Iterator<TacletGoalTemplate> it               = goalTemplates().iterator();	
 	Iterator<Goal>               goalIt           = newGoals.iterator();
+   Iterator<SequentChangeInfo> newSequentsIt = newSequentsForGoals.iterator();
 
 	while (it.hasNext()) {
 	    TacletGoalTemplate gt          = it    .next();
 	    Goal               currentGoal = goalIt.next();
+       SequentChangeInfo  currentSequent = newSequentsIt.next();
+
 	    // add first because we want to use pos information that
 	    // is lost applying replacewith
-	    applyAdd(         gt.sequent(),
-			      currentGoal,
+	    
+	    applyAdd(termLabelState, gt.sequent(),
+			      currentSequent,
 			      tacletApp.posInOccurrence(),
 			      services,
-			      mc );
+			      mc,
+			      goal,
+			      (TacletApp) ruleApp);
 
-	    applyReplacewith( gt,
-			      currentGoal,
-			      tacletApp.posInOccurrence(),
-			      services,
-			      mc );
+	    applyReplacewith(currentGoal, 
+	             termLabelState, gt,
+	             currentSequent,
+	             tacletApp.posInOccurrence(),
+	             services,
+	             mc,
+	             (TacletApp) ruleApp);
 
-	    applyAddrule(     gt.rules(),
+	    applyAddrule( gt.rules(),
 			      currentGoal,
 			      services,
 			      mc );
 
 	    
 	    applyAddProgVars( gt.addedProgVars(),
+	            currentSequent,
 			      currentGoal,
-                              tacletApp.posInOccurrence(),
-                              services,
+               tacletApp.posInOccurrence(),
+               services,
 			      mc);
                                
-            currentGoal.setBranchLabel(gt.name());
+       currentGoal.setSequent(currentSequent);      	    
+	    
+       currentGoal.setBranchLabel(gt.name());
 	}
+	
+	// in case the assumes sequent of the taclet did not
+	// already occur in the goal sequent, we had to perform a cut
+	// in this loop we make sure to assign the cut goal its correct
+	// sequent
+	while (newSequentsIt.hasNext()) {
+	   goalIt.next().setSequent(newSequentsIt.next());
+	}
+	
+	assert !goalIt.hasNext();
 
 	return newGoals;
     }
@@ -275,9 +334,10 @@ public abstract class FindTaclet extends Taclet {
 	    find ().execPostOrder ( svc );
 	    
 	    ifFindVariables             = getIfVariables ();
-	    Iterator<SchemaVariable> it = svc.varIterator ();
-	    while ( it.hasNext () )
-		ifFindVariables = ifFindVariables.add ( it.next () );
+	    
+	    for (final SchemaVariable sv : svc.vars ()) {
+	       ifFindVariables = ifFindVariables.add ( sv );
+	    }
 	}
 
 	return ifFindVariables;
@@ -285,9 +345,21 @@ public abstract class FindTaclet extends Taclet {
 
 
     protected Taclet setName(String s, FindTacletBuilder b) {
-	return super.setName(s, b); 
+       return super.setName(s, b); 
     }
 
+    @Override
+    public boolean equals(Object o) {
+       if (!super.equals(o)) {
+          return false;
+       }
+       return find.equals(((FindTaclet)o).find);       
+    }
+      
+    
+    public int hashCode() {
+       return 13* super.hashCode() + find.hashCode(); 
+    }
 
     /**
      * returns the variables that occur bound in the find part
@@ -308,4 +380,4 @@ public abstract class FindTaclet extends Taclet {
         }
     }
     
-} 
+}

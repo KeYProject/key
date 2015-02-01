@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.proof.init;
 
@@ -19,7 +19,6 @@ import java.util.Properties;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -28,22 +27,25 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.ITermLabelWorker;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.SelectSkolemConstantTermLabelInstantiator;
+import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
+import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.MethodWellDefinedness;
+import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -53,10 +55,9 @@ import de.uka.ilkd.key.util.Pair;
  */
 public abstract class AbstractPO implements IPersistablePO {
 
-    protected static final TermFactory TF = TermFactory.DEFAULT;
-    protected static final TermBuilder TB = TermBuilder.DF;
-    protected final InitConfig initConfig;
-    protected final Services services;
+    protected final TermBuilder tb; 
+    protected final InitConfig environmentConfig;
+    protected Services environmentServices;
     protected final JavaInfo javaInfo;
     protected final HeapLDT heapLDT;
     protected final SpecificationRepository specRepos;
@@ -73,8 +74,9 @@ public abstract class AbstractPO implements IPersistablePO {
     //-------------------------------------------------------------------------
     public AbstractPO(InitConfig initConfig,
                       String name) {
-        this.initConfig = initConfig;
-        this.services = initConfig.getServices();
+        this.environmentConfig = initConfig;
+        this.environmentServices = initConfig.getServices();
+        this.tb = environmentServices.getTermBuilder();
         this.javaInfo = initConfig.getServices().getJavaInfo();
         this.heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
         this.specRepos = initConfig.getServices().getSpecificationRepository();
@@ -101,11 +103,12 @@ public abstract class AbstractPO implements IPersistablePO {
 
     private boolean reach(Pair<Sort, IObserverFunction> from,
                           Pair<Sort, IObserverFunction> to,
-                          ImmutableSet<ClassAxiom> axioms) {
+                          ImmutableSet<ClassAxiom> axioms,
+                          Services services) {
         ImmutableSet<Pair<Sort, IObserverFunction>> reached =
                 DefaultImmutableSet.nil();
-        ImmutableSet<Pair<Sort, IObserverFunction>> newlyReached = DefaultImmutableSet.<Pair<Sort, IObserverFunction>>nil().add(
-                from);
+        ImmutableSet<Pair<Sort, IObserverFunction>> newlyReached =
+                DefaultImmutableSet.<Pair<Sort, IObserverFunction>>nil().add(from);
 
         while (!newlyReached.isEmpty()) {
             for (Pair<Sort, IObserverFunction> node : newlyReached) {
@@ -114,8 +117,8 @@ public abstract class AbstractPO implements IPersistablePO {
                 final ImmutableSet<ClassAxiom> nodeAxioms = getAxiomsForObserver(
                         node, axioms);
                 for (ClassAxiom nodeAxiom : nodeAxioms) {
-                    final ImmutableSet<Pair<Sort, IObserverFunction>> nextNodes = nodeAxiom.getUsedObservers(
-                            services);
+                    final ImmutableSet<Pair<Sort, IObserverFunction>> nextNodes =
+                            nodeAxiom.getUsedObservers(services);
                     for (Pair<Sort, IObserverFunction> nextNode : nextNodes) {
                         if (nextNode.equals(to)) {
                             return true;
@@ -132,7 +135,8 @@ public abstract class AbstractPO implements IPersistablePO {
 
 
     private ImmutableSet<Pair<Sort, IObserverFunction>> getSCC(ClassAxiom startAxiom,
-                                                              ImmutableSet<ClassAxiom> axioms) {
+                                                               ImmutableSet<ClassAxiom> axioms,
+                                                               Services services) {
         //TODO: make more efficient
         final Pair<Sort, IObserverFunction> start =
                 new Pair<Sort, IObserverFunction>(startAxiom.getKJT().getSort(),
@@ -144,36 +148,79 @@ public abstract class AbstractPO implements IPersistablePO {
                     new Pair<Sort, IObserverFunction>(
                     nodeAxiom.getKJT().getSort(),
                                                      nodeAxiom.getTarget());
-            if (reach(start, node, axioms) && reach(node, start, axioms)) {
+            if (reach(start, node, axioms, services) && reach(node, start, axioms, services)) {
                 result = result.add(node);
             }
         }
         return result;
     }
 
+    /**
+     * Generate well-definedness taclets to resolve formulas as
+     * WD(pv.<inv>) or WD(pv.m(...)).
+     */
+    void generateWdTaclets(InitConfig proofConfig) {
+        if (!WellDefinednessCheck.isOn()) {
+            return;
+        }
+        ImmutableSet<RewriteTaclet> res = DefaultImmutableSet.<RewriteTaclet>nil();
+        ImmutableSet<String> names = DefaultImmutableSet.<String>nil();
+        for (WellDefinednessCheck ch: specRepos.getAllWdChecks()) {
+            if (ch instanceof MethodWellDefinedness) {
+                MethodWellDefinedness mwd = (MethodWellDefinedness)ch;
+                // WD(callee.m(...))
+                RewriteTaclet mwdTaclet = mwd.createOperationTaclet(proofConfig.getServices());
+                String tName = mwdTaclet.name().toString();
+                final String prefix;
+                if (tName.startsWith(WellDefinednessCheck.OP_TACLET)) {
+                    prefix = WellDefinednessCheck.OP_TACLET;
+                } else if (tName.startsWith(WellDefinednessCheck.OP_EXC_TACLET)) {
+                    prefix = WellDefinednessCheck.OP_EXC_TACLET;
+                } else {
+                    prefix = "";
+                }
+                tName = tName.replace(prefix, "");
+                if (names.contains(tName)) {
+                    for(RewriteTaclet t: res) {
+                        if (t.find().toString().equals(mwdTaclet.find().toString())) {
+                            res = res.remove(t);
+                            names = names.remove(tName);
+                            mwdTaclet = mwd.combineTaclets(t, mwdTaclet, proofConfig.getServices());
+                        }
+                    }
+                }
+                res = res.add(mwdTaclet);
+                names = names.add(tName);
+            }
+        }
+        // WD(a.<inv>)
+        res = res.union(ClassWellDefinedness.createInvTaclet(proofConfig.getServices()));
+        for (RewriteTaclet t: res) {
+            register(t, proofConfig);
+        }
+    }
 
-    protected void collectClassAxioms(KeYJavaType selfKJT) {
-        final ImmutableSet<ClassAxiom> axioms =
-                specRepos.getClassAxioms(selfKJT);
+    protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType selfKJT) {
+        return specRepos.getClassAxioms(selfKJT);
+    }
 
+    protected void collectClassAxioms(KeYJavaType selfKJT, InitConfig proofConfig) {
+        final ImmutableSet<ClassAxiom> axioms = selectClassAxioms(selfKJT);
         for (ClassAxiom axiom : axioms) {
             final ImmutableSet<Pair<Sort, IObserverFunction>> scc =
-                    getSCC(axiom, axioms);
-            for (Taclet axiomTaclet : axiom.getTaclets(scc, services)) {
+                    getSCC(axiom, axioms, proofConfig.getServices());
+            
+            for (Taclet axiomTaclet : axiom.getTaclets(scc, proofConfig.getServices())) {
                 assert axiomTaclet != null : "class axiom returned null taclet: "
                         + axiom.getName();
-
                 // only include if choices are appropriate
-                if (choicesApply(axiomTaclet, initConfig.getActivatedChoices())) {
-                    taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
-                            axiomTaclet));
-                    initConfig.getProofEnv().registerRule(axiomTaclet,
-                            AxiomJustification.INSTANCE);
+                if (choicesApply(axiomTaclet, proofConfig.getActivatedChoices())) {
+                    register(axiomTaclet, proofConfig);
                 }
             }
         }
     }
-    
+
     /** Check whether a taclet conforms with the currently active choices.
      * I.e., whether the taclet's given choices is a subset of <code>choices</code>.
      */
@@ -184,7 +231,14 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected final void register(ProgramVariable pv) {
+    private void register(Taclet t, InitConfig proofConfig) {
+        assert t != null;
+        taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
+        proofConfig.registerRule(t, AxiomJustification.INSTANCE);
+    }
+
+
+    protected final void register(ProgramVariable pv, Services services) {
          Namespace progVarNames = services.getNamespaces().programVariables();
          if (pv != null && progVarNames.lookup(pv.name()) == null) {
              progVarNames.addSafely(pv);
@@ -192,14 +246,14 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected final void register(ImmutableList<ProgramVariable> pvs) {
+    protected final void register(ImmutableList<ProgramVariable> pvs, Services services) {
         for (ProgramVariable pv : pvs) {
-            register(pv);
+            register(pv, services);
         }
     }
 
 
-    protected final void register(Function f) {
+    protected final void register(Function f, Services services) {
          Namespace functionNames = services.getNamespaces().functions();
          if (f != null && functionNames.lookup(f.name()) == null) {
              assert f.sort() != Sort.UPDATE;
@@ -227,7 +281,8 @@ public abstract class AbstractPO implements IPersistablePO {
      */
     private void createProofHeader(String javaPath,
                                    String classPath,
-                                   String bootClassPath) {
+                                   String bootClassPath, 
+                                   Services services) {
         if (header != null) {
             return;
         }
@@ -270,32 +325,47 @@ public abstract class AbstractPO implements IPersistablePO {
      * Creates a Proof (helper for getPO()).
      */
     private Proof createProof(String proofName,
-                              Term poTerm) {
-        final JavaModel javaModel = initConfig.getProofEnv().getJavaModel();
+                              Term poTerm,
+                              InitConfig proofConfig) {
+        if (proofConfig == null) {
+            proofConfig = environmentConfig.deepCopy();
+        }
+        final JavaModel javaModel = proofConfig.getServices().getJavaModel();
         createProofHeader(javaModel.getModelDir(),
                           javaModel.getClassPath(),
-                          javaModel.getBootClassPath());
+                          javaModel.getBootClassPath(),
+                          proofConfig.getServices());
         Proof proof = new Proof(proofName,
                                 poTerm,
                                 header,
-                                initConfig.createTacletIndex(),
-                                initConfig.createBuiltInRuleIndex(),
-                                initConfig.getServices(),
-                                initConfig.getSettings() != null
-                                ? initConfig.getSettings()
-                                : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
-
-        // Make sure that required label works are present
-        ImmutableList<ITermLabelWorker> labelInstantiators = proof.getSettings().getLabelSettings().getLabelInstantiators();
-        if (!labelInstantiators.contains(SelectSkolemConstantTermLabelInstantiator.INSTANCE)) {
-           labelInstantiators = labelInstantiators.append(SelectSkolemConstantTermLabelInstantiator.INSTANCE);
+                                proofConfig.createTacletIndex(),
+                                proofConfig.createBuiltInRuleIndex(),
+                                proofConfig);
+        assert proof.openGoals().size() == 1 : "expected one first open goal";
+        final boolean isInfFlowProof =
+                (this instanceof InfFlowPO);
+//        ||
+//                // this is a hack and has to be changed by time
+//                proof.getSettings().getStrategySettings().getActiveStrategyProperties()
+//                                   .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+//                                   .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
+        if (isInfFlowProof) {
+            StrategyInfoUndoMethod undo =
+                    new StrategyInfoUndoMethod() {
+                @Override
+                public void undo(
+                        de.uka.ilkd.key.util.properties.Properties strategyInfos) {
+                    strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true);
+                }
+            };
+            proof.openGoals().head().addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true, undo);
         }
-        proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
-
         return proof;
     }
 
 
+    protected abstract InitConfig getCreatedInitConfigForSingleProof();
+    
     @Override
     public final ProofAggregate getPO() {
         if (proofAggregate != null) {
@@ -307,9 +377,11 @@ public abstract class AbstractPO implements IPersistablePO {
         }
 
         Proof[] proofs = new Proof[poTerms.length];
+        InitConfig ic = getCreatedInitConfigForSingleProof();
         for (int i = 0; i < proofs.length; i++) {
+        	if(i>0) { ic = ic.deepCopy(); }
             proofs[i] = createProof(poNames != null ? poNames[i] : name,
-                                    poTerms[i]);
+                                    poTerms[i], ic);
             if (taclets != null) {
                 proofs[i].getGoal(proofs[i].root()).indexOfTaclets().addTaclets(
                         taclets);

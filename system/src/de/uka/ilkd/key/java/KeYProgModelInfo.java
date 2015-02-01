@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -17,11 +17,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Constructor;
+import recoder.java.CompilationUnit;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -43,7 +45,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class KeYProgModelInfo{
 
@@ -54,10 +56,10 @@ public class KeYProgModelInfo{
     private TypeConverter typeConverter;
     private HashMap<KeYJavaType, HashMap<String, IProgramMethod>> implicits =
         new LinkedHashMap<KeYJavaType, HashMap<String, IProgramMethod>>();
-    private KeYExceptionHandler exceptionHandler = null;
+    private KeYRecoderExcHandler exceptionHandler = null;
 
     public KeYProgModelInfo(Services services, TypeConverter typeConverter,
-            KeYExceptionHandler keh){
+            KeYRecoderExcHandler keh){
  	this(services, new KeYCrossReferenceServiceConfiguration(keh),
 	     new KeYRecoderMapping(), typeConverter);
 	exceptionHandler = keh;
@@ -80,7 +82,7 @@ public class KeYProgModelInfo{
 	return sc;
     }
 
-    public KeYExceptionHandler getExceptionHandler(){
+    public KeYRecoderExcHandler getExceptionHandler(){
 	return exceptionHandler;
     }
 
@@ -158,6 +160,66 @@ public class KeYProgModelInfo{
     }
 
 
+    @SuppressWarnings("unchecked")
+    public KeYJavaType resolveType(String shortName, KeYJavaType context) {
+        recoder.abstraction.ClassType result = null;
+
+        recoder.abstraction.Type rt
+        = (recoder.abstraction.Type) rec2key().toRecoder(context);
+
+
+       if (rt instanceof recoder.java.declaration.ClassDeclaration) {
+
+           // check for inner types
+           result = searchType(shortName, ((recoder.java.declaration.ClassDeclaration) rt).getTypes());
+
+           if (result != null) {
+               return (KeYJavaType) rec2key().toKeY(result);
+           }
+
+           // check for imported types
+           recoder.java.NonTerminalProgramElement rct = (recoder.java.NonTerminalProgramElement) rt;
+           recoder.java.CompilationUnit cunit = null;
+           while (!(rct.getASTParent() instanceof recoder.java.CompilationUnit)) {
+               rct = rct.getASTParent();
+           }
+
+           cunit = (CompilationUnit) rct.getASTParent();
+
+           for (recoder.java.Import i : cunit.getImports()) {
+               final List<? extends recoder.abstraction.ClassType> types;
+               if (i.getPackageReference() != null) {
+                  types = sc.getCrossReferenceSourceInfo().getPackage(i.getPackageReference()).getTypes();
+               } else {
+                   if (i.isMultiImport()) {
+                       recoder.abstraction.ClassType type = (recoder.abstraction.ClassType)sc.getCrossReferenceSourceInfo().getType(i.getTypeReference());
+                       types = type.getTypes();
+                   } else {
+                       types = new LinkedList<recoder.abstraction.ClassType>();
+                       ((LinkedList<recoder.abstraction.ClassType>)types).add((recoder.abstraction.ClassType)sc.getCrossReferenceSourceInfo().getType(i.getTypeReference()));
+                   }
+               }
+               result = searchType(shortName, types);
+               if (result != null) {
+                   return (KeYJavaType) rec2key().toKeY(result);
+               }
+
+           }
+       }
+       return null;
+
+    }
+
+    private recoder.abstraction.ClassType searchType(String shortName,
+            final List<? extends ClassType> types) {
+        for (recoder.abstraction.ClassType type : types) {
+            if (type.getName().equals(shortName)) {
+                return type;
+            }
+        }
+        return null;
+    }
+
     /**
      * Returns the full name of a KeYJavaType t.
      * @return the full name of t as a String.
@@ -173,7 +235,7 @@ public class KeYProgModelInfo{
         recoder.abstraction.Type result;
         if (tr instanceof TypeRef) {
             result = (recoder.abstraction.Type)
-            rec2key().toRecoder(((TypeRef)tr).getKeYJavaType());
+            rec2key().toRecoder(tr.getKeYJavaType());
             return result;
         }
         result=getServConf().getSourceInfo().getType
@@ -291,13 +353,13 @@ public class KeYProgModelInfo{
 	if (bt1 instanceof recoder.abstraction.ArrayType &&
 	    bt2 instanceof recoder.abstraction.ClassType) {
 	    if (((recoder.abstraction.ClassType)bt2).isInterface()) {
-		return ((recoder.abstraction.ClassType)bt2).
+		return bt2.
                     getFullName().equals("java.lang.Cloneable") ||
-                    ((recoder.abstraction.ClassType)bt2).
+                    bt2.
                     getFullName().equals("java.lang.Serializable")
                     ;
 	    } else {
-		return ((recoder.abstraction.ClassType)bt2).
+		return bt2.
 		    getFullName().equals("java.lang.Object");
 	    }
 	}
@@ -328,6 +390,7 @@ public class KeYProgModelInfo{
             = (recoder.abstraction.ClassType) rec2key().toRecoder(ct);
         recoder.abstraction.ClassType rcontext
             = (recoder.abstraction.ClassType) rec2key().toRecoder(context);
+
         return rct.getProgramModelInfo().getMethods(rct, m,
 						    getRecoderTypes(signature),
 						    null,  // no generic type variables yet
@@ -443,13 +506,6 @@ public class KeYProgModelInfo{
             getRecoderConstructors(ct, signature);
         if (constructors.size()==1) {
             return (IProgramMethod) rec2key().toKeY(constructors.get(0));
-//	    Object o = rec2key().toKeY(constructors.get(0));
-//	    if(o instanceof Constructor){
-//		return (Constructor) o;
-//	    }
-//	    if(o instanceof IProgramMethod){
-//		return (Constructor) ((IProgramMethod) o).getMethodDeclaration();
-//	    }
         }
         if (constructors.size()==0) {
             Debug.out("javainfo: Constructor not found: ",ct);
@@ -505,7 +561,7 @@ public class KeYProgModelInfo{
 	}
 
 	List<recoder.abstraction.Method> methodlist =
-            getRecoderMethods(ct, m, signature, context);
+	        getRecoderMethods(ct, m, signature, context);
 
         if (methodlist.size()==1) {
             return (IProgramMethod) rec2key().toKeY(methodlist.get(0));
@@ -582,6 +638,7 @@ public class KeYProgModelInfo{
         = (recoder.abstraction.ClassType) rec2key().toRecoder(ct);
         List<recoder.abstraction.Field> rfl =
             rct.getProgramModelInfo().getAllFields(rct);
+
         return asKeYFields(rfl);
     }
 
@@ -661,7 +718,9 @@ public class KeYProgModelInfo{
     }
 
     /**
-     * Returns all known subtypes of the given class type.
+     * Returns all known supertypes of the given class type with the type itself
+     * as first element.
+     *
      * @param ct a class type
      * @return the list of the known subtypes of the given class type.
      */
@@ -782,7 +841,7 @@ public class KeYProgModelInfo{
         recoder.abstraction.ClassType[] classesArray =
                 classes.toArray(new recoder.abstraction.ClassType[classes.size()]);
         java.util.Arrays.sort(classesArray, new java.util.Comparator<recoder.abstraction.ClassType>() {
-            public int compare(ClassType o1, ClassType o2) {
+            public int compare(recoder.abstraction.ClassType o1, recoder.abstraction.ClassType o2) {
                 return o2.getFullName().compareTo(o1.getFullName());
             }
         });

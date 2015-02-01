@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -17,6 +17,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IVariable;
+import org.key_project.sed.core.model.ISEDBranchCondition;
+import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
@@ -28,11 +31,11 @@ import org.key_project.sed.core.model.impl.AbstractSEDExceptionalTermination;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermination implements ISEDMemoryDebugNode {
+public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermination implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryDebugNode {
    /**
     * The contained child nodes.
     */
-   private List<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
+   private final List<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
    
    /**
     * The name of this debug node.
@@ -50,15 +53,58 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
    private ISEDDebugNode[] callStack;
    
    /**
+    * Verified?
+    */
+   private boolean verified;
+   
+   /**
+    * The contained {@link ISEDConstraint}s.
+    */
+   private final List<ISEDConstraint> constraints = new LinkedList<ISEDConstraint>();
+
+   /**
+    * The source path.
+    */
+   private String sourcePath;
+   
+   /**
+    * The line number.
+    */
+   private int lineNumber = -1;
+
+   /**
+    * The index of the start character.
+    */
+   private int charStart = -1;
+   
+   /**
+    * The index of the end character.
+    */
+   private int charEnd = -1;
+   
+   /**
+    * The contained variables.
+    */
+   private final List<IVariable> variables = new LinkedList<IVariable>();
+   
+   /**
+    * The known group start conditions.
+    */
+   private final List<ISEDBranchCondition> groupStartConditions = new LinkedList<ISEDBranchCondition>();
+   
+   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this exceptional termination is contained.
     * @param parent The parent in that this node is contained as child.
     * @param thread The {@link ISEDThread} in that this exceptional termination is contained.
+    * @param verified Verified?
     */
    public SEDMemoryExceptionalTermination(ISEDDebugTarget target, 
                                           ISEDDebugNode parent,
-                                          ISEDThread thread) {
+                                          ISEDThread thread,
+                                          boolean verified) {
       super(target, parent, thread);
+      this.verified = verified;
    }
 
    /**
@@ -171,5 +217,129 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
    @Override
    public void setCallStack(ISEDDebugNode[] callStack) {
       this.callStack = callStack;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isVerified() {
+      return verified;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addConstraint(ISEDConstraint constraint) {
+      if (constraint != null) {
+         constraints.add(constraint);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDConstraint[] getConstraints() throws DebugException {
+      return constraints.toArray(new ISEDConstraint[constraints.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getSourcePath() {
+      return sourcePath;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getLineNumber() throws DebugException {
+      return lineNumber;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharStart() throws DebugException {
+      return charStart;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharEnd() throws DebugException {
+      return charEnd;
+   }
+   
+   /**
+    * Sets the line number.
+    * @param lineNumber The line number or {@code -1} if it is unknown.
+    */
+   public void setLineNumber(int lineNumber) {
+      this.lineNumber = lineNumber;
+   }
+
+   /**
+    * Sets the index of the start character.
+    * @param charStart The index or {@code -1} if it is unknown.
+    */
+   public void setCharStart(int charStart) {
+      this.charStart = charStart;
+   }
+
+   /**
+    * Sets the index of the end character.
+    * @param charEnd The index or {@code -1} if it is unknown.
+    */
+   public void setCharEnd(int charEnd) {
+      this.charEnd = charEnd;
+   }
+   
+   /**
+    * Sets the source path.
+    * @param sourcePath The source path to set.
+    */
+   public void setSourcePath(String sourcePath) {
+      this.sourcePath = sourcePath;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addVariable(IVariable variable) {
+      variables.add(variable);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IVariable[] getVariables() throws DebugException {
+      return variables.toArray(new IVariable[variables.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition[] getGroupStartConditions() throws DebugException {
+      return groupStartConditions.toArray(new ISEDBranchCondition[groupStartConditions.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addGroupStartCondition(ISEDBranchCondition groupStartCondition) {
+      if (groupStartCondition != null) {
+         groupStartConditions.add(groupStartCondition);
+      }
    }
 }

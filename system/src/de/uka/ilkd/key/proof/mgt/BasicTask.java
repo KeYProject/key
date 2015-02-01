@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof.mgt;
 
@@ -38,7 +37,6 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode{
     public BasicTask(ProofAggregate pl) {
 	super(pl);
 	proof=pl;
-	proof().setBasicTask(this);
     }
 
     public String shortDescr() {
@@ -50,7 +48,7 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode{
     }
 
     public ProofEnvironment getProofEnv() {
-	return proof().env();
+	return proof().getEnv();
     }
 
     /* returns the single proof of this task */
@@ -87,6 +85,11 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode{
 
     /** removes the associated proof from their environment*/
     public void decoupleFromEnv() {
-	getProofEnv().removeProofList(proof);
+       getProofEnv().removeProofList(proof);
+    }
+
+    @Override
+    public TaskTreeNode[] getChildren() {
+        return NO_CHILDREN;
     }
 }

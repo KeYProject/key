@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -17,11 +17,17 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.key4eclipse.resources.ui.test.testcase.swtbot.SWTBotConvertToKeYProjectTest;
 import org.key_project.key4eclipse.resources.ui.test.testcase.swtbot.SWTBotKeYProjectWizardTest;
+import org.key_project.key4eclipse.resources.ui.test.testcase.swtbot.SWTBotKeYResourceExampleNewWizardTest;
+import org.key_project.key4eclipse.resources.ui.test.testcase.swtbot.SWTBotVerificationLogViewTest;
+import org.key_project.key4eclipse.resources.ui.test.testcase.swtbot.SWTBotVerificationStatusViewTest;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
    SWTBotKeYProjectWizardTest.class,
-   SWTBotConvertToKeYProjectTest.class
+   SWTBotKeYResourceExampleNewWizardTest.class,
+   SWTBotConvertToKeYProjectTest.class,
+   SWTBotVerificationLogViewTest.class,
+   SWTBotVerificationStatusViewTest.class
 })
 public class SWTBotAllResourcesUiTests {
 

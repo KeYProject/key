@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package recoder.service;
 
@@ -39,10 +39,6 @@ import recoder.java.reference.UncollatedReferenceQualifier;
 import recoder.java.reference.VariableReference;
 import recoder.java.statement.Case;
 import recoder.list.generic.ASTList;
-import recoder.service.ChangeHistory;
-import recoder.service.DefaultCrossReferenceSourceInfo;
-import recoder.service.NameInfo;
-import recoder.service.UnresolvedReferenceException;
 import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationBuilder;
 import de.uka.ilkd.key.java.recoderext.adt.*;
 import de.uka.ilkd.key.java.recoderext.*;
@@ -84,6 +80,7 @@ public class KeYCrossReferenceSourceInfo
 	// ADTs
 	name2primitiveType.put("\\seq", new PrimitiveType("\\seq", this));
 	name2primitiveType.put("\\free", new PrimitiveType("\\free", this));
+	name2primitiveType.put("\\map", new PrimitiveType("\\map", this));
 	
 	// JML's primitive types
 	name2primitiveType.put("\\bigint", new PrimitiveType("\\bigint", this));
@@ -611,7 +608,7 @@ public class KeYCrossReferenceSourceInfo
                   || expr instanceof SeqSub
                   || expr instanceof SeqReverse) {
         return name2primitiveType.get("\\seq");
-	} else if(expr instanceof DLEmbeddedExpression) {
+	} else if(expr instanceof EscapeExpression) {
 	    // w/o further resolution, a type cannot be determined.
 	    // but this does not fail.
 	    return getNameInfo().getUnknownType();

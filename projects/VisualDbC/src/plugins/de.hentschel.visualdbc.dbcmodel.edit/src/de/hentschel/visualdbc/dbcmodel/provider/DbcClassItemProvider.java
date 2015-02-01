@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -77,6 +77,7 @@ public class DbcClassItemProvider
          addFinalPropertyDescriptor(object);
          addExtendsPropertyDescriptor(object);
          addAnonymousPropertyDescriptor(object);
+         addExtendsFullNamesPropertyDescriptor(object);
       }
       return itemPropertyDescriptors;
    }
@@ -121,6 +122,28 @@ public class DbcClassItemProvider
              false,
              false,
              ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
+             null,
+             null));
+   }
+
+   /**
+    * This adds a property descriptor for the Extends Full Names feature.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   protected void addExtendsFullNamesPropertyDescriptor(Object object) {
+      itemPropertyDescriptors.add
+         (createItemPropertyDescriptor
+            (((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+             getResourceLocator(),
+             getString("_UI_DbcClass_extendsFullNames_feature"),
+             getString("_UI_PropertyDescriptor_description", "_UI_DbcClass_extendsFullNames_feature", "_UI_DbcClass_type"),
+             DbcmodelPackage.Literals.DBC_CLASS__EXTENDS_FULL_NAMES,
+             true,
+             false,
+             false,
+             ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
              null,
              null));
    }
@@ -225,6 +248,7 @@ public class DbcClassItemProvider
          case DbcmodelPackage.DBC_CLASS__ABSTRACT:
          case DbcmodelPackage.DBC_CLASS__FINAL:
          case DbcmodelPackage.DBC_CLASS__ANONYMOUS:
+         case DbcmodelPackage.DBC_CLASS__EXTENDS_FULL_NAMES:
             fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
             return;
       }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -15,6 +15,7 @@ package org.key_project.key4eclipse.starter.core.test.testcase.swtbot;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,11 +42,11 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.SwingUtil;
 import org.key_project.util.jdt.JDTUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 
@@ -53,7 +54,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
  * SWT Bot tests for {@link KeYUtil}.
  * @author Martin Hentschel
  */
-public class SWTBotKeYUtilTest extends TestCase {
+public class SWTBotKeYUtilTest extends AbstractSetupTestCase {
    /**
     * Tests {@link KeYUtil#getRuleDisplayName(de.uka.ilkd.key.proof.Node)}.
     */
@@ -125,7 +126,7 @@ public class SWTBotKeYUtilTest extends TestCase {
       if (nodeName != null) {
          result.add(nodeName);
       }
-      NodeIterator iter = node.childrenIterator();
+      Iterator<Node> iter = node.childrenIterator();
       while (iter.hasNext()) {
          result.addAll(collectRuleNames(iter.next()));
       }
@@ -173,43 +174,56 @@ public class SWTBotKeYUtilTest extends TestCase {
         IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
         JDTUtil.addClasspathEntry(javaProject, JavaCore.newSourceEntry(secondSrc.getFullPath()));
         IMethod chargeMehtod = TestUtilsUtil.getJdtMethod(javaProject, "banking.PayCard", "charge", Signature.C_INT + "");
-        try {
-            KeYUtil.startProof(chargeMehtod);
-            fail("Multiple source paths are not supported.");
-        }
-        catch (Exception e) {
-            assertTrue(e.getMessage(), e.getMessage().contains("Multiple source paths are not supported."));
-        }
+        KeYUtil.startProofAsync(chargeMehtod);
+        TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null), // selected
+                                     TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null));
         javaProject.setRawClasspath(oldEntries, null);
+        KeYUtil.clearProofList(MainWindow.getInstance());
         // Load java project with one source directory
         KeYUtil.startProofAsync(chargeMehtod);
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null));
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null), // selected
+                                     TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null));
         // Load second java project
         IJavaProject secondProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testStartProof_Java2");
         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MCDemo", secondProject.getProject().getFolder("src"));
         IMethod incMethod = TestUtilsUtil.getJdtMethod(secondProject, "MCDemo", "inc", Signature.C_INT + "");
         KeYUtil.startProofAsync(incMethod);
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MCDemo", "MCDemo", "inc(int)", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "MCDemo", "inc(int)", "0", "normal_behavior"));
-        // Open first project again to make sure that only the proof is selected again and no second proof environment is created
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MCDemo", "MCDemo", "inc(int)", "0", "normal_behavior"), // selected
+                                     TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null), 
+                                     TestKeY4EclipseUtil.createOperationContractId("MCDemo", "MCDemo", "inc(int)", "0", "normal_behavior"));
+        // Open first project again
         KeYUtil.startProofAsync(chargeMehtod);
-        TestUtilsUtil.keyGoToSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "MCDemo", "inc(int)", "0", "normal_behavior"));
+        TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null), // selected
+                                     TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null), 
+                                     TestKeY4EclipseUtil.createOperationContractId("MCDemo", "MCDemo", "inc(int)", "0", "normal_behavior"), 
+                                     TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null));
         // Open proof for default constructor of PayCard
         IMethod defaultConstructor = TestUtilsUtil.getJdtMethod(javaProject, "banking.PayCard", "PayCard");
         assertNotNull(defaultConstructor);
         assertTrue(defaultConstructor.isConstructor());
         KeYUtil.startProofAsync(defaultConstructor);
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "PayCard()", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "MCDemo", "inc(int)", "0", "normal_behavior"));
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "PayCard()", "0", null), // selected
+                                     TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null), 
+                                     TestKeY4EclipseUtil.createOperationContractId("MCDemo", "MCDemo", "inc(int)", "0", "normal_behavior"),
+                                     TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null),
+                                     TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "PayCard()", "0", null));
         // Open proof for int constructor of PayCard
         IMethod intConstructor = TestUtilsUtil.getJdtMethod(javaProject, "banking.PayCard", "PayCard", Signature.C_INT + "");
         assertNotNull(intConstructor);
         assertTrue(intConstructor.isConstructor());
         KeYUtil.startProofAsync(intConstructor);
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "PayCard(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "MCDemo", "inc(int)", "0", "normal_behavior"));
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "PayCard(int)", "0", null), // selected
+                                     TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null), 
+                                     TestKeY4EclipseUtil.createOperationContractId("MCDemo", "MCDemo", "inc(int)", "0", "normal_behavior"),
+                                     TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null), 
+                                     TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "PayCard()", "0", null),
+                                     TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "PayCard(int)", "0", null));
         // Clear proof list
         KeYUtil.clearProofList(MainWindow.getInstance());
         TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
@@ -246,12 +260,12 @@ public class SWTBotKeYUtilTest extends TestCase {
         File firstLocation = ResourceUtil.getLocation(javaProject.getProject().getFolder("src"));
         InitConfig firstConfig = KeYUtil.getInitConfig(firstLocation);
         assertNotNull(firstConfig);
-        assertEquals(firstConfig.getProofEnv().getJavaModel().getModelDir(), firstLocation.getAbsolutePath());
+        assertEquals(firstConfig.getServices().getJavaModel().getModelDir(), firstLocation.getAbsolutePath());
         // Check second environment
         File secondLocation = ResourceUtil.getLocation(secondProject.getProject().getFolder("src"));
         InitConfig secondConfig = KeYUtil.getInitConfig(secondLocation);
         assertNotNull(secondConfig);
-        assertEquals(secondConfig.getProofEnv().getJavaModel().getModelDir(), secondLocation.getAbsolutePath());
+        assertEquals(secondConfig.getServices().getJavaModel().getModelDir(), secondLocation.getAbsolutePath());
         // Test invalid location
         File invalidLocation = ResourceUtil.getLocation(secondProject.getProject());
         assertNull(KeYUtil.getInitConfig(invalidLocation));
@@ -333,7 +347,7 @@ public class SWTBotKeYUtilTest extends TestCase {
             fail("Loading general projects should not be possible.");
         }
         catch (Exception e) {
-            assertTrue(e.getMessage(), e.getMessage().contains("The project \"" + project + "\" is no Java project."));
+            assertTrue(e.getMessage(), e.getMessage().contains("The project \"" + project.getName() + "\" is no Java project."));
         }
         // Load java project with multiple source directories
         final IJavaProject javaProject = TestUtilsUtil.createJavaProject("SWTBotKeYUtilTest_testLoad_Java");
@@ -344,13 +358,10 @@ public class SWTBotKeYUtilTest extends TestCase {
         }
         IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
         JDTUtil.addClasspathEntry(javaProject, JavaCore.newSourceEntry(secondSrc.getFullPath()));
-        try {
-            KeYUtil.load(javaProject.getProject());
-            fail("Multiple source paths are not supported.");
-        }
-        catch (Exception e) {
-            assertTrue(e.getMessage(), e.getMessage().contains("Multiple source paths are not supported."));
-        }
+        KeYUtil.loadAsync(javaProject.getProject());
+        TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "banking.PayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "banking.PayCard", "charge(int)", "0", null));
+        KeYUtil.clearProofList(MainWindow.getInstance());
         javaProject.setRawClasspath(oldEntries, null);
         // Load java project with one source directory
         KeYUtil.loadAsync(javaProject.getProject());

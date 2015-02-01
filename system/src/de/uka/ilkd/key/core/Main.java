@@ -560,4 +560,3 @@ public final class Main {
 
     public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 }
-

@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.java.recoderext;
 
@@ -18,19 +18,19 @@ import recoder.ProgramFactory;
 import recoder.io.*;
 import recoder.service.*;
 import de.uka.ilkd.key.java.KeYProgModelInfo;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class KeYCrossReferenceServiceConfiguration 
     extends CrossReferenceServiceConfiguration{
 
     protected KeYProgModelInfo kpmi = null;
 
-    public KeYCrossReferenceServiceConfiguration(KeYExceptionHandler keh ) {
+    public KeYCrossReferenceServiceConfiguration(KeYRecoderExcHandler keh ) {
 	super(); // initialises servConf
 	// better not: it might add to the input path of recoder
 	// getProjectSettings().ensureSystemClassesAreInPath();
 	assert keh != null : "The exception handler must not be null";
-	getProjectSettings().setErrorHandler( (recoder.service.ErrorHandler)(keh) );
+        getProjectSettings().setErrorHandler(keh);
     }
 
     public KeYCrossReferenceServiceConfiguration(KeYProgModelInfo kpmi) {

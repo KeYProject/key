@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -22,8 +22,6 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
@@ -33,6 +31,7 @@ import org.key_project.key4eclipse.test.Activator;
 import org.key_project.key4eclipse.util.KeYExampleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 import org.osgi.framework.Bundle;
 
@@ -42,7 +41,7 @@ import de.uka.ilkd.key.gui.ExampleChooser;
  * Contains tests for {@link KeYExampleUtil}.
  * @author Martin Hentschel
  */
-public class KeYExampleUtilTest extends TestCase {
+public class KeYExampleUtilTest extends AbstractSetupTestCase {
     /**
      * Tests {@link KeYExampleUtil#getExampleProof()}.
      */

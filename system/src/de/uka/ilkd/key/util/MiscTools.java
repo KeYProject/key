@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.util;
 
@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -37,19 +39,17 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.RuleCollection;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 
 /**
@@ -148,6 +148,23 @@ public final class MiscTools {
 
 
     // =======================================================
+    // Methods operating on Arrays
+    // =======================================================
+    
+    /**
+     * Concatenates two arrays.
+     * The second array may have an entry type that is a
+     * subtype of the first one.
+     */
+    public static <S,T extends S> S[] concat(S[] s1, T[] s2) {
+        S[] res = Arrays.copyOf(s1, s1.length+s2.length);
+        for (int i= 0; i < s2.length; i++)
+            res[i+s1.length] = s2[i];
+        return res;
+    }
+
+
+    // =======================================================
     // Methods operating on Collections
     // =======================================================
 
@@ -234,10 +251,14 @@ public final class MiscTools {
      * This method only operates on Strings, not on real files!
      * Note that it treats Strings case-sensitive.
      * The resulting filename always uses UNIX directory delimiters.
+     * Raises a RuntimeException if no relative path could be found
+     * (may happen on Windows systems).
      */
     public static String makeFilenameRelative(String origFilename, String toFilename){
-        String[] a = disectFilename(origFilename).toArray(new String[0]);
-        String[] b = disectFilename(toFilename).toArray(new String[0]);
+        final List<String> origFileNameSections = disectFilename(origFilename);
+        String[] a = origFileNameSections.toArray(new String[origFileNameSections.size()]);
+        final List<String> destinationFilenameSections = disectFilename(toFilename);
+        String[] b = destinationFilenameSections.toArray(new String[destinationFilenameSections.size()]);
 
         // check for Windows paths
         if (File.separatorChar == '\\' &&
@@ -326,6 +347,12 @@ public final class MiscTools {
              .replace("]", ")");
         return s;
     }
+
+    public static Name toValidVariableName(String s) {
+        s = s.replaceAll("\\s|\\.|::\\$|::|<|>|/|\\(|\\)|,", "_");
+        return new Name(s);
+    }
+
 
     /**
      * Join the string representations of a collection of objects into onw
@@ -519,22 +546,34 @@ public final class MiscTools {
     }
     
     /**
-     * Searches the {@link OneStepSimplifier} which is used in the
-     * {@link ProofEnvironment} of the current proof which is not in general
-     * {@link OneStepSimplifier#INSTANCE}. For instance uses the
-     * symbolic execution tree extraction its own instances of
-     * {@link OneStepSimplifier} in site proofs for parallelization.
-     * @return The found {@link OneStepSimplifier}.
+     * Returns the {@link OneStepSimplifier} used in the given {@link Proof}.
+     * @param proof The {@link Proof} to get its used {@link OneStepSimplifier}.
+     * @return The used {@link OneStepSimplifier} or {@code null} if not available.
      */
     public static OneStepSimplifier findOneStepSimplifier(Proof proof) {
-       RuleCollection rc = proof.env().getInitConfig().getProfile().getStandardRules();
-       return (OneStepSimplifier)JavaUtil.search(rc.getStandardBuiltInRules(), new IFilter<BuiltInRule>() {
-         @Override
-         public boolean select(BuiltInRule element) {
-            return element instanceof OneStepSimplifier;
-         }
-       });
+       if (proof != null && !proof.isDisposed() && proof.getInitConfig() !=null) {
+          Profile profile = proof.getInitConfig().getProfile();
+          return findOneStepSimplifier(profile);
+       }
+       else {
+          return null;
+       }
     }
+    
+    /**
+     * Returns the {@link OneStepSimplifier} used in the given {@link Profile}.
+     * @param profile The {@link Profile} to get its used {@link OneStepSimplifier}.
+     * @return The used {@link OneStepSimplifier} or {@code null} if not available.
+     */
+    public static OneStepSimplifier findOneStepSimplifier(Profile profile) {
+       if (profile instanceof JavaProfile) {
+          return ((JavaProfile) profile).getOneStepSimpilifier();
+       }
+       else {
+          return null;
+       }
+    }
+
     //-------------------------------------------------------------------------
     //inner classes
     //-------------------------------------------------------------------------
@@ -611,6 +650,18 @@ public final class MiscTools {
 	}
     }
 
+    public static ImmutableList<Term> toTermList(Iterable<ProgramVariable> list,
+                                                 TermBuilder tb) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (ProgramVariable pv : list) {
+            if (pv != null) {
+                Term t = tb.var(pv);
+                result = result.append(t);
+            }
+        }
+        return result;
+    }
+    
     /**
      * read an input stream to its end into a string.
      *
@@ -627,5 +678,16 @@ public final class MiscTools {
             sb.append(new String(buffer, 0, read));
         }
         return sb.toString();
+    }
+
+    public static ImmutableList<Term> filterOutDuplicates(ImmutableList<Term> localIns,
+                                                          ImmutableList<Term> localOuts) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (Term localIn : localIns) {
+            if (!localOuts.contains(localIn)) {
+                result = result.append(localIn);
+            }
+        }
+        return result;
     }
 }

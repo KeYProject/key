@@ -3,15 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
-
 
 package de.uka.ilkd.key.java;
 
@@ -84,6 +82,24 @@ public class StatementBlock extends JavaStatement
 	this(new ImmutableArray<Statement>(body));
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || !(o instanceof StatementBlock)) {
+            return false;
+        }
+        StatementBlock block = (StatementBlock)o;
+
+        return super.equals(block)
+                && (this.getStartPosition().equals(Position.UNDEFINED) ||
+                        block.getStartPosition().equals(Position.UNDEFINED) ||
+                        this.getStartPosition().getLine() == block.getStartPosition().getLine());
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
     private ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends Statement> b) {
         return computePrefixElements(b,0,this);
     }
@@ -118,8 +134,8 @@ public class StatementBlock extends JavaStatement
         return body;
     }
 
-    public boolean isEmpty() {
-	return body.size() == 0;
+    public final boolean isEmpty() {
+       return body.isEmpty();
     }
 
 
@@ -234,6 +250,12 @@ public class StatementBlock extends JavaStatement
         return (e instanceof StatementBlock) ? e.getFirstElement() : e;
     }
 
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       if (isEmpty()) return this;
+       else return getBody().get(0);
+    }
+
     public int getPrefixLength() {
         return prefixElementArray.size();
     }
@@ -252,8 +274,4 @@ public class StatementBlock extends JavaStatement
         }
         return firstActiveChildPos;
     }
-
-
-
-
 }

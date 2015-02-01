@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof.io;
 
@@ -23,22 +22,22 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
-import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import org.antlr.runtime.RecognitionException;
 
 
 /** 
@@ -105,7 +104,7 @@ public class KeYFile implements EnvInput {
                    File file, 
                    ProgressMonitor monitor,
                    Profile profile) {
-	this(name, RuleSource.initRuleFile(file), monitor, profile);
+	this(name, RuleSourceFactory.initRuleFile(file), monitor, profile);
     }
     
 
@@ -114,11 +113,10 @@ public class KeYFile implements EnvInput {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private KeYParser createDeclParser(InputStream is) throws FileNotFoundException {
-        return new KeYParser(ParserMode.DECLARATION,
-                             new KeYLexer(is,
-                                          initConfig.getServices().getExceptionHandler()),
-                             file.toString(), 
+    private KeYParserF createDeclParser(InputStream is) throws IOException {
+        return new KeYParserF(ParserMode.DECLARATION,
+                             new KeYLexerF(is,
+                                          file.toString()),
                              initConfig.getServices(),
                              initConfig.namespaces());
     }
@@ -133,35 +131,37 @@ public class KeYFile implements EnvInput {
         return input;
     }
     
-    
     protected ProofSettings getPreferences() throws ProofInputException {
         if (initConfig.getSettings() == null) {
-            if (file.isDirectory()) {
-                return null;
-            }
-            try {
-                
-               KeYParser problemParser 
-                    = new KeYParser(ParserMode.PROBLEM,
-                                    new KeYLexer(getNewStream(), null), 
-                                    file.toString());
-               problemParser.profile();
-               ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
-                settings.loadSettingsFromString(problemParser.preferences());
-                initConfig.setSettings(settings);
-                return settings;                
-            } catch (antlr.ANTLRException e) {
-                throw new ProofInputException(e);
-            } catch (FileNotFoundException fnfe) {
-                throw new ProofInputException(fnfe);
-            } catch (de.uka.ilkd.key.util.ExceptionHandlerException ehe) {
-                throw new ProofInputException(ehe.getCause().getMessage());
-            }
+            return readPreferences();
         } else {
             return initConfig.getSettings();
         }
     }
     
+    public ProofSettings readPreferences() throws ProofInputException {
+       if (file.isDirectory()) {
+          return null;
+      }
+        KeYParserF problemParser = null;
+      try {
+            problemParser =
+                    new KeYParserF(ParserMode.PROBLEM,
+                              new KeYLexerF(getNewStream(), file.toString()));
+         problemParser.profile();
+         ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
+         settings.loadSettingsFromString(problemParser.preferences());
+          return settings;                
+      } catch (RecognitionException e) {
+            // problemParser cannot be null since exception is thrown during parsing.
+            String message = problemParser.getErrorMessage(e, problemParser.getTokenNames());
+            throw new ProofInputException(message, e);
+      } catch (IOException fnfe) {
+          throw new ProofInputException(fnfe);
+      } catch (de.uka.ilkd.key.util.ExceptionHandlerException ehe) {
+          throw new ProofInputException(ehe.getCause().getMessage());
+      }
+    }
     
     
     //-------------------------------------------------------------------------
@@ -176,7 +176,7 @@ public class KeYFile implements EnvInput {
     
     @Override
     public int getNumberOfChars() {
-	return file.getNumberOfChars();
+	return file.getNumberOfBytes();
     }
     
     
@@ -189,6 +189,7 @@ public class KeYFile implements EnvInput {
     @Override
     public Includes readIncludes() throws ProofInputException {
         if (includes == null) {
+            KeYParserF problemParser = null;
             try {
                 ParserConfig pc = new ParserConfig
                 (new Services(getProfile()), 
@@ -197,20 +198,21 @@ public class KeYFile implements EnvInput {
                 // during collection of includes (it is enough to mispell \include) the error
                 // message is very uninformative - ProofInputException without filename, line and column
                 // numbers. Somebody please fix that. /Woj
-                KeYParser problemParser = new KeYParser(ParserMode.PROBLEM, 
-                        new KeYLexer(getNewStream(),
-                                null), 
-                                file.toString(), 
+                problemParser = new KeYParserF(ParserMode.PROBLEM,
+                        new KeYLexerF(getNewStream(),
+                                file.toString()),
                                 pc, 
                                 pc, 
                                 null, 
                                 null); 
                 problemParser.parseIncludes(); 
                 includes = problemParser.getIncludes();
-            } catch (antlr.ANTLRException e) {
+            } catch (RecognitionException e) {
+                // problemParser cannot be null since exception is thrown during parsing.
+                String message = problemParser.getErrorMessage(e);
+                throw new ProofInputException(message, e);
+            } catch (IOException e) {
                 throw new ProofInputException(e);
-            } catch (FileNotFoundException fnfe) {
-                throw new ProofInputException(fnfe);
             } catch(de.uka.ilkd.key.util.ExceptionHandlerException ehe){
                 throw new ProofInputException(ehe);
             }
@@ -262,11 +264,11 @@ public class KeYFile implements EnvInput {
         if (javaPathAlreadyParsed) {
             return javaPath;       
         }
+        KeYParserF problemParser = null;
         try {
-            KeYParser problemParser = new KeYParser(ParserMode.PROBLEM,
-                                                    new KeYLexer(getNewStream(),
-                                                                 null), 
-                                                    file.toString());
+            problemParser = new KeYParserF(ParserMode.PROBLEM,
+                                                    new KeYLexerF(getNewStream(),
+                                                                 file.toString()));
             
             problemParser.profile(); // skip profile
             problemParser.preferences(); // skip preferences
@@ -292,8 +294,10 @@ public class KeYFile implements EnvInput {
             javaPathAlreadyParsed = true;
             
             return javaPath;
-        } catch (antlr.ANTLRException e) {
-            throw new ProofInputException(e);
+        } catch (RecognitionException e) {
+            // problemParser cannot be null since exception is thrown during parsing.
+            String message = problemParser.getErrorMessage(e);
+            throw new ProofInputException(message, e);
         } catch (IOException ioe) {
             throw new ProofInputException(ioe);
         } catch(de.uka.ilkd.key.util.ExceptionHandlerException ehe){
@@ -311,6 +315,7 @@ public class KeYFile implements EnvInput {
 	}
         
         //read .key file
+	KeYParserF problemParser = null;
 	try {
             Debug.out("Reading KeY file", file);
                    
@@ -319,16 +324,13 @@ public class KeYFile implements EnvInput {
             final ParserConfig schemaConfig 
                     = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
 
-            CountingBufferedReader cinp = 
+            CountingBufferedReader cinp =
                     new CountingBufferedReader
                         (getNewStream(),monitor,getNumberOfChars()/100);
             try {
-                KeYParser problemParser 
-                = new KeYParser(ParserMode.PROBLEM, 
-                        new KeYLexer(cinp, 
-                                initConfig.getServices()
-                                .getExceptionHandler()), 
-                                file.toString(), 
+                problemParser = new KeYParserF(ParserMode.PROBLEM,
+                        new KeYLexerF(cinp,
+                                file.toString()),
                                 schemaConfig, 
                                 normalConfig, 
                                 initConfig.getTaclet2Builder(), 
@@ -349,10 +351,10 @@ public class KeYFile implements EnvInput {
             } finally {
                 cinp.close();
             }
-	} catch (antlr.ANTLRException e) {
-	    throw new ProofInputException(e);
-	} catch (FileNotFoundException fnfe) {
-	    throw new ProofInputException(fnfe);
+	} catch (RecognitionException e) {
+            // problemParser cannot be null since exception is thrown during parsing.
+            String message = problemParser.getErrorMessage(e);
+            throw new ProofInputException(message, e);
         } catch (IOException io) {
             throw new ProofInputException(io);            
         }
@@ -364,19 +366,19 @@ public class KeYFile implements EnvInput {
      * of the initial configuration 
      */
     public void readSorts() throws ProofInputException {
+        KeYParserF p = null;
         try {
             InputStream is = getNewStream();
             try { 
-                KeYParser p=createDeclParser(is);          
+                p=createDeclParser(is);
                 p.parseSorts();
                 initConfig.addCategory2DefaultChoices(p.getCategory2Default());
             } finally {
                 is.close();
             }
-	} catch (antlr.ANTLRException e) {
-	    throw new ProofInputException(e);
-	} catch (FileNotFoundException fnfe) {
-            throw new ProofInputException(fnfe);
+	} catch (RecognitionException e) {
+	    // p cannot be null here
+            throw new ProofInputException(p.getErrorMessage(e), e);
         } catch (IOException io) {
             throw new ProofInputException(io);            
         }
@@ -388,18 +390,19 @@ public class KeYFile implements EnvInput {
      */
     public void readFuncAndPred() throws ProofInputException {	
 	if(file == null) return;
+
+	KeYParserF p = null;
 	try {
             InputStream is = getNewStream();
             try { 
-                KeYParser p=createDeclParser(getNewStream());
+                p=createDeclParser(getNewStream());
                 p.parseFuncAndPred();
             } finally {
                 is.close();
             }
-	} catch (antlr.ANTLRException e) {
-	    throw new ProofInputException(e);
-	} catch (FileNotFoundException fnfe) {
-            throw new ProofInputException(fnfe);
+	} catch (RecognitionException e) {
+	    // p cannot be null here
+            throw new ProofInputException(p.getErrorMessage(e), e);
         } catch (IOException io) {
             throw new ProofInputException(io);            
         }
@@ -410,36 +413,32 @@ public class KeYFile implements EnvInput {
      * modifying the set of rules 
      * of the initial configuration 
      */
-    public void readRulesAndProblem() 
-            throws ProofInputException {
+    public void readRulesAndProblem() throws ProofInputException {
         final ParserConfig schemaConfig = 
 	    new ParserConfig(initConfig.getServices(), initConfig.namespaces());
         final ParserConfig normalConfig = 
 	    new ParserConfig(initConfig.getServices(), initConfig.namespaces());
         
+        KeYParserF problemParser = null;
         try {
             final CountingBufferedReader cinp = new CountingBufferedReader
                     (getNewStream(), monitor, getNumberOfChars()/100);
             try {
-                KeYParser problemParser 
-                = new KeYParser(ParserMode.PROBLEM,
-                        new KeYLexer(cinp, 
-                                initConfig.getServices()
-                                .getExceptionHandler()), 
-                                file.toString(),
+                problemParser = new KeYParserF(ParserMode.PROBLEM,
+                        new KeYLexerF(cinp,
+                                file.toString()),
                                 schemaConfig,
                                 normalConfig,
                                 initConfig.getTaclet2Builder(),
-                                initConfig.getTaclets());                             
+                                initConfig.getTaclets());
                 problemParser.parseTacletsAndProblem();
                 initConfig.setTaclets(problemParser.getTaclets());
             } finally {
                 cinp.close();
             }
-	} catch (antlr.ANTLRException e) {
-	    throw new ProofInputException(e);
-	} catch (FileNotFoundException fnfe) {
-            throw new ProofInputException(fnfe);
+	} catch (RecognitionException e) {
+	    // problemParser cannot be null here
+	    throw new ProofInputException(problemParser.getErrorMessage(e), e);
         } catch (IOException io) {
             throw new ProofInputException(io);            
         }
@@ -496,5 +495,10 @@ public class KeYFile implements EnvInput {
     @Override
     public Profile getProfile() {
         return profile;
+    }
+    
+    @Override
+    public File getInitialFile() {
+       return file != null ? file.file() : null;
     }
 }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dbcmodel:DbcModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dbcmodel="http://www.hentschel.de/dbcmodel" driverId="de.hentschel.visualdbc.dataSource.key">
+  <types xsi:type="dbcmodel:DbcClass" name="A">
+    <methods signature="magic()" returnType="int"/>
+    <methods signature="staticMagic()" static="true" returnType="int"/>
+    <constructors signature="A()" visibility="default"/>
+    <extendsFullNames>java.lang.Object</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcClass" name="B" extends="//@types.0">
+    <methods signature="staticMagic()" static="true" returnType="int"/>
+    <constructors signature="B()" visibility="default"/>
+    <extendsFullNames>A</extendsFullNames>
+  </types>
+  <types xsi:type="dbcmodel:DbcClass" name="ConstructorTest">
+    <attributes name="value" type="int" visibility="default"/>
+    <constructors signature="ConstructorTest(x : int, a : B)">
+      <operationContracts name="ConstructorTest[ConstructorTest::ConstructorTest(int,B)].JML normal_behavior operation contract.0" proofObligations="//@proofObligations.0" pre="!a = null" post="int::select(heap, self, ConstructorTest::$value)&#xA;  = javaSubInt(Z(2(4(#))), Z(1(1(7(4(#))))))&#xA;&amp; java.lang.Object::&lt;inv>(heap, self)&#xA;&amp; exc = null" modifies="mod[heap]: allLocs" termination="diamond"/>
+    </constructors>
+    <extendsFullNames>java.lang.Object</extendsFullNames>
+  </types>
+  <connectionSettings key="location" value="D:\Forschung\Development\KeY_Master\junit-workspace\ConstructorTest_testConstructor"/>
+  <connectionSettings key="packageManagement" value="FLAT_LIST"/>
+  <connectionSettings key="packageManagementType" value="de.hentschel.visualdbc.datasource.model.DSPackageManagement"/>
+  <connectionSettings key="locationType" value="java.io.File"/>
+  <proofObligations obligation="ContractPO"/>
+</dbcmodel:DbcModel>

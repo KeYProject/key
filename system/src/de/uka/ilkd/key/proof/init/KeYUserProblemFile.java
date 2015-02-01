@@ -1,36 +1,34 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.parser.DeclPicker;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
-import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.io.CountingBufferedReader;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.proof.io.KeYFile;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import org.antlr.runtime.RecognitionException;
 
 
 /** 
@@ -42,7 +40,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     private Term problemTerm = null;
     private String problemHeader = "";
     
-    private KeYParser lastParser;
+    private KeYParserF lastParser;
     
     
     //-------------------------------------------------------------------------
@@ -75,16 +73,18 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         }	
         
         //read activated choices
+        KeYParserF problemParser = null;
         try {
-            ProofSettings settings = getPreferences();
-            
+
+        	ProofSettings settings = getPreferences();
+            initConfig.setSettings(settings);	
+        	
             ParserConfig pc = new ParserConfig
                 (initConfig.getServices(), 
                  initConfig.namespaces());
-            KeYParser problemParser = new KeYParser
-                (ParserMode.PROBLEM, new KeYLexer(getNewStream(),
-                        initConfig.getServices().getExceptionHandler()), 
-                        file.toString(), pc, pc, null, null);    
+            problemParser = new KeYParserF
+                (ParserMode.PROBLEM, new KeYLexerF(getNewStream(), file.toString()),
+                        pc, pc, null, null);
             problemParser.parseWith();            
         
             settings.getChoiceSettings()
@@ -92,12 +92,14 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             
             initConfig.setActivatedChoices(settings.getChoiceSettings()
         	      		                   .getDefaultChoicesAsSet());
-        
-        } catch (antlr.ANTLRException e) {
+            
+        } catch(RecognitionException e) {
+            // problemParser cannot be null here
+            String message = problemParser.getErrorMessage(e);
+            throw new ProofInputException(message, e);
+        } catch (Exception e) {
             throw new ProofInputException(e);      
-        } catch (FileNotFoundException fnfe) {
-            throw new ProofInputException(fnfe);
-        }        
+        }     
 	
         //read in-code specifications
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), 
@@ -117,54 +119,51 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             throw new IllegalStateException("KeYUserProblemFile: InitConfig not set.");
         }
         
+        KeYParserF problemParser = null;
         try {
             CountingBufferedReader cinp = 
                 new CountingBufferedReader
                     (getNewStream(),monitor,getNumberOfChars()/100);
-            DeclPicker lexer = new DeclPicker(new KeYLexer(cinp,initConfig.getServices().getExceptionHandler()));
-            
+            KeYLexerF lexer = new KeYLexerF(cinp, file.toString());
+
             final ParserConfig normalConfig 
                 = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
             final ParserConfig schemaConfig 
                 = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
             
-            KeYParser problemParser 
-                    = new KeYParser(ParserMode.PROBLEM, 
-                                    lexer, 
-                                    file.toString(), 
+            problemParser = new KeYParserF(ParserMode.PROBLEM,
+                                    lexer,
                                     schemaConfig, 
                                     normalConfig,
                                     initConfig.getTaclet2Builder(),
                                     initConfig.getTaclets()); 
+
             problemTerm = problemParser.parseProblem();
-            String searchS = "\\problem";            
 
 	    if(problemTerm == null) {
 	       boolean chooseDLContract = problemParser.getChooseContract() != null;
           boolean proofObligation = problemParser.getProofObligation() != null;
-	       if(chooseDLContract) {
-  	         searchS = "\\chooseContract";
-	       }
-	       else if (proofObligation) {
-	            searchS = "\\proofObligation";
-	       }
-	       else {
-	         throw new ProofInputException("No \\problem or \\chooseContract or \\proofObligation in the input file!");
+                if(!chooseDLContract && !proofObligation) {
+	         throw new ProofInputException(
+	                 "No \\problem or \\chooseContract or \\proofObligation in the input file!");
 	       }
 	    }
 
-            problemHeader = lexer.getText();
-            if(problemHeader != null && 
-               problemHeader.lastIndexOf(searchS) != -1){
-                problemHeader = problemHeader.substring(
-                    0, problemHeader.lastIndexOf(searchS));
-            }
+            problemHeader = problemParser.getProblemHeader();
+            // removed unnecessary check, keep them as assertions. (MU, Nov 14)
+            assert problemHeader != null;
+            assert problemHeader.lastIndexOf("\\problem") == -1;
+            assert problemHeader.lastIndexOf("\\proofObligation") == -1;
+            assert problemHeader.lastIndexOf("\\chooseContract") == -1;
+
             initConfig.setTaclets(problemParser.getTaclets());
             lastParser = problemParser;
-        } catch (antlr.ANTLRException e) {
+        } catch(RecognitionException e) {
+            // problemParser cannot be null here
+            String message = problemParser.getErrorMessage(e);
+            throw new ProofInputException(message, e);
+        } catch (Exception e) {
             throw new ProofInputException(e);
-        } catch (FileNotFoundException fnfe) {
-            throw new ProofInputException(fnfe);
         }
     }
 
@@ -174,14 +173,14 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         assert problemTerm != null;
         String name = name();
         ProofSettings settings = getPreferences();
+        initConfig.setSettings(settings);
         return ProofAggregate.createProofAggregate(
                 new Proof(name, 
                           problemTerm, 
                           problemHeader,
                           initConfig.createTacletIndex(), 
                           initConfig.createBuiltInRuleIndex(),
-                          initConfig.getServices(), 
-                          settings), 
+                          initConfig), 
                 name);
     }
     
@@ -196,13 +195,15 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * Reads a saved proof of a .key file.
      */
     public void readProof(IProofFileParser prl) throws ProofInputException {
-	if(lastParser == null) {
-	    readProblem();
-	}
+        if (lastParser == null) {
+            readProblem();
+        }
         try {
             lastParser.proof(prl);
-        } catch(antlr.ANTLRException e) {
-            throw new ProofInputException(e);
+        } catch (RecognitionException ex) {
+            // problemParser cannot be null
+            String message = lastParser.getErrorMessage(ex);
+            throw new ProofInputException(message, ex);
         }
     }
         
@@ -248,7 +249,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     * @throws Exception Occurred Exception.
     */
    protected Profile readProfileFromFile() throws Exception {
-      KeYParser problemParser = new KeYParser(ParserMode.GLOBALDECL, new KeYLexer(getNewStream(), null), file.toString());
+      KeYParserF problemParser = new KeYParserF(ParserMode.GLOBALDECL, new KeYLexerF(getNewStream(), file.toString()));
       problemParser.profile();
       String profileName = problemParser.getProfileName();
       if (profileName != null && !profileName.isEmpty()) {

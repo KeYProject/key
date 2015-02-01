@@ -1,23 +1,22 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -52,7 +51,7 @@ public final class SortDependingFunction extends Function {
 	      instantiateResultSort(template, sortDependingOn),
 	      instantiateArgSorts(template, sortDependingOn),
 	      null,
-	      template.unique);
+	      template.unique, false);
 	this.template = template;
 	this.sortDependingOn = sortDependingOn;
     }
@@ -104,8 +103,9 @@ public final class SortDependingFunction extends Function {
 	    			              Sort s2, 
 	    			              MatchConditions mc,
 	    			              Services services) {
-        assert !(s2 instanceof GenericSort)
-               : "Sort s2 is not allowed to be of type generic.";
+// This restriction has been dropped for free generic sorts to prove taclets correct
+//        assert !(s2 instanceof GenericSort)
+//               : "Sort s2 is not allowed to be of type generic.";
         if (!(s1 instanceof GenericSort)) {
             if (s1 == s2) {
                 return mc;
@@ -154,7 +154,7 @@ public final class SortDependingFunction extends Function {
     
     
     public static SortDependingFunction getFirstInstance(Name kind,
-	    					         Services services) {
+	    					         TermServices services) {
 	return (SortDependingFunction) 
 			services.getNamespaces()
 			        .functions()
@@ -163,7 +163,7 @@ public final class SortDependingFunction extends Function {
         
 
     public SortDependingFunction getInstanceFor(Sort sort, 
-	    				        Services services) {
+	    				        TermServices services) {
 	if(sort == this.sortDependingOn) {
 	    return this;
 	}
@@ -171,7 +171,7 @@ public final class SortDependingFunction extends Function {
 	assert !(sort instanceof ProgramSVSort);
 	assert sort != AbstractTermTransformer.METASORT;
 	
-	SortDependingFunction result 
+	SortDependingFunction result
 		= (SortDependingFunction) 
 		      services.getNamespaces()
 	                      .lookup(instantiateName(getKind(), 
@@ -241,7 +241,7 @@ public final class SortDependingFunction extends Function {
 
         final SortDependingFunction sdp = (SortDependingFunction)subst;   
         if(!isSimilar(sdp)) {
-            Debug.out("FAILED. Sort depending symbols not similar.", this, subst);            
+            Debug.out("FAILED. Sort depending symbols not similar.", this, subst);
             return null;
         }
         
@@ -254,7 +254,7 @@ public final class SortDependingFunction extends Function {
             return null;
         }
         
-        return result;        
+        return result;
     }
     
     

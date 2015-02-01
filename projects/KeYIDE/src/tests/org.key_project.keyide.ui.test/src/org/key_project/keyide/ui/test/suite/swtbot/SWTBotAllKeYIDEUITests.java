@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -16,9 +16,13 @@ package org.key_project.keyide.ui.test.suite.swtbot;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotAutoModeHandlerTest;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEMethodStarterTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEPreferencePageTest;
 import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotManualRuleApplicationTest;
-import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEMethodStarterTest;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotNodePropertySectionTest;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotProofPropertySectionTest;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotTacletPropertySectionTest;
+import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotTermPropertySectionTest;
 
 /**
  * <p>
@@ -36,9 +40,13 @@ import org.key_project.keyide.ui.test.testcase.swtbot.SWTBotKeYIDEMethodStarterT
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
    SWTBotAutoModeHandlerTest.class,
+   SWTBotKeYIDEMethodStarterTest.class,
    SWTBotKeYIDEPreferencePageTest.class,
    SWTBotManualRuleApplicationTest.class,
-   SWTBotKeYIDEMethodStarterTest.class
+   SWTBotNodePropertySectionTest.class,
+   SWTBotProofPropertySectionTest.class,
+   SWTBotTacletPropertySectionTest.class,
+   SWTBotTermPropertySectionTest.class
 })
 public class SWTBotAllKeYIDEUITests {
 }

@@ -1,29 +1,35 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /** 
  * An AntecTaclet represents a taclet whose find part has to match a top level
@@ -75,49 +81,49 @@ public class AntecTaclet extends FindTaclet{
     /** CONSTRAINT NOT USED 
      * applies the replacewith part of Taclets
      * @param gt TacletGoalTemplate used to get the replaceexpression in the Taclet
-     * @param goal the Goal where the rule is applied
+     * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
      * @param posOfFind the PosInOccurrence belonging to the find expression
      * @param services the Services encapsulating all java information
      * @param matchCond the MatchConditions with all required instantiations 
+    * @return 
      */
-    protected void applyReplacewith(TacletGoalTemplate gt, Goal goal,
+    @Override
+    protected void applyReplacewith(Goal goal, TermLabelState termLabelState, TacletGoalTemplate gt, SequentChangeInfo currentSequent,
 				    PosInOccurrence posOfFind,
 				    Services services, 
-				    MatchConditions matchCond) {
-	if (gt instanceof AntecSuccTacletGoalTemplate) {
-	    final Sequent replWith = ((AntecSuccTacletGoalTemplate)gt).replaceWith();
+				    MatchConditions matchCond,
+				    TacletApp tacletApp) {
+       if (gt instanceof AntecSuccTacletGoalTemplate) {
+          final Sequent replWith = ((AntecSuccTacletGoalTemplate)gt).replaceWith();
 
-
-	    replaceAtPos ( replWith.antecedent (),
-		    goal,
-		    posOfFind,
-		    services,
-		    matchCond );
-
-	    addToSucc(replWith.succedent(), goal, 
-		      null, services, matchCond);	   	    	    
-	    
-	
-	} else {
-	    // Then there was no replacewith...
-	}
+          replaceAtPos(termLabelState, replWith.antecedent(), currentSequent, posOfFind, services, matchCond, new TacletLabelHint(TacletOperation.REPLACE_AT_ANTECEDENT, replWith), goal, tacletApp);
+          addToSucc(termLabelState, replWith.succedent(), currentSequent, null, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.REPLACE_TO_SUCCEDENT, replWith), goal, tacletApp);	   	    	    
+       } else {
+          // Then there was no replacewith...
+       }
     }
 
+    
     /**
      * adds the sequent of the add part of the Taclet to the goal sequent
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param add the Sequent to be added
-     * @param goal the Goal to be updated
+     * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
      * @param posOfFind the PosInOccurrence describes the place where to add
      * the semisequent 
      * @param services the Services encapsulating all java information
      * @param matchCond the MatchConditions with all required instantiations 
      */
-    protected void applyAdd(Sequent add, Goal goal,
+    @Override
+    protected void applyAdd(TermLabelState termLabelState, Sequent add, 
+             SequentChangeInfo currentSequent,
 			    PosInOccurrence posOfFind,
 			    Services services,
-			    MatchConditions matchCond) {
-	addToAntec(add.antecedent(), goal, posOfFind, services, matchCond);
-	addToSucc(add.succedent(), goal, null, services, matchCond);
+			    MatchConditions matchCond,
+			    Goal goal,
+			    TacletApp tacletApp) {
+       addToAntec(termLabelState, add.antecedent(), currentSequent, posOfFind, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), goal, tacletApp);
+       addToSucc(termLabelState, add.succedent(), currentSequent, null, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), goal, tacletApp);
     }
         
     /** toString for the find part */

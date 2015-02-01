@@ -1,17 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.java;
 
@@ -39,14 +37,15 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
     protected Namespace svns;
 
     /** caches access to methods for reflection */
-    private final static HashMap schemaCt2meth = new LinkedHashMap(400);
+    private final static HashMap<?, ?> schemaCt2meth = new LinkedHashMap<Object, Object>(400);
 
     /** caches constructor access for reflection */
-    private final static HashMap recClass2schemakeyClassCons = new LinkedHashMap(400);
+    private final static HashMap<?, ?> recClass2schemakeyClassCons =
+            new LinkedHashMap<Object, Object>(400);
 
     // could this be the servConf of the super class?
-    private static SchemaCrossReferenceServiceConfiguration schemaServConf = new SchemaCrossReferenceServiceConfiguration(
-            new KeYRecoderExcHandler());
+    private static SchemaCrossReferenceServiceConfiguration schemaServConf =
+            new SchemaCrossReferenceServiceConfiguration(new KeYRecoderExcHandler());
 
     public SchemaRecoder2KeY(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -62,11 +61,11 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
      * corresponding KeY class. Speeds up reflection. Attention must be
      * overwritten by subclasses!
      */
-    protected HashMap getKeYClassConstructorCache() {
+    protected HashMap<?, ?> getKeYClassConstructorCache() {
         return recClass2schemakeyClassCons;
     }
 
-    protected HashMap getMethodCache() {
+    protected HashMap<?, ?> getMethodCache() {
         return schemaCt2meth;
     }
 

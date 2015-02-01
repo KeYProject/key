@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -14,8 +14,6 @@
 package org.key_project.keyide.ui.test.testcase;
 
 import java.io.File;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.jdt.core.IJavaProject;
@@ -33,6 +31,7 @@ import org.key_project.keyide.ui.test.util.TreeViewerIterator;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -40,13 +39,13 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 // TODO: Tests LazyProofTreeContentProvider#getParent() on each possible node (visible structure not proof tree structure!)
 // TODO: Tests LazyProofTreeContentProvider#getIndexOf(Object, Object) on each possible parent child combinations (visible structure not proof tree structure!)
 
 // TODO Document class TreeViewerIteratorTest
-public class TreeViewerIteratorTest extends TestCase {
+public class TreeViewerIteratorTest extends AbstractSetupTestCase {
    /**
     * Creates a proof and the viewer of the proof for the tests.
     * @throws Exception
@@ -60,7 +59,7 @@ public class TreeViewerIteratorTest extends TestCase {
       // Get local file in operating system of folder src 
       File location = ResourceUtil.getLocation(src);
       // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
-      KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(location, null, null);
+      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(location, null, null);
       IProgramMethod pm = TestUtilsUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
       ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
       FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);
@@ -76,8 +75,8 @@ public class TreeViewerIteratorTest extends TestCase {
          shell.setLayout(new FillLayout());
          TreeViewer viewer = new TreeViewer(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
          viewer.setUseHashlookup(true);
-         viewer.setContentProvider(new LazyProofTreeContentProvider(viewer, environment, proof));
-         viewer.setLabelProvider(new ProofTreeLabelProvider(viewer, environment, proof));
+         viewer.setContentProvider(new LazyProofTreeContentProvider());
+         viewer.setLabelProvider(new ProofTreeLabelProvider(viewer, proof));
          viewer.setInput(proof);
          shell.setVisible(true);
          viewer.expandAll();

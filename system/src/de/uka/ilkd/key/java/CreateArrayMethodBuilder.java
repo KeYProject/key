@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.java;
 
@@ -34,7 +34,6 @@ import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.speclang.HeapContext;
 
 /**
  * This class creates the <code>&lt;createArray&gt;</code> method for array
@@ -214,7 +213,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
         
         final ProgramVariable paramLength = new LocationVariable(
-                new ProgramElementName("length"), integerType);
+                new ProgramElementName("length"), integerType, true);
 
         final ParameterDeclaration param = new ParameterDeclaration(
                 new Modifier[0], new TypeRef(integerType),
@@ -407,11 +406,11 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final ProgramVariable pv = (ProgramVariable) forInit.getVariables()
                 .get(0).getProgramVariable();
 
-        final For forLoop = new For(new LoopInitializer[] { forInit },
-                new LessThan(pv,
-                        new FieldReference(length, new ThisReference())),
-                new Expression[] { new PostIncrement(pv) }, assign(
-                        new ArrayReference(new ThisReference(),
+        final For forLoop =
+                new For(new LoopInitializer[] { forInit },
+                        new LessThan(pv, new FieldReference(length, new ThisReference())),
+                        new Expression[] { new PostIncrement(pv) },
+                        assign(new ArrayReference(new ThisReference(),
                                 new Expression[] { pv }), defaultValue));
 
         final StatementBlock body = new StatementBlock(

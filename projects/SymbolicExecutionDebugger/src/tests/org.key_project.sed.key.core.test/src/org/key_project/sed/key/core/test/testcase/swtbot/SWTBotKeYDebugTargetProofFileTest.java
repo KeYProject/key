@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -36,11 +36,44 @@ public class SWTBotKeYDebugTargetProofFileTest extends AbstractKeYDebugTargetTes
     * Tests the step over functionality on each branch separately.
     */
    @Test
+   public void testVerifyMin() throws Exception {
+      IKeYDebugTargetProofFileTestExecutor executor = new IKeYDebugTargetProofFileTestExecutor() {
+         @Override
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IFile file, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/verificationProofFile_VerifyMin/oracle/VerifyMin.xml", true, false, false);
+         }
+      };
+      doKeYDebugTargetTest("SWTBotKeYDebugTargetProofFileTest_testVerifyMin", 
+                           Activator.PLUGIN_ID, 
+                           "data/verificationProofFile_VerifyMin/test", 
+                           true, 
+                           true, 
+                           new IFileSelector() {
+                              @Override
+                              public IFile getFile(IJavaProject project) throws Exception {
+                                 return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path("SWTBotKeYDebugTargetProofFileTest_testVerifyMin/src/VerifyMin.proof"));
+                              }
+                           },
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           14, 
+                           executor);
+   }
+
+   
+   /**
+    * Tests the step over functionality on each branch separately.
+    */
+   @Test
    public void testMagic42() throws Exception {
       IKeYDebugTargetProofFileTestExecutor executor = new IKeYDebugTargetProofFileTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IFile file, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
-            assertDebugTargetViaOracle(target, "data/magic42/oracle/Magic42ProofFile.xml", true, false);
+            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/magic42/oracle/Magic42ProofFile.xml", true, false, false);
          }
       };
       doKeYDebugTargetTest("SWTBotKeYDebugTargetProofFileTest_testMagic42", 
@@ -58,8 +91,9 @@ public class SWTBotKeYDebugTargetProofFileTest extends AbstractKeYDebugTargetTes
                            Boolean.TRUE, 
                            Boolean.FALSE, 
                            Boolean.FALSE, 
+                           Boolean.FALSE,
+                           Boolean.FALSE,
                            14, 
                            executor);
    }
-
 }

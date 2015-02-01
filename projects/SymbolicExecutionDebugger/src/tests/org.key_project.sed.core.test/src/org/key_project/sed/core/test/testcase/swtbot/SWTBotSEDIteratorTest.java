@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -12,8 +12,6 @@
  *******************************************************************************/
 
 package org.key_project.sed.core.test.testcase.swtbot;
-
-import junit.framework.TestCase;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -29,13 +27,14 @@ import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
 import org.key_project.sed.core.util.SEDPreorderIterator;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests for {@link SEDPreorderIterator}.
  * @author Martin Hentschel
  */
-public class SWTBotSEDIteratorTest extends TestCase {
+public class SWTBotSEDIteratorTest extends AbstractSetupTestCase {
    /**
     * Makes sure that all children of an {@link ISEDDebugTarget} are
     * traversed by {@link SEDPreorderIterator} in the correct order. The tested

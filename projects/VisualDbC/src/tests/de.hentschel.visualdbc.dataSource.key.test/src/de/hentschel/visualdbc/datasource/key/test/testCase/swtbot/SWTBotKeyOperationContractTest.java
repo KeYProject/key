@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -21,6 +21,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
@@ -47,7 +48,7 @@ import de.hentschel.visualdbc.datasource.model.memory.MemoryProvableReference;
  * Tests for {@link KeyOperationContract}
  * @author Martin Hentschel
  */
-public class SWTBotKeyOperationContractTest extends TestCase {
+public class SWTBotKeyOperationContractTest extends AbstractSetupTestCase {
    /**
     * Tests {@link IDSProvable#openInteractiveProof(String)} and
     * specially the references of kind "Use Invariant".
@@ -297,7 +298,7 @@ public class SWTBotKeyOperationContractTest extends TestCase {
    @Test
    public void testOpenInteractiveProof_ContractPO_withInitialReferences() {
       TestKeyUtil.testOpenProof("KeyOperationContract_testOpenInteractiveProof_EnsuresPost_withInitialReferences",
-                                "data/quicktour/paycard",
+                                "data/quicktour/test/paycard",
                                 new IDSProvableSelector() {
                                    @Override
                                    public IDSProvable getProvable(IDSConnection con) throws DSException {
@@ -324,7 +325,7 @@ public class SWTBotKeyOperationContractTest extends TestCase {
    @Test
    public void testOpenInteractiveProof_ContractPO_noInitialReferences() {
       TestKeyUtil.testOpenProof("KeyOperationContract_testOpenInteractiveProof_EnsuresPost_noInitialReferences",
-                                "data/quicktour/paycard",
+                                "data/quicktour/test/paycard",
                                 new IDSProvableSelector() {
                                    @Override
                                    public IDSProvable getProvable(IDSConnection con) throws DSException {

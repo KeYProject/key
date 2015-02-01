@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -21,6 +21,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
@@ -34,16 +35,17 @@ public class FontSizeAction extends MainWindowAction implements ConfigChangeList
 
     public static enum Mode { LARGER, SMALLER }
 
-    private Mode mode;;
+    private Mode mode;
 
     public FontSizeAction(MainWindow mainWindow, Mode mode) {
 	super(mainWindow);
 	this.mode = mode;
 	
 	setName(mode == Mode.LARGER ? "Larger" : "Smaller");
+        setIcon(mode == Mode.LARGER ? IconFactory.plus(16): IconFactory.minus(16));
 	
 	int downMask = getDownMask();
-	int key = mode == Mode.LARGER ? KeyEvent.VK_UP : KeyEvent.VK_DOWN;
+	int key = mode == Mode.LARGER ? KeyEvent.VK_PLUS : KeyEvent.VK_MINUS;
         setAcceleratorKey(KeyStroke.getKeyStroke(key, downMask));
 	
         Config.DEFAULT.addConfigChangeListener(this);

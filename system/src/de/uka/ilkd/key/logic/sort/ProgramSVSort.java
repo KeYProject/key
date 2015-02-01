@@ -1,27 +1,27 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.logic.sort;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.NamedProgramElement;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -34,7 +34,6 @@ import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.expression.operator.DLEmbeddedExpression;
 import de.uka.ilkd.key.java.expression.operator.Instanceof;
@@ -73,6 +72,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -88,7 +88,7 @@ public abstract class ProgramSVSort extends AbstractSort {
     // Keeps the mapping of ProgramSVSort names to
     // ProgramSVSort instances (helpful in parsing
     // schema variable declarations)
-    private static final HashMap<Name, ProgramSVSort> name2sort =
+    private static final Map<Name, ProgramSVSort> name2sort =
         new LinkedHashMap<Name, ProgramSVSort>(60);
 
     //----------- Types of Expression Program SVs ----------------------------
@@ -985,7 +985,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	protected boolean canStandFor(ProgramElement pe,
 				      Services services) {	    
             if(pe instanceof MethodName) {                
-                return methodName == null ? true : pe.equals(methodName);
+                return methodName == null || pe.equals(methodName);
             }
             return false;
 	}
@@ -1305,7 +1305,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	}
 
 	protected boolean allowed(ProgramElement pe, 
-				  Services services) {
+				  TermServices services) {
 	    final Name peName; 
 	    if (pe instanceof Named) {		
 		peName = ((Named)pe).name();		
@@ -1451,7 +1451,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 		|| (pe instanceof ConstructorReference);
     }
 
-    public ProgramElement getSVWithSort(ExtList l, Class alternative) {
+    public ProgramElement getSVWithSort(ExtList l, Class<?> alternative) {
         for (final Object o : l) {
 	    if (o instanceof SchemaVariable
 		&& (((SchemaVariable)o).sort()==this)) {
@@ -1490,7 +1490,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	return elemname.charAt(0)=='<';
     }
 
-    public static HashMap<Name, ProgramSVSort> name2sort() {
+    public static Map<Name, ProgramSVSort> name2sort() {
         return name2sort;
     }
    

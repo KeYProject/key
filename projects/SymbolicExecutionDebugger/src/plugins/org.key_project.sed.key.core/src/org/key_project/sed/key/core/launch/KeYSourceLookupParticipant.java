@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -26,6 +26,8 @@ import org.key_project.sed.core.model.ISourcePathProvider;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
+
+import de.uka.ilkd.key.proof.JavaModel;
 
 /**
  * {@link AbstractSourceLookupParticipant} implementation for the
@@ -65,18 +67,18 @@ public class KeYSourceLookupParticipant extends AbstractSourceLookupParticipant 
       if (adaptable instanceof IDebugElement) {
          IDebugTarget target = ((IDebugElement) adaptable).getDebugTarget();
          if (target instanceof KeYDebugTarget) {
-            KeYLaunchSettings settings = ((KeYDebugTarget) target).getLaunchSettings();
-            File location = settings.getLocation();
-            if (location != null) {
-               result.add(location);
-            }
-            List<File> classPaths = settings.getClassPaths();
-            if (classPaths != null) {
-               result.addAll(classPaths);
-            }
-            File bootClassPath = settings.getBootClassPath();
-            if (bootClassPath != null) {
-               result.add(bootClassPath);
+            KeYDebugTarget keyTarget = (KeYDebugTarget) target;
+            if (!keyTarget.getProof().isDisposed()) {
+               JavaModel javaModel = keyTarget.getProof().getServices().getJavaModel();
+               if (javaModel.getModelDir() != null) {
+                  result.add(new File(javaModel.getModelDir()));
+               }
+               if (javaModel.getClassPathEntries() != null) {
+                  result.addAll(javaModel.getClassPathEntries());
+               }
+               if (javaModel.getBootClassPath() != null) {
+                  result.add(new File(javaModel.getBootClassPath()));
+               }
             }
          }
       }

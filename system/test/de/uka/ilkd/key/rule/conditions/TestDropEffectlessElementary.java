@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -70,12 +70,13 @@ public class TestDropEffectlessElementary extends TestCase {
         Term term;
         // Term term = TacletForTests.parseTerm("{ {i := i+1}i:=i }(i=0)");
         {
-            TermBuilder df = TermBuilder.DF;
             Term t0 = TacletForTests.parseTerm("{i := i+1}0").sub(0);
             Term t1 = TacletForTests.parseTerm("{i := i}0").sub(0);
             Term t2 = TacletForTests.parseTerm("i=0");
-            Term t3 = df.apply(t0, t1, null);
-            term = df.apply(t3, t2, null);
+            TermBuilder tb = TacletForTests.services().getTermBuilder();
+
+            Term t3 = tb.apply(t0, t1, null);
+            term = tb.apply(t3, t2, null);
         }
         assertEquals("{{i:=i + 1}i:=i}(i = 0)", 
                 LogicPrinter.quickPrintTerm(term, TacletForTests.services).trim());

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -31,7 +31,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IEditorPart;
 import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
-import org.key_project.key4eclipse.util.KeYExampleUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -50,8 +49,6 @@ import de.hentschel.visualdbc.key.ui.adapter.ProofProviderAdapterFactory;
 import de.hentschel.visualdbc.key.ui.test.Activator;
 import de.hentschel.visualdbc.key.ui.test.testCase.AbstractProofReferenceModelCreatorTest;
 import de.hentschel.visualdbc.key.ui.view.ProofDependenciesViewPart;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * SWTBot tests for {@link ProofProviderAdapterFactory} which is used to
@@ -69,16 +66,7 @@ public class SWTBotProofProviderAdapterFactoryTest extends AbstractProofReferenc
       ProofDependenciesViewPart dependenciesViewPart = null;
       LogStartProofJobListener startProofListener = new LogStartProofJobListener();
       StartProofJob.addStartProofJobListener(startProofListener);
-      String originalRuntimeExceptions = null;
       try {
-         // Store original settings of KeY which requires that at least one proof was instantiated.
-         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            KeYEnvironment<?> environment = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null);
-            environment.dispose();
-         }
-         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
-         assertNotNull(originalRuntimeExceptions);
-         SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          // Create and fill project if not already available
          IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("SWTBotProofProviderAdapterFactoryTest");
          IFolder src;
@@ -122,7 +110,7 @@ public class SWTBotProofProviderAdapterFactoryTest extends AbstractProofReferenc
          assertNull(dependenciesViewPart.getCurrentModel());
          TestInteractiveProvingUtil.openProof(startProofListener, tree, pathToFirstProof);
          waitForModel(dependenciesViewPart);
-         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), "data/TwoClassesWithDiagram/oracle/FirstProof.xml");
+         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), Activator.PLUGIN_ID, "data/TwoClassesWithDiagram/oracle/FirstProof.xml");
          // Start second proof
          TestUtilsUtil.selectInTree(tree, pathToSecondProof);
          waitForNoModel(dependenciesViewPart);
@@ -130,13 +118,13 @@ public class SWTBotProofProviderAdapterFactoryTest extends AbstractProofReferenc
          assertEquals("The active editor provides no supported proof.", dependenciesView.bot().label(0).getText());
          TestInteractiveProvingUtil.openProof(startProofListener, tree, 1);
          waitForModel(dependenciesViewPart);
-         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), "data/TwoClassesWithDiagram/oracle/SecondProof.xml");
+         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), Activator.PLUGIN_ID, "data/TwoClassesWithDiagram/oracle/SecondProof.xml");
          // Select first proof again
          DbcModel oldModel = dependenciesViewPart.getCurrentModel();
          TestUtilsUtil.selectInTree(tree, pathToFirstProof);
          waitForModelChange(oldModel, dependenciesViewPart);
          assertNotNull(dependenciesViewPart.getCurrentModel());
-         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), "data/TwoClassesWithDiagram/oracle/FirstProof.xml");
+         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), Activator.PLUGIN_ID, "data/TwoClassesWithDiagram/oracle/FirstProof.xml");
          // Close data source connection
          IDSConnection connection = InteractiveConnectionUtil.getConnection(model);
          if (connection != null && connection.isConnected()) {
@@ -146,10 +134,6 @@ public class SWTBotProofProviderAdapterFactoryTest extends AbstractProofReferenc
          assertEquals("The active editor provides no supported proof.", dependenciesView.bot().label(0).getText());
       }
       finally {
-         // Restore runtime option
-         if (originalRuntimeExceptions != null) {
-            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
-         }
          // Remove listener
          StartProofJob.removeStartProofJobListener(startProofListener);
          // Close editor and view
@@ -209,7 +193,7 @@ public class SWTBotProofProviderAdapterFactoryTest extends AbstractProofReferenc
          assertNull(dependenciesViewPart.getCurrentModel());
          TestInteractiveProvingUtil.openProof(startProofListener, editor, proofEditParts.get(0));
          waitForModel(dependenciesViewPart);
-         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), "data/TwoClassesWithDiagram/oracle/FirstProof.xml");
+         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), Activator.PLUGIN_ID, "data/TwoClassesWithDiagram/oracle/FirstProof.xml");
          // Start second proof
          editor.select(proofEditParts.get(2));
          waitForNoModel(dependenciesViewPart);
@@ -217,13 +201,13 @@ public class SWTBotProofProviderAdapterFactoryTest extends AbstractProofReferenc
          assertEquals("The active editor provides no supported proof.", dependenciesView.bot().label(0).getText());
          TestInteractiveProvingUtil.openProof(startProofListener, editor, proofEditParts.get(2));
          waitForModel(dependenciesViewPart);
-         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), "data/TwoClassesWithDiagram/oracle/SecondProof.xml");
+         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), Activator.PLUGIN_ID, "data/TwoClassesWithDiagram/oracle/SecondProof.xml");
          // Select first proof again
          DbcModel oldModel = dependenciesViewPart.getCurrentModel();
          editor.select(proofEditParts.get(0));
          waitForModelChange(oldModel, dependenciesViewPart);
          assertNotNull(dependenciesViewPart.getCurrentModel());
-         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), "data/TwoClassesWithDiagram/oracle/FirstProof.xml");
+         compareWithOracle(oracleDirectory, dependenciesViewPart.getCurrentModel(), Activator.PLUGIN_ID, "data/TwoClassesWithDiagram/oracle/FirstProof.xml");
          // Close data source connection
          DbcProof proof = (DbcProof)proofEditParts.get(0).part().getAdapter(DbcProof.class);
          DbcModel editorModel = DbcModelUtil.getModelRoot(proof);

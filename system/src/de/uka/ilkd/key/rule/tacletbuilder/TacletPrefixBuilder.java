@@ -1,17 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.rule.tacletbuilder;
 
@@ -21,6 +19,7 @@ import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.NotFreeIn;
 import de.uka.ilkd.key.rule.Taclet;
@@ -80,7 +79,7 @@ public class TacletPrefixBuilder {
             t.arity() == 0 &&
 	    !(t.op() instanceof VariableSV) &&
 	    !(t.op() instanceof ProgramSV) &&
-	    !(t.op() instanceof SkolemTermSV)) { 
+	    !(t.op() instanceof SkolemTermSV)) {
 	    SchemaVariable sv = (SchemaVariable)t.op();
 	    ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
 	    TacletPrefix prefix = prefixMap.get(sv);
@@ -92,12 +91,29 @@ public class TacletPrefixBuilder {
 						 prefix, 
 						 relevantBoundVars);
 	    }
-	} 
+	}
 	for (int i=0; i<t.arity(); i++) {
 	    ImmutableSet<SchemaVariable> oldBounds=currentlyBoundVars;
 	    addVarsBoundHere(t, i);
 	    visit(t.sub(i));
 	    currentlyBoundVars=oldBounds;
+	}
+	if (t.hasLabels()) {
+	    for (TermLabel l: t.getLabels()) {
+	        if (l instanceof SchemaVariable) {
+	            SchemaVariable sv = (SchemaVariable) l;
+	            ImmutableSet<SchemaVariable> relevantBoundVars = removeNotFreeIn(sv);
+	            TacletPrefix prefix = prefixMap.get(sv);
+	            if (prefix == null || prefix.prefix().equals(relevantBoundVars)) {
+	                setPrefixOfOccurrence(sv, relevantBoundVars);
+	            } else {
+	                throw new InvalidPrefixException(tacletBuilder.getName().toString(),
+	                        sv,
+	                        prefix,
+	                        relevantBoundVars);
+	            }
+	        }
+	    }
 	}
     }
     
@@ -171,20 +187,17 @@ public class TacletPrefixBuilder {
     
 
     private boolean atMostOneRepl() {
-	RewriteTacletBuilder rwtacletBuilder=(RewriteTacletBuilder)tacletBuilder;
-	Iterator<TacletGoalTemplate> it
-	    =rwtacletBuilder.goalTemplates().iterator();
-	int count=0;
-	while (it.hasNext()) {
-	    TacletGoalTemplate tmpl = it.next();
-	    if (tmpl instanceof RewriteTacletGoalTemplate) {
-		if (((RewriteTacletGoalTemplate)tmpl).replaceWith()!=null) {
-		    count++;
-		}
-	    }
-	    if (count>1) return false;
-	}
-	return true;
+       RewriteTacletBuilder rwtacletBuilder=(RewriteTacletBuilder)tacletBuilder;
+       int count=0;
+       for (TacletGoalTemplate tmpl : rwtacletBuilder.goalTemplates()) {
+          if (tmpl instanceof RewriteTacletGoalTemplate) {
+             if (((RewriteTacletGoalTemplate)tmpl).replaceWith()!=null) {
+                count++;
+             }
+          }
+          if (count>1) return false;
+       }
+       return true;
     }
 
     private boolean occurrsOnlyInFindOrRepl(SchemaVariable sv) {
@@ -241,5 +254,3 @@ public class TacletPrefixBuilder {
     }
 
 }
-
-

@@ -3,16 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
-
-
 
 package de.uka.ilkd.key.java;
 
@@ -50,10 +47,17 @@ import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.Throws;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.declaration.modifier.Abstract;
 import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
+import de.uka.ilkd.key.java.declaration.modifier.Final;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.declaration.modifier.Model;
 import de.uka.ilkd.key.java.declaration.modifier.NoState;
+import de.uka.ilkd.key.java.declaration.modifier.Private;
+import de.uka.ilkd.key.java.declaration.modifier.Protected;
+import de.uka.ilkd.key.java.declaration.modifier.Public;
+import de.uka.ilkd.key.java.declaration.modifier.Static;
+import de.uka.ilkd.key.java.declaration.modifier.StrictFp;
 import de.uka.ilkd.key.java.declaration.modifier.TwoState;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -62,6 +66,7 @@ import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
@@ -133,6 +138,7 @@ import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.SuperConstructorReference;
 import de.uka.ilkd.key.java.reference.SuperReference;
@@ -147,6 +153,7 @@ import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.Do;
 import de.uka.ilkd.key.java.statement.Else;
+import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.Finally;
 import de.uka.ilkd.key.java.statement.For;
@@ -404,7 +411,7 @@ public class Recoder2KeYConverter {
 
         Object result = null;
         try {
-            result = m.invoke(this, new Object[] { pe });
+            result = m.invoke(this, pe);
         } catch (IllegalAccessException iae) {
             Debug.out("recoder2key: cannot access method ", iae);
             throw new ConvertException("recoder2key: cannot access method", iae);
@@ -650,8 +657,7 @@ public class Recoder2KeYConverter {
         final Class<? extends recoder.java.JavaProgramElement> class_ = pe.getClass();
 
         try {
-            result = (ProgramElement) getKeYClassConstructor(class_)
-            .newInstance(new Object[] { parameter });
+            result = (ProgramElement) getKeYClassConstructor(class_).newInstance(parameter);
             return result;
         } catch (Exception e) {
             final String className = class_.toString().substring(6);
@@ -883,12 +889,16 @@ public class Recoder2KeYConverter {
         ExtList children = collectChildren(e);
 	return new SeqReverse(children);
     }
+    
+    public EmptyMapLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral e) {
+        return EmptyMapLiteral.INSTANCE;
+    }
 
     /**
      * Resolve the function symbol which is embedded here to its logical
      * counterpart.
      */
-    public DLEmbeddedExpression convert(de.uka.ilkd.key.java.recoderext.DLEmbeddedExpression e) {
+    public DLEmbeddedExpression convert(de.uka.ilkd.key.java.recoderext.EscapeExpression e) {
         ExtList children = collectChildren(e);
         String name = e.getFunctionName();
         Named named = namespaceSet.functions().lookup(new Name(name));
@@ -1389,10 +1399,11 @@ public class Recoder2KeYConverter {
                 final Literal compileTimeConstant = getCompileTimeConstantInitializer(recoderVarSpec);
 
                 boolean isModel = false;
+                boolean isFinal = recoderVarSpec.isFinal();
                 for(recoder.java.declaration.Modifier mod : recoderVarSpec.getParent().getModifiers()) {
                     if(mod instanceof de.uka.ilkd.key.java.recoderext.Model) {
-                	isModel = true;
-                	break;
+                        isModel = true;
+                        break;
                     }
                 }
 
@@ -1400,7 +1411,7 @@ public class Recoder2KeYConverter {
                     pv = new LocationVariable(pen, getKeYJavaType(recoderType),
                             getKeYJavaType(recContainingClassType),
                             recoderVarSpec.isStatic(),
-                            isModel);
+                            isModel, false, isFinal);
                 } else {
                     pv = new ProgramConstant(pen, getKeYJavaType(recoderType),
                             getKeYJavaType(recContainingClassType),
@@ -1559,11 +1570,12 @@ public class Recoder2KeYConverter {
                     fr.getIdentifier());
 
             final boolean isModel = false; // bytecode-only fields are no model fields
+            final boolean isFinal = fs.isFinal();
 
             pv = new LocationVariable(new ProgramElementName(makeAdmissibleName(fs.getName()),
                     makeAdmissibleName(recField.getContainingClassType().getFullName())),
                     getKeYJavaType(recoderType), getKeYJavaType(recField
-                            .getContainingClassType()), recField.isStatic(), isModel);
+                            .getContainingClassType()), recField.isStatic(), isModel, false, isFinal);
             insertToMap(fs, new FieldSpecification(pv));
             return new FieldReference(pv, prefix);
         }
@@ -2203,5 +2215,43 @@ public class Recoder2KeYConverter {
         return new NoState(collectComments(m));
     }
 
-}	
+    public EmptyStatement convert(recoder.java.statement.EmptyStatement m) {
+        return new EmptyStatement(collectChildrenAndComments(m));
+    }   
+    
+    //modifiers
+    
+    public Abstract convert(recoder.java.declaration.modifier.Abstract m) {
+        return new Abstract(collectChildrenAndComments(m));
+    }
+    
+    public Public convert(recoder.java.declaration.modifier.Public m) {
+        return new Public(collectChildrenAndComments(m));
+    }
 
+    public Protected convert(recoder.java.declaration.modifier.Protected m) {
+        return new Protected(collectChildrenAndComments(m));
+    }
+
+    public Private convert(recoder.java.declaration.modifier.Private m) {
+        return new Private(collectChildrenAndComments(m));
+    }
+
+    public Static convert(recoder.java.declaration.modifier.Static m) {
+        return new Static(collectChildrenAndComments(m));
+    }
+
+    public Final convert(recoder.java.declaration.modifier.Final m) {
+        return new Final(collectChildrenAndComments(m));
+    }
+    
+    public StrictFp convert(recoder.java.declaration.modifier.StrictFp m) {
+        return new StrictFp(collectChildrenAndComments(m));
+    }
+
+    // package reference
+    public PackageReference convert(recoder.java.reference.PackageReference m) {
+        return new PackageReference(collectChildrenAndComments(m));
+    }
+
+}

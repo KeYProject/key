@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -14,8 +14,6 @@
 package de.hentschel.visualdbc.datasource.key.test.testCase;
 
 import java.io.File;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -34,7 +32,7 @@ import de.hentschel.visualdbc.datasource.model.exception.DSException;
  * Contains tests for {@link KeyConnection}.
  * @author Martin Hentschel
  */
-public class KeyConnectionTest extends TestCase {
+public class KeyConnectionTest extends AbstractKeYTest {
    /**
     * Tests
     * {@link KeyConnection#connect(java.util.Map, boolean, org.eclipse.core.runtime.IProgressMonitor)},
@@ -43,11 +41,12 @@ public class KeyConnectionTest extends TestCase {
     */
    @Test
    public void testConnectionToValidLocation() throws Exception {
-      TestKeyUtil.testKeyConnection("KeyConnectionTest_testConnectionToValidLocation",
-                                    "data/quicktour",
-                                    "paycard",
-                                    DSPackageManagement.HIERARCHY,
-                                    TestKeyUtil.createExpectedQuicktourModel());
+      testKeyConnection("KeyConnectionTest_testConnectionToValidLocation",
+                        "data/quicktour/test",
+                        "paycard",
+                        DSPackageManagement.HIERARCHY,
+                        Activator.PLUGIN_ID,
+                        "data/quicktour/oracle/quicktour.dbc");
    }
 
    /**
@@ -61,7 +60,7 @@ public class KeyConnectionTest extends TestCase {
       try {
          // Create project and fill it with test data
          IProject project = TestUtilsUtil.createProject("KeyConnectionTest_testConnectionToInvalidLocation");
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour", project);
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/quicktour/test", project);
          IFolder guiFolder = project.getFolder("gui");
          assertNotNull(guiFolder);
          assertTrue(guiFolder.exists());

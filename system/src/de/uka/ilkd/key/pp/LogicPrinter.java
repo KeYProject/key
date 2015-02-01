@@ -1,22 +1,20 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -26,31 +24,27 @@ import java.util.StringTokenizer;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -60,6 +54,8 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.Notation.HeapConstructorNotation;
+import de.uka.ilkd.key.pp.Notation.ObserverNotation;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.NewDependingOn;
@@ -74,18 +70,18 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.speclang.WellDefinednessCheck.POTerms;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
-
 /**
  * The front end for the Sequent pretty-printer.  It prints a sequent
  * and its parts and computes the PositionTable, which is needed for
- * highliting.
+ * highlighting.
  *
  * <P>The actual layouting/formatting is done using the {@link
  * de.uka.ilkd.key.util.pp.Layouter} class.  The concrete syntax for
@@ -100,10 +96,10 @@ import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
  *
  *
  */
-public final class LogicPrinter {
+public class LogicPrinter {
 
     /**
-     * The default and minimal value o fthe
+     * The default and minimal value of the
      * max. number of characters to put in one line
      */
     public static final int DEFAULT_LINE_WIDTH = 55;
@@ -115,16 +111,16 @@ public final class LogicPrinter {
      * The ProgramPrinter used to pretty-print Java blocks in
      * formulae.
      */
-    private ProgramPrinter prgPrinter;
+    private final ProgramPrinter prgPrinter;
 
     /** Contains information on the concrete syntax of operators. */
-    private final NotationInfo notationInfo;
+    protected final NotationInfo notationInfo;
 
     /** the services object */
-    private final Services services;
+    protected final Services services;
 
     /** This chooses the layout. */
-    private Layouter layouter;
+    protected Layouter layouter;
 
     /** The backend <code>layouter</code> will write to. */
     private Backend backend;
@@ -135,18 +131,28 @@ public final class LogicPrinter {
     private SVInstantiations instantiations
     	= SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
+    private final SelectPrinter selectPrinter = new SelectPrinter(this);
+    private final StorePrinter storePrinter = new StorePrinter(this);
+    
+    protected HeapLDT getHeapLDT() {
+        return services == null ? null : services.getTypeConverter().getHeapLDT();
+    }
+
     private enum QuantifiableVariablePrintMode {NORMAL, WITH_OUT_DECLARATION}
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
             QuantifiableVariablePrintMode.NORMAL;
 
-    
     public static String quickPrintTerm(Term t, Services services) {
+        return quickPrintTerm(t, services, NotationInfo.DEFAULT_PRETTY_SYNTAX, NotationInfo.DEFAULT_UNICODE_ENABLED);
+    }
+
+    public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
-            ni.refresh(services);
+            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
         }
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
-                                          ni, 
+        LogicPrinter p = new LogicPrinter(new ProgramPrinter(),
+                                          ni,
                                           services);
         try {
             p.printTerm(t);
@@ -155,14 +161,14 @@ public final class LogicPrinter {
         }
         return p.result().toString();
     }
-    
+
     public static String quickPrintSemisequent(Semisequent s, Services services) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
             ni.refresh(services);
         }
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
-                                          ni, 
+        LogicPrinter p = new LogicPrinter(new ProgramPrinter(),
+                                          ni,
                                           services);
 
         try {
@@ -172,21 +178,21 @@ public final class LogicPrinter {
 		}
         return p.result().toString();
     }
-    
-    
+
+
     public static String quickPrintSequent(Sequent s, Services services) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
             ni.refresh(services);
         }
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), 
-                                          ni, 
+        LogicPrinter p = new LogicPrinter(new ProgramPrinter(),
+                                          ni,
                                           services);
         p.printSequent(s);
         return p.result().toString();
     }
-    
-    
+
+
     /**
      * Creates a LogicPrinter.  Sets the sequent to be printed, as
      * well as a ProgramPrinter to print Java programs and a
@@ -199,21 +205,20 @@ public final class LogicPrinter {
                     (simulates the behaviour of the former PureSequentPrinter)
      */
     public LogicPrinter(ProgramPrinter prgPrinter,
-                        NotationInfo notationInfo,
-                        Backend backend, 
-                        Services services,
-                        boolean purePrint) {
-	this.backend      = backend;
-	this.layouter     = new Layouter(backend,2);
-	this.prgPrinter   = prgPrinter;
-	this.notationInfo = notationInfo;
-	this.services     = services;
-	this.pure         = purePrint;
-	if(services != null) {
-	    notationInfo.refresh(services);
-	}
-    }    
-    
+            NotationInfo notationInfo,
+            Backend backend,
+            Services services,
+            boolean purePrint) {
+        this.backend = backend;
+        this.layouter = new Layouter(backend, 2);
+        this.prgPrinter = prgPrinter;
+        this.notationInfo = notationInfo;
+        this.services = services;
+        this.pure = purePrint;
+        if (services != null) {
+            notationInfo.refresh(services);
+        }
+    }
 
     /**
      * Creates a LogicPrinter.  Sets the sequent to be printed, as
@@ -227,10 +232,10 @@ public final class LogicPrinter {
     public LogicPrinter(ProgramPrinter prgPrinter,
                         NotationInfo notationInfo,
                         Services services) {
-	this(prgPrinter, 
-             notationInfo, 
-             new PosTableStringBackend(DEFAULT_LINE_WIDTH), 
-             services, 
+	this(prgPrinter,
+             notationInfo,
+             new PosTableStringBackend(DEFAULT_LINE_WIDTH),
+             services,
              false);
     }
 
@@ -243,21 +248,18 @@ public final class LogicPrinter {
      * @param notationInfo the NotationInfo for the concrete syntax
      * @param purePrint    if true the PositionTable will not be calculated
      *               (simulates the behaviour of the former PureSequentPrinter)
-     * @param services     the Services object               
+     * @param services     the Services object
      */
     public LogicPrinter(ProgramPrinter prgPrinter,
-                        NotationInfo notationInfo, 
-                        Services services,
-                        boolean purePrint) {
-	this(prgPrinter, 
-	     notationInfo,
-	     new PosTableStringBackend(DEFAULT_LINE_WIDTH), 
-	     services,
-	     purePrint);
+            NotationInfo notationInfo,
+            Services services,
+            boolean purePrint) {
+        this(prgPrinter,
+                notationInfo,
+                new PosTableStringBackend(DEFAULT_LINE_WIDTH),
+                services,
+                purePrint);
     }
-
-
-
 
     /**
      * @return the notationInfo associated with this LogicPrinter
@@ -294,7 +296,6 @@ public final class LogicPrinter {
 
     /** Reprints the sequent.  This can be useful if settings like
      * PresentationFeatures or abbreviations have changed.
-     * @param seq The Sequent to be reprinted
      * @param filter The SequentPrintFilter for seq
      * @param lineWidth the max. number of character to put on one line
      *   (the actual taken linewidth is the max of
@@ -313,25 +314,25 @@ public final class LogicPrinter {
     public void setInstantiation(SVInstantiations instantiations) {
         this.instantiations = instantiations;
     }
-    
-    
+
+
     private static void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
 	for(SequentFormula cf : s) {
 	    cf.formula().execPostOrder(oc);
 	}
     }
-    
-    
+
+
     private static Set<SchemaVariable> collectSchemaVars(Taclet t) {
-	
+
 	Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
 	OpCollector oc = new OpCollector();
-	
+
 	//find, assumes
 	for(SchemaVariable sv: t.getIfFindVariables()) {
 	    result.add(sv);
 	}
-		
+
 	//add, replacewith
 	for(TacletGoalTemplate tgt : t.goalTemplates()) {
 	    collectSchemaVarsHelper(tgt.sequent(), oc);
@@ -343,16 +344,16 @@ public final class LogicPrinter {
 					        .execPostOrder(oc);
 	    }
 	}
-	
+
 	for(Operator op : oc.ops()) {
 	    if(op instanceof SchemaVariable) {
 		result.add((SchemaVariable)op);
 	    }
 	}
-	
+
 	return result;
     }
-    
+
 
     /**
      * Pretty-print a taclet. Line-breaks are taken care of.
@@ -366,7 +367,7 @@ public final class LogicPrinter {
      * @param declareSchemaVars
      *           Should declarations for the schema variables used in the taclet be pretty-printed?
      */
-    public void printTaclet(Taclet taclet, 
+    public void printTaclet(Taclet taclet,
 	    		    SVInstantiations sv,
                             boolean showWholeTaclet,
                             boolean declareSchemaVars) {
@@ -381,7 +382,7 @@ public final class LogicPrinter {
 		layouter.beginC();
 	    }
 	    if (declareSchemaVars) {
-		Set<SchemaVariable> schemaVars = collectSchemaVars(taclet);
+		Set<SchemaVariable> schemaVars = taclet.collectSchemaVars();
 		layouter.brk();
 		for(SchemaVariable schemaVar : schemaVars) {
                     layouter.print(schemaVar.proofToString() + "  ");
@@ -423,13 +424,13 @@ public final class LogicPrinter {
      */
     public void printTaclet(Taclet taclet) {
         // the last argument used to be false. Changed that - M.Ulbrich
-        printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, true); 
+        printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, true);
     }
 
     protected void printAttribs(Taclet taclet) throws IOException{
 //        if (taclet.noninteractive()) {
 //            layouter.brk().print("\\noninteractive");
-//        }       
+//        }
     }
 
     protected void printRewriteAttributes(RewriteTaclet taclet) throws IOException{
@@ -460,18 +461,18 @@ public final class LogicPrinter {
             layouter.brk().beginC(2).print("\\varcond (").brk();
             while (itVarsNewDepOn.hasNext()) {
                 printNewVarDepOnCond(itVarsNewDepOn.next());
-                if (itVarsNewDepOn.hasNext() || 
-                        itVarsNew.hasNext() || 
-                        itVarsNotFreeIn.hasNext() || 
+                if (itVarsNewDepOn.hasNext() ||
+                        itVarsNew.hasNext() ||
+                        itVarsNotFreeIn.hasNext() ||
                         itVC.hasNext()) {
-                        layouter.print(",").brk(); 
+                        layouter.print(",").brk();
                 }
             }
             while (itVarsNew.hasNext()) {
             	printNewVarcond(itVarsNew.next());
-            	if (itVarsNew.hasNext() || itVarsNotFreeIn.hasNext() 
+            	if (itVarsNew.hasNext() || itVarsNotFreeIn.hasNext()
 		    || itVC.hasNext()) {
-            		layouter.print(",").brk(); 
+            		layouter.print(",").brk();
             	}
             }
             while (itVarsNotFreeIn.hasNext()) {
@@ -490,7 +491,7 @@ public final class LogicPrinter {
             layouter.brk(1,-2).print(")").end();
         }
     }
-    
+
     private void printNewVarDepOnCond(NewDependingOn on) throws IOException {
         layouter.beginC(0);
         layouter.brk().print("\\new( ");
@@ -536,7 +537,7 @@ public final class LogicPrinter {
     }
 
     protected void printHeuristics(Taclet taclet) throws IOException{
-        if (taclet.getRuleSets().size() == 0) {
+        if (taclet.getRuleSets().isEmpty()) {
                 return;
         }
                 layouter.brk().beginC(2).print("\\heuristics (");
@@ -554,7 +555,7 @@ public final class LogicPrinter {
     protected void printHeuristic(RuleSet sv) throws IOException {
 	layouter.print(sv.name().toString());
     }
-    
+
 
     protected void printFind(Taclet taclet) throws IOException{
                 if (!(taclet instanceof FindTaclet)) {
@@ -607,21 +608,21 @@ public final class LogicPrinter {
 	    if (tgt.name().length() > 0) {
 		layouter.brk().beginC(2).print("\"" + tgt.name() + "\"").print(":");
 	    }
-			
+
 	}
 	if (tgt instanceof AntecSuccTacletGoalTemplate) {
 	    printTextSequent
-		(((AntecSuccTacletGoalTemplate)tgt).replaceWith(), 
+		(((AntecSuccTacletGoalTemplate)tgt).replaceWith(),
 		 "\\replacewith", true);
 	}
 	if (tgt instanceof RewriteTacletGoalTemplate) {
 	    layouter.brk();
 	    printRewrite(((RewriteTacletGoalTemplate)tgt).replaceWith());
-	}	
-	
+	}
+
 	if (!(tgt.sequent().isEmpty())) {
 	    printTextSequent(tgt.sequent(), "\\add", true);
-	} 
+	}
 	if (!tgt.rules().isEmpty()) {
 	    printRules(tgt.rules());
 	}
@@ -629,7 +630,7 @@ public final class LogicPrinter {
 	    layouter.brk();
 	    printAddProgVars(tgt.addedProgVars());
 	}
-	
+
 	if (tgt.name() != null) {
 	    if (tgt.name().length() > 0) {
 		layouter.brk(1,-2).end();
@@ -676,8 +677,8 @@ public final class LogicPrinter {
 		printTerm((Term)o);
 	    } else if (o instanceof ProgramElement) {
 		printProgramElement((ProgramElement)o);
-	    } else {		
-		Debug.log4jWarn("Unknown instantiation type of " + o + 
+	    } else {
+                Debug.log4jWarn("Unknown instantiation type of " + o +
 			        "; class is " + o.getClass().getName(),
 			        LogicPrinter.class.getName());
 		printConstant(sv.name().toString());
@@ -794,7 +795,6 @@ public final class LogicPrinter {
      * formula, the sequent arrow is on a line of its own, and formulae
      * are indented w.r.t. the arrow.
      * A line-break is printed after the Sequent.
-     * @param seq The Sequent to be pretty-printed
      * @param filter The SequentPrintFilter for seq
      */
     public void printSequent(SequentPrintFilter filter) {
@@ -876,11 +876,13 @@ public final class LogicPrinter {
             startTerm(0);
             layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
         } else {
-            if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+            if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+					&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
                 layouter.print("(");
             }
-            notationInfo.getNotation(t.op(), services).print(t,this);
-            if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+            notationInfo.getNotation(t.op()).print(t,this);
+            if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+					&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
                 layouter.print(")");
             }
         }
@@ -889,10 +891,30 @@ public final class LogicPrinter {
         }
     }
 
+    /*
+     * Use this method to determine the Set of printed TermLabels.
+     * The class SequentViewLogicPrinter overrides this method.
+     * The default is to print all TermLabels.
+     */
+    protected ImmutableArray<TermLabel> getVisibleTermLabels(Term t){
+        return t.getLabels();
+    }
+
     public void printLabels(Term t) throws IOException {
-        layouter.beginC().print("<<");
+        notationInfo.getNotation(TermLabel.class).print(t, this);
+    }
+
+    void printLabels(Term t, String left, String right) throws IOException {
+
+        ImmutableArray<TermLabel> termLabelList = getVisibleTermLabels(t);
+        if (termLabelList.isEmpty()) {
+            return;
+        }
+
+        layouter.beginC().print(left);
         boolean afterFirst = false;
-        for (ITermLabel l : t.getLabels()) {
+
+        for (TermLabel l : termLabelList) {
             if (afterFirst) {
                layouter.print(",").brk(1, 0);
             }
@@ -911,7 +933,7 @@ public final class LogicPrinter {
                layouter.end().print(")");
             }
         }
-        layouter.end().print(">>");
+        layouter.end().print(right);
     }
 
     /**
@@ -924,8 +946,9 @@ public final class LogicPrinter {
         Iterator<Term> it = terms.iterator();
         while (it.hasNext()) {
             printTerm(it.next());
-            if (it.hasNext())
+            if (it.hasNext()) {
                 getLayouter().print(", ");
+            }
         }
         getLayouter().print("}");
     }
@@ -955,11 +978,13 @@ public final class LogicPrinter {
      *
      * @param t the Term to be printed */
     public void printTermContinuingBlock(Term t) throws IOException {
-       if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+       if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+				&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
            layouter.print("(");
        }
-       notationInfo.getNotation(t.op(), services).printContinuingBlock(t,this);
-       if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+       notationInfo.getNotation(t.op()).printContinuingBlock(t,this);
+       if(t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
+				&& notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
            layouter.print(")");
        }
        if (t.hasLabels()) {
@@ -967,32 +992,26 @@ public final class LogicPrinter {
        }
     }
 
-
     /** Print a term in <code>f(t1,...tn)</code> style.  If the
      * operator has arity 0, no parentheses are printed, i.e.
      * <code>f</code> instead of <code>f()</code>.  If the term
      * doesn't fit on one line, <code>t2...tn</code> are aligned below
      * <code>t1</code>.
      *
-     * @param name the name to be printed before the parentheses.
      * @param t the term to be printed.  */
-    public void printFunctionTerm(String name, Term t) throws IOException {	
-	//XXX
-	if(NotationInfo.PRETTY_SYNTAX
-           && services != null
-           && t.op() instanceof Function
-           && t.sort() == services.getTypeConverter().getHeapLDT().getFieldSort() 
-           && t.arity() == 0
-           && t.boundVars().isEmpty()) {
-            startTerm(0);            
-            final String prettyFieldName 
-            	= services.getTypeConverter()
-                          .getHeapLDT()
-                          .getPrettyFieldName((Function)t.op());            
+    public void printFunctionTerm(Term t) throws IOException {
+        if (notationInfo.isPrettySyntax()
+                && services != null && FieldPrinter.isJavaFieldConstant(t, getHeapLDT())
+                && getNotationInfo().isHidePackagePrefix()) {
+            // Hide package prefix when printing field constants.
+            startTerm(0);
+            String name = t.op().name().toString();
+            int index = name.lastIndexOf(".");
+            String prettyFieldName = name.substring(index+1);
             layouter.print(prettyFieldName);
-        } 
-        
+        }
         else {
+            String name = t.op().name().toString();
             startTerm(t.arity());
             layouter.print(name);
             if(!t.boundVars().isEmpty()) {
@@ -1016,238 +1035,310 @@ public final class LogicPrinter {
         }
     }
 
-    public void printCast(String pre, 
+    public void printCast(String pre,
 	    		  String post,
-	    		  Term t, 
+	    		  Term t,
 	    		  int ass) throws IOException {
         final SortDependingFunction cast = (SortDependingFunction)t.op();
-        
+
         startTerm(t.arity());
         layouter.print(pre);
         layouter.print(cast.getSortDependingOn().toString());
         layouter.print(post);
         maybeParens(t.sub(0), ass);
     }
-    
-    
-    public void printSelect(Term t) throws IOException {
-        assert t.boundVars().isEmpty();            
-        assert t.arity() == 3;	
-	final HeapLDT heapLDT = services == null 
-			        ? null 
-			        : services.getTypeConverter().getHeapLDT();
-        if(NotationInfo.PRETTY_SYNTAX
-            && heapLDT != null
-            && t.sub(0).op().sort(t.subs()).equals(
-               services.getNamespaces().sorts().lookup(new Name("Heap")))) {
-            startTerm(3);
-            
-            final Term objectTerm = t.sub(1);
-            final Term fieldTerm  = t.sub(2);
-                
-            final boolean printHeap = t.sub(0).op() != heapLDT.getHeap();
-            if (printHeap) {
-                markStartSub();
-                printTerm(t.sub(0));
-                markEndSub();
-                layouter.print("[");
-            } else {
-                markStartSub();
-            //heap not printed
-            markEndSub();
-            }
 
-            if(objectTerm.equals(TermBuilder.DF.NULL(services))
-                && fieldTerm.op() instanceof Function
-                && ((Function)fieldTerm.op()).isUnique()) {
-        	String className 
-        		= heapLDT.getClassName((Function)fieldTerm.op());
-        	
-        	if(className == null) {
-        	    markStartSub();
-        	    printTerm(objectTerm);
-        	    markEndSub();
-        	} else {
-        	    markStartSub();
-        	    //"null" not printed
-        	    markEndSub();
-        	    layouter.print(className);
-        	}
-        	
-        	layouter.print(".");
-        	
-                markStartSub();
-                startTerm(0);                    
-                printTerm(fieldTerm);
-                markEndSub();                    
-            } else if(fieldTerm.arity() == 0) {
-        	markStartSub();
-                printTerm(objectTerm);
-                markEndSub();
-        	
-                layouter.print(".");
-                
-                markStartSub();
-                startTerm(0);                    
-                printTerm(fieldTerm);
-                markEndSub();                    
-            } else if(fieldTerm.op() == heapLDT.getArr()) {
-        	markStartSub();
-                printTerm(objectTerm);
-                markEndSub();
-        	
-                layouter.print("[");
-                
-                markStartSub();
-                startTerm(1);
-                markStartSub();
-                printTerm(fieldTerm.sub(0));
-                markEndSub();
-                markEndSub();
-                
-                layouter.print("]");
-            } else {
-        	printFunctionTerm(t.op().name().toString(), t);
-            }	
-            if (printHeap) {
-                layouter.print("]");
-            }
+    protected boolean printEmbeddedHeapConstructorTerm(Term t) throws IOException {
+
+        Notation notation = notationInfo.getNotation(t.op());
+        if (notation instanceof HeapConstructorNotation) {
+            HeapConstructorNotation heapNotation = (HeapConstructorNotation) notation;
+            heapNotation.printEmbeddedHeap(t, this);
+            return true;
         } else {
-            printFunctionTerm(t.op().name().toString(), t);
+            printTerm(t);
+            return false;
         }
     }
+
+ public void printClassName (String className) throws IOException {
+        layouter.print(className);
+    }
+
+    public void printHeapConstructor(Term t, boolean closingBrace) throws IOException {
+        assert t.boundVars().isEmpty();
+
+        final HeapLDT heapLDT = getHeapLDT();
+
+        if(notationInfo.isPrettySyntax() && heapLDT != null) {
+            startTerm(t.arity());
+
+            final Term heapTerm = t.sub(0);
+            final String opName = t.op().name().toString();
+
+            assert heapTerm.sort() == heapLDT.targetSort();
+
+            markStartSub();
+            boolean hasEmbedded = printEmbeddedHeapConstructorTerm(heapTerm);
+            markEndSub();
+
+            if(hasEmbedded) {
+                layouter.brk(0);
+            } else {
+                layouter.beginC(0);
+            }
+
+            layouter.print("[" + opName + "(").beginC(0);
+
+            for(int i = 1; i < t.arity(); i++) {
+                // do not print anon_heap if parsability is not required
+                if (getNotationInfo().isHidePackagePrefix() && "anon".equals(opName) && i == 2) {
+                    break;
+                }
+
+                if(i > 1) {
+                    layouter.print(",").brk(1,0);
+                }
+                markStartSub();
+                printTerm(t.sub(i));
+                markEndSub();
+            }
+
+            layouter.print(")]").end();
+
+            if(closingBrace) {
+                layouter.end();
+            }
+
+        } else {
+            printFunctionTerm(t);
+        }
+    }
+
+    protected void printEmbeddedObserver(final Term heapTerm, final Term objectTerm)
+            throws IOException {
+        Notation notation = notationInfo.getNotation(objectTerm.op());
+        if(notation instanceof ObserverNotation) {
+            ObserverNotation obsNotation = (ObserverNotation)notation;
+            Term innerheap = objectTerm.sub(0);
+            boolean paren = !heapTerm.equals(innerheap);
+            if(paren) {
+                layouter.print("(");
+                obsNotation.printWithHeap(objectTerm, this, heapTerm);
+                layouter.print(")");
+            } else {
+                obsNotation.printWithHeap(objectTerm, this, heapTerm);
+            }
+        } else {
+            printTerm(objectTerm);
+        }
+    }
+
+    /*
+     * Print a term of the form: T::select(heap, object, field).
+     */
+    public void printSelect(Term t, Term tacitHeap) throws IOException {
+        selectPrinter.printSelect(t, tacitHeap);
+    }
+
+    /*
+     * Print a term of the form: store(heap, object, field, value).
+     */
+    public void printStore(Term t, boolean closingBrace) throws IOException {
+        storePrinter.printStore(t, closingBrace);
+    }
     
-    
-    public void printLength(Term t) throws IOException {
-	final HeapLDT heapLDT = services == null 
-        			? null 
-        			: services.getTypeConverter().getHeapLDT();
-	if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
-	    assert t.op() == heapLDT.getLength();
+    /*
+     * Print a term of the form: T::seqGet(Seq, int).
+     */
+    public void printSeqGet(Term t) throws IOException {
+        if (notationInfo.isPrettySyntax()) {
+            startTerm(2);
+            if (!t.sort().equals(Sort.ANY)) {
+                layouter.print("(" + t.sort().toString() + ")");
+            }
+            markStartSub();
+            printTerm(t.sub(0));
+            markEndSub();
+
+            layouter.print("[");
+            markStartSub();
+            printTerm(t.sub(1));
+            markEndSub();
+            layouter.print("]");
+        } else {
+            printFunctionTerm(t);
+        }
+    }
+
+    public void printPostfix(Term t, String postfix) throws IOException {
+	if(notationInfo.isPrettySyntax()) {
 	    startTerm(t.arity());
-	    
+
 	    markStartSub();
 	    printTerm(t.sub(0));
 	    markEndSub();
-	    layouter.print(".length");
+	    layouter.print(postfix);
 	} else {
-	    printFunctionTerm(t.op().name().toString(), t);            
-	}	
+	    printFunctionTerm(t);
+	}
     }
-    
-    
-    public void printObserver(Term t) throws IOException {
-	assert t.op() instanceof IObserverFunction;
-	assert t.boundVars().isEmpty();
-	final HeapLDT heapLDT = services == null 
-			        ? null 
-			        : services.getTypeConverter().getHeapLDT();	
-	if(NotationInfo.PRETTY_SYNTAX
-           && heapLDT != null 
-           && t.sub(0).op().sort(t.subs()).equals(
-                services.getNamespaces().sorts().lookup(new Name("Heap")))) {
-	    final ObserverFunction obs = (ObserverFunction) t.op();
-            startTerm(t.arity());
 
+    public void printObserver(Term t, Term tacitHeap) throws IOException {
+        assert t.op() instanceof IObserverFunction;
+        assert t.boundVars().isEmpty();
+
+        final HeapLDT heapLDT = getHeapLDT();
+
+        final IObserverFunction obs = (IObserverFunction) t.op();
+
+        boolean printFancy = false;
+
+        if(notationInfo.isPrettySyntax() && heapLDT != null) {
+
+            Sort heapSort = heapLDT.targetSort();
             int numHeaps = obs.getHeapCount(services);
-            final int stateCount = obs.getStateCount();
-            final boolean printHeaps = 
-            		(stateCount == 1 && t.sub(0).op() != heapLDT.getHeap()) 
-                 || numHeaps > 1 || stateCount > 1;
-            final int totalHeaps = stateCount * numHeaps;
-            if (printHeaps) {
-            	if(totalHeaps > 1) layouter.print("{");
-                for(int i=0;i<totalHeaps;i++) {
-                  markStartSub();
-                  if(i>0) layouter.print(",");
-                  printTerm(t.sub(i));
-                  markEndSub();
-                }
-            	if(totalHeaps > 1) layouter.print("}");
-                layouter.print("[");
-            } else {
-                markStartSub();
-                //heaps not printed
-                markEndSub();
+            int stateCount = obs.getStateCount();
+            int totalHeaps = stateCount * numHeaps;
+
+            // TODO find a good way to pretty print / parse multiple-heap observers
+            printFancy =
+                    totalHeaps == 1 && t.arity() >= 1 &&
+                    t.sub(0).sort() == heapSort;
+        }
+
+        if(printFancy) {
+
+            if(tacitHeap == null) {
+                tacitHeap = services.getTermFactory().createTerm(heapLDT.getHeap());
             }
-            
+
+            // this needs not be 1 in general:
+            int totalHeaps = 1;
+
+            startTerm(obs.arity());
+
+            layouter.beginC();
+
             if(!obs.isStatic() ) {
-        	  markStartSub();
-        	  printTerm(t.sub(totalHeaps));
-        	  markEndSub();
-        	  layouter.print(".");
+                markStartSub(totalHeaps);
+                printEmbeddedObserver(t.sub(0), t.sub(totalHeaps));
+                markEndSub();
+                layouter.print(".");
             }
-            
-            final String prettyFieldName 
-            	= services.getTypeConverter()
-                          .getHeapLDT()
-                          .getPrettyFieldName((Function)t.op());
-            layouter.print(prettyFieldName);
-            
+
+            // Print class name if the field is static.
+            String fieldName = obs.isStatic()
+                    ? HeapLDT.getClassName((Function)t.op()) + "."
+                    : "";
+            fieldName += HeapLDT.getPrettyFieldName(t.op());
+
             if(obs.getNumParams() > 0 || obs instanceof IProgramMethod) {
-        	layouter.print("(").beginC(0);
-        	for(int i = 0, n = obs.getNumParams(); i < n; i++) {
-        	    markStartSub();
-        	    printTerm(t.sub(i + (obs.isStatic() ? 1 : 2)));
-        	    markEndSub();
-                    if(i < n - 1) {
+                JavaInfo javaInfo = services.getJavaInfo();
+                if (t.arity() > 1) {
+                    // in case arity > 1 we assume fieldName refers to a query (method call)
+                    Term object = t.sub(1);
+                    KeYJavaType keYJavaType = javaInfo.getKeYJavaType(object.sort());
+                    if (obs.isStatic()
+                            || javaInfo.isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType)) {
+                        layouter.print(fieldName);
+                    } else {
+                        layouter.print("(" + t.op() + ")");
+                    }
+                } else {
+                    // in case arity == 1 we assume fieldName refers to an array
+                    layouter.print(fieldName);
+                }
+
+                layouter.print("(").beginC(0);
+                int startIndex = totalHeaps + (obs.isStatic() ? 0 : 1);
+                for (int i = startIndex; i < obs.arity(); i++) {
+                    if (i != startIndex) {
                         layouter.print(",").brk(1,0);
                     }
-        	}
-        	layouter.print(")").end();
+                    markStartSub(i);
+                    printTerm(t.sub(i));
+                    markEndSub();
+                }
+                layouter.print(")").end();
+            } else {
+                layouter.print(fieldName);
             }
-            if (printHeaps) {
-                layouter.print("]");
+
+            // must the heap be printed at all: no, if default heap.
+            final Term heapTerm = t.sub(0);
+            if (!heapTerm.equals(tacitHeap)) {
+                layouter.brk(0).print("@");
+                markStartSub(0);
+                printTerm(heapTerm);
+                markEndSub();
+            } else {
+                markStartSub(0);
+                // heaps not printed
+                markEndSub();
             }
+            layouter.end();
+
         } else {
-            printFunctionTerm(t.op().name().toString(), t);            
+            printFunctionTerm(t);
         }
     }
-    
-    
+
+
     public void printSingleton(Term t) throws IOException {
 	assert t.arity() == 2;
-	startTerm(2);	 
-	layouter.print("{(").beginC(0);;
+	startTerm(2);
+	layouter.print("{(").beginC(0);
 
-	markStartSub();	 
+        markStartSub();
 	printTerm(t.sub(0));
 	markEndSub();
-	
+
 	layouter.print(",").brk(1,0);
-	
-	markStartSub();	 
+
+	markStartSub();
 	printTerm(t.sub(1));
-	markEndSub();	
+	markEndSub();
 
 	layouter.print(")}").end();
-    }  
-    
-    
+    }
+
+
+    public void printSeqSingleton(Term t, String lDelimiter, String rDelimiter) throws IOException {
+	assert t.arity() == 1;
+	startTerm(1);
+	layouter.print(lDelimiter).beginC(0);
+	markStartSub();
+	printTerm(t.sub(0));
+	markEndSub();
+	layouter.print(rDelimiter).end();
+    }
+
+
     public void printElementOf(Term t) throws IOException {
 	assert t.arity() == 3;
 	startTerm(3);
-	
+
 	layouter.print("(").beginC(0);
-	
-	markStartSub();	 
+
+	markStartSub();
 	printTerm(t.sub(0));
 	markEndSub();
-	
+
 	layouter.print(",").brk(1,0);
-	
-	markStartSub();	 
+
+	markStartSub();
 	printTerm(t.sub(1));
 	markEndSub();
 
 	layouter.print(")").end();
 	layouter.print(" \\in ");
-	
-	markStartSub();	 
+
+	markStartSub();
 	printTerm(t.sub(2));
-	markEndSub();	
-    }     
-    
+	markEndSub();
+    }
+
     public void printElementOf(Term t, String symbol) throws IOException {
         if (symbol == null) {
             printElementOf(t);
@@ -1256,27 +1347,27 @@ public final class LogicPrinter {
 
         assert t.arity() == 3;
         startTerm(3);
-        
+
         layouter.print("(").beginC(0);
-        
-        markStartSub();  
+
+        markStartSub();
         printTerm(t.sub(0));
         markEndSub();
-        
+
         layouter.print(",").brk(1,0);
-        
-        markStartSub();  
+
+        markStartSub();
         printTerm(t.sub(1));
         markEndSub();
 
         layouter.print(")").end();
         layouter.print(symbol);
-        
-        markStartSub();  
+
+        markStartSub();
         printTerm(t.sub(2));
-        markEndSub();   
+        markEndSub();
     }
-    
+
 
     /** Print a unary term in prefix style.  For instance
      * <code>!a</code>.  No line breaks are possible.
@@ -1388,25 +1479,25 @@ public final class LogicPrinter {
                                             Term t,
                                             int ass3) throws IOException {
 	assert t.op() instanceof UpdateApplication && t.arity() == 2;
-		
-	mark(MARK_START_UPDATE);
+
+        mark(MarkType.MARK_START_UPDATE);
         layouter.beginC(2).print(l);
         startTerm(t.arity());
-        
+
         markStartSub();
         printTerm(t.sub(0));
-        markEndSub();        
-        
+        markEndSub();
+
         layouter.print(r);
-        mark(MARK_END_UPDATE);
+        mark(MarkType.MARK_END_UPDATE);
         layouter.brk(0);
-        
+
         maybeParens(t.sub(1), ass3);
-        
+
         layouter.end();
-    }    
-    
-    
+    }
+
+
    /**
      * Print an elementary update.  This looks like
      * <code>loc := val</code>
@@ -1418,23 +1509,23 @@ public final class LogicPrinter {
                                       Term t,
                                       int ass2) throws IOException {
 	ElementaryUpdate op = (ElementaryUpdate)t.op();
-	
+
 	assert t.arity() == 1;
 	startTerm(1);
-	
+
 	layouter.print(op.lhs().name().toString());
-	
+
 	layouter.print(asgn);
-	
+
 	maybeParens(t.sub(0), ass2);
     }
-    
-    
+
+
     private void printParallelUpdateHelper(String separator, Term t, int ass)
     					    throws IOException {
 	assert t.arity() == 2;
 	startTerm(2);
-	
+
 	if(t.sub(0).op() == UpdateJunctor.PARALLEL_UPDATE) {
 	    markStartSub();
 	    printParallelUpdateHelper(separator, t.sub(0), ass);
@@ -1442,42 +1533,43 @@ public final class LogicPrinter {
 	} else {
 	    maybeParens(t.sub(0), ass);
 	}
-	
+
 	layouter.brk(1).print(separator + " ");
-	
+
 	if(t.sub(1).op() == UpdateJunctor.PARALLEL_UPDATE) {
 	    markStartSub();
 	    printParallelUpdateHelper(separator, t.sub(1), ass);
 	    markEndSub();
 	} else {
 	    maybeParens(t.sub(1), ass);
-	}	
+	}
     }
-    
-    
-    public void printParallelUpdate(String separator, Term t, int ass) 
+
+
+    public void printParallelUpdate(String separator, Term t, int ass)
     					    throws IOException {
 	layouter.beginC(0);
 	printParallelUpdateHelper(separator, t, ass);
 	layouter.end();
     }
-    
 
-    protected void printVariables (ImmutableArray<QuantifiableVariable> vars,
+
+    private void printVariables (ImmutableArray<QuantifiableVariable> vars,
                                    QuantifiableVariablePrintMode mode)
                                             throws IOException {
         int size = vars.size ();
         for(int j = 0; j != size; j++) {
             final QuantifiableVariable v = vars.get (j);
             if(v instanceof LogicVariable) {
-                Term t =
-                    TermFactory.DEFAULT.createTerm(v);
                 if (mode != QuantifiableVariablePrintMode.WITH_OUT_DECLARATION) {
                     // do not print declarations in taclets...
-                    layouter.print(v.sort().name().toString() + " ");
+                    printClassName(v.sort().name().toString());
+                    layouter.print(" ");
                 }
-                if(notationInfo.getAbbrevMap().containsTerm(t)) {
-                    layouter.print (notationInfo.getAbbrevMap().getAbbrev(t));
+                if(services != null &&
+                        notationInfo.getAbbrevMap().containsTerm(services.getTermFactory().createTerm(v))) {
+                    layouter.print (notationInfo.getAbbrevMap().
+                                        getAbbrev(services.getTermFactory().createTerm(v)));
                 } else {
                     layouter.print (v.name().toString());
                 }
@@ -1488,10 +1580,10 @@ public final class LogicPrinter {
         	layouter.print(", ");
             }
         }
-        layouter.print(";");        
+        layouter.print(";");
     }
 
-      
+
     public void printIfThenElseTerm(Term t, String keyword) throws IOException {
         startTerm(t.arity());
 
@@ -1503,7 +1595,7 @@ public final class LogicPrinter {
             layouter.print ( " " );
             printVariables ( t.varsBoundHere ( 0 ), quantifiableVariablePrintMode );
         }
-        
+
         layouter.print( " (" );
         markStartSub ();
         printTerm ( t.sub ( 0 ) );
@@ -1538,7 +1630,7 @@ public final class LogicPrinter {
      *
      * @param l       the String used as left brace symbol
      * @param v       the {@link QuantifiableVariable} to be substituted
-     * @param t       the Term to be used as new value 
+     * @param t       the Term to be used as new value
      * @param ass2    the int defining the associativity for the new value
      * @param r       the String used as right brace symbol
      * @param phi     the substituted term/formula
@@ -1581,7 +1673,7 @@ public final class LogicPrinter {
      */
     public void printQuantifierTerm(String name,
                                     ImmutableArray<QuantifiableVariable> vars,
-                                    Term phi, 
+                                    Term phi,
                                     int ass)
         throws IOException {
         layouter.beginC(2);
@@ -1593,7 +1685,7 @@ public final class LogicPrinter {
         layouter.end();
     }
 
-    
+
     /** Print a constant.  This just prints the string <code>s</code> and
      * marks it as a nullary term.
      *
@@ -1657,9 +1749,9 @@ public final class LogicPrinter {
         String end = s.substring(iEnd);
         layouter.beginC(0);
         printVerbatim(start);
-        mark(MARK_START_FIRST_STMT);
+        mark(MarkType.MARK_START_FIRST_STMT);
         printVerbatim(firstStmt);
-        mark(MARK_END_FIRST_STMT);
+        mark(MarkType.MARK_END_FIRST_STMT);
         printVerbatim(end);
         layouter.end();
     }
@@ -1722,16 +1814,16 @@ public final class LogicPrinter {
                     for (int i = 0; i < phi.arity(); i++) {
                         ta[i] = phi.sub(i);
                     }
-                    Term term = TermFactory.DEFAULT.
+                    Term term = services.getTermFactory().
 			createTerm((Modality)o, ta, phi.boundVars(), phi.javaBlock());
-                    notationInfo.getNotation((Modality)o, services).print(term, this);
+                    notationInfo.getNotation((Modality)o).print(term, this);
                     return;
                 }
 
             }
         }
 
-        mark(MARK_MODPOSTBL);
+        mark(MarkType.MARK_MODPOSTBL);
         startTerm(phi.arity());
         layouter.print(left);
         printJavaBlock(jb);
@@ -1759,14 +1851,15 @@ public final class LogicPrinter {
      *
      * @return the pretty-printed sequent.
      */
+    @Override
     public String toString() {
         try {
             layouter.flush();
         } catch (IOException e) {
-            throw new RuntimeException (
-              "IO Exception in pretty printer:\n"+e);
+            throw new RuntimeException(
+                    "IO Exception in pretty printer:\n" + e);
         }
-        return ((PosTableStringBackend)backend).getString()+"\n";
+        return ((PosTableStringBackend) backend).getString() + "\n";
     }
 
     /**
@@ -1774,7 +1867,7 @@ public final class LogicPrinter {
      * should only be called after a <tt>printSequent</tt> invocation
      * returns.
      *
-     * @return the pretty-printed sequent.  
+     * @return the pretty-printed sequent.
      */
     public StringBuffer result() {
         try {
@@ -1786,21 +1879,25 @@ public final class LogicPrinter {
         return new StringBuffer(((PosTableStringBackend)backend).getString()).append("\n");
     }
 
-    protected Layouter mark(Object o) {
+    protected Layouter mark(MarkType type) {
+        return mark(type, -1);
+    }
+
+    protected Layouter mark(MarkType type, int parameter) {
         if (pure) {
                 return null;
         } else {
-                return layouter.mark(o);
+                return layouter.mark(new Pair<MarkType, Integer>(type, parameter));
         }
     }
-    
+
     /**
      * returns the PositionTable representing position information on
      * the sequent of this LogicPrinter. Subclasses may overwrite
      * this method with a null returning body if position information
      * is not computed there.
      */
-    public InitialPositionTable getPositionTable() {
+    public PositionTable getPositionTable() {
         if (pure) {
             return null;
         }
@@ -1817,7 +1914,7 @@ public final class LogicPrinter {
         if (pure) {
             return null;
         }
-        return ((PosTableStringBackend)backend).getPositionTable();
+        return ((PosTableStringBackend)backend).getInitialPositionTable();
     }
 
     /** Returns the ProgramPrinter
@@ -1850,20 +1947,20 @@ public final class LogicPrinter {
     protected void maybeParens(Term t, int ass)
         throws IOException {
         if (t.op() instanceof SchemaVariable && instantiations != null &&
-	    instantiations.getInstantiation((SchemaVariable)t.op()) 
+	    instantiations.getInstantiation((SchemaVariable)t.op())
 	    instanceof Term) {
 	    t = (Term) instantiations.getInstantiation((SchemaVariable)t.op());
 	}
-	    
-	if (notationInfo.getNotation(t.op(), services).getPriority() < ass){	    
+
+	if (notationInfo.getNotation(t.op()).getPriority() < ass){
 	    markStartSub();
-	    layouter.print("(");   
-	    printTerm(t);	   
+	    layouter.print("(");
+	    printTerm(t);
 	    layouter.print(")");
 	    markEndSub();
 	} else {
 	    markStartSub();
-	    if (notationInfo.getNotation(t.op(), services).getPriority() == ass) {
+	    if (notationInfo.getNotation(t.op()).getPriority() == ass) {
 		printTermContinuingBlock(t);
 	    } else {
 		printTerm(t);
@@ -1879,27 +1976,31 @@ public final class LogicPrinter {
         return instantiations;
     }
 
+    private static enum MarkType {
+        /** Mark the beginning of a term */
+        MARK_START_TERM,
     /** Mark the start of a subterm.  Needed for PositionTable construction.*/
-    private static final Object MARK_START_SUB = new Object();
+        MARK_START_SUB,
     /** Mark the end of a subterm.  Needed for PositionTable construction.*/
-    private static final Object MARK_END_SUB = new Object();
+        MARK_END_SUB,
     /** Mark the start of the first executable statement.
      * Needed for PositionTable construction.*/
-    private static final Object MARK_START_FIRST_STMT = new Object();
+        MARK_START_FIRST_STMT,
     /** Mark the end of the first executable statement.
      * Needed for PositionTable construction.*/
-    private static final Object MARK_END_FIRST_STMT = new Object();
+        MARK_END_FIRST_STMT,
     /** Mark the need for a ModalityPositionTable.  The next
      * startTerm mark will construct a ModalityPositionTable
      * instead of the usual PositionTable.
      * Needed for PositionTable construction.*/
-    private static final Object MARK_MODPOSTBL = new Object();
+        MARK_MODPOSTBL,
     /** Mark the start of an update.*/
-    private static final Object MARK_START_UPDATE = new Object();
+        MARK_START_UPDATE,
     /** Mark the end of an update.*/
-    private static final Object MARK_END_UPDATE = new Object();
+        MARK_END_UPDATE,
+    }
 
-    private boolean createPositionTable = true;
+    private final boolean createPositionTable = true;
 
     /**
      * Called before a substring is printed that has its own entry in
@@ -1912,7 +2013,16 @@ public final class LogicPrinter {
      */
     protected void markStartSub() {
         if (createPositionTable) {
-            mark(MARK_START_SUB);
+            mark(MarkType.MARK_START_SUB);
+        }
+    }
+
+    /**
+     * TODO
+     */
+    protected void markStartSub(int subterm) {
+        if (createPositionTable) {
+            mark(MarkType.MARK_START_SUB, subterm);
         }
     }
 
@@ -1926,7 +2036,7 @@ public final class LogicPrinter {
      */
     protected void markEndSub() {
         if (createPositionTable) {
-            mark(MARK_END_SUB);
+            mark(MarkType.MARK_END_SUB);
         }
     }
 
@@ -1940,7 +2050,7 @@ public final class LogicPrinter {
      */
     protected void startTerm(int size) {
         if (createPositionTable) {
-            mark(Integer.valueOf(size));
+            mark(MarkType.MARK_START_TERM, size);
         }
     }
 
@@ -1976,62 +2086,62 @@ public final class LogicPrinter {
     }
 
     /**
-     * escapes special characters by their HTML encoding 
+     * escapes special characters by their HTML encoding
      * @param text the String to be displayed as part of an HTML side
      * @return the text with special characters replaced
      */
     public static String escapeHTML(String text, boolean escapeWhitespace) {
-         StringBuffer sb = new StringBuffer();
-        
+         StringBuilder sb = new StringBuilder();
+
          for (int i = 0, sz = text.length(); i < sz; i++) {
-             char c = text.charAt(i); 
+             char c = text.charAt(i);
              switch (c) {
              case '<':
                  sb.append("&lt;");
                  break;
-             case '>': 
+             case '>':
                  sb.append("&gt;");
                  break;
-             case '&': 
+             case '&':
                  sb.append("&amp;");
                  break;
-             case '\"': 
+             case '\"':
                  sb.append("&quot;");
                  break;
-             case '\'': 
+             case '\'':
                  sb.append("&#039;");
                  break;
-             case '(': 
+             case '(':
                  sb.append("&#040;");
                  break;
-             case ')': 
+             case ')':
                  sb.append("&#041;");
                  break;
-             case '#': 
+             case '#':
                  sb.append("&#035;");
                  break;
-             case '+': 
+             case '+':
                  sb.append("&#043;");
                  break;
-             case '-': 
+             case '-':
                  sb.append("&#045;");
                  break;
-             case '%': 
+             case '%':
                  sb.append("&#037;");
                  break;
-             case ';': 
+             case ';':
                  sb.append("&#059;");
                  break;
-             case '\n': 
+             case '\n':
                  sb.append(escapeWhitespace ? "<br>" : c);
-                 break;            
+                 break;
              case ' ':
              	 sb.append(escapeWhitespace ? "&nbsp;" : c);
              	 break;
              default:
                  sb.append(c);
              }
-             
+
          }
          return sb.toString();
     }
@@ -2047,16 +2157,16 @@ public final class LogicPrinter {
      * @param services the Services class used to access the type hierarchy
      * @return true if the attribute is uniquely determined
      */
-    public static boolean printInShortForm(String programName, 
+    public static boolean printInShortForm(String programName,
 	    				   Sort sort,
 	    				   Services services) {
-        if ( ! ( services != null  
+        if ( ! ( services != null
         	  && sort.extendsTrans(services.getJavaInfo().objectSort()))) {
             return false;
         }
         final KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
         assert kjt != null : "Did not find KeYJavaType for " + sort;
-        return 
+        return
             services.getJavaInfo().getAllAttributes(programName, kjt).size() == 1;
     }
 
@@ -2092,7 +2202,7 @@ public final class LogicPrinter {
     private static class PosTableStringBackend extends StringBackend {
 
         /** The top PositionTable */
-        private final InitialPositionTable initPosTbl 
+        private final InitialPositionTable initPosTbl
         	= new InitialPositionTable();
 
         /** The resulting position table or an intermediate result */
@@ -2117,7 +2227,7 @@ public final class LogicPrinter {
 
         /** Remembers the start of an update to create a range */
         private final Stack<Integer> updateStarts = new Stack<Integer>();
-        
+
 
         PosTableStringBackend(int lineWidth) {
             super(lineWidth);
@@ -2126,13 +2236,30 @@ public final class LogicPrinter {
         /** Returns the constructed position table.
          *  @return the constructed position table
          */
-        public InitialPositionTable getPositionTable() {
+        public PositionTable getPositionTable() {
+            return posTbl;
+        }
+
+        /** Returns the constructed position table.
+         *  @return the constructed position table
+         */
+        public InitialPositionTable getInitialPositionTable() {
             return initPosTbl;
         }
 
         /** Receive a mark and act appropriately.
          */
+        @Override
         public void mark(Object o) {
+
+            assert o instanceof Pair : "corrupt mark object " + o;
+            Pair<?,?> pair = (Pair<?,?>)o;
+
+            assert pair.first instanceof MarkType : "corrupt mark object " + o;
+            MarkType markType = (MarkType) pair.first;
+
+            assert pair.second instanceof Integer : "corrupt mark object " + o;
+            int parameter = (Integer) pair.second;
 
             // IMPLEMENTATION NOTE
             //
@@ -2147,39 +2274,67 @@ public final class LogicPrinter {
             // objects for each startTerm call to wrap the arity.
             //
             // I (MG) prefer it this way.
-            if ( o==MARK_START_SUB ) {
-                posTbl.setStart(count()-pos);
+            //
+            // MU refactored this using enums which makes it a little less ugly
+            // and more flexible.
+            switch(markType) {
+            case MARK_START_SUB:
+                if(parameter == -1) {
+                    // no parameter means subterms in normal order
+                    posTbl.setStart(count()-pos);
+                } else {
+                    // parameter means a particular subterm has been chosen
+                    posTbl.setStart(parameter, count()-pos);
+                }
                 stack.push(new StackEntry(posTbl, pos));
                 pos=count();
-            } else if ( o==MARK_END_SUB ) {
+                break;
+
+            case MARK_END_SUB:
                 StackEntry se=stack.peek();
                 stack.pop();
                 pos=se.pos();
                 se.posTbl().setEnd(count()-pos, posTbl);
                 posTbl=se.posTbl();
-            } else if ( o==MARK_MODPOSTBL ) {
+                break;
+
+            case MARK_MODPOSTBL:
                 need_modPosTable = true;
-            } else if ( o instanceof Integer ) {
+                break;
+
+            case MARK_START_TERM:
                 // This is sent by startTerm
-                int rows = ((Integer)o).intValue();
+                int rows = parameter;
                 if (need_modPosTable) {
                     posTbl = new ModalityPositionTable(rows);
                 } else {
                     posTbl = new PositionTable(rows);
                 }
                 need_modPosTable = false;
-            } else if ( o==MARK_START_FIRST_STMT ) {
+                break;
+
+            case MARK_START_FIRST_STMT:
                 firstStmtStart = count()-pos;
-            } else if ( o==MARK_END_FIRST_STMT ) {
+                break;
+
+            case MARK_END_FIRST_STMT:
                 firstStmtRange = new Range(firstStmtStart,
                                            count()-pos);
                 ((ModalityPositionTable)posTbl)
                     .setFirstStatementRange(firstStmtRange);
-            } else if ( o==MARK_START_UPDATE ) {
+                break;
+
+            case MARK_START_UPDATE:
         	updateStarts.push(count());
-            } else if ( o==MARK_END_UPDATE ) {
+                break;
+
+            case MARK_END_UPDATE:
         	int updateStart = updateStarts.pop();
                 initPosTbl.addUpdateRange(new Range(updateStart, count()));
+                break;
+
+            default:
+                System.err.println("Unexpected LogicPrinter mark: " + markType);
             }
         }
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -22,22 +22,30 @@ import org.eclipse.ui.IMarkerResolutionGenerator;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 
-public class ProofMarkerResolutionGenerator implements IMarkerResolutionGenerator {
+import de.uka.ilkd.key.smt.testgen.AbstractTestGenerator;
 
-   
+/**
+ * Creates the QuickFixes for the KeY{@link IMarker}.
+ * @author Stefan Käsdorf
+ */
+public class ProofMarkerResolutionGenerator implements IMarkerResolutionGenerator {
    /**
     * {@inheritDoc}
     */
    @Override
    public IMarkerResolution[] getResolutions(IMarker marker) {
       LinkedList<IMarkerResolution> resolutions = new LinkedList<IMarkerResolution>();
-      try{
+      try {
          if (StarterUtil.areFileStartersAvailable()) {
-            resolutions.add(new ProofMarkerResolution(marker.getType()));
+            resolutions.add(new ProofMarkerResolution(marker));
          }
-      } catch (CoreException e){
-         LogUtil.getLogger().createErrorStatus(e);
+         if (AbstractTestGenerator.isSolverAvailable()) {
+            resolutions.add(new GenerateTestCasesResolution(marker));
+         }
       }
-      return (IMarkerResolution[])resolutions.toArray(new IMarkerResolution[resolutions.size()]);
+      catch (CoreException e) {
+         LogUtil.getLogger().logError(e);
+      }
+      return resolutions.toArray(new IMarkerResolution[resolutions.size()]);
    }
 }

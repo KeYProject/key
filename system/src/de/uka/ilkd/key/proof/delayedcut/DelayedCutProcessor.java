@@ -1,19 +1,18 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.proof.delayedcut;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,6 +24,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
@@ -148,55 +148,41 @@ public class DelayedCutProcessor implements Runnable {
          }     
    
          return delayedCut;
-    }
-    
+    }    
 
-    
-   
-    
-    
-    
-    
-    private ImmutableList<Goal> cut(DelayedCut cut){
+    private ImmutableList<Goal> cut(DelayedCut cut) {
         Goal goal = find(cut.getProof(), cut.getNode());
 
-        TacletFilter filter = new TacletFilter() {
-            
+        TacletFilter filter = new TacletFilter() {            
             @Override
-            protected boolean filter(Taclet taclet) {
-                
+            protected boolean filter(Taclet taclet) {                
                 return taclet.name().toString().equals(CUT_TACLET);
             }
-            
-            
         };
         
-        ImmutableList<NoPosTacletApp> apps =  goal.ruleAppIndex().getNoFindTaclet(filter, cut.getServices());
-        assert apps.size() == 1;
-         
+        ImmutableList<NoPosTacletApp> apps =
+                goal.ruleAppIndex().getNoFindTaclet(filter, cut.getServices());
+        assert apps.size() == 1;         
         TacletApp app = apps.head();
-        
+
         app = app.addCheckedInstantiation(app.uninstantiatedVars().iterator().next(),
-                                    cut.getFormula(),cut.getServices(), true);
+                                          cut.getFormula(),cut.getServices(), true);
         return goal.apply(app);
     }
     
-    private ImmutableList<Goal> apply(final String tacletName,Goal goal, PosInOccurrence pio){
+    private ImmutableList<Goal> apply(final String tacletName,Goal goal, PosInOccurrence pio) {
         TacletFilter filter = new TacletFilter() {
-            
             @Override
             protected boolean filter(Taclet taclet) {
-                
                 return taclet.name().toString().equals(tacletName);
             }
-            
-            
         };
-     
-        ImmutableList<NoPosTacletApp> apps =  goal.ruleAppIndex().getFindTaclet(filter,pio,goal.proof().getServices());
+
+        ImmutableList<NoPosTacletApp> apps =
+                goal.ruleAppIndex().getFindTaclet(filter,pio,goal.proof().getServices());
         assert apps.size() == 1;
         NoPosTacletApp app = apps.head();
-        
+
         PosTacletApp app2 = app.setPosInOccurrence(pio, goal.proof().getServices());
         return goal.apply(app2); 
     }
@@ -208,11 +194,11 @@ public class DelayedCutProcessor implements Runnable {
         SequentFormula sf = getSequentFormula(goal, cut.isDecisionPredicateInAntecendet());
         
         
-        PosInOccurrence pio = new PosInOccurrence(sf,PosInTerm.TOP_LEVEL,
+        PosInOccurrence pio = new PosInOccurrence(sf,PosInTerm.getTopLevel(),
                 cut.isDecisionPredicateInAntecendet());
         
         ImmutableList<Goal> result= apply(getHideTacletName(cut), goal, pio);
-          cut.setHideApp(result.head().node().getLocalIntroducedRules().iterator().next());
+        cut.setHideApp(result.head().node().getLocalIntroducedRules().iterator().next());
         return result;
     }
     
@@ -230,7 +216,8 @@ public class DelayedCutProcessor implements Runnable {
                      ? "TRUE":"FALSE";
            
             if(goal[i].node().getNodeInfo().getBranchLabel().endsWith(side)){
-                SequentFormula formula = getSequentFormula(goal[i], cut.isDecisionPredicateInAntecendet());
+                SequentFormula formula =
+                        getSequentFormula(goal[i], cut.isDecisionPredicateInAntecendet());
                 if(formula.formula() == cut.getFormula()){
                     return i;
                 }
@@ -301,7 +288,7 @@ public class DelayedCutProcessor implements Runnable {
      * @param app
      * @return
      */
-    private LinkedList<Goal> apply(Goal goal, RuleApp app, Services services){
+    private LinkedList<Goal> apply(Goal goal, RuleApp app, TermServices services){
         if(app instanceof TacletApp){
         	TacletApp tapp = (TacletApp) app;
         	final SVInstantiations insts = tapp.instantiations();
@@ -310,7 +297,7 @@ public class DelayedCutProcessor implements Runnable {
         	    final SchemaVariable sv = svIt.next();
         	    if(sv instanceof SkolemTermSV) {
         		final Term inst = (Term) insts.getInstantiation(sv);
-        		   		 services.getNamespaces().functions().remove(inst.op().name());
+        		services.getNamespaces().functions().remove(inst.op().name());
         	    }
         	}
         }
@@ -330,7 +317,7 @@ public class DelayedCutProcessor implements Runnable {
         return goals;
     }
     
-    private LinkedList<Goal> apply(Node oldNode, Goal goal, RuleApp app, Services services){
+    private LinkedList<Goal> apply(Node oldNode, Goal goal, RuleApp app, TermServices services){
     	 try{
     		return apply(goal, app, services);
     	}catch(Throwable e){
@@ -411,12 +398,12 @@ public class DelayedCutProcessor implements Runnable {
 //    		throw new RuntimeException("Cannot apply taclet-app");
     	}
     	
-    	throw new RuntimeException("App is neither a BuiltInApp nor a TacletApp, it's  of type"+app.getClass().getName());
+    	throw new RuntimeException("App is neither a BuiltInApp nor a TacletApp, it's  of type" +
+    	                           app.getClass().getName());
     	
     }
-    
-    
-    private PosInOccurrence translate(NodeGoalPair pair,Services services){
+
+    private PosInOccurrence translate(NodeGoalPair pair,TermServices services){
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
         if(oldRuleApp == null ||oldRuleApp.posInOccurrence() == null){
             return null;
@@ -429,9 +416,7 @@ public class DelayedCutProcessor implements Runnable {
         return PosInOccurrence.findInSequent(pair.goal.sequent(),
                 formulaNumber, oldRuleApp.posInOccurrence().posInTerm());
     }
-    
-    
-    
+
     /**
      * Used for rebuilding the tree: Joins the node of the old sub trees and the corresponding 
      * goals in the new tree to one object. 
@@ -483,7 +468,4 @@ public class DelayedCutProcessor implements Runnable {
             }
         }
     }
-
-    
-
 }

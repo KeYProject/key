@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -39,13 +39,20 @@ import javax.swing.event.DocumentListener;
  */
 public abstract class SearchBar extends JPanel {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -4821960226273983607L;
     public JTextField searchField = new JTextField(20);
-    private JButton prev = new JButton("\u2190");
-    private JButton next = new JButton("\u2192");
-    private JButton close = new JButton("\u00d7");
+    private JButton prev;
+    private JButton next;
+    private JButton close;
     private final Color ALLERT_COLOR = new Color(255, 178, 178);
 
     public SearchBar() {
+        prev = new JButton(IconFactory.previous(16));
+        next = new JButton(IconFactory.next(16));
+        close = new JButton(IconFactory.stop(16));
 
         // Initialize the Actionlisteners here:
 

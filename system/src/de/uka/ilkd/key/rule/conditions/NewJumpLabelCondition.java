@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.rule.conditions;
 
@@ -43,7 +42,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
     
     public NewJumpLabelCondition(SchemaVariable sv) {        
         if (!(sv instanceof ProgramSV) || 
-                ((ProgramSV)sv).sort() != ProgramSVSort.LABEL) {
+                sv.sort() != ProgramSVSort.LABEL) {
             throw new IllegalArgumentException("The new jump label " +
                         "variable condition, must be parameterised with a " +
                         "program schemavariable of sort LABEL.");
@@ -78,10 +77,10 @@ public final class NewJumpLabelCondition implements VariableCondition {
 
     private List<ProgramElement> collect(SVInstantiations inst) {
         final List<ProgramElement> result = new LinkedList<ProgramElement>();
-        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry>> 
+        final Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>>
             it = inst.pairIterator();
         while (it.hasNext()) {
-            final ImmutableMapEntry<SchemaVariable,InstantiationEntry> entry = it.next();            
+            final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> entry = it.next();
             if (entry.key() != labelSV && 
                     entry.value() != null && 
                     entry.value().getInstantiation() instanceof ProgramElement) {               
@@ -110,4 +109,3 @@ public final class NewJumpLabelCondition implements VariableCondition {
         return "\\newLabel (" +labelSV+ ")";
     }
 }
-    

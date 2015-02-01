@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -16,7 +16,7 @@ package org.key_project.keyide.ui.editor;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -27,13 +27,20 @@ import de.uka.ilkd.key.rule.TacletApp;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class TacletCommandContributionItem extends CommandContributionItem {
-   // TODO: Document missing members of class TacletCommandContributionItem
-
-   private TacletApp app;
+   /***
+    * The {@link TacletApp} to apply.
+    */
+   private final TacletApp app;
    
-   private KeYMediator mediator;
+   /**
+    * The {@link KeYMediator} to use.
+    */
+   private final KeYMediator mediator;
    
-   private PosInSequent pos;
+   /**
+    * The {@link PosInSequent} to apply {@link TacletApp} on.
+    */
+   private final PosInSequent pos;
    
    /**
     * The constructor with the additional parameters.
@@ -49,15 +56,27 @@ public class TacletCommandContributionItem extends CommandContributionItem {
       this.pos = pos;
    }
    
-   public TacletApp getTacletApp(){
+   /**
+    * Returns the {@link TacletApp} to apply.
+    * @return The {@link TacletApp} to apply.
+    */
+   public TacletApp getTacletApp() {
       return app;
    }
    
-   public KeYMediator getMediator(){
+   /**
+    * Returns the {@link KeYMediator} to use.
+    * @return The {@link KeYMediator} to use.
+    */
+   public KeYMediator getMediator() {
       return mediator;
    }
    
-   public PosInSequent getPosInSequent(){
+   /**
+    * Returns the {@link PosInSequent} to apply {@link TacletApp} on.
+    * @return The {@link PosInSequent} to apply {@link TacletApp} on.
+    */
+   public PosInSequent getPosInSequent() {
       return pos;
    }
 }

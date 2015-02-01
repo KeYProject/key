@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -145,7 +145,7 @@ public class StarterWizard<I> extends Wizard {
     * Updates the shown values in {@link #starterPage}.
     */
    protected void updateValues() {
-      StarterDescription<I> initiallySelectedStarter = StarterUtil.searchGlobalStarter(starterDescriptions, StarterPreferenceUtil.getStore().getString(selectedStarterProperty));
+      StarterDescription<I> initiallySelectedStarter = StarterUtil.searchStarter(starterDescriptions, StarterPreferenceUtil.getStore().getString(selectedStarterProperty));
       if (initiallySelectedStarter == null && !starterDescriptions.isEmpty()) {
          initiallySelectedStarter = starterDescriptions.head();
       }
@@ -198,7 +198,7 @@ public class StarterWizard<I> extends Wizard {
       // Check if functionality is enabled
       if (!StarterPreferenceUtil.getStore().getBoolean(disableProperty) && !starterDescriptions.isEmpty()) {
          // Compute initiallySelectedStarter
-         StarterDescription<I> initiallySelectedStarter = StarterUtil.searchGlobalStarter(starterDescriptions, StarterPreferenceUtil.getStore().getString(selectedStarterProperty));
+         StarterDescription<I> initiallySelectedStarter = StarterUtil.searchStarter(starterDescriptions, StarterPreferenceUtil.getStore().getString(selectedStarterProperty));
          // Check if starter can be returned directly without opening the wizard
          if (initiallySelectedStarter != null && StarterPreferenceUtil.getStore().getBoolean(dontAskAgainProperty)) {
             return initiallySelectedStarter;

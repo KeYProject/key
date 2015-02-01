@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -17,7 +17,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
 import org.junit.Test;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotSourceTabTest;
-import org.key_project.sed.ui.test.util.SWTBotTabbedPropertyList;
+import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 
 /**
  * Tests the property page tab "Source" in a Symbolic Execution Tree diagram.
@@ -51,6 +51,11 @@ public class SWTBotGraphitiSourceTabTest extends AbstractSWTBotGraphitiPropertyT
          
          @Override
          public void assertDiagram(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.hasTabItem("Source"));
+         }
+
+         @Override
+         public void assertMethodCall(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertFalse(tabs.hasTabItem("Source"));
          }
       });

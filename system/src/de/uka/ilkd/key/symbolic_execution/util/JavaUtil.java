@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -15,6 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +34,27 @@ public final class JavaUtil {
     */
    private JavaUtil() {
    }
+
+   /**
+    * Checks if the given array contains the element to search.
+    * @param <T> The type of the array.
+    * @param array The array.
+    * @param toSearch The element to search.
+    * @return {@code true} if the array contains the element or {@code false} if not or if the array is {@code null}.
+    */
+   public static <T> boolean contains(T[] array, T toSearch) {
+      boolean contains = false;
+      if (array != null) {
+         int i = 0;
+         while (!contains && i < array.length) {
+            if (equals(array[i], toSearch)) {
+               contains = true;
+            }
+            i++;
+         }
+      }
+      return contains;
+   }
    
    /**
     * Adds all elements to the {@link Collection}. 
@@ -42,9 +64,7 @@ public final class JavaUtil {
     */
    public static <T> void addAll(Collection<T> collection, T... elementsToAdd) {
       if (collection != null && elementsToAdd != null) {
-         for (T toAdd : elementsToAdd) {
-            collection.add(toAdd);
-         }
+          Collections.addAll(collection, elementsToAdd);
       }
    }
    
@@ -237,6 +257,26 @@ public final class JavaUtil {
       }
       return result;
    }
+   
+   /**
+    * Searches an element in the given {@link Iterable} instance.
+    * @param array The instance to search in.
+    * @param filter The filter to select an element.
+    * @return The found element or {@code null} if no element was found.
+    */
+   public static <T> T search(T[] array, IFilter<T> filter) {
+      T result = null;
+      if (array != null && filter != null) {
+         int i = 0;
+         while (result == null && i < array.length) {
+            if (filter.select(array[i])) {
+               result = array[i];
+            }
+            i++;
+         }
+      }
+      return result;
+   }
 
    /**
     * Searches an element in the given {@link Iterable} instance and removes
@@ -322,6 +362,25 @@ public final class JavaUtil {
       }
       else {
          return null;
+      }
+   }
+
+   /**
+    * Performs a binary insert on the given <b>sorted</b> {@link List}.
+    * @param list The <b>sorted</b> {@link List} to insert in.
+    * @param toInsert The element to insert.
+    * @param comparator The {@link Comparator} to use.
+    */
+   public static <T> void binaryInsert(List<T> list, T toInsert, Comparator<T> comparator) {
+      if (list.isEmpty()) {
+         list.add(toInsert);
+      }
+      else {
+         int index = Collections.binarySearch(list, toInsert, comparator);
+         if (index < 0) {
+            index = (index * -1) - 1;
+         }
+         list.add(index, toInsert);
       }
    }
 }

@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,10 +11,10 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -26,6 +26,17 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public final class LocationVariable extends ProgramVariable
 			            implements UpdateableOperator {
 
+
+    public LocationVariable(ProgramElementName name,
+                        KeYJavaType        t,
+                        KeYJavaType        containingType,
+                        boolean            isStatic,
+                        boolean            isModel,
+                        boolean isGhost,
+                        boolean isFinal) {
+        super(name, t.getSort(), t, containingType, isStatic, isModel, isGhost, isFinal);
+    }
+    
     public LocationVariable(ProgramElementName name,
             		    KeYJavaType        t,
             		    KeYJavaType        containingType,
@@ -49,7 +60,6 @@ public final class LocationVariable extends ProgramVariable
     }
 
 
-
     public LocationVariable(ProgramElementName name, Sort s) {
         super(name, s, null, null, false, false, false);
     }
@@ -58,5 +68,17 @@ public final class LocationVariable extends ProgramVariable
     @Override
     public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
         v.performActionOnLocationVariable(this);
+    }
+
+
+    @Override
+    public UpdateableOperator rename(Name name) {
+        if (getKeYJavaType() != null) {
+        return new LocationVariable(new ProgramElementName(name.toString()),
+                                    getKeYJavaType(), getContainerType(),
+                                    isStatic(), isModel());
+        } else {
+            return new LocationVariable(new ProgramElementName(name.toString()), sort());
+        }
     }
 }

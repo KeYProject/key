@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,29 +13,31 @@
 
 package org.key_project.sed.ui.visualization.test.testcase;
 
-import junit.framework.TestCase;
-
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.ui.IPerspectiveDescriptor;
+import org.junit.Before;
 import org.junit.Test;
 import org.key_project.sed.ui.visualization.test.view.LoggingDebugViewBasedEditorInViewView;
 import org.key_project.sed.ui.visualization.test.view.LoggingDebugViewBasedEditorInViewView.LogEntry;
 import org.key_project.sed.ui.visualization.view.AbstractDebugViewBasedEditorInViewView;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.test.perspective.EmptyTestPerspectiveFactory;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests for {@link AbstractDebugViewBasedEditorInViewView}.
  * @author Martin Hentschel
  */
-public class AbstractDebugViewBasedEditorInViewViewTest extends TestCase {
+public class AbstractDebugViewBasedEditorInViewViewTest extends AbstractSetupTestCase {
    /**
     * {@inheritDoc}
     */
+   @Before
    @Override
    public void setUp() throws Exception {
+      super.setUp();
       TestUtilsUtil.closeWelcomeView();
    }
 

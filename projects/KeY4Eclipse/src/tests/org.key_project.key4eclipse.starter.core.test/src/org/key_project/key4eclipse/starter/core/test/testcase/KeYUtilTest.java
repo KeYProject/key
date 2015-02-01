@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -14,8 +14,6 @@
 package org.key_project.key4eclipse.starter.core.test.testcase;
 
 import java.io.IOException;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
@@ -43,6 +41,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.jdt.JDTUtil;
+import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -54,7 +53,7 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
  * Tests for {@link KeYUtil}
  * @author Martin Hentschel
  */
-public class KeYUtilTest extends TestCase {
+public class KeYUtilTest extends AbstractSetupTestCase {
    /**
     * Tests {@link KeYUtil#getProgramMethod(IMethod, de.uka.ilkd.key.java.JavaInfo)}
     */

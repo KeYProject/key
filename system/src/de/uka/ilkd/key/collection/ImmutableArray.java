@@ -1,24 +1,22 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.collection;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
-import de.uka.ilkd.key.util.NotSupported;
 
 public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Serializable {
 
@@ -28,8 +26,6 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     private static final long serialVersionUID = -9041545065066866250L;
 
     private final S[] content;
-
-    private int hashCode = -1;
 
     /** creates an empty new <S>Array
      */
@@ -82,6 +78,10 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	System.arraycopy(content, srcIdx, dest, destIndex, length);
     }
 
+    public final boolean isEmpty() {  
+       return content.length == 0;
+    }
+    
     public boolean contains(S op) {
 	for (S el : content) {
 	   if (el.equals(op)) {
@@ -108,15 +108,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     }    
 
     public int hashCode() {
-	if (hashCode == -1) {
-        for (S aContent : content) {
-            hashCode += 17 * aContent.hashCode();
-        }
-	    if(hashCode == -1) {
-		hashCode = -2;
-	    }
-	}
-	return hashCode;
+	return Arrays.hashCode(content);
     }
 
     @SuppressWarnings("unchecked")
@@ -176,11 +168,22 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	}
 
 	public void remove() {
-	    throw new NotSupported("Illegal modification access on unmodifiable array.");
+	    throw new UnsupportedOperationException("Illegal modification access on unmodifiable array.");
 	}
     }
-
-    public boolean isEmpty() {	
-	return content.length == 0;
+    
+    /**
+     * Convert an {@link ImmutableArray} to an {@link ImmutableList}.
+     *
+     * @return This element converted to an {@link ImmutableList}.
+     */
+    public ImmutableList<S> toImmutableList() {
+        ImmutableList<S> ret = ImmutableSLList.<S>nil();
+        Iterator it = iterator();
+        while (it.hasNext()) {
+            ret = ret.prepend((S) it.next());
+        }
+        return ret.reverse();
     }
+    
 }

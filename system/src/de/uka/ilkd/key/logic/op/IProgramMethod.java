@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -30,7 +30,7 @@ public interface IProgramMethod extends IObserverFunction, SourceElement, Progra
    public abstract MethodDeclaration getMethodDeclaration();
 
    /**     
-    * returns the KeYJavaType of the <tt>i</tt>-th paramter declaration. This method 
+    * returns the KeYJavaType of the <tt>i</tt>-th parameter declaration. This method
     * does not care about the invoker as argSort does.      
     * @param i the int specifying the parameter position
     * @return the KeYJavaType of the <tt>i</tt>-th parameter
@@ -57,6 +57,8 @@ public interface IProgramMethod extends IObserverFunction, SourceElement, Progra
    public abstract KeYJavaType getReturnType();
 
    public abstract ProgramElementName getProgramElementName();
+
+   public abstract String getUniqueName();
 
    public abstract String getFullName();
 

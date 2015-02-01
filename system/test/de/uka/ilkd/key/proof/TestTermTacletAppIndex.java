@@ -1,23 +1,25 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 /** tests the TacletIndex class.*/
 package de.uka.ilkd.key.proof;
 
+import java.util.Map;
+
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -28,11 +30,13 @@ import de.uka.ilkd.key.proof.NullNewRuleListener;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TermTacletAppIndex;
 import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
+import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.util.LRUCache;
 
 
 public class TestTermTacletAppIndex extends TestCase{   
@@ -85,12 +89,13 @@ public class TestTermTacletAppIndex extends TestCase{
 	noCache = null;	
     }
 
+    private final Map<CacheKey, TermTacletAppIndex> termTacletAppIndexCache = new LRUCache<CacheKey, TermTacletAppIndex> ( ServiceCaches.MAX_TERM_TACLET_APP_INDEX_ENTRIES ); 
 
     private TermTacletAppIndexCacheSet realCache =
-        new TermTacletAppIndexCacheSet ();
+        new TermTacletAppIndexCacheSet (termTacletAppIndexCache);
 
     private TermTacletAppIndexCacheSet noCache =
-        new TermTacletAppIndexCacheSet () {
+        new TermTacletAppIndexCacheSet (termTacletAppIndexCache) {
             public ITermTacletAppIndexCache getAntecCache() {
                 return getNoCache ();
             }
@@ -119,7 +124,7 @@ public class TestTermTacletAppIndex extends TestCase{
         Term term = TacletForTests.parseTerm ( "f(f(f(zero)))=one" );
         SequentFormula cfma = new SequentFormula ( term );
 
-        PosInOccurrence pio = new PosInOccurrence ( cfma, PosInTerm.TOP_LEVEL,
+        PosInOccurrence pio = new PosInOccurrence ( cfma, PosInTerm.getTopLevel(),
                                                     false );
 
         TermTacletAppIndex termIdx =
@@ -140,7 +145,7 @@ public class TestTermTacletAppIndex extends TestCase{
         Term term2 = TacletForTests.parseTerm ( "f(f(zero))=one" );
         SequentFormula cfma2 = new SequentFormula ( term2 );
         PosInOccurrence pio2 = new PosInOccurrence ( cfma2,
-                                                     PosInTerm.TOP_LEVEL, false );
+                                                     PosInTerm.getTopLevel(), false );
 
         termIdx = termIdx.update ( pio2.down ( 0 ).down ( 0 ).down ( 0 ), serv,
                                    ruleIdx, NullNewRuleListener.INSTANCE,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -14,6 +14,7 @@
 package org.key_project.sed.core.model.memory;
 
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IValue;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDVariable;
@@ -43,9 +44,10 @@ public class SEDMemoryVariable extends AbstractSEDVariable {
    /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this element is contained.
+    * @param stackFrame The parent {@link IStackFrame} in which this {@link ISEDVariable} is shown.
     */
-   public SEDMemoryVariable(ISEDDebugTarget target) {
-      super(target);
+   public SEDMemoryVariable(ISEDDebugTarget target, IStackFrame stackFrame) {
+      super(target, stackFrame);
    }
    
    /**
@@ -102,5 +104,13 @@ public class SEDMemoryVariable extends AbstractSEDVariable {
     */
    public void setReferenceTypeName(String referenceTypeName) {
       this.referenceTypeName = referenceTypeName;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setId(String id) {
+      super.setId(id);
    }
 }

@@ -1,33 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_52acffc9-9e77-42dd-ac13-ed1e0f9c9457" name="min(int, int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_f73d53f3-9fce-4e48-9934-c27b4227d0af" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_695a8929-2a28-4f1b-b74b-4e005c8da9ec" name="self.min(i,j);" pathCondition="true" lineNumber="-1" charStart="424" charEnd="427">
-            <sedStatement xml:id="_c5c9bcb9-3138-4d7f-a62c-e7540fdcc103" name="int result;" pathCondition="true" lineNumber="-1" charStart="447" charEnd="458">
-               <sedBranchStatement xml:id="_6e8f6207-8846-4645-8676-04525410dc73" name="if (i&lt;j&amp;&amp;i!=j) {   result_1=i; }else  {   result_1=j; }" pathCondition="true" lineNumber="-1" charStart="462" charEnd="536">
-                  <sedBranchCondition xml:id="_b1430ae0-432e-4b2d-a38c-5df6e8707098" name="!j &gt;= 1 + i" pathCondition="!j &gt;= 1 + i">
-                     <sedStatement xml:id="_4ab5400d-0a63-4f2c-98e3-861545170f79" name="result_1=j;" pathCondition="!j &gt;= 1 + i" lineNumber="-1" charStart="520" charEnd="531">
-                        <sedStatement xml:id="_a995c94b-8bae-460c-97bc-3fcbd94ea3d3" name="return result_1;" pathCondition="!j &gt;= 1 + i" lineNumber="-1" charStart="540" charEnd="554">
-                           <sedMethodReturn xml:id="_51615157-68ad-4244-b280-1cef779fc069" name="&lt;return j as result of self.min(i,j);&gt;" pathCondition="!j &gt;= 1 + i" lineNumber="-1" charStart="424" charEnd="427">
-                              <sedTermination xml:id="_608292ee-512e-4a9b-922f-923efc076fed" name="&lt;end&gt;" pathCondition="!j &gt;= 1 + i">
+   <sedTarget xml:id="_fced9b25-84d0-4dee-a4ee-510bd52bd96a" name="min(int, int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_686066e6-d788-4080-a4a9-3fe2663e1246" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps\src\ComplexIf.java">
+         <sedMethodCall xml:id="_7606f44f-ad6b-4400-ae4d-8e084f38be6c" name="&lt;call self.min(i,j)&gt;" pathCondition="true" lineNumber="-1" charStart="424" charEnd="427" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps\src\ComplexIf.java" groupable="true">
+            <sedStatement xml:id="_013a4b04-994e-4c66-b95d-8f877eadf016" name="int result;" pathCondition="true" lineNumber="-1" charStart="447" charEnd="458" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps\src\ComplexIf.java">
+               <sedBranchStatement xml:id="_ad47b4ba-8ba9-4d45-b723-cb3aaea23cac" name="if (i&lt;j&amp;&amp;i!=j)" pathCondition="true" lineNumber="-1" charStart="462" charEnd="483" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps\src\ComplexIf.java" groupable="true">
+                  <sedBranchCondition xml:id="_d3ee126c-e850-4a08-a9d1-060e179943ea" name="leq(j,i)" pathCondition="leq(j,i)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps\src\ComplexIf.java">
+                     <sedStatement xml:id="_f8f67f2b-a9c8-4b88-ace5-ef4139221de8" name="result_1=j;" pathCondition="leq(j,i)" lineNumber="-1" charStart="520" charEnd="531" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps\src\ComplexIf.java">
+                        <sedStatement xml:id="_272b735c-eefa-45d1-878a-719f86bdfa13" name="return result_1;" pathCondition="leq(j,i)" lineNumber="-1" charStart="540" charEnd="554" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps\src\ComplexIf.java">
+                           <sedMethodReturn xml:id="_c426772a-f075-4b1f-8514-5e4702f45988" name="&lt;return j as result of self.min(i,j)&gt;" pathCondition="leq(j,i)" lineNumber="-1" charStart="424" charEnd="427" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps\src\ComplexIf.java" methodReturnConditionRef="_04f4a97a-f18a-454f-b5a0-3d26e7195a35">
+                              <sedTermination xml:id="_fa66257a-aa78-4d48-a911-5db0f7c9355e" name="&lt;end&gt;" pathCondition="leq(j,i)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps\src\ComplexIf.java" verified="true">
                               </sedTermination>
+                              <sedGroupEndConditionReference nodeIdRef="_04f4a97a-f18a-454f-b5a0-3d26e7195a35"/>
                            </sedMethodReturn>
                         </sedStatement>
+                        <sedGroupEndConditionReference nodeIdRef="_4bfbe0cb-705b-413b-bc08-cffaa40945de"/>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_5d13f514-8129-47ae-baf9-572df9b967bb" name="!j &lt;= i" pathCondition="!j &lt;= i">
-                     <sedStatement xml:id="_93824f80-a5e8-48db-8199-8f1bba6d0af3" name="result_1=i;" pathCondition="!j &lt;= i" lineNumber="-1" charStart="489" charEnd="500">
-                        <sedStatement xml:id="_eb4c525f-943c-4d17-95bd-10506ea1a57f" name="return result_1;" pathCondition="!j &lt;= i" lineNumber="-1" charStart="540" charEnd="554">
-                           <sedMethodReturn xml:id="_4895ba47-eb74-4d3a-816b-e2efa3840742" name="&lt;return i as result of self.min(i,j);&gt;" pathCondition="!j &lt;= i" lineNumber="-1" charStart="424" charEnd="427">
-                              <sedTermination xml:id="_50b4df7d-d8ec-452b-8241-bef3e664003d" name="&lt;end&gt;" pathCondition="!j &lt;= i">
+                  <sedBranchCondition xml:id="_25d1b07b-1d44-464a-a0a3-51be54bcb6d9" name="gt(j,i)" pathCondition="gt(j,i)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps\src\ComplexIf.java">
+                     <sedStatement xml:id="_9102b80c-90ac-4f85-82c2-4c00817de3f9" name="result_1=i;" pathCondition="gt(j,i)" lineNumber="-1" charStart="489" charEnd="500" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps\src\ComplexIf.java">
+                        <sedStatement xml:id="_8ea3141e-b496-45de-9991-56dbdd65fb62" name="return result_1;" pathCondition="gt(j,i)" lineNumber="-1" charStart="540" charEnd="554" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps\src\ComplexIf.java">
+                           <sedMethodReturn xml:id="_5b4e4dbb-b288-434d-967f-7035ec2f6de9" name="&lt;return i as result of self.min(i,j)&gt;" pathCondition="gt(j,i)" lineNumber="-1" charStart="424" charEnd="427" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps\src\ComplexIf.java" methodReturnConditionRef="_6702057c-1c9e-43c0-b1fe-02ac58b7cad9">
+                              <sedTermination xml:id="_3f2b73f2-5ad3-4eab-b19a-f4a18c9ffbf7" name="&lt;end&gt;" pathCondition="gt(j,i)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps\src\ComplexIf.java" verified="true">
                               </sedTermination>
+                              <sedGroupEndConditionReference nodeIdRef="_6702057c-1c9e-43c0-b1fe-02ac58b7cad9"/>
                            </sedMethodReturn>
                         </sedStatement>
+                        <sedGroupEndConditionReference nodeIdRef="_49ff5c2e-fab5-49f8-8300-5bb4346455ad"/>
                      </sedStatement>
                   </sedBranchCondition>
+                  <sedGroupEndCondition xml:id="_4bfbe0cb-705b-413b-bc08-cffaa40945de" name="leq(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                     <sedChildReference nodeIdRef="_f8f67f2b-a9c8-4b88-ace5-ef4139221de8"/>
+                  </sedGroupEndCondition>
+                  <sedGroupEndCondition xml:id="_49ff5c2e-fab5-49f8-8300-5bb4346455ad" name="gt(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                     <sedChildReference nodeIdRef="_9102b80c-90ac-4f85-82c2-4c00817de3f9"/>
+                  </sedGroupEndCondition>
                </sedBranchStatement>
             </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_04f4a97a-f18a-454f-b5a0-3d26e7195a35" name="leq(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_c426772a-f075-4b1f-8514-5e4702f45988"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedMethodCallMethodReturnCondition xml:id="_6702057c-1c9e-43c0-b1fe-02ac58b7cad9" name="gt(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_5b4e4dbb-b288-434d-967f-7035ec2f6de9"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_04f4a97a-f18a-454f-b5a0-3d26e7195a35" name="leq(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_c426772a-f075-4b1f-8514-5e4702f45988"/>
+            </sedGroupEndCondition>
+            <sedGroupEndCondition xml:id="_6702057c-1c9e-43c0-b1fe-02ac58b7cad9" name="gt(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_5b4e4dbb-b288-434d-967f-7035ec2f6de9"/>
+            </sedGroupEndCondition>
          </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_fa66257a-aa78-4d48-a911-5db0f7c9355e"/>
+         <sedTerminationEntry nodeIdRef="_3f2b73f2-5ad3-4eab-b19a-f4a18c9ffbf7"/>
       </sedThread>
    </sedTarget>
 </launch>

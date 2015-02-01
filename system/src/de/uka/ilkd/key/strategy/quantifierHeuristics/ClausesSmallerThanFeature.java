@@ -1,20 +1,19 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -71,7 +70,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         final ClauseCollector m2 = new ClauseCollector ();
         m2.collect ( rightTerm );
 
-        final boolean res = lessThan ( m1.getResult(), m2.getResult() );
+        final boolean res = lessThan ( m1.getResult(), m2.getResult(), goal.proof().getServices().getCaches() );
         
         focus = null;
         services = null;
@@ -82,7 +81,8 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
     /**
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
-    protected boolean lessThan(Term t1, Term t2) {
+    @Override
+    protected boolean lessThan(Term t1, Term t2, ServiceCaches caches) {
 
         final int t1Def = quanAnalyser.eliminableDefinition ( t1, focus );
         final int t2Def = quanAnalyser.eliminableDefinition ( t2, focus );
@@ -92,7 +92,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
 
         if ( t1.op () == Junctor.OR ) {
             if ( t2.op () == Junctor.OR ) {
-                return super.lessThan ( t1, t2 );
+                return super.lessThan ( t1, t2, caches );
             } else {
                 return false;
             }

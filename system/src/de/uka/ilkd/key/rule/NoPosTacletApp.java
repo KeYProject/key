@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.rule;
 
@@ -24,6 +23,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -92,7 +92,7 @@ public class NoPosTacletApp extends TacletApp {
 	    return new NoPosTacletApp(taclet,
 				      inst,
 				      ifInstantiations);
-	} 
+	}
 	return null;
     }
  
@@ -369,11 +369,12 @@ public class NoPosTacletApp extends TacletApp {
 
         MatchConditions mc = setupMatchConditions(pos, services);
         
-        if ( mc == null )
+        if ( mc == null ) {
             return null;
+        }
         
         MatchConditions res = null;
-	if (taclet() instanceof FindTaclet) {	   
+	if (taclet() instanceof FindTaclet) {
 		res = ((FindTaclet)taclet())
 		    .matchFind ( t,
 				 mc,
@@ -382,19 +383,20 @@ public class NoPosTacletApp extends TacletApp {
 		// constructor; this could be optimised
 		if ( res == null ||
 		     !checkVarCondNotFreeIn(taclet(), 
-                             res.getInstantiations(), pos) )
+                             res.getInstantiations(), pos) ) {
 		    return null;
+		}
 	} else {
 	    res = mc;
 	}
-        
         return evalCheckRes(res, services);
     }
 
     private NoPosTacletApp evalCheckRes(MatchConditions res, 
 	    			        Services services) {
-	if ( res == null )
+	if ( res == null ) {
 	    return null;
+	}
 
 	if ( updateContextFixed &&
 	     !updateContextCompatible ( res ) ) {
@@ -408,7 +410,7 @@ public class NoPosTacletApp extends TacletApp {
 
     
     protected MatchConditions setupMatchConditions(PosInOccurrence pos,
-		  				   Services services) {
+		  				   TermServices services) {
 	SVInstantiations svInst = taclet() instanceof NoFindTaclet ? 
                 instantiations   () : instantiations   ().clearUpdateContext ();
         
@@ -418,9 +420,8 @@ public class NoPosTacletApp extends TacletApp {
         
 	if ( taclet() instanceof RewriteTaclet ) {
 	    mc = ((RewriteTaclet)taclet ()).checkPrefix ( pos,
-								mc,
-								services );
-	    if (mc==null) {
+								mc );
+	    if (mc == null) {
                 Debug.out("NoPosTacletApp: Update prefix check failed.");
             }
         }
@@ -433,19 +434,5 @@ public class NoPosTacletApp extends TacletApp {
 	return 
 	    instantiations.getUpdateContext ()
 	    .equals ( p_mc.getInstantiations ().getUpdateContext () );
-    }
-
-    
-    @Override
-    public boolean equals(Object o) {
-    	if (o == this) return true;
-    	if (!(o instanceof NoPosTacletApp)) return false;
-    	return super.equals(o);
-    }
-    
-    
-    @Override
-    public int hashCode() {
-    	return super.hashCode();
     }    
 }

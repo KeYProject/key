@@ -1,31 +1,39 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.proof;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.JavaSourceElement;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 
 
 /**
@@ -54,13 +62,16 @@ public class NodeInfo {
     /** has the rule app of the node been applied interactively? */
     private boolean interactiveApplication = false;
 
+    /** User-provided plain-text annotations to the node. */
+    private String notes;
+
 
     public NodeInfo(Node node) {
         this.node = node;
     }
 
 
-    private static List<Name> symbolicExecNames = new ArrayList<Name>(10);
+    private static Set<Name> symbolicExecNames = new HashSet<Name>(9);
     static {
         symbolicExecNames.add(new Name("method_expand"));
         symbolicExecNames.add(new Name("simplify_prog"));
@@ -123,7 +134,7 @@ public class NodeInfo {
        if (ruleApp instanceof PosTacletApp) {
            PosTacletApp pta = (PosTacletApp) ruleApp;
            if (!isSymbolicExecution(pta.taclet())) return null;
-           Term t = TermBuilder.DF.goBelowUpdates(pta.posInOccurrence().subTerm());
+           Term t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
            final ProgramElement pe = t.javaBlock().program();
            if (pe != null) {
                firstStatement = pe.getFirstElement();
@@ -295,5 +306,15 @@ public class NodeInfo {
      */
     public boolean getInteractiveRuleApplication() {
         return interactiveApplication;
+    }
+
+    /** Add user-provided plain-text annotations. */
+    public void setNotes (String newNotes) {
+        notes = newNotes;
+    }
+
+    /** Get user-provided plain-text annotations. */
+    public String getNotes() {
+        return notes;
     }
 }
