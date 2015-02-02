@@ -15,10 +15,10 @@ package de.uka.ilkd.key.macros;
 
 import java.util.HashSet;
 
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -32,6 +32,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.util.AssertionFailure;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
  * The macro FinishSymbolicExecutionUntilJionPointMacro continues
@@ -162,25 +164,32 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
          if (pio != null) {
             JavaBlock theJavaBlock = getJavaBlockRecursive(pio.subTerm());
             
-            if (theJavaBlock.program().getFirstElement() instanceof Try) {
-               Try theTry = (Try) theJavaBlock.program().getFirstElement();
+            SourceElement activeStmt = JavaTools.getActiveStatement(theJavaBlock);
+            
+            JavaBlock rest = null;
+            try {
+               rest = JavaTools.removeActiveStatement(
+                     theJavaBlock, JoinRuleUtils.mediator().getServices());
+            } catch (AssertionFailure af) {
+               rest = JavaBlock.EMPTY_JAVABLOCK;
+            } catch (IndexOutOfBoundsException af) {
+               rest = JavaBlock.EMPTY_JAVABLOCK;
+            }
+            
+            if (activeStmt instanceof If) {
                
-               if (theTry.getBody().getFirstElement() instanceof MethodFrame) {
-                  MethodFrame theMethodFrame = (MethodFrame) theTry.getBody().getFirstElement();
-                  
-                  if (theMethodFrame.getBody().getFirstElement() instanceof If) {
-                     if (theMethodFrame.getBody().getChildCount() > 0) {
-                        blockElems.add(theMethodFrame.getBody().getChildAt(1));
-                     } else {
-                        //TODO: Can there come something outside the method frame?
-                        //      Or is this case interesting anyway?
-                     }
-                     
-                  } else if (blockElems.contains(
-                        (ProgramElement) theMethodFrame.getBody().getFirstElement())) {
-                        return false;
-                  }
-               }
+               blockElems.add((ProgramElement) JavaTools.getActiveStatement(rest));
+               
+            } else if (app.rule().name().toString().equals("One Step Simplification")) {
+               
+               // We allow One Step Simplification, otherwise we sometimes would
+               // have to do a simplification ourselves before joining nodes.
+               return true;
+               
+            } else if (blockElems.contains((ProgramElement) activeStmt)) {
+               
+               return false;
+               
             }
          }
 
