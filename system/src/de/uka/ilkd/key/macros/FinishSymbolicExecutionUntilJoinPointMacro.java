@@ -14,11 +14,32 @@
 package de.uka.ilkd.key.macros;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.statement.Branch;
+import de.uka.ilkd.key.java.statement.Break;
+import de.uka.ilkd.key.java.statement.Case;
+import de.uka.ilkd.key.java.statement.Catch;
+import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.java.statement.Else;
+import de.uka.ilkd.key.java.statement.EmptyStatement;
+import de.uka.ilkd.key.java.statement.Finally;
 import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.statement.SynchronizedBlock;
+import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -142,6 +163,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
    private static class FilterSymbexStrategy extends FilterStrategy {
       
       private HashSet<ProgramElement> blockElems = new HashSet<ProgramElement>();
+      private HashSet<JavaBlock> alreadySeen = new HashSet<JavaBlock>();
 
       private static final Name NAME = new Name(
             FilterSymbexStrategy.class.getSimpleName());
@@ -163,24 +185,23 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
          
          if (pio != null) {
             JavaBlock theJavaBlock = getJavaBlockRecursive(pio.subTerm());
-            
             SourceElement activeStmt = JavaTools.getActiveStatement(theJavaBlock);
             
-            JavaBlock rest = null;
-            try {
-               rest = JavaTools.removeActiveStatement(
-                     theJavaBlock, JoinRuleUtils.mediator().getServices());
-            } catch (AssertionFailure af) {
-               rest = JavaBlock.EMPTY_JAVABLOCK;
-            } catch (IndexOutOfBoundsException af) {
-               rest = JavaBlock.EMPTY_JAVABLOCK;
+            if (!(theJavaBlock.program() instanceof StatementBlock) ||
+                  (alreadySeen.contains(theJavaBlock) &&
+                        !blockElems.contains(activeStmt))) {
+               // For sake of efficiency: Do not treat the same
+               // statement block multiple times. However, we have
+               // to consider it if it is a break point, of course.
+               return super.isApprovedApp(app, pio, goal);
+            } else {
+               alreadySeen.add(theJavaBlock);
             }
             
-            if (activeStmt instanceof If) {
-               
-               blockElems.add((ProgramElement) JavaTools.getActiveStatement(rest));
-               
-            } else if (app.rule().name().toString().equals("One Step Simplification")) {
+            // Find break points
+            blockElems.addAll(findJoinPoints((StatementBlock) theJavaBlock.program()));
+            
+            if (app.rule().name().toString().equals("One Step Simplification")) {
                
                // We allow One Step Simplification, otherwise we sometimes would
                // have to do a simplification ourselves before joining nodes.
@@ -194,6 +215,345 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
          }
 
          return super.isApprovedApp(app, pio, goal);
+      }
+      
+      /**
+       * Returns a set of join points for the given statement block.
+       * A join point is the statement in a program directly after
+       * an if-then-else or a try-catch-finally block.
+       * 
+       * @param toSearch The statement block to search for join points.
+       * @return A set of join points for the given statement block.
+       */
+      private static HashSet<ProgramElement> findJoinPoints(StatementBlock toSearch) {
+         HashSet<ProgramElement> result = new HashSet<ProgramElement>();
+         ImmutableArray<? extends Statement> stmts = toSearch.getBody();
+         
+         if (stmts.size() > 0) {
+            // Recursive step: Go deeper in the first statement
+            // (the other statements will be objects to future
+            // rule applications) and try to find breakpoints.
+            // Essential if the first statement is a try, if or
+            // method frame.
+            SourceElement stmt = stmts.get(0);
+            while (!stmt.getFirstElement().equals(stmt)) {
+               for (StatementBlock body : getBodies(stmt)) {
+                  result.addAll(findJoinPoints(body));
+               }
+               stmt = stmt.getFirstElement();
+            }
+         }
+         
+         for (int i = 0; i < stmts.size(); i++) {
+            SourceElement stmt = stmts.get(i);
+            
+            if ((stmt instanceof If || stmt instanceof Try) && 
+                  i < stmts.size() - 1) {
+               // We have found a reason for a break point (i.e.,
+               // a try or if statement), so let's add the next
+               // statement as a break point.
+               result.add(stmts.get(i+1));
+            }
+            
+            if ((stmt instanceof LoopStatement) && 
+                  i < stmts.size() - 1) {
+               // If a loop statement contains a break, we also
+               // have a potential join point.
+               // Note: The FindBreakVisitor does not take care
+               // of potential nested loops, so there may occur
+               // an early stop in this case.
+               
+               FindBreakVisitor visitor = new FindBreakVisitor(
+                     getBodies(stmt).element(), JoinRuleUtils.mediator().getServices());
+               visitor.start();
+               if (visitor.containsBreak()) {
+                  result.add(stmts.get(i+1));
+               }
+            }
+         }
+         
+         return result;
+      }
+      
+      /**
+       * Visitor for finding out whether there is a break statement
+       * contained in a program element.
+       */
+      private static class FindBreakVisitor extends JavaASTVisitor {
+         private boolean containsBreak = false;
+         
+         public FindBreakVisitor(ProgramElement root, Services services) {
+            super(root, services);
+         }
+         
+         /**
+          * @return true iff the visitor did find a break.
+          */
+         public boolean containsBreak() {
+            return containsBreak;
+         }
+         
+         @Override
+         protected void doDefaultAction(SourceElement node) {}
+         
+         @Override
+         public void performActionOnBreak(Break x) {
+            containsBreak = true;
+         }
+      };
+      
+      /**
+       * Returns the bodies for various compound statements like
+       * if, try, case, etc. If there is no body, an empty list
+       * is returned.
+       * 
+       * @param elem The element to return the bodies for.
+       * @return The bodies for the given source element.
+       */
+      private static LinkedList<StatementBlock> getBodies(SourceElement elem) {
+         if (elem instanceof If) {
+            return getBodies((If) elem);
+         } else if (elem instanceof Then) {
+            return getBodies((Then) elem);
+         } else if (elem instanceof Else) {
+            return getBodies((Else) elem);
+         } else if (elem instanceof Try) {
+            return getBodies((Try) elem);
+         } else if (elem instanceof Catch) {
+            return getBodies((Catch) elem);
+         } else if (elem instanceof Finally) {
+            return getBodies((Finally) elem);
+         } else if (elem instanceof MethodFrame) {
+            return getBodies((MethodFrame) elem);
+         } else if (elem instanceof Case) {
+            return getBodies((Case) elem);
+         } else if (elem instanceof CatchAllStatement) {
+            return getBodies((CatchAllStatement) elem);
+         } else if (elem instanceof LabeledStatement) {
+            return getBodies((LabeledStatement) elem);
+         } else if (elem instanceof LoopStatement) {
+            return getBodies((LoopStatement) elem);
+         } else if (elem instanceof SynchronizedBlock) {
+            return getBodies((SynchronizedBlock) elem);
+         } else {
+            return new LinkedList<StatementBlock>();
+         }
+      }
+      
+      /**
+       * Returns the bodies for an If element. NOTE: This includes
+       * the bodies for the Then *and* the Else part!
+       * 
+       * @param elem The element to return the bodies for.
+       * @return The bodies for the given source element.
+       */
+      private static LinkedList<StatementBlock> getBodies(If elem) {
+         LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+
+         result.addAll(getBodies(elem.getThen()));
+         
+         if (elem.getElse() != null) {
+            result.addAll(getBodies(elem.getElse()));
+         }
+         
+         return result;
+      }
+      
+      /**
+       * Returns the body for a Then element.
+       * 
+       * @param elem The element to return the bodies for.
+       * @return The bodies for the given source element.
+       */
+      private static LinkedList<StatementBlock> getBodies(Then elem) {
+         LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+         
+         Statement thenBody = elem.getBody();
+         if (thenBody instanceof StatementBlock) {
+            result.add((StatementBlock) thenBody);
+         }
+         
+         return result;
+      }
+      
+      /**
+       * Returns the body for an Else element.
+       * 
+       * @param elem The element to return the bodies for.
+       * @return The bodies for the given source element.
+       */
+      private static LinkedList<StatementBlock> getBodies(Else elem) {
+         LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+         
+         Statement elseBody = elem.getBody();
+         if (elseBody instanceof StatementBlock) {
+            result.add((StatementBlock) elseBody);
+         }
+         
+         return result;
+      }
+      
+      /**
+       * Returns the bodies for a Try element. NOTE: This includes
+       * the bodies for Try *and* for the branches!
+       * 
+       * @param elem The element to return the bodies for.
+       * @return The bodies for the given source element.
+       */
+      private static LinkedList<StatementBlock> getBodies(Try elem) {
+         LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+         
+         if (elem instanceof Try) {
+            Statement tryBody = elem.getBody();
+            if (tryBody instanceof StatementBlock) {
+               result.add((StatementBlock) tryBody);
+            }
+            
+            ImmutableArray<Branch> branches = elem.getBranchList();
+            for (Branch branch : branches) {
+               result.addAll(getBodies(branch));
+            }
+         }
+         
+         return result;
+      }
+      
+      /**
+       * Returns the body for a Catch element.
+       * 
+       * @param elem The element to return the bodies for.
+       * @return The bodies for the given source element.
+       */
+      private static LinkedList<StatementBlock> getBodies(Catch elem) {
+         LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+         
+         Statement catchBody = elem.getBody();
+         if (catchBody instanceof StatementBlock) {
+            result.add((StatementBlock) catchBody);
+         }
+         
+         return result;
+      }
+      
+      /**
+       * Returns the body for a Finally element.
+       * 
+       * @param elem The element to return the bodies for.
+       * @return The bodies for the given source element.
+       */
+      private static LinkedList<StatementBlock> getBodies(Finally elem) {
+         LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+         
+         Statement finallyBody = elem.getBody();
+         if (finallyBody instanceof StatementBlock) {
+            result.add((StatementBlock) finallyBody);
+         }
+         
+         return result;
+      }
+      
+      /**
+       * Returns the body for a MethodFrame element.
+       * 
+       * @param elem The element to return the bodies for.
+       * @return The bodies for the given source element.
+       */
+      private static LinkedList<StatementBlock> getBodies(MethodFrame elem) {
+         LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+         
+         Statement methodFrameBody = elem.getBody();
+         if (methodFrameBody instanceof StatementBlock) {
+            result.add((StatementBlock) methodFrameBody);
+         }
+         
+         return result;
+      }
+      
+      /**
+       * Returns the bodies for a Case element.
+       * 
+       * @param elem The element to return the bodies for.
+       * @return The bodies for the given source element.
+       */
+      private static LinkedList<StatementBlock> getBodies(Case elem) {
+         LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+         
+         ImmutableArray<Statement> caseBodies = elem.getBody();
+         for (Statement body : caseBodies) {
+            if (body instanceof StatementBlock) {
+               result.add((StatementBlock) body);
+            }
+         }
+         
+         return result;
+      }
+      
+      /**
+       * Returns the body for a CatchAllStatement element.
+       * 
+       * @param elem The element to return the bodies for.
+       * @return The bodies for the given source element.
+       */
+      private static LinkedList<StatementBlock> getBodies(CatchAllStatement elem) {
+         LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+         
+         Statement catchBody = elem.getBody();
+         if (catchBody instanceof StatementBlock) {
+            result.add((StatementBlock) catchBody);
+         }
+         
+         return result;
+      }
+      
+      /**
+       * Returns the body for a LabeledStatement element.
+       * 
+       * @param elem The element to return the bodies for.
+       * @return The bodies for the given source element.
+       */
+      private static LinkedList<StatementBlock> getBodies(LabeledStatement elem) {
+         LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+         
+         Statement thenBody = elem.getBody();
+         if (thenBody instanceof StatementBlock) {
+            result.add((StatementBlock) thenBody);
+         }
+         
+         return result;
+      }
+      
+      /**
+       * Returns the body for a LoopStatement element.
+       * 
+       * @param elem The element to return the bodies for.
+       * @return The bodies for the given source element.
+       */
+      private static LinkedList<StatementBlock> getBodies(LoopStatement elem) {
+         LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+         
+         Statement thenBody = elem.getBody();
+         if (thenBody instanceof StatementBlock) {
+            result.add((StatementBlock) thenBody);
+         }
+         
+         return result;
+      }
+      
+      /**
+       * Returns the body for a SynchronizedBlock element.
+       * 
+       * @param elem The element to return the bodies for.
+       * @return The bodies for the given source element.
+       */
+      private static LinkedList<StatementBlock> getBodies(SynchronizedBlock elem) {
+         LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
+         
+         Statement thenBody = elem.getBody();
+         if (thenBody instanceof StatementBlock) {
+            result.add((StatementBlock) thenBody);
+         }
+         
+         return result;
       }
 
    }
