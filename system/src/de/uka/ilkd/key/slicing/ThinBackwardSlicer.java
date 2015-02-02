@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.slicing;
 
+import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -7,7 +8,7 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.proof.Node;
 
 /**
@@ -19,7 +20,9 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
     * {@inheritDoc}
     */
    @Override
-   protected boolean accept(Node node, Set<Term> relevantLocations) {
+   protected boolean accept(Node node, 
+                            Set<ReferencePrefix> relevantLocations, 
+                            Map<ReferencePrefix, Set<ReferencePrefix>> aliases) {
       boolean accept = false;
       SourceElement activeStatement = node.getNodeInfo().getActiveStatement();
       if (activeStatement instanceof CopyAssignment) {
@@ -27,9 +30,9 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
          ImmutableArray<Expression> arguments = copyAssignment.getArguments();
          if (arguments.size() >= 1) {
             Services services = node.proof().getServices();
-            Expression target = arguments.get(0);
-            Term targetTerm = toTerm(services, target);
-            if (relevantLocations.contains(targetTerm)) {
+            SourceElement originalTarget = arguments.get(0);
+            ReferencePrefix relevantTarget = computeReferencePrefix(originalTarget);
+            if (relevantTarget != null && isRelevant(relevantTarget, relevantLocations, aliases)) {
                accept = true;
                for (int i = 1; i < arguments.size(); i++) {
                   Expression read = arguments.get(i);
