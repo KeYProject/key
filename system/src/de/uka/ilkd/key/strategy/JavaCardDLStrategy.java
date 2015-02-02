@@ -352,7 +352,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "executeIntegerAssignment", -100 );
 
         bindRuleSet ( d, "javaIntegerSemantics", ifZero(sequentContainsNoPrograms(), longConst(-5000), 
-                    ifZero(leq(CountBranchFeature.INSTANCE, longConst(1)),  inftyConst(), longConst(-5000)) ));
+                    ifZero(leq(CountBranchFeature.INSTANCE, longConst(1)), longConst(-5000), inftyConst()) ));
         
         // always give infinite cost to obsolete rules
         bindRuleSet (d, "obsolete", inftyConst());
@@ -2259,7 +2259,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                    
             setupDefOpsExpandMod ( d );
             
-            bindRuleSet ( d, "defOps_expandRanges", -5000 );
+            bindRuleSet ( d, "defOps_expandRanges", -8000 );
             bindRuleSet ( d, "defOps_expandJNumericOp", -500 );
             bindRuleSet ( d, "defOps_modHomoEq", -5000 );
         } else {
