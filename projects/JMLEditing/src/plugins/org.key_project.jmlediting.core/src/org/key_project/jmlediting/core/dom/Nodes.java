@@ -224,28 +224,23 @@ public final class Nodes {
             final Iterator<IASTNode> childIterator = children.iterator();
             IASTNode node = childIterator.next();
             IASTNode nextNode = node;
-            do {
+            while (childIterator.hasNext()) {
                // Check whether is is a next node
-               if (childIterator.hasNext()) {
-                  nextNode = childIterator.next();
-                  // Check whether the caret is valid
-                  if (node.getStartOffset() < caretPosition
-                        && caretPosition <= nextNode.getStartOffset()) {
-                     return node;
-                  }
-                  // Go to next node
-                  node = nextNode;
+               nextNode = childIterator.next();
+               // Check whether the caret is valid
+               if (node.getStartOffset() < caretPosition
+                     && caretPosition <= nextNode.getStartOffset()) {
+                  return node;
                }
-               else {
-                  // Can only look into this node
-                  if (node.getStartOffset() < caretPosition
-                        && caretPosition <= node.getEndOffset()) {
-                     return node;
-                  }
-               }
+               // Go to next node
+               node = nextNode;
             }
-            while (childIterator.hasNext());
-
+            // Last node
+            // Can only look into this node
+            if (node.getStartOffset() < caretPosition
+                  && caretPosition <= node.getEndOffset()) {
+               return node;
+            }
             return null;
          }
       });
