@@ -671,9 +671,9 @@ public class TestCaseGenerator {
 					init = "false";
 				}
 
-				result += NEW_LINE +TAB+ c.sort().name() + " " + c + " = " + init + ";";
+				result += NEW_LINE +TAB+ NULLABLE+ " "+c.sort().name() + " " + c + " = " + init + ";";
 				if(junitFormat){
-					result += NEW_LINE+TAB+ c.sort().name() + " " + getPreName(c.toString()) + " = " + init + ";";
+					result += NEW_LINE+TAB+ NULLABLE+ " "+c.sort().name() + " " + getPreName(c.toString()) + " = " + init + ";";
 				}
 
 
