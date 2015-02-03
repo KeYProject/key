@@ -1,5 +1,6 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -130,7 +131,8 @@ public class JMLStoreRefProposer {
                   replacementOffset, prefixLength, cursorPosition));
          }
          for (final IVariableBinding varBind : vars) {
-            if (varBind.getName().startsWith(prefix)) {
+            if (varBind.getName().startsWith(prefix)
+                  && ((varBind.getModifiers() & Modifier.FINAL) == 0)) {
                final String replacementString = varBind.getName();
                final int cursorPosition = replacementString.length();
                result.add(new CompletionProposal(replacementString,
