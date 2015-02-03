@@ -108,23 +108,51 @@ public class JMLCompletionProposalComputer implements
 
          // If Parser could parse or complete Error Recovery
          if (parseResult != null) {
-
+            final int caretPosition = context.getInvocationOffset();
             // Get keyword application node
             final IASTNode keywordApplNode = Nodes
                   .getNodeAtCaretPositionIncludeRightWhiteSpace(parseResult,
-                        context.getInvocationOffset(), NodeTypes.KEYWORD_APPL);
+                        caretPosition, NodeTypes.KEYWORD_APPL);
             // Check that there is a keyword appl and the caret not on the
             // keyword itself
-            if (keywordApplNode != null
-                  && !keywordApplNode.getChildren().get(0)
-                        .containsCaret(context.getInvocationOffset())) {
-               // Get the keyword from the node and get result of autoproposals
-               final IKeyword activeKeyword = ((IKeywordNode) keywordApplNode
-                     .getChildren().get(0)).getKeyword();
-               System.out.println("activeKeyword == " + activeKeyword);
+            if (keywordApplNode != null) {
 
-               result.addAll(activeKeyword.createAutoProposals(keywordApplNode,
-                     javaContext));
+               // Check whether the caret is in the keyword content
+               final boolean caretOnKeyword = keywordApplNode.getChildren()
+                     .get(0).containsCaret(caretPosition);
+               final boolean keywordTopLevelError;
+               final boolean caretAtEndOrOnRightWhiteSpace;
+               if (keywordApplNode.getChildren().size() == 1) {
+                  keywordTopLevelError = false;
+                  caretAtEndOrOnRightWhiteSpace = false;
+               }
+               else {
+                  keywordTopLevelError = keywordApplNode.getChildren().get(1)
+                        .getType() == NodeTypes.ERROR_NODE;
+                  // Check for offset, because after last charater is not a
+                  // valid offset
+                  caretAtEndOrOnRightWhiteSpace = !keywordApplNode
+                        .containsOffset(caretPosition);
+               }
+               // Caret is not allowed to be on the keyword itself and not at
+               // the end of the keyword (or on whitespace) if the keywrod does
+               // not contains a toplevel error (e.g. missing semicolon)
+               if (!caretOnKeyword
+                     && (!caretAtEndOrOnRightWhiteSpace || keywordTopLevelError)) {
+
+                  // Get the keyword from the node and get result of
+                  // autoproposals
+                  final IKeyword activeKeyword = ((IKeywordNode) keywordApplNode
+                        .getChildren().get(0)).getKeyword();
+                  System.out.println("activeKeyword == " + activeKeyword);
+
+                  result.addAll(activeKeyword.createAutoProposals(
+                        keywordApplNode, javaContext));
+               }
+               else {
+
+                  return this.getFallback(javaContext);
+               }
             }
             else {
                System.out.println("no activeKeyword");
