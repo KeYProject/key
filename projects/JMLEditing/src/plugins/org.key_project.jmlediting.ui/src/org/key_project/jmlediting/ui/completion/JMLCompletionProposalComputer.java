@@ -25,6 +25,7 @@ import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordAutoProposer;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
@@ -146,8 +147,13 @@ public class JMLCompletionProposalComputer implements
                         .getChildren().get(0)).getKeyword();
                   System.out.println("activeKeyword == " + activeKeyword);
 
-                  result.addAll(activeKeyword.createAutoProposals(
-                        keywordApplNode, javaContext));
+                  final IKeywordAutoProposer proposer = activeKeyword
+                        .createAutoProposer();
+                  if (proposer != null) {
+
+                     result.addAll(proposer.createAutoProposals(
+                           keywordApplNode, javaContext));
+                  }
                }
                else {
 

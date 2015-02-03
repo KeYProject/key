@@ -3,13 +3,10 @@ package org.key_project.jmlediting.profile.jmlref.behavior;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
-import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.profile.syntax.EmptyKeywordParser;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordAutoProposer;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordContentRefactorer;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
@@ -68,9 +65,8 @@ public abstract class AbstractBehaviorKeyword implements IToplevelKeyword {
    }
 
    @Override
-   public List<ICompletionProposal> createAutoProposals(final IASTNode node,
-         final JavaContentAssistInvocationContext context) {
-      return Collections.emptyList();
+   public IKeywordAutoProposer createAutoProposer() {
+      return null;
    }
 
    @Override

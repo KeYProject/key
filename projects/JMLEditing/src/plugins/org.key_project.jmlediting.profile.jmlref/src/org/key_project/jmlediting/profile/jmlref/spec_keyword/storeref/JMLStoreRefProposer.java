@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.profile.jmlref.spec_keyword;
+package org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -20,8 +20,6 @@ import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.utilities.JMLJavaResolver;
 import org.key_project.jmlediting.core.utilities.TypeDeclarationFinder;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.IStoreRefKeyword;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefNodeTypes;
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
 
 @SuppressWarnings("restriction")
