@@ -4,10 +4,13 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.internal.core.CompilationUnit;
 import org.eclipse.jdt.internal.ui.viewsupport.BindingLabelProvider;
@@ -20,7 +23,10 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
+import org.key_project.jmlediting.core.utilities.CommentLocator;
+import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLJavaVisibleFieldsComputer;
+import org.key_project.jmlediting.core.utilities.MethodDeclarationFinder;
 import org.key_project.jmlediting.core.utilities.TypeDeclarationFinder;
 import org.key_project.jmlediting.ui.completion.JMLCompletionProposalComputer;
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
@@ -52,6 +58,13 @@ public class JMLStoreRefProposer {
                && end >= this.context.getInvocationOffset()) {
             activeTypeDecl = decl;
          }
+      }
+
+      final MethodDeclarationFinder methodFinder = new MethodDeclarationFinder();
+      ast.accept(methodFinder);
+      final HashMap<Integer, List<SingleVariableDeclaration>> parameterMap = new HashMap<Integer, List<SingleVariableDeclaration>>();
+      for (final MethodDeclaration decl : methodFinder.getDecls()) {
+         parameterMap.put(decl.getStartPosition(), decl.parameters());
       }
 
       final ITypeBinding activeType = activeTypeDecl.resolveBinding();
@@ -88,7 +101,31 @@ public class JMLStoreRefProposer {
       result.addAll(this.proposeStoreRefVariables(activeType, node, restNodes,
             false, allowKeywords, true));
 
+      System.out.println("prefix: " + prefix + "; allowKeywords?"
+            + allowKeywords);
+      if (prefix != null && prefix.isEmpty() && allowKeywords) {
+         result.addAll(this.proposeMethodParameters(activeType, parameterMap));
+      }
+
       result.addAll(this.proposeStoreRefApiVariables(node, restNodes));
+
+      return result;
+   }
+
+   private Collection<? extends ICompletionProposal> proposeMethodParameters(
+         final ITypeBinding activeType,
+         final HashMap<Integer, List<SingleVariableDeclaration>> parameterMap) {
+      final Collection<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
+
+      final int offset = this.context.getInvocationOffset();
+
+      final CommentLocator locator = new CommentLocator(
+            this.context.getDocument());
+
+      final CommentRange range = locator.getJMLComment(offset);
+
+      System.out.println("begin: " + range.getBeginOffset() + "; end: "
+            + range.getEndOffset());
 
       return result;
    }
