@@ -124,7 +124,7 @@ public class JMLStoreRefProposer {
                - prefix.length();
          final int prefixLength = prefix.length();
 
-         if (prefix.isEmpty() && allowAsteric) {
+         if (prefix.isEmpty() && allowAsteric && !activeType.isPrimitive()) {
             final String replacementString = "*";
             final int cursorPosition = replacementString.length();
             result.add(new CompletionProposal(replacementString,
