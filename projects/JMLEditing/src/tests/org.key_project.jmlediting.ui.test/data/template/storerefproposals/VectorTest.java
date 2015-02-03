@@ -39,6 +39,7 @@ public class VectorTest {
      @ public normal_behavior
      @      ensures true;
      @      assignable  temp.[[3]];
+     @      requires \not_specified;
      @*/
    public void doCalculation3() {
       

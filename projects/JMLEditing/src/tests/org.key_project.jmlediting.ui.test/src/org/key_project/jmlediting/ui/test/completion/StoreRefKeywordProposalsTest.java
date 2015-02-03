@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -18,6 +19,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
+import org.key_project.jmlediting.core.profile.JMLProfileHelper;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.IStoreRefKeyword;
 import org.key_project.jmlediting.ui.test.UITestUtils;
 import org.key_project.jmlediting.ui.test.UITestUtils.TestProject;
 import org.key_project.jmlediting.ui.test.UITestUtils.TestProject.SaveGuarantee;
@@ -84,13 +87,44 @@ public class StoreRefKeywordProposalsTest {
    @Test
    public void testOpenProposalsAfterNewAssignable() {
       goToTestOffset(1);
-      bot.sleep(2000);
       final List<String> proposals = editor.getAutoCompleteProposals("");
-      bot.sleep(2000);
-      assertEquals("Proposals after new keyword not correct", Arrays.asList(
-            "\\everything", "\\not_specified", "\\nothing",
-            "intermediateVector", "intermediateVectors", "results", "temp",
-            "vectors1", "vectors2"), proposals);
+      assertEquals(
+            "Proposals after new keyword not correct",
+            appendStoreRefKeywords("intermediateVector", "intermediateVectors",
+                  "results", "temp", "vectors1", "vectors2"), proposals);
+   }
+
+   @Test
+   public void testOpenProposalsWithToplevelPrefix() {
+      goToTestOffset(2);
+      final List<String> proposals = editor.getAutoCompleteProposals("");
+      assertEquals("Proposals after toplevel prefix is wrong",
+            Arrays.asList("vectors1", "vectors2"), proposals);
+   }
+
+   @Test
+   public void testOpenProposalsFieldAccess() {
+      goToTestOffset(3);
+      final List<String> proposals = editor.getAutoCompleteProposals("");
+      assertEquals("Field access proposals is wrong",
+            Arrays.asList("*", "temp1", "temp2", "temp3", "moreTemps"),
+            proposals);
+      editor.autoCompleteProposal("m", "moreTemps");
+      editor.insertText(".");
+      final List<String> nextProposals = editor.getAutoCompleteProposals("");
+      assertEquals("Field access second level is wrong",
+            Arrays.asList("*", "elem", "next"), nextProposals);
+   }
+
+   private static List<String> appendStoreRefKeywords(final String... others) {
+      final List<String> storeRefKeywords = new ArrayList<String>();
+      for (final IStoreRefKeyword keyword : JMLProfileHelper.filterKeywords(
+            UITestUtils.findReferenceProfile(), IStoreRefKeyword.class)) {
+         storeRefKeywords.addAll(keyword.getKeywords());
+      }
+      Collections.sort(storeRefKeywords);
+      storeRefKeywords.addAll(Arrays.asList(others));
+      return storeRefKeywords;
    }
 
    private static void goToTestOffset(final int num) {

@@ -20,7 +20,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.util.test;bundle-version="1.0.0",
  org.key_project.jmlediting.core.test;bundle-version="1.0.0",
  org.eclipse.swtbot.junit4_x,
- org.eclipse.help.ui;bundle-version="4.0.100"
+ org.eclipse.help.ui;bundle-version="4.0.100",
+ org.key_project.jmlediting.profile.jmlref;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
