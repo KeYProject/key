@@ -1,11 +1,14 @@
 package org.key_project.jmlediting.core.utilities;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 
 /**
  * Utility Class to resolve TypeBindings.
@@ -161,6 +164,15 @@ public class JMLJavaResolver {
 
       // is the variable visible?
       return result;
+   }
+
+   public List<IVariableBinding> getAllParameters(
+         final JavaContentAssistInvocationContext context) {
+      for (final IMethodBinding method : this.activeType.getDeclaredMethods()) {
+         System.out.println("method: " + method.getName());
+      }
+
+      return Collections.emptyList();
    }
 
    public List<IVariableBinding> getAllVisibleVariableBindings() {
