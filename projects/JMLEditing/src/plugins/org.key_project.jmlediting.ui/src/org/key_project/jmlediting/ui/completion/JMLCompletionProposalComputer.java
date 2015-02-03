@@ -41,7 +41,7 @@ public class JMLCompletionProposalComputer implements
 
    private static Image img = null;
 
-   private static Image getJMLImg() {
+   public static Image getJMLImg() {
       if (img != null) {
          return img;
       }

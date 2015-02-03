@@ -10,16 +10,19 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.internal.core.CompilationUnit;
+import org.eclipse.jdt.internal.ui.viewsupport.BindingLabelProvider;
 import org.eclipse.jdt.ui.SharedASTProvider;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.swt.graphics.Image;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.utilities.JMLJavaResolver;
 import org.key_project.jmlediting.core.utilities.TypeDeclarationFinder;
+import org.key_project.jmlediting.ui.completion.JMLCompletionProposalComputer;
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
 
 @SuppressWarnings("restriction")
@@ -78,7 +81,8 @@ public class JMLStoreRefProposer {
       // TODO check for ArrayIndices
       if (prefix != null && prefix.isEmpty() && allowKeywords) {
          result.addAll(JMLCompletionUtil.getKeywordProposals(this.context,
-               null, null, IStoreRefKeyword.class));
+               null, JMLCompletionProposalComputer.getJMLImg(),
+               IStoreRefKeyword.class));
       }
 
       result.addAll(this.proposeStoreRefVariables(activeType, node, restNodes,
@@ -126,15 +130,21 @@ public class JMLStoreRefProposer {
             final String replacementString = "*";
             final int cursorPosition = replacementString.length();
             result.add(new CompletionProposal(replacementString,
-                  replacementOffset, prefixLength, cursorPosition));
+                  replacementOffset, prefixLength, cursorPosition,
+                  JMLCompletionProposalComputer.getJMLImg(), replacementString,
+                  null, null));
          }
          for (final IVariableBinding varBind : vars) {
             if (varBind.getName().startsWith(prefix)
                   && ((varBind.getModifiers() & Modifier.FINAL) == 0)) {
                final String replacementString = varBind.getName();
                final int cursorPosition = replacementString.length();
+
+               final Image image = BindingLabelProvider
+                     .getBindingImageDescriptor(varBind, 0).createImage();
                result.add(new CompletionProposal(replacementString,
-                     replacementOffset, prefixLength, cursorPosition));
+                     replacementOffset, prefixLength, cursorPosition, image,
+                     replacementString, null, null));
             }
          }
 
