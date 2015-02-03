@@ -67,10 +67,18 @@ public abstract class StoreRefContainerKeyword extends
                .propose(cu, null, false));
          return result;
       }
-      final IASTNode content = tmpNode.getChildren().get(0);
+      IASTNode content = tmpNode.getChildren().get(0);
 
       System.out.println("node: " + node.prettyPrintAST());
       System.out.println("content: " + content);
+
+      if (content.getType() == NodeTypes.ERROR_NODE) {
+         // Toplevel error node is for missing semicolon. Try get content of
+         // error
+         if (content.getChildren().size() == 1) {
+            content = content.getChildren().get(0);
+         }
+      }
 
       // TODO NodeTypes.LIST?
       if (content.getType() == StoreRefNodeTypes.STORE_REF_LIST) {
