@@ -722,7 +722,18 @@ public class Model {
 			if(pointed !=null){
 				result.add(pointed);
 			}			
-		}	
+		}
+		
+		for(Entry<Integer, String> e : o.getArrayValues().entrySet()){
+			
+			String val = e.getValue();
+			ObjectVal pointed = getObject(val, heap);
+			
+			if(pointed !=null){
+				result.add(pointed);
+			}
+			
+		}
 		
 		return result;
 	}
