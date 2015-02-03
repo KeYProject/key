@@ -62,7 +62,7 @@ public class JMLJavaVisibleFieldsComputer {
       IVariableBinding foundBinding = null;
 
       for (final IVariableBinding varBind : this
-            .getAllVisibleVariableBindings(targetType)) {
+            .getAllVisibleFields(targetType)) {
          if (fieldName.equals(varBind.getName())) {
             foundBinding = varBind;
             break;
@@ -150,7 +150,7 @@ public class JMLJavaVisibleFieldsComputer {
     *           the type to calculate the visible fields for.
     * @return the list of all visible fields
     */
-   public List<IVariableBinding> getAllVisibleVariableBindings(
+   public List<IVariableBinding> getAllVisibleFields(
          final ITypeBinding targetType) {
 
       final List<IVariableBinding> result = new ArrayList<IVariableBinding>();

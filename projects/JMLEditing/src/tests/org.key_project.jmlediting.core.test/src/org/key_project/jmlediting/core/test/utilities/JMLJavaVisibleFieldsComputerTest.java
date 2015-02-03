@@ -84,7 +84,7 @@ public class JMLJavaVisibleFieldsComputerTest {
    private static int getNumVisibleVarsFor(final ITypeBinding context,
          final ITypeBinding type) {
       return new JMLJavaVisibleFieldsComputer(context)
-            .getAllVisibleVariableBindings(type).size();
+            .getAllVisibleFields(type).size();
    }
 
    @Test
@@ -149,7 +149,7 @@ public class JMLJavaVisibleFieldsComputerTest {
             firstClass);
 
       assertEquals("Not the right amount of visible Variables was found", 4,
-            secondResolver.getAllVisibleVariableBindings(secondClassBinding)
+            secondResolver.getAllVisibleFields(secondClassBinding)
                   .size());
 
    }

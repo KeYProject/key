@@ -120,7 +120,7 @@ public class JMLStoreRefProposer {
          }
 
          final List<IVariableBinding> vars = resolver
-               .getAllVisibleVariableBindings(activeType);
+               .getAllVisibleFields(activeType);
 
          final int replacementOffset = this.context.getInvocationOffset()
                - prefix.length();
