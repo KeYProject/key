@@ -45,6 +45,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDGroupable;
+import org.key_project.sed.core.util.NodeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeCollapseFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeResumeFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStepIntoFeature;

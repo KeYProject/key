@@ -47,6 +47,7 @@ import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDGroupable;
+import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.NodeUtil;
@@ -669,7 +670,10 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          
          // If we dont have previous siblings use the most left x from parents
          if(areaX == -1) {
-            areaX = findAbove(node, true);
+            int above = findAbove(node, true);
+            int under = findInSubtree(node, true, false);
+            int x = under < above && under > -1 ? under : above;
+            areaX = x;//findAbove(node, true);
          }
 
          areaContext.setX(areaX);
@@ -741,12 +745,12 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             int currentWidth = currentPE.getGraphicsAlgorithm().getWidth();
 
             // Either we add a new group, so we have to center the rect too or
-            // we added a new node outside the group, so we have to re-center the group inc. rect or
+            // we added a new node outside the group, so we have to re-center the group inclusive rect or
             // we have a group without statements (only Start and Endnode)
             if(NodeUtil.canBeGrouped(current) && 
                   (next == current && NodeUtil.getChildren(current).length < 2 ||
                   next != current && !isParentGroup(next, current) ||
-                  next != current && next.getGroupStartCondition(current) != null)) {
+                  next.getGroupStartCondition(current) != null && NodeUtil.getParent(next) == current)) {
                PictogramElement rectPE = getPictogramElementForBusinessObject(current , 0);
                currentWidth = rectPE.getGraphicsAlgorithm().getWidth();
                descendantsPE.add(rectPE);
@@ -927,15 +931,27 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     */
    protected void adjustRects(ISEDDebugNode node, IProgressMonitor monitor) throws DebugException {
       monitor.beginTask("Adjust rectangles", IProgressMonitor.UNKNOWN);
+      
+      LinkedList<ISEDGroupable> groups = new LinkedList<ISEDGroupable>();
+      
       ISEDDebugNode startNode = NodeUtil.getGroupStartNode(node) != null ? (ISEDDebugNode) NodeUtil.getGroupStartNode(node) : node;
       ISEDIterator iter = new SEDPreorderIterator(startNode);
       while (iter.hasNext() && !monitor.isCanceled()) {
          ISEDDebugElement next = iter.next();
          
          if(next instanceof ISEDDebugNode) {            compute((ISEDDebugNode) next, monitor);
+            if(NodeUtil.canBeGrouped(next)) {
+               groups.add((ISEDGroupable) next);
+            }
          }
          monitor.worked(1);
       }
+      
+      for(ISEDGroupable group : groups) {
+         resizeRectsIfNeeded(group, monitor);
+         monitor.worked(1);
+      }      
+      
       monitor.done();
    }
    
@@ -1057,6 +1073,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                            mostRight = findInSiblingBranch((ISEDDebugNode) group, true, false);
                            if(mostRight == -1 || mostRight + OFFSET <= outGroupGA.getX() + METOFF || mostRight + OFFSET < groupGA.getX()) {
                               enoughSpace = true;
+                              // get the most right x where we can move to
                               outX = mostRight == -1 || mostRight + OFFSET <= outGroupGA.getX() + METOFF ? outGroupGA.getX() + METOFF : mostRight + OFFSET;
                            }
                            break;
@@ -1067,10 +1084,22 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                   
                   // if there is enough space, it's possible to move the groups
                   if(enoughSpace) {
+                     // calc the max rang we can move
                      toMove = groups2.getFirst().getX() - outX;
-                     for(GraphicsAlgorithm groupGA : groups2) {
-                        groupGA.setX(groupGA.getX() - diff);
+                     
+                     if(toMove > diff) {
+                        toMove = diff;
                      }
+                     
+                     // move the rects as much as possible
+                     for(GraphicsAlgorithm groupGA : groups2) {
+                        groupGA.setX(groupGA.getX() - toMove);
+//                        groupGA.setX(groupGA.getX() - diff);
+                     }
+                     
+                     // move the nodes the the right the rest (no movement if whole diff is covered)
+                     moveRightAndAbove(node, diff - toMove, monitor);
+                     moveSubTreeHorizontal(node, diff - toMove, true, monitor);
                   }
                   // if there is not enough space, but we have a prev branch
                   // we move the rects as much as we can to the left and
@@ -1091,7 +1120,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          }
       }
       
-      resizeRectsIfNeeded(groupStart, monitor);
+//      resizeRectsIfNeeded(groupStart, monitor);
       updateParents(groupStartPE, monitor);
    }
 

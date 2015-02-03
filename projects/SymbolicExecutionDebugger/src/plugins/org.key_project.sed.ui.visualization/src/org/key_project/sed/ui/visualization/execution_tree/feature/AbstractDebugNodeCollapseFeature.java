@@ -166,7 +166,6 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       
       ISEDBranchCondition[] bcs = NodeUtil.getSortedBCs(groupStart);
 
-      int maxX = rectGA.getX();
       LinkedList<ISEDDebugNode> leafs = new LinkedList<ISEDDebugNode>();
       
       nodeGA.setX(rectGA.getX());
@@ -182,7 +181,8 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       // Add the branchconditions to the diagram
       for(ISEDBranchCondition bc : bcs)
       { 
-         uf.createGraphicalRepresentationForNode(bc, maxX);
+         // second parameter never used (parent always != null when collapsing)
+         uf.createGraphicalRepresentationForNode(bc, 0);
          
          PictogramElement bcPE = uf.getPictogramElementForBusinessObject(bc);
          GraphicsAlgorithm bcGA = bcPE.getGraphicsAlgorithm();
@@ -205,8 +205,6 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
                uf.moveSubTreeHorizontal(bc, mostRightXInPrev + uf.OFFSET - mostLeft, true, new SubProgressMonitor(monitor, 1));
             }
          }
-         
-         maxX = uf.findInSubtree(bc, false, true) + uf.OFFSET;
 
          createConnection((AnchorContainer)bcPE, (AnchorContainer)groupEndPE);
          leafs.add((bcGA.getWidth() > groupEndGA.getWidth() ? bc : groupEnd));
@@ -239,6 +237,11 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
                uf.moveSubTreeHorizontal(leaf, toMove, true, new SubProgressMonitor(monitor, 1));
             }
          }
+      }
+      
+      // if the group node overlaps the rect now, we have to reposition the rect
+      if(nodeGA.getX() < rectGA.getX() + uf.METOFF) {
+         rectGA.setX(nodeGA.getX() - uf.METOFF);
       }
 
       uf.adjustRects((ISEDDebugNode) groupStart, new SubProgressMonitor(monitor, 1));
