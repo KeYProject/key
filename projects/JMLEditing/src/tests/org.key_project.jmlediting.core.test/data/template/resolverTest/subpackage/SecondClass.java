@@ -13,5 +13,6 @@ public class SecondClass extends SuperClass {
       private int privateNestedInSecondClass;
       protected long protectedNestedInSecondClass;
       long packageNestedInSecondClass;
+      
    }
 }

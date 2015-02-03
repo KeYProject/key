@@ -29,7 +29,7 @@ import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordContentRefactorer;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
-import org.key_project.jmlediting.core.utilities.JMLJavaResolver;
+import org.key_project.jmlediting.core.utilities.JMLJavaVisibleFieldsComputer;
 import org.key_project.jmlediting.core.utilities.JavaElementIdentifier;
 import org.key_project.jmlediting.core.utilities.TypeDeclarationFinder;
 import org.key_project.util.jdt.JDTUtil;
@@ -90,11 +90,12 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
       final List<TypeDeclaration> decls = finder.getDecls();
       final TypeDeclaration topDecl = decls.get(0);
       final ITypeBinding type = topDecl.resolveBinding();
-      final JMLJavaResolver resolver = new JMLJavaResolver(type, type);
+      final JMLJavaVisibleFieldsComputer resolver = new JMLJavaVisibleFieldsComputer(
+            type);
       // Uniquely identify the Element that shall be refactored
       final JavaElementIdentifier refGoal = new JavaElementIdentifier(
-            elem.getElementName(), resolver.getTypeForName(elem
-                  .getElementName()), elem.getDeclaringType());
+            elem.getElementName(), resolver.getTypeForName(type,
+                  elem.getElementName()), elem.getDeclaringType());
       final List<Change> occurences = this.getJMLOccurences(refGoal);
       // final ReplaceEdit edit = new ReplaceEdit(offset,
       // refGoal.getName().length(), this

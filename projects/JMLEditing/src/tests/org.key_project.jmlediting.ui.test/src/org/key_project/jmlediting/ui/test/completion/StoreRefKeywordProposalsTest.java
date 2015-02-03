@@ -115,10 +115,10 @@ public class StoreRefKeywordProposalsTest {
       goToTestOffset(3);
       final List<String> proposals = editor.getAutoCompleteProposals("");
       assertEquals("Field access proposals is wrong",
-            Arrays.asList("*", "temp1", "temp2", "temp3", "moreTemps"),
+            Arrays.asList("*", "moreTemps", "temp1", "temp2", "temp3"),
             proposals);
-      editor.autoCompleteProposal("m", "moreTemps");
-      editor.insertText(".");
+      editor.autoCompleteProposal("", "moreTemps");
+      editor.typeText(".");
       this.checkConsProposals();
    }
 
@@ -131,7 +131,7 @@ public class StoreRefKeywordProposalsTest {
    private void checkConsProposals() {
       final List<String> nextProposals = editor.getAutoCompleteProposals("");
       assertEquals("Members for classes Cons are wrong",
-            Arrays.asList("*", "elem", "next"), nextProposals);
+            Arrays.asList("*", "elem", "id", "next"), nextProposals);
    }
 
    @Test

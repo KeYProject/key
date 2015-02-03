@@ -20,7 +20,7 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
-import org.key_project.jmlediting.core.utilities.JMLJavaResolver;
+import org.key_project.jmlediting.core.utilities.JMLJavaVisibleFieldsComputer;
 import org.key_project.jmlediting.core.utilities.TypeDeclarationFinder;
 import org.key_project.jmlediting.ui.completion.JMLCompletionProposalComputer;
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
@@ -106,8 +106,8 @@ public class JMLStoreRefProposer {
       // cut the prefix to the cursor position
       final String prefix = JMLCompletionUtil.computePrefix(this.context, node);
 
-      final JMLJavaResolver resolver = new JMLJavaResolver(this.declaringType,
-            activeType);
+      final JMLJavaVisibleFieldsComputer resolver = new JMLJavaVisibleFieldsComputer(
+            this.declaringType);
 
       // if prefix != null the cursor is in or before the currentNode ->
       // compute the proposals
@@ -120,7 +120,7 @@ public class JMLStoreRefProposer {
          }
 
          final List<IVariableBinding> vars = resolver
-               .getAllVisibleVariableBindings();
+               .getAllVisibleVariableBindings(activeType);
 
          final int replacementOffset = this.context.getInvocationOffset()
                - prefix.length();
@@ -176,7 +176,7 @@ public class JMLStoreRefProposer {
             }
             if (nextType == null) {
                System.out.println("searchingType for: " + name);
-               nextType = resolver.getTypeForName(name);
+               nextType = resolver.getTypeForName(activeType, name);
             }
 
             if (nextType == null) {
