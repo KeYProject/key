@@ -151,8 +151,26 @@ public class JMLStoreRefProposer {
             final String name = ((IStringNode) node.getChildren().get(0))
                   .getString();
 
-            System.out.println("searchingType for: " + name);
-            final ITypeBinding nextType = resolver.getTypeForName(name);
+            ITypeBinding nextType = null;
+            // Handle this and super
+            // this is not correct completely because the implementation
+            // allows this as a field access which is not correct
+            // this/super is allowed as an initial identifier and after
+            // a trype of the current or an enclosing class which is not handled
+            // currently
+            if (activeType == this.declaringType) {
+               if (name.equals("this")) {
+                  nextType = activeType;
+               }
+               else if (name.equals("super")) {
+                  nextType = activeType.getSuperclass();
+               }
+            }
+            if (nextType == null) {
+               System.out.println("searchingType for: " + name);
+               nextType = resolver.getTypeForName(name);
+            }
+
             if (nextType == null) {
                System.out.println("AAAAaaahhhhh, nextType is null!");
                return Collections.emptyList();
