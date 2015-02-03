@@ -383,4 +383,26 @@ public final class JavaUtil {
          list.add(index, toInsert);
       }
    }
+
+   /**
+    * Counts how often the character is contained in the given text.
+    * @param text The text to count in.
+    * @param toCount The character to count.
+    * @return The number of occurrence.
+    */
+   public static int count(String text, char toCount) {
+      if (text != null) {
+         char[] content = text.toCharArray();
+         int count = 0;
+         for (char character : content) {
+            if (character == toCount) {
+               count++;
+            }
+         }
+         return count;
+      }
+      else {
+         return 0;
+      }
+   }
 }

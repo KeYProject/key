@@ -26,6 +26,17 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
    public static final boolean PRINT_SLICE = true;
 
    /**
+    * Tests slicing on the example {@code simpleAliasChanged}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testSimpleAliasChanged() throws Exception {
+      doSlicingTest("examples/_testcase/slicing/simpleAliasChanged/SimpleAliasChanged.proof", 
+                    new ReturnSelector(36),
+                    false,
+                    24);
+   }
+
+   /**
     * Tests slicing on the example {@code instanceFieldsAliased}.
     * @throws Exception Occurred Exception.
     */
@@ -33,7 +44,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
       doSlicingTest("examples/_testcase/slicing/instanceFieldsAliased/InstanceFieldsAliased.proof", 
                     new ReturnSelector(194),
                     false,
-                    95, 68, 63, 55, 42);
+                    111, 68);
    }
    
    /**
@@ -44,7 +55,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
       doSlicingTest("examples/_testcase/slicing/nestedInstanceFields/NestedInstanceFields.proof", 
                     new ReturnSelector(153),
                     false,
-                    61, 32, 40);
+                    61, 32, 19);
    }
    
    /**
@@ -77,7 +88,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
       doSlicingTest("examples/_testcase/slicing/nestedInstanceAccess/NestedInstanceAccess.proof", 
                     new ReturnSelector(138),
                     false,
-                    136, 132, 127, 113, 103, 76, 45, 31);
+                    136, 132, 127, 113, 86, 45, 31);
    }
 
    /**
