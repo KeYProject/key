@@ -485,6 +485,41 @@ public class ArrayUtilTest extends TestCase {
             assertEquals("Can not create an array if both paramters are null.", e.getMessage());
         }
     }
+
+    /**
+     * Tests {@link ArrayUtil#addAll(Object[], Object[], Class)}
+     */
+    @Test
+    public void testAddAll_newType() {
+        String[] first = new String[] {"A", "B", "C"};
+        String[] second = new String[] {"D", "E"};
+        // Test first parameter null
+        Object[] combined = ArrayUtil.addAll(null, second, Object.class);
+        assertEquals(Object.class, combined.getClass().getComponentType());
+        assertEquals(2, combined.length);
+        assertEquals("D", combined[0]);
+        assertEquals("E", combined[1]);
+        // Test second parameter null
+        combined = ArrayUtil.addAll(first, null, Object.class);
+        assertEquals(Object.class, combined.getClass().getComponentType());
+        assertEquals(3, combined.length);
+        assertEquals("A", combined[0]);
+        assertEquals("B", combined[1]);
+        assertEquals("C", combined[2]);
+        // Test both parameter valid
+        combined = ArrayUtil.addAll(first, second, Object.class);
+        assertEquals(Object.class, combined.getClass().getComponentType());
+        assertEquals(5, combined.length);
+        assertEquals("A", combined[0]);
+        assertEquals("B", combined[1]);
+        assertEquals("C", combined[2]);
+        assertEquals("D", combined[3]);
+        assertEquals("E", combined[4]);
+        // Test both parameter null
+        combined = ArrayUtil.addAll(null, null, Object.class);
+        assertEquals(Object.class, combined.getClass().getComponentType());
+        assertEquals(0, combined.length);
+    }
     
     /**
      * Tests {@link ArrayUtil#add(int[], int)}
