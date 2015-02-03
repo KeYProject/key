@@ -63,8 +63,6 @@ public class JMLCompletionProposalComputer implements
    public List<ICompletionProposal> computeCompletionProposals(
          final ContentAssistInvocationContext context,
          final IProgressMonitor monitor) {
-      System.out
-            .println("InvocationOffset == " + context.getInvocationOffset());
 
       // Can only provide anything if there is a valid profile
       if (!JMLPreferencesHelper.isAnyProfileAvailable()) {

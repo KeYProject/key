@@ -206,6 +206,8 @@ public final class Nodes {
     */
    public static IASTNode getNodeAtCaretPositionIncludeRightWhiteSpace(
          final IASTNode root, final int caretPosition, final int type) {
+      final int cleanedCaretPosition = Math.min(root.getEndOffset(),
+            caretPosition);
       return root.search(new INodeSearcher<IASTNode>() {
 
          @Override
@@ -228,8 +230,8 @@ public final class Nodes {
                // Check whether is is a next node
                nextNode = childIterator.next();
                // Check whether the caret is valid
-               if (node.getStartOffset() < caretPosition
-                     && caretPosition <= nextNode.getStartOffset()) {
+               if (node.getStartOffset() < cleanedCaretPosition
+                     && cleanedCaretPosition <= nextNode.getStartOffset()) {
                   return node;
                }
                // Go to next node
@@ -237,8 +239,8 @@ public final class Nodes {
             }
             // Last node
             // Can only look into this node
-            if (node.getStartOffset() < caretPosition
-                  && caretPosition <= node.getEndOffset()) {
+            if (node.getStartOffset() < cleanedCaretPosition
+                  && cleanedCaretPosition <= node.getEndOffset()) {
                return node;
             }
             return null;
