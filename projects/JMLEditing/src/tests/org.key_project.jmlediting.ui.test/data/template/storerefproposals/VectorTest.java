@@ -20,6 +20,8 @@ public class VectorTest {
    
    private Temps temp;
    
+   private final Integer secret = 0;
+   
    
    /*@
      @ assignable [[1]]
@@ -47,9 +49,11 @@ public class VectorTest {
    
    /*@
      @ assignable [[4]];
-     @ assignable vectors2.cons.[[5]];
+     @ assignable vectors2.next.[[5]];
+     @ assignable factor.[[6]];
+     @ assignable secret.[[7]];
      @*/
-   public void doCalculation4_5(Double factor) {
+   public void doCalculation4_5(double factor, Vector2 newVector) {
       
    }
    

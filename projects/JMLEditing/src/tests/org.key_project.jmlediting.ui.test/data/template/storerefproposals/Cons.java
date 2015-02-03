@@ -4,6 +4,8 @@ public class Cons<T> {
    
    public T elem;
    public Cons<T> next;
+   protected int id;
+   private int privateId;
    
    public Cons(T elem, Cons<T> next) {
       this.elem = elem;

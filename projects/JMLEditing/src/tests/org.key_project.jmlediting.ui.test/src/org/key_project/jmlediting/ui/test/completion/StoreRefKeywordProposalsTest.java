@@ -15,6 +15,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
+import org.eclipse.swtbot.swt.finder.utils.Position;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -44,12 +45,17 @@ public class StoreRefKeywordProposalsTest {
             .getProject(), UITestUtils.findReferenceProfile());
       project.restoreClassAndOpen();
       // Preprocess file
+      // There are markers following the template [[<num>]] in the text with
+      // increasing numbers
+      // Remove them and store the positions
       final IFile classFile = project
             .getProject()
             .getProject()
             .getFile(
                   "src/" + project.getPackageName().replace('.', '/') + "/"
                         + project.getClassName() + ".java");
+
+      // Read the file
       final BufferedReader reader = new BufferedReader(new InputStreamReader(
             classFile.getContents()));
       String text = "";
@@ -58,6 +64,7 @@ public class StoreRefKeywordProposalsTest {
          text += "\n" + temp;
       }
 
+      // Find and remove the positions
       testPositions = new ArrayList<Integer>();
       int i = 1;
       int offset;
@@ -69,6 +76,7 @@ public class StoreRefKeywordProposalsTest {
          i++;
       }
 
+      // Store the transformed file
       classFile.setContents(new ByteArrayInputStream(text.getBytes()),
             IFile.FORCE, null);
 
@@ -111,9 +119,63 @@ public class StoreRefKeywordProposalsTest {
             proposals);
       editor.autoCompleteProposal("m", "moreTemps");
       editor.insertText(".");
+      this.checkConsProposals();
+   }
+
+   private void checkVector2Proposals() {
       final List<String> nextProposals = editor.getAutoCompleteProposals("");
-      assertEquals("Field access second level is wrong",
+      assertEquals("Members for class Vector2 are wrong",
+            Arrays.asList("*", "x", "y"), nextProposals);
+   }
+
+   private void checkConsProposals() {
+      final List<String> nextProposals = editor.getAutoCompleteProposals("");
+      assertEquals("Members for classes Cons are wrong",
             Arrays.asList("*", "elem", "next"), nextProposals);
+   }
+
+   @Test
+   public void testOpenProposalsWithParameter() {
+      goToTestOffset(4);
+      final List<String> proposals = editor.getAutoCompleteProposals("");
+      assertEquals(
+            "Proposals with parameters not correct",
+            appendStoreRefKeywords("factor, intermediateVector",
+                  "intermediateVectors", "newVector", "results", "temp",
+                  "vectors1", "vectors2"), proposals);
+      editor.autoCompleteProposal("", "newVector");
+      editor.typeText(".");
+      this.checkVector2Proposals();
+   }
+
+   @Test
+   public void testGenericsCompletion() {
+      goToTestOffset(5);
+      this.checkConsProposals();
+      editor.autoCompleteProposal("", "elem");
+      bot.sleep(2000);
+      editor.typeText(".");
+      bot.sleep(2000);
+      this.checkVector2Proposals();
+   }
+
+   @Test
+   public void testNoStarAfterPrimitiveType() {
+      goToTestOffset(6);
+      final List<String> nextProposals = editor.getAutoCompleteProposals("");
+      assertEquals("There should be no proposal after primitive type",
+            Arrays.asList("No Default Proposals"), nextProposals);
+   }
+
+   @Test
+   public void testStarAfterReferenceType() {
+      goToTestOffset(7);
+      final Position pos = editor.cursorPosition();
+      final List<String> nextProposals = editor.getAutoCompleteProposals("");
+      // Only one proposal, is inserted by default
+      assertEquals("Wrong proposals after reference type with no field", editor
+            .getTextOnLine(pos.line).subSequence(pos.column, pos.column + 1),
+            "*");
    }
 
    private static List<String> appendStoreRefKeywords(final String... others) {
