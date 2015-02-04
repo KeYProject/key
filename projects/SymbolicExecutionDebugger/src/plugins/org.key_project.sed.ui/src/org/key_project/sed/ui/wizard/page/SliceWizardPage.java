@@ -15,6 +15,7 @@ import org.key_project.sed.core.annotation.impl.SliceAnnotationType;
 import org.key_project.sed.core.slicing.ISEDSlicer;
 import org.key_project.sed.core.util.SEDAnnotationUtil;
 import org.key_project.sed.ui.composite.AnnotationAppearanceComposite;
+import org.key_project.sed.ui.util.SEDImages;
 
 /**
  * This {@link WizardPage} defines search criteria.
@@ -46,6 +47,7 @@ public class SliceWizardPage extends WizardPage {
       this.slicer = slicer;
       setTitle("Slicing");
       setDescription("Select the slicing algorithm.");
+      setImageDescriptor(SEDImages.getImageDescriptor(SEDImages.SLICE_WIZARD));
    }
 
    /**

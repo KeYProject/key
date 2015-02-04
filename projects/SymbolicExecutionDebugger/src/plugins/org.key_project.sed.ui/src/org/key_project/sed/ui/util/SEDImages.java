@@ -198,6 +198,11 @@ public final class SEDImages {
      * The key for the image that is used for slicing.
      */
     public static final String SLICE = "org.key_project.sed.ui.images.slicing";
+
+    /**
+     * The key for the image that is used for slicing wizard.
+     */
+    public static final String SLICE_WIZARD = "org.key_project.sed.ui.images.slicingWizard";
     
     /**
      * Forbid instances.
@@ -345,6 +350,9 @@ public final class SEDImages {
         else if (SLICE.equals(key)) {
            path = "icons/slice.gif";
         }
+        else if (SLICE_WIZARD.equals(key)) {
+           path = "icons/slice_wizard.png";
+        }
         // Load image if possible
         if (path != null) {
            InputStream in = null;
@@ -410,6 +418,7 @@ public final class SEDImages {
                registry.remove(METHOD_RETURN);
                registry.remove(SHOW_ALL_CONSTRAINTS);
                registry.remove(SLICE);
+               registry.remove(SLICE_WIZARD);
                registry.remove(TERMINATION);
                registry.remove(TERMINATION_NOT_VERIFIED);
                registry.remove(SYMBOLIC_DEBUG);

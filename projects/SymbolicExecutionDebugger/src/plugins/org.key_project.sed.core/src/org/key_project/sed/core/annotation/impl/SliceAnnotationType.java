@@ -46,7 +46,7 @@ public class SliceAnnotationType extends AbstractSEDAnnotationType {
     */
    @Override
    public RGB getDefaultBackgroundColor() {
-      return new RGB(255, 128, 0); // Nice orange
+      return new RGB(197, 112, 154); // Nice purple
    }
 
    /**
