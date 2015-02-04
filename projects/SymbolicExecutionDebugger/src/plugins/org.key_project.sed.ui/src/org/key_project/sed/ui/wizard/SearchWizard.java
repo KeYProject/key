@@ -53,6 +53,7 @@ public class SearchWizard extends Wizard {
       Assert.isNotNull(annotationType);
       setWindowTitle("Search");
       setNeedsProgressMonitor(true);
+      setHelpAvailable(false);
    }
 
    /**
@@ -145,6 +146,7 @@ public class SearchWizard extends Wizard {
     */
    public static int openWizard(Shell parentShell, ISEDDebugTarget target) {
       WizardDialog dialog = new WizardDialog(parentShell, new SearchWizard(target));
+      dialog.setHelpAvailable(false);
       return dialog.open();
    }
 }
