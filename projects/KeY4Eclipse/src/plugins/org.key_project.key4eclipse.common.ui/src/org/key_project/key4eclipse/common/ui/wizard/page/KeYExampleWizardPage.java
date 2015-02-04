@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
+import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -96,6 +97,7 @@ public class KeYExampleWizardPage extends WizardPage {
       super(pageName);
       setTitle("KeY Examples");
       setDescription("Select one example to create a Java Project for.");
+      setImageDescriptor(KeYImages.getImageDescriptor(KeYImages.NEW_KEY_JAVA_PROJECT_WIZARD));
    }
 
    /**

@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.wizards.JavaProjectWizard;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardPage;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.util.java.ObjectUtil;
@@ -50,10 +51,22 @@ public abstract class AbstractNewJavaProjectWizard extends JavaProjectWizard {
       super.addPages();
       try {
          Object obj = ObjectUtil.get(this, "fFirstPage");
-         if(obj instanceof WizardPage) {
+         if (obj instanceof WizardPage) {
             WizardPage page = (WizardPage) obj;
             page.setTitle(computeTitle());
             page.setDescription(computeDescription());
+            ImageDescriptor id = computeImageDescriptor();
+            if (id != null) {
+               page.setImageDescriptor(id);
+               Object secondObj = ObjectUtil.get(this, "fSecondPage");
+               if (secondObj instanceof WizardPage) {
+                  WizardPage secondPage = (WizardPage) secondObj;
+                  secondPage.setImageDescriptor(id);
+               }
+               else {
+                  LogUtil.getLogger().logWarning("API has changed");
+               }
+            }
          }
          else {
             LogUtil.getLogger().logWarning("API has changed");
@@ -64,7 +77,7 @@ public abstract class AbstractNewJavaProjectWizard extends JavaProjectWizard {
          LogUtil.getLogger().openErrorDialog(getShell(), e);
       }
    }
-   
+
    /**
     * Computes the description.
     * @return The description to set.
@@ -76,6 +89,12 @@ public abstract class AbstractNewJavaProjectWizard extends JavaProjectWizard {
     * @return The title to set.
     */
    protected abstract String computeTitle();
+   
+   /**
+    * Computes the {@link ImageDescriptor}.
+    * @return The {@link ImageDescriptor}.
+    */
+   protected abstract ImageDescriptor computeImageDescriptor();
 
    /**
     * Returns the {@link IResource} that will contain java source code.

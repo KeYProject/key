@@ -53,6 +53,11 @@ public final class KeYImages {
      * The key for the image that is used for the interactive rule application wizard.
      */
     public static final String INTERACTIVE_WIZARD = "org.key_project.key4eclipse.common.ui.interactiveWizard";
+
+    /**
+     * The key for the image that is used for the new KeY Java project wizard.
+     */
+    public static final String NEW_KEY_JAVA_PROJECT_WIZARD = "org.key_project.key4eclipse.common.ui.newKeYJavaProjectWizard";
     
     /**
      * Forbid instances.
@@ -126,6 +131,9 @@ public final class KeYImages {
         else if (INTERACTIVE_WIZARD.equals(key)) {
            path = "icons/interactive_wizard.png";
         }
+        else if (NEW_KEY_JAVA_PROJECT_WIZARD.equals(key)) {
+           path = "icons/new_key_java_wizard.png";
+        }
         // Load image if possible
         if (path != null) {
            InputStream in = null;
@@ -167,6 +175,7 @@ public final class KeYImages {
                ImageRegistry registry = Activator.getDefault().getImageRegistry();
                registry.remove(KEY_LOGO);
                registry.remove(INTERACTIVE_WIZARD);
+               registry.remove(NEW_KEY_JAVA_PROJECT_WIZARD);
                registry.remove(STARTER_WIZARD);
                registry.remove(TEST_GENERATION);
             }
