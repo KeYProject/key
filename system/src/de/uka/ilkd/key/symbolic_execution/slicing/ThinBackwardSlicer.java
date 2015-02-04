@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.slicing;
+package de.uka.ilkd.key.symbolic_execution.slicing;
 
 import java.util.Map;
 import java.util.Set;

@@ -1,7 +1,7 @@
 package org.key_project.sed.key.core.slicing;
 
-import de.uka.ilkd.key.slicing.AbstractSlicer;
-import de.uka.ilkd.key.slicing.ThinBackwardSlicer;
+import de.uka.ilkd.key.symbolic_execution.slicing.AbstractSlicer;
+import de.uka.ilkd.key.symbolic_execution.slicing.ThinBackwardSlicer;
 
 /**
  * Performs slicing with help of the {@link ThinBackwardSlicer}.

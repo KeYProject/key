@@ -20,7 +20,7 @@ import org.key_project.sed.key.core.model.KeYVariable;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.slicing.AbstractSlicer;
+import de.uka.ilkd.key.symbolic_execution.slicing.AbstractSlicer;
 
 /**
  * Provides a basic {@link ISEDSlicer} implementation which performs
