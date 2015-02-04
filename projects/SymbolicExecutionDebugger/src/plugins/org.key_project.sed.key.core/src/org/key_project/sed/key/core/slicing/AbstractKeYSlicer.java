@@ -6,6 +6,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
+import org.key_project.sed.core.annotation.ISEDAnnotationAppearance;
 import org.key_project.sed.core.annotation.impl.SliceAnnotation;
 import org.key_project.sed.core.annotation.impl.SliceAnnotationLink;
 import org.key_project.sed.core.annotation.impl.SliceAnnotationType;
@@ -34,6 +35,7 @@ public abstract class AbstractKeYSlicer implements ISEDSlicer {
    @Override
    public SliceAnnotation slice(ISEDDebugNode seedNode, 
                                 IVariable seedVariable, 
+                                ISEDAnnotationAppearance appearance,
                                 IProgressMonitor monitor) throws DebugException {
       // Check if parameters are valid.
       if (seedNode instanceof IKeYSEDDebugNode<?>) {
@@ -49,6 +51,9 @@ public abstract class AbstractKeYSlicer implements ISEDSlicer {
             // Show slice
             SliceAnnotationType annotationType = (SliceAnnotationType)SEDAnnotationUtil.getAnnotationtype(SliceAnnotationType.TYPE_ID);
             SliceAnnotation annotation = annotationType.createAnnotation();
+            if (appearance != null) {
+               appearance.applyTo(annotation);
+            }
             annotation.setSeed(seedVariable.getName() + " at " + seedNode.getName());
             keyDebugTarget.registerAnnotation(annotation);
             Set<IKeYSEDDebugNode<?>> linkedNodes = new HashSet<IKeYSEDDebugNode<?>>();

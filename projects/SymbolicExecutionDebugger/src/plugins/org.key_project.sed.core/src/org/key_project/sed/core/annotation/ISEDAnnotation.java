@@ -2,13 +2,11 @@ package org.key_project.sed.core.annotation;
 
 import java.util.Set;
 
-import org.eclipse.swt.graphics.RGB;
 import org.key_project.sed.core.annotation.event.ISEDAnnotationLinkListener;
 import org.key_project.sed.core.annotation.impl.AbstractSEDAnnotation;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDIDElement;
-import org.key_project.util.bean.IBean;
 
 /**
  * <p>
@@ -29,36 +27,11 @@ import org.key_project.util.bean.IBean;
  * @see ISEDAnnotationType
  * @see ISEDAnnotation
  */
-public interface ISEDAnnotation extends IBean, ISEDIDElement {
+public interface ISEDAnnotation extends ISEDAnnotationAppearance, ISEDIDElement {
    /**
     * Property {@link #isEnabled()}.
     */
    public static final String PROP_ENABLED = "enabled";
-
-   /**
-    * Property {@link #getType()}.
-    */
-   public static final String PROP_TYPE = "type";
-
-   /**
-    * Property {@link #isHighlightBackground()}.
-    */
-   public static final String PROP_HIGHLIGHT_BACKGROUND = "highlightBackground";
-
-   /**
-    * Property {@link #getBackgroundColor()}.
-    */
-   public static final String PROP_BACKGROUND_COLOR = "backgroundColor";
-
-   /**
-    * Property {@link #isHighlightForeground()}.
-    */
-   public static final String PROP_HIGHLIGHT_FOREGROUND = "highlightForeground";
-
-   /**
-    * Property {@link #getForegroundColor()}.
-    */
-   public static final String PROP_FOREGROUND_COLOR = "ForegroundColor";
    
    /**
     * Checks if the annotation is enabled.
@@ -122,61 +95,7 @@ public interface ISEDAnnotation extends IBean, ISEDIDElement {
     * @return The index of the given link or {@code -1} if not contained.
     */
    public int indexOfLink(ISEDAnnotationLink link);
-   
-   /**
-    * Returns the {@link ISEDAnnotationType} this {@link ISEDAnnotation} belongs to.
-    * @return The {@link ISEDAnnotationType} this {@link ISEDAnnotation} belongs to.
-    */
-   public ISEDAnnotationType getType();
 
-   /**
-    * Checks if the background color is highlighted.
-    * @return {@code true} highlight, {@code false} do nothing.
-    */
-   public boolean isHighlightBackground();
-   
-   /**
-    * Returns the background color.
-    * @return The background color or {@code null} if not defined.
-    */
-   public RGB getBackgroundColor();
-
-   /**
-    * Checks if the foreground color is highlighted.
-    * @return {@code true} highlight, {@code false} do nothing.
-    */
-   public boolean isHighlightForeground();
-   
-   /**
-    * Returns the foreground color.
-    * @return The foreground color or {@code null} if not defined.
-    */
-   public RGB getForegroundColor();
-   
-   /**
-    * Defines the custom background highlighting.
-    * @param customHighlightBackground {@code null} to disable custom highlighting or the specified value otherwise.
-    */
-   public void setCustomHighlightBackground(Boolean customHighlightBackground);
-
-   /**
-    * Sets the custom background color.
-    * @param customBackgroundColor {@code null} to disable custom color or the specified color otherwise.
-    */
-   public void setCustomBackgroundColor(RGB customBackgroundColor);
-
-   /**
-    * Defines the custom foreground highlighting.
-    * @param customHighlightForeground {@code null} to disable custom highlighting or the specified value otherwise.
-    */
-   public void setCustomHighlightForeground(Boolean customHighlightForeground);
-
-   /**
-    * Sets the custom foreground color.
-    * @param customForegroundColor {@code null} to disable custom color or the specified color otherwise.
-    */
-   public void setCustomForegroundColor(RGB customForegroundColor);
-   
    /**
     * Checks if this annotation can be deleted from the given {@link ISEDDebugTarget}.
     * @param target The {@link ISEDDebugTarget} to remove annotation from.
