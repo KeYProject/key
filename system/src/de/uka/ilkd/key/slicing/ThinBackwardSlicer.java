@@ -34,7 +34,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
             Services services = node.proof().getServices();
             SourceElement originalTarget = arguments.get(0);
             ReferencePrefix relevantTarget = computeReferencePrefix(originalTarget);
-            if (relevantTarget != null && isRelevant(relevantTarget, relevantLocations, aliases, thisReference)) {
+            if (relevantTarget != null && removeRelevant(relevantTarget, relevantLocations, aliases, thisReference)) {
                accept = true;
                for (int i = 1; i < arguments.size(); i++) {
                   Expression read = arguments.get(i);

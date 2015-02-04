@@ -2,7 +2,6 @@ package de.uka.ilkd.key.slicing;
 
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -387,13 +386,14 @@ public abstract class AbstractSlicer {
    /**
     * Checks if the given {@link SourceElement} is directly or indirectly
     * contained (aliased) in the {@link Set} of relevant locations.
+    * If it is contained, the element will be removed.
     * @param sourceElement The {@link SourceElement} to check.
     * @param relevantLocations The {@link Set} with locations of interest.
     * @param aliases The alias {@link Map}.
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
-    * @return {@code true} is relevant, {@code false} is not relevant.
+    * @return {@code true} is relevant and was removed, {@code false} is not relevant and nothing has changed.
     */
-   protected boolean isRelevant(ReferencePrefix sourceElement, 
+   protected boolean removeRelevant(ReferencePrefix sourceElement, 
                                 Set<ReferencePrefix> relevantLocations, 
                                 Map<ReferencePrefix, SortedSet<ReferencePrefix>> aliases,
                                 ReferencePrefix thisReference) {
@@ -404,6 +404,7 @@ public abstract class AbstractSlicer {
          ReferencePrefix next = iterator.next();
          ReferencePrefix nextNormalized = normalizeAlias(next, aliases, thisReference);
          if (normalized.equals(nextNormalized)) {
+            iterator.remove();
             relevant = true;
          }
       }
@@ -556,80 +557,6 @@ public abstract class AbstractSlicer {
                return null;
             }
          }
-      }
-   }
-
-   /**
-    * Updates the outdated locations. This means that locations with the given
-    * prefix are replaced with another previously (old) available alternative.
-    * @param oldLocationsToUpdate The locations to update.
-    * @param newAliases The new aliases.
-    * @param oldAliases The old aliases.
-    * @param outdatedPrefix The prefix of outdated locations.
-    * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
-    * @return The updated locations.
-    */
-   protected Set<ReferencePrefix> updateOutdatedLocations(Set<ReferencePrefix> oldLocationsToUpdate,
-                                                          Map<ReferencePrefix, SortedSet<ReferencePrefix>> newAliases, 
-                                                          Map<ReferencePrefix, SortedSet<ReferencePrefix>> oldAliases, 
-                                                          ReferencePrefix outdatedPrefix,
-                                                          ReferencePrefix thisReference) {
-      // Ensure that at least one possibly outdated location is available.
-      if (!oldLocationsToUpdate.isEmpty()) {
-         // Ensure that alternatives are different
-         SortedSet<ReferencePrefix> newAlternatives = newAliases.get(outdatedPrefix);
-         if (newAlternatives == null) {
-            newAlternatives = createSortedSet();
-            newAlternatives.add(outdatedPrefix);
-         }
-         SortedSet<ReferencePrefix> oldAlternatives = oldAliases.get(outdatedPrefix);
-         if (oldAlternatives == null) {
-            oldAlternatives = createSortedSet();
-            oldAlternatives.add(outdatedPrefix);
-         }
-         if (!newAlternatives.equals(oldAlternatives)) {
-            // Compute old variables
-            ImmutableList<ImmutableList<ProgramVariable>> newAlternativeVariables = ImmutableSLList.nil();
-            for (ReferencePrefix newALternative : newAlternatives) {
-               ImmutableList<ProgramVariable> variables = extractProgramVariables(newALternative, thisReference);
-               newAlternativeVariables = newAlternativeVariables.prepend(variables);
-            }
-            // Compute new alternative
-            ReferencePrefix newAlternative = findNewAlternative(oldAlternatives, newAlternatives);
-            // Compute new locations
-            Set<ReferencePrefix> newLocations = new HashSet<ReferencePrefix>();
-            for (ReferencePrefix oldLocation : oldLocationsToUpdate) {
-               ImmutableList<ProgramVariable> oldVariables = extractProgramVariables(oldLocation, thisReference);
-               int commonPrefixLength = computeFirstCommonPrefixLength(newAlternativeVariables, oldVariables);
-               if (commonPrefixLength >= 1) {
-                  if (newAlternative != null) { // Otherwise the relevant location is dropped because it was not known before
-                     if (commonPrefixLength == oldVariables.size()) {
-                        newLocations.add(newAlternative);
-                     }
-                     else {
-                        ImmutableList<ProgramVariable> oldRemainignVariables = oldVariables.take(commonPrefixLength);
-                        FieldReference newFr = new FieldReference(oldRemainignVariables.head(), newAlternative);
-                        oldRemainignVariables = oldRemainignVariables.take(1);
-                        while (!oldRemainignVariables.isEmpty()) {
-                           newFr = new FieldReference(oldRemainignVariables.head(), newFr);
-                           oldRemainignVariables = oldRemainignVariables.take(1);
-                        }
-                        newLocations.add(newFr);
-                     }
-                  }
-               }
-               else {
-                  newLocations.add(oldLocation); // Maintain location
-               }
-            }
-            return newLocations;
-         }
-         else {
-            return oldLocationsToUpdate;
-         }
-      }
-      else {
-         return oldLocationsToUpdate;
       }
    }
 
