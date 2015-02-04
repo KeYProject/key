@@ -1,7 +1,5 @@
 package org.key_project.jmlediting.core.profile.syntax;
 
-import java.util.List;
-
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.key_project.jmlediting.core.dom.IASTNode;
@@ -23,7 +21,7 @@ public interface IKeywordContentRefactorer {
     *           The AST to traverse
     * @return List of changes for Refactoring
     */
-   List<Change> refactorFieldRename(JavaElementIdentifier elem,
+   Change refactorFieldRename(JavaElementIdentifier elem,
          IASTNode contentNode, ICompilationUnit cu);
 
 }

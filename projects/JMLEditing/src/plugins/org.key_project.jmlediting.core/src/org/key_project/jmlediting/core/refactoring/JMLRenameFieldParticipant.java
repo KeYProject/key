@@ -1,6 +1,5 @@
 package org.key_project.jmlediting.core.refactoring;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -14,6 +13,7 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.ui.SharedASTProvider;
 import org.eclipse.ltk.core.refactoring.Change;
+import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
@@ -96,7 +96,7 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
       final JavaElementIdentifier refGoal = new JavaElementIdentifier(
             elem.getElementName(), resolver.getTypeForName(type,
                   elem.getElementName()), elem.getDeclaringType());
-      final List<Change> occurences = this.getJMLOccurences(refGoal);
+      final Change occurences = this.getJMLOccurences(refGoal);
       // final ReplaceEdit edit = new ReplaceEdit(offset,
       // refGoal.getName().length(), this
       // .getArguments().getNewName());
@@ -109,9 +109,9 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
     * @return a Range Array that contains all occurences of the Keyword. NULL if
     *         no occurences were found.
     */
-   private List<Change> getJMLOccurences(final JavaElementIdentifier identifier)
+   private Change getJMLOccurences(final JavaElementIdentifier identifier)
          throws CoreException {
-      final List<Change> changes = Collections.emptyList();
+      final CompositeChange change = new CompositeChange("JML Renaming Changes");
       CommentLocator loc = null;
       final IJavaProject[] projects = JDTUtil.getAllJavaProjects();
       // In each Project
@@ -127,7 +127,7 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
                         .getSource()
                         .substring(range.getBeginOffset(), range.getEndOffset())
                         .contains(identifier.getName())) {
-                     continue;
+                     continue; // no occurences in this compilation unit
                   }
 
                   final IJMLProfile activeProfile = JMLPreferencesHelper
@@ -150,13 +150,12 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
                         final IKeywordContentRefactorer refactorer = keyword
                               .createRefactorer();
                         if (refactorer != null) {
-                           List<Change> changesForContentNode;
+                           Change changesForContentNode;
                            changesForContentNode = refactorer
                                  .refactorFieldRename(identifier, contentNode,
                                        unit);
-                           if (!changesForContentNode.isEmpty()) {
-                              changes.addAll(refactorer.refactorFieldRename(
-                                    identifier, contentNode, unit));
+                           if (changesForContentNode != null) {
+                              change.add(changesForContentNode);
 
                            }
                         }
@@ -164,14 +163,14 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
                   }
                   catch (final ParserException e) {
                      // Parse Error, Refactoring in this JML Comment can not be
-                     // provided
-                     return null;
+                     // provided, so go on with the next one
+                     continue;
                   }
 
                }
             }
          }
       }
-      return changes;
+      return change;
    }
 }
