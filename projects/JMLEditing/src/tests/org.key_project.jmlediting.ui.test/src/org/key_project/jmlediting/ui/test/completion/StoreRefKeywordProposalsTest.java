@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.ui.test.completion;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -176,6 +177,26 @@ public class StoreRefKeywordProposalsTest {
       assertEquals("Wrong proposals after reference type with no field", editor
             .getTextOnLine(pos.line).subSequence(pos.column, pos.column + 1),
             "*");
+   }
+
+   @Test
+   public void testNoStoreRefProposalsAfterSemicolon() {
+      goToTestOffset(8);
+      final List<String> nextProposals = editor.getAutoCompleteProposals("");
+      // No Store Ref Keyword
+      for (final String storeRefKeyword : appendStoreRefKeywords("")) {
+         assertTrue("Proposal after semicolon contained soreRefKetword",
+               !nextProposals.contains(storeRefKeyword));
+      }
+      // but Top Level keywords
+      assertTrue("Proposals after semicolon contained no toplevel keyword",
+            nextProposals.contains("assignable"));
+   }
+
+   @Test
+   public void testProposalsAfterDotWithoutSemicolon() {
+      goToTestOffset(9);
+      this.checkConsProposals();
    }
 
    private static List<String> appendStoreRefKeywords(final String... others) {

@@ -43,7 +43,7 @@ public class VectorTest {
      @      assignable  temp.[[3]];
      @      requires \not_specified;
      @*/
-   public void doCalculation3() {
+   public void testProposalsInOtherKeywords() {
       
    }
    
@@ -54,6 +54,20 @@ public class VectorTest {
      @ assignable secret.[[7]];
      @*/
    public void doCalculation4_5(double factor, Vector2 newVector) {
+      
+   }
+   
+   /*@
+     @ assignable secret;[[8]]
+     @*/
+   public void testNoStoreRefProposalsAfterSemicolon() {
+      
+   }
+   
+   /*@
+     @ accessible temp.moreTemps.[[9]]
+     @*/
+   public void testProposalsAfterDotWithoutSemicolo() {
       
    }
    
