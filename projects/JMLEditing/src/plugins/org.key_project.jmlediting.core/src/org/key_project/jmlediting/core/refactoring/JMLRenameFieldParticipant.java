@@ -110,7 +110,7 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
     */
    private List<Change> getJMLOccurences(final JavaElementIdentifier identifier)
          throws CoreException {
-      final List<Change> changes = Collections.EMPTY_LIST;
+      final List<Change> changes = Collections.emptyList();
       CommentLocator loc = null;
       final IJavaProject[] projects = JDTUtil.getAllJavaProjects();
       // In each Project
@@ -148,16 +148,16 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
 
                         final IKeywordContentRefactorer refactorer = keyword
                               .createRefactorer();
-                        if (refactorer == null) {
-                           System.out.println("Refactorer is null");
-                        }
-                        List<Change> changesForContentNode;
-                        changesForContentNode = refactorer.refactorFieldRename(
-                              identifier, contentNode);
-                        if (!changesForContentNode.isEmpty()) {
-                           changes.addAll(refactorer.refactorFieldRename(
-                                 identifier, contentNode));
+                        if (refactorer != null) {
+                           List<Change> changesForContentNode;
+                           changesForContentNode = refactorer
+                                 .refactorFieldRename(identifier, contentNode,
+                                       unit);
+                           if (!changesForContentNode.isEmpty()) {
+                              changes.addAll(refactorer.refactorFieldRename(
+                                    identifier, contentNode, unit));
 
+                           }
                         }
                      }
                   }
