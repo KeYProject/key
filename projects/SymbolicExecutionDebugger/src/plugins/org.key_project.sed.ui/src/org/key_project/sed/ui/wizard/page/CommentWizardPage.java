@@ -9,6 +9,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.key_project.sed.ui.util.SEDImages;
 import org.key_project.util.java.StringUtil;
 
 /**
@@ -37,6 +38,7 @@ public class CommentWizardPage extends WizardPage {
       this.initialComment = initialComment;
       setTitle(title);
       setDescription(description);
+      setImageDescriptor(SEDImages.getImageDescriptor(SEDImages.COMMENT_WIZARD));
    }
 
    /**

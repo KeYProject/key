@@ -160,6 +160,11 @@ public final class SEDImages {
     public static final String ANNOTATION_EDIT = "org.key_project.sed.ui.images.annotation.edit";
     
     /**
+     * The key for the image that is used to edit an {@link ISEDAnnotation}.
+     */
+    public static final String ANNOTATION_EDIT_WIZARD = "org.key_project.sed.ui.images.annotation.editWizard";
+    
+    /**
      * The key for the image that is used to move an {@link ISEDAnnotation} up.
      */
     public static final String ANNOTATION_MOVE_UP = "org.key_project.sed.ui.images.annotation.moveUp";
@@ -203,6 +208,26 @@ public final class SEDImages {
      * The key for the image that is used for slicing wizard.
      */
     public static final String SLICE_WIZARD = "org.key_project.sed.ui.images.slicingWizard";
+
+    /**
+     * The key for the image that is used for searching.
+     */
+    public static final String SEARCH = "org.key_project.sed.ui.images.search";
+
+    /**
+     * The key for the image that is used for search wizard.
+     */
+    public static final String SEARCH_WIZARD = "org.key_project.sed.ui.images.searchWizard";
+
+    /**
+     * The key for the image that is used for comments.
+     */
+    public static final String COMMENT = "org.key_project.sed.ui.images.comment";
+
+    /**
+     * The key for the image that is used for comment wizard.
+     */
+    public static final String COMMENT_WIZARD = "org.key_project.sed.ui.images.commentWizard";
     
     /**
      * Forbid instances.
@@ -326,6 +351,9 @@ public final class SEDImages {
         else if (ANNOTATION_EDIT.equals(key)) {
            path = "icons/write_obj.gif";
         }
+        else if (ANNOTATION_EDIT_WIZARD.equals(key)) {
+           path = "icons/write_wizard.png";
+        }
         else if (ANNOTATION_MOVE_UP.equals(key)) {
            path = "icons/up.gif";
         }
@@ -352,6 +380,18 @@ public final class SEDImages {
         }
         else if (SLICE_WIZARD.equals(key)) {
            path = "icons/slice_wizard.png";
+        }
+        else if (SEARCH.equals(key)) {
+           path = "icons/search.gif";
+        }
+        else if (SEARCH_WIZARD.equals(key)) {
+           path = "icons/search_wizard.png";
+        }
+        else if (COMMENT.equals(key)) {
+           path = "icons/comment.gif";
+        }
+        else if (COMMENT_WIZARD.equals(key)) {
+           path = "icons/comment_wizard.png";
         }
         // Load image if possible
         if (path != null) {
@@ -394,12 +434,15 @@ public final class SEDImages {
                ImageRegistry registry = Activator.getDefault().getImageRegistry();
                registry.remove(ANNOTATION_DELETE);
                registry.remove(ANNOTATION_EDIT);
+               registry.remove(ANNOTATION_EDIT_WIZARD);
                registry.remove(ANNOTATION_GO_TO);
                registry.remove(ANNOTATION_LINKS);
                registry.remove(ANNOTATION_MOVE_DOWN);
                registry.remove(ANNOTATION_MOVE_UP);
                registry.remove(BRANCH_CONDITION);
                registry.remove(BRANCH_STATEMENT);
+               registry.remove(COMMENT);
+               registry.remove(COMMENT_WIZARD);
                registry.remove(EXCEPTIONAL_METHOD_RETURN);
                registry.remove(EXCEPTIONAL_TERMINATION);
                registry.remove(EXCEPTIONAL_TERMINATION_NOT_VERIFIED);
@@ -417,6 +460,8 @@ public final class SEDImages {
                registry.remove(METHOD_CONTRACT_NOT_PRE_NOT_NPC);
                registry.remove(METHOD_RETURN);
                registry.remove(SHOW_ALL_CONSTRAINTS);
+               registry.remove(SEARCH);
+               registry.remove(SEARCH_WIZARD);
                registry.remove(SLICE);
                registry.remove(SLICE_WIZARD);
                registry.remove(TERMINATION);

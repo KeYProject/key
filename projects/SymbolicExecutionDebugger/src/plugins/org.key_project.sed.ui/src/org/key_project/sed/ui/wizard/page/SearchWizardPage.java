@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Text;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
 import org.key_project.sed.ui.composite.AnnotationAppearanceComposite;
+import org.key_project.sed.ui.util.SEDImages;
 import org.key_project.util.java.StringUtil;
 
 /**
@@ -45,6 +46,7 @@ public class SearchWizardPage extends WizardPage {
       this.annotationType = annotationType;
       setTitle("Search");
       setDescription("Define search criteria");
+      setImageDescriptor(SEDImages.getImageDescriptor(SEDImages.SEARCH_WIZARD));
    }
 
    /**

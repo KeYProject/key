@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Control;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.ui.composite.AnnotationAppearanceComposite;
 import org.key_project.sed.ui.edit.ISEDAnnotationEditor;
+import org.key_project.sed.ui.util.SEDImages;
 
 /**
  * This {@link WizardPage} is used to edit an {@link ISEDAnnotation}.
@@ -43,6 +44,7 @@ public class EditWizardPage extends WizardPage {
       super(pageName);
       setTitle("Edit Annotation");
       setDescription("Change the details and the appearance of the annotation.");
+      setImageDescriptor(SEDImages.getImageDescriptor(SEDImages.ANNOTATION_EDIT_WIZARD));
       this.annotation = annotation;
       this.editor = editor;
       if (this.editor != null) {
