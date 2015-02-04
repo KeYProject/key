@@ -676,7 +676,7 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
     */
    @Override
    public ISEDSlicer[] getSlicer(ISEDDebugNode seedNode, IVariable seedVariable) {
-      if (seedVariable instanceof KeYVariable) {
+      if (!(seedNode instanceof KeYThread) && seedVariable instanceof KeYVariable) {
          return new ISEDSlicer[] {new KeYThinBackwardSlicer()};
       }
       else {
