@@ -3,7 +3,7 @@ package org.key_project.jmlediting.core.profile.syntax;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.key_project.jmlediting.core.dom.IASTNode;
-import org.key_project.jmlediting.core.utilities.JavaElementIdentifier;
+import org.key_project.jmlediting.core.utilities.JavaRefactoringElementInformationContainer;
 
 /**
  *
@@ -21,7 +21,7 @@ public interface IKeywordContentRefactorer {
     *           The AST to traverse
     * @return List of changes for Refactoring
     */
-   Change refactorFieldRename(JavaElementIdentifier elem,
+   Change refactorFieldRename(JavaRefactoringElementInformationContainer elem,
          IASTNode contentNode, ICompilationUnit cu);
 
 }

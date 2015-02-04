@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -8,14 +9,19 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.ltk.core.refactoring.Change;
-import org.eclipse.ltk.core.refactoring.CompositeChange;
+import org.eclipse.ltk.core.refactoring.TextFileChange;
+import org.eclipse.text.edits.MultiTextEdit;
+import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordContentRefactorer;
-import org.key_project.jmlediting.core.utilities.JavaElementIdentifier;
+import org.key_project.jmlediting.core.utilities.JavaRefactoringElementInformationContainer;
 
 /**
  * provides a Method to create changes needed for a Rename Refactoring in
- * StoreRefKeywords.
+ * StoreRefKeywords. <br>
+ * Code is following this <a href=
+ * "http://alvinalexander.com/java/jwarehouse/eclipse/org.eclipse.jdt.ui.tests/examples/org/eclipse/jdt/ui/examples/MyRenameTypeParticipant.java.shtml"
+ * > Example </a>
  *
  * @author David Giessing
  *
@@ -33,20 +39,27 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
    /**
     * The unique identifier for the Element that has to be refactored.
     */
-   private JavaElementIdentifier elem;
+   private JavaRefactoringElementInformationContainer elem;
+   /**
+    * The file that is modified.
+    */
+   private IFile file;
 
    @Override
-   public Change refactorFieldRename(final JavaElementIdentifier elem,
+   public Change refactorFieldRename(
+         final JavaRefactoringElementInformationContainer elem,
          final IASTNode contentNode, final ICompilationUnit cu) {
       this.cu = cu;
       IResource res = null;
-      final CompositeChange change = new CompositeChange(elem.getName()
-            + " renaming");
+      final MultiTextEdit edits = new MultiTextEdit();
+      TextFileChange tfchange = null;
       try {
          res = cu.getCorrespondingResource();
          if (res.getType() == IResource.FILE) {
             System.out.println("isFile");
-            final IFile file = (IFile) res;
+            this.file = (IFile) res;
+            tfchange = new TextFileChange("StoreRefNameEdit", this.file);
+            tfchange.setEdit(edits);
          }
       }
       catch (final JavaModelException e) {
@@ -64,9 +77,11 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
       }
       catch (final JavaModelException e1) {
          System.out.println("Could not get SourceCode");
+         // adding null to a Change results in something like "do nothing" which
+         // is
+         // perfect for our needs in this case
          return null;
       }
-      final List<Change> changes = Collections.emptyList();
       System.out.println(contentNode.prettyPrintAST() + " "
             + contentNode.getChildren().size());
       for (final IASTNode node : contentNode.getChildren()) {
@@ -76,6 +91,9 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
             if (this.src.substring(node.getStartOffset(), node.getEndOffset())
                   .matches(elem.getName())) {
                System.out.println("Found match in StoreRefName");
+               final ReplaceEdit edit = new ReplaceEdit(node.getStartOffset(),
+                     node.getEndOffset(), elem.getNewName());
+               edits.addChild(edit);
             }
          }
          else if (node.getType() == StoreRefNodeTypes.STORE_REF_NAME_SUFFIX) {
@@ -84,16 +102,22 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
             if (this.src.substring(node.getStartOffset(), node.getEndOffset())
                   .matches(elem.getName())) {
                System.out.println("Found match in StoreRefNameSuffix");
-
+               final ReplaceEdit edit = new ReplaceEdit(node.getStartOffset(),
+                     node.getEndOffset(), elem.getNewName());
+               edits.addChild(edit);
             }
          }
          else {
             System.out.println("Going Deeper");
-            change.add(this.refactorFieldRenameRecursively(node));
+            final Collection<ReplaceEdit> recursiveEdits = this
+                  .refactorFieldRenameRecursively(node);
+            for (final ReplaceEdit r : recursiveEdits) {
+               edits.addChild(r);
+            }
          }
       }
-
-      return change;
+      // tfchange.addEdit(edits);
+      return tfchange;
    }
 
    /**
@@ -103,8 +127,9 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
     *           the actual Content Node
     * @return a List of Changes
     */
-   private Change refactorFieldRenameRecursively(final IASTNode contentNode) {
-      final CompositeChange change = new CompositeChange(this.elem.getName());
+   private Collection<ReplaceEdit> refactorFieldRenameRecursively(
+         final IASTNode contentNode) {
+      final List<ReplaceEdit> changes = new ArrayList<ReplaceEdit>();
       for (final IASTNode node : contentNode.getChildren()) {
          if (node.getType() == StoreRefNodeTypes.STORE_REF_NAME) {
             System.out.println("StoreRefName Recursively");
@@ -112,6 +137,9 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
             if (this.src.substring(node.getStartOffset(), node.getEndOffset())
                   .matches(this.elem.getName())) {
                System.out.println("Found match in StoreRefName Recursively");
+               final ReplaceEdit edit = new ReplaceEdit(node.getStartOffset(),
+                     node.getEndOffset(), this.elem.getNewName());
+               changes.add(edit);
             }
          }
          else if (node.getType() == StoreRefNodeTypes.STORE_REF_NAME_SUFFIX) {
@@ -121,14 +149,18 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
                   .matches(this.elem.getName())) {
                System.out
                      .println("Found match in StoreRefNameSuffix Recursively");
+               final ReplaceEdit edit = new ReplaceEdit(node.getStartOffset(),
+                     node.getEndOffset(), this.elem.getNewName());
+               changes.add(edit);
             }
          }
          else {
             System.out.println("Going Deeper Recursively");
-            change.add((this.refactorFieldRenameRecursively(node)));
+            changes.addAll(this.refactorFieldRenameRecursively(node));
+
          }
       }
 
-      return change;
+      return changes;
    }
 }

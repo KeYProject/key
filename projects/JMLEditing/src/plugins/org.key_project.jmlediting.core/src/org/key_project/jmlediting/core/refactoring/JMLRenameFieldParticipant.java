@@ -1,5 +1,7 @@
 package org.key_project.jmlediting.core.refactoring;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -30,7 +32,7 @@ import org.key_project.jmlediting.core.profile.syntax.IKeywordContentRefactorer;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLJavaVisibleFieldsComputer;
-import org.key_project.jmlediting.core.utilities.JavaElementIdentifier;
+import org.key_project.jmlediting.core.utilities.JavaRefactoringElementInformationContainer;
 import org.key_project.jmlediting.core.utilities.TypeDeclarationFinder;
 import org.key_project.util.jdt.JDTUtil;
 
@@ -93,14 +95,15 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
       final JMLJavaVisibleFieldsComputer resolver = new JMLJavaVisibleFieldsComputer(
             type);
       // Uniquely identify the Element that shall be refactored
-      final JavaElementIdentifier refGoal = new JavaElementIdentifier(
+      final JavaRefactoringElementInformationContainer refGoal = new JavaRefactoringElementInformationContainer(
             elem.getElementName(), resolver.getTypeForName(type,
-                  elem.getElementName()), elem.getDeclaringType());
+                  elem.getElementName()), elem.getDeclaringType(), this
+                  .getArguments().getNewName());
       final Change occurences = this.getJMLOccurences(refGoal);
       // final ReplaceEdit edit = new ReplaceEdit(offset,
       // refGoal.getName().length(), this
       // .getArguments().getNewName());
-      return null;
+      return occurences;
    }
 
    /**
@@ -109,8 +112,10 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
     * @return a Range Array that contains all occurences of the Keyword. NULL if
     *         no occurences were found.
     */
-   private Change getJMLOccurences(final JavaElementIdentifier identifier)
+   private Change getJMLOccurences(
+         final JavaRefactoringElementInformationContainer identifier)
          throws CoreException {
+      final Collection<Change> changes = new ArrayList<Change>();
       final CompositeChange change = new CompositeChange("JML Renaming Changes");
       CommentLocator loc = null;
       final IJavaProject[] projects = JDTUtil.getAllJavaProjects();
@@ -150,14 +155,8 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
                         final IKeywordContentRefactorer refactorer = keyword
                               .createRefactorer();
                         if (refactorer != null) {
-                           Change changesForContentNode;
-                           changesForContentNode = refactorer
-                                 .refactorFieldRename(identifier, contentNode,
-                                       unit);
-                           if (changesForContentNode != null) {
-                              change.add(changesForContentNode);
-
-                           }
+                           changes.add(refactorer.refactorFieldRename(
+                                 identifier, contentNode, unit));
                         }
                      }
                   }
@@ -170,6 +169,9 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
                }
             }
          }
+      }
+      for (final Change c : changes) {
+         change.add(c);
       }
       return change;
    }
