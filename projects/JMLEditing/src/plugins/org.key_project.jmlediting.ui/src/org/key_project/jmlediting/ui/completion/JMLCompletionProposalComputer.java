@@ -119,25 +119,11 @@ public class JMLCompletionProposalComputer implements
                // Check whether the caret is in the keyword content
                final boolean caretOnKeyword = keywordApplNode.getChildren()
                      .get(0).containsCaret(caretPosition);
-               final boolean keywordTopLevelError;
-               final boolean caretAtEndOrOnRightWhiteSpace;
-               if (keywordApplNode.getChildren().size() == 1) {
-                  keywordTopLevelError = false;
-                  caretAtEndOrOnRightWhiteSpace = false;
-               }
-               else {
-                  keywordTopLevelError = keywordApplNode.getChildren().get(1)
-                        .getType() == NodeTypes.ERROR_NODE;
-                  // Check for offset, because after last charater is not a
-                  // valid offset
-                  caretAtEndOrOnRightWhiteSpace = !keywordApplNode
-                        .containsOffset(caretPosition);
-               }
+
                // Caret is not allowed to be on the keyword itself and not at
                // the end of the keyword (or on whitespace) if the keywrod does
                // not contains a toplevel error (e.g. missing semicolon)
-               if (!caretOnKeyword
-                     && (!caretAtEndOrOnRightWhiteSpace || keywordTopLevelError)) {
+               if (!caretOnKeyword) {
 
                   // Get the keyword from the node and get result of
                   // autoproposals
@@ -148,19 +134,24 @@ public class JMLCompletionProposalComputer implements
                   final IKeywordAutoProposer proposer = activeKeyword
                         .createAutoProposer();
                   if (proposer != null) {
-
-                     result.addAll(proposer.createAutoProposals(
-                           keywordApplNode, javaContext));
+                     final List<ICompletionProposal> proposals = proposer
+                           .createAutoProposals(keywordApplNode, javaContext);
+                     if (proposals != null) {
+                        result.addAll(proposals);
+                     }
+                     else {
+                        result.addAll(this.proposeToplevelKeywords(javaContext));
+                     }
                   }
                }
                else {
 
-                  return this.getFallback(javaContext);
+                  return this.proposeToplevelKeywords(javaContext);
                }
             }
             else {
                System.out.println("no activeKeyword");
-               return this.getFallback(javaContext);
+               return this.proposeToplevelKeywords(javaContext);
             }
 
             return result;
@@ -168,13 +159,13 @@ public class JMLCompletionProposalComputer implements
          // Fallback Method to display all JML Keyword-Proposals, if
          // no active Keyword was discovered.
          System.out.println("no parseResult");
-         return this.getFallback(javaContext);
+         return this.proposeToplevelKeywords(javaContext);
       }
       return result;
 
    }
 
-   private List<ICompletionProposal> getFallback(
+   private List<ICompletionProposal> proposeToplevelKeywords(
          final JavaContentAssistInvocationContext javaContext) {
       System.out.println("fallback");
       return JMLCompletionUtil.getStandardKeywordProposals(javaContext,
