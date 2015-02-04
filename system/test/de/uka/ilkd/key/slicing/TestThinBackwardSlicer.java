@@ -23,7 +23,18 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
    /**
     * Flag to print found slices in the console.
     */
-   public static final boolean PRINT_SLICE = false;
+   public static final boolean PRINT_SLICE = true;
+
+   /**
+    * Tests slicing on the example {@code figure2Instance}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testFigure2Instance_right() throws Exception {
+      doSlicingTest("examples/_testcase/slicing/figure2Instance/Figure2Instance.proof", 
+                    new RightAssignmentSelector(269),
+                    true,
+                    231, 171, 169, 154, 150, 133);
+   }
 
    /**
     * Tests slicing on the example {@code valueChange}.

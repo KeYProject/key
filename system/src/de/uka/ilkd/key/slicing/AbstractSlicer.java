@@ -319,19 +319,20 @@ public abstract class AbstractSlicer {
                                             Map<ReferencePrefix, SortedSet<ReferencePrefix>> aliases,
                                             ReferencePrefix thisReference) {
       if (referencePrefix instanceof ProgramVariable) {
-         return normalizeAlias((ProgramVariable) referencePrefix, aliases);
+         return computeRepresentativeAlias((ProgramVariable) referencePrefix, aliases);
       }
       else if (referencePrefix instanceof FieldReference) {
          ImmutableList<ProgramVariable> vars = extractProgramVariables((FieldReference) referencePrefix, thisReference);
          Iterator<ProgramVariable> iter = vars.iterator();
          ProgramVariable next = iter.next();
-         ReferencePrefix root = normalizeAlias(next, aliases);
+         ReferencePrefix root = computeRepresentativeAlias(next, aliases);
          if (next != root) {
             root = normalizeAlias(root, aliases, thisReference);
          }
          while (iter.hasNext()) {
             next = iter.next();
             root = new FieldReference(next, root);
+            root = computeRepresentativeAlias(root, aliases);
          }
          return root;
       }
@@ -344,19 +345,19 @@ public abstract class AbstractSlicer {
    }
    
    /**
-    * Returns the representative alias of the given {@link ProgramVariable}.
-    * @param pv The {@link ProgramVariable}.
+    * Returns the representative alias of the given {@link ReferencePrefix}.
+    * @param prefix The {@link ReferencePrefix}.
     * @param aliases The available aliases.
     * @return The representative alias.
     */
-   protected ReferencePrefix normalizeAlias(ProgramVariable pv, 
-                                            Map<ReferencePrefix, SortedSet<ReferencePrefix>> aliases) {
-      Set<ReferencePrefix> alternatives = aliases.get(pv);
+   protected ReferencePrefix computeRepresentativeAlias(ReferencePrefix prefix, 
+                                                        Map<ReferencePrefix, SortedSet<ReferencePrefix>> aliases) {
+      Set<ReferencePrefix> alternatives = aliases.get(prefix);
       if (alternatives != null) {
          return alternatives.iterator().next(); // Return first alternative
       }
       else {
-         return pv;
+         return prefix;
       }
    }
 
