@@ -10,7 +10,7 @@ import org.key_project.jmlediting.core.dom.NodeTypes;
 /**
  * The {@link IKeywordAutoProposer} makes proposals for the content of a
  * keyword.
- * 
+ *
  * @author Moritz Lichter
  *
  */
@@ -27,7 +27,9 @@ public interface IKeywordAutoProposer {
     *           asked
     * @param context
     *           the invocation context for calculating proposals
-    * @return a non null list of proposals, might be empty
+    * @return a non null list of proposals, might be empty. if null, the
+    *         proposer rejects to make proposals and indicated that toplevel
+    *         keywords should be proposed
     */
    List<ICompletionProposal> createAutoProposals(IASTNode node,
          JavaContentAssistInvocationContext context);

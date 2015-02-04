@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.jdt.internal.core.CompilationUnit;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.INodeTraverser;
@@ -20,6 +21,10 @@ public class StoreRefKeywordProposer implements IKeywordAutoProposer {
       final List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 
       final IASTNode nodeAtPos = node;
+
+      if (this.isOffsetAfterSemicolon(node, context)) {
+         return null;
+      }
 
       final CompilationUnit cu;
       if (context.getCompilationUnit() instanceof CompilationUnit) {
@@ -82,6 +87,27 @@ public class StoreRefKeywordProposer implements IKeywordAutoProposer {
          System.out.println("nothing... ");
       }
       return result;
+   }
+
+   private boolean isOffsetAfterSemicolon(final IASTNode node,
+         final JavaContentAssistInvocationContext context) {
+      // Check whether offset is after a closing semicolon
+      final int invocationOffset = context.getInvocationOffset();
+      if (invocationOffset >= node.getEndOffset()) {
+         // Cursor after last character (invocationoffset inclusive,
+         // node.getEndOffset exlusive, therfore >= )
+         try {
+            // If last char of the node is ; do not make proposals but requries
+            // toplevel keywords
+            if (context.getDocument().getChar(node.getEndOffset() - 1) == ';') {
+               return true;
+            }
+         }
+         catch (final BadLocationException e) {
+            return true;
+         }
+      }
+      return false;
    }
 
 }
