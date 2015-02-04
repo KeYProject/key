@@ -185,6 +185,11 @@ public final class SEDImages {
     public static final String ANNOTATION_LINKS = "org.key_project.sed.ui.images.annotation.links";
 
     /**
+     * The key for the image that is used to show links of an {@link ISEDAnnotation}.
+     */
+    public static final String ANNOTATION_LINKS_WIZARD = "org.key_project.sed.ui.images.annotation.linksWizard";
+
+    /**
      * The key for the image that is used to follow an {@link ISEDAnnotationLink}.
      */
     public static final String ANNOTATION_GO_TO = "org.key_project.sed.ui.images.annotation.goTo";
@@ -366,6 +371,9 @@ public final class SEDImages {
         else if (ANNOTATION_LINKS.equals(key)) {
            path = "icons/links_obj.gif";
         }
+        else if (ANNOTATION_LINKS_WIZARD.equals(key)) {
+           path = "icons/links_wizard.png";
+        }
         else if (ANNOTATION_GO_TO.equals(key)) {
            path = "icons/follow_annotation_link.gif";
         }
@@ -437,6 +445,7 @@ public final class SEDImages {
                registry.remove(ANNOTATION_EDIT_WIZARD);
                registry.remove(ANNOTATION_GO_TO);
                registry.remove(ANNOTATION_LINKS);
+               registry.remove(ANNOTATION_LINKS_WIZARD);
                registry.remove(ANNOTATION_MOVE_DOWN);
                registry.remove(ANNOTATION_MOVE_UP);
                registry.remove(BRANCH_CONDITION);

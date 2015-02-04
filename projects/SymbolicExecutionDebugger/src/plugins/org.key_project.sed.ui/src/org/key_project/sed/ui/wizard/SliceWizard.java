@@ -73,7 +73,7 @@ public class SliceWizard extends Wizard {
    public boolean performFinish() {
       try {
          final ISEDSlicer slicer = sliceWizardPage.getSlicer();
-         final ISEDAnnotationAppearance appearance = sliceWizardPage.getAnnotationAppearance(); // TODO: Use appearance
+         final ISEDAnnotationAppearance appearance = sliceWizardPage.getAnnotationAppearance();
          getContainer().run(true, true, new IRunnableWithProgress() {
             @Override
             public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {

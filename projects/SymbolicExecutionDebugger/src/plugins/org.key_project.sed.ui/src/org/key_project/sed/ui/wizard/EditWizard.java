@@ -119,6 +119,7 @@ public class EditWizard extends Wizard {
                                 ISEDDebugTarget target,
                                 ISEDAnnotation annotation) {
       WizardDialog dialog = new WizardDialog(parentShell, new EditWizard(target, annotation));
+      dialog.setHelpAvailable(false);
       return dialog.open();
    }
 }
