@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -30,7 +29,6 @@ import de.uka.ilkd.key.java.statement.Case;
 import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.Else;
-import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.statement.Finally;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
@@ -53,7 +51,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.util.AssertionFailure;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
@@ -129,7 +126,20 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
 
    @Override
    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+      //TODO: Could use a different goal chooser by:
+//      JoinRuleUtils.mediator().getProfile().setSelectedGoalChooserBuilder("");
+      // A new goal chooser will have to be added in
+      // AbstractProfile#AbstractProfile(String) manually in order to
+      // be a valid choice.
+      
       return new FilterSymbexStrategy(proof.getActiveStrategy());
+   }
+   
+   @Override
+   protected void doPostProcessing(Proof proof) {
+      for (Goal goal : proof.openEnabledGoals()) {
+         
+      }
    }
    
    /**
