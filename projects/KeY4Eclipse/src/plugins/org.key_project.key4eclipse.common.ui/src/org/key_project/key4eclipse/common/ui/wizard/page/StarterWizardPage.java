@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Text;
 import org.key_project.key4eclipse.common.ui.preference.page.StarterPreferencePage;
 import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
 import org.key_project.key4eclipse.common.ui.provider.StarterDescriptionLabelProvider;
+import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.key_project.key4eclipse.common.ui.util.StarterDescription;
 import org.key_project.key4eclipse.common.ui.wizard.StarterWizard;
 import org.key_project.util.eclipse.swt.SWTUtil;
@@ -92,6 +93,7 @@ public class StarterWizardPage<I> extends WizardPage {
       this.starterDescriptions = starterDescriptions;
       setTitle(title);
       setDescription(description);
+      setImageDescriptor(KeYImages.getImageDescriptor(KeYImages.STARTER_WIZARD));
    }
 
    /**

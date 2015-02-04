@@ -9,6 +9,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.key_project.key4eclipse.common.ui.completion.IInteractiveRuleApplicationCompletionPerform;
+import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.key_project.key4eclipse.common.ui.wizard.CompleteBuiltInRuleAppWizard;
 
 /**
@@ -43,6 +44,7 @@ public class CompleteBuiltInRuleAppWizardPage extends WizardPage {
       this.perform.addPropertyChangeListener(IInteractiveRuleApplicationCompletionPerform.PROP_ERROR_MESSAGE, performListener);
       setTitle(perform.getTitle());
       setDescription(perform.getDescription());
+      setImageDescriptor(KeYImages.getImageDescriptor(KeYImages.INTERACTIVE_WIZARD));
    }
 
    /**

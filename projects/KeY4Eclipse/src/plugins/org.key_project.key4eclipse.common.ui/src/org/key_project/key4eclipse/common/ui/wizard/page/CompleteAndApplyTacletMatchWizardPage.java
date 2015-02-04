@@ -5,6 +5,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.key_project.key4eclipse.common.ui.wizard.CompleteAndApplyTacletMatchWizard;
 
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
@@ -37,6 +38,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
       this.goal = goal;
       setTitle("Choose Taclet Instantiation");
       setDescription("Define instantiations required to apply the taclet.");
+      setImageDescriptor(KeYImages.getImageDescriptor(KeYImages.INTERACTIVE_WIZARD));
    }
 
    /**

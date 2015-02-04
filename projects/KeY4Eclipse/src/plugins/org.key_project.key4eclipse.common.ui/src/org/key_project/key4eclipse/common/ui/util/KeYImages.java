@@ -43,6 +43,16 @@ public final class KeYImages {
      * The key for the image that is used for test generation.
      */
     public static final String TEST_GENERATION = "org.key_project.key4eclipse.common.ui.testGeneration";
+
+    /**
+     * The key for the image that is used for the starter wizard.
+     */
+    public static final String STARTER_WIZARD = "org.key_project.key4eclipse.common.ui.starterWizard";
+
+    /**
+     * The key for the image that is used for the interactive rule application wizard.
+     */
+    public static final String INTERACTIVE_WIZARD = "org.key_project.key4eclipse.common.ui.interactiveWizard";
     
     /**
      * Forbid instances.
@@ -110,6 +120,12 @@ public final class KeYImages {
         else if (TEST_GENERATION.equals(key)) {
            path = "icons/testGeneration.png";
         }
+        else if (STARTER_WIZARD.equals(key)) {
+           path = "icons/start_wizard.png";
+        }
+        else if (INTERACTIVE_WIZARD.equals(key)) {
+           path = "icons/interactive_wizard.png";
+        }
         // Load image if possible
         if (path != null) {
            InputStream in = null;
@@ -150,6 +166,9 @@ public final class KeYImages {
             public void run() {
                ImageRegistry registry = Activator.getDefault().getImageRegistry();
                registry.remove(KEY_LOGO);
+               registry.remove(INTERACTIVE_WIZARD);
+               registry.remove(STARTER_WIZARD);
+               registry.remove(TEST_GENERATION);
             }
          });
        }
