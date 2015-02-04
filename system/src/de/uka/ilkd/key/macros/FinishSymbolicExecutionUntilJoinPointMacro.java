@@ -17,7 +17,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.ProverTaskListener;
+import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -30,7 +31,6 @@ import de.uka.ilkd.key.java.statement.Case;
 import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.Else;
-import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.statement.Finally;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
@@ -43,6 +43,7 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -53,7 +54,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.util.AssertionFailure;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
@@ -70,7 +70,16 @@ import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
  * @see FinishSymbolicExecutionMacro
  */
 public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMacro {
+   
+   private HashSet<ProgramElement> blockElems = new HashSet<ProgramElement>();
+   private HashSet<JavaBlock> alreadySeen = new HashSet<JavaBlock>();
 
+   public FinishSymbolicExecutionUntilJoinPointMacro() {}
+   
+   public FinishSymbolicExecutionUntilJoinPointMacro(HashSet<ProgramElement> blockElems) {
+      this.blockElems = blockElems;
+   }
+   
    @Override
    public String getName() {
       return "Finish symbolic execution until join point";
@@ -132,6 +141,74 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
       return new FilterSymbexStrategy(proof.getActiveStrategy());
    }
    
+   @Override
+   protected void doPostProcessing(Proof proof) {
+      // This hack was introduced since in a "while loop with break"
+      // I discovered that the execution stopped early, that is three
+      // automatic steps before a join would be possible.
+      // So we do single automatic steps until our break point
+      // vanishes; then we undo until the break point is there again.
+      
+      for (Goal goal : proof.openEnabledGoals()) {
+         
+         if (!hashBreakPoint(goal.sequent().succedent())) {
+            continue;
+         }
+         
+         Node lastNode = goal.node();
+         do {
+            try {
+               // Do single proof step
+               new OneStepProofMacro().applyTo(
+                     JoinRuleUtils.mediator(), goal.node(), null, DUMMY_PROVER_TASK_LISTENER);
+            } catch (InterruptedException e) {}
+            
+            // We want no splits, but the proof must have changed
+            if (lastNode.childrenCount() == 1) {
+               lastNode = lastNode.child(0);
+            } else {
+               break;
+            }
+         } while (hashBreakPoint(goal.sequent().succedent()));
+         
+         // Undo until a break condition is the first active statement again.
+         while (!hashBreakPoint(lastNode.sequent().succedent())) {
+            lastNode = lastNode.parent();
+            proof.pruneProof(lastNode);
+         }
+         
+      }
+   }
+   
+   /**
+    * Dummy ProverTaskListener.
+    */
+   private static final ProverTaskListener DUMMY_PROVER_TASK_LISTENER = new ProverTaskListener() {                        
+      @Override
+      public void taskStarted(String message, int size) {}                        
+      @Override
+      public void taskProgress(int position) {}                        
+      @Override
+      public void taskFinished(TaskFinishedInfo info) {}
+   };
+   
+   /**
+    * @param succedent Succedent of a sequent.
+    * @return true iff the given succedent has one formula with
+    *   a break point statement.
+    */
+   private boolean hashBreakPoint(Semisequent succedent) {
+      for (SequentFormula formula : succedent.toList()) {
+         if (blockElems.contains(
+               JavaTools.getActiveStatement(
+                     getJavaBlockRecursive(formula.formula())))) {
+            return true;
+         }
+      }
+      
+      return false;
+   }
+   
    /**
     * Returns the first Java block in the given term that
     * can be found by recursive search, or the empty block
@@ -160,12 +237,9 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
     * to any rule  infinite costs if the goal has no modality or if
     * a join point is reached.
     */
-   private static class FilterSymbexStrategy extends FilterStrategy {
-      
-      private HashSet<ProgramElement> blockElems = new HashSet<ProgramElement>();
-      private HashSet<JavaBlock> alreadySeen = new HashSet<JavaBlock>();
+   private class FilterSymbexStrategy extends FilterStrategy {
 
-      private static final Name NAME = new Name(
+      private final Name NAME = new Name(
             FilterSymbexStrategy.class.getSimpleName());
 
       public FilterSymbexStrategy(Strategy delegate) {
@@ -225,7 +299,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
        * @param toSearch The statement block to search for join points.
        * @return A set of join points for the given statement block.
        */
-      private static HashSet<ProgramElement> findJoinPoints(StatementBlock toSearch) {
+      private HashSet<ProgramElement> findJoinPoints(StatementBlock toSearch) {
          HashSet<ProgramElement> result = new HashSet<ProgramElement>();
          ImmutableArray<? extends Statement> stmts = toSearch.getBody();
          
@@ -279,7 +353,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
        * Visitor for finding out whether there is a break statement
        * contained in a program element.
        */
-      private static class FindBreakVisitor extends JavaASTVisitor {
+      private class FindBreakVisitor extends JavaASTVisitor {
          private boolean containsBreak = false;
          
          public FindBreakVisitor(ProgramElement root, Services services) {
@@ -310,7 +384,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
        * @param elem The element to return the bodies for.
        * @return The bodies for the given source element.
        */
-      private static LinkedList<StatementBlock> getBodies(SourceElement elem) {
+      private LinkedList<StatementBlock> getBodies(SourceElement elem) {
          if (elem instanceof If) {
             return getBodies((If) elem);
          } else if (elem instanceof Then) {
@@ -347,7 +421,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
        * @param elem The element to return the bodies for.
        * @return The bodies for the given source element.
        */
-      private static LinkedList<StatementBlock> getBodies(If elem) {
+      private LinkedList<StatementBlock> getBodies(If elem) {
          LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
 
          result.addAll(getBodies(elem.getThen()));
@@ -365,7 +439,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
        * @param elem The element to return the bodies for.
        * @return The bodies for the given source element.
        */
-      private static LinkedList<StatementBlock> getBodies(Then elem) {
+      private LinkedList<StatementBlock> getBodies(Then elem) {
          LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
          
          Statement thenBody = elem.getBody();
@@ -382,7 +456,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
        * @param elem The element to return the bodies for.
        * @return The bodies for the given source element.
        */
-      private static LinkedList<StatementBlock> getBodies(Else elem) {
+      private LinkedList<StatementBlock> getBodies(Else elem) {
          LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
          
          Statement elseBody = elem.getBody();
@@ -400,7 +474,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
        * @param elem The element to return the bodies for.
        * @return The bodies for the given source element.
        */
-      private static LinkedList<StatementBlock> getBodies(Try elem) {
+      private LinkedList<StatementBlock> getBodies(Try elem) {
          LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
          
          if (elem instanceof Try) {
@@ -424,7 +498,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
        * @param elem The element to return the bodies for.
        * @return The bodies for the given source element.
        */
-      private static LinkedList<StatementBlock> getBodies(Catch elem) {
+      private LinkedList<StatementBlock> getBodies(Catch elem) {
          LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
          
          Statement catchBody = elem.getBody();
@@ -441,7 +515,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
        * @param elem The element to return the bodies for.
        * @return The bodies for the given source element.
        */
-      private static LinkedList<StatementBlock> getBodies(Finally elem) {
+      private LinkedList<StatementBlock> getBodies(Finally elem) {
          LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
          
          Statement finallyBody = elem.getBody();
@@ -458,7 +532,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
        * @param elem The element to return the bodies for.
        * @return The bodies for the given source element.
        */
-      private static LinkedList<StatementBlock> getBodies(MethodFrame elem) {
+      private LinkedList<StatementBlock> getBodies(MethodFrame elem) {
          LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
          
          Statement methodFrameBody = elem.getBody();
@@ -475,7 +549,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
        * @param elem The element to return the bodies for.
        * @return The bodies for the given source element.
        */
-      private static LinkedList<StatementBlock> getBodies(Case elem) {
+      private LinkedList<StatementBlock> getBodies(Case elem) {
          LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
          
          ImmutableArray<Statement> caseBodies = elem.getBody();
@@ -494,7 +568,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
        * @param elem The element to return the bodies for.
        * @return The bodies for the given source element.
        */
-      private static LinkedList<StatementBlock> getBodies(CatchAllStatement elem) {
+      private LinkedList<StatementBlock> getBodies(CatchAllStatement elem) {
          LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
          
          Statement catchBody = elem.getBody();
@@ -511,7 +585,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
        * @param elem The element to return the bodies for.
        * @return The bodies for the given source element.
        */
-      private static LinkedList<StatementBlock> getBodies(LabeledStatement elem) {
+      private LinkedList<StatementBlock> getBodies(LabeledStatement elem) {
          LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
          
          Statement thenBody = elem.getBody();
@@ -528,7 +602,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
        * @param elem The element to return the bodies for.
        * @return The bodies for the given source element.
        */
-      private static LinkedList<StatementBlock> getBodies(LoopStatement elem) {
+      private LinkedList<StatementBlock> getBodies(LoopStatement elem) {
          LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
          
          Statement thenBody = elem.getBody();
@@ -545,7 +619,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
        * @param elem The element to return the bodies for.
        * @return The bodies for the given source element.
        */
-      private static LinkedList<StatementBlock> getBodies(SynchronizedBlock elem) {
+      private LinkedList<StatementBlock> getBodies(SynchronizedBlock elem) {
          LinkedList<StatementBlock> result = new LinkedList<StatementBlock>();
          
          Statement thenBody = elem.getBody();
