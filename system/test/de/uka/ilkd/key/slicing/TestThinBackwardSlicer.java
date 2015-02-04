@@ -4,6 +4,8 @@ import java.io.File;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.declaration.VariableDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.statement.Return;
@@ -23,7 +25,29 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
    /**
     * Flag to print found slices in the console.
     */
-   public static final boolean PRINT_SLICE = true;
+   public static final boolean PRINT_SLICE = false;
+
+   /**
+    * Tests slicing on the example {@code figure2Param}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testFigure2Param_right() throws Exception {
+      doSlicingTest("examples/_testcase/slicing/figure2Param/Figure2Param.proof", 
+                    new RightAssignmentSelector(165),
+                    true,
+                    151, 85);
+   }
+
+   /**
+    * Tests slicing on the example {@code figure2Local}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testFigure2Local_right() throws Exception {
+      doSlicingTest("examples/_testcase/slicing/figure2Local/Figure2Local.proof", 
+                    new RightVariableDeclarationSelector(168),
+                    true,
+                    154, 86);
+   }
 
    /**
     * Tests slicing on the example {@code figure2Instance}.
@@ -33,7 +57,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
       doSlicingTest("examples/_testcase/slicing/figure2Instance/Figure2Instance.proof", 
                     new RightAssignmentSelector(269),
                     true,
-                    231, 171, 169, 154, 150, 133);
+                    231, 171, 169, 154, 150, 133, 99);
    }
 
    /**
@@ -283,6 +307,42 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
       }
       finally {
          environment.dispose();
+      }
+   }
+   
+   /**
+    * {@link ISeedLocationSelector} which searches the right side of a variable declaration.
+    * @author Martin Hentschel
+    */
+   protected static class RightVariableDeclarationSelector implements ISeedLocationSelector {
+      /**
+       * The serial ID of the seed node.
+       */
+      private final int seedNodeId;
+      
+      /**
+       * Constructor.
+       * @param seedNodeId The serial ID of the seed node.
+       */
+      public RightVariableDeclarationSelector(int seedNodeId) {
+         this.seedNodeId = seedNodeId;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Pair<Node, ReferencePrefix> findSeed(Proof proof) {
+         // Find seed
+         Node seedNode = findNode(proof, seedNodeId);
+         assertNotNull(seedNode);
+         // Get seed location
+         SourceElement activeStatemt = seedNode.getNodeInfo().getActiveStatement();
+         assertTrue(activeStatemt instanceof VariableDeclaration);
+         VariableDeclaration variableDeclaration = (VariableDeclaration) activeStatemt;
+         SourceElement seedLocation = variableDeclaration.getChildAt(1);
+         assertTrue(seedLocation instanceof VariableSpecification);
+         return new Pair<Node, ReferencePrefix>(seedNode, (ReferencePrefix) ((VariableSpecification) seedLocation).getInitializer());
       }
    }
    

@@ -10,6 +10,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 
 /**
@@ -41,6 +43,14 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
                   updateRelevantLocations(read, relevantLocations, aliases, thisReference, services);
                }
             }
+         }
+      }
+      else if (activeStatement instanceof MethodBodyStatement) {
+         MethodBodyStatement mbs = (MethodBodyStatement) activeStatement;
+         IProgramVariable resultVariable = mbs.getResultVariable();
+         ReferencePrefix relevantTarget = computeReferencePrefix(resultVariable);
+         if (relevantTarget != null && removeRelevant(relevantTarget, relevantLocations, aliases, thisReference)) {
+            accept = true;            
          }
       }
       return accept;
