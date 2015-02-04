@@ -26,6 +26,50 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
    public static final boolean PRINT_SLICE = false;
 
    /**
+    * Tests slicing on the example {@code valueChange}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testValueChange() throws Exception {
+      doSlicingTest("examples/_testcase/slicing/valueChange/ValueChange.proof", 
+                    new ReturnSelector(113),
+                    true,
+                    109, 97, 81, 77, 52);
+   }
+
+   /**
+    * Tests slicing on the example {@code readWriteTest}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testReadWriteTest() throws Exception {
+      doSlicingTest("examples/_testcase/slicing/readWriteTest/ReadWriteTest.proof", 
+                    new ReturnSelector(40),
+                    true,
+                    36, 29, 21, 11);
+   }
+
+   /**
+    * Tests slicing on the example {@code aliasChanged}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testAliasChanged() throws Exception {
+      doSlicingTest("examples/_testcase/slicing/aliasChanged/AliasChanged.proof", 
+                    new ReturnSelector(225),
+                    false,
+                    220, 216, 86, 57);
+   }
+
+   /**
+    * Tests slicing on the example {@code aliasNotAvailable}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testAliasNotAvailable() throws Exception {
+      doSlicingTest("examples/_testcase/slicing/aliasNotAvailable/AliasNotAvailable.proof", 
+                    new ReturnSelector(200),
+                    false,
+                    195, 191, 107, 86);
+   }
+
+   /**
     * Tests slicing on the example {@code intEndTest}.
     * @throws Exception Occurred Exception.
     */
