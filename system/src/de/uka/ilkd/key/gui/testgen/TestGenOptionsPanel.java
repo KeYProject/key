@@ -44,6 +44,7 @@ class TestGenOptionsPanel extends TablePanel{
 		super();
 		this.minWidthOfTitle = SwingUtilities.computeStringWidth(this.getFontMetrics(getFont()),"Concurrent ProcessesBLANK");
 		this.settings = settings;
+		this.setShowInfo(true);
 		createTable();
 	}
 	
@@ -59,7 +60,7 @@ class TestGenOptionsPanel extends TablePanel{
 	   getMaxProcesses();
 	   getMaxUnwinds();
 	   getInvariantForall();
-	   getRemoveDuplicatesPanel();
+	   //getRemoveDuplicatesPanel();
 	   getRFLSelectionPanel();
 	   getJUnitPanel();	   
 	    
