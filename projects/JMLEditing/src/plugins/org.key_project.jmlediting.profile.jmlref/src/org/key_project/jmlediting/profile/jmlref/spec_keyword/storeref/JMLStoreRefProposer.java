@@ -1,26 +1,34 @@
-package org.key_project.jmlediting.profile.jmlref.spec_keyword;
+package org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.internal.core.CompilationUnit;
+import org.eclipse.jdt.internal.ui.viewsupport.BindingLabelProvider;
 import org.eclipse.jdt.ui.SharedASTProvider;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.swt.graphics.Image;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
-import org.key_project.jmlediting.core.utilities.JMLJavaResolver;
+import org.key_project.jmlediting.core.utilities.CommentLocator;
+import org.key_project.jmlediting.core.utilities.CommentRange;
+import org.key_project.jmlediting.core.utilities.JMLJavaVisibleFieldsComputer;
+import org.key_project.jmlediting.core.utilities.MethodDeclarationFinder;
 import org.key_project.jmlediting.core.utilities.TypeDeclarationFinder;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.IStoreRefKeyword;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefNodeTypes;
+import org.key_project.jmlediting.ui.completion.JMLCompletionProposalComputer;
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
 
 @SuppressWarnings("restriction")
@@ -52,6 +60,13 @@ public class JMLStoreRefProposer {
          }
       }
 
+      final MethodDeclarationFinder methodFinder = new MethodDeclarationFinder();
+      ast.accept(methodFinder);
+      final HashMap<Integer, List<SingleVariableDeclaration>> parameterMap = new HashMap<Integer, List<SingleVariableDeclaration>>();
+      for (final MethodDeclaration decl : methodFinder.getDecls()) {
+         parameterMap.put(decl.getStartPosition(), decl.parameters());
+      }
+
       final ITypeBinding activeType = activeTypeDecl.resolveBinding();
       this.declaringType = topDecl.resolveBinding();
       System.out.println("declaring: " + this.declaringType.getName());
@@ -79,13 +94,38 @@ public class JMLStoreRefProposer {
       // TODO check for ArrayIndices
       if (prefix != null && prefix.isEmpty() && allowKeywords) {
          result.addAll(JMLCompletionUtil.getKeywordProposals(this.context,
-               null, null, IStoreRefKeyword.class));
+               null, JMLCompletionProposalComputer.getJMLImg(),
+               IStoreRefKeyword.class));
       }
 
       result.addAll(this.proposeStoreRefVariables(activeType, node, restNodes,
             false, allowKeywords, true));
 
+      System.out.println("prefix: " + prefix + "; allowKeywords?"
+            + allowKeywords);
+      if (prefix != null && prefix.isEmpty() && allowKeywords) {
+         result.addAll(this.proposeMethodParameters(activeType, parameterMap));
+      }
+
       result.addAll(this.proposeStoreRefApiVariables(node, restNodes));
+
+      return result;
+   }
+
+   private Collection<? extends ICompletionProposal> proposeMethodParameters(
+         final ITypeBinding activeType,
+         final HashMap<Integer, List<SingleVariableDeclaration>> parameterMap) {
+      final Collection<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
+
+      final int offset = this.context.getInvocationOffset();
+
+      final CommentLocator locator = new CommentLocator(
+            this.context.getDocument());
+
+      final CommentRange range = locator.getJMLComment(offset);
+
+      System.out.println("begin: " + range.getBeginOffset() + "; end: "
+            + range.getEndOffset());
 
       return result;
    }
@@ -103,8 +143,8 @@ public class JMLStoreRefProposer {
       // cut the prefix to the cursor position
       final String prefix = JMLCompletionUtil.computePrefix(this.context, node);
 
-      final JMLJavaResolver resolver = new JMLJavaResolver(this.declaringType,
-            activeType);
+      final JMLJavaVisibleFieldsComputer resolver = new JMLJavaVisibleFieldsComputer(
+            this.declaringType);
 
       // if prefix != null the cursor is in or before the currentNode ->
       // compute the proposals
@@ -117,24 +157,31 @@ public class JMLStoreRefProposer {
          }
 
          final List<IVariableBinding> vars = resolver
-               .getAllVisibleVariableBindings();
+               .getAllVisibleFields(activeType);
 
          final int replacementOffset = this.context.getInvocationOffset()
                - prefix.length();
          final int prefixLength = prefix.length();
 
-         if (prefix.isEmpty() && allowAsteric) {
+         if (prefix.isEmpty() && allowAsteric && !activeType.isPrimitive()) {
             final String replacementString = "*";
             final int cursorPosition = replacementString.length();
             result.add(new CompletionProposal(replacementString,
-                  replacementOffset, prefixLength, cursorPosition));
+                  replacementOffset, prefixLength, cursorPosition,
+                  JMLCompletionProposalComputer.getJMLImg(), replacementString,
+                  null, null));
          }
          for (final IVariableBinding varBind : vars) {
-            if (varBind.getName().startsWith(prefix)) {
+            if (varBind.getName().startsWith(prefix)
+                  && ((varBind.getModifiers() & Modifier.FINAL) == 0)) {
                final String replacementString = varBind.getName();
                final int cursorPosition = replacementString.length();
+
+               final Image image = BindingLabelProvider
+                     .getBindingImageDescriptor(varBind, 0).createImage();
                result.add(new CompletionProposal(replacementString,
-                     replacementOffset, prefixLength, cursorPosition));
+                     replacementOffset, prefixLength, cursorPosition, image,
+                     replacementString, null, null));
             }
          }
 
@@ -149,8 +196,26 @@ public class JMLStoreRefProposer {
             final String name = ((IStringNode) node.getChildren().get(0))
                   .getString();
 
-            System.out.println("searchingType for: " + name);
-            final ITypeBinding nextType = resolver.getTypeForName(name);
+            ITypeBinding nextType = null;
+            // Handle this and super
+            // this is not correct completely because the implementation
+            // allows this as a field access which is not correct
+            // this/super is allowed as an initial identifier and after
+            // a trype of the current or an enclosing class which is not handled
+            // currently
+            if (activeType == this.declaringType) {
+               if (name.equals("this")) {
+                  nextType = activeType;
+               }
+               else if (name.equals("super")) {
+                  nextType = activeType.getSuperclass();
+               }
+            }
+            if (nextType == null) {
+               System.out.println("searchingType for: " + name);
+               nextType = resolver.getTypeForName(activeType, name);
+            }
+
             if (nextType == null) {
                System.out.println("AAAAaaahhhhh, nextType is null!");
                return Collections.emptyList();

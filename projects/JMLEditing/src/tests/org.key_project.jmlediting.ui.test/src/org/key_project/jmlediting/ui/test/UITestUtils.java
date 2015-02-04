@@ -211,6 +211,24 @@ public class UITestUtils {
          this.openedEditor = null;
       }
 
+      public String getClassLocation() {
+         return this.classLocation;
+      }
+
+      public String getClassName() {
+         return this.className;
+      }
+
+      public String getPackageName() {
+         return this.packageName;
+      }
+
+      public void copyData() throws CoreException {
+         // Copy the class
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
+               this.classLocation, this.testFolder);
+      }
+
       public void restoreClassAndOpen() throws CoreException {
          // Check what to do in order to restore the content of the editor to
          // the given class
@@ -240,9 +258,7 @@ public class UITestUtils {
             if (this.openedEditor != null) {
                this.openedEditor.close();
             }
-            // Copy the class
-            BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
-                  this.classLocation, this.testFolder);
+            this.copyData();
             // Open the editor
             this.bot.tree().getTreeItem(this.projectName).select().expand()
                   .getNode("src").select().expand().getNode(this.packageName)

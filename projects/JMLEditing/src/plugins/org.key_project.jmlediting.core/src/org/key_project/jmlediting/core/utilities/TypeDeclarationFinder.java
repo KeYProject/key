@@ -18,4 +18,5 @@ public class TypeDeclarationFinder extends ASTVisitor {
       this.decls.add(node);
       return super.visit(node);
    }
+
 }

@@ -1,0 +1,197 @@
+package org.key_project.jmlediting.ui.test.completion;
+
+import static org.junit.Assert.assertEquals;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
+import org.eclipse.swtbot.swt.finder.utils.Position;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
+import org.key_project.jmlediting.core.profile.JMLProfileHelper;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.IStoreRefKeyword;
+import org.key_project.jmlediting.ui.test.UITestUtils;
+import org.key_project.jmlediting.ui.test.UITestUtils.TestProject;
+import org.key_project.jmlediting.ui.test.UITestUtils.TestProject.SaveGuarantee;
+
+public class StoreRefKeywordProposalsTest {
+
+   private static final SWTWorkbenchBot bot = new SWTWorkbenchBot();
+
+   private static TestProject project;
+   private static SWTBotEclipseEditor editor;
+   private static List<Integer> testPositions;
+
+   @BeforeClass
+   public static void createProject() throws CoreException,
+         InterruptedException, IOException {
+      project = UITestUtils.createProjectWithFile(bot,
+            "StoreRefKeywordProposals", StoreRefKeywordProposalsTest.class
+                  .getPackage().getName(), "VectorTest",
+            "data/template/storerefproposals/", SaveGuarantee.NO_SAVE);
+      JMLPreferencesHelper.setProjectJMLProfile(project.getProject()
+            .getProject(), UITestUtils.findReferenceProfile());
+      project.restoreClassAndOpen();
+      // Preprocess file
+      // There are markers following the template [[<num>]] in the text with
+      // increasing numbers
+      // Remove them and store the positions
+      final IFile classFile = project
+            .getProject()
+            .getProject()
+            .getFile(
+                  "src/" + project.getPackageName().replace('.', '/') + "/"
+                        + project.getClassName() + ".java");
+
+      // Read the file
+      final BufferedReader reader = new BufferedReader(new InputStreamReader(
+            classFile.getContents()));
+      String text = "";
+      String temp;
+      while ((temp = reader.readLine()) != null) {
+         text += "\n" + temp;
+      }
+
+      // Find and remove the positions
+      testPositions = new ArrayList<Integer>();
+      int i = 1;
+      int offset;
+
+      while ((offset = text.indexOf(getMarker(i))) != -1) {
+         text = text.substring(0, offset)
+               + text.substring(offset + getMarker(i).length(), text.length());
+         testPositions.add(offset);
+         i++;
+      }
+
+      // Store the transformed file
+      classFile.setContents(new ByteArrayInputStream(text.getBytes()),
+            IFile.FORCE, null);
+
+   }
+
+   private static String getMarker(final int i) {
+      return "[[" + i + "]]";
+   }
+
+   @Before
+   public void cleanEditor() throws CoreException {
+      project.restoreClassAndOpen();
+      editor = project.getOpenedEditor();
+   }
+
+   @Test
+   public void testOpenProposalsAfterNewAssignable() {
+      goToTestOffset(1);
+      final List<String> proposals = editor.getAutoCompleteProposals("");
+      assertEquals(
+            "Proposals after new keyword not correct",
+            appendStoreRefKeywords("intermediateVector", "intermediateVectors",
+                  "results", "temp", "vectors1", "vectors2"), proposals);
+   }
+
+   @Test
+   public void testOpenProposalsWithToplevelPrefix() {
+      goToTestOffset(2);
+      final List<String> proposals = editor.getAutoCompleteProposals("");
+      assertEquals("Proposals after toplevel prefix is wrong",
+            Arrays.asList("vectors1", "vectors2"), proposals);
+   }
+
+   @Test
+   public void testOpenProposalsFieldAccess() {
+      goToTestOffset(3);
+      final List<String> proposals = editor.getAutoCompleteProposals("");
+      assertEquals("Field access proposals is wrong",
+            Arrays.asList("*", "moreTemps", "temp1", "temp2", "temp3"),
+            proposals);
+      editor.autoCompleteProposal("", "moreTemps");
+      editor.typeText(".");
+      this.checkConsProposals();
+   }
+
+   private void checkVector2Proposals() {
+      final List<String> nextProposals = editor.getAutoCompleteProposals("");
+      assertEquals("Members for class Vector2 are wrong",
+            Arrays.asList("*", "x", "y"), nextProposals);
+   }
+
+   private void checkConsProposals() {
+      final List<String> nextProposals = editor.getAutoCompleteProposals("");
+      assertEquals("Members for classes Cons are wrong",
+            Arrays.asList("*", "elem", "id", "next"), nextProposals);
+   }
+
+   @Test
+   public void testOpenProposalsWithParameter() {
+      goToTestOffset(4);
+      final List<String> proposals = editor.getAutoCompleteProposals("");
+      assertEquals(
+            "Proposals with parameters not correct",
+            appendStoreRefKeywords("factor, intermediateVector",
+                  "intermediateVectors", "newVector", "results", "temp",
+                  "vectors1", "vectors2"), proposals);
+      editor.autoCompleteProposal("", "newVector");
+      editor.typeText(".");
+      this.checkVector2Proposals();
+   }
+
+   @Test
+   public void testGenericsCompletion() {
+      goToTestOffset(5);
+      this.checkConsProposals();
+      editor.autoCompleteProposal("", "elem");
+      bot.sleep(2000);
+      editor.typeText(".");
+      bot.sleep(2000);
+      this.checkVector2Proposals();
+   }
+
+   @Test
+   public void testNoStarAfterPrimitiveType() {
+      goToTestOffset(6);
+      final List<String> nextProposals = editor.getAutoCompleteProposals("");
+      assertEquals("There should be no proposal after primitive type",
+            Arrays.asList("No Default Proposals"), nextProposals);
+   }
+
+   @Test
+   public void testStarAfterReferenceType() {
+      goToTestOffset(7);
+      final Position pos = editor.cursorPosition();
+      final List<String> nextProposals = editor.getAutoCompleteProposals("");
+      // Only one proposal, is inserted by default
+      assertEquals("Wrong proposals after reference type with no field", editor
+            .getTextOnLine(pos.line).subSequence(pos.column, pos.column + 1),
+            "*");
+   }
+
+   private static List<String> appendStoreRefKeywords(final String... others) {
+      final List<String> storeRefKeywords = new ArrayList<String>();
+      for (final IStoreRefKeyword keyword : JMLProfileHelper.filterKeywords(
+            UITestUtils.findReferenceProfile(), IStoreRefKeyword.class)) {
+         storeRefKeywords.addAll(keyword.getKeywords());
+      }
+      Collections.sort(storeRefKeywords);
+      storeRefKeywords.addAll(Arrays.asList(others));
+      return storeRefKeywords;
+   }
+
+   private static void goToTestOffset(final int num) {
+      editor.navigateTo(UITestUtils.getLineAndColumn(
+            testPositions.get(num - 1), editor));
+   }
+
+}

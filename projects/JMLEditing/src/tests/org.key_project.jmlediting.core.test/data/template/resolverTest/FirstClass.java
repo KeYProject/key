@@ -14,5 +14,9 @@ public class FirstClass extends SuperClass {
       private int privateNestedInFirstClass;
       protected long protectedNestedInFirstClass;
       long packageNestedInFirstClass;
+      
+      public void f() {
+         NestedInSu
+      }
    }
 }

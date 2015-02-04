@@ -12,4 +12,9 @@ public class SuperClass {
       protected long protectedNestedInSuperClass;
       long packageNestedInSuperClass;
    }
+   
+   public void main() {
+     
+      
+   }
 }
