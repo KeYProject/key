@@ -81,7 +81,10 @@ public class JMLCompletionUtil {
             // check for all spellings
             for (final String keyword : keywords) {
                // ignore not possible suggestions
-               if (keyword.startsWith(prefix)) {
+               System.out.println("\"" + keyword + "\".startsWith(\"\\"
+                     + prefix + "\") == " + keyword.startsWith("\\" + prefix));
+               if (keyword.startsWith(prefix)
+                     || keyword.startsWith("\\" + prefix)) {
                   result.add(new CompletionProposal(keyword, proposalOffset,
                         prefixLength, keyword.length(), proposalImage, null,
                         null, null));

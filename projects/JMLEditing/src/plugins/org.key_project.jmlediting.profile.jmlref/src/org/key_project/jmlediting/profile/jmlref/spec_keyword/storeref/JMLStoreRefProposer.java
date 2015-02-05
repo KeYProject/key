@@ -4,7 +4,6 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -27,6 +26,7 @@ import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLJavaVisibleFieldsComputer;
 import org.key_project.jmlediting.core.utilities.MethodDeclarationFinder;
+import org.key_project.jmlediting.core.utilities.MethodParameter;
 import org.key_project.jmlediting.core.utilities.TypeDeclarationFinder;
 import org.key_project.jmlediting.ui.completion.JMLCompletionProposalComputer;
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
@@ -62,9 +62,10 @@ public class JMLStoreRefProposer {
 
       final MethodDeclarationFinder methodFinder = new MethodDeclarationFinder();
       ast.accept(methodFinder);
-      final HashMap<Integer, List<SingleVariableDeclaration>> parameterMap = new HashMap<Integer, List<SingleVariableDeclaration>>();
+      final List<MethodParameter> parameterList = new ArrayList<MethodParameter>();
       for (final MethodDeclaration decl : methodFinder.getDecls()) {
-         parameterMap.put(decl.getStartPosition(), decl.parameters());
+         parameterList.add(new MethodParameter(decl.getStartPosition(), decl
+               .parameters()));
       }
 
       final ITypeBinding activeType = activeTypeDecl.resolveBinding();
@@ -75,36 +76,37 @@ public class JMLStoreRefProposer {
       final IASTNode node;
       final List<IASTNode> restNodes;
       final boolean allowKeywords;
+      allowKeywords = !hasOtherExpressions;
       if (expr == null) {
          final int invocationOffset = this.context.getInvocationOffset();
          node = Nodes.createNode(StoreRefNodeTypes.STORE_REF_NAME,
                Nodes.createString(invocationOffset, invocationOffset, ""));
          restNodes = Collections.<IASTNode> emptyList();
-         allowKeywords = !hasOtherExpressions;
       }
       else {
          System.out.println("expr: " + expr.prettyPrintAST());
          node = expr.getChildren().get(0);
          restNodes = expr.getChildren().get(1).getChildren();
-         allowKeywords = false;
       }
 
       final String prefix = JMLCompletionUtil.computePrefix(this.context, node);
 
       // TODO check for ArrayIndices
-      if (prefix != null && prefix.isEmpty() && allowKeywords) {
+      System.out.println("allowKeywords == " + allowKeywords);
+      if (allowKeywords) {
          result.addAll(JMLCompletionUtil.getKeywordProposals(this.context,
-               null, JMLCompletionProposalComputer.getJMLImg(),
+               prefix, JMLCompletionProposalComputer.getJMLImg(),
                IStoreRefKeyword.class));
       }
 
       result.addAll(this.proposeStoreRefVariables(activeType, node, restNodes,
             false, allowKeywords, true));
 
-      System.out.println("prefix: " + prefix + "; allowKeywords?"
-            + allowKeywords);
-      if (prefix != null && prefix.isEmpty() && allowKeywords) {
-         result.addAll(this.proposeMethodParameters(activeType, parameterMap));
+      // if we have no other Expressions, we can propose the Method parameters
+      // -> only at the beginning of proposals;
+      if (!hasOtherExpressions) {
+         result.addAll(this.proposeMethodParameters(activeType, prefix,
+               parameterList));
       }
 
       result.addAll(this.proposeStoreRefApiVariables(node, restNodes));
@@ -113,9 +115,11 @@ public class JMLStoreRefProposer {
    }
 
    private Collection<? extends ICompletionProposal> proposeMethodParameters(
-         final ITypeBinding activeType,
-         final HashMap<Integer, List<SingleVariableDeclaration>> parameterMap) {
+         final ITypeBinding activeType, final String prefix,
+         final List<MethodParameter> parameterList) {
       final Collection<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
+
+      System.out.println("startMethodParameters");
 
       final int offset = this.context.getInvocationOffset();
 
@@ -123,9 +127,49 @@ public class JMLStoreRefProposer {
             this.context.getDocument());
 
       final CommentRange range = locator.getJMLComment(offset);
-
-      System.out.println("begin: " + range.getBeginOffset() + "; end: "
+      System.out.println("commentRange: " + range.getBeginOffset() + "-"
             + range.getEndOffset());
+
+      final String content = this.context.getDocument().get();
+      for (final MethodParameter methodParams : parameterList) {
+         boolean addParams = true;
+         for (int i = range.getEndOffset(); i < methodParams.getStartOffset(); i++) {
+            final char toBeChecked = content.charAt(i);
+            System.out.println("checking chat at " + i + ": \'" + toBeChecked
+                  + "\'");
+            if (toBeChecked == ' ' || toBeChecked == '\n') {
+               System.out.println("\twhitespace/eol");
+               continue;
+            }
+            else if (locator.getCommentOfOffset(i) != null) {
+               System.out.println("\tinComment");
+               continue;
+            }
+            addParams = false;
+            break;
+         }
+
+         if (addParams) {
+            final int replacementOffset = this.context.getInvocationOffset()
+                  - prefix.length();
+            final int prefixLength = prefix.length();
+            System.out.println("Prefix: " + prefix);
+            for (final SingleVariableDeclaration param : methodParams
+                  .getParameters()) {
+               final Image image = BindingLabelProvider
+                     .getBindingImageDescriptor(param.resolveBinding(), 0)
+                     .createImage();
+               final String replacementString = param.getName().toString();
+               if (replacementString.startsWith(prefix)) {
+                  final int cursorPosition = replacementString.length();
+                  result.add(new CompletionProposal(replacementString,
+                        replacementOffset, prefixLength, cursorPosition, image,
+                        replacementString, null, null));
+                  System.out.println("added");
+               }
+            }
+         }
+      }
 
       return result;
    }

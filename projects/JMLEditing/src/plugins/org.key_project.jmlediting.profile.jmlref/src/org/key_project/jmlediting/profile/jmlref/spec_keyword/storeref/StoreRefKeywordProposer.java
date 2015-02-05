@@ -65,13 +65,18 @@ public class StoreRefKeywordProposer implements IKeywordAutoProposer {
                   @Override
                   public Boolean traverse(final IASTNode node,
                         final Boolean existing) {
-                     if (node.getType() == StoreRefNodeTypes.STORE_REF_NAME) {
+                     // added containsOffset, because i want to complete
+                     // parameters and keywords as well
+                     if (node.getType() == StoreRefNodeTypes.STORE_REF_NAME
+                           && !node.containsOffset(context
+                                 .getInvocationOffset() - 1)) {
                         return true;
                      }
                      return existing;
                   }
                }, false);
 
+         System.out.println("hasExpr == " + hasExpr);
          result.addAll(new JMLStoreRefProposer(context).propose(cu,
                exprInOffset, hasExpr));
       }
