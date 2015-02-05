@@ -520,6 +520,29 @@ public final class Main {
         System.exit(exitValue);
     }
 
+    /**
+     * Used by {@link de.uka.ilkd.key.gui.KeYFileChooser} (and potentially
+     * others) to determine working directory. In case there is at least one
+     * location (i.e. a file or directory) specified as command line argument,
+     * working directory is determined based on first location that occured in
+     * the list of arguments. Otherwise, value of System.getProperty("user.dir")
+     * is used to determine working directory.
+     *
+     * @return {@link File} object representing working directory.
+     */
+    public static File getWorkingDir() {
+        if (fileArguments.isEmpty()) {
+            File f = fileArguments.get(0);
+            if (f.isDirectory()) {
+                return f;
+            } else {
+                return f.getParentFile();
+            }
+        } else {
+            return new File(System.getProperty("user.dir"));
+        }
+    }
+
     public static String getExamplesDir() {
         return examplesDir;
     }
