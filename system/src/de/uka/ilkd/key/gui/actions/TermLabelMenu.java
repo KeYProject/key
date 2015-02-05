@@ -46,7 +46,7 @@ public class TermLabelMenu extends JMenu {
 
     public TermLabelMenu(final MainWindow mainWindow) {
 
-        setText("Hide Term Labels");
+        setText("Term Labels");
         setToolTipText("Configure term label visibility.");
         checkBoxMap = new TreeMap<Name, TermLabelCheckBox>();
         this.mainWindow = mainWindow;
