@@ -105,6 +105,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        batchMode.finishedBatchMode ( result2, info.getProof() );
    }
 
+    @Override
    public void taskFinished(TaskFinishedInfo info) {
        progressMax = 0; // reset progress bar marker
        final Proof proof = info.getProof();
@@ -325,10 +326,10 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        }
        final Pair<File, String> f = fileName(proof, fileExtension);
        File file = f.first;
+       assert file != null : "No corresponding filename available for proof";
        String defaultName = f.second;
 
-       final String recDir = file != null ?
-               file.getParent() : new File(Main.getFileNameOnStartUp()).getParent();
+       final String recDir = file.getParent();
        file = (defaultName != null) ? new File(recDir, defaultName): file;
 
        String poDir =
