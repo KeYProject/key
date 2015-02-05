@@ -11,10 +11,6 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import javax.swing.JCheckBox;
@@ -22,6 +18,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
+ * {@link JCheckBox} indicating whether taclet info is displayed for inner nodes
+ * in proof tree.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
@@ -33,11 +31,15 @@ public class TacletInfoToggle extends JCheckBox {
     public TacletInfoToggle() {
         setText("Show taclet info (Inner Nodes only)");
         addChangeListener(new ChangeListener() {
+            @Override
             public void stateChanged(ChangeEvent e) {
-                innerNodeView.tacletInfo.setVisible(isSelected());
+                if (innerNodeView != null) {
+                    innerNodeView.tacletInfo.setVisible(isSelected());
+                }
             }
         });
         setVisible(false);
+        setName(this.getClass().getSimpleName());
     }
 
     public void setSequentView(SequentView sequentView) {
