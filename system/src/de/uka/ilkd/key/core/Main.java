@@ -439,7 +439,7 @@ public final class Main {
      */
     private static UserInterface createUserInterface(List<File> fileArguments) {
 
-        if (isAutoMode()) {
+        if (uiMode == UiMode.AUTO) {
             // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see bug #1216
             Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                 @Override
@@ -544,10 +544,6 @@ public final class Main {
     /** Returns the time of the program start in millis. */
     public static long getStartTime() {
         return startTime;
-    }
-    
-    public static boolean isAutoMode(){
-        return uiMode == UiMode.AUTO;
     }
 
     /** Command line output verbosity levels. */

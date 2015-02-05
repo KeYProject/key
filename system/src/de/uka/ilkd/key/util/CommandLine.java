@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.util;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.core.Main;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
