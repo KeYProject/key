@@ -5,6 +5,8 @@ import static org.key_project.jmlediting.core.parser.util.JavaBasicsParser.*;
 import static org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes.*;
 import static org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParserUtils.*;
 
+import java.util.Set;
+
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.IRecursiveParseFunction;
 import org.key_project.jmlediting.core.parser.ParseFunction;
@@ -23,6 +25,8 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
  *
  */
 public class ExpressionParser implements ParseFunction {
+
+   public static final Object ADDITIONAL_PRIMARY_SUFFIXES = new Object();
 
    /**
     * The main parser which is used to parse text.
@@ -202,7 +206,10 @@ public class ExpressionParser implements ParseFunction {
        * | `[' expression `]'<br>
        * | [ `[' `]' ] ... . class
        */
-      final ParseFunction primarySuffix = alt(
+      final Set<ParseFunction> additionalSuffixes = profile.getExtensions(
+            ADDITIONAL_PRIMARY_SUFFIXES, ParseFunction.class);
+      final ParseFunction primarySuffix = alt(appendFirsts(
+            additionalSuffixes,
             seq(MEMBER_ACCESS, constant("."),
                   alt(ident(), constant("this"), constant("class"))),
             seq(constant("."), newExpr),
@@ -211,7 +218,7 @@ public class ExpressionParser implements ParseFunction {
             typed(METHOD_CALL_PARAMETERS, brackets(opt(expressionList))),
             typed(ARRAY_ACCESS, squareBrackets(expression)),
             seq(ARRAY_CLASS, list(seq(constant("["), constant("]"))),
-                  constant("."), constant("class")));
+                  constant("."), constant("class"))));
 
       /**
        * postfix-expr ::= primary-expr [ primary-suffix ] ... [ ++ ]<br>

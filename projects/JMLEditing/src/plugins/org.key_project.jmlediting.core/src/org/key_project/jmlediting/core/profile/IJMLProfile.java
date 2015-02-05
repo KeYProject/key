@@ -44,6 +44,21 @@ public interface IJMLProfile {
    Set<IJMLPrimary> getSupportedPrimaries();
 
    /**
+    * Returns an extension to the project for the given key and type. This can
+    * be used put or get extensions to a profile which is not worth for a single
+    * method because it is not generic.
+    *
+    * @param key
+    *           the key object
+    * @param clazz
+    *           the type class
+    * @return a set of all extension values, never null
+    * @param <T>
+    *           the type of the extension
+    */
+   <T> Set<T> getExtensions(Object key, Class<T> clazz);
+
+   /**
     * Creates a new parser to parse JML for this profile. A parser created with
     * this method must only be used once. This allows the parser to cover some
     * state. But implementations of this method may return the same object

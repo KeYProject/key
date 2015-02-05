@@ -51,6 +51,11 @@ public class JMLProfileManagementTest {
          return new DefaultJMLParser(this);
       }
 
+      @Override
+      public <T> Set<T> getExtensions(final Object key, final Class<T> clazz) {
+         return Collections.emptySet();
+      }
+
    }
 
    public static class DummyJMLProfile1 extends DummyProfile {

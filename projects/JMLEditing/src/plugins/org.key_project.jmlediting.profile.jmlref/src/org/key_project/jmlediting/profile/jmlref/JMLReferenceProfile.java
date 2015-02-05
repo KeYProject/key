@@ -7,7 +7,7 @@ import java.util.Set;
 
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.BehaviorKeyword;
@@ -21,6 +21,7 @@ import org.key_project.jmlediting.profile.jmlref.other.AlsoKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.HelperKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.InvariantKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.PureKeyword;
+import org.key_project.jmlediting.profile.jmlref.primary.InvariantForKeyword;
 import org.key_project.jmlediting.profile.jmlref.primary.KeywordJMLPrimary;
 import org.key_project.jmlediting.profile.jmlref.quantifier.ExistentialQuantifierKeyword;
 import org.key_project.jmlediting.profile.jmlref.quantifier.ForallQuantifierKeyword;
@@ -54,7 +55,7 @@ import org.key_project.jmlediting.profile.jmlref.visibility.SpecPublicKeyword;
  * @author Moritz Lichter
  *
  */
-public class JMLReferenceProfile implements IJMLProfile {
+public class JMLReferenceProfile extends AbstractJMLProfile {
 
    /**
     * A set containing all supported keywords.
@@ -88,7 +89,7 @@ public class JMLReferenceProfile implements IJMLProfile {
             new SumQuantifierKeyword(), new NumOfQuantifierKeyword(),
             new NonNullKeyword(), new NullableKeyword(),
             new InvariantKeyword(), new LoopInvariantKeyword(),
-            new DecreasingKeyword()));
+            new DecreasingKeyword(), new InvariantForKeyword()));
 
       this.supportedPrimaries = new HashSet<IJMLPrimary>(Arrays.asList(
             new KeywordJMLPrimary(), new QuantifierPrimary()));

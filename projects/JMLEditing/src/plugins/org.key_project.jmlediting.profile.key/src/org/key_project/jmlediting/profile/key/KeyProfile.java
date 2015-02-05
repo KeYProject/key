@@ -5,11 +5,15 @@ import java.util.Set;
 
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
+import org.key_project.jmlediting.core.parser.ParseFunction;
+import org.key_project.jmlediting.core.parser.ParserBuilder;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
 import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
+import org.key_project.jmlediting.profile.key.other.InvKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAccessibleKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAssignableKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyNothingKeyword;
@@ -27,6 +31,12 @@ public class KeyProfile extends JMLReferenceProfile {
             new KeyAssignableKeyword());
       replace(this.getSupportedKeywordsInternal(), AccessibleKeyword.class,
             new KeyAccessibleKeyword());
+      this.getSupportedKeywordsInternal().add(new InvKeyword());
+      this.putExtension(
+            ExpressionParser.ADDITIONAL_PRIMARY_SUFFIXES,
+            ParserBuilder.separateBy('.',
+                  ParserBuilder.keywords(InvKeyword.class, this)),
+            ParseFunction.class);
    }
 
    private static void replace(final Set<IKeyword> keywords,

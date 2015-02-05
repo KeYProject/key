@@ -10,6 +10,7 @@ public abstract class AllKeywordsHighlightingTest {
    private /*@ spec_public */ int numCalls;
    private /*@ spec_protected*/ int handledCalls;
    private boolean needsRefresh;
+   private Object[] obs;
    
    /*@
      @ public normal_behavior
@@ -25,6 +26,7 @@ public abstract class AllKeywordsHighlightingTest {
      @ public normal_behavior
      @   requires number > 0;
      @   ensures this.numCalls == \old(this.nunCalls); 
+     @   requires \invariant_for(obs);
      @ 
      @ also
      @ 

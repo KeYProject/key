@@ -3,6 +3,7 @@ package org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression;
 import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -332,6 +333,15 @@ public final class ExpressionParserUtils {
             return this.primary.parse(text, start, end);
          }
       };
+   }
+
+   public static ParseFunction[] appendFirsts(
+         final Collection<ParseFunction> moreAlts, final ParseFunction... alts) {
+      final ArrayList<ParseFunction> allFunctions = new ArrayList<ParseFunction>(
+            moreAlts.size() + alts.length);
+      allFunctions.addAll(Arrays.asList(alts));
+      allFunctions.addAll(moreAlts);
+      return allFunctions.toArray(new ParseFunction[allFunctions.size()]);
    }
 
 }
