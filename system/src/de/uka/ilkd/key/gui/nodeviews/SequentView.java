@@ -20,7 +20,6 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.ADDITIONAL_HIGHLIGHT_COLOR;
 import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.pp.LogicPrinter;
 
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
@@ -81,7 +80,7 @@ public abstract class SequentView extends JTextArea {
 
     private final ConfigChangeListener configChangeListener;
     SequentPrintFilter filter;
-    private LogicPrinter printer;
+    private SequentViewLogicPrinter printer;
     public boolean refreshHighlightning = true;
 
     // the default tag of the highlight
@@ -244,7 +243,7 @@ public abstract class SequentView extends JTextArea {
      *
      * @return The LogicPrinter that is used.
      */
-    public LogicPrinter getLogicPrinter() {
+    public SequentViewLogicPrinter getLogicPrinter() {
         return printer;
     }
 
