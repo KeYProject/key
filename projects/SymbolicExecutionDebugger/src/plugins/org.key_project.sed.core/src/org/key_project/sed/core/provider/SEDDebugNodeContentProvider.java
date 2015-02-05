@@ -259,7 +259,7 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
          if (children != null && children.length == 1) {
             ISEDDebugNode[] childChildren = children[0].getChildren();
             if (childChildren != null && childChildren.length == 1) {
-               return ArrayUtil.addAll(children, getCompactChildren(children[0]));
+               return ArrayUtil.addAll(children, getCompactChildren(children[0]), ISEDDebugNode.class);
             }
             else {
                return children;

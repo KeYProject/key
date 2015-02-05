@@ -4,7 +4,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.debug.core.DebugException;
+import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.sourcesummary.ISEDSourceModel;
+import org.key_project.sed.core.util.SEDPreorderIterator;
 
 /**
  * The default implementation of {@link ISEDSourceModel}.
@@ -15,6 +18,24 @@ public class SEDMemorySourceModel implements ISEDSourceModel {
     * All available {@link SEDMemorySourceSummary}s accessible by the source {@link Object}s.
     */
    private final Map<Object, SEDMemorySourceSummary> sourceSummaries = new HashMap<Object, SEDMemorySourceSummary>();
+
+   /**
+    * The parent {@link ISEDDebugTarget}.
+    */
+   private final ISEDDebugTarget debugTarget;
+   
+   /**
+    * Indicates that the model is completed or not.
+    */
+   private boolean possiblyIncomplete = true;
+
+   /**
+    * Constructor.
+    * @param debugTarget The parent {@link ISEDDebugTarget}.
+    */
+   public SEDMemorySourceModel(ISEDDebugTarget debugTarget) {
+      this.debugTarget = debugTarget;
+   }
 
    /**
     * {@inheritDoc}
@@ -45,5 +66,28 @@ public class SEDMemorySourceModel implements ISEDSourceModel {
       else {
          return null;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void ensureCompleteness() throws DebugException {
+      if (possiblyIncomplete) {
+         // Iterate over the full tree to ensure that all nodes are loaded.
+         SEDPreorderIterator iterator = new SEDPreorderIterator(debugTarget);
+         while (iterator.hasNext()) {
+            iterator.next();
+         }
+         this.possiblyIncomplete = false;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setPossiblyIncomplete() {
+      this.possiblyIncomplete = true;
    }
 }
