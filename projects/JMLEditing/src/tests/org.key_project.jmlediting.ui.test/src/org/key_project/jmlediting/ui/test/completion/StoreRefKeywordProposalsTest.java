@@ -138,14 +138,17 @@ public class StoreRefKeywordProposalsTest {
    @Test
    public void testOpenProposalsWithParameter() {
       goToTestOffset(4);
-      final List<String> proposals = editor.getAutoCompleteProposals("");
+      List<String> proposals = editor.getAutoCompleteProposals("");
+      bot.sleep(1000);
+      proposals = editor.getAutoCompleteProposals("");
       assertEquals(
             "Proposals with parameters not correct",
-            appendStoreRefKeywords("factor, intermediateVector",
+            appendStoreRefKeywords("factor", "intermediateVector",
                   "intermediateVectors", "newVector", "results", "temp",
                   "vectors1", "vectors2"), proposals);
       editor.autoCompleteProposal("", "newVector");
       editor.typeText(".");
+      bot.sleep(10000);
       this.checkVector2Proposals();
    }
 

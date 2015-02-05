@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -13,7 +14,6 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.internal.core.CompilationUnit;
 import org.eclipse.jdt.internal.ui.viewsupport.BindingLabelProvider;
-import org.eclipse.jdt.ui.SharedASTProvider;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -31,43 +31,93 @@ import org.key_project.jmlediting.core.utilities.TypeDeclarationFinder;
 import org.key_project.jmlediting.ui.completion.JMLCompletionProposalComputer;
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
 
+/**
+ * The StoreRefProposer computes the AutoCompletion for StoreRefKeywords
+ * <ul>
+ * <li>Visible Fields</li>
+ * <li>Method Parameters</li>
+ * </ul>
+ *
+ * @author Thomas Glaser
+ *
+ */
 @SuppressWarnings("restriction")
 public class JMLStoreRefProposer {
+   /**
+    * the invocationContext the AutoCompletion is called from
+    */
    private final JavaContentAssistInvocationContext context;
+   /**
+    * The TypeBinding the AutoCompletion is called in
+    */
    private ITypeBinding declaringType;
+   /**
+    * the computed List of MethodParameters catched from the AST
+    */
+   private final List<MethodParameter> parameterList = new ArrayList<MethodParameter>();
 
+   /**
+    * the CompilationUnit to get the AST from
+    */
+   private final CompilationUnit cu;
+
+   /**
+    * Only Constructor
+    *
+    * @param context
+    *           The context the AutoCompletion is called from
+    */
    public JMLStoreRefProposer(final JavaContentAssistInvocationContext context) {
       super();
       this.context = context;
+      if (context.getCompilationUnit() instanceof CompilationUnit) {
+         this.cu = (CompilationUnit) context.getCompilationUnit();
+      }
+      else {
+         // TODO make eclipse explode
+         this.cu = null;
+      }
    }
 
-   public Collection<ICompletionProposal> propose(final CompilationUnit cu,
-         final IASTNode expr, final boolean hasOtherExpressions) {
+   /**
+    * proposes the AutoCompletion for StoreRefKeywords
+    *
+    * @param expr
+    *           the parsed JML to compute the AutoCompletion for
+    * @param hasOtherExpressions
+    *           is this the first Expression for this specific StoreRefKeyword
+    * @return the computed CompletionProposals, empty List if none are found
+    */
+   @SuppressWarnings("unchecked")
+   public Collection<ICompletionProposal> propose(final IASTNode expr,
+         final boolean hasOtherExpressions) {
       final Collection<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
-      final org.eclipse.jdt.core.dom.CompilationUnit ast = SharedASTProvider
-            .getAST(cu, SharedASTProvider.WAIT_YES, null);
+      final org.eclipse.jdt.core.dom.CompilationUnit ast;
+      final ASTParser parser = ASTParser
+            .newParser(ASTParser.K_COMPILATION_UNIT);
+      parser.setKind(ASTParser.K_COMPILATION_UNIT);
+      parser.setSource(this.cu);
+      parser.setResolveBindings(true);
+      ast = (org.eclipse.jdt.core.dom.CompilationUnit) parser.createAST(null);
 
+      // find all TypeDeclarations
       final TypeDeclarationFinder finder = new TypeDeclarationFinder();
       ast.accept(finder);
       final List<TypeDeclaration> decls = finder.getDecls();
       final TypeDeclaration topDecl = decls.get(0);
       TypeDeclaration activeTypeDecl = null;
+      // find the activeTypeDeclaration to compute the completion.
       for (final TypeDeclaration decl : decls) {
          final int end = decl.getStartPosition() + decl.getLength();
+         // ignore all types after the invocationOffset, one may call
+         // AutoCompletion in the middle of some word or sequence
          if (decl.getStartPosition() <= this.context.getInvocationOffset()
                && end >= this.context.getInvocationOffset()) {
             activeTypeDecl = decl;
          }
       }
 
-      final MethodDeclarationFinder methodFinder = new MethodDeclarationFinder();
-      ast.accept(methodFinder);
-      final List<MethodParameter> parameterList = new ArrayList<MethodParameter>();
-      for (final MethodDeclaration decl : methodFinder.getDecls()) {
-         parameterList.add(new MethodParameter(decl.getStartPosition(), decl
-               .parameters()));
-      }
-
+      // compute all TypeBinding needed to resolve visibility of variables
       final ITypeBinding activeType = activeTypeDecl.resolveBinding();
       this.declaringType = topDecl.resolveBinding();
       System.out.println("declaring: " + this.declaringType.getName());
@@ -89,38 +139,82 @@ public class JMLStoreRefProposer {
          restNodes = expr.getChildren().get(1).getChildren();
       }
 
+      // find all methods to get all MethodParameters
+      final MethodDeclarationFinder methodFinder = new MethodDeclarationFinder();
+      ast.accept(methodFinder);
+
+      for (final MethodDeclaration decl : methodFinder.getDecls()) {
+         this.parameterList.add(new MethodParameter(decl.getStartPosition(),
+               decl.parameters()));
+      }
+
+      // compute the prefix the AutoCompletion has to handle
       final String prefix = JMLCompletionUtil.computePrefix(this.context, node);
 
       // TODO check for ArrayIndices
       System.out.println("allowKeywords == " + allowKeywords);
+      // propose StoreRef specific keywords, when called at the beginning.
       if (allowKeywords) {
          result.addAll(JMLCompletionUtil.getKeywordProposals(this.context,
                prefix, JMLCompletionProposalComputer.getJMLImg(),
                IStoreRefKeyword.class));
       }
 
+      // propose all (visible)fields
       result.addAll(this.proposeStoreRefVariables(activeType, node, restNodes,
             false, allowKeywords, true));
 
       // if we have no other Expressions, we can propose the Method parameters
       // -> only at the beginning of proposals;
       if (!hasOtherExpressions) {
-         result.addAll(this.proposeMethodParameters(activeType, prefix,
-               parameterList));
+         result.addAll(this.proposeMethodParameters(prefix));
       }
 
+      // TODO atm not implemented, but here API statements get resolved and
+      // fields from them get proposed
       result.addAll(this.proposeStoreRefApiVariables(node, restNodes));
 
       return result;
    }
 
+   /**
+    * propose methodParameters from the following method
+    *
+    * @param prefix
+    *           the prefix to compute the proposals for
+    * @return all Method parameters matching the prefix, empty List of none
+    *         matched
+    */
    private Collection<? extends ICompletionProposal> proposeMethodParameters(
-         final ITypeBinding activeType, final String prefix,
-         final List<MethodParameter> parameterList) {
+         final String prefix) {
       final Collection<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 
-      System.out.println("startMethodParameters");
+      final MethodParameter methodParams = this.getMethodParams();
+      if (methodParams != null) {
+         final int replacementOffset = this.context.getInvocationOffset()
+               - prefix.length();
+         final int prefixLength = prefix.length();
+         System.out.println("Prefix: " + prefix);
+         // check all VariableDeclarations to match the prefix
+         for (final SingleVariableDeclaration param : methodParams
+               .getParameters()) {
+            final Image image = BindingLabelProvider.getBindingImageDescriptor(
+                  param.resolveBinding(), 0).createImage();
+            final String replacementString = param.getName().toString();
+            if (replacementString.startsWith(prefix)) {
+               final int cursorPosition = replacementString.length();
+               result.add(new CompletionProposal(replacementString,
+                     replacementOffset, prefixLength, cursorPosition, image,
+                     replacementString, null, null));
+               System.out.println("added: " + replacementString);
+            }
+         }
+      }
 
+      return result;
+   }
+
+   private MethodParameter getMethodParams() {
       final int offset = this.context.getInvocationOffset();
 
       final CommentLocator locator = new CommentLocator(
@@ -131,13 +225,25 @@ public class JMLStoreRefProposer {
             + range.getEndOffset());
 
       final String content = this.context.getDocument().get();
-      for (final MethodParameter methodParams : parameterList) {
-         boolean addParams = true;
-         for (int i = range.getEndOffset(); i < methodParams.getStartOffset(); i++) {
+
+      MethodParameter result = null;
+
+      // search for the Methodparameters
+      for (final MethodParameter methodParams : this.parameterList) {
+         // continue if comment is after the method -> no checking needed
+         if (range.getEndOffset() > methodParams.getStartOffset()) {
+            System.out.println("outOfRange: " + methodParams.getStartOffset());
+            continue;
+         }
+         boolean setResult = true;
+         // check all following characters to be either whitespace or eol, or to
+         // be in comment. Else the JMLComment does not belong to this method
+         for (int i = range.getEndOffset(); i < methodParams.getStartOffset() - 1; i++) {
             final char toBeChecked = content.charAt(i);
             System.out.println("checking chat at " + i + ": \'" + toBeChecked
                   + "\'");
-            if (toBeChecked == ' ' || toBeChecked == '\n') {
+            if (toBeChecked == ' ' || toBeChecked == '\n'
+                  || toBeChecked == '\r') {
                System.out.println("\twhitespace/eol");
                continue;
             }
@@ -145,33 +251,32 @@ public class JMLStoreRefProposer {
                System.out.println("\tinComment");
                continue;
             }
-            addParams = false;
+            System.out.println("noAddParams...");
+            setResult = false;
             break;
          }
-
-         if (addParams) {
-            final int replacementOffset = this.context.getInvocationOffset()
-                  - prefix.length();
-            final int prefixLength = prefix.length();
-            System.out.println("Prefix: " + prefix);
-            for (final SingleVariableDeclaration param : methodParams
-                  .getParameters()) {
-               final Image image = BindingLabelProvider
-                     .getBindingImageDescriptor(param.resolveBinding(), 0)
-                     .createImage();
-               final String replacementString = param.getName().toString();
-               if (replacementString.startsWith(prefix)) {
-                  final int cursorPosition = replacementString.length();
-                  result.add(new CompletionProposal(replacementString,
-                        replacementOffset, prefixLength, cursorPosition, image,
-                        replacementString, null, null));
-                  System.out.println("added");
-               }
-            }
+         if (setResult) {
+            System.out.println("---setting methodParam");
+            result = methodParams;
          }
       }
-
+      System.out.println("returning: " + result);
       return result;
+   }
+
+   private ITypeBinding getMethodParameterTypeForName(final String fieldName) {
+      final MethodParameter methodParams = this.getMethodParams();
+      if (methodParams == null) {
+         return null;
+      }
+      for (final SingleVariableDeclaration varDecl : methodParams
+            .getParameters()) {
+         final IVariableBinding varBind = varDecl.resolveBinding();
+         if (varBind.getName().equals(fieldName)) {
+            return varBind.getType();
+         }
+      }
+      return null;
    }
 
    private List<ICompletionProposal> proposeStoreRefVariables(
@@ -255,6 +360,13 @@ public class JMLStoreRefProposer {
                   nextType = activeType.getSuperclass();
                }
             }
+            // check for Method parameters
+            if (nextType == null) {
+               System.out.println("checking MethodParameters");
+               nextType = this.getMethodParameterTypeForName(name);
+            }
+
+            // check for fields
             if (nextType == null) {
                System.out.println("searchingType for: " + name);
                nextType = resolver.getTypeForName(activeType, name);

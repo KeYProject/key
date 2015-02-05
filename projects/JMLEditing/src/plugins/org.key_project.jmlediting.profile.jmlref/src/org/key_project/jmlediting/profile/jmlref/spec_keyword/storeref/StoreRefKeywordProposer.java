@@ -3,7 +3,6 @@ package org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jdt.internal.core.CompilationUnit;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -26,20 +25,11 @@ public class StoreRefKeywordProposer implements IKeywordAutoProposer {
          return null;
       }
 
-      final CompilationUnit cu;
-      if (context.getCompilationUnit() instanceof CompilationUnit) {
-         cu = (CompilationUnit) context.getCompilationUnit();
-      }
-      else {
-         // TODO make eclipse explode
-         cu = null;
-      }
       // Keyword APPL or error Node
       final IASTNode tmpNode = nodeAtPos.getChildren().get(1);
       // empty KeywordContent
       if (tmpNode.getChildren().isEmpty()) {
-         result.addAll(new JMLStoreRefProposer(context)
-               .propose(cu, null, false));
+         result.addAll(new JMLStoreRefProposer(context).propose(null, false));
          return result;
       }
       IASTNode content = tmpNode.getChildren().get(0);
@@ -77,8 +67,8 @@ public class StoreRefKeywordProposer implements IKeywordAutoProposer {
                }, false);
 
          System.out.println("hasExpr == " + hasExpr);
-         result.addAll(new JMLStoreRefProposer(context).propose(cu,
-               exprInOffset, hasExpr));
+         result.addAll(new JMLStoreRefProposer(context).propose(exprInOffset,
+               hasExpr));
       }
       else if (content.getType() == NodeTypes.KEYWORD) {
          // TODO
