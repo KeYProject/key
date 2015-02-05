@@ -29,6 +29,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordContentRefactorer;
+import org.key_project.jmlediting.core.utilities.ChangeShiftContainer;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLJavaVisibleFieldsComputer;
@@ -76,13 +77,13 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
    @Override
    public RefactoringStatus checkConditions(final IProgressMonitor pm,
          final CheckConditionsContext context)
-               throws OperationCanceledException {
+         throws OperationCanceledException {
       return new RefactoringStatus();
    }
 
    @Override
    public Change createChange(final IProgressMonitor pm) throws CoreException,
-   OperationCanceledException {
+         OperationCanceledException {
       System.out.println("Creating Changes");
       // Cast Safe because of the Check in InitializerMethod
       final IField elem = (IField) this.element;
@@ -125,6 +126,7 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
             // In each Compilation Unit
             for (final ICompilationUnit unit : pac.getCompilationUnits()) {
                String src = null;
+               int shift = 0;
                if (this.getTextChange(unit) != null) {
                   src = this.getTextChange(unit).getPreviewContent(pm);
                   System.out.println(src);
@@ -160,8 +162,11 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
                         final IKeywordContentRefactorer refactorer = keyword
                               .createRefactorer();
                         if (refactorer != null) {
-                           changes.add(refactorer.refactorFieldRename(
-                                 identifier, contentNode, unit, src));
+                           final ChangeShiftContainer container = refactorer
+                                 .refactorFieldRename(identifier, contentNode,
+                                       unit, src, shift);
+                           changes.add(container.getChange());
+                           shift = container.getShift();
                         }
                      }
                   }

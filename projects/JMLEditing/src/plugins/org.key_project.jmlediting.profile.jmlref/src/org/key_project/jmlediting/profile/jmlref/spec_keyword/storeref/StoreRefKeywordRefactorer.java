@@ -8,12 +8,12 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordContentRefactorer;
+import org.key_project.jmlediting.core.utilities.ChangeShiftContainer;
 import org.key_project.jmlediting.core.utilities.JavaRefactoringElementInformationContainer;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes;
 
@@ -46,11 +46,17 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
     */
    private IFile file;
 
+   private int shift = 0;
+
+   private int difference;
+
    @Override
-   public Change refactorFieldRename(
+   public ChangeShiftContainer refactorFieldRename(
          final JavaRefactoringElementInformationContainer elem,
          final IASTNode contentNode, final ICompilationUnit cu,
-         final String srcAfterChanges) {
+         final String srcAfterChanges, final int initialShift) {
+      this.difference = elem.getNewName().length() - elem.getName().length();
+      this.shift = initialShift;
       this.cu = cu;
       IResource res = null;
       final MultiTextEdit edits = new MultiTextEdit();
@@ -84,9 +90,10 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
             if (this.src.substring(node.getStartOffset(), node.getEndOffset())
                   .equals(elem.getName())) {
                System.out.println("Found match in StoreRefName");
-               final ReplaceEdit edit = new ReplaceEdit(node.getStartOffset(),
-                     node.getEndOffset() - node.getStartOffset(),
+               final ReplaceEdit edit = new ReplaceEdit(node.getStartOffset()
+                     + this.shift, node.getEndOffset() - node.getStartOffset(),
                      elem.getNewName());
+               this.shift += this.difference;
                edits.addChild(edit);
             }
          }
@@ -95,9 +102,10 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
             if (this.src.substring(node.getStartOffset(), node.getEndOffset())
                   .equals(elem.getName())) {
                System.out.println("Found match in StoreRefNameSuffix");
-               final ReplaceEdit edit = new ReplaceEdit(node.getStartOffset(),
-                     node.getEndOffset() - node.getStartOffset(),
+               final ReplaceEdit edit = new ReplaceEdit(node.getStartOffset()
+                     + this.shift, node.getEndOffset() - node.getStartOffset(),
                      elem.getNewName());
+               this.shift += this.difference;
                edits.addChild(edit);
             }
          }
@@ -110,8 +118,7 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
             }
          }
       }
-      // tfchange.addEdit(edits);
-      return tfchange;
+      return new ChangeShiftContainer(tfchange, this.shift);
    }
 
    /**
@@ -131,9 +138,10 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
             if (this.src.substring(node.getStartOffset(), node.getEndOffset())
                   .equals(this.elem.getName())) {
                System.out.println("Found match in StoreRefName Recursively");
-               final ReplaceEdit edit = new ReplaceEdit(node.getStartOffset(),
-                     node.getEndOffset() - node.getStartOffset(),
+               final ReplaceEdit edit = new ReplaceEdit(node.getStartOffset()
+                     + this.shift, node.getEndOffset() - node.getStartOffset(),
                      this.elem.getNewName());
+               this.shift += this.difference;
                changes.add(edit);
             }
          }
@@ -147,9 +155,10 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
                   .equals(this.elem.getName())) {
                System.out
                .println("Found match in StoreRefNameSuffix Recursively");
-               final ReplaceEdit edit = new ReplaceEdit(node.getStartOffset(),
-                     node.getEndOffset() - node.getStartOffset(),
+               final ReplaceEdit edit = new ReplaceEdit(node.getStartOffset()
+                     + this.shift, node.getEndOffset() - node.getStartOffset(),
                      this.elem.getNewName());
+               this.shift += this.difference;
                changes.add(edit);
             }
          }
