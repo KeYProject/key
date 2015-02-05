@@ -76,13 +76,14 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
    @Override
    public RefactoringStatus checkConditions(final IProgressMonitor pm,
          final CheckConditionsContext context)
-         throws OperationCanceledException {
+               throws OperationCanceledException {
       return new RefactoringStatus();
    }
 
    @Override
    public Change createChange(final IProgressMonitor pm) throws CoreException,
-         OperationCanceledException {
+   OperationCanceledException {
+      System.out.println("Creating Changes");
       // Cast Safe because of the Check in InitializerMethod
       final IField elem = (IField) this.element;
       final org.eclipse.jdt.core.dom.CompilationUnit cu = SharedASTProvider
@@ -99,10 +100,7 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
             elem.getElementName(), resolver.getTypeForName(type,
                   elem.getElementName()), elem.getDeclaringType(), this
                   .getArguments().getNewName());
-      final Change occurences = this.getJMLOccurences(refGoal);
-      // final ReplaceEdit edit = new ReplaceEdit(offset,
-      // refGoal.getName().length(), this
-      // .getArguments().getNewName());
+      final Change occurences = this.getJMLOccurences(refGoal, pm);
       return occurences;
    }
 
@@ -113,8 +111,9 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
     *         no occurences were found.
     */
    private Change getJMLOccurences(
-         final JavaRefactoringElementInformationContainer identifier)
-         throws CoreException {
+         final JavaRefactoringElementInformationContainer identifier,
+         final IProgressMonitor pm) throws CoreException {
+      System.out.println("Getting Occurences");
       final Collection<Change> changes = new ArrayList<Change>();
       final CompositeChange change = new CompositeChange("JML Renaming Changes");
       CommentLocator loc = null;
@@ -125,13 +124,19 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
          for (final IPackageFragment pac : project.getPackageFragments()) {
             // In each Compilation Unit
             for (final ICompilationUnit unit : pac.getCompilationUnits()) {
-               loc = new CommentLocator(unit.getSource());
-               // In each JML Comment
+               String src = null;
+               if (this.getTextChange(unit) != null) {
+                  src = this.getTextChange(unit).getPreviewContent(pm);
+                  System.out.println(src);
+               }
+               else {
+                  src = unit.getSource();
+               }
+               loc = new CommentLocator(src);
+
                for (final CommentRange range : loc.findJMLCommentRanges()) {
-                  if (!unit
-                        .getSource()
-                        .substring(range.getBeginOffset(), range.getEndOffset())
-                        .contains(identifier.getName())) {
+                  if (!src.substring(range.getBeginOffset(),
+                        range.getEndOffset()).contains(identifier.getName())) {
                      continue; // no occurences in this compilation unit
                   }
 
@@ -140,7 +145,7 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
                   final IJMLParser parser = activeProfile.createParser();
                   IASTNode parseResult;
                   try {
-                     parseResult = parser.parse(unit.getSource(), range);
+                     parseResult = parser.parse(src, range);
                      final List<IASTNode> keywords = Nodes.getAllNodesOfType(
                            parseResult, NodeTypes.KEYWORD_APPL);
                      for (final IASTNode keywordApplNode : keywords) {
@@ -156,7 +161,7 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
                               .createRefactorer();
                         if (refactorer != null) {
                            changes.add(refactorer.refactorFieldRename(
-                                 identifier, contentNode, unit));
+                                 identifier, contentNode, unit, src));
                         }
                      }
                   }

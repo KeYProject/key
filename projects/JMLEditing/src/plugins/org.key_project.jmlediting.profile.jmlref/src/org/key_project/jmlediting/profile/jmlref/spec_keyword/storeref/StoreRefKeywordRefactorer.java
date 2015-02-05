@@ -15,6 +15,7 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordContentRefactorer;
 import org.key_project.jmlediting.core.utilities.JavaRefactoringElementInformationContainer;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionNodeTypes;
 
 /**
  * provides a Method to create changes needed for a Rename Refactoring in
@@ -48,7 +49,8 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
    @Override
    public Change refactorFieldRename(
          final JavaRefactoringElementInformationContainer elem,
-         final IASTNode contentNode, final ICompilationUnit cu) {
+         final IASTNode contentNode, final ICompilationUnit cu,
+         final String srcAfterChanges) {
       this.cu = cu;
       IResource res = null;
       final MultiTextEdit edits = new MultiTextEdit();
@@ -72,16 +74,7 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
       }
 
       this.elem = elem;
-      try {
-         this.src = cu.getSource();
-      }
-      catch (final JavaModelException e1) {
-         System.out.println("Could not get SourceCode");
-         // adding null to a Change results in something like "do nothing" which
-         // is
-         // perfect for our needs in this case
-         return null;
-      }
+      this.src = srcAfterChanges;
       System.out.println(contentNode.prettyPrintAST() + " "
             + contentNode.getChildren().size());
       for (final IASTNode node : contentNode.getChildren()) {
@@ -89,21 +82,22 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
             System.out.println("StoreRefName");
             // TODO: something
             if (this.src.substring(node.getStartOffset(), node.getEndOffset())
-                  .matches(elem.getName())) {
+                  .equals(elem.getName())) {
                System.out.println("Found match in StoreRefName");
                final ReplaceEdit edit = new ReplaceEdit(node.getStartOffset(),
-                     node.getEndOffset(), elem.getNewName());
+                     node.getEndOffset() - node.getStartOffset(),
+                     elem.getNewName());
                edits.addChild(edit);
             }
          }
          else if (node.getType() == StoreRefNodeTypes.STORE_REF_NAME_SUFFIX) {
-            System.out.println("StoreRefNameSuffix");
             // TODO: do something else
             if (this.src.substring(node.getStartOffset(), node.getEndOffset())
-                  .matches(elem.getName())) {
+                  .equals(elem.getName())) {
                System.out.println("Found match in StoreRefNameSuffix");
                final ReplaceEdit edit = new ReplaceEdit(node.getStartOffset(),
-                     node.getEndOffset(), elem.getNewName());
+                     node.getEndOffset() - node.getStartOffset(),
+                     elem.getNewName());
                edits.addChild(edit);
             }
          }
@@ -135,22 +129,27 @@ public class StoreRefKeywordRefactorer implements IKeywordContentRefactorer {
             System.out.println("StoreRefName Recursively");
             // TODO: something
             if (this.src.substring(node.getStartOffset(), node.getEndOffset())
-                  .matches(this.elem.getName())) {
+                  .equals(this.elem.getName())) {
                System.out.println("Found match in StoreRefName Recursively");
                final ReplaceEdit edit = new ReplaceEdit(node.getStartOffset(),
-                     node.getEndOffset(), this.elem.getNewName());
+                     node.getEndOffset() - node.getStartOffset(),
+                     this.elem.getNewName());
                changes.add(edit);
             }
          }
          else if (node.getType() == StoreRefNodeTypes.STORE_REF_NAME_SUFFIX) {
             System.out.println("StoreRefNameSuffix Recursively");
             // TODO: do something else
+            if (node.getChildren().get(0).getType() == ExpressionNodeTypes.IDENTIFIER) {
+               System.out.println("Identifier: " + node.getChildren().get(0));
+            }
             if (this.src.substring(node.getStartOffset(), node.getEndOffset())
-                  .matches(this.elem.getName())) {
+                  .equals(this.elem.getName())) {
                System.out
-                     .println("Found match in StoreRefNameSuffix Recursively");
+               .println("Found match in StoreRefNameSuffix Recursively");
                final ReplaceEdit edit = new ReplaceEdit(node.getStartOffset(),
-                     node.getEndOffset(), this.elem.getNewName());
+                     node.getEndOffset() - node.getStartOffset(),
+                     this.elem.getNewName());
                changes.add(edit);
             }
          }

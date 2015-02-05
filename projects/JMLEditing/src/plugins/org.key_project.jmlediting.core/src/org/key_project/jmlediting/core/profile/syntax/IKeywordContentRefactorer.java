@@ -19,9 +19,11 @@ public interface IKeywordContentRefactorer {
     *           The Object to refactor
     * @param contentNode
     *           The AST to traverse
+    * @param srcAfterChanges
+    *           TODO
     * @return List of changes for Refactoring
     */
    Change refactorFieldRename(JavaRefactoringElementInformationContainer elem,
-         IASTNode contentNode, ICompilationUnit cu);
+         IASTNode contentNode, ICompilationUnit cu, String srcAfterChanges);
 
 }
