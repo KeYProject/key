@@ -43,18 +43,18 @@ import de.uka.ilkd.key.testgen.oracle.OracleTermCall;
  * @author herda
  */
 public class TestCaseGenerator {
-   /**
-    * The Java source file extension with a leading dot.
-    */
-   public static final String JAVA_FILE_EXTENSION_WITH_DOT = ".java";
-   
-   /**
-    * Constant for the line break which is used by the operating system.
-    * <p>
-    * <b>Do not use {@code \n}!</b>
-    */
-   public static final String NEW_LINE = System.getProperty("line.separator");
-   
+	/**
+	 * The Java source file extension with a leading dot.
+	 */
+	public static final String JAVA_FILE_EXTENSION_WITH_DOT = ".java";
+
+	/**
+	 * Constant for the line break which is used by the operating system.
+	 * <p>
+	 * <b>Do not use {@code \n}!</b>
+	 */
+	public static final String NEW_LINE = System.getProperty("line.separator");
+
 	private static final String NULLABLE = "/*@ nullable */";
 	public static final String ALL_OBJECTS = "allObjects";
 	public static final String ALL_INTS = "allInts";
@@ -63,28 +63,28 @@ public class TestCaseGenerator {
 	public static final String ALL_FIELDS = "allFields";
 	public static final String ALL_SEQ = "allSeq";
 	public static final String ALL_LOCSETS = "allLocSets";
-	
+
 	public static final String OBJENESIS_NAME = "objenesis-2.1.jar";
-	
+
 	public static final String OLDMap = "old";
-	
+
 	public static final String TAB = "   ";
 	private Services services;
 	static int fileCounter = 0;
 	private final boolean junitFormat;
 	private static final String DONT_COPY = "aux"; // Classes of the Java
-	                                               // environment needed by KeY
-	                                               // can be placed in this
-	                                               // subdirectory.
+	// environment needed by KeY
+	// can be placed in this
+	// subdirectory.
 
 	public static boolean modelIsOK(Model m) {
 		return m != null && !m.isEmpty() && m.getHeaps() != null
-		        && m.getHeaps().size() > 0 && m.getTypes() != null;
+				&& m.getHeaps().size() > 0 && m.getTypes() != null;
 	}
 
 	private final boolean rflAsInternalClass;
 	protected boolean useRFL;
-   protected ReflectionClassCreator rflCreator;
+	protected ReflectionClassCreator rflCreator;
 	private final String dontCopy;
 	protected final String modDir;
 	protected final String directory;
@@ -100,31 +100,31 @@ public class TestCaseGenerator {
 	// TODO: in future remove this string and provide the file in the
 	// KeY-project
 	private String compileWithOpenJML = "#!/bin/bash" + NEW_LINE + NEW_LINE
-	        + "if [ -e \"openjml.jar\" ]" + NEW_LINE
-	        + "then" + NEW_LINE
-	        + "   java -jar openjml.jar -cp \".\" -rac *" + JAVA_FILE_EXTENSION_WITH_DOT + NEW_LINE
-	        + "else" + NEW_LINE
-	        + "   echo \"openjml.jar not found!\"" + NEW_LINE
-	        + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"" + NEW_LINE
-	        + "   echo \"Copy openjml.jar into the directory with test files.\"" + NEW_LINE
-	        + "fi" + NEW_LINE;
-	
+			+ "if [ -e \"openjml.jar\" ]" + NEW_LINE
+			+ "then" + NEW_LINE
+			+ "   java -jar openjml.jar -cp \".\" -rac *" + JAVA_FILE_EXTENSION_WITH_DOT + NEW_LINE
+			+ "else" + NEW_LINE
+			+ "   echo \"openjml.jar not found!\"" + NEW_LINE
+			+ "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"" + NEW_LINE
+			+ "   echo \"Copy openjml.jar into the directory with test files.\"" + NEW_LINE
+			+ "fi" + NEW_LINE;
+
 	private String createCompileWithOpenJML(String openJMLPath, String objenesisPath){
 		return "#!/bin/bash" + NEW_LINE + NEW_LINE
-		        + "if [ -e \""+openJMLPath+File.separator+"openjml.jar\" ] " + NEW_LINE
-		        + "then" + NEW_LINE 
-		        + "   if [ -e \""+objenesisPath+File.separator+OBJENESIS_NAME+"\" ]" + NEW_LINE
-		        + "   then" + NEW_LINE
-		        + "      java -jar "+openJMLPath+File.separator+"openjml.jar -cp \"."+objenesisPath+File.separator+OBJENESIS_NAME+"\" -rac *" + JAVA_FILE_EXTENSION_WITH_DOT + NEW_LINE
-		        + "   else" + NEW_LINE
-		        + "      echo \"objenesis-2.1.jar not found!\"" + NEW_LINE
-		        + "   fi" + NEW_LINE
-		        + "else" + NEW_LINE
-		        + "   echo \"openjml.jar not found!\"" + NEW_LINE
-		        
-		        + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"" + NEW_LINE
-		        + "   echo \"Copy openjml.jar into the directory with test files.\"" + NEW_LINE
-		        + "fi" + NEW_LINE;
+				+ "if [ -e \""+openJMLPath+File.separator+"openjml.jar\" ] " + NEW_LINE
+				+ "then" + NEW_LINE 
+				+ "   if [ -e \""+objenesisPath+File.separator+OBJENESIS_NAME+"\" ]" + NEW_LINE
+				+ "   then" + NEW_LINE
+				+ "      java -jar "+openJMLPath+File.separator+"openjml.jar -cp \"."+objenesisPath+File.separator+OBJENESIS_NAME+"\" -rac *" + JAVA_FILE_EXTENSION_WITH_DOT + NEW_LINE
+				+ "   else" + NEW_LINE
+				+ "      echo \"objenesis-2.1.jar not found!\"" + NEW_LINE
+				+ "   fi" + NEW_LINE
+				+ "else" + NEW_LINE
+				+ "   echo \"openjml.jar not found!\"" + NEW_LINE
+
+				+ "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"" + NEW_LINE
+				+ "   echo \"Copy openjml.jar into the directory with test files.\"" + NEW_LINE
+				+ "fi" + NEW_LINE;
 	}
 	// TODO: in future remove this string and provide the file in the
 	// KeY-project
@@ -132,47 +132,47 @@ public class TestCaseGenerator {
 
 	private String createExecuteWithOpenJML(String path, String objenesisPath){
 		return "#!/bin/bash" + NEW_LINE
-		        + "if [ -e \""+path+File.separator+"jmlruntime.jar\" ]" + NEW_LINE
-		        + "then"
-		        + "  if [ -e \""+path+File.separator+"jmlspecs.jar\" ]" + NEW_LINE
-		        + "  then" + NEW_LINE
-		        + "     if [ -e \""+objenesisPath+File.separator+OBJENESIS_NAME+"\" ]" + NEW_LINE
-		        + "     then" + NEW_LINE
-		        + "        if [ \"$1\" = \"\" ] ; then" + NEW_LINE
-		        + "           echo \"Provide the test driver as an argument (without " + JAVA_FILE_EXTENSION_WITH_DOT + " postfix). For example:\"" + NEW_LINE
-		        + "           echo \"  executeWithOpenJML.sh TestGeneric0 \"" + NEW_LINE
-		        + "           echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\"" + NEW_LINE
-		        + "           echo \"current directory.\"" + NEW_LINE
-		        + "           quit" + NEW_LINE
-		        + "        else" + NEW_LINE
-		        + "           java -cp "+objenesisPath+File.separator+OBJENESIS_NAME+":"+path+File.separator+"jmlruntime.jar:"+path+File.separator+"jmlspecs.jar:. $1" + NEW_LINE
-		        + "        fi" + NEW_LINE
-		        + "      else" + NEW_LINE
-		        + "         echo \"objenesis-2.1.jar not found!\"" + NEW_LINE
-		        + "      fi" + NEW_LINE
-		        + "else" + NEW_LINE
-		        + "  echo \"jmlspecs.jar not found!\"" + NEW_LINE
-		        + "  echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"" + NEW_LINE
-		        + "  echo \"Copy jmlspecs.jar into the directory with test files.\"" + NEW_LINE
-		        + "  quit" + NEW_LINE
-		        + "fi" + NEW_LINE
-		        + "else" + NEW_LINE
-		        + "   echo \"jmlruntime.jar not found!\"" + NEW_LINE
-		        + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"" + NEW_LINE
-		        + "   echo \"Copy jmlruntime.jar into the directory with test files.\"" + NEW_LINE
-		        + "   quit" + NEW_LINE 
-		        + "fi" + NEW_LINE;
+				+ "if [ -e \""+path+File.separator+"jmlruntime.jar\" ]" + NEW_LINE
+				+ "then"
+				+ "  if [ -e \""+path+File.separator+"jmlspecs.jar\" ]" + NEW_LINE
+				+ "  then" + NEW_LINE
+				+ "     if [ -e \""+objenesisPath+File.separator+OBJENESIS_NAME+"\" ]" + NEW_LINE
+				+ "     then" + NEW_LINE
+				+ "        if [ \"$1\" = \"\" ] ; then" + NEW_LINE
+				+ "           echo \"Provide the test driver as an argument (without " + JAVA_FILE_EXTENSION_WITH_DOT + " postfix). For example:\"" + NEW_LINE
+				+ "           echo \"  executeWithOpenJML.sh TestGeneric0 \"" + NEW_LINE
+				+ "           echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\"" + NEW_LINE
+				+ "           echo \"current directory.\"" + NEW_LINE
+				+ "           quit" + NEW_LINE
+				+ "        else" + NEW_LINE
+				+ "           java -cp "+objenesisPath+File.separator+OBJENESIS_NAME+":"+path+File.separator+"jmlruntime.jar:"+path+File.separator+"jmlspecs.jar:. $1" + NEW_LINE
+				+ "        fi" + NEW_LINE
+				+ "      else" + NEW_LINE
+				+ "         echo \"objenesis-2.1.jar not found!\"" + NEW_LINE
+				+ "      fi" + NEW_LINE
+				+ "else" + NEW_LINE
+				+ "  echo \"jmlspecs.jar not found!\"" + NEW_LINE
+				+ "  echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"" + NEW_LINE
+				+ "  echo \"Copy jmlspecs.jar into the directory with test files.\"" + NEW_LINE
+				+ "  quit" + NEW_LINE
+				+ "fi" + NEW_LINE
+				+ "else" + NEW_LINE
+				+ "   echo \"jmlruntime.jar not found!\"" + NEW_LINE
+				+ "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"" + NEW_LINE
+				+ "   echo \"Copy jmlruntime.jar into the directory with test files.\"" + NEW_LINE
+				+ "   quit" + NEW_LINE 
+				+ "fi" + NEW_LINE;
 	}
 
 	public TestCaseGenerator(Proof proof) {
-	   this(proof, false);
+		this(proof, false);
 	}
 
 	public TestCaseGenerator(Proof proof, boolean rflAsInternalClass) {
 		super();
 		this.rflAsInternalClass = rflAsInternalClass; 
 		final TestGenerationSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE
-		        .getTestGenerationSettings();
+				.getTestGenerationSettings();
 		services = proof.getServices();
 		junitFormat = settings.useJunit();
 		useRFL = settings.useRFL();
@@ -188,11 +188,11 @@ public class TestCaseGenerator {
 		oracleGenerator  =new OracleGenerator(services,rflCreator, useRFL);
 		if(junitFormat){
 			//System.out.println("Translating oracle");
-         oracleMethods = new LinkedList<OracleMethod>();
-         oracleMethodCall = getOracleAssertion(oracleMethods);
+			oracleMethods = new LinkedList<OracleMethod>();
+			oracleMethodCall = getOracleAssertion(oracleMethods);
 		}
 	}
-	
+
 	/**
 	 * Computes the project specific sub path of the output directory 
 	 * ({@link #directory}) in which the generated files will be stored.
@@ -200,34 +200,34 @@ public class TestCaseGenerator {
 	 * @return The computed sub path.
 	 */
 	protected String computeProjectSubPath(String modelDir) {
-	   if (modelDir.startsWith("/")) {
-	      return modelDir;
-	   }
-	   else {
-	      int index = modelDir.indexOf(File.separator);
-	      if (index >= 0) {
-	         return modelDir.substring(index); // Remove drive letter, e.g. Microsoft Windows
-	      }
-	      else {
-	         return modelDir;
-	      }
-	   }
-   }
-	
-   private Set<ObjectVal> getPrestateObjects(Model m){ // TODO: Remove unused method or use it
-		
+		if (modelDir.startsWith("/")) {
+			return modelDir;
+		}
+		else {
+			int index = modelDir.indexOf(File.separator);
+			if (index >= 0) {
+				return modelDir.substring(index); // Remove drive letter, e.g. Microsoft Windows
+			}
+			else {
+				return modelDir;
+			}
+		}
+	}
+
+	private Set<ObjectVal> getPrestateObjects(Model m){ // TODO: Remove unused method or use it
+
 		Set<ObjectVal> result  =new HashSet<ObjectVal>();
-		
+
 		Set<String> refs = oracleGenerator.getPrestateTerms();
-      for(String ref : refs){
-         result.addAll(m.getNecessaryPrestateObjects(ref));
-      }
-		
+		for(String ref : refs){
+			result.addAll(m.getNecessaryPrestateObjects(ref));
+		}
+
 		return result;
 	}
-	
-	
-	
+
+
+
 	public String getMUTCall(){
 		IProgramMethod m = info.getMUT();		
 		String name = m.getFullName();
@@ -241,7 +241,7 @@ public class TestCaseGenerator {
 		if(params.length() > 0){
 			params = params.substring(1);
 		}
-		
+
 		String caller;
 		if(m.isStatic()){
 			caller = info.getTypeOfClassUnderTest().getName();
@@ -249,7 +249,7 @@ public class TestCaseGenerator {
 		else{
 			caller = "self";
 		}
-		
+
 		if(m.getReturnType().equals(KeYJavaType.VOID_TYPE)){
 			return caller+"."+name+"("+params+");";
 		}
@@ -268,17 +268,17 @@ public class TestCaseGenerator {
 		}
 		final StringBuffer sb = new StringBuffer();
 		sortDummyClass.put(sort, sb); // Put the string buffer as soon as
-		                              // possible, due to possible recursive
-		                              // calls of this method.
+		// possible, due to possible recursive
+		// calls of this method.
 		sb.append("import " + sort.declarationString() + ";" + NEW_LINE + NEW_LINE);
 		sb.append("class " + className + " implements "
-		        + sort.declarationString() + "{" + NEW_LINE); // TODO:extends or
-		                                             // implements depending if
-		                                             // it is a class or
-		                                             // interface.
+				+ sort.declarationString() + "{" + NEW_LINE); // TODO:extends or
+		// implements depending if
+		// it is a class or
+		// interface.
 		sb.append(" public " + className + "(){ };" + NEW_LINE); // default constructor
 		final Iterator<IProgramMethod> methods = jinfo
-		        .getAllProgramMethods(kjt).iterator();
+				.getAllProgramMethods(kjt).iterator();
 		while (methods.hasNext()) {
 			final IProgramMethod m = methods.next();
 			if (m.getFullName().indexOf('<') > -1) {
@@ -312,7 +312,7 @@ public class TestCaseGenerator {
 			}
 			sb.append(m.getName() + "(");
 			final Iterator<ParameterDeclaration> pdIter = md.getParameters()
-			        .iterator();
+					.iterator();
 			int varcount = 0;
 			while (pdIter.hasNext()) {
 				final ParameterDeclaration pd = pdIter.next();
@@ -337,7 +337,7 @@ public class TestCaseGenerator {
 			sb.append(")");
 			if (md.getThrown() != null) {
 				sb.append(" throws " + md.getThrown().getTypeReferenceAt(0)
-				        + " " + NEW_LINE + " ");
+						+ " " + NEW_LINE + " ");
 			}
 			if (md.getTypeReference() == null) {
 				sb.append("{ };");
@@ -353,7 +353,7 @@ public class TestCaseGenerator {
 					boolean returnNull = true;
 					try {
 						final String retType = md.getTypeReference()
-						        .getKeYJavaType().getSort().name().toString();
+								.getKeYJavaType().getSort().name().toString();
 						if (retType.equals("java.lang.String")) {
 							sb.append("{ return \"" + className + "\";}");
 							returnNull = false;
@@ -374,7 +374,7 @@ public class TestCaseGenerator {
 	}
 
 	private void copyFiles(final String srcName, final String targName)
-	        throws IOException {
+			throws IOException {
 		// We don't want to copy the Folder with API Reference
 		// Implementation
 		if (srcName.equals(dontCopy)) {
@@ -385,11 +385,11 @@ public class TestCaseGenerator {
 		final File srcFile = new File(srcName);
 		if (!srcFile.exists()) {
 			throw new IOException("FileCopy: " + "no such source file: "
-			        + srcName);
+					+ srcName);
 		}
 		if (!srcFile.canRead()) {
 			throw new IOException("FileCopy: " + "source file is unreadable: "
-			        + srcName);
+					+ srcName);
 		}
 		if (srcFile.isDirectory()) {
 			final String newTarget;
@@ -410,7 +410,7 @@ public class TestCaseGenerator {
 			if (targFile.exists()) {
 				if (!targFile.canWrite()) {
 					throw new IOException("FileCopy: "
-					        + "destination file is unwriteable: " + targName);
+							+ "destination file is unwriteable: " + targName);
 				}
 			}
 			FileInputStream src = null;
@@ -441,7 +441,7 @@ public class TestCaseGenerator {
 			}
 		} else {
 			throw new IOException("FileCopy: " + srcName
-			        + " is neither a file nor a directory!");
+					+ " is neither a file nor a directory!");
 		}
 	}
 
@@ -452,21 +452,21 @@ public class TestCaseGenerator {
 			writeToFile(file, sb);
 		}
 	}
-	
-    /** Creates the RFL.java file, that provides setter and getter methods using the reflection API
-     *  as well as object creation functions based on the objenesis library.
-    * @throws IOException 
-     */
+
+	/** Creates the RFL.java file, that provides setter and getter methods using the reflection API
+	 *  as well as object creation functions based on the objenesis library.
+	 * @throws IOException 
+	 */
 	protected void writeRFLFile() throws IOException{
 		writeToFile(ReflectionClassCreator.NAME_OF_CLASS + JAVA_FILE_EXTENSION_WITH_DOT, createRFLFileContent());
 	}
-	
+
 	/**
 	 * Used by the Eclipse integration to creat the content of the RFL file.
 	 * @return The content of the RFL file.
 	 */
 	public StringBuffer createRFLFileContent() {
-	   return rflCreator.createClass(rflAsInternalClass);
+		return rflCreator.createClass(rflAsInternalClass);
 	}
 
 	protected void createOpenJMLShellScript() throws IOException {
@@ -487,13 +487,13 @@ public class TestCaseGenerator {
 	}
 
 	protected void exportCodeUnderTest() throws IOException {
-      // Copy the involved classes without modification
-      copyFiles(modDir, directory + modDir);
+		// Copy the involved classes without modification
+		copyFiles(modDir, directory + modDir);
 	}
 
 	private boolean filterVal(String s) {
 		if (s.startsWith("#a") || s.startsWith("#s") || s.startsWith("#h")
-		        || s.startsWith("#l") || s.startsWith("#f")) {
+				|| s.startsWith("#l") || s.startsWith("#f")) {
 			return false;
 		} else {
 			return true;
@@ -513,12 +513,12 @@ public class TestCaseGenerator {
 		testCase.append(getMainMethod(fileName, 1) + NEW_LINE + NEW_LINE);
 		testCase.append(getTestMethodSignature(0) + "{" + NEW_LINE);
 		testCase.append("   //Test preamble: creating objects and intializing test data"
-		        + generateTestCase(m) + NEW_LINE + NEW_LINE);
+				+ generateTestCase(m) + NEW_LINE + NEW_LINE);
 		testCase.append("   //Calling the method under test   " + NEW_LINE + mut
-		      + NEW_LINE);
+				+ NEW_LINE);
 		testCase.append("}" + NEW_LINE + "}");
 		logger.writeln("Writing test file to:" + directory + modDir
-		        + File.separator + fileName);
+				+ File.separator + fileName);
 		writeToFile(fileName + JAVA_FILE_EXTENSION_WITH_DOT, testCase);
 		exportCodeUnderTest();
 		createDummyClasses();
@@ -531,24 +531,24 @@ public class TestCaseGenerator {
 		TestCaseGenerator.fileCounter++;
 		return testCase.toString();
 	}
-	
-	
-	
+
+
+
 	protected String getOracleAssertion(List<OracleMethod> oracleMethods){		
 		Term postcondition = getPostCondition();
-		
+
 		OracleMethod oracle = oracleGenerator.generateOracleMethod(postcondition);
-		
-		
-		
+
+
+
 		OracleTermCall oracleCall = new OracleTermCall(oracle, oracle.getArgs());
-		
+
 		oracleMethods.add(oracle);
 		oracleMethods.addAll(oracleGenerator.getOracleMethods());
-		
+
 		System.out.println("Modifier Set: "+oracleGenerator.getOracleLocationSet(info.getAssignable()));
-		
-		
+
+
 		return "assertTrue("+oracleCall.toString()+");";
 	}
 
@@ -556,11 +556,11 @@ public class TestCaseGenerator {
 		return info.getPostCondition();
 	}
 	public String generateJUnitTestSuite(Collection<SMTSolver> problemSolvers) throws IOException {
-	   initFileName();
+		initFileName();
 		StringBuffer testSuite = createTestCaseCotent(problemSolvers);
 		writeToFile(fileName + JAVA_FILE_EXTENSION_WITH_DOT, testSuite);
 		logger.writeln("Writing test file to:" + directory + modDir
-		        + File.separator + fileName + JAVA_FILE_EXTENSION_WITH_DOT);
+				+ File.separator + fileName + JAVA_FILE_EXTENSION_WITH_DOT);
 		exportCodeUnderTest();
 		createDummyClasses();
 		try{
@@ -572,98 +572,97 @@ public class TestCaseGenerator {
 		TestCaseGenerator.fileCounter++;
 		return testSuite.toString();
 	}
-	
+
 	public void initFileName() {
-      fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
-      String mut = getMUTCall(); 
-      if (mut == null) {
-         mut = "<method under test> //Manually write a call to the method under test, because KeY could not determine it automatically.";
-      } else {
-         fileName += "_" + MUTName;
-      }
+		fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
+		String mut = getMUTCall(); 
+		if (mut == null) {
+			mut = "<method under test> //Manually write a call to the method under test, because KeY could not determine it automatically.";
+		} else {
+			fileName += "_" + MUTName;
+		}
 	}
-	
+
 	public StringBuffer createTestCaseCotent(Collection<SMTSolver> problemSolvers) { // TODO: Include package definition (same as type containing the proof obligation)
-	     final StringBuffer testSuite = new StringBuffer();
-	      testSuite.append(getFilePrefix(fileName) + NEW_LINE);
-	      final StringBuffer testMethods = new StringBuffer();
-	      int i = 0;
-	      for (final SMTSolver solver : problemSolvers) {
-	         try {
-	            final StringBuffer testMethod = new StringBuffer();
-	            final String originalNodeName = solver.getProblem().getGoal()
-	                    .proof().name().toString();
-	            boolean success = false;
-	            if (solver.getSocket().getQuery() != null) {
-	               final Model m = solver.getSocket().getQuery().getModel();
-	               if (TestCaseGenerator.modelIsOK(m)) {
-	                  logger.writeln("Generate: " + originalNodeName);
-	                  testMethod.append("  //" + originalNodeName + NEW_LINE);
-	                  testMethod.append(getTestMethodSignature(i) + "{" + NEW_LINE);
-	                  testMethod
-	                          .append("   //Test preamble: creating objects and intializing test data"
-	                                  + generateTestCase(m) + NEW_LINE + NEW_LINE);
-	                  
-	                  //info.getCode();
-	                  if(junitFormat){
-	                     testMethod.append(TAB+"//Other variables" + NEW_LINE + getOtherVariables(m) + NEW_LINE);
-	                  }
-	                  testMethod
-	                          .append("   //Calling the method under test   " + NEW_LINE
-	                                  + info.getCode() + NEW_LINE);
-	                  
-	                  
-	                  if(junitFormat){
-	                     testMethod.append("   //calling the test oracle" + NEW_LINE+TAB+oracleMethodCall + NEW_LINE);
-	                  }
-	                  
-	                  testMethod.append(" }" + NEW_LINE + NEW_LINE);
-	                  i++;
-	                  success = true;
-	                  testMethods.append(testMethod);
-	               }
-	            }
-	            if (!success) {
-	               logger.writeln("A model (test data) was not generated for:"
-	                       + originalNodeName);
-	            }
-	         } catch (final Exception ex) {
-	            for(StackTraceElement ste: ex.getStackTrace()){
-	               logger.writeln(ste.toString());
-	            }
-	            logger.writeln("A test case was not generated due to an exception. Continuing test generation...");
-	         }
-	      }
-	      if (i == 0) {
-	         logger.writeln("Warning: no test case was generated. Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
-	      } else if (i < problemSolvers.size()) {
-	         logger.writeln("Warning: SMT solver could not solve all test data constraints. Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
-	      }
-	      testSuite.append(getMainMethod(fileName, i) + NEW_LINE + NEW_LINE);
-	      testSuite.append(testMethods);
-	      
-	      if(junitFormat){
-	         for(OracleMethod m : oracleMethods){
-	            testSuite.append(NEW_LINE + NEW_LINE);
-	            testSuite.append(m);
-	         }
-	      }
-	      
-	      if (rflAsInternalClass) {
-	         testSuite.append(createRFLFileContent());
-	      }
-	      
-	      testSuite.append(NEW_LINE + "}");
-	      return testSuite;
-	}
-	
-	private String getOtherVariables(Model m) {
+		final StringBuffer testSuite = new StringBuffer();
+		testSuite.append(getFilePrefix(fileName) + NEW_LINE);
+		final StringBuffer testMethods = new StringBuffer();
+		int i = 0;
+		for (final SMTSolver solver : problemSolvers) {
+			try {
+				final StringBuffer testMethod = new StringBuffer();
+				final String originalNodeName = solver.getProblem().getGoal()
+						.proof().name().toString();
+				boolean success = false;
+				if (solver.getSocket().getQuery() != null) {
+					final Model m = solver.getSocket().getQuery().getModel();
+					if (TestCaseGenerator.modelIsOK(m)) {
+						logger.writeln("Generate: " + originalNodeName);
+						testMethod.append("  //" + originalNodeName + NEW_LINE);
+						testMethod.append(getTestMethodSignature(i) + "{" + NEW_LINE);
+						testMethod
+						.append("   //Test preamble: creating objects and intializing test data"
+								+ generateTestCase(m) + NEW_LINE + NEW_LINE);
+
+						Set<Term> vars = new HashSet<Term>();
+						info.getProgramVariables(info.getPO(), vars);         	  
+						testMethod.append(TAB+"//Other variables" + NEW_LINE + getRemainingConstants(m.getConstants().keySet(), vars) + NEW_LINE);
+						testMethod
+						.append("   //Calling the method under test   " + NEW_LINE
+								+ info.getCode() + NEW_LINE);
+
+
+						if(junitFormat){
+							testMethod.append("   //calling the test oracle" + NEW_LINE+TAB+oracleMethodCall + NEW_LINE);
+						}
+
+						testMethod.append(" }" + NEW_LINE + NEW_LINE);
+						i++;
+						success = true;
+						testMethods.append(testMethod);
+					}
+				}
+				if (!success) {
+					logger.writeln("A model (test data) was not generated for:"
+							+ originalNodeName);
+				}
+			} catch (final Exception ex) {
+				for(StackTraceElement ste: ex.getStackTrace()){
+					logger.writeln(ste.toString());
+				}
+				logger.writeln("A test case was not generated due to an exception. Continuing test generation...");
+			}
+		}
+		if (i == 0) {
+			logger.writeln("Warning: no test case was generated. Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
+		} else if (i < problemSolvers.size()) {
+			logger.writeln("Warning: SMT solver could not solve all test data constraints. Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
+		}
+		testSuite.append(getMainMethod(fileName, i) + NEW_LINE + NEW_LINE);
+		testSuite.append(testMethods);
+
+		if(junitFormat){
+			for(OracleMethod m : oracleMethods){
+				testSuite.append(NEW_LINE + NEW_LINE);
+				testSuite.append(m);
+			}
+		}
+
+		if (rflAsInternalClass) {
+			testSuite.append(createRFLFileContent());
+		}
+
+		testSuite.append(NEW_LINE + "}");
+		return testSuite;
+}
+
+	private String getRemainingConstants(Collection<String> existingConstants, Collection<Term> newConstants){
 		String result = "";
-		
-		
-		
-		for(Term c : oracleGenerator.getConstants()){
-			if(!m.getConstants().containsKey(c.toString())){
+
+		for(Term c : newConstants){
+
+			if(!existingConstants.contains(c.toString())){
+
 				String init = "null";
 				if(c.sort().equals(services.getTypeConverter().getIntegerLDT().targetSort())){
 					init = "0";
@@ -671,56 +670,63 @@ public class TestCaseGenerator {
 				else if(c.sort().equals(services.getTypeConverter().getBooleanLDT().targetSort())){
 					init = "false";
 				}
-				
-				result += NEW_LINE +TAB+ c.sort().name() + " " + c + " = " + init + ";";
-				result += NEW_LINE+TAB+ c.sort().name() + " " + getPreName(c.toString()) + " = " + init + ";";
-				
+
+				result += NEW_LINE +TAB+ NULLABLE+ " "+c.sort().name() + " " + c + " = " + init + ";";
+				if(junitFormat){
+					result += NEW_LINE+TAB+ NULLABLE+ " "+c.sort().name() + " " + getPreName(c.toString()) + " = " + init + ";";
+				}
+
+
 			}
+
 		}
+
 		return result;
 	}
+
+
 	private boolean isInPrestate(Collection<? extends ObjectVal> prestate, ObjectVal o){
 		return true;
 	}
-	
+
 	private boolean isInPrestate(Collection<? extends ObjectVal> prestate, String name){
-		
-		
-		
+
+
+
 		return true;
-// TODO return only needed objects		
-//		for(ObjectVal o : prestate){
-//			String oName = createObjectName(o);
-//			if(oName.equals(name)){
-//				return true;
-//			}
-//		}
-//		
-//		return false;
+		// TODO return only needed objects		
+		//		for(ObjectVal o : prestate){
+		//			String oName = createObjectName(o);
+		//			if(oName.equals(name)){
+		//				return true;
+		//			}
+		//		}
+		//		
+		//		return false;
 	}
-	
+
 	public String generateModifierSetAssertions(Model m){
 		StringBuffer res  =new StringBuffer();
-		
+
 		res.append(TAB + "//Modifier set assertions");
-		
-		
-		
+
+
+
 		return res.toString();
 	}
 
 	public String generateTestCase(Model m) {
-/*		if(useRFL){
+		/*		if(useRFL){
 			for(Sort s:m.getTypes().getJavaSorts()){
 				System.out.println("Adding sort:"+s.name());
 				rflCreator.addSort(s);
 			}
 		}
-*/
+		 */
 		m.removeUnnecessaryObjects();
-		
+
 		Set<String> objects = new HashSet<String>();
-		
+
 		final List<Assignment> assignments = new LinkedList<Assignment>();
 		Heap heap = null;
 		for (final Heap h : m.getHeaps()) {
@@ -729,12 +735,12 @@ public class TestCaseGenerator {
 				break;
 			}
 		}
-		
+
 		//Set<ObjectVal> prestate = getPrestateObjects(m);
 		Set<ObjectVal> prestate = new HashSet<ObjectVal>();
 		if (heap != null) {
-			
-			
+
+
 			// create objects
 			for (final ObjectVal o : heap.getObjects()) {
 				if (o.getName().equals("#o0")) {
@@ -744,7 +750,7 @@ public class TestCaseGenerator {
 				String right;
 				if (type.endsWith("[]")) {
 					right = "new " + type.substring(0, type.length() - 2) + "["
-					        + o.getLength() + "]";
+							+ o.getLength() + "]";
 				} else {
 					if(useRFL){
 						right = "RFL.new"+ReflectionClassCreator.cleanTypeName(type)+"()";
@@ -754,7 +760,7 @@ public class TestCaseGenerator {
 					}else
 						right = "new " + type + "()";
 				}
-				
+
 				String objName = createObjectName(o);
 				objects.add(objName);
 				assignments.add(new Assignment(type, objName, right));
@@ -774,9 +780,9 @@ public class TestCaseGenerator {
 					final ObjectVal o = getObject(heap, val);
 					if (o != null) {
 						if (val.equals("#o0")
-						        && m.getTypes().getOriginalConstantType(c) != null) {
+								&& m.getTypes().getOriginalConstantType(c) != null) {
 							type = m.getTypes().getOriginalConstantType(c)
-							        .name().toString();
+									.name().toString();
 						} else {
 							type = o.getSort().name().toString();
 						}
@@ -812,21 +818,21 @@ public class TestCaseGenerator {
 					val = translateValueExpression(val);
 					final String rcObjType = getSafeType(o.getSort());
 					assignments
-					        .add(new Assignment(new RefEx(rcObjType,receiverObject,vType,fieldName), val));
-					
+					.add(new Assignment(new RefEx(rcObjType,receiverObject,vType,fieldName), val));
+
 					if(junitFormat && isInPrestate(prestate, o)){
 						//if value that is pointed to is object and in prestate then use prestate object
 						if(!vType.equals("int") && !vType.equals("boolean") && isInPrestate(prestate, val)){
 							val = getPreName(val);
 						}					
 						assignments
-				        .add(new Assignment(new RefEx(rcObjType,getPreName(receiverObject),vType,fieldName), val));
+						.add(new Assignment(new RefEx(rcObjType,getPreName(receiverObject),vType,fieldName), val));
 					}
-					
+
 				}
 				if (o.getSort() != null
-				        && o.getSort().name().toString().endsWith("[]")) {
-					
+						&& o.getSort().name().toString().endsWith("[]")) {
+
 					String safeType = getSafeType(o.getSort());
 					rflCreator.addSort(safeType);
 					//System.out.println("Added sort (init array fields):"+safeType);					
@@ -837,23 +843,23 @@ public class TestCaseGenerator {
 						val = translateValueExpression(val);
 						assignments.add(new Assignment(receiverObject + fieldName, val));
 						//assignments.add(new Assignment("",new RefArrayEx("","",name,""+i), val));
-						
+
 						if(junitFormat && isInPrestate(prestate, o)){
 							assignments.add(new Assignment(getPreName(receiverObject) + fieldName, val));
 						}
-						
-						
+
+
 					}
 				}
 			}
 		}
-		
+
 		final StringBuffer result = new StringBuffer();
 		for (final Assignment a : assignments) {
 			result.append(NEW_LINE + "   ");
 			result.append(a.toString(useRFL));
 		}
-		
+
 		if(junitFormat){
 			result.append(NEW_LINE);
 			result.append(createOldMap(objects) + NEW_LINE);
@@ -861,11 +867,11 @@ public class TestCaseGenerator {
 			result.append(createIntSet() + NEW_LINE);
 			result.append(createObjSet(heap) + NEW_LINE);			
 		}
-				
-		
+
+
 		return result.toString();
 	}
-	
+
 	private String createOldMap(Set<String> objNames){
 		String result = NEW_LINE+TAB+"Map<Object,Object> "+OLDMap+" = new HashMap<Object,Object>();";
 		for(String o : objNames){
@@ -873,14 +879,14 @@ public class TestCaseGenerator {
 		}
 		return result;
 	}
-	
+
 	private String getPreName(String val) {
 		return OracleGenerator.PRE_STRING+val;
 	}
 	private String createObjectName(final ObjectVal o) {
 		return o.getName().replace("#", "_");
 	}
-	
+
 	private String getTypeOfValue(Heap heap, Model m, String val){
 		String type = "int";
 		if (val.equals("true") || val.equals("false")) {
@@ -889,10 +895,10 @@ public class TestCaseGenerator {
 			final ObjectVal o = getObject(heap, val);
 			if (o != null) {
 				if (val.equals("#o0")){
-/*				        && m.getTypes().getOriginalConstantType(c) != null) {
+					/*				        && m.getTypes().getOriginalConstantType(c) != null) {
 					type = m.getTypes().getOriginalConstantType(c)
 					        .name().toString();
-					        */
+					 */
 					type = "Object";
 				} else {
 					//System.out.println(o);
@@ -913,27 +919,27 @@ public class TestCaseGenerator {
 
 	private String getFilePrefix(String className) {
 		String res = "/** This is a test driver generated by KeY "+Main.VERSION+" (www.key-project.org). " + NEW_LINE +
-		          " * Possible use cases:" + NEW_LINE +
-		          " *  1. Compile and execute the main method with a JML runtime checker to test the method under test." + NEW_LINE +
-		          " *  2. Use a debuger to follow the execution of the method under test." + NEW_LINE +
-		          " * @author gladisch" + NEW_LINE +
-		          " * @author herda" + NEW_LINE +
-		          " */" + NEW_LINE;
+				" * Possible use cases:" + NEW_LINE +
+				" *  1. Compile and execute the main method with a JML runtime checker to test the method under test." + NEW_LINE +
+				" *  2. Use a debuger to follow the execution of the method under test." + NEW_LINE +
+				" * @author gladisch" + NEW_LINE +
+				" * @author herda" + NEW_LINE +
+				" */" + NEW_LINE;
 		if (junitFormat) {
 			res += "import java.util.Set;" + NEW_LINE
-               + "import java.util.HashSet;" + NEW_LINE
+					+ "import java.util.HashSet;" + NEW_LINE
 					+ "import java.util.Map;" + NEW_LINE
 					+ "import java.util.HashMap;" + NEW_LINE
 					+ " public class " + className
-			        + " extends junit.framework.TestCase {" + NEW_LINE + NEW_LINE + " public "
-			        + className + "(){}" + NEW_LINE
-			        + " public static junit.framework.TestSuite suite () {" + NEW_LINE
-			        + "   junit.framework.TestSuite suiteVar;" + NEW_LINE
-			        + "   suiteVar=new junit.framework.TestSuite (" + className
-			        + ".class);" + NEW_LINE + "   return  suiteVar;" + NEW_LINE + " }" + NEW_LINE;
+					+ " extends junit.framework.TestCase {" + NEW_LINE + NEW_LINE + " public "
+					+ className + "(){}" + NEW_LINE
+					+ " public static junit.framework.TestSuite suite () {" + NEW_LINE
+					+ "   junit.framework.TestSuite suiteVar;" + NEW_LINE
+					+ "   suiteVar=new junit.framework.TestSuite (" + className
+					+ ".class);" + NEW_LINE + "   return  suiteVar;" + NEW_LINE + " }" + NEW_LINE;
 		} else {
 			res += "public class " + className + "{ " + NEW_LINE + NEW_LINE + " public "
-			        + className + "(){}" + NEW_LINE;
+					+ className + "(){}" + NEW_LINE;
 		}
 		return res;
 	}
@@ -941,8 +947,8 @@ public class TestCaseGenerator {
 	private StringBuffer getMainMethod(String className, int i) {
 		final StringBuffer res = new StringBuffer();
 		res.append(" public static void  main (java.lang.String[]  arg) {" + NEW_LINE
-		        + "   " + className + " testSuiteObject;" + NEW_LINE
-		        + "   testSuiteObject=new " + className + " ();" + NEW_LINE + NEW_LINE);
+				+ "   " + className + " testSuiteObject;" + NEW_LINE
+				+ "   testSuiteObject=new " + className + " ();" + NEW_LINE + NEW_LINE);
 		for (int j = 0; j < i; j++) {
 			res.append("   testSuiteObject.testcode" + j + "();" + NEW_LINE);
 		}
@@ -964,9 +970,9 @@ public class TestCaseGenerator {
 		}
 		return null;
 	}
-	
+
 	private String createBoolSet(){
-		
+
 		StringBuffer res = new StringBuffer();		
 		//bool
 		String allbool = ALL_BOOLS;
@@ -976,31 +982,31 @@ public class TestCaseGenerator {
 		res.append(TAB+allbool+".add(false);" + NEW_LINE);
 		return res.toString();		
 	}
-	
+
 	private String createIntSet(){
-		
+
 		StringBuffer res  = new StringBuffer();
 		long size = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound;
-		
+
 		long low = (long) - Math.pow(2, size-1);
 		long hi = (long) (Math.pow(2, size-1)-1);
-		
+
 		String allint = ALL_INTS;
 		res.append(TAB+"Set<Integer> "+allint +"= new HashSet<Integer>();" + NEW_LINE);
-		
+
 		for(long i = low; i <= hi; i++ ){			
 			res.append(TAB+allint+".add("+i+");" + NEW_LINE);			
 		}	
-		
+
 		return res.toString();		
 	}
-	
+
 	private String createObjSet(Heap h){
-		
+
 		StringBuffer res  = new StringBuffer();		
-		
+
 		res.append(TAB+"Set<Object> "+ALL_OBJECTS +"= new HashSet<Object>();" + NEW_LINE);
-		
+
 		for(ObjectVal o : h.getObjects()){
 			String name = o.getName();
 			if(name.equals("#o0")){
@@ -1008,13 +1014,13 @@ public class TestCaseGenerator {
 			}
 			name = name.replace("#", "_");
 			res.append(TAB+ALL_OBJECTS+".add("+name+");" + NEW_LINE);
-			
+
 		}			
-		
+
 		return res.toString();		
 	}
-	
-	
+
+
 
 	public String getSafeType(Sort sort) {
 		if (sort == null) {
@@ -1041,13 +1047,13 @@ public class TestCaseGenerator {
 
 	protected boolean isNumericType(String type) {
 		return type.equals("byte") || type.equals("short")
-		        || type.equals("int") || type.equals("long")
-		        || type.equals("float") || type.equals("double");
+				|| type.equals("int") || type.equals("long")
+				|| type.equals("float") || type.equals("double");
 	}
 
 	protected boolean isPrimitiveType(String type) {
 		return isNumericType(type) || type.equals("boolean")
-		        || type.equals("char");
+				|| type.equals("char");
 	}
 
 	public void setLogger(TestGenerationLog logger) {
@@ -1067,41 +1073,41 @@ public class TestCaseGenerator {
 	}
 
 	public void writeToFile(String file, StringBuffer sb) throws IOException {
-      final File dir = new File(directory + modDir);
-      if (!dir.exists()) {
-         dir.mkdirs();
-      }
-      final File pcFile = new File(dir, file);
-      System.out.println("Writing file:"+pcFile.toString());
-      final BufferedWriter bw = new BufferedWriter(new FileWriter(pcFile));
-      try  {
-         bw.write(sb.toString());
-      }
-      finally {
-         bw.close();
-      }
-      // create a temporary file
-      // File logFile=new File("TestGeneric"+fileCounter+JAVA_FILE_EXTENSION_WITH_DOT);
-      // BufferedWriter writer = new BufferedWriter(new
-      // FileWriter(logFile));
-      // writer.write (sb.toString());
-      // Close writer
-      // writer.close();
+		final File dir = new File(directory + modDir);
+		if (!dir.exists()) {
+			dir.mkdirs();
+		}
+		final File pcFile = new File(dir, file);
+		System.out.println("Writing file:"+pcFile.toString());
+		final BufferedWriter bw = new BufferedWriter(new FileWriter(pcFile));
+		try  {
+			bw.write(sb.toString());
+		}
+		finally {
+			bw.close();
+		}
+		// create a temporary file
+		// File logFile=new File("TestGeneric"+fileCounter+JAVA_FILE_EXTENSION_WITH_DOT);
+		// BufferedWriter writer = new BufferedWriter(new
+		// FileWriter(logFile));
+		// writer.write (sb.toString());
+		// Close writer
+		// writer.close();
 	}
-	
-   public boolean isUseRFL() {
-      return useRFL;
-   }
-   
-   public String getFileName() {
-      return fileName;
-   }
-   
-   public void setFileName(String fileName) {
-      this.fileName = fileName;
-   }
-   
-   public boolean isRflAsInternalClass() {
-      return rflAsInternalClass;
-   }
+
+	public boolean isUseRFL() {
+		return useRFL;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public boolean isRflAsInternalClass() {
+		return rflAsInternalClass;
+	}
 }
