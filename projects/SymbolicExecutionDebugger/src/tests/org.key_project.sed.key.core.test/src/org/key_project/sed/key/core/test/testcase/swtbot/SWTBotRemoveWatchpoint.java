@@ -62,6 +62,8 @@ public class SWTBotRemoveWatchpoint extends AbstractKeYDebugTargetTestCase {
             Boolean.FALSE,
             Boolean.FALSE,
             Boolean.TRUE,
-            8, executor);   
+            Boolean.FALSE,
+            8, 
+            executor);   
    } 
 }

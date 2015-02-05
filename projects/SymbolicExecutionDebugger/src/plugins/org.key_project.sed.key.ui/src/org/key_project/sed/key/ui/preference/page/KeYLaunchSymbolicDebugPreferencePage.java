@@ -90,6 +90,11 @@ public class KeYLaunchSymbolicDebugPreferencePage extends FieldEditorPreferenceP
          }
       });
       
+      group = SWTFactory.createGroup(getFieldEditorParent(), "Source Code", 1, 1, GridData.FILL_HORIZONTAL);
+      Composite sourceCodeSpacer = SWTFactory.createComposite(group, 1, 1, GridData.FILL_HORIZONTAL);
+      BooleanFieldEditor highlightReachedCode = new BooleanFieldEditor(KeYSEDPreferences.HIGHLIGHT_REACHED_SOURCE_CODE, "Highlight reached source code during symbolic execution", SWT.NONE, sourceCodeSpacer);
+      addField(highlightReachedCode);
+      
       group = SWTFactory.createGroup(getFieldEditorParent(), "KeY", 1, 1, GridData.FILL_HORIZONTAL);
       Composite keySpacer = SWTFactory.createComposite(group, 1, 1, GridData.FILL_HORIZONTAL);
       BooleanFieldEditor mainWindowEdit = new BooleanFieldEditor(KeYSEDPreferences.SHOW_KEY_MAIN_WINDOW, "Show &KeY's main window (only for experienced user)", SWT.NONE, keySpacer);
