@@ -32,6 +32,8 @@ public class KeyProfile extends JMLReferenceProfile {
       replace(this.getSupportedKeywordsInternal(), AccessibleKeyword.class,
             new KeyAccessibleKeyword());
       this.getSupportedKeywordsInternal().add(new InvKeyword());
+
+      // Allows \inv as access on a not toplevel object just as for x[3].\inv
       this.putExtension(
             ExpressionParser.ADDITIONAL_PRIMARY_SUFFIXES,
             ParserBuilder.separateBy('.',
