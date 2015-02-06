@@ -6,21 +6,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.key_project.jmlediting.core.Activator;
 import org.key_project.jmlediting.core.parser.ParserError;
 import org.key_project.jmlediting.core.parser.ParserException;
+import org.key_project.jmlediting.core.utilities.Position;
 import org.key_project.util.eclipse.Logger;
 
 public class ParseErrorMarkerUpdater {
-
-   private static class Position {
-      int line;
-      int column;
-
-      public Position(final int line, final int column) {
-         super();
-         this.line = line;
-         this.column = column;
-      }
-
-   }
 
    private static Position getPositionForOffset(final String text,
          final int offset) {
@@ -79,7 +68,7 @@ public class ParseErrorMarkerUpdater {
             final Position pos = getPositionForOffset(text,
                   error.getErrorOffset());
             marker.setAttribute(IMarker.TEXT, error.getErrorMessage());
-            marker.setAttribute(IMarker.LINE_NUMBER, pos.line + 1);
+            marker.setAttribute(IMarker.LINE_NUMBER, pos.getLine + 1);
             marker.setAttribute(IMarker.PRIORITY, IMarker.PRIORITY_HIGH);
             marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
             marker.setAttribute(IMarker.MESSAGE, error.getErrorMessage());

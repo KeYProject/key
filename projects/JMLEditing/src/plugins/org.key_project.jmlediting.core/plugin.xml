@@ -3,21 +3,6 @@
 <plugin>
    <extension-point id="org.key_project.jmlediting.core.profiles" name="JML Profiles" schema="schema/org.key_project.jmlediting.core.profiles.exsd"/>
    <extension
-         point="org.eclipse.ltk.core.refactoring.renameParticipants">
-      <renameParticipant
-            class="org.key_project.jmlediting.core.refactoring.JMLRenameFieldParticipant"
-            id="org.key_project.jmlediting.core.refactoring.JMLRenameFieldParticipant"
-            name="JMLFieldRename">
-            <enablement>
-               <with variable="affectedNatures">
-                  <iterate operator="or">
-                     <equals value="org.eclipse.jdt.core.javanature"/>
-                  </iterate>
-               </with>
-            </enablement>
-      </renameParticipant>
-   </extension>
-   <extension
          id="org.key_project.jmlediting.core.parseerror"
          point="org.eclipse.core.resources.markers">
       <super

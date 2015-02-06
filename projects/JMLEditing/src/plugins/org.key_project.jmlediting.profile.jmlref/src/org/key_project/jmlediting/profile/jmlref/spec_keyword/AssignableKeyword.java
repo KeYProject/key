@@ -27,4 +27,9 @@ public class AssignableKeyword extends StoreRefContainerKeyword {
             + "in the pre-state.";
    }
 
+   @Override
+   boolean getProposeFinal() {
+      return false;
+   }
+
 }

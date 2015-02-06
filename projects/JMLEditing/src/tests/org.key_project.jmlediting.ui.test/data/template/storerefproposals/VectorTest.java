@@ -9,6 +9,8 @@ public class VectorTest {
    private Cons<Vector2> intermediateVectors;
    private Vector2 intermediateVector;
    
+   public final Object finalTemp = new Object();
+
    private class Temps {
 
       private Vector2 temp1;
@@ -33,7 +35,7 @@ public class VectorTest {
    /*@
      @ assignable vec[[2]];
      @*/
-   public void doCalculation2() {
+   public void doCalculation2(final boolean vectorParameter) {
       
    }
    
@@ -69,6 +71,14 @@ public class VectorTest {
      @*/
    public void testProposalsAfterDotWithoutSemicolo() {
       
+   }
+   
+   /*@
+     @ assignable [[10]];
+     @ accessible [[11]];
+     @*/
+   public void testFinal(final boolean doSomething) {
+    
    }
    
 

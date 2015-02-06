@@ -175,7 +175,7 @@ public class StoreRefKeywordProposalsTest {
    public void testStarAfterReferenceType() {
       goToTestOffset(7);
       final Position pos = editor.cursorPosition();
-      final List<String> nextProposals = editor.getAutoCompleteProposals("");
+      editor.getAutoCompleteProposals("");
       // Only one proposal, is inserted by default
       assertEquals("Wrong proposals after reference type with no field", editor
             .getTextOnLine(pos.line).subSequence(pos.column, pos.column + 1),
@@ -188,7 +188,7 @@ public class StoreRefKeywordProposalsTest {
       final List<String> nextProposals = editor.getAutoCompleteProposals("");
       // No Store Ref Keyword
       for (final String storeRefKeyword : appendStoreRefKeywords("")) {
-         assertTrue("Proposal after semicolon contained soreRefKetword",
+         assertTrue("Proposal after semicolon contained storeRefKetword",
                !nextProposals.contains(storeRefKeyword));
       }
       // but Top Level keywords
@@ -202,14 +202,31 @@ public class StoreRefKeywordProposalsTest {
       this.checkConsProposals();
    }
 
+   @Test
+   public void testFinalProposals() {
+      goToTestOffset(10);
+      final List<String> proposals = editor.getAutoCompleteProposals("");
+      assertEquals(
+            "Proposed final variables for assignable",
+            appendStoreRefKeywords("intermediateVector", "intermediateVectors",
+                  "results", "temp", "vectors1", "vectors2"), proposals);
+      goToTestOffset(11);
+      final List<String> nextProposals = editor.getAutoCompleteProposals("");
+      assertEquals(
+            "Not proposed final variables for accessible",
+            appendStoreRefKeywords("intermediateVector", "intermediateVectors",
+                  "results", "temp", "vectors1", "vectors2", "doSomething",
+                  "finalTemp", "secret"), nextProposals);
+   }
+
    private static List<String> appendStoreRefKeywords(final String... others) {
       final List<String> storeRefKeywords = new ArrayList<String>();
       for (final IStoreRefKeyword keyword : JMLProfileHelper.filterKeywords(
             UITestUtils.findReferenceProfile(), IStoreRefKeyword.class)) {
          storeRefKeywords.addAll(keyword.getKeywords());
       }
-      Collections.sort(storeRefKeywords);
       storeRefKeywords.addAll(Arrays.asList(others));
+      Collections.sort(storeRefKeywords);
       return storeRefKeywords;
    }
 
