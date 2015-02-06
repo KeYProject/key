@@ -25,8 +25,9 @@ public class KeyAccessibleKeyword extends AccessibleKeyword {
                final IJMLProfile profile) {
             final LocSetExprListParser locSetExprList = new LocSetExprListParser(
                   profile);
-            return alt(seq(ident(), constant(":"), locSetExprList),
-                  locSetExprList);
+            return alt(
+                  seq(alt(ident(), keywords(InvKeyword.class, profile)),
+                        constant(":"), locSetExprList), locSetExprList);
          }
 
       };
