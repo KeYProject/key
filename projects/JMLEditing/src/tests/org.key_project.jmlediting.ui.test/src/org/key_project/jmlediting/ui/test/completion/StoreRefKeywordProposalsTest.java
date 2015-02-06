@@ -175,7 +175,7 @@ public class StoreRefKeywordProposalsTest {
    public void testStarAfterReferenceType() {
       goToTestOffset(7);
       final Position pos = editor.cursorPosition();
-      final List<String> nextProposals = editor.getAutoCompleteProposals("");
+      editor.getAutoCompleteProposals("");
       // Only one proposal, is inserted by default
       assertEquals("Wrong proposals after reference type with no field", editor
             .getTextOnLine(pos.line).subSequence(pos.column, pos.column + 1),
