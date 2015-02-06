@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.profile.key.locset;
 
 import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
+import static org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefNodeTypes.STORE_REF_LIST;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.IRecursiveParseFunction;
@@ -47,13 +48,14 @@ public class LocSetExprListParser implements ParseFunction {
       final ParseFunction otherKeywords = keywords(ILocSetKeyword.class,
             profile);
 
-      locSetExpr.defineAs(alt(otherKeywords, storeRef.storeRef(), locSetOpExpr,
-            expr));
+      locSetExpr
+            .defineAs(alt(storeRef.storeRef(), otherKeywords, locSetOpExpr));
 
-      final ParseFunction locSetExprList = alt(
-            keywords(IStoreRefKeyword.class, profile),
-            separatedNonEmptyListErrorRecovery(',', locSetExpr,
-                  "Expected a Loc Set Expr"));
+      final ParseFunction locSetExprList = typed(
+            STORE_REF_LIST,
+            alt(keywords(IStoreRefKeyword.class, profile),
+                  separatedNonEmptyListErrorRecovery(',', locSetExpr,
+                        "Expected a Loc Set Expr")));
 
       this.mainParser = locSetExprList;
       this.elem = locSetExpr;

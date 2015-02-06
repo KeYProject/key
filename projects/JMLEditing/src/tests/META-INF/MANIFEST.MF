@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Key Profile Test
+Bundle-SymbolicName: org.key_project.jmlediting.profile.key.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.jmlediting.profile.key.test.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.key_project.jmlediting.profile.key;bundle-version="1.0.0",
+ org.key_project.jmlediting.profile.jmlref;bundle-version="1.0.0",
+ org.key_project.jmlediting.core;bundle-version="1.0.0",
+ org.key_project.jmlediting.core.test;bundle-version="1.0.0",
+ org.key_project.jmlediting.ui;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Import-Package: junit.framework,
+ org.junit;version="4.11.0"
