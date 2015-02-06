@@ -382,7 +382,6 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     */
    @Override
    public boolean update(IUpdateContext context) {
-      final boolean groupingSupported = ExecutionTreeUtil.isGroupingSupported(getFeatureProvider(), context);
       Object updateStyle = context.getProperty(KEY_UPDATE_STYLE);
       if (updateStyle instanceof Boolean && ((Boolean)updateStyle).booleanValue()) {
          Object nodeProp = context.getProperty(KEY_SED_NODE);
@@ -406,30 +405,36 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
 
             // Update children, they have the correct layout after this step
             if (success) {
-               success = updateChildren(pictogramElement, groupingSupported, new SubProgressMonitor(monitor, 1));
+               success = updateChildren(pictogramElement, new SubProgressMonitor(monitor, 1));
             }
             monitor.worked(1);
             // Update parents, because children maybe have now a bigger width and overlap with other branches
             if (success) {
-               success = updateParents(pictogramElement, groupingSupported, new SubProgressMonitor(monitor, 1));
+               success = updateParents(pictogramElement, new SubProgressMonitor(monitor, 1));
             }
             monitor.worked(1);
             // adjust the rects, because nodes may overlap them after the update
-            if(groupingSupported && success) {
-               Object bo = getBusinessObjectForPictogramElement(pictogramElement);
-               ISEDDebugNode node = bo instanceof ISEDDebugNode ? (ISEDDebugNode)bo : null;
-               
-               // needed for the reselect of the diagram
-               if(node == null && bo instanceof ISEDDebugTarget)
-               {
-                  ISEDThread[] threads = ((ISEDDebugTarget) bo).getSymbolicThreads();
-                  for(ISEDThread thread : threads) {
-                     adjustRects(thread, groupingSupported, monitor);
+            if(success) {
+               Object[] bos = getAllBusinessObjectsForPictogramElement(pictogramElement);
+               int i = 0;
+               while (i < bos.length && !monitor.isCanceled()) {
+                  ISEDDebugNode node = bos[i] instanceof ISEDDebugNode ? (ISEDDebugNode) bos[i] : null;
+                  final boolean groupingSupported = ExecutionTreeUtil.isGroupingSupported(node);
+                  if (groupingSupported) {
+                     // needed for the reselect of the diagram
+                     if(node == null && bos[i] instanceof ISEDDebugTarget)
+                     {
+                        ISEDThread[] threads = ((ISEDDebugTarget) bos[i]).getSymbolicThreads();
+                        for(ISEDThread thread : threads) {
+                           adjustRects(thread, groupingSupported, monitor);
+                        }
+                     }
+                     
+                     if(node != null) {
+                        adjustRects(node, groupingSupported, monitor);
+                     }
                   }
-               }
-               
-               if(node != null) {
-                  adjustRects(node, groupingSupported, monitor);
+                  i++;
                }
             }
             monitor.done();
@@ -487,13 +492,11 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * Updates the children of the {@link ISEDDebugNode} represented
     * by the given {@link PictogramElement}.
     * @param pictogramElement The {@link PictogramElement} to update.
-    * @param groupingSupported Is grouping supported?
     * @param monitor The {@link IProgressMonitor} to use.
     * @return {@code true}, if update process was successful
     * @throws DebugException Occurred Exception.
     */
    protected boolean updateChildren(PictogramElement pictogramElement, 
-                                    boolean groupingSupported, 
                                     IProgressMonitor monitor) throws DebugException {
       monitor.beginTask("Update children", IProgressMonitor.UNKNOWN);
       maxX = 0;
@@ -503,6 +506,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             int i = 0;
             while (i < bos.length && !monitor.isCanceled()) {
                if (bos[i] instanceof ISEDDebugElement) {
+                  final boolean groupingSupported = ExecutionTreeUtil.isGroupingSupported((ISEDDebugElement)bos[i]);
                   // Add all children left aligned
                   Set<ISEDDebugNode> leafs = updateChildrenLeftAligned((ISEDDebugElement)bos[i], groupingSupported, monitor, maxX);
                   maxX += OFFSET;
@@ -523,7 +527,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                            
                            moveSubTreeHorizontal(leaf, groupingSupported, toMove, false, monitor);
                            moveRighterNodes(leaf, groupingSupported, toMove, monitor);
-                           updateParents(leafPE, groupingSupported, monitor);
+                           updateParents(leafPE, monitor);
                            if (groupingSupported) {
                               resizeRectsIfNeeded(NodeUtil.getGroupStartNode(leaf), groupingSupported, monitor);
                            }
@@ -1168,7 +1172,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       }
       
 //      resizeRectsIfNeeded(groupStart, monitor);
-      updateParents(groupStartPE, groupingSupported, monitor);
+      updateParents(groupStartPE, monitor);
    }
 
    /**
@@ -1177,13 +1181,11 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * right to the given {@link PictogramElement} to the right and re-centers
     * the parent nodes.
     * @param pictogramElement The {@link PictogramElement} which was updated.
-    * @param groupingSupported Is grouping supported?
     * @param monitor The {@link IProgressMonitor} to use.
     * @return {@code true}, if update process was successful
     * @throws DebugException Occurred Exception.
     */
    protected boolean updateParents(PictogramElement pictogramElement, 
-                                   boolean groupingSupported,
                                    IProgressMonitor monitor) throws DebugException {
       monitor.beginTask("Update parents", IProgressMonitor.UNKNOWN);
       try {
@@ -1192,6 +1194,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             int i = 0;
             while (i < bos.length && !monitor.isCanceled()) {
                if (bos[i] instanceof ISEDDebugNode) {
+                  final boolean groupingSupported = ExecutionTreeUtil.isGroupingSupported((ISEDDebugNode)bos[i]);
                   ISEDDebugNode node = (ISEDDebugNode)bos[i];
                   ISEDDebugNode parent = NodeUtil.getParent(node);
                   if (parent != null) {

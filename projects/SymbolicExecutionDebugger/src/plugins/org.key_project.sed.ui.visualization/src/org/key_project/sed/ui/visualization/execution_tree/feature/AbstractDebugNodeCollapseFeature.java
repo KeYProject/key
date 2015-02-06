@@ -245,7 +245,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       }
 
       uf.adjustRects((ISEDDebugNode) groupStart, true, new SubProgressMonitor(monitor, 1));
-      uf.updateParents(uf.getPictogramElementForBusinessObject(groupStart, true), true, new SubProgressMonitor(monitor, 1));
+      uf.updateParents(uf.getPictogramElementForBusinessObject(groupStart, true), new SubProgressMonitor(monitor, 1));
       
       /**
        * Adjust Space between the left/right side of the group

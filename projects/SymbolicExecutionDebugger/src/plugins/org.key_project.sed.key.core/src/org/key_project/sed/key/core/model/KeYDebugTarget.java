@@ -648,6 +648,6 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
     */
    @Override
    public boolean isGroupingSupported() {
-      return true;
+      return launchSettings.isGroupingEnabled();
    }
 }
