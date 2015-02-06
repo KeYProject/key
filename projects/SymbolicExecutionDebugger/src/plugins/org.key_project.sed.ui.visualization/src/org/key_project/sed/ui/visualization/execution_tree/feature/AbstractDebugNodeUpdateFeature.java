@@ -622,6 +622,18 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             if(iter instanceof SEDPreorderIterator && NodeUtil.canBeGrouped(bo)) {
                iter = new SEDGroupPreorderIterator((ISEDGroupable) bo, nextNode, false);
             }
+            
+            ISEDDebugNode parent = NodeUtil.getParent(nextNode); 
+            
+            if(NodeUtil.canBeGrouped(parent)) {
+               PictogramElement parentPE = getPictogramElementForBusinessObject(parent, 0);
+               if(parentPE != null) {
+                  GraphicsAlgorithm parentGA = parentPE.getGraphicsAlgorithm();
+                  GraphicsAlgorithm nextGA = nextPE.getGraphicsAlgorithm();
+                  parentGA.setHeight(nextGA.getY() + nextGA.getHeight() / 2 - parentGA.getY());
+               }
+               
+            }
             int mostLeftXAbove = findAbove(nextNode, true);            // Adjust the remaining endnodes and their subtrees as if there were just placed under their parents            moveSubTreeHorizontal(nextNode, mostLeftXAbove - nextPE.getGraphicsAlgorithm().getX(), true, monitor);                        int mostLeftSub = findInSubtree(nextNode, true, true);            int mostRightXInPrev = findInSiblingBranch(nextNode, true, false);
             // Since the subtree can now overlap branches on the left, adjust them again            if(mostRightXInPrev != -1 && mostRightXInPrev + OFFSET > mostLeftSub) {               moveSubTreeHorizontal(nextNode, mostRightXInPrev + OFFSET - mostLeftSub, true, monitor);            }
             
@@ -965,12 +977,13 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       // Either the node or the rect if groupable
       PictogramElement pe = getPictogramElementForBusinessObject(node, 0);
       ISEDGroupable groupStart = NodeUtil.getGroupStartNode(node);
+//      groupStart = NodeUtil.getGroupStartNode(node) != null ? NodeUtil.getGroupStartNode(node) : (NodeUtil.canBeGrouped(node) ? (ISEDGroupable) node : null);
       
       // if the node has no graphical representation or is not in a group, return
       if(pe == null || groupStart == null) {
          return;
       }
-      
+      System.out.println(node);
       GraphicsAlgorithm ga = pe.getGraphicsAlgorithm();
 
       PictogramElement groupStartPE = getPictogramElementForBusinessObject(groupStart, 0);
@@ -1016,6 +1029,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                int toMove = groupStartGA.getX() + METOFF - ga.getX();
                moveRightAndAbove(node, toMove, monitor);
                moveSubTreeHorizontal(node, toMove, true, monitor);
+               System.out.println("halo");
                continue;
             }
 

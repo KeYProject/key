@@ -240,7 +240,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       }
       
       // if the group node overlaps the rect now, we have to reposition the rect
-      if(nodeGA.getX() < rectGA.getX() + uf.METOFF) {
+      if(rectGA.getX() > 0 && nodeGA.getX() < rectGA.getX() + uf.METOFF) {
          rectGA.setX(nodeGA.getX() - uf.METOFF);
       }
 
