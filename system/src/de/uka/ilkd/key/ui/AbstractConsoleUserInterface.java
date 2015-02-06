@@ -194,11 +194,6 @@ public abstract class AbstractConsoleUserInterface extends AbstractUserInterface
     }
 
    @Override
-   final public void loadProblem(File file, List<File> classPath, File bootClassPath) {
-      super.getProblemLoader(file, classPath, bootClassPath, mediator).runSynchronously();
-   }
-
-   @Override
    final public void openExamples() {
        System.out.println("Open Examples not suported by console UI.");
    }
