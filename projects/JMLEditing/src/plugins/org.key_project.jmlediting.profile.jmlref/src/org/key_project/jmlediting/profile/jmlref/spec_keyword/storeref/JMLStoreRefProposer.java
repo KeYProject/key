@@ -4,6 +4,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -32,7 +33,7 @@ import org.key_project.jmlediting.ui.completion.JMLCompletionProposalComputer;
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
 
 /**
- * The StoreRefProposer computes the AutoCompletion for StoreRefKeywords
+ * The StoreRefProposer computes the AutoCompletion for StoreRefKeywords.
  * <ul>
  * <li>Visible Fields</li>
  * <li>Method Parameters</li>
@@ -44,32 +45,42 @@ import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
 @SuppressWarnings("restriction")
 public class JMLStoreRefProposer {
    /**
-    * the invocationContext the AutoCompletion is called from
+    * the invocationContext the AutoCompletion is called from.
     */
    private final JavaContentAssistInvocationContext context;
    /**
-    * The TypeBinding the AutoCompletion is called in
+    * The TypeBinding the AutoCompletion is called in.
     */
    private ITypeBinding declaringType;
    /**
-    * the computed List of MethodParameters catched from the AST
+    * the computed List of MethodParameters catched from the AST.
     */
    private final List<MethodParameter> parameterList = new ArrayList<MethodParameter>();
 
    /**
-    * the CompilationUnit to get the AST from
+    * the CompilationUnit to get the AST from.
     */
    private final CompilationUnit cu;
 
    /**
-    * Only Constructor
+    * does the keyword wants to get final variables proposed.
+    */
+   private final boolean proposeFinal;
+
+   /**
+    * the only Constructor to instantiate the JMLStoreRefProposer.
     *
     * @param context
     *           The context the AutoCompletion is called from
+    * @param proposeFinal
+    *           let the keyword decide whether to propose final variables
+    *
     */
-   public JMLStoreRefProposer(final JavaContentAssistInvocationContext context) {
+   public JMLStoreRefProposer(final JavaContentAssistInvocationContext context,
+         final boolean proposeFinal) {
       super();
       this.context = context;
+      this.proposeFinal = proposeFinal;
       if (context.getCompilationUnit() instanceof CompilationUnit) {
          this.cu = (CompilationUnit) context.getCompilationUnit();
       }
@@ -80,7 +91,7 @@ public class JMLStoreRefProposer {
    }
 
    /**
-    * proposes the AutoCompletion for StoreRefKeywords
+    * proposes the AutoCompletion for StoreRefKeywords.
     *
     * @param expr
     *           the parsed JML to compute the AutoCompletion for
@@ -91,7 +102,7 @@ public class JMLStoreRefProposer {
    @SuppressWarnings("unchecked")
    public Collection<ICompletionProposal> propose(final IASTNode expr,
          final boolean hasOtherExpressions) {
-      final Collection<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
+      final List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
       final org.eclipse.jdt.core.dom.CompilationUnit ast;
       final ASTParser parser = ASTParser
             .newParser(ASTParser.K_COMPILATION_UNIT);
@@ -174,11 +185,19 @@ public class JMLStoreRefProposer {
       // fields from them get proposed
       result.addAll(this.proposeStoreRefApiVariables(node, restNodes));
 
+      Collections.sort(result, new Comparator<ICompletionProposal>() {
+         @Override
+         public int compare(final ICompletionProposal o1,
+               final ICompletionProposal o2) {
+            return o1.getDisplayString().compareTo(o2.getDisplayString());
+         };
+      });
+
       return result;
    }
 
    /**
-    * propose methodParameters from the following method
+    * propose methodParameters from the following method.
     *
     * @param prefix
     *           the prefix to compute the proposals for
@@ -198,10 +217,12 @@ public class JMLStoreRefProposer {
          // check all VariableDeclarations to match the prefix
          for (final SingleVariableDeclaration param : methodParams
                .getParameters()) {
+            final IVariableBinding varBind = param.resolveBinding();
             final Image image = BindingLabelProvider.getBindingImageDescriptor(
-                  param.resolveBinding(), 0).createImage();
+                  varBind, 0).createImage();
             final String replacementString = param.getName().toString();
-            if (replacementString.startsWith(prefix)) {
+            if (replacementString.startsWith(prefix)
+                  && ((varBind.getModifiers() & Modifier.FINAL) == 0 || this.proposeFinal)) {
                final int cursorPosition = replacementString.length();
                result.add(new CompletionProposal(replacementString,
                      replacementOffset, prefixLength, cursorPosition, image,
@@ -322,7 +343,7 @@ public class JMLStoreRefProposer {
          }
          for (final IVariableBinding varBind : vars) {
             if (varBind.getName().startsWith(prefix)
-                  && ((varBind.getModifiers() & Modifier.FINAL) == 0)) {
+                  && ((varBind.getModifiers() & Modifier.FINAL) == 0 || this.proposeFinal)) {
                final String replacementString = varBind.getName();
                final int cursorPosition = replacementString.length();
 

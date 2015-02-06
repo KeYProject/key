@@ -25,4 +25,9 @@ public class AccessibleKeyword extends StoreRefContainerKeyword {
             + "clauses or that are dependees of such locations, are read from.";
    }
 
+   @Override
+   boolean getProposeFinal() {
+      return true;
+   }
+
 }

@@ -13,7 +13,6 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefK
  * @author Moritz Lichter
  *
  */
-@SuppressWarnings("restriction")
 public abstract class StoreRefContainerKeyword extends
       AbstractGenericSpecificationKeyword {
 
@@ -37,8 +36,13 @@ public abstract class StoreRefContainerKeyword extends
 
    @Override
    public IKeywordAutoProposer createAutoProposer() {
-      return new StoreRefKeywordProposer();
+      return new StoreRefKeywordProposer(this.getProposeFinal());
    }
+
+   /**
+    * @return whether to propose final fields and parameters or not
+    */
+   abstract boolean getProposeFinal();
 
    @Override
    public IKeywordContentRefactorer createRefactorer() {

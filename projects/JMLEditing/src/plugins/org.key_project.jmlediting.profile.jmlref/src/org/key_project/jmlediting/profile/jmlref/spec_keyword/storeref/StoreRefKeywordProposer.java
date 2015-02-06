@@ -14,6 +14,13 @@ import org.key_project.jmlediting.core.profile.syntax.IKeywordAutoProposer;
 
 public class StoreRefKeywordProposer implements IKeywordAutoProposer {
 
+   private final boolean proposeFinal;
+
+   public StoreRefKeywordProposer(final boolean proposeFinal) {
+      super();
+      this.proposeFinal = proposeFinal;
+   }
+
    @Override
    public List<ICompletionProposal> createAutoProposals(final IASTNode node,
          final JavaContentAssistInvocationContext context) {
@@ -29,7 +36,8 @@ public class StoreRefKeywordProposer implements IKeywordAutoProposer {
       final IASTNode tmpNode = nodeAtPos.getChildren().get(1);
       // empty KeywordContent
       if (tmpNode.getChildren().isEmpty()) {
-         result.addAll(new JMLStoreRefProposer(context).propose(null, false));
+         result.addAll(new JMLStoreRefProposer(context, this.proposeFinal)
+               .propose(null, false));
          return result;
       }
       IASTNode content = tmpNode.getChildren().get(0);
@@ -67,8 +75,8 @@ public class StoreRefKeywordProposer implements IKeywordAutoProposer {
                }, false);
 
          System.out.println("hasExpr == " + hasExpr);
-         result.addAll(new JMLStoreRefProposer(context).propose(exprInOffset,
-               hasExpr));
+         result.addAll(new JMLStoreRefProposer(context, this.proposeFinal)
+               .propose(exprInOffset, hasExpr));
       }
       else if (content.getType() == NodeTypes.KEYWORD) {
          // TODO
