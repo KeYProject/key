@@ -172,6 +172,7 @@ public final class SymbolicExecutionUtil {
     */
    public static Term simplify(Proof parentProof,
                                Term term) throws ProofInputException {
+      final Services services = parentProof.getServices();
       final ProofEnvironment sideProofEnv = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(parentProof, true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       // Create sequent to proof
       Sequent sequentToProve = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(term), false, true).sequent();
@@ -180,7 +181,7 @@ public final class SymbolicExecutionUtil {
       try {
          // The simplified formula is the conjunction of all open goals
          ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
-         final TermBuilder tb = parentProof.getServices().getTermBuilder();
+         final TermBuilder tb = services.getTermBuilder();
          if (openGoals.isEmpty()) {
             return tb.tt();
          }
@@ -195,7 +196,7 @@ public final class SymbolicExecutionUtil {
          }
       }
       finally {
-         SideProofUtil.disposeOrStore("Simplification of " + ProofSaver.printAnything(term, parentProof.getServices()), info);
+         SideProofUtil.disposeOrStore("Simplification of " + ProofSaver.printAnything(term, services), info);
       }
    }
 
