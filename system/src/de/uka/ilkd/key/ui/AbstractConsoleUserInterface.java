@@ -189,7 +189,7 @@ public abstract class AbstractConsoleUserInterface extends AbstractUserInterface
     }
 
     @Override
-    final public void loadProblem(File file) {
+    public void loadProblem(File file) {
         super.getProblemLoader(file, null, null, mediator).runSynchronously();
     }
 

@@ -33,17 +33,20 @@ import java.io.IOException;
  * KeY.
  */
 public class ConsoleUserInterface extends AbstractConsoleUserInterface {
-
-    private final BatchMode batchMode;
     
     // flag to indicate that a file should merely be loaded not proved. (for
     // "reload" testing)
     private final boolean loadOnly;
+    
+    private String fileName = null;
+    
+    public ConsoleUserInterface(byte verbosity, boolean loadOnly) {
+        super(verbosity);
+        this.loadOnly = loadOnly;
+    }
 
-    public ConsoleUserInterface(BatchMode batchMode, boolean verbose, boolean loadOnly) {
+    public ConsoleUserInterface(boolean verbose, boolean loadOnly) {
         super(verbose);
-        assert batchMode != null;
-        this.batchMode = batchMode;
         this.loadOnly = loadOnly;
     }
 
@@ -68,7 +71,8 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
        }
        // this seems to be a good place to free some memory
        Runtime.getRuntime().gc();
-       batchMode.saveProof ( result2, info.getProof() );
+       assert fileName != null : "It is expected that there is always a filename available, in which a proof shall be stored.";
+       BatchMode.saveProof ( result2, info.getProof(), fileName);
    }
 
     @Override
@@ -128,6 +132,12 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
                 System.out.println(message);
             }
         }
+    }
+
+    @Override
+    public void loadProblem(File file) {
+        fileName = file.getName();
+        super.loadProblem(file);
     }
 
    @Override

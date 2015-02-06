@@ -24,18 +24,11 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 
 public class BatchMode {
 
-    private final String fileName;
-
-    public BatchMode(String fileName) {
-        this.fileName = fileName;
-    }
-
-   public void saveProof (Object result,
-                                  Proof proof) {
+   public static void saveProof (Object result, Proof proof, String fileName) {
 
         if ( Main.getStatisticsFile() != null )
             saveStatistics ( Main.getStatisticsFile(), result.toString(),
-                              proof.statistics(), proof.closed() );
+                              proof.statistics(), proof.closed(), fileName);
 
        if (result instanceof Throwable) {
            throw new Error("Error in batchmode.", (Throwable) result);
@@ -77,9 +70,10 @@ public class BatchMode {
      *        statistics like the number of applied rules and so on.
      * @param proofClosed information whether the proof has been closed.
      */
-    private void saveStatistics(String file, Object result,
+    private static void saveStatistics(String file, Object result,
                                  Proof.Statistics statistics,
-                                 boolean proofClosed) {
+                                 boolean proofClosed,
+                                 String fileName) {
         
         // get current memory consumption (after GC) in kB
         Runtime.getRuntime().gc();
@@ -119,7 +113,7 @@ public class BatchMode {
         }
     }
 
-    private void saveProof(Proof proof, String filename) throws IOException {
+    private static void saveProof(Proof proof, String filename) throws IOException {
         ProofSaver saver = new ProofSaver(proof, filename, Main.INTERNAL_VERSION);
         saver.save();
     }
