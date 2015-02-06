@@ -19,6 +19,7 @@ import org.key_project.jmlediting.profile.jmlref.loop.DecreasingKeyword;
 import org.key_project.jmlediting.profile.jmlref.loop.LoopInvariantKeyword;
 import org.key_project.jmlediting.profile.jmlref.model.GhostKeyword;
 import org.key_project.jmlediting.profile.jmlref.model.ModelKeyword;
+import org.key_project.jmlediting.profile.jmlref.model.RepresentsKeyword;
 import org.key_project.jmlediting.profile.jmlref.model.SetKeyword;
 import org.key_project.jmlediting.profile.jmlref.model.SuchThatKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.AlsoKeyword;
@@ -95,7 +96,7 @@ public class JMLReferenceProfile extends AbstractJMLProfile {
             new InvariantKeyword(), new LoopInvariantKeyword(),
             new DecreasingKeyword(), new InvariantForKeyword(),
             new SuchThatKeyword(), new SetKeyword(), new ModelKeyword(),
-            new GhostKeyword()));
+            new GhostKeyword(), new RepresentsKeyword()));
 
       this.supportedPrimaries = new HashSet<IJMLPrimary>(Arrays.asList(
             new KeywordJMLPrimary(), new QuantifierPrimary()));

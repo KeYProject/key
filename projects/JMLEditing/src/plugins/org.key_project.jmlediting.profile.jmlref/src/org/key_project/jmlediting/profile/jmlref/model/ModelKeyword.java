@@ -1,11 +1,19 @@
 package org.key_project.jmlediting.profile.jmlref.model;
 
-import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
 
-public class ModelKeyword extends AbstractEmptyKeyword implements
+/**
+ * The implementation of the model keyword.
+ *
+ * @author Moritz Lichter
+ *
+ */
+public class ModelKeyword extends VariableDeclarationKeyword implements
       IToplevelKeyword {
 
+   /**
+    * Creates a new instance of model.
+    */
    public ModelKeyword() {
       super("model");
    }

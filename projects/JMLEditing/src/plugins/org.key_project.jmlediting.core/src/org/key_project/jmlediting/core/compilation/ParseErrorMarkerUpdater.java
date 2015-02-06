@@ -68,7 +68,7 @@ public class ParseErrorMarkerUpdater {
             final Position pos = getPositionForOffset(text,
                   error.getErrorOffset());
             marker.setAttribute(IMarker.TEXT, error.getErrorMessage());
-            marker.setAttribute(IMarker.LINE_NUMBER, pos.getLine + 1);
+            marker.setAttribute(IMarker.LINE_NUMBER, pos.getLine() + 1);
             marker.setAttribute(IMarker.PRIORITY, IMarker.PRIORITY_HIGH);
             marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
             marker.setAttribute(IMarker.MESSAGE, error.getErrorMessage());

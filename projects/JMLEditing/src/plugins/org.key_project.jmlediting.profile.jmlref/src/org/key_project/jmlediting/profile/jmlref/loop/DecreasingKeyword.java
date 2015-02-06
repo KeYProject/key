@@ -5,7 +5,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.ParseFunctionGenericKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.SemicolonClosedKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.SpecExpressionParser;
 
 /**
@@ -34,7 +34,7 @@ public class DecreasingKeyword extends AbstractKeyword implements
 
    @Override
    public IKeywordParser createParser() {
-      return new ParseFunctionGenericKeywordParser() {
+      return new SemicolonClosedKeywordParser() {
 
          @Override
          protected ParseFunction createContentParseFunction(

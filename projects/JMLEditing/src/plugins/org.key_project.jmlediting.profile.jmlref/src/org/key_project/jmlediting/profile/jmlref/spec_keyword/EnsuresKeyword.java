@@ -30,7 +30,7 @@ public class EnsuresKeyword extends AbstractGenericSpecificationKeyword {
 
    @Override
    public IKeywordParser createParser() {
-      return new ParseFunctionGenericKeywordParser() {
+      return new SemicolonClosedKeywordParser() {
 
          @Override
          protected ParseFunction createContentParseFunction(

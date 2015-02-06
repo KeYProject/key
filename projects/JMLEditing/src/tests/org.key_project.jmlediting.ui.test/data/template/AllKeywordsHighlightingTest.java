@@ -12,11 +12,18 @@ public abstract class AllKeywordsHighlightingTest {
    private boolean needsRefresh;
    private Object[] obs;
    
+   //@ private model int i ;
+   //@ private model int j;
+   //@ represents i = numCalls + handledCalls;
+   //@ represents j \such_that j==0;
+   //@ private ghost java.lang.Double d1,d2,d3;
+   
    /*@
      @ public normal_behavior
      @   ensures numCalls == 0;
      @*/
    public AllKeywordsHighlightingTest() {
+      //@ set d1 = max (numCalls, handledCalls);
       numCalls = 0;
       handledCalls = 0;
       needsRefresh = !isFresh();

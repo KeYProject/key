@@ -14,7 +14,7 @@ import org.key_project.jmlediting.core.profile.syntax.ParseFunctionKeywordParser
  * @author Moritz Lichter
  *
  */
-public abstract class ParseFunctionGenericKeywordParser extends
+public abstract class SemicolonClosedKeywordParser extends
       ParseFunctionKeywordParser {
 
    /**

@@ -1,11 +1,19 @@
 package org.key_project.jmlediting.profile.jmlref.model;
 
-import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
 
-public class GhostKeyword extends AbstractEmptyKeyword implements
+/**
+ * The implementation of the ghost keyword.
+ *
+ * @author Moritz Lichter
+ *
+ */
+public class GhostKeyword extends VariableDeclarationKeyword implements
       IToplevelKeyword {
 
+   /**
+    * Creates a new instance of this keyword.
+    */
    public GhostKeyword() {
       super("ghost");
    }
