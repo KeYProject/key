@@ -30,7 +30,7 @@ import java.io.File;
 
 /**
  * <p>
- * An extended version of {@link ConsoleUserInterface} which can be used
+ * An extended version of {@link AbstractConsoleUserInterface} which can be used
  * to prove manually instantiated proofs.
  * </p>
  * <p>

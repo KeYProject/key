@@ -30,11 +30,11 @@ public class BatchMode {
         this.fileName = fileName;
     }
 
-   public void finishedBatchMode (Object result,
+   public void saveProof (Object result,
                                   Proof proof) {
 
         if ( Main.getStatisticsFile() != null )
-            printStatistics ( Main.getStatisticsFile(), result.toString(),
+            saveStatistics ( Main.getStatisticsFile(), result.toString(),
                               proof.statistics(), proof.closed() );
 
        if (result instanceof Throwable) {
@@ -77,7 +77,7 @@ public class BatchMode {
      *        statistics like the number of applied rules and so on.
      * @param proofClosed information whether the proof has been closed.
      */
-    private void printStatistics(String file, Object result,
+    private void saveStatistics(String file, Object result,
                                  Proof.Statistics statistics,
                                  boolean proofClosed) {
         
@@ -120,8 +120,7 @@ public class BatchMode {
     }
 
     private void saveProof(Proof proof, String filename) throws IOException {
-        ProofSaver saver =
-        		new ProofSaver(proof, filename, Main.INTERNAL_VERSION);
+        ProofSaver saver = new ProofSaver(proof, filename, Main.INTERNAL_VERSION);
         saver.save();
     }
 

@@ -28,6 +28,10 @@ import de.uka.ilkd.key.util.Pair;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Implementation of {@link UserInterface} used by command line interface of
+ * KeY.
+ */
 public class ConsoleUserInterface extends AbstractConsoleUserInterface {
 
     private final BatchMode batchMode;
@@ -43,7 +47,7 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
         this.loadOnly = loadOnly;
     }
 
-   private void finalizeBatchMode(final int openGoals,
+   private void printResults(final int openGoals,
                                   TaskFinishedInfo info,
                                   final Object result2) {
        if (verbosity >= HIGH) {
@@ -64,7 +68,7 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
        }
        // this seems to be a good place to free some memory
        Runtime.getRuntime().gc();
-       batchMode.finishedBatchMode ( result2, info.getProof() );
+       batchMode.saveProof ( result2, info.getProof() );
    }
 
     @Override
@@ -87,7 +91,7 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
        if (info.getSource() instanceof ApplyStrategy ||
            info.getSource() instanceof ProofMacro) {
            if (numOfInvokedMacros == 0) {
-               finalizeBatchMode(openGoals, info, result2);
+               printResults(openGoals, info, result2);
            } else if (!macroChosen()) {
                finish(proof);
            }
