@@ -642,4 +642,12 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
          return containsRelevantJavaFile;
       }
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isGroupingSupported() {
+      return true;
+   }
 }

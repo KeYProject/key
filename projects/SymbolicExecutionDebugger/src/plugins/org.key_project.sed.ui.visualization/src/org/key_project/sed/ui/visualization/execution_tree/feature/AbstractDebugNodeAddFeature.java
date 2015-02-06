@@ -40,7 +40,6 @@ import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.util.ColorConstant;
-
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDGroupable;
@@ -101,14 +100,15 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
    @Override
    public PictogramElement add(IAddContext context) {
       ISEDDebugNode addedNode = (ISEDDebugNode) context.getNewObject();
-
+      boolean groupingSupported = addedNode.getDebugTarget().isGroupingSupported();
+      
       IPeCreateService peCreateService = Graphiti.getPeCreateService();
       IGaService gaService = Graphiti.getGaService();
       
       Diagram targetDiagram = (Diagram) context.getTargetContainer();
       
       // If the new node opens a group, we need to create the rect first
-      if(NodeUtil.canBeGrouped(addedNode)) {
+      if(groupingSupported && NodeUtil.canBeGrouped(addedNode)) {
          ISEDGroupable groupStart = (ISEDGroupable) addedNode;
          ContainerShape container = peCreateService.createContainerShape(targetDiagram, true);
          Rectangle rect = gaService.createRectangle(container);
@@ -132,23 +132,25 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
          rect.setFilled(false);
          link(container, addedNode);
          
-         GraphicsAlgorithm ga = createNode(context).getGraphicsAlgorithm();
+         GraphicsAlgorithm ga = createNode(context, groupingSupported).getGraphicsAlgorithm();
 
          gaService.setLocationAndSize(rect, context.getX(), context.getY() + ga.getHeight() / 2, ga.getWidth(), ga.getHeight() + ga.getHeight() / 2);
 
          return container;
       }
-
-      // create the node
-      return createNode(context);
+      else {
+         // create the node
+         return createNode(context, groupingSupported);
+      }
    }
    
    /**
     * Creates the node with rounded rect, image, text, anchor and connection.
     * @param context The {@link IAddContext} for this node.
+    * @param groupingSupported Is grouping supported?
     * @return The {@link PictogramElement} for this node.
     */
-   private PictogramElement createNode(IAddContext context) {
+   private PictogramElement createNode(IAddContext context, boolean groupingSupported) {
       ISEDDebugNode addedNode = (ISEDDebugNode) context.getNewObject();
       
       Diagram targetDiagram = (Diagram) context.getTargetContainer();
@@ -213,7 +215,7 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
             // Since the first pe of a group startnode is always the rec
             // we need to get the second pe.
             PictogramElement pe = getFeatureProvider().getAllPictogramElementsForBusinessObject(parentNode)
-                  [NodeUtil.canBeGrouped(parentNode) ? 1 : 0];
+                  [groupingSupported && NodeUtil.canBeGrouped(parentNode) ? 1 : 0];
                
             if (pe == null) {
                throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't find PictogramElement for \"" + pe + "\"."));

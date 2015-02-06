@@ -108,7 +108,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
                ISEDBranchCondition[] bcs = NodeUtil.getSortedBCs(groupStart);
                
                for(ISEDBranchCondition bc : bcs) {
-                  PictogramElement bcPE = uf.getPictogramElementForBusinessObject(bc);
+                  PictogramElement bcPE = uf.getPictogramElementForBusinessObject(bc, true);
                   removeConnections(bcPE, drf);
                   drf.remove(new RemoveContext(bcPE));
                }
@@ -118,7 +118,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
                GraphicsAlgorithm rectGA = pes[0].getGraphicsAlgorithm();
                GraphicsAlgorithm nodeGA = pes[1].getGraphicsAlgorithm();
 
-               int mostLeftAbove = uf.findAbove((ISEDDebugNode) groupStart, true);
+               int mostLeftAbove = uf.findAbove((ISEDDebugNode) groupStart, true, true);
                int mostLeftInSubtree = uf.findInSubtree((ISEDDebugNode) groupStart, true, true);
                int mostLeft = mostLeftAbove < mostLeftInSubtree ? mostLeftAbove : mostLeftInSubtree;
 
@@ -135,8 +135,8 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
                for(ISEDBranchCondition bc : bcs) {
                   ISEDDebugNode groupEnd = bc.getChildren()[0];
 
-                  PictogramElement groupEndPE = uf.getPictogramElementForBusinessObject(groupEnd);
-                  PictogramElement parentPE = uf.getPictogramElementForBusinessObject(NodeUtil.getParent(groupEnd));
+                  PictogramElement groupEndPE = uf.getPictogramElementForBusinessObject(groupEnd, true);
+                  PictogramElement parentPE = uf.getPictogramElementForBusinessObject(NodeUtil.getParent(groupEnd), true);
                   
                   createConnection((AnchorContainer)parentPE, (AnchorContainer)groupEndPE);
                }
@@ -162,7 +162,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
     */
    private void updateCollapse(ISEDGroupable groupStart, AbstractDebugNodeUpdateFeature uf, IProgressMonitor monitor) throws DebugException {
       GraphicsAlgorithm rectGA = uf.getPictogramElementForBusinessObject(groupStart, 0).getGraphicsAlgorithm();
-      GraphicsAlgorithm nodeGA = uf.getPictogramElementForBusinessObject(groupStart).getGraphicsAlgorithm();
+      GraphicsAlgorithm nodeGA = uf.getPictogramElementForBusinessObject(groupStart, true).getGraphicsAlgorithm();
       
       ISEDBranchCondition[] bcs = NodeUtil.getSortedBCs(groupStart);
 
@@ -171,10 +171,10 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       nodeGA.setX(rectGA.getX());
 
       if(bcs.length > 1) {
-         int above = uf.findBiggestWidthInPartTreeAbove((ISEDDebugNode) groupStart);
+         int above = uf.findBiggestWidthInPartTreeAbove((ISEDDebugNode) groupStart, true);
          // if there is a bigger node above our rect set the x-position to it
          if(above > rectGA.getWidth()) {
-            nodeGA.setX(uf.findAbove((ISEDDebugNode) groupStart, true));
+            nodeGA.setX(uf.findAbove((ISEDDebugNode) groupStart, true, true));
          }
       }
       
@@ -182,19 +182,19 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       for(ISEDBranchCondition bc : bcs)
       { 
          // second parameter never used (parent always != null when collapsing)
-         uf.createGraphicalRepresentationForNode(bc, 0);
+         uf.createGraphicalRepresentationForNode(bc, true, 0);
          
-         PictogramElement bcPE = uf.getPictogramElementForBusinessObject(bc);
+         PictogramElement bcPE = uf.getPictogramElementForBusinessObject(bc, true);
          GraphicsAlgorithm bcGA = bcPE.getGraphicsAlgorithm();
 
          ISEDDebugNode groupEnd = bc.getChildren()[0];
          
-         PictogramElement groupEndPE = uf.getPictogramElementForBusinessObject(groupEnd);
+         PictogramElement groupEndPE = uf.getPictogramElementForBusinessObject(groupEnd, true);
          GraphicsAlgorithm groupEndGA = groupEndPE.getGraphicsAlgorithm();
          
          // center the subtree below the new branchcondition
          int toMove = bcGA.getX() - groupEndGA.getX() + (bcGA.getWidth() - groupEndGA.getWidth()) / 2;
-         uf.moveSubTreeHorizontal(groupEnd, toMove, true, new SubProgressMonitor(monitor, 1));
+         uf.moveSubTreeHorizontal(groupEnd, true, toMove, true, new SubProgressMonitor(monitor, 1));
 
          int mostLeft = uf.findInSubtree(bc, true, false);
          if(mostLeft < bcGA.getX()) {
@@ -202,7 +202,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
             // if there is a prev branch and the subtree is bigger than the branchcondition
             // adjust the branch
             if(mostRightXInPrev != -1) {
-               uf.moveSubTreeHorizontal(bc, mostRightXInPrev + uf.OFFSET - mostLeft, true, new SubProgressMonitor(monitor, 1));
+               uf.moveSubTreeHorizontal(bc, true, mostRightXInPrev + uf.OFFSET - mostLeft, true, new SubProgressMonitor(monitor, 1));
             }
          }
 
@@ -210,9 +210,9 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
          leafs.add((bcGA.getWidth() > groupEndGA.getWidth() ? bc : groupEnd));
       }
 
-      uf.shrinkRectHeights(groupStart);
-      uf.centerChildren(new HashSet<ISEDDebugNode>(leafs), new SubProgressMonitor(monitor, 1));
-      uf.adjustSubtreeIfSmaller((ISEDDebugNode) groupStart, new SubProgressMonitor(monitor, 1));
+      uf.shrinkRectHeights(groupStart, true);
+      uf.centerChildren(new HashSet<ISEDDebugNode>(leafs), true, new SubProgressMonitor(monitor, 1));
+      uf.adjustSubtreeIfSmaller((ISEDDebugNode) groupStart, true, new SubProgressMonitor(monitor, 1));
       monitor.worked(1);
 
       // if the group has only one branch we need to adjust it manually
@@ -222,19 +222,19 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
          ISEDDebugNode child = ArrayUtil.getFirst(NodeUtil.getChildren(leaf));
          
          if(child != null) {
-            GraphicsAlgorithm leafGA = uf.getPictogramElementForBusinessObject(leaf).getGraphicsAlgorithm();
-            GraphicsAlgorithm childGA = uf.getPictogramElementForBusinessObject(child).getGraphicsAlgorithm();
+            GraphicsAlgorithm leafGA = uf.getPictogramElementForBusinessObject(leaf, true).getGraphicsAlgorithm();
+            GraphicsAlgorithm childGA = uf.getPictogramElementForBusinessObject(child, true).getGraphicsAlgorithm();
 
             int toMove = leafGA.getX() - childGA.getX() + (leafGA.getWidth() - childGA.getWidth()) / 2;
-            uf.moveSubTreeHorizontal(child, toMove, true, monitor);
+            uf.moveSubTreeHorizontal(child, true, toMove, true, monitor);
             
             int mostLeft = uf.findInSubtree(leaf, true, true);
             int mostRightXInPrev = uf.findInSiblingBranch(leaf, true, false);
             // adjust the branch with respect to the prev branch
             if(mostRightXInPrev != -1) {
                toMove = mostRightXInPrev + uf.OFFSET - mostLeft;
-               uf.moveRightAndAbove(leaf, toMove, monitor);
-               uf.moveSubTreeHorizontal(leaf, toMove, true, new SubProgressMonitor(monitor, 1));
+               uf.moveRightAndAbove(leaf, true, toMove, monitor);
+               uf.moveSubTreeHorizontal(leaf, true, toMove, true, new SubProgressMonitor(monitor, 1));
             }
          }
       }
@@ -244,15 +244,15 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
          rectGA.setX(nodeGA.getX() - uf.METOFF);
       }
 
-      uf.adjustRects((ISEDDebugNode) groupStart, new SubProgressMonitor(monitor, 1));
-      uf.updateParents(uf.getPictogramElementForBusinessObject(groupStart), new SubProgressMonitor(monitor, 1));
+      uf.adjustRects((ISEDDebugNode) groupStart, true, new SubProgressMonitor(monitor, 1));
+      uf.updateParents(uf.getPictogramElementForBusinessObject(groupStart, true), true, new SubProgressMonitor(monitor, 1));
       
       /**
        * Adjust Space between the left/right side of the group
        */
       int mostRightXInPrev = uf.findInSiblingBranch((ISEDDebugNode) groupStart, true, false);
       int mostLeftXInSubtree = uf.findInSubtree((ISEDDebugNode) groupStart, true, true);
-      int mostLeftXAbove = uf.findAbove((ISEDDebugNode) groupStart, true);
+      int mostLeftXAbove = uf.findAbove((ISEDDebugNode) groupStart, true, true);
       int mostLeftX = mostLeftXAbove < mostLeftXInSubtree ? mostLeftXAbove : mostLeftXInSubtree; 
 
       int toMove = 0;
@@ -275,11 +275,11 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       }
 
       if(toMove != 0) {
-         uf.moveRightAndAbove((ISEDDebugNode) groupStart, toMove, monitor);
-         uf.moveSubTreeHorizontal((ISEDDebugNode) groupStart, toMove, true, monitor);
+         uf.moveRightAndAbove((ISEDDebugNode) groupStart, true, toMove, monitor);
+         uf.moveSubTreeHorizontal((ISEDDebugNode) groupStart, true, toMove, true, monitor);
       }
       
-      uf.resizeRectsIfNeeded(groupStart, monitor);
+      uf.resizeRectsIfNeeded(groupStart, true, monitor);
    }
    
    /**

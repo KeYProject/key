@@ -174,4 +174,10 @@ public interface ISEDDebugTarget extends ISEDDebugElement, IDebugTarget {
     * @return The {@link ISEDSourceModel} or {@code null} if not available.
     */
    public ISEDSourceModel getSourceModel();
+   
+   /**
+    * Checks if {@link ISEDGroupable}s are supported or not.
+    * @return {@code false} {@link ISEDGroupable} are never contained in the symbolic execution tree, {@code true} {@link ISEDGroupable} might be part of the symbolic execution tree.
+    */
+   public boolean isGroupingSupported();
 }

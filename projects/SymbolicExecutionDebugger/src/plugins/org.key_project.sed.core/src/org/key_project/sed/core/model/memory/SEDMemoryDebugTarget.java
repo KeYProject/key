@@ -157,4 +157,12 @@ public class SEDMemoryDebugTarget extends AbstractSEDDebugTarget implements ISED
    protected boolean checkBreakpointHit(IBreakpoint breakpoint, ISEDDebugNode node) {
       return false;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isGroupingSupported() {
+      return true;
+   }
 }
