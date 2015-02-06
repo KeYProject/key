@@ -1,12 +1,13 @@
 package org.key_project.jmlediting.core.validator;
 
-import org.key_project.jmlediting.core.dom.IASTNode;
-
-public interface JMLValidator {
+public interface IJMLValidator {
    /**
     * Method for checking if a given JML Spec (Represented by a node) is valid.
+    * 
+    * @param context
+    *           TODO
     *
     * @return
     */
-   boolean isValid(IASTNode node);
+   boolean isValid(IJMLValidationContext context);
 }
