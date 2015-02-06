@@ -26,13 +26,8 @@ public class BatchMode {
 
     private final String fileName;
 
-    // flag to indicate that a file should merely be loaded not proved. (for
-    // "reload" testing)
-    private final boolean loadOnly;
-
-    public BatchMode(String fileName, boolean loadOnly) {
+    public BatchMode(String fileName) {
         this.fileName = fileName;
-        this.loadOnly = loadOnly;
     }
 
    public void finishedBatchMode (Object result,
@@ -129,10 +124,5 @@ public class BatchMode {
         		new ProofSaver(proof, filename, Main.INTERNAL_VERSION);
         saver.save();
     }
-
-    public boolean isLoadOnly() {
-        return loadOnly;
-    }
-
 
 }

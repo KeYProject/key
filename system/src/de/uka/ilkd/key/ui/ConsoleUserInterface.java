@@ -31,11 +31,16 @@ import java.io.IOException;
 public class ConsoleUserInterface extends AbstractConsoleUserInterface {
 
     private final BatchMode batchMode;
+    
+    // flag to indicate that a file should merely be loaded not proved. (for
+    // "reload" testing)
+    private final boolean loadOnly;
 
-    public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
+    public ConsoleUserInterface(BatchMode batchMode, boolean verbose, boolean loadOnly) {
         super(verbose);
         assert batchMode != null;
         this.batchMode = batchMode;
+        this.loadOnly = loadOnly;
     }
 
    private void finalizeBatchMode(final int openGoals,
@@ -95,7 +100,7 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
                }
                System.exit(-1);
            }
-           if(batchMode.isLoadOnly() ||  openGoals==0) {
+           if(loadOnly ||  openGoals==0) {
                if (verbosity > SILENT)
                    System.out.println("Number of open goals after loading: " +
                            openGoals);
@@ -123,7 +128,7 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
 
    @Override
    public File saveProof(Proof proof, String fileExtension) {
-       if (batchMode.isLoadOnly()) {
+       if (loadOnly) {
            return null;
        }
        final Pair<File, String> f = fileName(proof, fileExtension);

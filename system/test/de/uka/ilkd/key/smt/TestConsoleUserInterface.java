@@ -10,8 +10,8 @@ import de.uka.ilkd.key.ui.ConsoleUserInterface;
  */
 public class TestConsoleUserInterface extends ConsoleUserInterface{
 
-	public TestConsoleUserInterface(BatchMode batchMode, boolean verbose) {
-		super(batchMode, verbose);
+	public TestConsoleUserInterface(BatchMode batchMode, boolean verbose, boolean loadOnly) {
+		super(batchMode, verbose, loadOnly);
 	}
 
 	@Override
