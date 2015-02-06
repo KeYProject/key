@@ -59,6 +59,8 @@ import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
 import de.uka.ilkd.key.util.Pair;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * an instance serves as representation of a Java model underlying a DL
@@ -88,7 +90,7 @@ public final class JavaInfo {
     protected KeYJavaType[] commonTypes = new KeYJavaType[3];
 
     //some caches for the getKeYJavaType methods.
-    private HashMap<Sort, KeYJavaType> sort2KJTCache = null;
+    private HashMap<Sort, List<KeYJavaType>> sort2KJTCache = null;
     private HashMap<Type, KeYJavaType> type2KJTCache = null;
     private HashMap<String, KeYJavaType> name2KJTCache = null;
 
@@ -434,37 +436,52 @@ public final class JavaInfo {
             return kjt.equals(visibleTo);
     }
 
-
     /**
      * returns a KeYJavaType having the given sort
      */
-     public KeYJavaType getKeYJavaType(Sort sort) {
-	 if(sort2KJTCache == null || kpmi.rec2key().size() > sortCachedSize){
-	     sortCachedSize = kpmi.rec2key().size();
-	     sort2KJTCache = new LinkedHashMap<Sort, KeYJavaType>();
-	     for (final Object o : kpmi.allElements()) {
-	         if (o instanceof KeYJavaType){
-	             final KeYJavaType oKJT = (KeYJavaType)o;
-	             if(sort2KJTCache.containsKey(oKJT.getSort())) {
-	                 sort2KJTCache.remove(oKJT.getSort()); //XXX
-	             }
-	             sort2KJTCache.put((oKJT).getSort(), oKJT);
-	         }
-	     }
-	 }
+    public KeYJavaType getKeYJavaType(Sort sort) {
+        List<KeYJavaType> l = lookupSort2KJTCache(sort);
+        if (l != null && l.size() > 0) {
+            // Return first KeYJavaType found for sort.
+            return l.get(0);
+        }
 
-	 // lookup for primitive ldts
-	 KeYJavaType result = sort2KJTCache.get(sort);
-	 if(result == null) {
-	     Name n = sort.name();
-	     PrimitiveType pt = PrimitiveType.getPrimitiveTypeByLDT(n);
-	     if(pt != null) {
-	         return getPrimitiveKeYJavaType(pt);
-	     }
-	 }
-    return result;
-     }
+        // sort not found in sort2KJTCache
+        Name n = sort.name();
+        PrimitiveType pt = PrimitiveType.getPrimitiveTypeByLDT(n);
+        if (pt != null) {
+            return getPrimitiveKeYJavaType(pt);
+        }
 
+        // sort not found
+        return null;
+    }
+
+    private void updateSort2KJTCache() {
+        if (sort2KJTCache == null || kpmi.rec2key().size() > sortCachedSize) {
+            sortCachedSize = kpmi.rec2key().size();
+            sort2KJTCache = new HashMap<Sort, List<KeYJavaType>>();
+            for (final Object o : kpmi.allElements()) {
+                if (o instanceof KeYJavaType) {
+                    final KeYJavaType oKJT = (KeYJavaType) o;
+                    Sort s = oKJT.getSort();
+                    List<KeYJavaType> l = sort2KJTCache.get(s);
+                    if (l == null) {
+                        l = new LinkedList<KeYJavaType>();
+                        sort2KJTCache.put(s, l);
+                    }
+                    if (!l.contains(oKJT)) {
+                        l.add(oKJT);
+                    }
+                }
+            }
+        }
+    }
+
+    public List<KeYJavaType> lookupSort2KJTCache(Sort sort) {
+        updateSort2KJTCache();
+        return sort2KJTCache.get(sort);
+    }
 
     /**
      * returns the KeYJavaType belonging to the given Type t
@@ -549,6 +566,42 @@ public final class JavaInfo {
         return getProgramMethod(classType, methodName, signature.toImmutableList(), context);
     }
     
+    private IProgramMethod getProgramMethodFromPartialSignature(KeYJavaType classType,
+            String methodName,
+            List<List<KeYJavaType>> signature,
+            ImmutableList<KeYJavaType> partialSignature,
+            KeYJavaType context) {
+        if (signature.isEmpty()) {
+            return getProgramMethod(classType, methodName, partialSignature, context);
+        } else {
+            List<KeYJavaType> types = signature.get(0);
+            assert !types.isEmpty();
+            for (KeYJavaType t : types) {
+                IProgramMethod programMethod = getProgramMethodFromPartialSignature(classType, methodName, signature.subList(1, signature.size()), partialSignature.append(t), context);
+                if (programMethod != null) {
+                    return programMethod;
+                }
+            }
+        }
+        return null;
+    }
+
+    /*
+     * Takes for each signature entry a list of types for all of which
+     * a corresponding IProgramMethod is looked up. Several types must
+     * be considered if for one sort several KeYJavaTypes must be considered.
+     * This is the case for sort int in KeY, which has the following as possible
+     * corresponding KeYJavaTypes:
+     * char, byte, short, int, long
+     */
+    public IProgramMethod getProgramMethod(KeYJavaType classType,
+            String methodName,
+            List<List<KeYJavaType>> signature,
+            KeYJavaType context) {
+        ImmutableList<KeYJavaType> partialSignature = ImmutableSLList.nil();
+        return getProgramMethodFromPartialSignature(classType, methodName, signature, partialSignature, context);
+    }
+
     /**
      * returns the program method defined in the KeYJavaType of the program
      * variable clv, with the name m, and the KeYJavaTypes of the given array
@@ -605,13 +658,18 @@ public final class JavaInfo {
 	return getToplevelPM(kjt, methodName, sig);
     }
 
-    public Term getStaticProgramMethodTerm(String methodName, Term[] args, String className) {
-        ImmutableList<KeYJavaType> argList = ImmutableSLList.<KeYJavaType>nil();
-        for (int i = 0; i < args.length; i++) {
-            argList = argList.append(getServices().getJavaInfo().getKeYJavaType(args[i].sort()));
+    private List<List<KeYJavaType>> termArrayToSignature(Term[] args) {
+        List<List<KeYJavaType>> signature = new LinkedList<List<KeYJavaType>>();
+        for (Term arg : args) {
+            signature.add(lookupSort2KJTCache(arg.sort()));
         }
+        return signature;
+    }
+
+    public Term getStaticProgramMethodTerm(String methodName, Term[] args, String className) {
+        List<List<KeYJavaType>> signature = termArrayToSignature(args);
         KeYJavaType classKJT = getTypeByClassName(className);
-        IProgramMethod pm = getProgramMethod(classKJT, methodName, argList, classKJT);
+        IProgramMethod pm = getProgramMethod(classKJT, methodName, signature, classKJT);
         return getTermFromProgramMethod(pm, methodName, className, args, null);
     }
 
@@ -620,46 +678,44 @@ public final class JavaInfo {
             Term[] args,
             String className,
             boolean traverseHierarchy) {
-        ImmutableList<KeYJavaType> argList = ImmutableSLList.<KeYJavaType>nil();
-        for (int i = 0; i < args.length; i++) {
-            argList = argList.append(getServices().getJavaInfo().getKeYJavaType(args[i].sort()));
+
+        /*
+         * This is just a safety measure. To avoid null pointers, try to call
+         * getStaticProgramMethodTerm() directly, if possible.
+         */
+        if (prefix == null) {
+            return getStaticProgramMethodTerm(methodName, args, className);
         }
 
+        List<List<KeYJavaType>> signature = termArrayToSignature(args);
         IProgramMethod pm = null;
         KeYJavaType classKJT = getTypeByClassName(className);
-        if (prefix == null) {
-            /*
-             * Method is referenced from a static context.
+        /*
+         * Method is referenced from a non-static context.
+         */
+        if (traverseHierarchy) {
+            /* 
+             * Traverse type hierarchy to find a method with the specified name.
              */
-            pm = getProgramMethod(classKJT, methodName, argList, classKJT);
-        } else {
-            /*
-             * Method is referenced from a non-static context.
-             */
-            if (traverseHierarchy) {
-                /* 
-                 * Traverse type hierarchy to find a method with the specified name.
-                 */
-                ImmutableList<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(classKJT).reverse();
-                Iterator iterator = allSupertypes.iterator();
-                while (iterator.hasNext() && pm == null) {
-                    KeYJavaType next = (KeYJavaType) iterator.next();
-                    pm = getProgramMethod(next, methodName, argList, next);
-                    if (pm != null && pm.isPrivate() && !next.equals(classKJT)) {
-                        /*
-                         * Private methods from supertypes are not visible in their
-                         * subtypes. They will not be selected here.
-                         */
-                        pm = null;
-                    }
+            ImmutableList<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(classKJT).reverse();
+            Iterator<KeYJavaType> iterator = allSupertypes.iterator();
+            while (iterator.hasNext() && pm == null) {
+                KeYJavaType next = iterator.next();
+                pm = getProgramMethod(next, methodName, signature, next);
+                if (pm != null && pm.isPrivate() && !next.equals(classKJT)) {
+                    /*
+                     * Private methods from supertypes are not visible in their
+                     * subtypes. They will not be selected here.
+                     */
+                    pm = null;
                 }
-            } else {
-                /* 
-                 * Do not traverse type hierarchy. pm stays null in case classKJT
-                 * does not contain a method with the specified name.
-                 */
-                pm = getProgramMethod(classKJT, methodName, argList, classKJT);
             }
+        } else {
+            /* 
+             * Do not traverse type hierarchy. pm stays null in case classKJT
+             * does not contain a method with the specified name.
+             */
+            pm = getProgramMethod(classKJT, methodName, signature, classKJT);
         }
         return getTermFromProgramMethod(pm, methodName, className, args, prefix);
     }
