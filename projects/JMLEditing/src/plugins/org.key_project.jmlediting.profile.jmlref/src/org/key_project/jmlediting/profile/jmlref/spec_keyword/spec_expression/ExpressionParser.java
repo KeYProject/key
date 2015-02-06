@@ -44,6 +44,8 @@ public class ExpressionParser implements ParseFunction {
     */
    private final ParseFunction typeSpecParser;
 
+   private final ParseFunction assignmentExprParser;
+
    /**
     * Returns the parser which parses array dimension declaration.
     *
@@ -60,6 +62,10 @@ public class ExpressionParser implements ParseFunction {
     */
    public ParseFunction typeSpec() {
       return this.typeSpecParser;
+   }
+
+   public ParseFunction assignmentExpr() {
+      return this.assignmentExprParser;
    }
 
    @Override
@@ -414,5 +420,6 @@ public class ExpressionParser implements ParseFunction {
       this.mainParser = expression;
       this.dimsParser = dims;
       this.typeSpecParser = typeSpec;
+      this.assignmentExprParser = assignmentExpr;
    }
 }

@@ -32,7 +32,7 @@ public class StoreRefKeywordContentParser extends
 
    @Override
    protected ParseFunction createContentParseFunction(final IJMLProfile profile) {
-      return new StoreRefParser(profile, this.allowInformalDescription);
+      return new StoreRefListParser(profile, this.allowInformalDescription);
    }
 
 }

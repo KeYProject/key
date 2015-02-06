@@ -14,19 +14,20 @@ import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.SpecExpressionParser;
 
 /**
- * The {@link StoreRefParser} parses the content specified as store-ref-list in
- * the <a href="URL#value">http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/
+ * The {@link StoreRefListParser} parses the content specified as store-ref-list
+ * in the <a href="URL#value">http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/
  * jmlrefman_12.html#SEC166>JML reference manual</a>.
  *
  * @author Moritz Lichter
  *
  */
-public class StoreRefParser implements ParseFunction {
+public class StoreRefListParser implements ParseFunction {
 
    /**
     * The {@link ParseFunction} which is used to parse the text.
     */
    private final ParseFunction mainParser;
+   private final ParseFunction storeRef;
 
    @Override
    public IASTNode parse(final String text, final int start, final int end)
@@ -34,8 +35,12 @@ public class StoreRefParser implements ParseFunction {
       return this.mainParser.parse(text, start, end);
    }
 
+   public ParseFunction storeRef() {
+      return this.storeRef;
+   }
+
    /**
-    * Creates a new {@link StoreRefParser} accepting all keywords which
+    * Creates a new {@link StoreRefListParser} accepting all keywords which
     * implements {@link IStoreRefKeyword} as keywords for a storage location.
     * The user can enable or disable informal descriptions as content.
     *
@@ -45,7 +50,7 @@ public class StoreRefParser implements ParseFunction {
     * @param allowInformalDescription
     *           whether informal descriptions are allows
     */
-   public StoreRefParser(final IJMLProfile profile,
+   public StoreRefListParser(final IJMLProfile profile,
          final boolean allowInformalDescription) {
       // Determine keywords which are allowed as storage location keywords
       final Set<IStoreRefKeyword> storeRefKeywords = JMLProfileHelper
@@ -107,12 +112,11 @@ public class StoreRefParser implements ParseFunction {
        * | informal-description <br>
        * Informal descriptions may be disabled
        */
-      final ParseFunction storeRef;
       if (allowInformalDescription) {
-         storeRef = alt(storeRefExpr, informalDescr);
+         this.storeRef = alt(storeRefExpr, informalDescr);
       }
       else {
-         storeRef = storeRefExpr;
+         this.storeRef = storeRefExpr;
       }
 
       /**
@@ -123,7 +127,7 @@ public class StoreRefParser implements ParseFunction {
       final ParseFunction storeRefList = typed(
             STORE_REF_LIST,
             alt(storeRefKeyword,
-                  separatedNonEmptyListErrorRecovery(',', storeRef,
+                  separatedNonEmptyListErrorRecovery(',', this.storeRef,
                         "Expected at least one storage reference")));
 
       this.mainParser = storeRefList;
