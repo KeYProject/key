@@ -891,12 +891,19 @@ public class LogicPrinter {
         }
     }
 
-    /*
-     * Use this method to determine the Set of printed TermLabels.
-     * The class SequentViewLogicPrinter overrides this method.
-     * The default is to print all TermLabels.
+    /**
+     * Determine the Set of labels that will be printed out for a specific
+     * {@link Term}. The class {@link SequentViewLogicPrinter} overrides this
+     * method. {@link TermLabel} visibility can be configured via GUI, see
+     * {@link de.uka.ilkd.key.gui.actions.TermLabelMenu}. Default is to print
+     * all TermLabels.
+     *
+     * @param t {@link Term} whose visible {@link TermLabel}s will be
+     * determined.
+     * @return List of visible {@link TermLabel}s, i.e. labels that are
+     * syntactically added to a {@link Term} while printing.
      */
-    protected ImmutableArray<TermLabel> getVisibleTermLabels(Term t){
+    protected ImmutableArray<TermLabel> getVisibleTermLabels(Term t) {
         return t.getLabels();
     }
 
