@@ -15,19 +15,13 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditPart;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
-import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
-import org.key_project.sed.core.model.memory.SEDMemoryStatement;
-import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.ui.visualization.execution_tree.feature.AbstractDebugNodeUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugTargetConnectFeature;
 import org.key_project.sed.ui.visualization.test.util.TestVisualizationUtil;
-import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests the automatic layout of symbolic execution trees via
