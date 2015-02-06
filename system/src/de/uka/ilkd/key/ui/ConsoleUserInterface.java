@@ -38,7 +38,7 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
     // "reload" testing)
     private final boolean loadOnly;
     
-    private String fileName = null;
+    private String keyProblemFile = null;
     
     public ConsoleUserInterface(byte verbosity, boolean loadOnly) {
         super(verbosity);
@@ -71,8 +71,25 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
        }
        // this seems to be a good place to free some memory
        Runtime.getRuntime().gc();
-       assert fileName != null : "It is expected that there is always a filename available, in which a proof shall be stored.";
-       BatchMode.saveProof ( result2, info.getProof(), fileName);
+
+       /*
+        * It is assumed that this part of the code is never reached, unless a 
+        * value has been assigned to keyProblemFile in method loadProblem(File).
+        */
+       assert keyProblemFile != null : "Unexcpected null pointer. Trying to"
+               + " save a proof but no corresponding key problem file is "
+               + "available.";
+       BatchMode.saveProof(result2, info.getProof(), keyProblemFile);
+       /*
+        * We "delete" the value of keyProblemFile at this point by assigning
+        * null to it. That way we prevent KeY from saving another proof (that
+        * belongs to another key problem file) for a key problem file whose
+        * execution cycle has already been finished (and whose proof has
+        * already been saved). It is assumed that a new value has been assigned
+        * beforehand in method loadProblem(File), if this part of the code is
+        * reached again.
+        */
+       keyProblemFile = null;
    }
 
     @Override
@@ -136,7 +153,12 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
 
     @Override
     public void loadProblem(File file) {
-        fileName = file.getName();
+        /*
+         * We store the file name in a private field here.
+         * It will be used in method printResults() to determine file names,
+         * in which proofs will be written.
+         */
+        keyProblemFile = file.getName();
         super.loadProblem(file);
     }
 
