@@ -9,7 +9,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
  * which implement this interface are allowed to occur as a storage location.
  *
  * @author Moritz Lichter
- * @see StoreRefParser
+ * @see StoreRefListParser
  *
  */
 public interface IStoreRefKeyword extends IKeyword {

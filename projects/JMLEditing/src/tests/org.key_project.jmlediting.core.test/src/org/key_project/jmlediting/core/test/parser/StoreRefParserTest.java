@@ -4,7 +4,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefParser;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefListParser;
 
 public class StoreRefParserTest {
 
@@ -130,7 +130,7 @@ public class StoreRefParserTest {
    }
 
    private static void testRecovery(final String text, final String recoveryTerm) {
-      ParserTestUtils.testRecovery(text, new StoreRefParser(
+      ParserTestUtils.testRecovery(text, new StoreRefListParser(
             ProfileWrapper.testProfile, true), recoveryTerm);
    }
 
@@ -141,7 +141,7 @@ public class StoreRefParserTest {
 
    private static void testParse(final String text, final String resultTerm,
          final boolean allowInformalDescr) throws ParserException {
-      ParserTestUtils.testParseComplete(text, new StoreRefParser(
+      ParserTestUtils.testParseComplete(text, new StoreRefListParser(
             ProfileWrapper.testProfile, allowInformalDescr), resultTerm);
    }
 

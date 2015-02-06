@@ -3,10 +3,10 @@ package org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 
 /**
- * This class defines node types which are used in the {@link StoreRefParser}.
+ * This class defines node types which are used in the {@link StoreRefListParser}.
  *
  * @author Moritz Lichter
- * @see StoreRefParser
+ * @see StoreRefListParser
  */
 public final class StoreRefNodeTypes {
 

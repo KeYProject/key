@@ -1,5 +1,6 @@
 package org.key_project.jmlediting.profile.key;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -13,6 +14,14 @@ import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.EverythingKeyword;
+import org.key_project.jmlediting.profile.key.locset.EmptyKeywod;
+import org.key_project.jmlediting.profile.key.locset.InfiniteUnionKeyword;
+import org.key_project.jmlediting.profile.key.locset.IntersetOperatorKeyword;
+import org.key_project.jmlediting.profile.key.locset.LocSetEverythingKeyword;
+import org.key_project.jmlediting.profile.key.locset.ReachLocsParser;
+import org.key_project.jmlediting.profile.key.locset.SetMinusOperatorKeyword;
+import org.key_project.jmlediting.profile.key.locset.SetUnionOperatorKeyword;
 import org.key_project.jmlediting.profile.key.other.InvKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAccessibleKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAssignableKeyword;
@@ -23,15 +32,27 @@ public class KeyProfile extends JMLReferenceProfile {
 
    public KeyProfile() {
       super(KeywordLocale.AMERICAN);
+
+      final Set<IKeyword> supportedKeywords = this
+            .getSupportedKeywordsInternal();
       // Add strictly keywords
-      this.getSupportedKeywordsInternal().add(new StrictlyPureKeyword());
-      this.getSupportedKeywordsInternal().add(new StrictlyNothingKeyword());
+      supportedKeywords.add(new StrictlyPureKeyword());
+      supportedKeywords.add(new StrictlyNothingKeyword());
       // Disable informal descriptions in Assignable/Accessible keywords
-      replace(this.getSupportedKeywordsInternal(), AssignableKeyword.class,
+      replace(supportedKeywords, AssignableKeyword.class,
             new KeyAssignableKeyword());
-      replace(this.getSupportedKeywordsInternal(), AccessibleKeyword.class,
+      replace(supportedKeywords, AccessibleKeyword.class,
             new KeyAccessibleKeyword());
-      this.getSupportedKeywordsInternal().add(new InvKeyword());
+
+      supportedKeywords.add(new InvKeyword());
+
+      // Support for LocSetExpressions
+      replace(supportedKeywords, EverythingKeyword.class,
+            new LocSetEverythingKeyword());
+      supportedKeywords.addAll(Arrays.asList(new EmptyKeywod(),
+            new InfiniteUnionKeyword(), new IntersetOperatorKeyword(),
+            new ReachLocsParser(), new SetMinusOperatorKeyword(),
+            new SetUnionOperatorKeyword()));
 
       // Allows \inv as access on a not toplevel object just as for x[3].\inv
       this.putExtension(
