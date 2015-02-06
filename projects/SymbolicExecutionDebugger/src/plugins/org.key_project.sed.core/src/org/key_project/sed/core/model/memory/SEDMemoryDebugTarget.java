@@ -42,7 +42,7 @@ public class SEDMemoryDebugTarget extends AbstractSEDDebugTarget implements ISED
     * @param executable {@code true} Support suspend, resume, etc.; {@code false} Do not support suspend, resume, etc.
     */
    public SEDMemoryDebugTarget(ILaunch launch, boolean executable) {
-      super(launch, executable);
+      super(launch, executable, true);
    }
 
    /**

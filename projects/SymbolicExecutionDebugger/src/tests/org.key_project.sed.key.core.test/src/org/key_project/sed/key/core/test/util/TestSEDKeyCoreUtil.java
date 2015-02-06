@@ -143,6 +143,7 @@ public final class TestSEDKeyCoreUtil {
     * @param useUnicode Use unicode characters?
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
+    * @param higlightReachedSourceCode Highlight reached source code?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IMethod method,
@@ -154,7 +155,8 @@ public final class TestSEDKeyCoreUtil {
                                 final Boolean mergeBranchConditions,
                                 final Boolean useUnicode,
                                 final Boolean usePrettyPrinting,
-                                final Boolean showSignatureOnMethodReturnNodes) throws Exception {
+                                final Boolean showSignatureOnMethodReturnNodes,
+                                final Boolean higlightReachedSourceCode) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
@@ -197,6 +199,9 @@ public final class TestSEDKeyCoreUtil {
                }
                if (showSignatureOnMethodReturnNodes != null) {
                   wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, showSignatureOnMethodReturnNodes);
+               }
+               if (higlightReachedSourceCode != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, higlightReachedSourceCode);
                }
                config = wc.doSave();
                DebugUITools.launch(config, KeySEDUtil.MODE);

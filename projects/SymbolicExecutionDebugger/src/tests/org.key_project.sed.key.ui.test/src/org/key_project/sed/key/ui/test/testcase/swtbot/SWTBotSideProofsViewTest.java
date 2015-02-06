@@ -75,6 +75,7 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               8, 
                               new SideProofsViewTestExecutor(false, false, 0, -1, new int[][] {}));
          // Test with collecting side proofs
@@ -93,6 +94,7 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               8, 
                               new SideProofsViewTestExecutor(true, true, 4, 0, new int[][] {{1}, {0, 2}, {0}}));
          // Test without collecting side proofs again
@@ -111,6 +113,7 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               8, 
                               new SideProofsViewTestExecutor(true, false, 0, -1, new int[][] {}));
       }

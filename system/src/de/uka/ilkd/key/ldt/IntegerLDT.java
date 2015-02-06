@@ -554,7 +554,7 @@ public final class IntegerLDT extends LDT {
         // "0x" for hex) and suffixes ("L" for long literal). The latter
         // do not have any of these but can have arbitrary length.
         if (lit instanceof IntLiteral) {
-            if (literalString.startsWith("0")) { // hex or octal literal
+            if (literalString.startsWith("0") && !literalString.equals("0")) { // hex or octal literal
                 try {
                     long l = Long.decode(literalString);
                     //the following contortion is necessary to deal with
@@ -576,8 +576,11 @@ public final class IntegerLDT extends LDT {
             }
             length = int_ch.length;
         } else if (lit instanceof LongLiteral) {
+            // long constants have the letter 'l' as final character
+            // need to cut that off (fixes bug #1523)
+            assert Character.toLowerCase(literalString.charAt(literalString.length()-1)) == 'l';
             try {
-                final long l = Long.decode(literalString);
+                final long l = Long.decode(literalString.substring(0, literalString.length()-1));
                 int_ch=(""+l).toCharArray();
             } catch (NumberFormatException nfe) {
                 Debug.fail("Cannot convert long constant! "+literalString);

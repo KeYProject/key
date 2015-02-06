@@ -146,7 +146,7 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
    public KeYDebugTarget(ILaunch launch,
                          SymbolicExecutionEnvironment<?> environment,
                          KeYLaunchSettings launchSettings) throws DebugException {
-      super(launch, true);
+      super(launch, true, launchSettings.isHighlightReachedSourceCode());
       DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
       // Update references
       Assert.isNotNull(environment);
@@ -161,7 +161,7 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
       // Update initial model
       setModelIdentifier(MODEL_IDENTIFIER);
       setName(proof.name() != null ? proof.name().toString() : "Unnamed");
-      // Init breakpoints
+      // Initialize breakpoints
       initBreakpoints();
       // Add thread
       KeYThread thread = new KeYThread(this, environment.getBuilder().getStartNode());
