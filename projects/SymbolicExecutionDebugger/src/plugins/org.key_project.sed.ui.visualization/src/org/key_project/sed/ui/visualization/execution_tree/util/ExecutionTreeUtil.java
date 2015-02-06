@@ -83,18 +83,39 @@ public final class ExecutionTreeUtil {
     * @return {@code false} {@link ISEDGroupable} are never contained in the symbolic execution tree, {@code true} {@link ISEDGroupable} might be part of the symbolic execution tree.
     */
    public static boolean isGroupingSupported(IFeatureProvider fp, IPictogramElementContext context) {
-      boolean result = false;
       PictogramElement pe = context.getPictogramElement();
       if (pe != null) {
          Object bo = fp.getBusinessObjectForPictogramElement(pe);
          if (bo instanceof IDebugElement) {
-            IDebugTarget target = ((IDebugElement) bo).getDebugTarget();
-            if (target instanceof ISEDDebugTarget) {
-               result = ((ISEDDebugTarget) target).isGroupingSupported();
-            }
+            return isGroupingSupported((IDebugElement) bo);
+         }
+         else {
+            return false;
          }
       }
-      return result;
+      else {
+         return false;
+      }
+   }
+
+   /**
+    * Checks if grouping is supported.
+    * @param element The {@link IDebugElement} to check.
+    * @return {@code false} {@link ISEDGroupable} are never contained in the symbolic execution tree, {@code true} {@link ISEDGroupable} might be part of the symbolic execution tree.
+    */
+   public static boolean isGroupingSupported(IDebugElement element) {
+      if (element != null) {
+         IDebugTarget target = ((IDebugElement) element).getDebugTarget();
+         if (target instanceof ISEDDebugTarget) {
+            return ((ISEDDebugTarget) target).isGroupingSupported();
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         return false;
+      }
    }
    
    /**

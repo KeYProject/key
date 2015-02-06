@@ -54,6 +54,7 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStep
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeSuspendFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeTerminateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeVisualizeStateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.ICustomFeatureFactory;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -108,7 +109,7 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
          data.getGenericContextButtons().clear();
          
          ISEDDebugNode node = (ISEDDebugNode) getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElement());
-         if(node instanceof ISEDGroupable) {
+         if(ExecutionTreeUtil.isGroupingSupported(node) && node instanceof ISEDGroupable) {
             ISEDGroupable groupStart = (ISEDGroupable) node;
             if(groupStart.isCollapsed()) {
                data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeCollapseFeature(getFeatureProvider()), context, "Expand", null, IPlatformImageConstants.IMG_EDIT_EXPAND));
@@ -175,7 +176,7 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
          Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElements()[0]);
          if(bo instanceof ISEDDebugNode) {
             ISEDDebugNode node = (ISEDDebugNode) bo;
-            if(node instanceof ISEDGroupable) {
+            if(ExecutionTreeUtil.isGroupingSupported(node) && node instanceof ISEDGroupable) {
                ISEDGroupable groupStart = (ISEDGroupable) node;
                if(groupStart.isCollapsed()) {
                   result.add(createCustomContextMenuEntry(new DebugNodeCollapseFeature(getFeatureProvider()), context, "Expand", null, IPlatformImageConstants.IMG_EDIT_EXPAND));
