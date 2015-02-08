@@ -213,6 +213,9 @@ public final class Main {
                 File f = fileArguments.get(i);
                 ui.loadProblem(f);
             }
+            if (ui instanceof ConsoleUserInterface) {
+                System.exit(((ConsoleUserInterface) ui).allProofsSuccessful ? 0 : 1);
+            }
         } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
             ui.openExamples();
         }

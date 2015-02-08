@@ -38,7 +38,19 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
     // "reload" testing)
     private final boolean loadOnly;
     
+    
+    /**
+     * Name of current key problem file that is attempted to be proven.
+     */
     private String keyProblemFile = null;
+    
+    /**
+     * We want to record whether there was a proof that could not be proven.
+     * {@link Main} calls System.exit() after all files have been loaded with
+     * {@link #loadProblem(java.io.File)}. Program return value depends on
+     * whether there has been a proof attempt that was not successful.
+     */
+    public boolean allProofsSuccessful = true;
     
     public ConsoleUserInterface(byte verbosity, boolean loadOnly) {
         super(verbosity);
@@ -79,7 +91,7 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
        assert keyProblemFile != null : "Unexcpected null pointer. Trying to"
                + " save a proof but no corresponding key problem file is "
                + "available.";
-       BatchMode.saveProof(result2, info.getProof(), keyProblemFile);
+       allProofsSuccessful &= BatchMode.saveProof(result2, info.getProof(), keyProblemFile);
        /*
         * We "delete" the value of keyProblemFile at this point by assigning
         * null to it. That way we prevent KeY from saving another proof (that

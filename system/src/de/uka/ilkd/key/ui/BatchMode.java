@@ -24,7 +24,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 
 public class BatchMode {
 
-   public static void saveProof (Object result, Proof proof, String fileName) {
+   public static boolean saveProof (Object result, Proof proof, String fileName) {
 
         if ( Main.getStatisticsFile() != null )
             saveStatistics ( Main.getStatisticsFile(), result.toString(),
@@ -58,6 +58,14 @@ public class BatchMode {
             saveProof (proof, baseName + ".auto.proof" );
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+        if (proof.openGoals ().size () == 0) {
+            // Says that all Proofs have succeeded
+            return true;
+        } else {
+            // Says that there is at least one open Proof
+            return false;
         }
     }
 
