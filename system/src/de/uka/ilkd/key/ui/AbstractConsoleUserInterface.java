@@ -18,7 +18,6 @@ import static de.uka.ilkd.key.core.Main.Verbosity.HIGH;
 import static de.uka.ilkd.key.core.Main.Verbosity.NORMAL;
 
 import java.io.File;
-import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -190,7 +189,7 @@ public abstract class AbstractConsoleUserInterface extends AbstractUserInterface
 
     @Override
     public void loadProblem(File file) {
-        super.getProblemLoader(file, null, null, mediator).runSynchronously();
+        getProblemLoader(file, null, null, mediator).runSynchronously();
     }
 
    @Override

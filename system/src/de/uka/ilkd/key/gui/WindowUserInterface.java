@@ -86,7 +86,7 @@ public class WindowUserInterface extends AbstractUserInterface {
     public void loadProblem(File file, List<File> classPath,
                             File bootClassPath) {
         mainWindow.addRecentFile(file.getAbsolutePath());
-        super.getProblemLoader(file, classPath, bootClassPath,
+        getProblemLoader(file, classPath, bootClassPath,
                                mainWindow.getMediator()).runAsynchronously();
     }
 
