@@ -12,10 +12,13 @@ import java.util.TreeSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
+import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -50,7 +53,7 @@ public abstract class AbstractSlicer {
     * @return The computed slice.
     */
    public ImmutableArray<Node> slice(Node seedNode, Term term) {
-      return slice(seedNode, toSourceElement(seedNode.proof().getServices(), term));
+      return slice(seedNode, toLocation(seedNode.proof().getServices(), term));
    }
 
    /**
@@ -60,6 +63,24 @@ public abstract class AbstractSlicer {
     * @return The computed slice.
     */
    public ImmutableArray<Node> slice(Node seedNode, ReferencePrefix seedLocation) {
+      // Solve this reference
+      PosInOccurrence pio = seedNode.getAppliedRuleApp().posInOccurrence();
+      Term topLevel = pio.constrainedFormula().formula();
+      Term modalityTerm = TermBuilder.goBelowUpdates(topLevel);
+      Services services = seedNode.proof().getServices();
+      IExecutionContext ec = JavaTools.getInnermostExecutionContext(modalityTerm.javaBlock(), services);
+      ReferencePrefix thisReference = ec != null ? ec.getRuntimeInstance() : null;
+      // Perform slicing
+      return slice(seedNode, toLocation(services, seedLocation, thisReference));
+   }
+
+   /**
+    * Computes the slice.
+    * @param seedNode The seed {@link Node} to start slicing at.
+    * @param seedLocation The seed {@link ReferencePrefix}.
+    * @return The computed slice.
+    */
+   public ImmutableArray<Node> slice(Node seedNode, Location seedLocation) {
       // Ensure that seed node is valid
       if (seedNode.getAppliedRuleApp() == null) {
          throw new IllegalStateException("No rule applied on seed Node '" + seedNode.serialNr() + "'.");
@@ -79,18 +100,78 @@ public abstract class AbstractSlicer {
    /**
     * Performs the slicing.
     * @param seedNode The seed {@link Node} to start slicing at.
-    * @param seedLocation The seed {@link ReferencePrefix}.
+    * @param seedLocation The seed {@link Location}.
     * @return The computed slice.
     */
-   protected abstract ImmutableArray<Node> doSlicing(Node seedNode, ReferencePrefix seedLocation);
+   protected abstract ImmutableArray<Node> doSlicing(Node seedNode, Location seedLocation);
+   
+   /**
+    * The result returned by {@link AbstractSlicer#analyzeSequent(Node)}.
+    * @author Martin Hentschel
+    */
+   protected static class SequentInfo {
+      /**
+       * The found aliases.
+       */
+      private final Map<Location, SortedSet<Location>> aliases;
+      
+      /**
+       * The local values.
+       */
+      private final Map<ProgramVariable, Term> localValues;
+      
+      /**
+       * The this reference if available.
+       */
+      private final ReferencePrefix thisReference;
+
+      /**
+       * Constructor.
+       * @param aliases The found aliases.
+       * @param thisReference The this reference if available.
+       */
+      public SequentInfo(Map<Location, SortedSet<Location>> aliases, 
+                         Map<ProgramVariable, Term> localValues, 
+                         ReferencePrefix thisReference) {
+         assert aliases != null;
+         assert localValues != null;
+         this.aliases = aliases;
+         this.localValues = localValues;
+         this.thisReference = thisReference;
+      }
+
+      /**
+       * Returns the found aliases.
+       * @return The found aliases.
+       */
+      public Map<Location, SortedSet<Location>> getAliases() {
+         return aliases;
+      }
+
+      /**
+       * Returns the local values.
+       * @return The local values.
+       */
+      public Map<ProgramVariable, Term> getLocalValues() {
+         return localValues;
+      }
+
+      /**
+       * Returns the this reference if available.
+       * @return The this reference if available.
+       */
+      public ReferencePrefix getThisReference() {
+         return thisReference;
+      }
+   }
    
    /**
     * Computes the aliases specified by the updates of the current {@link Node}
     * at the application {@link PosInOccurrence} and computes the current {@code this} reference.
     * @param node The {@link Node} to analyze.
-    * @return A {@link Pair} with the computed alias map and the {@code this} reference or {@code null} if the application {@link PosInOccurrence} is not of interest.
+    * @return The computed {@link SequentInfo} or {@code null} if the {@link Node} is not supported.
     */
-   protected Pair<Map<ReferencePrefix, SortedSet<ReferencePrefix>>, ReferencePrefix> analyzeSequent(Node node) {
+   protected SequentInfo analyzeSequent(Node node) {
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Term topLevel = pio.constrainedFormula().formula();
       Pair<ImmutableList<Term>,Term> pair = TermBuilder.goBelowUpdates2(topLevel);
@@ -103,9 +184,10 @@ public abstract class AbstractSlicer {
          IExecutionContext ec = JavaTools.getInnermostExecutionContext(modalityTerm.javaBlock(), services);
          ReferencePrefix thisReference = ec != null ? ec.getRuntimeInstance() : null;
          // Compute aliases
-         Map<ReferencePrefix, SortedSet<ReferencePrefix>> aliases = new HashMap<ReferencePrefix, SortedSet<ReferencePrefix>>();
-         analyzeUpdates(pair.first, services, heapLDT, aliases, thisReference);
-         return new Pair<Map<ReferencePrefix,SortedSet<ReferencePrefix>>, ReferencePrefix>(aliases, thisReference);
+         Map<Location, SortedSet<Location>> aliases = new HashMap<Location, SortedSet<Location>>();
+         Map<ProgramVariable, Term> localValues = new HashMap<ProgramVariable, Term>();
+         analyzeUpdates(pair.first, services, heapLDT, aliases, localValues, thisReference);
+         return new SequentInfo(aliases, localValues, thisReference);
       }
       else {
          return null; // Not the modality of interest.
@@ -118,15 +200,17 @@ public abstract class AbstractSlicer {
     * @param services The {@link Services} to use.
     * @param heapLDT The {@link HeapLDT} of the {@link Services}.
     * @param aliases The alias {@link Map} to fill.
+    * @param localValues The local values to fill.
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
     */
    protected void analyzeUpdates(ImmutableList<Term> updates, 
                                  Services services, 
                                  HeapLDT heapLDT, 
-                                 Map<ReferencePrefix, SortedSet<ReferencePrefix>> aliases,
+                                 Map<Location, SortedSet<Location>> aliases,
+                                 Map<ProgramVariable, Term> localValues,
                                  ReferencePrefix thisReference) {
       for (Term update : updates) {
-         analyzeUpdate(update, services, heapLDT, aliases, thisReference);
+         analyzeUpdate(update, services, heapLDT, aliases, localValues, thisReference);
       }
    }
    
@@ -136,16 +220,18 @@ public abstract class AbstractSlicer {
     * @param services The {@link Services} to use.
     * @param heapLDT The {@link HeapLDT} of the {@link Services}.
     * @param aliases The alias {@link Map} to fill.
+    * @param localValues The local values to fill.
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
     */
    protected void analyzeUpdate(Term term, 
                                 Services services, 
                                 HeapLDT heapLDT, 
-                                Map<ReferencePrefix, SortedSet<ReferencePrefix>> aliases, 
+                                Map<Location, SortedSet<Location>> aliases, 
+                                Map<ProgramVariable, Term> localValues,
                                 ReferencePrefix thisReference) {
       if (term.op() == UpdateJunctor.PARALLEL_UPDATE) {
          for (int i = 0 ; i < term.arity(); i++) {
-            analyzeUpdate(term.sub(i), services, heapLDT, aliases, thisReference);
+            analyzeUpdate(term.sub(i), services, heapLDT, aliases, localValues, thisReference);
          }
       }
       else if (term.op() instanceof ElementaryUpdate) {
@@ -154,14 +240,18 @@ public abstract class AbstractSlicer {
             analyzeHeapUpdate(term.sub(0), services, heapLDT, aliases, thisReference);
          }
          else {
-            ReferencePrefix source = toSourceElement(services, term.sub(0));
-            if (target instanceof ReferencePrefix && source != null) {
-               updateAliases((ReferencePrefix) target, source, aliases ,thisReference);
+            if (target instanceof ProgramVariable) {
+               localValues.put((ProgramVariable) target, term.sub(0));
+            }
+            Location sourceLocation = toLocation(services, term.sub(0));
+            if (target instanceof ReferencePrefix && sourceLocation != null) {
+               Location targetLocation = toLocation(services, (ReferencePrefix) target, thisReference);
+               updateAliases(services, targetLocation, sourceLocation, aliases, thisReference);
             }
          }
       }
       else {
-         throw new IllegalArgumentException();
+         throw new IllegalArgumentException("Can not analyze update '" + term + "'.");
       }
    }
 
@@ -176,7 +266,7 @@ public abstract class AbstractSlicer {
    protected void analyzeHeapUpdate(Term term, 
                                     Services services, 
                                     HeapLDT heapLDT, 
-                                    Map<ReferencePrefix, SortedSet<ReferencePrefix>> aliases,
+                                    Map<Location, SortedSet<Location>> aliases,
                                     ReferencePrefix thisReference) {
       final Function store = heapLDT.getStore();
       final Function create = heapLDT.getCreate();
@@ -185,12 +275,11 @@ public abstract class AbstractSlicer {
          analyzeHeapUpdate(term.sub(0), services, heapLDT, aliases, thisReference);
          // Check for alias in current store
          if (SymbolicExecutionUtil.hasReferenceSort(services, term.sub(3))) {
-            ReferencePrefix source = toSourceElement(services, term.sub(3));
+            Location source = toLocation(services, term.sub(3));
             if (source != null) {
-               ReferencePrefix targetPrefix = toSourceElement(services, term.sub(1));
-               ReferencePrefix targetVariable = toSourceElement(services, term.sub(2));
-               assert targetVariable instanceof ProgramVariable;
-               updateAliases(new FieldReference((ProgramVariable) targetVariable, targetPrefix), source, aliases, thisReference);
+               Location targetPrefix = toLocation(services, term.sub(1));
+               Location targetVariable = toLocation(services, term.sub(2));
+               updateAliases(services, targetPrefix != null ? targetPrefix.append(targetVariable) : targetVariable, source, aliases, thisReference);
             }
          }
       }
@@ -202,29 +291,28 @@ public abstract class AbstractSlicer {
          // Nothing to do, root of heap reached.
       }
       else {
-         throw new IllegalStateException();
+         throw new IllegalStateException("Can not analyze heap update '" + term + "'.");
       }
    }
 
    /**
     * Adds the found alias consisting of first and second {@link ReferencePrefix} to the alias {@link Map}.
     * If required, all participating entries in the {@link Map} are updated to ensure consistency.
+    * @param services The {@link Services} to use.
     * @param first The first alias.
     * @param second The second alias.
     * @param aliases The alias {@link Map} to update.
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
     */
-   protected void updateAliases(ReferencePrefix first, 
-                                ReferencePrefix second, 
-                                Map<ReferencePrefix, SortedSet<ReferencePrefix>> aliases,
+   protected void updateAliases(Services services,
+                                Location first, 
+                                Location second, 
+                                Map<Location, SortedSet<Location>> aliases,
                                 ReferencePrefix thisReference) {
-      // Ensure normal form
-      first = normalForm(first, thisReference);
-      second = normalForm(second, thisReference);
       // Try to get Set for key
-      SortedSet<ReferencePrefix> firstValues = aliases.get(first);
-      SortedSet<ReferencePrefix> secondValues = aliases.get(second);
-      SortedSet<ReferencePrefix> values = null;
+      SortedSet<Location> firstValues = aliases.get(first);
+      SortedSet<Location> secondValues = aliases.get(second);
+      SortedSet<Location> values = null;
       if (firstValues == null && secondValues == null) {
          values = createSortedSet();
          aliases.put(first, values);
@@ -240,61 +328,31 @@ public abstract class AbstractSlicer {
       }
       else if (firstValues != null && secondValues != null) { // both are not null
          values = firstValues;
-         for (ReferencePrefix existingPrefix : secondValues) {
-            aliases.put(existingPrefix, values);
+         for (Location existingLocation : secondValues) {
+            aliases.put(existingLocation, values);
          }
          values.addAll(secondValues);
       }
       else {
-         throw new IllegalStateException(); // Can not happen!
+         throw new IllegalStateException("Reached a state which should never happen."); // Can not happen!
       }
       values.add(first);
       values.add(second);
-   }
-
-   /**
-    * Ensures that the {@link ReferencePrefix} is in the normal from which
-    * means that static variables are directly accessed without a {@link FieldReference}.
-    * @param prefix The {@link ReferencePrefix} to check.
-    * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
-    * @return The {@link ReferencePrefix} in normal form.
-    */
-   protected ReferencePrefix normalForm(ReferencePrefix prefix, ReferencePrefix thisReference) {
-      if (prefix instanceof FieldReference) {
-         FieldReference fr = (FieldReference) prefix;
-         if (fr.getReferencePrefix() == null) {
-            return fr.getProgramVariable();
-         }
-         else {
-            return new FieldReference(fr.getProgramVariable(), normalForm(fr.getReferencePrefix(), thisReference));
-         }
-      }
-      else if (prefix instanceof ProgramVariable) {
-         return prefix;
-      }
-      else if (prefix instanceof ThisReference) {
-         return normalForm(thisReference, thisReference);
-      }
-      else {
-         throw new IllegalStateException();
-      }
    }
    
    /**
     * Creates a {@link SortedSet} which ensures that the elements are sorted.
     * @return The new created {@link SortedSet}.
     */
-   protected SortedSet<ReferencePrefix> createSortedSet() {
-      return new TreeSet<ReferencePrefix>(new Comparator<ReferencePrefix>() {
+   protected SortedSet<Location> createSortedSet() {
+      return new TreeSet<Location>(new Comparator<Location>() {
          /**
           * {@inheritDoc}
           */
          @Override
-         public int compare(ReferencePrefix o1, ReferencePrefix o2) {
-            String o1string = o1.toString();
-            String o2string = o2.toString();
-            int o1DotCount = JavaUtil.count(o1string, '.');
-            int o2DotCount = JavaUtil.count(o2string, '.');
+         public int compare(Location o1, Location o2) {
+            int o1DotCount = o1.getDepth();
+            int o2DotCount = o2.getDepth();
             if (o1DotCount < o2DotCount) {
                return 1;
             }
@@ -302,7 +360,7 @@ public abstract class AbstractSlicer {
                return -1;
             }
             else {
-               return o1string.compareTo(o2string);
+               return o1.toString().compareTo(o2.toString());
             }
          }
       }); // Order is important for normalization;
@@ -310,54 +368,79 @@ public abstract class AbstractSlicer {
    
    /**
     * Returns the representative alias for the given {@link ReferencePrefix}.
+    * @param services The {@link Services} to use.
     * @param referencePrefix The {@link ReferencePrefix}.
-    * @param aliases The available aliases.
-    * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
+    * @param info The {@link SequentInfo} with the aliases and so on.
     * @return The representative alias.
     */
-   protected ReferencePrefix normalizeAlias(ReferencePrefix referencePrefix, 
-                                            Map<ReferencePrefix, SortedSet<ReferencePrefix>> aliases,
-                                            ReferencePrefix thisReference) {
-      if (referencePrefix instanceof ProgramVariable) {
-         return computeRepresentativeAlias((ProgramVariable) referencePrefix, aliases);
-      }
-      else if (referencePrefix instanceof FieldReference) {
-         ImmutableList<ProgramVariable> vars = extractProgramVariables((FieldReference) referencePrefix, thisReference);
-         Iterator<ProgramVariable> iter = vars.iterator();
-         ProgramVariable next = iter.next();
-         ReferencePrefix root = computeRepresentativeAlias(next, aliases);
-         if (next != root) {
-            root = normalizeAlias(root, aliases, thisReference);
-         }
-         while (iter.hasNext()) {
-            next = iter.next();
-            root = new FieldReference(next, root);
-            root = computeRepresentativeAlias(root, aliases);
-         }
-         return root;
-      }
-      else if (referencePrefix instanceof ThisReference) {
-         return normalizeAlias(thisReference, aliases, thisReference);
-      }
-      else {
-         throw new IllegalStateException();
-      }
+   protected Location normalizeAlias(Services services,
+                                     ReferencePrefix referencePrefix, 
+                                     SequentInfo info) {
+      Location location = toLocation(services, referencePrefix, info.getThisReference());
+      return normalizeAlias(services, location, info);
    }
    
    /**
-    * Returns the representative alias of the given {@link ReferencePrefix}.
-    * @param prefix The {@link ReferencePrefix}.
+    * Returns the representative alias for the given {@link Location}.
+    * @param services The {@link Services} to use.
+    * @param location The {@link Location}.
+    * @param info The {@link SequentInfo} with the aliases and so on.
+    * @return The representative alias.
+    */
+   protected Location normalizeAlias(Services services,
+                                     Location location, 
+                                     SequentInfo info) {
+      ImmutableList<Access> normalizedAccesses = ImmutableSLList.nil();
+      for (Access access : location.getAccesses()) {
+         if (access.isArrayIndex()) {
+            access = normalizeArrayIndex(access, info);
+         }
+         normalizedAccesses = normalizedAccesses.append(access);
+         Location oldLocation = new Location(normalizedAccesses);
+         Location newLocation = computeRepresentativeAlias(oldLocation, info.getAliases());
+         if (!oldLocation.equals(newLocation)) {
+            normalizedAccesses = normalizeAlias(services, newLocation, info).getAccesses();
+         }
+      }
+      return new Location(normalizedAccesses);
+   }
+   
+   /**
+    * Normalizes the given array index.
+    * @param access The {@link Access} representing an array index.
+    * @param info The {@link SequentInfo} with the aliases and so on.
+    * @return The normalized array access.
+    */
+   protected Access normalizeArrayIndex(Access access, SequentInfo info) {
+      ImmutableArray<Term> oldTerms = access.getDimensionExpressions();
+      Term[] newTerms = new Term[oldTerms.size()];
+      for (int i = 0; i < newTerms.length; i++) {
+         Term oldTerm = oldTerms.get(i);
+         if (oldTerm.op() instanceof ProgramVariable) {
+            Term value = info.getLocalValues().get((ProgramVariable) oldTerm.op());
+            if (value != null) {
+               oldTerm = value;
+            }
+         }
+         newTerms[i] = oldTerm;
+      }
+      return new Access(new ImmutableArray<Term>(newTerms));
+   }
+
+   /**
+    * Computes the representative alias of the given {@link Location}.
+    * @param location The given {@link Location}.
     * @param aliases The available aliases.
     * @return The representative alias.
     */
-   protected ReferencePrefix computeRepresentativeAlias(ReferencePrefix prefix, 
-                                                        Map<ReferencePrefix, SortedSet<ReferencePrefix>> aliases) {
-      Set<ReferencePrefix> alternatives = aliases.get(prefix);
+   protected Location computeRepresentativeAlias(Location location, 
+                                                 Map<Location, SortedSet<Location>> aliases) {
+      Set<Location> alternatives = aliases.get(location);
       if (alternatives != null) {
          return alternatives.iterator().next(); // Return first alternative
       }
       else {
-         return prefix;
+         return location;
       }
    }
 
@@ -366,10 +449,10 @@ public abstract class AbstractSlicer {
     * @param sourceElement The {@link SourceElement} to work with.
     * @return The {@link ReferencePrefix} or {@code null} if the {@link SourceElement} can't be represented as {@link ReferencePrefix}.
     */
-   protected ReferencePrefix computeReferencePrefix(SourceElement sourceElement) {
+   protected ReferencePrefix toReferencePrefix(SourceElement sourceElement) {
       if (sourceElement instanceof PassiveExpression) {
          if (((PassiveExpression) sourceElement).getChildCount() != 1) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("PassiveExpression '" + sourceElement + "' has not exactly one child.");
          }
          sourceElement = ((PassiveExpression) sourceElement).getChildAt(0);
       }
@@ -378,6 +461,9 @@ public abstract class AbstractSlicer {
       }
       else if (sourceElement instanceof ProgramVariable) {
          return (ProgramVariable) sourceElement;
+      }
+      else if (sourceElement instanceof ArrayReference) {
+         return (ArrayReference) sourceElement;
       }
       else {
          return null;
@@ -388,22 +474,22 @@ public abstract class AbstractSlicer {
     * Checks if the given {@link SourceElement} is directly or indirectly
     * contained (aliased) in the {@link Set} of relevant locations.
     * If it is contained, the element will be removed.
+    * @param services The {@link Services} to use.
     * @param sourceElement The {@link SourceElement} to check.
     * @param relevantLocations The {@link Set} with locations of interest.
-    * @param aliases The alias {@link Map}.
-    * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
+    * @param info The {@link SequentInfo} with the aliases and so on.
     * @return {@code true} is relevant and was removed, {@code false} is not relevant and nothing has changed.
     */
-   protected boolean removeRelevant(ReferencePrefix sourceElement, 
-                                Set<ReferencePrefix> relevantLocations, 
-                                Map<ReferencePrefix, SortedSet<ReferencePrefix>> aliases,
-                                ReferencePrefix thisReference) {
-      ReferencePrefix normalized = normalizeAlias(sourceElement, aliases, thisReference);
+   protected boolean removeRelevant(Services services,
+                                    ReferencePrefix sourceElement, 
+                                    Set<Location> relevantLocations, 
+                                    SequentInfo info) {
+      Location normalized = normalizeAlias(services, sourceElement, info);
       boolean relevant = false;
-      Iterator<ReferencePrefix> iterator = relevantLocations.iterator();
+      Iterator<Location> iterator = relevantLocations.iterator();
       while (!relevant && iterator.hasNext()) {
-         ReferencePrefix next = iterator.next();
-         ReferencePrefix nextNormalized = normalizeAlias(next, aliases, thisReference);
+         Location next = iterator.next();
+         Location nextNormalized = normalizeAlias(services, next, info);
          if (normalized.equals(nextNormalized)) {
             iterator.remove();
             relevant = true;
@@ -411,138 +497,130 @@ public abstract class AbstractSlicer {
       }
       return relevant;
    }
-   
-   /**
-    * Recursive utility method used by {@link #isRelevant(SourceElement, Set, Map)}.
-    * @param root The root {@link ReferencePrefix}.
-    * @param remainingVariables The remaining {@link ProgramVariable}s in the access path.
-    * @param relevantLocations The {@link Set} with locations of interest.
-    * @param aliases The alias {@link Map}.
-    * @return {@code true} is relevant, {@code false} is not relevant.
-    */
-   protected boolean checkFieldReference(ReferencePrefix root, 
-                                         ImmutableList<ProgramVariable> remainingVariables, 
-                                         Set<ReferencePrefix> relevantLocations, 
-                                         Map<ReferencePrefix, SortedSet<ReferencePrefix>> aliases) {
-      Set<ReferencePrefix> alternatives = aliases.get(root);
-      if (alternatives != null) {
-         boolean relevant = false;
-         Iterator<ReferencePrefix> iterator = alternatives.iterator();
-         while (!relevant && iterator.hasNext()) {
-            ReferencePrefix alternative = iterator.next();
-            FieldReference alternativeFR = createFieldReference(alternative, remainingVariables);
-            if (relevantLocations.contains(alternativeFR)) {
-               relevant = true;
-            }
-            else {
-               FieldReference childReference = new FieldReference(remainingVariables.head(), alternative);
-               relevant = checkFieldReference(childReference, remainingVariables.tail(), relevantLocations, aliases);
-            }
-         }
-         return relevant;
-      }
-      else {
-         return false;
-      }
-   }
 
    /**
-    * Extracts all {@link ProgramVariable}s in the given {@link ReferencePrefix}.
+    * Converts the given {@link ReferencePrefix} into a {@link Location}.
+    * @param services The {@link Services} to use.
+    * @param prefix The {@link ReferencePrefix} to convert.
+    * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
+    * @return The {@link Location} representing the given {@link ReferencePrefix}.
+    */
+   protected Location toLocation(Services services,
+                                 ReferencePrefix prefix, 
+                                 ReferencePrefix thisReference) {
+      ImmutableList<Access> accesses = toLocationRecursive(services, prefix, thisReference, ImmutableSLList.<Access>nil());
+      return new Location(accesses);
+   }
+   
+   /**
+    * Utility method used by {@link #toLocation(Services, ReferencePrefix, ReferencePrefix)}
+    * to recursively extract the {@link Access} instances.
+    * @param services The {@link Services} to use.
     * @param prefix The {@link ReferencePrefix} to work with.
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
-    * @return An {@link ImmutableList} containing all {@link ProgramVariable}s of the {@link ReferencePrefix} in the order of access.
+    * @param children The already known child {@link Access}s.
+    * @return An {@link ImmutableList} containing all {@link Access}s of the {@link ReferencePrefix} in the order of access.
     */
-   protected ImmutableList<ProgramVariable> extractProgramVariables(ReferencePrefix prefix, 
-                                                                    ReferencePrefix thisReference) {
+   protected ImmutableList<Access> toLocationRecursive(Services services,
+                                                       ReferencePrefix prefix, 
+                                                       ReferencePrefix thisReference, 
+                                                       ImmutableList<Access> children) {
       if (prefix instanceof ProgramVariable) {
-         return ImmutableSLList.<ProgramVariable>nil().prepend((ProgramVariable) prefix);
+         return children.prepend(new Access((ProgramVariable) prefix));
       }
       else if (prefix instanceof FieldReference) {
-         return extractProgramVariables((FieldReference) prefix, thisReference);
-      }
-      else {
-         throw new IllegalStateException();
-      }
-   }
-
-   /**
-    * Extracts all {@link ProgramVariable}s in the given {@link FieldReference}.
-    * @param fr The {@link FieldReference} to work with.
-    * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
-    * @return An {@link ImmutableList} containing all {@link ProgramVariable}s of the {@link FieldReference} in the order of access.
-    */
-   protected ImmutableList<ProgramVariable> extractProgramVariables(FieldReference fr, 
-                                                                    ReferencePrefix thisReference) {
-      ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
-      while (fr != null) {
-         result = result.prepend(fr.getProgramVariable());
-         ReferencePrefix prefix = fr.getReferencePrefix();
-         if (prefix instanceof ProgramVariable) {
-            result = result.prepend((ProgramVariable) prefix);
-            fr = null;
-         }
-         else if (prefix instanceof FieldReference) {
-            fr = (FieldReference) prefix;
-         }
-         else if (prefix instanceof ThisReference) {
-            if (thisReference instanceof ProgramVariable) {
-               result = result.prepend((ProgramVariable) thisReference);
-               fr = null;
-            }
-            else if (thisReference instanceof FieldReference) {
-               fr = (FieldReference) thisReference;
-            }
-            else {
-               throw new IllegalStateException();
-            }
-         }
-         else if (prefix == null) {
-            fr = null;
+         FieldReference fr = (FieldReference) prefix;
+         ReferencePrefix parent = fr.getReferencePrefix();
+         children = children.prepend(new Access(fr.getProgramVariable()));
+         if (parent != null) {
+            return toLocationRecursive(services, parent, thisReference, children);
          }
          else {
-            throw new IllegalStateException();
+            return children;
          }
       }
-      return result;
-   }
-
-   /**
-    * Creates a new {@link FieldReference} for the given {@link ProgramVariable}s.
-    * @param root The root {@link ReferencePrefix}.
-    * @param variables The {@link ProgramVariable} to access in order of access.
-    * @return The created {@link FieldReference}.
-    */
-   protected FieldReference createFieldReference(ReferencePrefix root, 
-                                                 ImmutableList<ProgramVariable> variables) {
-      Iterator<ProgramVariable> iterator = variables.iterator();
-      assert iterator.hasNext();
-      FieldReference fr = new FieldReference(iterator.next(), root);
-      while (iterator.hasNext()) {
-         fr = new FieldReference(iterator.next(), fr);
+      else if (prefix instanceof ThisReference) {
+         if (thisReference instanceof ProgramVariable) {
+            return children.prepend(new Access((ProgramVariable) thisReference));
+         }
+         else if (thisReference instanceof FieldReference) {
+            return toLocationRecursive(services, thisReference, thisReference, children);
+         }
+         else {
+            throw new IllegalStateException("Unsupported this reference '" + thisReference + "'.");
+         }
       }
-      return fr;
+      else if (prefix instanceof ArrayReference) {
+         ArrayReference ar = (ArrayReference) prefix;
+         children = children.prepend(new Access(toTerm(services, ar.getDimensionExpressions())));
+         return toLocationRecursive(services, ar.getReferencePrefix(), thisReference, children);
+      }
+      else {
+         throw new IllegalStateException("Unsupported prefix '" + prefix + "'.");
+      }
    }
    
    /**
-    * Converts the given {@link Term} into a {@link ReferencePrefix}.
+    * Converts the given {@link Expression}s into {@link Term}s.
+    * @param services The {@link Services} to use.
+    * @param expressions The {@link Expression}s to convert.
+    * @return The created {@link Term}s.
+    */
+   public static ImmutableArray<Term> toTerm(Services services, 
+                                             ImmutableArray<Expression> expressions) {
+      Term[] terms = new Term[expressions.size()];
+      int i = 0;
+      for (Expression expression : expressions) {
+         terms[i] = AbstractSlicer.toTerm(services, expression);
+         i++;
+      }
+      return new ImmutableArray<Term>(terms);
+   }
+   
+   /**
+    * Converts the given {@link Expression} into a {@link Term}.
+    * @param services The {@link Services} to use.
+    * @param expression The {@link Expression} to convert.
+    * @return The created {@link Term}.
+    */
+   public static Term toTerm(Services services, Expression expression) {
+      if (expression instanceof IntLiteral) {
+         IntLiteral literal = (IntLiteral) expression;
+         return services.getTermBuilder().zTerm(literal.getValue());
+      }
+      else if (expression instanceof ProgramVariable) {
+         return services.getTermBuilder().var((ProgramVariable) expression);
+      }
+      else {
+         throw new IllegalStateException("Unsupported expression '" + expression + "'.");
+      }
+   }
+
+   /**
+    * Converts the given {@link Term} into a {@link Location}.
     * @param services The {@link Services} to use.
     * @param term The {@link Term} to convert.
-    * @return The {@link ReferencePrefix} or {@code null} if the {@link Term} could not be represented as {@link ReferencePrefix}.
+    * @return The {@link Location} or {@code null} if the {@link Term} could not be represented as {@link Location}.
     */
-   protected ReferencePrefix toSourceElement(Services services, Term term) {
+   public static Location toLocation(Services services, Term term) {
       if (term.op() instanceof ProgramVariable) {
-         return (ProgramVariable) term.op();
+         return new Location(new Access((ProgramVariable) term.op()));
       }
       else if (SymbolicExecutionUtil.isNullSort(term.sort(), services)) {
          return null;
       }
       else {
-         Function selectFunction = services.getTypeConverter().getHeapLDT().getSelect(term.sort(), services);
-         if (term.op() == selectFunction) {
-            ReferencePrefix prefix = toSourceElement(services, term.sub(1));
-            ReferencePrefix variable = toSourceElement(services, term.sub(2));
-            assert variable instanceof ProgramVariable;
-            return new FieldReference((ProgramVariable) variable, prefix);
+         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+         if (term.op() == heapLDT.getSelect(term.sort(), services)) {
+            Location prefix = toLocation(services, term.sub(1));
+            Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(services, heapLDT, term.sub(2));
+            if (arrayIndex != null) {
+               return prefix.append(new Access(arrayIndex));
+            }
+            else {
+               Location variable = toLocation(services, term.sub(2));
+               return prefix != null ? prefix.append(variable) : variable;
+            }
          }
          else {
             String name = term.op().name().toString();
@@ -552,7 +630,7 @@ public abstract class AbstractSlicer {
                String fieldName = name.substring(index + 3);
                ProgramVariable pv = services.getJavaInfo().getAttribute(fullTypeName + "::" + fieldName);
                assert term.op() == services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable) pv, services);
-               return pv;
+               return new Location(new Access(pv));
             }
             else {
                return null;
@@ -567,11 +645,11 @@ public abstract class AbstractSlicer {
     * @param newAlternatives The new alternatives.
     * @return The found alternative or {@code null} if not available.
     */
-   protected ReferencePrefix findNewAlternative(final SortedSet<ReferencePrefix> oldAlternatives, 
-                                                final SortedSet<ReferencePrefix> newAlternatives) {
-      return JavaUtil.search(oldAlternatives, new IFilter<ReferencePrefix>() {
+   protected Location findNewAlternative(final SortedSet<Location> oldAlternatives, 
+                                         final SortedSet<Location> newAlternatives) {
+      return JavaUtil.search(oldAlternatives, new IFilter<Location>() {
          @Override
-         public boolean select(ReferencePrefix element) {
+         public boolean select(Location element) {
             return !newAlternatives.contains(element);
          }
       });

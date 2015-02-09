@@ -29,6 +29,17 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
    public static final boolean PRINT_SLICE = false;
 
    /**
+    * Tests slicing on the example {@code simpleArrayTest}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testSimpleArrayTest() throws Exception {
+      doSlicingTest("examples/_testcase/slicing/simpleArrayTest/SimpleArrayTest.proof", 
+                    new ReturnSelector(202),
+                    false,
+                    182, 36, 21);
+   }
+
+   /**
     * Tests slicing on the example {@code figure2Param}.
     * @throws Exception Occurred Exception.
     */
