@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.TacletForTests;
+import org.antlr.runtime.RecognitionException;
 
 public class TestTermParser extends AbstractTestTermParser {
 
@@ -54,7 +55,7 @@ public class TestTermParser extends AbstractTestTermParser {
     }
 
     @Override
-    public void setUp() {	
+    public void setUp() throws RecognitionException {	
         
         /*
          * Setting up only static variables here. It needs to be called only once.
@@ -135,7 +136,7 @@ public class TestTermParser extends AbstractTestTermParser {
                 new AbbrevMap());
     }
 
-    public void test1() {
+    public void test1() throws Exception {
 	assertEquals("parse x",t_x,parseTerm("x"));
     }
 
@@ -145,11 +146,11 @@ public class TestTermParser extends AbstractTestTermParser {
 	assertFalse("parse x() should fail", parsed);
     }
 
-    public void test2() {
+    public void test2() throws Exception {
 	assertEquals("parse head(xs)",t_headxs,parseTerm("head(xs)"));
     }
 
-    public void test3() {
+    public void test3() throws Exception {
 	Term t = tf.createTerm(cons,t_headxs,t_tailys);
 	
 	assertEquals("parse cons(head(xs),tail(ys))",
@@ -230,7 +231,7 @@ public class TestTermParser extends AbstractTestTermParser {
 	
     }
 
-    public void test8() {
+    public void test8() throws Exception {
 	/** A bit like test7, but for a substitution term */
 
 	{
@@ -274,7 +275,7 @@ public class TestTermParser extends AbstractTestTermParser {
 	
     }
 
-    public void test10() {
+    public void test10() throws Exception {
 	// Unquoted, this is
 	// <{ int x = 2; {String x = "\"}";} }> true
 	//	String s = "< { int x = 1; {String s = \"\\\"}\";} } > true";
@@ -294,12 +295,12 @@ public class TestTermParser extends AbstractTestTermParser {
    
 
 
-    public void test12() {
+    public void test12() throws Exception {
 	    String s="\\<{int i; i=0;}\\> \\<{ while (i>0) ;}\\>true";
 	    Term t = parseTerm(s);
     }
 
-    public void test13(){
+    public void test13() throws Exception{
        Term t1 = parseTerm("\\exists elem x; \\forall list ys; \\forall list xs; ( xs ="
 		                    			+" cons(x,ys))");
 	Term t2 = parseTerm("\\exists elem y; \\forall list xs; \\forall list ys; ( ys ="
@@ -319,39 +320,39 @@ public class TestTermParser extends AbstractTestTermParser {
         assertTrue("Terms should be equalModRenaming", t3.equalsModRenaming(t4));
      }
 
-    public void test14() {
+    public void test14() throws Exception {
 	String s="\\<{int[] i;i=new int[5];}\\>true";
 	Term t=parseTerm(s);
 	s="\\<{int[] i;}\\>\\<{}\\>true";
 	t=parseTerm(s);
     }
 
-    public void xtestBindingUpdateTermOldBindingAlternative() {
+    public void xtestBindingUpdateTermOldBindingAlternative() throws Exception {
 	String s="\\<{int i,j;}\\> {i:=j} i = j";
 	Term t = parseTerm(s);
 	assertTrue("expected {i:=j}(i=j) but is ({i:=j}i)=j)", 
 		t.sub(0).op() instanceof UpdateApplication);
     }
 
-    public void testBindingUpdateTerm() {
+    public void testBindingUpdateTerm() throws Exception {
 	String s="\\forall int j; {globalIntPV:=j} globalIntPV = j";
 	Term t = parseTerm(s);
 	assertFalse("expected ({globalIntPV:=j}globalIntPV)=j) but is {globalIntPV:=j}(globalIntPV=j)", 
 		t.sub(0).op() instanceof UpdateApplication);
     }
 
-    public void testParsingArray() {
+    public void testParsingArray() throws Exception {
 	String s="\\forall int[][] i; \\forall int j; i[j][j] = j";
 	Term t = parseTerm(s);
     }
 
 
-    public void xtestParsingArrayWithSpaces() {
+    public void xtestParsingArrayWithSpaces() throws Exception {
 	String s="\\<{int[][] i; int j;}\\> i[ j ][ j ] = j";
 	Term t = parseTerm(s);
     }
 
-    public void testParsingArrayCombination() {
+    public void testParsingArrayCombination() throws Exception {
 	String s="\\forall int[][] i; \\forall int j; i [i[i[j][j]][i[j][j]]][i[j][i[j][j]]] = j";
 	Term t = parseTerm(s);
     }
@@ -373,7 +374,7 @@ public class TestTermParser extends AbstractTestTermParser {
 	}
     }
 
-    public void testParseQueriesAndAttributes() {
+    public void testParseQueriesAndAttributes() throws Exception {
 	TacletForTests.getJavaInfo().readJavaBlock("{}");
 	r2k.readCompilationUnit("public class T extends "
 				+"java.lang.Object{ "
@@ -436,7 +437,7 @@ public class TestTermParser extends AbstractTestTermParser {
 	
     }
 
-    public void testIfThenElse () {
+    public void testIfThenElse () throws Exception {
         Term t=null, t2=null;
         
         String s1 = "\\if (3=4) \\then (1) \\else (2)";
@@ -478,27 +479,27 @@ public class TestTermParser extends AbstractTestTermParser {
     }
    
 
-    public void testInfix1() {
+    public void testInfix1() throws Exception {
 	assertEquals("infix1",parseTerm("aa + bb"),
 	                      parseTerm("add(aa,bb)"));
     }
 
-    public void testInfix2() {
+    public void testInfix2() throws Exception {
 	assertEquals("infix2",parseTerm("aa + bb*cc"),
 	                      parseTerm("add(aa,mul(bb,cc))"));
     }
 
-    public void testInfix3() {
+    public void testInfix3() throws Exception {
 	assertEquals("infix3",parseTerm("aa + bb*cc < 123 + -90"),
 	                      parseTerm("lt(add(aa,mul(bb,cc)),add(123,-90))"));
     }
 
-    public void testInfix4() {
+    public void testInfix4() throws Exception {
 	assertEquals("infix4",parseTerm("aa%bb*cc < -123"),
 	                      parseTerm("lt(mul(mod(aa,bb),cc),-123)"));
     }
     
-    public void testCast() {
+    public void testCast() throws Exception {
         assertEquals("cast stronger than plus", parseTerm("(int)3+2"), 
                 parseTerm("((int)3)+2"));
      }
