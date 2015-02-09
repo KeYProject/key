@@ -40,8 +40,6 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.MetaDiv;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaEqual;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaGeq;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaGreater;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaIntUnsignedShiftRight;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaLongUnsignedShiftRight;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaLeq;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaLess;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaMul;
@@ -97,11 +95,6 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer META_GEQ = new MetaGeq();
 
     public static final AbstractTermTransformer META_EQ = new MetaEqual();
-
-
-    public static final AbstractTermTransformer META_INT_UNSIGNEDSHIFTRIGHT = new MetaJavaIntUnsignedShiftRight();
-
-    public static final AbstractTermTransformer META_LONG_UNSIGNEDSHIFTRIGHT = new MetaJavaLongUnsignedShiftRight();
 
     public static final AbstractTermTransformer ARRAY_BASE_INSTANCE_OF = new ArrayBaseInstanceOf();
 
