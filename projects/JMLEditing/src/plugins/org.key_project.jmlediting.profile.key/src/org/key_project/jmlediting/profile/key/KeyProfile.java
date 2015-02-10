@@ -25,6 +25,7 @@ import org.key_project.jmlediting.profile.key.locset.LocSetKeyword;
 import org.key_project.jmlediting.profile.key.locset.ReachLocsParser;
 import org.key_project.jmlediting.profile.key.locset.SetMinusOperatorKeyword;
 import org.key_project.jmlediting.profile.key.locset.SetUnionOperatorKeyword;
+import org.key_project.jmlediting.profile.key.other.DynamicLogicPrimary;
 import org.key_project.jmlediting.profile.key.other.InvKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAccessibleKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAssignableKeyword;
@@ -59,6 +60,7 @@ public class KeyProfile extends JMLReferenceProfile {
             new KeyAccessibleKeyword());
 
       supportedKeywords.add(new InvKeyword());
+      supportedPrimaries.add(new DynamicLogicPrimary());
 
       // Support for LocSetExpressions
       replace(supportedKeywords, EverythingKeyword.class,

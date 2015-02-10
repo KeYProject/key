@@ -19,21 +19,24 @@ public final class LexicalHelper {
    }
 
    /**
-    * Scans the text from the start index on for a closing semicolon. Semicolons
-    * in strings or chars are ignored.
+    * Scans the text from the start index on for a closing given character.
+    * characters in strings or chars are ignored.
     *
+    * @param character
+    *           the character to search for
     * @param text
     *           the test to scan in
     * @param start
     *           the start position of scanning
     * @param end
     *           the maximum position
-    * @return the position of the next closing semicolon
+    * @return the position of the next closing character
     * @throws ParserException
     *            if no semicolon is found
     */
-   public static int scanForClosingSemicolon(final String text,
-         final int start, final int end) throws ParserException {
+   public static int scanForClosingCharacter(final int character,
+         final String text, final int start, final int end)
+         throws ParserException {
       boolean isStringOrChar = false;
       char quoteChar = ' ';
       int position = start;
@@ -61,14 +64,15 @@ public final class LexicalHelper {
             }
          }
          if (!isStringOrChar) {
-            if (c == ';') {
+            if (c == character) {
                break;
             }
          }
          position++;
       }
       if (position >= end) {
-         throw new ParserException("No closing semicolon found", text, end);
+         throw new ParserException("No closing " + character + " found", text,
+               end);
       }
       return position;
 
