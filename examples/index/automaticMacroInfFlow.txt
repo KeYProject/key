@@ -15,12 +15,12 @@
 #
 
 # # Test for information flow to be executed with information flow proof macro "FullInformationFlowAutoPilotMacro"
-notprovable: ./InformationFlow/ToyBanking/Voter(Voter__insecure_voting()).Non-interference contract.0.key
-provable: ./InformationFlow/ToyBanking/Voter(Voter__publishVoterParticipation()).Non-interference contract.0.key
-provable: ./InformationFlow/ToyBanking/Voter(Voter__isValid(int)).Non-interference contract.0.key
-provable: ./InformationFlow/ToyBanking/Voter(Voter__sendVote(int)).Non-interference contract.0.key
-provable: ./InformationFlow/ToyBanking/Voter(Voter__inputVote()).Non-interference contract.0.key
-provable: ./InformationFlow/ToyBanking/Voter(Voter__secure_voting()).Non-interference contract.0.key
+notprovable: ./InformationFlow/ToyVoting/Voter(Voter__insecure_voting()).Non-interference contract.0.key
+provable: ./InformationFlow/ToyVoting/Voter(Voter__publishVoterParticipation()).Non-interference contract.0.key
+provable: ./InformationFlow/ToyVoting/Voter(Voter__isValid(int)).Non-interference contract.0.key
+provable: ./InformationFlow/ToyVoting/Voter(Voter__sendVote(int)).Non-interference contract.0.key
+provable: ./InformationFlow/ToyVoting/Voter(Voter__inputVote()).Non-interference contract.0.key
+provable: ./InformationFlow/ToyVoting/Voter(Voter__secure_voting()).Non-interference contract.0.key
 #provable: ./InformationFlow/ConditionalConfidentialExample(ConditionalConfidentialExample__getConfidentialData(ConditionalConfidentialExample.User)).Non-interference contract.0.key
 provable: ./InformationFlow/Sum/SumExample(SumExample__getSum()).Non-interference contract.0.key
 provable: ./InformationFlow/ToyBanking/banking_example.UserAccount(banking_example.UserAccount__getBankAccount(int)).Non-interference contract.0.key
