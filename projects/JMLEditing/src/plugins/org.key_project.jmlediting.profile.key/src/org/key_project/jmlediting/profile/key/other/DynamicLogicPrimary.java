@@ -31,6 +31,7 @@ public class DynamicLogicPrimary implements IJMLPrimary {
          throws ParserException {
       final int keywordBegin = LexicalHelper.skipWhiteSpacesOrAt(text, start,
             end);
+      // Check for the beginning \dl_
       if (end - keywordBegin < 4
             || !text.subSequence(keywordBegin, keywordBegin + 4)
                   .equals("\\dl_")) {
@@ -38,13 +39,16 @@ public class DynamicLogicPrimary implements IJMLPrimary {
                "Requires \\dl_ for introducing dynamic logic", text,
                keywordBegin);
       }
+      // Get the following identifier without whitespaces
       final int identifierStart = keywordBegin + 4;
       final int identifierEnd = LexicalHelper.getIdentifier(text,
             identifierStart, end);
+
+      // Get content in parenthesis
       final int whiteSpaceEnd = LexicalHelper.skipWhiteSpacesOrAt(text,
             identifierEnd, end);
       if (text.charAt(whiteSpaceEnd) != '(') {
-         throw new ParserException("Expected open pharentesis", text,
+         throw new ParserException("Expected open parenthesis", text,
                whiteSpaceEnd);
       }
       final int contentStart = LexicalHelper.skipWhiteSpacesOrAt(text,
@@ -52,6 +56,7 @@ public class DynamicLogicPrimary implements IJMLPrimary {
       final int contentEnd = LexicalHelper.scanForClosingCharacter(')', text,
             contentStart, end);
 
+      // Create the nodes
       final IASTNode keywordNode = Nodes.createKeyword(keywordBegin,
             identifierStart, keyword, "\\dl_");
       final IASTNode identifier = Nodes.createString(identifierStart,
