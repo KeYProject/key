@@ -1,5 +1,7 @@
 package org.key_project.jmlediting.profile.key;
 
+import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
+
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
@@ -7,7 +9,6 @@ import java.util.Set;
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParseFunction;
-import org.key_project.jmlediting.core.parser.ParserBuilder;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
 import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
@@ -19,6 +20,7 @@ import org.key_project.jmlediting.profile.key.locset.EmptyKeywod;
 import org.key_project.jmlediting.profile.key.locset.InfiniteUnionKeyword;
 import org.key_project.jmlediting.profile.key.locset.IntersetOperatorKeyword;
 import org.key_project.jmlediting.profile.key.locset.LocSetEverythingKeyword;
+import org.key_project.jmlediting.profile.key.locset.LocSetKeyword;
 import org.key_project.jmlediting.profile.key.locset.ReachLocsParser;
 import org.key_project.jmlediting.profile.key.locset.SetMinusOperatorKeyword;
 import org.key_project.jmlediting.profile.key.locset.SetUnionOperatorKeyword;
@@ -27,6 +29,7 @@ import org.key_project.jmlediting.profile.key.other.KeyAccessibleKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAssignableKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyPureKeyword;
+import org.key_project.jmlediting.profile.key.seq.SeqKeyword;
 
 public class KeyProfile extends JMLReferenceProfile {
 
@@ -55,11 +58,16 @@ public class KeyProfile extends JMLReferenceProfile {
             new SetUnionOperatorKeyword()));
 
       // Allows \inv as access on a not toplevel object just as for x[3].\inv
-      this.putExtension(
-            ExpressionParser.ADDITIONAL_PRIMARY_SUFFIXES,
-            ParserBuilder.separateBy('.',
-                  ParserBuilder.keywords(InvKeyword.class, this)),
+      this.putExtension(ExpressionParser.ADDITIONAL_PRIMARY_SUFFIXES,
+            separateBy('.', keywords(InvKeyword.class, this)),
             ParseFunction.class);
+      this.putExtension(ExpressionParser.ADDITIONAL_PRIMITIVE_TYPES,
+            keywords(LocSetKeyword.class, this), ParseFunction.class);
+
+      // Support for seq expression
+      supportedKeywords.addAll(Arrays.asList(new SeqKeyword()));
+      this.putExtension(ExpressionParser.ADDITIONAL_PRIMITIVE_TYPES,
+            keywords(SeqKeyword.class, this), ParseFunction.class);
    }
 
    private static void replace(final Set<IKeyword> keywords,

@@ -27,6 +27,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 public class ExpressionParser implements ParseFunction {
 
    public static final Object ADDITIONAL_PRIMARY_SUFFIXES = new Object();
+   public static final Object ADDITIONAL_PRIMITIVE_TYPES = new Object();
 
    /**
     * The main parser which is used to parse text.
@@ -161,10 +162,14 @@ public class ExpressionParser implements ParseFunction {
        */
       referenceType.defineAs(seq(REFERENCE_TYPE, name(),
             opt(typed(TYPE_ARGUMENT, brackets("<", referenceType, ">")))));
+
+      final Set<ParseFunction> pluginTypes = profile.getExtensions(
+            ADDITIONAL_PRIMITIVE_TYPES, ParseFunction.class);
       /**
        * type ::= reference-type | built-in-type
        */
-      final ParseFunction type = alt(referenceType, builtInType);
+      final ParseFunction type = alt(appendFirsts(pluginTypes, referenceType,
+            builtInType));
       /**
        * type-spec ::= [ ownership-modifiers ] type [ dims ]<br>
        * | \TYPE [ dims ]
