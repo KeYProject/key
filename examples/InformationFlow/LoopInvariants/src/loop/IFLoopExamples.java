@@ -455,7 +455,7 @@ public class IFLoopExamples {
         public void insecure_while_3(int x) {
                 low = low + 1;
                 /*@
-                  @ loop_invariant 1 <= x;
+                  @ loop_invariant 0 <= x;
                   @ assignable  low;
                   @ determines  low \by \itself;
                   @ decreases   x;
