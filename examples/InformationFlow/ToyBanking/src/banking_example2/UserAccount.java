@@ -2,7 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package banking_example;
+package banking_example2;
+
+import banking_example.*;
 
 
 /**
@@ -26,12 +28,9 @@ public class UserAccount {
       @           (\seq_def int i; 0; password.length; password[i]),
       @           (\seq_def int i; 0; bankAccounts.length; bankAccounts[i].customerViewOnBankAccount) );
       @
-      @ public invariant 0 <= incorrectLogins && incorrectLogins <= 3;
+      @ accessible \inv : this.*, password[*], bankAccounts[*];
       @
-      @ accessible \inv : this.*, password[*], bankAccounts[*],
-      @                   \infinite_union(int i;
-      @                                   (0 <= i && i < bankAccounts.length) ?
-      @                                   bankAccounts[i].* : \empty);
+      @ public invariant 0 <= incorrectLogins && incorrectLogins <= 3;
       @*/
 
     /*@ normal_behavior
@@ -41,22 +40,7 @@ public class UserAccount {
       @                      && password.length == this.password.length
       @                      && (\forall int i; 0 <= i && i < password.length;
       @                             password[i] == this.password[i]) );
-      @ determines  employeeViewOnUserAccount  \by  \itself
-      @             \declassifies
-      @                    (    0 <= incorrectLogins
-      @                      && incorrectLogins < 3
-      @                      && userID == this.userID
-      @                      && password.length == this.password.length
-      @                      && (\forall int i; 0 <= i && i < password.length;
-      @                             password[i] == this.password[i]) )
-      @             \declassifies
-      @                    (    0 <= incorrectLogins
-      @                      && incorrectLogins < 3
-      @                      && userID == this.userID
-      @                      && ( password.length != this.password.length
-      @                           || (\exists int i; 0 <= i && i < password.length;
-      @                                  password[i] != this.password[i]) ) );
-      @ determines  bankCustomerView  \by  \itself
+      @ determines  incorrectLogins  \by  \itself
       @             \declassifies
       @                    (    0 <= incorrectLogins
       @                      && incorrectLogins < 3
