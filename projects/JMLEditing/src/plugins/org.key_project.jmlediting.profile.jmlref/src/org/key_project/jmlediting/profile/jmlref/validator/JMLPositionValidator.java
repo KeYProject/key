@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.core.validator;
+package org.key_project.jmlediting.profile.jmlref.validator;
 
 import org.key_project.jmlediting.core.utilities.Position;
 
