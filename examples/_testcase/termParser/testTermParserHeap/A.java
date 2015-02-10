@@ -12,6 +12,8 @@ static int staticMethod() {
 	return 0;
 }
 
+/*@ pure */ public int queryByte(byte a) { return 0; }
+
 /*@ pure */ public int query(int a) { return 0; }
 /*@ pure */ public A getNext() { return next; }
 /*@ pure */ public int queryOverridden() { return 0; }
@@ -31,3 +33,4 @@ private  int f;
 /*@ pure */ public int queryOverriddenWithArguments(int i, A a, A1 a1) { return 0; }
 
 }
+
