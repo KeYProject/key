@@ -636,6 +636,23 @@ public final class ParserBuilder {
    }
 
    /**
+    * Returns a {@link ParseFunction} which always throws an error. This may be
+    * useful to specify that a sort is not defined.
+    *
+    * @return a {@link ParseFunction} that always fails.
+    */
+   public static ParseFunction fail() {
+      return new ParseFunction() {
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            throw new ParserException("Failed.", text, start);
+         }
+      };
+   }
+
+   /**
     * Returns {@link ParseFunction} which checks that the given function parses
     * the complete input string. Trailing whitespaces are allowed.
     *

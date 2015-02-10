@@ -28,6 +28,7 @@ public class ExpressionParser implements ParseFunction {
 
    public static final Object ADDITIONAL_PRIMARY_SUFFIXES = new Object();
    public static final Object ADDITIONAL_PRIMITIVE_TYPES = new Object();
+   public static final Object CONDITONAL_EXPR_SUFFIXES = new Object();
 
    /**
     * The main parser which is used to parse text.
@@ -100,7 +101,7 @@ public class ExpressionParser implements ParseFunction {
       final IRecursiveParseFunction unaryExpr = recursiveInit();
       final IRecursiveParseFunction expressionList = recursiveInit();
       final IRecursiveParseFunction arrayInitializer = recursiveInit();
-      final IRecursiveParseFunction conditionalExpr = recursiveInit();
+      final IRecursiveParseFunction conditionalOrigExpr = recursiveInit();
       final IRecursiveParseFunction assignmentExpr = recursiveInit();
       final IRecursiveParseFunction impliesNonBackwardExpr = recursiveInit();
       final IRecursiveParseFunction referenceType = recursiveInit();
@@ -389,14 +390,33 @@ public class ExpressionParser implements ParseFunction {
             equivalenceOp, impliesExpr);
 
       /**
-       * conditional-expr ::= equivalence-expr <br>
-       * [ ? conditional-expr : conditional-expr ]
+       * conditional-expr-orig ::= equivalence-expr <br>
+       * [ ? conditional-expr-orig : conditional-expr-orig ]
        */
-      conditionalExpr.defineAs(repackListOp(
+      conditionalOrigExpr.defineAs(repackListOp(
             CONDITIONAL_OP,
             seq(equivalenceExpr,
-                  unpackOptional(opt(seq(constant("?"), conditionalExpr,
-                        constant(":"), conditionalExpr))))));
+                  unpackOptional(opt(seq(constant("?"), conditionalOrigExpr,
+                        constant(":"), conditionalOrigExpr))))));
+      // The following is to support extensions which append something to
+      // expression
+      /**
+       * conditional-expr ::= conditional-expr-orig [conditional-expr-suffix]
+       */
+      final Set<ParseFunction> conditionalExprSuffixes = profile.getExtensions(
+            CONDITONAL_EXPR_SUFFIXES, ParseFunction.class);
+
+      final ParseFunction conditionalExprSuffix;
+      // alt requires at least one argument -> check whether there is something
+      if (conditionalExprSuffixes.isEmpty()) {
+         conditionalExprSuffix = fail();
+      }
+      else {
+         conditionalExprSuffix = alt(conditionalExprSuffixes
+               .toArray(new ParseFunction[0]));
+      }
+      final ParseFunction conditionalExpr = seq(conditionalOrigExpr,
+            opt(conditionalExprSuffix));
 
       /**
        * assignment-op ::= = | += | -= | *= | /= | %= | >>= | >>>= | <<= | &= |

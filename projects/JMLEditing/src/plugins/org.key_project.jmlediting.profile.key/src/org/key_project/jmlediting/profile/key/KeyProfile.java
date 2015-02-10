@@ -9,6 +9,7 @@ import java.util.Set;
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParseFunction;
+import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
 import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
@@ -29,7 +30,14 @@ import org.key_project.jmlediting.profile.key.other.KeyAccessibleKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAssignableKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyPureKeyword;
+import org.key_project.jmlediting.profile.key.seq.SeqConcatKeyword;
+import org.key_project.jmlediting.profile.key.seq.SeqDefKeyword;
+import org.key_project.jmlediting.profile.key.seq.SeqEmptyKeyword;
+import org.key_project.jmlediting.profile.key.seq.SeqExpressionParser;
 import org.key_project.jmlediting.profile.key.seq.SeqKeyword;
+import org.key_project.jmlediting.profile.key.seq.SeqPrimary;
+import org.key_project.jmlediting.profile.key.seq.SeqSingletonKeyword;
+import org.key_project.jmlediting.profile.key.seq.ValuesKeyword;
 
 public class KeyProfile extends JMLReferenceProfile {
 
@@ -38,6 +46,9 @@ public class KeyProfile extends JMLReferenceProfile {
 
       final Set<IKeyword> supportedKeywords = this
             .getSupportedKeywordsInternal();
+      final Set<IJMLPrimary> supportedPrimaries = this
+            .getSupportedPrimariesInternal();
+
       // Add strictly keywords
       supportedKeywords.add(new StrictlyPureKeyword());
       supportedKeywords.add(new StrictlyNothingKeyword());
@@ -65,9 +76,14 @@ public class KeyProfile extends JMLReferenceProfile {
             keywords(LocSetKeyword.class, this), ParseFunction.class);
 
       // Support for seq expression
-      supportedKeywords.addAll(Arrays.asList(new SeqKeyword()));
+      supportedKeywords.addAll(Arrays.asList(new SeqKeyword(),
+            new SeqConcatKeyword(), new SeqDefKeyword(), new SeqEmptyKeyword(),
+            new SeqSingletonKeyword(), new ValuesKeyword()));
+      supportedPrimaries.add(new SeqPrimary());
       this.putExtension(ExpressionParser.ADDITIONAL_PRIMITIVE_TYPES,
             keywords(SeqKeyword.class, this), ParseFunction.class);
+      this.putExtension(ExpressionParser.CONDITONAL_EXPR_SUFFIXES,
+            SeqExpressionParser.seqExpressionSuffix(this), ParseFunction.class);
    }
 
    private static void replace(final Set<IKeyword> keywords,

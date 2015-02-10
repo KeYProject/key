@@ -146,4 +146,8 @@ public class JMLReferenceProfile extends AbstractJMLProfile {
       return this.supportedKeywords;
    }
 
+   protected final Set<IJMLPrimary> getSupportedPrimariesInternal() {
+      return this.supportedPrimaries;
+   }
+
 }
