@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 import de.uka.ilkd.key.logic.Term;
@@ -104,14 +105,19 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         }     
 	
         //read in-code specifications
+        try {
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), 
         				       readClassPath(), 
-        				       readBootClassPath(), getProfile());
+        				       readBootClassPath(), getProfile());        
+        
         slEnvInput.setInitConfig(initConfig);
         slEnvInput.read();
+        } catch (IOException ioe) {
+            throw new ProofInputException(ioe);
+        }
                 
         //read key file itself
-	super.read();        
+        super.read();        
     }    
 
 

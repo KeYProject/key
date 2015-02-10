@@ -291,8 +291,8 @@ public abstract class AbstractPO implements IPersistablePO {
 
         //bootclasspath
         if (bootClassPath != null && !bootClassPath.equals("")) {
-            sb.append("\\bootclasspath ").append(bootClassPath).append(
-                    ";\n\n");
+            sb.append("\\bootclasspath \"").append(bootClassPath).append(
+                    "\";\n\n");
         }
 
         //classpath
