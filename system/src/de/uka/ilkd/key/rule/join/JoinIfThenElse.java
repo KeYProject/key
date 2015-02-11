@@ -139,28 +139,10 @@ public class JoinIfThenElse extends JoinRule {
             // Apply if-then-else construction: Different values
             if (v.sort().equals(heapSort)) {
                
-               Function storeFunc = (Function) services.getNamespaces().functions().lookup("store");
-               Function createFunc = (Function) services.getNamespaces().functions().lookup("create");
-               //TODO add further functions, e.g. anon
-               
-               if (((Function) rightSide1.op()).equals(storeFunc) &&
-                     ((Function) rightSide2.op()).equals(storeFunc)) {
-                  Term subHeap1 = rightSide1.sub(0);
-                  LocationVariable object1 = (LocationVariable) rightSide1.sub(1).op();
-                  Function field1 = (Function) rightSide1.sub(2).op();
-                  Term value1 = rightSide1.sub(3);
-                  
-                  Term subHeap2 = rightSide2.sub(0);
-                  LocationVariable object2 = (LocationVariable) rightSide2.sub(1).op();
-                  Function field2 = (Function) rightSide2.sub(2).op();
-                  Term value2 = rightSide2.sub(3);
-                  
-                  // Check whether the variables point to the same
-                  // object in both states. We judge that they do
-                  // if they are created at nodes with the same
-                  // program counters modulo renaming.
-               }
-               
+               newElementaryUpdates = newElementaryUpdates.prepend(
+                     tb.elementary(
+                           tb.var(v),
+                           joinHeaps(rightSide1, rightSide2, state1, state2, services)));
                
             } else {
                
@@ -177,6 +159,73 @@ public class JoinIfThenElse extends JoinRule {
       
       return new SymbolicExecutionState(newSymbolicState, newPathCondition);
       
+   }
+   
+   private Term joinHeaps(
+         Term heap1,
+         Term heap2,
+         SymbolicExecutionState state1,
+         SymbolicExecutionState state2,
+         Services services) {
+      
+      TermBuilder tb = services.getTermBuilder();
+      
+      if (heap1.equals(heap2)) {
+         return heap1;
+      }
+      
+      if (!(heap1.op() instanceof Function) ||
+            !(heap2.op() instanceof Function)) {
+         tb.ife(state1.getPathCondition(), heap1, heap2);
+      }
+      
+      Function storeFunc = (Function) services.getNamespaces().functions().lookup("store");
+      Function createFunc = (Function) services.getNamespaces().functions().lookup("create");
+      //TODO add further functions, e.g. anon
+      
+      if (((Function) heap1.op()).equals(storeFunc) &&
+            ((Function) heap2.op()).equals(storeFunc)) {
+         
+         Term subHeap1 = heap1.sub(0);
+         LocationVariable pointer1 = (LocationVariable) heap1.sub(1).op();
+         Function field1 = (Function) heap1.sub(2).op();
+         Term value1 = heap1.sub(3);
+         
+         Term subHeap2 = heap2.sub(0);
+         LocationVariable pointer2 = (LocationVariable) heap2.sub(1).op();
+         Function field2 = (Function) heap2.sub(2).op();
+         Term value2 = heap2.sub(3);
+         
+         if (pointer1.equals(pointer2) && field1.equals(field2)) {
+            Term joinedSubHeap = joinHeaps(subHeap1, subHeap2, state1, state2, services);
+            Term joinedVal = null;
+            
+            if (value1.equals(value2)) {
+               joinedVal = value1;
+            } else {
+               joinedVal = tb.ife(state1.getPathCondition(), value1, value2);
+            }
+            
+            return tb.func((Function) heap1.op(), joinedSubHeap, tb.var(pointer1), tb.func(field1), joinedVal);
+         }
+         
+      } else if (((Function) heap1.op()).equals(createFunc) &&
+            ((Function) heap2.op()).equals(createFunc)) {
+         
+         Term subHeap1 = heap1.sub(0);
+         LocationVariable pointer1 = (LocationVariable) heap1.sub(1).op();
+         
+         Term subHeap2 = heap2.sub(0);
+         LocationVariable pointer2 = (LocationVariable) heap2.sub(1).op();
+         
+         if (pointer1.equals(pointer2)) {
+            Term joinedSubHeap = joinHeaps(subHeap1, subHeap2, state1, state2, services);
+            return tb.func((Function) heap1.op(), joinedSubHeap, tb.var(pointer1));
+         }
+         
+      }
+      
+      return tb.ife(state1.getPathCondition(), heap1, heap2);
    }
    
    /**

@@ -113,7 +113,7 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
                sequentToSETriple(joinPartner.first, joinPartner.second, services);
          
          joinPartnerStates = joinPartnerStates.prepend(
-               new SymbolicExecutionState(partnerSEState.first, partnerSEState.second));
+               new SymbolicExecutionState(partnerSEState.first, partnerSEState.second, joinPartner.first.node()));
       }
       
       SymbolicExecutionStateWithProgCnt thisSEState =
@@ -121,7 +121,7 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
       
       // The join loop
       SymbolicExecutionState joinedState =
-            new SymbolicExecutionState(thisSEState.first, thisSEState.second);    
+            new SymbolicExecutionState(thisSEState.first, thisSEState.second, goal.node());    
 
       int progress = 0;
       for (SymbolicExecutionState state : joinPartnerStates) {
@@ -131,6 +131,7 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
          System.out.println(joinPartners.size());
          
          joinedState = joinStates(joinedState, state, thisSEState.third, services);
+         joinedState.setCorrespondingNode(goal.node());
          
          // Signal progress to UI
          mediator().getUI().taskProgress(++progress);
@@ -350,7 +351,7 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
                         equalsModBranchUniqueRenaming(
                            ownProgramElem,
                            partnerProgramElem,
-                           goal,
+                           goal.node(),
                            services)) {
                      
                      potentialPartners = potentialPartners.prepend(
