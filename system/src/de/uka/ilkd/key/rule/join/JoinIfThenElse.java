@@ -135,9 +135,26 @@ public class JoinIfThenElse extends JoinRule {
          } else {
             
             // Apply if-then-else construction: Different values
-            
-            newElementaryUpdates = newElementaryUpdates.prepend(
-                  createIfThenElseTerm(v, state1, state2, services));
+            if (v.name().toString().equals("heap")) {
+               
+               Function storeFunc = (Function) services.getNamespaces().functions().lookup("store");
+               Function createFunc = (Function) services.getNamespaces().functions().lookup("create");
+               //TODO add further functions, e.g. anon
+               
+               if (((Function) rightSide1.op()).equals(storeFunc)) {
+                  Term subHeap = rightSide1.sub(0);
+                  LocationVariable object = (LocationVariable) rightSide1.sub(1).op();
+                  Function field = (Function) rightSide1.sub(2).op();
+                  Term value = rightSide1.sub(3);
+               }
+               
+               
+            } else {
+               
+               newElementaryUpdates = newElementaryUpdates.prepend(
+                     createIfThenElseTerm(v, state1, state2, services));
+               
+            }
             
          }
       }

@@ -442,6 +442,45 @@ public class JoinRuleUtils {
       return result;
    }
    
+
+   
+   /**
+    * Find a location variable for the given one that is unique for the
+    * branch corresponding to the given goal, but not necessarily globally
+    * unique. The variable with the first branch-unique name w.r.t. a
+    * numeric index is returned.
+    * 
+    * @param var Variable to get a branch-unique correspondent for.
+    * @param startLeaf The leaf of the branch.
+    * @return The first indexed PV that is unique w.r.t. the given branch,
+    *    but not with the global variable registry.
+    */
+   public static LocationVariable getBranchUniqueLocVar(
+         LocationVariable var,
+         Goal startLeaf) {
+      
+      // Find the node where the variable was introduced
+      Node intrNode = startLeaf.node();
+      while (!intrNode.root() && intrNode.getGlobalProgVars().contains(var)) {
+         intrNode = intrNode.parent();
+      }
+      
+      String base = stripIndex(var.name().toString());
+      
+      int newCounter = 0;
+      String branchUniqueName = base;
+      while (!isUniqueInGlobals(branchUniqueName.toString(), intrNode.getGlobalProgVars()) ||
+            (lookupVarInNS(branchUniqueName) != null &&
+               !lookupVarInNS(branchUniqueName).sort().equals(var.sort()))) {
+         newCounter += 1;
+         branchUniqueName = base + "_" + newCounter;
+      }
+      
+      LocationVariable branchUniqueVar = lookupVarInNS(branchUniqueName);
+      
+      return branchUniqueVar == null ? var : branchUniqueVar;
+   }
+   
    ///////////////////////////////////////////////////
    ////////////////// GENERAL LOGIC //////////////////
    ////////////////// (Provability) //////////////////
@@ -1179,10 +1218,10 @@ public class JoinRuleUtils {
     * @return The PV with the given name in the global namespace,
     *    or null if there is none.
     */
-   private static ProgramVariable lookupVarInNS(String name) {
-      return (ProgramVariable) mediator().progVar_ns().lookup(new Name(name));
+   private static LocationVariable lookupVarInNS(String name) {
+      return (LocationVariable) mediator().progVar_ns().lookup(new Name(name));
    }
-   
+
    /**
     * Visitor for collecting program locations in a Java block.
     * 
@@ -1259,26 +1298,7 @@ public class JoinRuleUtils {
                return var;
             }
             
-            // Find the node where the variable was introduced
-            Node intrNode = goal.node();
-            while (!intrNode.root() && intrNode.getGlobalProgVars().contains(var)) {
-               intrNode = intrNode.parent();
-            }
-            
-            String base = stripIndex(var.name().toString());
-            
-            int newCounter = 0;
-            String branchUniqueName = base;
-            while (!isUniqueInGlobals(branchUniqueName.toString(), intrNode.getGlobalProgVars()) ||
-                  (lookupVarInNS(branchUniqueName) != null &&
-                     !lookupVarInNS(branchUniqueName).sort().equals(var.sort()))) {
-               newCounter += 1;
-               branchUniqueName = base + "_" + newCounter;
-            }
-            
-            ProgramVariable branchUniqueVar = lookupVarInNS(branchUniqueName);
-            
-            return branchUniqueVar == null ? var : branchUniqueVar;
+            return getBranchUniqueLocVar(var, goal);
          } else {
             return null;
          }
