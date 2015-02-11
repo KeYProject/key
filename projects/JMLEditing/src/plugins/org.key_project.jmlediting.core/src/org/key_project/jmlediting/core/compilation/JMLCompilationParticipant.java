@@ -123,10 +123,11 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                   .getProjectActiveJMLProfile(res.getProject()).createParser();
             try {
                final IASTNode parseResult = parser.parse(source, jmlComment);
-               final IJMLValidationContext jmlContext = new JMLValidationContext(
-                     parseResult, res, jmlComments.subList(
-                           jmlComments.indexOf(jmlComment) + 1,
-                           jmlComments.size()));
+               /*
+                * final IJMLValidationContext jmlContext = new
+                * JMLValidationContext( parseResult, res, jmlComments.subList(
+                * jmlComments.indexOf(jmlComment) + 1, jmlComments.size()));
+                */
                // Throw away the result, here only a parse exception is
                // interesting
             }
