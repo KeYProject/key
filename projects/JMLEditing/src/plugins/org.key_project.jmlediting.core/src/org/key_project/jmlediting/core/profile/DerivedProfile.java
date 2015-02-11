@@ -127,8 +127,8 @@ public class DerivedProfile extends AbstractJMLProfile implements
    }
 
    @Override
-   public void setParentKeywordEnabled(final IKeyword parentKeyword,
-         final boolean enabled) {
+   public void setParentKeywordDisabled(final IKeyword parentKeyword,
+         final boolean disabled) {
       // Validate that this is a keyword of the parent
       if (!this.parentProfile.getSupportedKeywords().contains(parentKeyword)) {
          throw new IllegalArgumentException(
@@ -136,16 +136,16 @@ public class DerivedProfile extends AbstractJMLProfile implements
       }
       // Check whether there is a change
       final boolean change = this.disabledParentKeywords
-            .contains(parentKeyword) == !enabled;
+            .contains(parentKeyword) != disabled;
       if (!change) {
          return;
       }
       // Enable or disable the keyword
-      if (enabled) {
-         this.disabledParentKeywords.remove(parentKeyword);
+      if (disabled) {
+         this.disabledParentKeywords.add(parentKeyword);
       }
       else {
-         this.disabledParentKeywords.add(parentKeyword);
+         this.disabledParentKeywords.remove(parentKeyword);
       }
       // Calculate new keyword set
       this.keywordSetIsDirty = true;
@@ -153,7 +153,10 @@ public class DerivedProfile extends AbstractJMLProfile implements
 
    @Override
    public void addKeyword(final IKeyword newKeyword) {
-      final boolean change = this.additionalKeywords.contains(newKeyword);
+      if (newKeyword == null) {
+         throw new IllegalArgumentException("Cannot add a null keyword");
+      }
+      final boolean change = !this.additionalKeywords.contains(newKeyword);
       if (!change) {
          return;
       }
@@ -163,7 +166,10 @@ public class DerivedProfile extends AbstractJMLProfile implements
 
    @Override
    public void removeKeyword(final IKeyword oldKeyword) {
-      final boolean change = !this.additionalKeywords.contains(oldKeyword);
+      if (oldKeyword == null) {
+         throw new IllegalArgumentException("Cannot remove a null keyword");
+      }
+      final boolean change = this.additionalKeywords.contains(oldKeyword);
       if (!change) {
          return;
       }

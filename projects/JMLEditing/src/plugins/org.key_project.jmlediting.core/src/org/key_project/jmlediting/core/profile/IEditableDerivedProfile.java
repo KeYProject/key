@@ -5,7 +5,7 @@ import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 /**
  * The {@link IEditableDerivedProfile} is a derived profile which content may be
  * edited on runtime.
- * 
+ *
  * @author Moritz Lichter
  *
  */
@@ -27,13 +27,13 @@ public interface IEditableDerivedProfile extends IDerivedProfile {
     *
     * @param parentKeyword
     *           the keyword of the parent to enabled or disable
-    * @param enabled
-    *           enable if true or disable if false
+    * @param disabled
+    *           disable if true or enable if false
     * @throws IllegalArgumentException
     *            if the given keyword is not a member of the keywords of the
     *            parent
     */
-   void setParentKeywordEnabled(IKeyword parentKeyword, boolean enabled)
+   void setParentKeywordDisabled(IKeyword parentKeyword, boolean disabled)
          throws IllegalArgumentException;
 
    /**
