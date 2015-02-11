@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.rule.join;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -24,6 +25,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Quadruple;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
@@ -131,40 +133,22 @@ public class JoinIfThenElseAntecedent extends JoinRule {
             
             if (v.sort().equals(heapSort)) {
                
-               //TODO: Change to antecedent implementation
-               newElementaryUpdates = newElementaryUpdates.prepend(
-                     tb.elementary(
-                           tb.var(v),
-                           JoinIfThenElse.joinHeaps(rightSide1, rightSide2, state1, state2, services)));
+               Pair<Term, LinkedList<Term>> joinedHeaps = joinHeaps(rightSide1, rightSide2, state1, state2, services);
+               newElementaryUpdates = newElementaryUpdates.prepend(tb.elementary(v, joinedHeaps.first));
+               newPathCondition = tb.and(newPathCondition, tb.and(joinedHeaps.second));
                
             } else {
-               Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
-                     JoinIfThenElse.createDistFormAndRightSidesForITEUpd(v, state1, state2, services);
                
-               Term cond         = distFormAndRightSidesForITEUpd.first;
-               Term ifForm       = distFormAndRightSidesForITEUpd.second;
-               Term elseForm     = distFormAndRightSidesForITEUpd.third;
-               boolean isSwapped = distFormAndRightSidesForITEUpd.fourth;
+               newPathCondition = tb.and(newPathCondition,
+                     tb.and(getIfThenElseConstraints(
+                           tb.var(v),
+                           rightSide1,
+                           rightSide2,
+                           state1,
+                           state2,
+                           services
+                     )));
                
-               Term vTerm = tb.var(v);
-               
-               Term varEqualsIfForm   = tb.equals(vTerm, ifForm);
-               Term varEqualsElseForm = tb.equals(vTerm, elseForm);
-               
-               if (!(rightSide1.equals(vTerm) && !isSwapped ||
-                     rightSide2.equals(vTerm) && isSwapped)) {
-                  newPathCondition = tb.and(newPathCondition, 
-                        tb.imp(cond, varEqualsIfForm));
-               }
-               
-               if (!(rightSide2.equals(vTerm) && !isSwapped ||
-                     rightSide1.equals(vTerm) && isSwapped)) {
-                  newPathCondition = tb.and(newPathCondition, 
-                        tb.or (cond, varEqualsElseForm));
-               }
-               
-   //            newElementaryUpdates = newElementaryUpdates.prepend(
-   //                  tb.elementary(vTerm, vTerm));
             }
             
          }
@@ -175,6 +159,183 @@ public class JoinIfThenElseAntecedent extends JoinRule {
       
       return new SymbolicExecutionState(newSymbolicState, newPathCondition);
       
+   }
+   
+   /**
+    * Returns a list of if-then-else constraints for the given constrained
+    * term, states and if/else terms.
+    * 
+    * @param constrained The constrained term.
+    * @param ifTerm The value for the if case.
+    * @param elseTerm The value for the else case.
+    * @param state1 First SE state ("if").
+    * @param state2 Second SE state ("else").
+    * @param services The services object.
+    * @return A list of if-then-else constraints for the given constrained
+    *    term, states and if/else terms.
+    */
+   private static LinkedList<Term> getIfThenElseConstraints(
+         Term constrained,
+         Term ifTerm,
+         Term elseTerm,
+         SymbolicExecutionState state1,
+         SymbolicExecutionState state2,
+         Services services) {
+      
+      TermBuilder tb = services.getTermBuilder();
+      LinkedList<Term> result = new LinkedList<Term>();
+      
+      Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
+            JoinIfThenElse.createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm, elseTerm, services);
+      
+      Term cond         = distFormAndRightSidesForITEUpd.first;
+      Term ifForm       = distFormAndRightSidesForITEUpd.second;
+      Term elseForm     = distFormAndRightSidesForITEUpd.third;
+      boolean isSwapped = distFormAndRightSidesForITEUpd.fourth;
+      
+      Term varEqualsIfForm   = tb.equals(constrained, ifForm);
+      Term varEqualsElseForm = tb.equals(constrained, elseForm);
+      
+      if (!(ifTerm.equals(constrained) && !isSwapped ||
+            elseTerm.equals(constrained) && isSwapped)) {
+         result.add(tb.imp(cond, varEqualsIfForm));
+      }
+      
+      if (!(elseTerm.equals(constrained) && !isSwapped ||
+            ifTerm.equals(constrained) && isSwapped)) {
+         result.add(tb.or (cond, varEqualsElseForm));
+      }
+      
+      return result;
+      
+   }
+   
+   /**
+    * Joins two heaps by if-then-else construction. Tries to shift
+    * the if-then-else as deeply into the heap as possible.
+    * 
+    * @param heap1 The first heap term.
+    * @param heap2 The second heap term.
+    * @param state1 SE state for the first heap term.
+    * @param state2 SE state for the second heap term
+    * @param services The services object.
+    * @return A joined heap term.
+    */
+   private Pair<Term, LinkedList<Term>> joinHeaps(
+         Term heap1,
+         Term heap2,
+         SymbolicExecutionState state1,
+         SymbolicExecutionState state2,
+         Services services) {
+      
+      //TODO: Parts of this code appear redundantly in different join rules;
+      //      it could be sensible to extract those into an own method.
+      
+      TermBuilder tb = services.getTermBuilder();      
+      LinkedList<Term> newConstraints = new LinkedList<Term>();
+      
+      if (heap1.equals(heap2)) {
+         // Keep equal heaps
+         return new Pair<Term, LinkedList<Term>>(heap1, newConstraints);
+      }
+      
+      if (!(heap1.op() instanceof Function) ||
+            !(heap2.op() instanceof Function)) {
+         // Covers the case of two different symbolic heaps
+         return new Pair<Term, LinkedList<Term>>(
+               JoinIfThenElse.createIfThenElseTerm(state1, state2, heap1, heap2, services),
+               newConstraints);
+      }
+      
+      Function storeFunc = (Function) services.getNamespaces().functions().lookup("store");
+      Function createFunc = (Function) services.getNamespaces().functions().lookup("create");
+      //Note: Check if there are other functions that should be covered.
+      //      Unknown functions are treated by if-then-else procedure.
+      
+      if (((Function) heap1.op()).equals(storeFunc) &&
+            ((Function) heap2.op()).equals(storeFunc)) {
+         
+         // Store operations.
+         
+         // Decompose the heap operations.
+         Term subHeap1 = heap1.sub(0);
+         LocationVariable pointer1 = (LocationVariable) heap1.sub(1).op();
+         Function field1 = (Function) heap1.sub(2).op();
+         Term value1 = heap1.sub(3);
+         
+         Term subHeap2 = heap2.sub(0);
+         LocationVariable pointer2 = (LocationVariable) heap2.sub(1).op();
+         Function field2 = (Function) heap2.sub(2).op();
+         Term value2 = heap2.sub(3);
+         
+         if (pointer1.equals(pointer2) && field1.equals(field2)) {
+            // Potential for deep merge: Access of same object / field.
+            
+            Pair<Term, LinkedList<Term>> joinedSubHeap = joinHeaps(subHeap1, subHeap2, state1, state2, services);
+            newConstraints.addAll(joinedSubHeap.second);
+            
+            Term joinedVal = null;
+            
+            if (value1.equals(value2)) {
+               // Idempotency...
+               joinedVal = value1;
+               
+            } else {
+               
+               // if-then-else
+               Function skolemConstant = getNewScolemConstantForPrefix(
+                     field1.name().toString(),
+                     ((Function) value1.op()).sort(),
+                     services);
+               
+               joinedVal = tb.func(skolemConstant);
+               newConstraints.addAll(getIfThenElseConstraints(
+                     joinedVal,
+                     value1,
+                     value2,
+                     state1,
+                     state2,
+                     services));
+               
+            }
+            
+            return new Pair<Term, LinkedList<Term>>(
+                  tb.func((Function) heap1.op(), joinedSubHeap.first, tb.var(pointer1), tb.func(field1), joinedVal),
+                  newConstraints);
+         }
+         
+      } else if (((Function) heap1.op()).equals(createFunc) &&
+            ((Function) heap2.op()).equals(createFunc)) {
+         
+         // Create operations.
+         
+         // Decompose the heap operations.
+         Term subHeap1 = heap1.sub(0);
+         LocationVariable pointer1 = (LocationVariable) heap1.sub(1).op();
+         
+         Term subHeap2 = heap2.sub(0);
+         LocationVariable pointer2 = (LocationVariable) heap2.sub(1).op();
+         
+         if (pointer1.equals(pointer2)) {
+            // Same objects are created: Join.
+            
+            Pair<Term, LinkedList<Term>> joinedSubHeap =
+                  joinHeaps(subHeap1, subHeap2, state1, state2, services);
+            newConstraints.addAll(joinedSubHeap.second);
+            
+            return new Pair<Term, LinkedList<Term>>(
+                  tb.func((Function) heap1.op(), joinedSubHeap.first, tb.var(pointer1)),
+                  newConstraints);
+         }
+         
+         // "else" case is fallback at end of method:
+         // if-then-else of heaps.
+         
+      }
+
+      return new Pair<Term, LinkedList<Term>>(
+            JoinIfThenElse.createIfThenElseTerm(state1, state2, heap1, heap2, services),
+            newConstraints);
    }
 
    @Override
