@@ -172,7 +172,7 @@ public class JoinIfThenElse extends JoinRule {
     * @param services The services object.
     * @return A joined heap term.
     */
-   private Term joinHeaps(
+   static Term joinHeaps(
          Term heap1,
          Term heap2,
          SymbolicExecutionState state1,

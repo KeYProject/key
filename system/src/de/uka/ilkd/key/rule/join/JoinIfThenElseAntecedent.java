@@ -127,33 +127,45 @@ public class JoinIfThenElseAntecedent extends JoinRule {
             
             // Apply if-then-else construction: Different values
             
-            Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
-                  JoinIfThenElse.createDistFormAndRightSidesForITEUpd(v, state1, state2, services);
+            Sort heapSort = (Sort) services.getNamespaces().sorts().lookup("Heap");
             
-            Term cond         = distFormAndRightSidesForITEUpd.first;
-            Term ifForm       = distFormAndRightSidesForITEUpd.second;
-            Term elseForm     = distFormAndRightSidesForITEUpd.third;
-            boolean isSwapped = distFormAndRightSidesForITEUpd.fourth;
-            
-            Term vTerm = tb.var(v);
-            
-            Term varEqualsIfForm   = tb.equals(vTerm, ifForm);
-            Term varEqualsElseForm = tb.equals(vTerm, elseForm);
-            
-            if (!(rightSide1.equals(vTerm) && !isSwapped ||
-                  rightSide2.equals(vTerm) && isSwapped)) {
-               newPathCondition = tb.and(newPathCondition, 
-                     tb.imp(cond, varEqualsIfForm));
+            if (v.sort().equals(heapSort)) {
+               
+               //TODO: Change to antecedent implementation
+               newElementaryUpdates = newElementaryUpdates.prepend(
+                     tb.elementary(
+                           tb.var(v),
+                           JoinIfThenElse.joinHeaps(rightSide1, rightSide2, state1, state2, services)));
+               
+            } else {
+               Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
+                     JoinIfThenElse.createDistFormAndRightSidesForITEUpd(v, state1, state2, services);
+               
+               Term cond         = distFormAndRightSidesForITEUpd.first;
+               Term ifForm       = distFormAndRightSidesForITEUpd.second;
+               Term elseForm     = distFormAndRightSidesForITEUpd.third;
+               boolean isSwapped = distFormAndRightSidesForITEUpd.fourth;
+               
+               Term vTerm = tb.var(v);
+               
+               Term varEqualsIfForm   = tb.equals(vTerm, ifForm);
+               Term varEqualsElseForm = tb.equals(vTerm, elseForm);
+               
+               if (!(rightSide1.equals(vTerm) && !isSwapped ||
+                     rightSide2.equals(vTerm) && isSwapped)) {
+                  newPathCondition = tb.and(newPathCondition, 
+                        tb.imp(cond, varEqualsIfForm));
+               }
+               
+               if (!(rightSide2.equals(vTerm) && !isSwapped ||
+                     rightSide1.equals(vTerm) && isSwapped)) {
+                  newPathCondition = tb.and(newPathCondition, 
+                        tb.or (cond, varEqualsElseForm));
+               }
+               
+   //            newElementaryUpdates = newElementaryUpdates.prepend(
+   //                  tb.elementary(vTerm, vTerm));
             }
-            
-            if (!(rightSide2.equals(vTerm) && !isSwapped ||
-                  rightSide1.equals(vTerm) && isSwapped)) {
-               newPathCondition = tb.and(newPathCondition, 
-                     tb.or (cond, varEqualsElseForm));
-            }
-            
-//            newElementaryUpdates = newElementaryUpdates.prepend(
-//                  tb.elementary(vTerm, vTerm));
             
          }
       }
