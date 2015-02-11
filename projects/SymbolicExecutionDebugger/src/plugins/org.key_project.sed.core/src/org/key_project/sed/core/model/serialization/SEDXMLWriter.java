@@ -168,7 +168,7 @@ public class SEDXMLWriter {
    /**
     * Tag name to store {@link ISEDDebugNode#getGroupStartConditions()}.
     */
-   public static final String TAG_GROUP_START_CONDITION = "sedGroupStartCondition";
+   public static final String TAG_GROUP_END_CONDITION_REFERENCE = "sedGroupEndConditionReference";
 
    /**
     * Tag name to store {@link IVariable}s.
@@ -203,7 +203,7 @@ public class SEDXMLWriter {
    /**
     * Tag name to store a reference of {@link ISEDGroupable#getGroupEndConditions()}.
     */
-   public static final String TAG_GROUP_END_REFERENCE = "sedGroupEndReference";
+   public static final String TAG_GROUP_END_CONDITION = "sedGroupEndCondition";
 
    /**
     * Tag name to store {@link ISEDMethodContract}s.
@@ -1172,7 +1172,7 @@ public class SEDXMLWriter {
          appendGroupStartNodes(level + 1, node, saveVariables, saveCallStack, saveConstraints, sb, monitor);
          // Append method end nodes
          if (node instanceof ISEDGroupable) {
-            appendGroupEndNodes(level + 1, (ISEDGroupable) node, sb, monitor);
+            appendGroupEndNodes(level + 1, (ISEDGroupable) node, saveVariables, saveCallStack, saveConstraints, sb, monitor);
          }
          // Append end tag
          XMLUtil.appendEndTag(level, tagName, sb);
@@ -1212,7 +1212,9 @@ public class SEDXMLWriter {
       ISEDBranchCondition[] conditions = node.getGroupStartConditions();
       if (conditions != null) {
          for (ISEDBranchCondition condition : conditions) {
-            appendNode(level, TAG_GROUP_START_CONDITION, condition, saveVariables, saveCallStack, saveConstraints, true, sb, monitor);
+            Map<String, String> childAttributeValues = new LinkedHashMap<String, String>();
+            childAttributeValues.put(ATTRIBUTE_NODE_ID_REF, condition.getId());
+            XMLUtil.appendEmptyTag(level, TAG_GROUP_END_CONDITION_REFERENCE, childAttributeValues, sb);               
          }
       }
    }
@@ -1221,17 +1223,18 @@ public class SEDXMLWriter {
     * Appends all known group end conditions.
     * @param level The level in the tree used for leading white space (formating).
     * @param node he {@link ISEDGroupable} which provides the known end conditions.
+    * @param saveVariables Save variables?
+    * @param saveCallStack Save call stack?
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to write to.
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception.
     */
-   protected void appendGroupEndNodes(int level, ISEDGroupable node, StringBuffer sb, IProgressMonitor monitor) throws DebugException {
+   protected void appendGroupEndNodes(int level, ISEDGroupable node, boolean saveVariables, boolean saveCallStack, boolean saveConstraints, StringBuffer sb, IProgressMonitor monitor) throws DebugException {
       ISEDBranchCondition[] conditions = node.getGroupEndConditions();
       if (conditions != null) {
          for (ISEDBranchCondition condition : conditions) {
-            Map<String, String> childAttributeValues = new LinkedHashMap<String, String>();
-            childAttributeValues.put(ATTRIBUTE_NODE_ID_REF, condition.getId());
-            XMLUtil.appendEmptyTag(level, TAG_GROUP_END_REFERENCE, childAttributeValues, sb);               
+            appendNode(level, TAG_GROUP_END_CONDITION, condition, saveVariables, saveCallStack, saveConstraints, true, sb, monitor);
          }
       }
    }

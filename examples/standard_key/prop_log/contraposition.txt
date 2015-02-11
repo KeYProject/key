@@ -1,0 +1,7 @@
+example.name = Contraposition
+example.path = Getting Started
+example.file = contraposition.key
+
+Contraposition (propositional logic)
+
+( p implies q ) implies ( not q implies not p)

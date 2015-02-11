@@ -316,7 +316,7 @@ public class MethodCall extends ProgramTransformer {
 	return KeYJavaASTFactory.methodBody(pvar, newContext, meth, arguments);
     }
 
-    public Expression makeIOf(Type t) {
+    private Expression makeIOf(Type t) {
 	Debug.assertTrue(newContext!=null);
 	return KeYJavaASTFactory.instanceOf((Expression) newContext,
 		(KeYJavaType) t);
@@ -334,7 +334,7 @@ public class MethodCall extends ProgramTransformer {
     }
 
 
-    public VariableSpecification[] createParamSpecs(Services services){
+    private VariableSpecification[] createParamSpecs(Services services){
 	
 	MethodDeclaration methDecl    = pm.getMethodDeclaration();
 	int params                    = methDecl.getParameterDeclarationCount();
@@ -433,7 +433,7 @@ public class MethodCall extends ProgramTransformer {
     }
 
 
-    public Statement[] createParamAssignments(VariableSpecification[] specs) {
+    private Statement[] createParamAssignments(VariableSpecification[] specs) {
 	MethodDeclaration methDecl    = pm.getMethodDeclaration();
 	Statement[] paramDecl = new Statement[specs.length];
 	for (int i=0; i<specs.length; i++) {

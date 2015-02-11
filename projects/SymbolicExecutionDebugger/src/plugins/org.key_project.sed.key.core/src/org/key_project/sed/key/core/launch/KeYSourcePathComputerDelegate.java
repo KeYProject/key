@@ -34,9 +34,7 @@ import org.eclipse.debug.core.sourcelookup.containers.ExternalArchiveSourceConta
 import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.WorkspaceSourceContainer;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.launching.sourcelookup.containers.JavaProjectSourceContainer;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
@@ -64,6 +62,11 @@ public class KeYSourcePathComputerDelegate implements ISourcePathComputerDelegat
         if (method != null) {
            List<ISourceContainer> result = new LinkedList<ISourceContainer>();
            IProject project = method.getResource().getProject();
+           // Add Key source path
+           IResource sourceLocation = KeYResourceProperties.getSourceClassPathResource(project);
+           if (sourceLocation != null) {
+              result.add(createSourceContainer(sourceLocation));
+           }
            // Add KeY boot class path if defined.
            UseBootClassPathKind kind = KeYResourceProperties.getUseBootClassPathKind(project);
            if (UseBootClassPathKind.WORKSPACE.equals(kind)) {
@@ -87,14 +90,6 @@ public class KeYSourcePathComputerDelegate implements ISourcePathComputerDelegat
                  File file = entry.getLocation();
                  result.add(createSourceContainer(file));
               }
-           }
-           // Add source project, functionality was adapted from JavaSourceLookupUtil
-           IJavaProject javaProject = method.getJavaProject();
-           if (javaProject.exists()) {
-              result.add(new JavaProjectSourceContainer(javaProject));
-           }
-           else {
-              result.add(new ProjectSourceContainer(project, false));
            }
            return result.toArray(new ISourceContainer[result.size()]);
         }

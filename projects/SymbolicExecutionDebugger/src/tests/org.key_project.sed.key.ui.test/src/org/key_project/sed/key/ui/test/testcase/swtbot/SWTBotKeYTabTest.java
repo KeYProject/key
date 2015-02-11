@@ -28,14 +28,14 @@ public class SWTBotKeYTabTest extends AbstractSWTBotKeYPropertyTabTest {
     */
    @Test
    public void testValuesAndTabExistence() throws Exception {
-      doFlatStepsTest("SWTBotKeYTabTest_testValuesAndTabExistence", createFixedExampleSteps());
+      doAllNodeTypesTest("SWTBotKeYTabTest_testValuesAndTabExistence", createAllNodeTypesSteps());
    }
    
    /**
     * Creates the test steps to execute.
     * @return The created test steps.
     */
-   public static ITestSteps createFixedExampleSteps() {
+   public static ITestSteps createAllNodeTypesSteps() {
       return new ITestSteps() {
          @Override
          public void assertThread(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
@@ -66,6 +66,34 @@ public class SWTBotKeYTabTest extends AbstractSWTBotKeYPropertyTabTest {
          @Override
          public void assertLaunch(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertFalse(tabs.hasTabItem("KeY"));
+         }
+
+         @Override
+         public void assertTermination(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertTrue(tabs.selectTabItem("KeY"));
+            assertFalse(propertiesView.bot().text(0).getText().isEmpty());
+            assertFalse(propertiesView.bot().styledText(0).getText().isEmpty());
+         }
+
+         @Override
+         public void assertMethodContract(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertTrue(tabs.selectTabItem("KeY"));
+            assertFalse(propertiesView.bot().text(0).getText().isEmpty());
+            assertFalse(propertiesView.bot().styledText(0).getText().isEmpty());
+         }
+
+         @Override
+         public void assertLoopInvariant(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertTrue(tabs.selectTabItem("KeY"));
+            assertFalse(propertiesView.bot().text(0).getText().isEmpty());
+            assertFalse(propertiesView.bot().styledText(0).getText().isEmpty());
+         }
+
+         @Override
+         public void assertLoopBodyTermination(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertTrue(tabs.selectTabItem("KeY"));
+            assertFalse(propertiesView.bot().text(0).getText().isEmpty());
+            assertFalse(propertiesView.bot().styledText(0).getText().isEmpty());
          }
       };
    }

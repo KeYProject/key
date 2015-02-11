@@ -18,10 +18,10 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
@@ -64,8 +64,8 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
     protected abstract boolean allowOSS();
 
     @Override
-    protected Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
-        return new PropExpansionStrategy(mediator.getInteractiveProver().getProof().getActiveStrategy(),
+    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+        return new PropExpansionStrategy(proof.getActiveStrategy(),
                                          getAdmittedRuleNames(), allowOSS());
     }
     

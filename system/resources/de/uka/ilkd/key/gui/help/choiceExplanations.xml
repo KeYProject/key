@@ -94,14 +94,15 @@ switch sets how the rules handle these clauses.
   specifications, for example the following contradictory JML clause
   will not be rejected:
      //@ represents modelField == modelField + 1;
+  This is the default option since KeY 2.4.
   
 * If set to 'showSatisfiability', for every expansion of the represents
-  clause, it must be shown that the definition is
+  clause, it must be shown that the definition is _locally_
   satisfiable. Cross-definition inconsistencies can still be
   formulated, however:
      //@ represents modelField1 == modelField2;
      //@ represents modelField2 == modelField1 + 1;
-  This is the default option.
+  This had been the default option previously, until KeY 2.2.
 </entry>
 
 <entry key="Strings">

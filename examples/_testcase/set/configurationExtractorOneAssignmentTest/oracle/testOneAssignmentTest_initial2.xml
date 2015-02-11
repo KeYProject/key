@@ -5,11 +5,11 @@
       <term term="null"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return this.first.value+this.second.value+tempX.value+tempY.value;">
-      <value name="x" programVariable="x" isArrayIndex="false" value="null" type="Null"/>
-      <association name="self" programVariable="self" isArrayIndex="false" target="o1"/>
+      <value name="x {true}" programVariable="x" isArrayIndex="false" value="null" type="Null" condition="true"/>
+      <association name="self {true}" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="self" type="OneAssignmentTest">
-      <association name="y" programVariable="y" isArrayIndex="false" target="o2"/>
+      <association name="y {true}" programVariable="y" isArrayIndex="false" target="o2" condition="true"/>
    </object>
    <object xml:id="o2" name="OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y)" type="OneAssignmentTestValueWrapper">
    </object>

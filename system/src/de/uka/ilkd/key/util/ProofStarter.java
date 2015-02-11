@@ -20,12 +20,12 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.ApplyStrategy;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -56,10 +56,16 @@ public class ProofStarter {
         private static final String EMPTY_PROOF_HEADER = "";
         private final ProofEnvironment env;
         private final Sequent seq;
+        private final String proofName;
 
         public UserProvidedInput(Sequent seq, ProofEnvironment env) {
-            this.seq     = seq;
-            this.env     = env;
+            this(seq, env, null);
+        }
+
+        public UserProvidedInput(Sequent seq, ProofEnvironment env, String proofName) {
+            this.seq       = seq;
+            this.env       = env;
+            this.proofName = proofName;
         }
 
         public UserProvidedInput(Term formula, ProofEnvironment env) {
@@ -69,7 +75,9 @@ public class ProofStarter {
 
         @Override
         public String name() {
-            return "ProofObligation for " + ProofSaver.printAnything(seq, null);
+            return proofName != null ? 
+                   proofName : 
+                   "ProofObligation for " + ProofSaver.printAnything(seq, null);
         }
 
         @Override
@@ -92,8 +100,7 @@ public class ProofStarter {
 
         @Override
         public ProofAggregate getPO() throws ProofInputException {
-            final Proof proof = createProof("Proof object for "+
-                    ProofSaver.printAnything(seq, null));
+            final Proof proof = createProof(proofName != null ? proofName : "Proof object for "+ ProofSaver.printAnything(seq, null));
 
             return ProofAggregate.createProofAggregate(proof,
                                                        "ProofAggregate for claim: "+proof.name());
@@ -154,8 +161,8 @@ public class ProofStarter {
      *
      * @throws ProofInputException
      */
-    public void init(Sequent sequentToProve, ProofEnvironment env) throws ProofInputException {
-       final ProofOblInput input = new UserProvidedInput(sequentToProve, env);
+    public void init(Sequent sequentToProve, ProofEnvironment env, String proofName) throws ProofInputException {
+       final ProofOblInput input = new UserProvidedInput(sequentToProve, env, proofName);
        proof = input.getPO().getFirstProof();
        proof.setEnv(env);
     }

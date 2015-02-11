@@ -35,6 +35,9 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
 
     private final SequentView sequentView;
     private boolean showTermInfo = false;
+    
+    //do not refresh when set to false
+    private static boolean refresh = true;
 
     protected void showTermInfo(Point p) {
         if (showTermInfo) {
@@ -67,8 +70,22 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
             }
         }
     }
+    
+    
 
-    SequentViewInputListener(SequentView sequentView) {
+    public static boolean isRefresh() {
+		return refresh;
+	}
+
+
+
+	public static void setRefresh(boolean refresh) {
+		SequentViewInputListener.refresh = refresh;
+	}
+
+
+
+	SequentViewInputListener(SequentView sequentView) {
         this.sequentView = sequentView;
     }
 
@@ -107,7 +124,7 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
     @Override
     public void mouseMoved(MouseEvent me) {
         showTermInfo(me.getPoint());
-        if (sequentView.refreshHighlightning) {
+        if (sequentView.refreshHighlightning && refresh) {
             sequentView.highlight(me.getPoint());
         }
     }

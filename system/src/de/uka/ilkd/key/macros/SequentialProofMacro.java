@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.macros;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.ArrayList;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.core.AutoModeListener;
@@ -88,7 +88,8 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      *             if one of the wrapped macros is interrupted.
      */
     @Override
-    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+    public ProofMacroFinishedInfo applyTo(Proof proof,
+                                          KeYMediator mediator,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
@@ -96,8 +97,6 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
         for (Goal goal : goals) {
             initNodes.add(goal.node());
         }
-        final Proof proof = initNodes.isEmpty() ?
-                mediator.getSelectedProof() : initNodes.get(0).proof();
         final ImmutableList<Goal> gs = initNodes.isEmpty() ?
                 proof.openEnabledGoals() : proof.getSubtreeEnabledGoals(initNodes.get(0));
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, gs, proof);

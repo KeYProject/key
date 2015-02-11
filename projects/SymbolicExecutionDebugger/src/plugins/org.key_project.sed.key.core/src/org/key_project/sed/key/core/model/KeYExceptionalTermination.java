@@ -29,6 +29,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -36,7 +37,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination implements IKeYSEDDebugNode<IExecutionTermination> {
+public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination implements IKeYTerminationNode<IExecutionTermination> {
    /**
     * The {@link IExecutionTermination} to represent by this debug node.
     */
@@ -290,5 +291,13 @@ public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination
          }
          return groupStartConditions;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isTruthValueEvaluationEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
    }
 }

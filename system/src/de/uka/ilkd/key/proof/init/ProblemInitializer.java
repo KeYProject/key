@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -24,7 +25,6 @@ import recoder.io.PathList;
 import recoder.io.ProjectSettings;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -62,6 +62,7 @@ import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -271,7 +272,15 @@ public final class ProblemInitializer {
         envInput.setInitConfig(initConfig);
         final String javaPath = envInput.readJavaPath();
         final List<File> classPath = envInput.readClassPath();
-        final File bootClassPath = envInput.readBootClassPath();
+        
+        final File bootClassPath;
+        try {
+         bootClassPath = envInput.readBootClassPath();
+        } catch (IOException ioe) {
+            throw new ProofInputException(ioe);
+        }
+
+        final Includes includes = envInput.readIncludes();
 
         //create Recoder2KeY, set classpath
         final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(),
@@ -302,6 +311,7 @@ public final class ProblemInitializer {
         initConfig.getServices().setJavaModel(JavaModel.createJavaModel(javaPath,
                                                                         classPath,
                                                                         bootClassPath,
+                                                                        includes,
                                                                         initialFile));
     }
     
@@ -462,7 +472,7 @@ public final class ProblemInitializer {
            alreadyParsed.clear();
 
            //the first time, read in standard rules
-           Profile profile = envInput.getProfile();
+           Profile profile = services.getProfile();
            if(currentBaseConfig == null || profile != currentBaseConfig.getProfile()) {
                currentBaseConfig = new InitConfig(services);
                RuleSource tacletBase = profile.getStandardRules().getTacletBase();

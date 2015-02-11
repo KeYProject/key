@@ -18,7 +18,6 @@ import java.io.StringWriter;
 
 import javax.swing.JMenuItem;
 
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.pp.WriterBackend;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /** 
  * this class extends JMenuItem. The objective is to store

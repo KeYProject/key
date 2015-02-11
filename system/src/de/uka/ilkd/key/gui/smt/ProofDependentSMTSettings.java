@@ -22,13 +22,13 @@ import java.util.Properties;
 
 
 
-import de.uka.ilkd.key.gui.configuration.SettingsConverter;
-import de.uka.ilkd.key.gui.configuration.SettingsListener;
+import de.uka.ilkd.key.settings.SettingsConverter;
+import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
 
 
-public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configuration.Settings, Cloneable {
+public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Settings, Cloneable {
 	
 
 

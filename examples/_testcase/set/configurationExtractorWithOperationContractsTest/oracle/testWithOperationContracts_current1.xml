@@ -5,13 +5,13 @@
       <term term="y"/>
    </equivalenceClass>
    <state name="return add_1;">
-      <value name="exc_2" programVariable="exc_2" isArrayIndex="false" value="null" type="Null"/>
-      <value name="result_0" programVariable="result_0" isArrayIndex="false" value="Z(6(#))" type="int"/>
-      <value name="add_1" programVariable="add_1" isArrayIndex="false" value="Z(6(#))" type="int"/>
-      <association name="x" programVariable="x" isArrayIndex="false" target="o1"/>
-      <association name="y" programVariable="y" isArrayIndex="false" target="o1"/>
+      <value name="exc_2 {true}" programVariable="exc_2" isArrayIndex="false" value="null" type="Null" condition="true"/>
+      <value name="result_0 {true}" programVariable="result_0" isArrayIndex="false" value="Z(6(#))" type="int" condition="true"/>
+      <value name="add_1 {true}" programVariable="add_1" isArrayIndex="false" value="Z(6(#))" type="int" condition="true"/>
+      <association name="x {true}" programVariable="x" isArrayIndex="false" target="o1" condition="true"/>
+      <association name="y {true}" programVariable="y" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="x" type="ConfigurationExtractorWithOperationContractsTest.IntWrapper">
-      <value name="value" programVariable="value" isArrayIndex="false" value="Z(3(#))" type="int"/>
+      <value name="value {true}" programVariable="value" isArrayIndex="false" value="Z(3(#))" type="int" condition="true"/>
    </object>
 </model>

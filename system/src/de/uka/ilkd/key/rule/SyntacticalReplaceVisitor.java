@@ -41,6 +41,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
@@ -53,6 +54,7 @@ import de.uka.ilkd.key.logic.op.SubstOp;
 import de.uka.ilkd.key.logic.op.TermTransformer;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -62,7 +64,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.util.Debug;
 
 public final class SyntacticalReplaceVisitor extends DefaultVisitor {
-
+    private final TermLabelState termLabelState;
     private final SVInstantiations svInst;
     @Deprecated
     private final Constraint metavariableInst;
@@ -75,6 +77,8 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
     private final boolean resolveSubsts;
     private final PosInOccurrence applicationPosInOccurrence;
     private final Rule rule;
+    private final Object labelHint;
+    private final Goal goal;
 
     /**
      * the stack contains the subterms that will be added in the next step of
@@ -93,13 +97,17 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
 
     /**
      */
-    public SyntacticalReplaceVisitor(Services services,
+    public SyntacticalReplaceVisitor(TermLabelState termLabelState,
+                                     Services services,
                                      SVInstantiations svInst,
                                      PosInOccurrence applicationPosInOccurrence,
                                      Rule rule,
                                      Constraint metavariableInst,
                                      boolean allowPartialReplacement,
-                                     boolean  resolveSubsts) {
+                                     boolean  resolveSubsts,
+                                     Object labelHint,
+                                     Goal goal) {
+   this.termLabelState   = termLabelState;
 	this.services         = services;
 	this.svInst           = svInst;
 	this.metavariableInst = metavariableInst;
@@ -107,27 +115,38 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
 	this.resolveSubsts    = resolveSubsts;
 	this.applicationPosInOccurrence = applicationPosInOccurrence;
 	this.rule = rule;
+	this.labelHint = labelHint;
+	this.goal = goal;
 	subStack = new Stack<Object>(); // of Term
     }
 
-    public SyntacticalReplaceVisitor(Services services,
+    public SyntacticalReplaceVisitor(TermLabelState termLabelState,
+                                     Services services,
                                      SVInstantiations svInst,
                                      PosInOccurrence applicationPosInOccurrence,
-                                     Rule rule) {
-       this(services, svInst, applicationPosInOccurrence, rule, Constraint.BOTTOM, false, true);
+                                     Rule rule,
+                                     Object labelHint,
+                                     Goal goal) {
+       this(termLabelState, services, svInst, applicationPosInOccurrence, rule, Constraint.BOTTOM, false, true, labelHint, goal);
     }
 
-    public SyntacticalReplaceVisitor(Services services,
+    public SyntacticalReplaceVisitor(TermLabelState termLabelState,
+                                     Services services,
                                      Constraint metavariableInst,
                                      PosInOccurrence applicationPosInOccurrence,
-                                     Rule rule) {
-       this(services,
+                                     Rule rule,
+                                     Object labelHint, 
+                                     Goal goal) {
+       this(termLabelState,
+            services,
             SVInstantiations.EMPTY_SVINSTANTIATIONS,
             applicationPosInOccurrence,
             rule,
             metavariableInst, 
             false, 
-            true);
+            true,
+            labelHint,
+            goal);
     }
 
     private JavaProgramElement addContext(StatementBlock pe) {
@@ -218,7 +237,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                 // use the visitor recursively for replacing metavariables that
                 // might occur in the term (if possible)
                 final SyntacticalReplaceVisitor srv =
-                    new SyntacticalReplaceVisitor (getServices(), metavariableInst, applicationPosInOccurrence, rule);
+                    new SyntacticalReplaceVisitor (termLabelState, getServices(), metavariableInst, applicationPosInOccurrence, rule, labelHint, goal);
                 t.execPostOrder ( srv );
                 return srv.getTerm ();
             }
@@ -342,7 +361,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
             Term newTerm = toTerm(svInst.getInstantiation((SchemaVariable) visitedOp));
             pushNew(services.getTermBuilder().label(
                     newTerm, instantiateLabels(visited, newTerm.op(), newTerm.subs(),
-                                               newTerm.boundVars(), newTerm.javaBlock(), "visit")));
+                                               newTerm.boundVars(), newTerm.javaBlock(), newTerm.getLabels())));
         } else if ((visitedOp instanceof Metavariable)
                 && metavariableInst.getInstantiation((Metavariable) visitedOp, services)
                         .op() != visitedOp) {
@@ -383,7 +402,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                         neededsubs[0]);
                 ImmutableArray<TermLabel> labels =
                         instantiateLabels(visited, newTerm.op(), newTerm.subs(), newTerm.boundVars(),
-                                          newTerm.javaBlock(), "elementary");
+                                          newTerm.javaBlock(), newTerm.getLabels());
                 if (labels.size() != 0) {
                     newTerm = services.getTermBuilder().label(newTerm, labels);
                 }
@@ -393,14 +412,14 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
                 ImmutableArray<TermLabel> labels =
                         instantiateLabels(visited, newOp, new ImmutableArray<Term>(neededsubs),
-                                          boundVars, jb, "boundVars");
+                                          boundVars, jb, visited.getLabels());
                Term newTerm = services.getTermFactory().createTerm(newOp, neededsubs, boundVars, jb, labels);
                 pushNew(resolveSubst(newTerm));
             } else {
                 Term t;
                 ImmutableArray<TermLabel> labels =
                         instantiateLabels(visited, visited.op(), visited.subs(), visited.boundVars(),
-                                          visited.javaBlock(), "else");
+                                          visited.javaBlock(), visited.getLabels());
                 if (!visited.hasLabels() && labels != null && labels.isEmpty()) {
                    t = visited;
                 }
@@ -424,10 +443,10 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                                                         ImmutableArray<QuantifiableVariable>
                                                                         newTermBoundVars,
                                                         JavaBlock newTermJavaBlock,
-                                                        Object hint) {
-       return TermLabelManager.instantiateLabels(services, applicationPosInOccurrence, rule, null,
-                                                 hint, tacletTerm, newTermOp, newTermSubs,
-                                                 newTermBoundVars, newTermJavaBlock);
+                                                        ImmutableArray<TermLabel> newTermOriginalLabels) {
+       return TermLabelManager.instantiateLabels(termLabelState, services, applicationPosInOccurrence, rule, goal,
+                                                 labelHint, tacletTerm, newTermOp, newTermSubs,
+                                                 newTermBoundVars, newTermJavaBlock, newTermOriginalLabels);
     }
 
     private Operator handleSortDependingSymbol (SortDependingFunction depOp) {
@@ -502,7 +521,8 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
 	    pushNew(services.getTermBuilder().label(newTerm,
 	                                 instantiateLabels(subtreeRoot, newTerm.op(),
 	                                                   newTerm.subs(), newTerm.boundVars(),
-	                                                   newTerm.javaBlock(), "subtreeLeft")));
+	                                                   newTerm.javaBlock(),
+	                                                   newTerm.getLabels())));
 	} 
    }
 }

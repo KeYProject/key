@@ -10,14 +10,14 @@
       <term term="SimpleLinkedArrays[]::select(heap,SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next),arr(Z(0(#)))),SimpleLinkedArrays::$next)"/>
    </equivalenceClass>
    <state name="return x.value+x.next[0].value+x.next[0].next[0].value+x.next.length;">
-      <association name="x" programVariable="x" isArrayIndex="false" target="o1"/>
+      <association name="x {true}" programVariable="x" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="x" type="SimpleLinkedArrays">
-      <value name="value" programVariable="value" isArrayIndex="false" value="Z(3(#))" type="int"/>
-      <association name="next" programVariable="next" isArrayIndex="false" target="o2"/>
+      <value name="value {true}" programVariable="value" isArrayIndex="false" value="Z(3(#))" type="int" condition="true"/>
+      <association name="next {true}" programVariable="next" isArrayIndex="false" target="o2" condition="true"/>
    </object>
    <object xml:id="o2" name="SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next)" type="SimpleLinkedArrays[]">
-      <value name="length" programVariable="length" isArrayIndex="false" value="length(SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next))" type="int"/>
-      <association name="[Z(0(#))]" isArrayIndex="true" arrayIndex="Z(0(#))" target="o1"/>
+      <value name="length {true}" programVariable="length" isArrayIndex="false" value="length(SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next))" type="int" condition="true"/>
+      <association name="[Z(0(#))] {true}" isArrayIndex="true" arrayIndex="Z(0(#))" target="o1" condition="true"/>
    </object>
 </model>

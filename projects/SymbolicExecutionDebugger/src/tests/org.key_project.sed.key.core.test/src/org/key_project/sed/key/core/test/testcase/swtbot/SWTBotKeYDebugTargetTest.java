@@ -52,6 +52,30 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
+   public void testGroupStartOccurrenceTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testGroupStartOccurrenceTest",
+                     "data/groupStartOccurrenceTest/test",
+                     false,
+                     createMethodSelector("GroupStartOccurrenceTest", "main", "I"),
+                     "data/groupStartOccurrenceTest/oracle/GroupStartOccurrenceTest.xml",
+                     false,
+                     14,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false, 
+                     false);
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
    public void testConstraintsOfAppliedMethodContract() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract",
                      "data/constraintsOfAppliedMethodContract/test",
@@ -1230,7 +1254,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE, 
-                           6, executor);
+                           Boolean.FALSE,
+                           6, 
+                           executor);
    }
    
    /**
@@ -1397,7 +1423,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE, 
-                           timeoutFactor, executor);
+                           Boolean.FALSE,
+                           timeoutFactor, 
+                           executor);
    }
 
    /**
@@ -1524,7 +1552,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE, 
-                           8, executor);
+                           Boolean.FALSE,
+                           8, 
+                           executor);
    }
 
    /**
@@ -1624,6 +1654,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE, 
-                           8, executor);
+                           Boolean.FALSE,
+                           8, 
+                           executor);
    }
 }

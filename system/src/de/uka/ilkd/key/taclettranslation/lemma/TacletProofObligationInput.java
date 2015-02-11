@@ -166,7 +166,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
                     new ProblemInitializer( environmentConfig.getProfile());
             // bugfix: All files are loaded relative to the basedir of the loaded file
             loader = new TacletLoader.TacletFromFileLoader(null, null, problemInitializer,
-                    new File(baseDir, definitionFile), new File(baseDir, tacletFile), 
+                    new File(baseDir, tacletFile),
                     fileCollection(axiomFiles), environmentConfig);
         }
 

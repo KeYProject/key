@@ -233,7 +233,7 @@ public class ResourceUtil {
                      if (!targetFolder.exists()) {
                         targetFolder.create(true, true, null);
                      }
-                     copyIntoWorkspace(targetFolder, opener, startDirectory, file.listFiles());
+                     copyIntoWorkspace(targetFolder, opener, file, file.listFiles());
                   }
                }
             }
@@ -370,5 +370,44 @@ public class ResourceUtil {
     */
    public static File getWorkspaceLocation() {
       return getLocation(ResourcesPlugin.getWorkspace().getRoot());
+   }
+
+   /**
+    * Creates an {@link IProject} with the given name and ensures that it is open.
+    * @param projectName The Name of the {@link IProject} to create.
+    * @return The open {@link IProject}.
+    * @throws CoreException Occurred Exception.
+    */
+   public static IProject createProject(String projectName) throws CoreException {
+      IProject project = getProject(projectName);
+      if (project != null) {
+         if (!project.exists()) {
+            project.create(null);
+         }
+         if (!project.isOpen()) {
+            project.open(null);
+         }
+      }
+      return project;
+   }
+   
+   /**
+    * Creates an {@link IFolder} in the {@link IContainer} with the given folder name.
+    * @param parent The {@link IContainer} to create folder in.
+    * @param folderName The name of the folder to create.
+    * @return The created or existing folder.
+    * @throws CoreException Occurred Exception.
+    */
+   public static IFolder createFolder(IContainer parent, String folderName) throws CoreException {
+      if (parent != null && !StringUtil.isTrimmedEmpty(folderName)) {
+         IFolder folder = parent.getFolder(new Path(folderName));
+         if (!folder.exists()) {
+            folder.create(true, true, null);
+         }
+         return folder;
+      }
+      else {
+         return null;
+      }
    }
 }

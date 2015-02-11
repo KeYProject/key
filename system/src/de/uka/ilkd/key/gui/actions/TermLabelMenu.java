@@ -46,7 +46,7 @@ public class TermLabelMenu extends JMenu {
 
     public TermLabelMenu(final MainWindow mainWindow) {
 
-        setText("Hide Term Labels");
+        setText("Term Labels");
         setToolTipText("Configure term label visibility.");
         checkBoxMap = new TreeMap<Name, TermLabelCheckBox>();
         this.mainWindow = mainWindow;
@@ -57,11 +57,10 @@ public class TermLabelMenu extends JMenu {
             @Override
             public boolean contains(Name name) {
                 if (displayLabelsCheckBox.isSelected()) {
-                   TermLabelCheckBox checkedName = checkBoxMap.get(name);
-                   return checkedName != null && checkedName.isSelected();
-                }
-                else {
-                   return false;
+                    TermLabelCheckBox checkedName = checkBoxMap.get(name);
+                    return checkedName == null || checkedName.isSelected();
+                } else {
+                    return false;
                 }
             }
         };

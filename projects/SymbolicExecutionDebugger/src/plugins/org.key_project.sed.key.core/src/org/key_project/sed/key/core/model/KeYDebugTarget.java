@@ -14,7 +14,9 @@
 package org.key_project.sed.key.core.model;
 
 import java.io.File;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.eclipse.core.resources.IMarkerDelta;
@@ -144,7 +146,7 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
    public KeYDebugTarget(ILaunch launch,
                          SymbolicExecutionEnvironment<?> environment,
                          KeYLaunchSettings launchSettings) throws DebugException {
-      super(launch, true);
+      super(launch, true, launchSettings.isHighlightReachedSourceCode());
       DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
       // Update references
       Assert.isNotNull(environment);
@@ -159,7 +161,7 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
       // Update initial model
       setModelIdentifier(MODEL_IDENTIFIER);
       setName(proof.name() != null ? proof.name().toString() : "Unnamed");
-      // Init breakpoints
+      // Initialize breakpoints
       initBreakpoints();
       // Add thread
       KeYThread thread = new KeYThread(this, environment.getBuilder().getStartNode());
@@ -268,6 +270,34 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
     */
    public IKeYSEDDebugNode<?> getDebugNode(IExecutionNode<?> executionNode) {
       return executionToDebugMapping.get(executionNode);
+   }
+
+   /**
+    * Ensures that the debug model presentation of the given {@link IExecutionNode} and all its parents are created.
+    * @param executionNode The {@link IExecutionNode}.
+    * @return The {@link IKeYSEDDebugNode} which represents the given {@link IExecutionNode}.
+    * @throws DebugException Occurred Exception.
+    */
+   public IKeYSEDDebugNode<?> ensureDebugNodeIsCreated(IExecutionNode<?> executionNode) throws DebugException {
+      // Collect unknown parents
+      Deque<IExecutionNode<?>> parentStack = new LinkedList<IExecutionNode<?>>();
+      while (executionNode != null) {
+         IKeYSEDDebugNode<?> keyNode = getDebugNode(executionNode);
+         parentStack.addFirst(executionNode);
+         if (keyNode == null) {
+            executionNode = executionNode.getParent();
+         }
+         else {
+            executionNode = null;
+         }
+      }
+      // Ensure that children are loaded
+      IKeYSEDDebugNode<?> keyNode = null;
+      for (IExecutionNode<?> parent : parentStack) {
+         keyNode = getDebugNode(parent);
+         keyNode.getChildren();
+      }
+      return keyNode;
    }
    
    /**

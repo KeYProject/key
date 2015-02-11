@@ -74,6 +74,7 @@ key_ext_jars="antlr.jar recoderKey.jar"
 
 keyclasspath="$KEY_HOME/system/binary/"
 
+
 for i in $key_ext_jars ; do
     current_jar="$KEY_LIB/$i"
     if [ ! -f "$current_jar" ]

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <state name="One Step Simplification resulting in return 42;">
-      <value name="a" programVariable="a" isArrayIndex="false" value="Z(1(#))" type="int"/>
-      <value name="IntegerConditionTest::y" programVariable="IntegerConditionTest::y" isArrayIndex="false" value="Z(3(#))" type="int"/>
-      <association name="self" programVariable="self" isArrayIndex="false" target="o1"/>
+      <value name="a {true}" programVariable="a" isArrayIndex="false" value="Z(1(#))" type="int" condition="true"/>
+      <value name="IntegerConditionTest::y {true}" programVariable="IntegerConditionTest::y" isArrayIndex="false" value="Z(3(#))" type="int" condition="true"/>
+      <association name="self {true}" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="self" type="IntegerConditionTest">
-      <value name="x" programVariable="x" isArrayIndex="false" value="Z(1(#))" type="int"/>
+      <value name="x {true}" programVariable="x" isArrayIndex="false" value="Z(1(#))" type="int" condition="true"/>
    </object>
 </model>

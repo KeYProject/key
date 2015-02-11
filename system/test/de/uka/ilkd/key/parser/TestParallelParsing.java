@@ -121,7 +121,7 @@ public class TestParallelParsing extends AbstractSymbolicExecutionTestCase {
       @Override
       public void run() {
          try {
-            KeYEnvironment<CustomUserInterface> env = KeYEnvironment.load(new JavaProfile(), location, null, null);
+            KeYEnvironment<CustomUserInterface> env = KeYEnvironment.load(new JavaProfile(), location, null, null, false);
             env.dispose();
          }
          catch (Exception e) {

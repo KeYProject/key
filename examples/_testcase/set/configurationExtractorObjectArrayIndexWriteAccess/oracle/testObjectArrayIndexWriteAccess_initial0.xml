@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <state name="One Step Simplification resulting in return array[0].value;">
-      <association name="array" programVariable="array" isArrayIndex="false" target="o1"/>
+      <association name="array {true}" programVariable="array" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="array" type="ObjectIntWrapper[]">
-      <value name="length" programVariable="length" isArrayIndex="false" value="Z(1(#))" type="int"/>
+      <value name="length {true}" programVariable="length" isArrayIndex="false" value="Z(1(#))" type="int" condition="true"/>
    </object>
 </model>

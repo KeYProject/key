@@ -22,7 +22,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.parser.KeYLexerF;
@@ -35,6 +34,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import org.antlr.runtime.RecognitionException;
@@ -222,7 +222,7 @@ public class KeYFile implements EnvInput {
 
 
     @Override    
-    public File readBootClassPath() {
+    public File readBootClassPath() throws IOException {
         if(!javaPathAlreadyParsed) {
             throw new IllegalStateException("Can access this only after 'readJavaPath' has been called");
         }
@@ -230,9 +230,14 @@ public class KeYFile implements EnvInput {
         if(bootClassPath == null) {
             return null;
         }
+        File bootClassPathFile = new File(bootClassPath);
         
-        String parentDirectory = file.file().getParent();
-        return new File(parentDirectory, bootClassPath);
+        if (!bootClassPathFile.isAbsolute()) {
+            String parentDirectory = file.file().getParent();
+            bootClassPathFile = new File(parentDirectory, bootClassPath);            
+        }
+        
+        return bootClassPathFile.getCanonicalFile();         
     }
     
 

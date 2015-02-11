@@ -213,6 +213,7 @@ lexer grammar KeYLexer;
 	TERM : '\\term';
 	UPDATE : '\\update';
 	VARIABLES : '\\variables';
+	VARIABLE : '\\variable';
 	SKOLEMTERM : '\\skolemTerm';
 	SKOLEMFORMULA : '\\skolemFormula';
 	TERMLABEL : '\\termlabel';
@@ -319,6 +320,7 @@ lexer grammar KeYLexer;
 	UNIQUE : '\\unique';
 
 	RULES : '\\rules';
+	AXIOMS : '\\axioms';
         PROBLEM : '\\problem';
         CHOOSECONTRACT : '\\chooseContract';
         PROOFOBLIGATION : '\\proofObligation';

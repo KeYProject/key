@@ -1,6 +1,7 @@
 package org.key_project.sed.ui.dialog;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
@@ -31,9 +32,11 @@ import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.event.ISEDAnnotationListener;
 import org.key_project.sed.core.model.event.SEDAnnotationEvent;
+import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
 import org.key_project.sed.ui.action.ISEDAnnotationLinkEditAction;
 import org.key_project.sed.ui.provider.AnnotationAnnotationLinkLabelProvider;
 import org.key_project.sed.ui.provider.AnnotationAnnotationLinkLazyContentProvider;
+import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.sed.ui.util.SEDImages;
 import org.key_project.sed.ui.util.SEDUIUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
@@ -288,15 +291,23 @@ public class AnnotationLinksDialog extends TitleAreaDialog {
     * @param selection The {@link ISelection}.
     */
    protected void followLink(ISelection selection) {
-      Object object = SWTUtil.getFirstElement(selection);
-      if (object instanceof ISEDAnnotationLink) {
-         ISEDAnnotationLink link = (ISEDAnnotationLink)object;
-         IDebugView debugView = SEDUIUtil.getDebugView(getParentShell());
-         if (debugView != null) {
-            SEDUIUtil.selectInDebugView(debugView.getSite().getPart(), 
-                                        debugView, 
-                                        SWTUtil.createSelection(link.getTarget()));
+      try {
+         Object object = SWTUtil.getFirstElement(selection);
+         if (object instanceof ISEDAnnotationLink) {
+            ISEDAnnotationLink link = (ISEDAnnotationLink)object;
+            if (SEDDebugNodeContentProvider.getDefaultInstance().isShown(link.getTarget())) {
+               IDebugView debugView = SEDUIUtil.getDebugView(getParentShell());
+               if (debugView != null) {
+                  SEDUIUtil.selectInDebugView(debugView.getSite().getPart(), 
+                                              debugView, 
+                                              SWTUtil.createSelection(link.getTarget()));
+               }
+            }
          }
+      }
+      catch (DebugException e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
       }
    }
 

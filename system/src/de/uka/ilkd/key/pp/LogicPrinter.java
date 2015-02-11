@@ -24,6 +24,7 @@ import java.util.StringTokenizer;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -69,6 +70,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.speclang.WellDefinednessCheck.POTerms;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.pp.Backend;
@@ -889,12 +891,19 @@ public class LogicPrinter {
         }
     }
 
-    /*
-     * Use this method to determine the Set of printed TermLabels.
-     * The class SequentViewLogicPrinter overrides this method.
-     * The default is to print all TermLabels.
+    /**
+     * Determine the Set of labels that will be printed out for a specific
+     * {@link Term}. The class {@link SequentViewLogicPrinter} overrides this
+     * method. {@link TermLabel} visibility can be configured via GUI, see
+     * {@link de.uka.ilkd.key.gui.actions.TermLabelMenu}. Default is to print
+     * all TermLabels.
+     *
+     * @param t {@link Term} whose visible {@link TermLabel}s will be
+     * determined.
+     * @return List of visible {@link TermLabel}s, i.e. labels that are
+     * syntactically added to a {@link Term} while printing.
      */
-    protected ImmutableArray<TermLabel> getVisibleTermLabels(Term t){
+    protected ImmutableArray<TermLabel> getVisibleTermLabels(Term t) {
         return t.getLabels();
     }
 
@@ -1230,9 +1239,24 @@ public class LogicPrinter {
                     ? HeapLDT.getClassName((Function)t.op()) + "."
                     : "";
             fieldName += HeapLDT.getPrettyFieldName(t.op());
-            layouter.print(fieldName);
 
             if(obs.getNumParams() > 0 || obs instanceof IProgramMethod) {
+                JavaInfo javaInfo = services.getJavaInfo();
+                if (t.arity() > 1) {
+                    // in case arity > 1 we assume fieldName refers to a query (method call)
+                    Term object = t.sub(1);
+                    KeYJavaType keYJavaType = javaInfo.getKeYJavaType(object.sort());
+                    if (obs.isStatic()
+                            || javaInfo.isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType)) {
+                        layouter.print(fieldName);
+                    } else {
+                        layouter.print("(" + t.op() + ")");
+                    }
+                } else {
+                    // in case arity == 1 we assume fieldName refers to an array
+                    layouter.print(fieldName);
+                }
+
                 layouter.print("(").beginC(0);
                 int startIndex = totalHeaps + (obs.isStatic() ? 0 : 1);
                 for (int i = startIndex; i < obs.arity(); i++) {
@@ -1244,6 +1268,8 @@ public class LogicPrinter {
                     markEndSub();
                 }
                 layouter.print(")").end();
+            } else {
+                layouter.print(fieldName);
             }
 
             // must the heap be printed at all: no, if default heap.
@@ -1878,7 +1904,7 @@ public class LogicPrinter {
      * this method with a null returning body if position information
      * is not computed there.
      */
-    public InitialPositionTable getPositionTable() {
+    public PositionTable getPositionTable() {
         if (pure) {
             return null;
         }
@@ -1895,7 +1921,7 @@ public class LogicPrinter {
         if (pure) {
             return null;
         }
-        return ((PosTableStringBackend)backend).getPositionTable();
+        return ((PosTableStringBackend)backend).getInitialPositionTable();
     }
 
     /** Returns the ProgramPrinter
@@ -2217,7 +2243,14 @@ public class LogicPrinter {
         /** Returns the constructed position table.
          *  @return the constructed position table
          */
-        public InitialPositionTable getPositionTable() {
+        public PositionTable getPositionTable() {
+            return posTbl;
+        }
+
+        /** Returns the constructed position table.
+         *  @return the constructed position table
+         */
+        public InitialPositionTable getInitialPositionTable() {
             return initPosTbl;
         }
 

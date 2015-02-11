@@ -6,9 +6,9 @@
       <term term="SimpleLinkedOjbectsInstanceVariable::select(heap,SimpleLinkedOjbectsInstanceVariable::select(heap,self,SimpleLinkedOjbectsInstanceVariable::$next),SimpleLinkedOjbectsInstanceVariable::$next)"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return this.value+this.next.value+this.next.next.value;">
-      <association name="self" programVariable="self" isArrayIndex="false" target="o1"/>
+      <association name="self {true}" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="self" type="SimpleLinkedOjbectsInstanceVariable">
-      <association name="next" programVariable="next" isArrayIndex="false" target="o1"/>
+      <association name="next {true}" programVariable="next" isArrayIndex="false" target="o1" condition="true"/>
    </object>
 </model>

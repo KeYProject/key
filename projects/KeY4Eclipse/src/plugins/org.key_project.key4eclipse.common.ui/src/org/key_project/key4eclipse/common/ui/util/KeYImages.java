@@ -38,6 +38,11 @@ public final class KeYImages {
      * The key for the image that is used for method calls.
      */
     public static final String KEY_LOGO = "org.key_project.key4eclipse.common.ui.keyLogo";
+
+    /**
+     * The key for the image that is used for test generation.
+     */
+    public static final String TEST_GENERATION = "org.key_project.key4eclipse.common.ui.testGeneration";
     
     /**
      * Forbid instances.
@@ -101,6 +106,9 @@ public final class KeYImages {
         String path = null;
         if (KEY_LOGO.equals(key)) {
            path = "icons/logo16.gif";
+        }
+        else if (TEST_GENERATION.equals(key)) {
+           path = "icons/testGeneration.png";
         }
         // Load image if possible
         if (path != null) {

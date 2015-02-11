@@ -29,6 +29,7 @@ import org.key_project.util.java.ArrayUtil;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -428,8 +429,10 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
                KeYMethodCall methodCall = getMethodCall();
                methodReturnCondition = new SEDMemoryBranchCondition(getDebugTarget(), methodCall, getThread());
                methodReturnCondition.addChild(this);
+               methodReturnCondition.setCallStack(KeYModelUtil.createCallStack(methodCall.getDebugTarget(), methodCall.getExecutionNode().getCallStack()));
                methodReturnCondition.setName(executionNode.getFormatedMethodReturnCondition());
                methodReturnCondition.setPathCondition(methodCall.getPathCondition());
+               methodReturnCondition.setSourcePath(methodCall.getSourcePath());
             }
             return methodReturnCondition;
          }
@@ -458,6 +461,7 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
             SEDMemoryBranchCondition[] completedBlockConditions = KeYModelUtil.createCompletedBlocksConditions(this);
             if (returnCondition != null) {
                groupStartConditions = ArrayUtil.insert(completedBlockConditions, returnCondition, 0);
+               KeYModelUtil.sortyByOccurrence(this, groupStartConditions); // Sort conditions to ensure order of occurrence // TODO: To increase performance use binary insertion instead of sorting
             }
             else {
                groupStartConditions = completedBlockConditions;
@@ -465,5 +469,13 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
          }
          return groupStartConditions;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isTruthValueEvaluationEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
    }
 }

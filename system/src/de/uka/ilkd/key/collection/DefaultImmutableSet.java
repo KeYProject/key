@@ -183,6 +183,26 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         return hashCode;
     }
 
+    /**
+     * Get the underlying immutable list.
+     *
+     * @return an immutable list with the same iteration order as this set.
+     */
+    public ImmutableList<T> toImmutableList() {
+        return elementList;
+    }
+
+    /**
+     * Create an immutable set from an immutable list.
+     *
+     * @param list
+     *            a non-null immutable list
+     * @return a fresh immutable set with the same iteration order.
+     */
+    public static<T> ImmutableSet<T> fromImmutableList(ImmutableList<T> list) {
+        return new DefaultImmutableSet<T>(list);
+    }
+
 
     public String toString() {
 	Iterator<T> it=this.iterator();

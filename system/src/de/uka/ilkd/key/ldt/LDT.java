@@ -67,7 +67,7 @@ public abstract class LDT implements Named {
      * @return the added function (for convenience reasons)
      */
     protected final Function addFunction(Function f) {
-	functions.add(f);
+	functions.addSafely(f);
 	return f;
     }
     

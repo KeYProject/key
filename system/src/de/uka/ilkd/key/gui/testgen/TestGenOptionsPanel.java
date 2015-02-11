@@ -7,9 +7,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.smt.FileChooserPanel;
 import de.uka.ilkd.key.gui.smt.TablePanel;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 @SuppressWarnings("serial")
 class TestGenOptionsPanel extends TablePanel{
@@ -44,6 +44,7 @@ class TestGenOptionsPanel extends TablePanel{
 		super();
 		this.minWidthOfTitle = SwingUtilities.computeStringWidth(this.getFontMetrics(getFont()),"Concurrent ProcessesBLANK");
 		this.settings = settings;
+		this.setShowInfo(true);
 		createTable();
 	}
 	
@@ -59,7 +60,7 @@ class TestGenOptionsPanel extends TablePanel{
 	   getMaxProcesses();
 	   getMaxUnwinds();
 	   getInvariantForall();
-	   getRemoveDuplicatesPanel();
+	   //getRemoveDuplicatesPanel();
 	   getRFLSelectionPanel();
 	   getJUnitPanel();	   
 	    

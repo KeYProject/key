@@ -19,15 +19,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
 import org.antlr.runtime.MismatchedTokenException;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.parser.KeYLexer;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -40,10 +42,12 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -63,7 +67,37 @@ import de.uka.ilkd.key.util.Pair;
  * @author Martin Hentschel
  */
 public abstract class AbstractProblemLoader {
-    /**
+    private static class ReplayResult {
+
+		private Node node;
+		private List<Throwable> errors;
+		private String status;
+
+		public ReplayResult(String status, List<Throwable> errors, Node node) {
+			this.status = status;
+			this.errors = errors;
+			this.node = node;				
+		}
+
+		public Node getNode() {
+			return node;
+		}
+
+		public String getStatus() {
+			return status;
+		}
+
+		public List<Throwable> getErrorList() {
+			return errors;
+		}
+
+		public boolean hasErrors() {
+			return errors != null && !errors.isEmpty();
+		}
+
+	}
+
+	/**
      * The file or folder to load.
      */
     private final File file;
@@ -100,6 +134,11 @@ public abstract class AbstractProblemLoader {
      */
     private final Properties poPropertiesToForce;
 
+    /**
+     * {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
+     */
+    private final boolean forceNewProfileOfNewProofs;
+    
     /**
      * The instantiated {@link EnvInput} which describes the file to load.
      */
@@ -146,6 +185,7 @@ public abstract class AbstractProblemLoader {
      * @param classPath The optional class path entries to use.
      * @param bootClassPath An optional boot class path.
      * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
+     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
      * @param mediator The {@link KeYMediator} to use.
      * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call {@link UserInterface#selectProofObligation(InitConfig)} if no {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
      */
@@ -153,6 +193,7 @@ public abstract class AbstractProblemLoader {
                                  List<File> classPath, 
                                  File bootClassPath,
                                  Profile profileOfNewProofs, 
+                                 boolean forceNewProfileOfNewProofs,
                                  KeYMediator mediator,
                                  boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
                                  Properties poPropertiesToForce) {
@@ -162,6 +203,7 @@ public abstract class AbstractProblemLoader {
         this.bootClassPath = bootClassPath;
         this.mediator = mediator;
         this.profileOfNewProofs = profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile();
+        this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
         this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile = askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
         this.poPropertiesToForce = poPropertiesToForce;
     }
@@ -175,9 +217,6 @@ public abstract class AbstractProblemLoader {
      */
     public void load() throws ProofInputException, IOException, ProblemLoaderException {
             // Read environment
-            boolean oneStepSimplifier =
-                            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
-            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
             envInput = createEnvInput();
             problemInitializer = createProblemInitializer();
             initConfig = createInitConfig();
@@ -187,6 +226,8 @@ public abstract class AbstractProblemLoader {
             } else {
                 // Read proof obligation settings
                 LoadedPOContainer poContainer = createProofObligationContainer();
+                ProofAggregate proofList = null;
+                ReplayResult result = null;
                 try {
                     if (poContainer == null) {
                         if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
@@ -204,17 +245,51 @@ public abstract class AbstractProblemLoader {
                             return;
                         }
                     }
-                    // Create proof and apply rules again if possible
-                    proof = createProof(poContainer);
+                    // Create and register proof at specification repository                    
+                    proofList = createProof(poContainer); 
+
+                    // try to replay first proof
+                    proof = proofList.getProof(poContainer.getProofNum());
+                    
+                    
                     if (proof != null) {
-                        replayProof(proof);
+                    	OneStepSimplifier oss = MiscTools.findOneStepSimplifier(proof);
+                    	if (oss != null) {
+                    		oss.refresh(proof);
+                    	}
+                    	result = replayProof(proof);
                     }
+                                        	
                     // this message is propagated to the top level in console mode
                     return; // Everything fine
                 }
                 finally {
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
-                    .setOneStepSimplification(oneStepSimplifier);
+                	if (proofList != null) {
+                		// avoid double registration at specrepos as that is done already earlier in createProof
+                		// the UI method should just do the necessarily UI registrations
+                		mediator.getUI().createProofEnvironmentAndRegisterProof(poContainer.getProofOblInput(), proofList, initConfig);
+                		mediator.setProof(proof);
+                		mediator.getSelectionModel().setSelectedProof(proof);                       
+                		if (result != null) {
+                			mediator.getSelectionModel().setSelectedNode(result.getNode());
+                		} else {
+                			// should never happen as replay always returns a result object
+                			mediator.getSelectionModel().setSelectedNode(proof.root());                			
+                		}
+
+                		if ("".equals(result.getStatus())) {
+                			mediator.getUI().resetStatus(this);
+                		} else {
+                    		mediator.getUI().reportStatus(this, result.getStatus());                			
+                		}
+                		if (result.hasErrors()) {
+                			throw new ProblemLoaderException(this,
+                					"Proof could only be loaded partially.\n" +
+                							"In summary " + result.getErrorList().size() +
+                							" not loadable rule application(s) have been detected.\n" +
+                							"The first one:\n"+result.getErrorList().get(0).getMessage(), result.getErrorList().get(0));
+                		}
+                	}
                     getMediator().resetNrGoalsClosedByHeuristics();
                     if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
                         ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
@@ -323,8 +398,8 @@ public abstract class AbstractProblemLoader {
      */
     protected ProblemInitializer createProblemInitializer() {
         UserInterface ui = mediator.getUI();
-        return new ProblemInitializer(ui,
-                        new Services(envInput.getProfile()), ui);
+        Profile profile = forceNewProfileOfNewProofs ? profileOfNewProofs : envInput.getProfile();
+        return new ProblemInitializer(ui, new Services(profile), ui);
     }
 
     /**
@@ -418,42 +493,46 @@ public abstract class AbstractProblemLoader {
      * @return The instantiated {@link Proof}.
      * @throws ProofInputException Occurred Exception.
      */
-    protected Proof createProof(LoadedPOContainer poContainer) throws ProofInputException {
-        ProofAggregate proofList = problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
+    protected ProofAggregate createProof(LoadedPOContainer poContainer) throws ProofInputException {
+        ProofAggregate proofList = 
+        		problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
 
-        mediator.getUI().createProofEnvironmentAndRegisterProof(poContainer.getProofOblInput(), proofList, initConfig);
+        for (Proof p : proofList.getProofs()) {
+        	// register proof 
+        	initConfig.getServices().getSpecificationRepository().registerProof(poContainer.getProofOblInput(), p);
+        }
 
-        return proofList.getProof(poContainer.getProofNum());
+        return proofList;
     }
 
-    protected void replayProof(Proof proof) throws ProofInputException, ProblemLoaderException {
-        mediator.setProof(proof);
-
+    protected ReplayResult replayProof(Proof proof) throws ProofInputException, ProblemLoaderException {
         mediator.stopInterface(true); // first stop (above) is not enough
 
         String status = "";
-        List<Throwable> errors = null;
-        if (envInput instanceof KeYUserProblemFile) {
-            DefaultProofFileParser parser = new DefaultProofFileParser(this, proof,
-                            mediator);
-            problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
-            status = parser.getStatus();
-            errors = parser.getErrors();
-        }
+        List<Throwable> errors = new LinkedList<Throwable>();
+        Node lastTouchedNode = proof.root();
 
-        if ("".equals(status)) {
-            mediator.getUI().resetStatus(this);
-        } else {
-            mediator.getUI().reportStatus(this, status);
-            if (errors != null &&
-                            !errors.isEmpty()) {
-                throw new ProblemLoaderException(this,
-                                "Proof could only be loaded partially.\n" +
-                                                "In summary " + errors.size() +
-                                                " not loadable rule application(s) have been detected.\n" +
-                                                "The first one:\n"+errors.get(0).getMessage(), errors.get(0));
-            }
+        DefaultProofFileParser parser = null;
+        try {
+        	if (envInput instanceof KeYUserProblemFile) {
+        		parser = new DefaultProofFileParser(this, proof);
+        		problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
+
+        		lastTouchedNode = parser.getLastSelectedGoal() != null ? parser.getLastSelectedGoal().node() : proof.root();       
+        	}
+        } catch (Exception e) {
+        	if (parser == null || parser.getErrors() == null || parser.getErrors().isEmpty()) {
+        		// this exception was something unexpected
+        		errors.add(e);
+        	}
+        } finally {
+    		status = parser.getStatus();
+    		errors.addAll(parser.getErrors());
         }
+        	
+        ReplayResult result = new ReplayResult(status, errors, lastTouchedNode);
+        
+        return result;
     }
 
     /**

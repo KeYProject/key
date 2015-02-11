@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <variable name="heapAtPre" isArrayIndex="false">
-      <value name="heapAtPre {true}" typeString="Heap" valueString="heapAtPre" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+      <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
    <methodCall name="&lt;call PrettyPrintTest.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
@@ -46,7 +46,7 @@
                <operationContract name="result_0 = magic() catch(exc_0)
 pre: true
 post: result_0 = 42 &amp; exc_0 = null
-mod: empty
+mod: {}
 termination: diamond" pathCondition="x &gt;  -1" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                   <variable name="x" isArrayIndex="false">
                      <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
@@ -97,6 +97,10 @@ termination: diamond" pathCondition="x &gt;  -1" pathConditionChanged="false" re
                      </callStateVariable>
                      <callStateVariable name="savedHeapBefore_main" isArrayIndex="false">
                         <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="xBefore_main" isArrayIndex="false">
+                        <value name="xBefore_main {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </callStateVariable>
                   </methodReturn>
@@ -200,7 +204,7 @@ mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid
                </branchCondition>
                <branchCondition name="x_0 = -1" pathCondition="x &lt;= -1 &amp; x_0 = -1" pathConditionChanged="true" branchCondition="x_0 = -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                   <variable name="x" isArrayIndex="false">
-                     <value name="x {true}" typeString="int" valueString="-1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="x {true}" typeString="int" valueString="x_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="exc" isArrayIndex="false">
@@ -254,6 +258,10 @@ mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid
                         </callStateVariable>
                         <callStateVariable name="savedHeapBefore_main" isArrayIndex="false">
                            <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="xBefore_main" isArrayIndex="false">
+                           <value name="xBefore_main {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </callStateVariable>
                      </methodReturn>

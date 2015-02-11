@@ -38,6 +38,7 @@ public abstract class TablePanel extends JPanel{
         private static final int STRUT = 5;
         
         private JTextArea infoText;
+        private boolean showInfo;
         
         protected  TablePanel() {
                 this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
@@ -51,11 +52,15 @@ public abstract class TablePanel extends JPanel{
                 finalizeAddingComponents();
         }
         
+        public void setShowInfo(boolean showInfo){
+        	this.showInfo = showInfo;
+        }
+        
         private void addInfo(JButton infoButton, String info){
          
                 final JTextArea infoBox = addInfoArea(info);
                
-                infoBox.setVisible(false);
+                infoBox.setVisible(showInfo);
             
                 infoButton.addActionListener(new ActionListener() {
                         

@@ -340,9 +340,7 @@ public class Recoder2KeY implements JavaReader {
                     fr = new BufferedReader(new FileReader(filename));
                     cu = servConf.getProgramFactory().parseCompilationUnit(fr);
                 } catch (Exception e) {
-                    throw (ParseException) 
-                       new ParseException("Error in file " + 
-                               filename + ": " + e.getMessage()).initCause(e); 
+                    throw new ParseExceptionInFile(filename, e);
                 } finally {
                     if (fr != null) {
                 	fr.close();
@@ -510,14 +508,8 @@ public class Recoder2KeY implements JavaReader {
                 rcu.setDataLocation(loc);
                 // done by parser : rcu.makeAllParentRolesValid();
                 rcuList.add(rcu);
-            } catch(ParseException ex) {
-                ParseException e2 = new ParseException("Error while parsing " + loc);
-                e2.initCause(ex);
-                throw e2;
-            } catch(Exception ex){
-    	        ConvertException e2 = new ConvertException("While parsing "+loc+"\n"+ex.getMessage());
-                e2.initCause(ex);
-                throw e2;
+            } catch(Exception ex) {
+                throw new ParseExceptionInFile(loc.toString(), ex);
             } finally {        
         	    f.close();
             }

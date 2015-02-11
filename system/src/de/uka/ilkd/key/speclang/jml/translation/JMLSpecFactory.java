@@ -48,6 +48,7 @@ import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -1390,20 +1391,19 @@ public class JMLSpecFactory {
         //atPre-Functions
         ProgramVariable selfVar =
                 TB.selfVar(pm, pm.getContainerType(), false);
-        ImmutableList<ProgramVariable> paramVars =
-                ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<LocationVariable> paramVars =
+                ImmutableSLList.<LocationVariable>nil();
         int numParams = pm.getParameterDeclarationCount();
         for (int i = numParams - 1; i >= 0; i--) {
             ParameterDeclaration pd = pm.getParameterDeclarationAt(i);
-            paramVars =
-                    paramVars.prepend(
-                    (ProgramVariable) pd.getVariableSpecification().getProgramVariable());
+            IProgramVariable paramProgVar = pd.getVariableSpecification().getProgramVariable();
+            assert paramProgVar instanceof LocationVariable :
+                "Parameter declaration expected to be location var!";
+            LocationVariable paramLocVar = (LocationVariable) paramProgVar;
+            paramVars = paramVars.prepend(paramLocVar);
         }
         ProgramVariable resultVar = TB.resultVar(pm, false);
 
-        ImmutableList<ProgramVariable> localVars =
-                collectLocalVariables(pm.getBody(), loop);
-        paramVars = paramVars.append(localVars);
         final ImmutableList<LocationVariable> allHeaps =
                 services.getTypeConverter().getHeapLDT().getAllHeaps();
 
@@ -1411,6 +1411,15 @@ public class JMLSpecFactory {
         for(LocationVariable heap : allHeaps) {
           atPres.put(heap, TB.var(TB.heapAtPreVar(heap+"AtPre", heap.sort(), false)));
         }
+
+        for (LocationVariable param : paramVars) {
+            // TODO rename heapAtPreVar
+            atPres.put(param, TB.var(TB.heapAtPreVar(param + "AtPre", param.sort(), false)));
+        }
+
+        ImmutableList<ProgramVariable> localVars =
+                collectLocalVariables(pm.getBody(), loop);
+        ImmutableList<ProgramVariable> allVars = append(localVars, paramVars);
 
         //translateToTerm invariant
         Map<LocationVariable,Term> invariants = new LinkedHashMap<LocationVariable,Term>();
@@ -1425,7 +1434,7 @@ public class JMLSpecFactory {
             for (PositionedString expr : originalInvariant) {
                 Term translated =
                         JMLTranslator.translate(expr, pm.getContainerType(),
-                                                selfVar, paramVars, null,
+                                                selfVar, allVars, null,
                                                 null, atPres,
                                                 Term.class, services);
                 invariant = TB.andSC(invariant, TB.convertToFormula(translated));
@@ -1448,7 +1457,7 @@ public class JMLSpecFactory {
              for (PositionedString expr : as) {
                 Term translated =
                         JMLTranslator.translate(expr, pm.getContainerType(),
-                                                selfVar, paramVars, null,
+                                                selfVar, allVars, null,
                                                 null, null, Term.class,
                                                 services);
                 a = TB.union(a, translated);
@@ -1467,7 +1476,7 @@ public class JMLSpecFactory {
         final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         for(LocationVariable heap : allHeaps) {
             if (!originalInfFlowSpecs.isEmpty() && heap.equals(baseHeap)) {
-                infFlowSpecTermList = translateInfFlowSpecClauses(pm, selfVar, paramVars,
+                infFlowSpecTermList = translateInfFlowSpecClauses(pm, selfVar, allVars,
                                                                   resultVar, originalInfFlowSpecs);
             } else {
                 infFlowSpecTermList = ImmutableSLList.<InfFlowSpec>nil();
@@ -1483,7 +1492,7 @@ public class JMLSpecFactory {
             Term translated =
                     JMLTranslator.translate(originalVariant,
                                             pm.getContainerType(), selfVar,
-                                            paramVars, null, null, atPres, Term.class, services);
+                                            allVars, null, null, atPres, Term.class, services);
             variant = translated;
         }
 
@@ -1506,6 +1515,19 @@ public class JMLSpecFactory {
                                      atPres);
     }
 
+
+    // ImmutableList does not accept lists of subclasses to #append and cannot
+    // be lifted without changing the interface.
+    // Hence this little helper.
+    private ImmutableList<ProgramVariable> append(
+            ImmutableList<ProgramVariable> localVars,
+            ImmutableList<LocationVariable> paramVars) {
+        ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
+        for (LocationVariable param : paramVars) {
+            result = result.prepend(param);
+        }
+        return result.prepend(localVars);
+    }
 
     public LoopInvariant createJMLLoopInvariant(IProgramMethod pm,
                                                 LoopStatement loop,

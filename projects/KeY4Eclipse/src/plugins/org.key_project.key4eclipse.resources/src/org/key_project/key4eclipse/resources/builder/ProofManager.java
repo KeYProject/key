@@ -77,7 +77,6 @@ import org.key_project.util.java.ObjectUtil;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ClassTree;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -90,6 +89,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
@@ -160,7 +160,7 @@ public class ProofManager {
    private void handleProblemLoaderException(ProblemLoaderException e) throws CoreException{
       IResource res = project;
       int lineNumber = -1;
-      if(e.getOrigin() != null){
+      if(e.getOrigin() != null && e.getOrigin().getFile() != null){
          String originPath = e.getOrigin().getFile().getAbsolutePath();
          StringBuffer sb = new StringBuffer(e.getMessage());
          int indexOfOriginPath = sb.indexOf(originPath);

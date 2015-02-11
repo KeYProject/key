@@ -265,10 +265,11 @@ options {
     private Term convertToOld(final Term term) {
 	    assert atPres != null && atPres.get(getBaseHeap()) != null;
 	    Map<Term, Term> map = new LinkedHashMap<Term, Term>();
-        for (LocationVariable heap : atPres.keySet()) {
-            Term heapAtPre = atPres.get(heap);
-            if (heapAtPre != null) {
-                map.put(tb.var(heap), heapAtPre);
+        for (LocationVariable var : atPres.keySet()) {
+            // caution: That may now also be other variables than only heaps.
+            Term varAtPre = atPres.get(var);
+            if (varAtPre != null) {
+                map.put(tb.var(var), varAtPre);
             }
         }
 	    OpReplacer or = new OpReplacer(map, tb.tf());
@@ -391,8 +392,6 @@ assignableclause returns [Term result = null] throws SLTranslationException
     ass:ASSIGNABLE
     ( result=storeRefUnion
         { result = translator.translate(ass.getText(), Term.class, result, services); }
-    | l:LESS_THAN_NOTHING // deprecated
-        { translator.addDeprecatedWarning(l.getText()); result = tb.strictlyNothing(); }
     | STRICTLY_NOTHING
         { result = tb.strictlyNothing(); }
     )
@@ -1592,7 +1591,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    result = new SLExpression(tb.var(resultVar), resultVar.getKeYJavaType());
 	}
     |
-	(LPAREN QUANTIFIER) => result=specquantifiedexpression
+	(LPAREN quantifier) => result=specquantifiedexpression
     |
         (LPAREN BSUM) => result=bsumterm
     |
@@ -1621,11 +1620,6 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         {
             result = new SLExpression(convertToPermission(result.getTerm()));
         }
-    |
-	CREATED LPAREN result=expression RPAREN
-	{
-		raiseNotSupported("\\created is deliberately not supported in this KeY version, you should not need it");
-	}
     |
 	NONNULLELEMENTS LPAREN result=expression RPAREN
 	{
@@ -1665,9 +1659,9 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         
     |   mapEmpty:MAPEMPTY { result = translator.translateMapExpressionToJDL(mapEmpty,list,services); }
         
-    |   mapExp:MAPEXPRESSION LPAREN ( list=expressionlist )? RPAREN
+    |   tk=mapExpression LPAREN ( list=expressionlist )? RPAREN
 		{
-		    result = translator.translateMapExpressionToJDL(mapExp,list,services);
+		    result = translator.translateMapExpressionToJDL(tk,list,services);
 		}
 
     |   s2m:SEQ2MAP LPAREN ( list=expressionlist )? RPAREN
@@ -1922,16 +1916,43 @@ sequence returns [SLExpression result = null] throws SLTranslationException
         }
 ;
 
+mapExpression returns [Token token = null] :
+  ( MAP_GET
+  | MAP_OVERRIDE
+  | MAP_UPDATE
+  | MAP_REMOVE
+  | IN_DOMAIN
+  | DOMAIN_IMPLIES_CREATED
+  | MAP_SIZE
+  | MAP_SINGLETON
+  | IS_FINITE
+  )
+    { token = LT(-1); }
+  ;
+
+quantifier returns [Token token = null] :
+  ( FORALL
+  | EXISTS
+  | MIN
+  | MAX
+  | NUM_OF
+  | PRODUCT
+  | SUM
+  )
+    { token = LT(0); }
+  ;
+
 specquantifiedexpression returns [SLExpression result = null] throws SLTranslationException
 {
     SLExpression expr;
     Term p = tb.tt();
+    Token q;
     boolean nullable = false;
     Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;
 }
 :
 	LPAREN
-	q:QUANTIFIER
+	q=quantifier
 	(nullable=boundvarmodifiers)?
 	declVars=quantifiedvardecls SEMI
 	{

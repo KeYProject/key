@@ -7,7 +7,7 @@ pre: SimpleObjectQuery.&lt;$inv&gt; &amp; !x = null
 post: result_0 = SimpleObjectQuery.subMagic(x)
 &amp; SimpleObjectQuery.&lt;$inv&gt;
 &amp; exc_0 = null
-mod: empty
+mod: {}
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">

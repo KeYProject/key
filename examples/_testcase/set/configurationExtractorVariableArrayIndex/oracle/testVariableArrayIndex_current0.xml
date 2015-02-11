@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <state name="{}">
-      <association name="self" programVariable="self" isArrayIndex="false" target="o2"/>
+      <association name="self {true}" programVariable="self" isArrayIndex="false" target="o2" condition="true"/>
    </state>
    <object xml:id="o1" name="int[]::select(heap,self,VariableArrayIndex::$array)" type="int[]">
-      <value name="length" programVariable="length" isArrayIndex="false" value="length(int[]::select(heap,self,VariableArrayIndex::$array))" type="int"/>
-      <value name="[int::select(heap,self,VariableArrayIndex::$index)]" isArrayIndex="true" arrayIndex="int::select(heap,self,VariableArrayIndex::$index)" value="Z(2(4(#)))" type="int"/>
+      <value name="length {true}" programVariable="length" isArrayIndex="false" value="length(int[]::select(heap,self,VariableArrayIndex::$array))" type="int" condition="true"/>
+      <value name="[int::select(heap,self,VariableArrayIndex::$index)] {true}" isArrayIndex="true" arrayIndex="int::select(heap,self,VariableArrayIndex::$index)" value="Z(2(4(#)))" type="int" condition="true"/>
    </object>
    <object xml:id="o2" name="self" type="VariableArrayIndex">
-      <value name="index" programVariable="index" isArrayIndex="false" value="int::select(heap,self,VariableArrayIndex::$index)" type="int"/>
-      <association name="array" programVariable="array" isArrayIndex="false" target="o1"/>
+      <value name="index {true}" programVariable="index" isArrayIndex="false" value="int::select(heap,self,VariableArrayIndex::$index)" type="int" condition="true"/>
+      <association name="array {true}" programVariable="array" isArrayIndex="false" target="o1" condition="true"/>
    </object>
 </model>

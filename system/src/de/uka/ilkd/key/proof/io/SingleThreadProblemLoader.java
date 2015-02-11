@@ -21,6 +21,7 @@ public class SingleThreadProblemLoader extends AbstractProblemLoader {
     * @param classPath The optional class path entries to use.
     * @param bootClassPath An optional boot class path.
     * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
+    * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
     * @param mediator The {@link KeYMediator} to use.
     * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call {@link UserInterface#selectProofObligation(InitConfig)} if no {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
     */
@@ -28,9 +29,10 @@ public class SingleThreadProblemLoader extends AbstractProblemLoader {
                                     List<File> classPath, 
                                     File bootClassPath, 
                                     Profile profileOfNewProofs, 
+                                    boolean forceNewProfileOfNewProofs,
                                     KeYMediator mediator, 
                                     boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile, 
                                     Properties poPropertiesToForce) {
-      super(file, classPath, bootClassPath, profileOfNewProofs, mediator, askUiToSelectAProofObligationIfNotDefinedByLoadedFile, poPropertiesToForce);
+      super(file, classPath, bootClassPath, profileOfNewProofs, forceNewProfileOfNewProofs, mediator, askUiToSelectAProofObligationIfNotDefinedByLoadedFile, poPropertiesToForce);
    }
 }

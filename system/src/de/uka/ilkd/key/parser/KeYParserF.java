@@ -14,7 +14,7 @@ package de.uka.ilkd.key.parser;
 
 import java.util.HashMap;
 
-import org.antlr.runtime.LegacyCommonTokenStream;
+import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
 
@@ -33,7 +33,7 @@ public class KeYParserF extends KeYParser {
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF,
             ParserConfig schemaConfig, ParserConfig normalConfig,
             HashMap taclet2Builder, ImmutableSet<Taclet> taclets) {
-        super(mode, new LegacyCommonTokenStream(keYLexerF), schemaConfig,
+        super(mode, new CommonTokenStream(keYLexerF), schemaConfig,
                 normalConfig, taclet2Builder, taclets);
     }
 
@@ -44,16 +44,16 @@ public class KeYParserF extends KeYParser {
     }
 
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF) {
-        super(mode, new LegacyCommonTokenStream(keYLexerF));
+        super(mode, new CommonTokenStream(keYLexerF));
     }
 
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF,
             JavaReader jr, Services services, NamespaceSet nss, AbbrevMap scm) {
-        super(mode, new LegacyCommonTokenStream(keYLexerF), jr, services, nss, scm);
+        super(mode, new CommonTokenStream(keYLexerF), jr, services, nss, scm);
     }
 
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF, Services services, NamespaceSet nss) {
-        super(mode, new LegacyCommonTokenStream(keYLexerF), services, nss);
+        super(mode, new CommonTokenStream(keYLexerF), services, nss);
     }
 
     /**

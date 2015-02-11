@@ -113,7 +113,7 @@ public final class KeYResourceProperties {
      * @throws CoreException Occurred Exception.
      */
     public static void setUseBootClassPathKind(IProject project, UseBootClassPathKind kind) throws CoreException {
-        if (project != null) {
+        if (project != null && project.isOpen()) {
             project.setPersistentProperty(PROP_USE_BOOT_CLASS_PATH, kind != null ? kind.toString() : null);
         }
     }
@@ -125,7 +125,7 @@ public final class KeYResourceProperties {
      * @throws CoreException Occurred Exception.
      */    
     public static String getBootClassPath(IProject project) throws CoreException {
-        if (project != null) {
+        if (project != null && project.isOpen()) {
             return project.getPersistentProperty(PROP_BOOT_CLASS_PATH);
         }
         else {
@@ -140,7 +140,7 @@ public final class KeYResourceProperties {
      * @throws CoreException Occurred Exception.
      */
     public static void setBootClassPath(IProject project, String bootClassPath) throws CoreException {
-        if (project != null) {
+        if (project != null && project.isOpen()) {
             project.setPersistentProperty(PROP_BOOT_CLASS_PATH, bootClassPath);
         }
     }
@@ -153,7 +153,7 @@ public final class KeYResourceProperties {
      */
     public static List<KeYClassPathEntry> getClassPathEntries(IProject project) throws CoreException {
         try {
-            if (project != null) {
+            if (project != null && project.isOpen()) {
                 String xml = project.getPersistentProperty(PROP_CLASS_PATH_ENTRIES);
                 final List<KeYClassPathEntry> result = new LinkedList<KeYClassPathEntry>();
                 if (!StringUtil.isEmpty(xml)) {
@@ -195,7 +195,7 @@ public final class KeYResourceProperties {
      * @throws CoreException Occurred Exception.
      */
     public static void setClassPathEntries(IProject project, List<KeYClassPathEntry> entries) throws CoreException {
-        if (project != null) {
+        if (project != null && project.isOpen()) {
             StringBuffer sb = new StringBuffer();
             sb.append("<?xml version=\"1.0\"?>");
             sb.append("<classPathEntries>");
@@ -300,7 +300,7 @@ public final class KeYResourceProperties {
      * @throws CoreException Occurred Exception.
      */    
     public static String getSourceClassPath(IProject project) throws CoreException {
-        if (project != null) {
+        if (project != null && project.isOpen()) {
             String value = project.getPersistentProperty(PROP_SOURCE_CLASS_PATH);
             if (value == null) {
                value = getDefaultSourceClassPath(project);
@@ -319,7 +319,7 @@ public final class KeYResourceProperties {
      * @throws CoreException Occurred Exception.
      */
     public static void setSourceClassPath(IProject project, String sourceClassPath) throws CoreException {
-        if (project != null) {
+        if (project != null && project.isOpen()) {
             project.setPersistentProperty(PROP_SOURCE_CLASS_PATH, sourceClassPath);
         }
     }
@@ -331,7 +331,7 @@ public final class KeYResourceProperties {
     */
    public static String getDefaultSourceClassPath(IProject project) {
       try {
-         if (project != null) {
+         if (project != null && project.isOpen()) {
             if (JDTUtil.isJavaProject(project)) {
                List<IResource> sourcePaths = JDTUtil.getSourceResources(project);
                if (!CollectionUtil.isEmpty(sourcePaths)) {

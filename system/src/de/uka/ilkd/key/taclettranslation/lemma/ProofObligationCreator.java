@@ -40,7 +40,7 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderLis
 public class ProofObligationCreator {       
 
         private String createName(ProofAggregate[] singleProofs) {
-                return "Side proofs for " + singleProofs.length + " lemmata.";
+                return "Side proofs for " + singleProofs.length + " taclets.";
         }
         
         
@@ -62,7 +62,6 @@ public class ProofObligationCreator {
                 
               for(LoaderListener listener : listeners){
                       listener.progressStarted(this);
-        
               }
 
               int i = 0;

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_787d048e-37d2-4a36-a89d-c1a2c17f7144" name="doSomething(int, java.lang.String, boolean) from 24 : 13 to 25 : 22" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_b3c5bc29-1d99-4fdd-b3f0-2f686046f270" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorElseBlockSelected\src\MethodPartPOTest.java">
-         <sedStatement xml:id="_89fe0d43-dc30-49a5-826d-4692ba01eb67" name="x-=42;" pathCondition="true" lineNumber="-1" charStart="373" charEnd="381" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorElseBlockSelected\src\MethodPartPOTest.java">
-            <sedStatement xml:id="_789b4958-4853-4b9f-81bd-555ca457e33c" name="return x;" pathCondition="true" lineNumber="-1" charStart="386" charEnd="395" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorElseBlockSelected\src\MethodPartPOTest.java">
-               <sedTermination xml:id="_e58de2f4-9f52-4b5e-900f-2f0538edee65" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorElseBlockSelected\src\MethodPartPOTest.java" verified="true">
+   <sedTarget xml:id="_e9a2eb02-b569-46da-8105-a22dc5b5710a" name="doSomething(int, java.lang.String, boolean) from 24 : 13 to 25 : 22" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_3d157537-1158-4683-81f3-310723280200" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorElseBlockSelected\src\MethodPartPOTest.java">
+         <sedStatement xml:id="_db56dcdd-6bd6-423a-a11f-7a1dd4c8bead" name="x-=42;" pathCondition="true" lineNumber="-1" charStart="373" charEnd="381" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorElseBlockSelected\src\MethodPartPOTest.java">
+            <sedStatement xml:id="_e4489208-8697-4c35-ae21-1c1cb897c89d" name="return x;" pathCondition="true" lineNumber="-1" charStart="386" charEnd="395" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorElseBlockSelected\src\MethodPartPOTest.java">
+               <sedTermination xml:id="_6db7fc5e-888d-4e1e-8f83-2fcadef60628" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorElseBlockSelected\src\MethodPartPOTest.java" verified="true">
                </sedTermination>
             </sedStatement>
          </sedStatement>
-         <sedTerminationEntry nodeIdRef="_e58de2f4-9f52-4b5e-900f-2f0538edee65"/>
+         <sedTerminationEntry nodeIdRef="_6db7fc5e-888d-4e1e-8f83-2fcadef60628"/>
       </sedThread>
    </sedTarget>
 </launch>

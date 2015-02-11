@@ -57,13 +57,4 @@ public class ConvertException extends RuntimeException {
 			return null;
 		}
 	}
-
-	public String getMessage() {
-		String mess = super.getMessage();
-		if (getCause() != null && getCause().getMessage() != null) {
-			return mess + " - " + getCause().getMessage();
-		}
-		return mess;
-	}
-    
 }

@@ -718,7 +718,9 @@ public class KeYProgModelInfo{
     }
 
     /**
-     * Returns all known subtypes of the given class type.
+     * Returns all known supertypes of the given class type with the type itself
+     * as first element.
+     *
      * @param ct a class type
      * @return the list of the known subtypes of the given class type.
      */

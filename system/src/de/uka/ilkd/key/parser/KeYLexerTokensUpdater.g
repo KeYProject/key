@@ -84,6 +84,12 @@ tokens {
 	int gtype;
 	
     public static void main(String[] args) throws Exception {
+    
+        if(args.length == 0) {
+           System.err.println("Please provide the classname for ID-lookup as argument (e.g. KeYParser)");
+        }
+        String parserClassName = args[0];
+    
         ANTLRInputStream input = new ANTLRInputStream(System.in);
         KeYLexerTokensUpdaterLexer lexer = new KeYLexerTokensUpdaterLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -130,7 +136,7 @@ tokens {
             String text = childTree.getText();
             text = text.substring(1, text.length()-1);
 
-            System.out.println("names[KeYParser." + name + "] = \"'" + text + "'\";");
+            System.out.println("names[" + parserClassName + "." + name + "] = \"'" + text + "'\";");
         }
 
         System.out.println("// ---- end generated token names ----");
