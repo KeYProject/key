@@ -185,21 +185,27 @@ public class JoinIfThenElse extends JoinRule {
       TermBuilder tb = services.getTermBuilder();
       
       if (heap1.equals(heap2)) {
+         // Keep equal heaps
          return heap1;
       }
       
       if (!(heap1.op() instanceof Function) ||
             !(heap2.op() instanceof Function)) {
+         // Covers the case of two different symbolic heaps
          return createIfThenElseTerm(state1, state2, heap1, heap2, services);
       }
       
       Function storeFunc = (Function) services.getNamespaces().functions().lookup("store");
       Function createFunc = (Function) services.getNamespaces().functions().lookup("create");
-      //TODO add further functions, e.g. anon
+      //Note: Check if there are other functions that should be covered.
+      //      Unknown functions are treated by if-then-else procedure.
       
       if (((Function) heap1.op()).equals(storeFunc) &&
             ((Function) heap2.op()).equals(storeFunc)) {
          
+         // Store operations.
+         
+         // Decompose the heap operations.
          Term subHeap1 = heap1.sub(0);
          LocationVariable pointer1 = (LocationVariable) heap1.sub(1).op();
          Function field1 = (Function) heap1.sub(2).op();
@@ -211,10 +217,12 @@ public class JoinIfThenElse extends JoinRule {
          Term value2 = heap2.sub(3);
          
          if (pointer1.equals(pointer2) && field1.equals(field2)) {
+            // Potential for deep merge: Access of same object / field.
             Term joinedSubHeap = joinHeaps(subHeap1, subHeap2, state1, state2, services);
             Term joinedVal = null;
             
             if (value1.equals(value2)) {
+               // Idempotency...
                joinedVal = value1;
             } else {
                joinedVal = createIfThenElseTerm(state1, state2, value1, value2, services);
@@ -226,6 +234,9 @@ public class JoinIfThenElse extends JoinRule {
       } else if (((Function) heap1.op()).equals(createFunc) &&
             ((Function) heap2.op()).equals(createFunc)) {
          
+         // Create operations.
+         
+         // Decompose the heap operations.
          Term subHeap1 = heap1.sub(0);
          LocationVariable pointer1 = (LocationVariable) heap1.sub(1).op();
          
@@ -233,9 +244,14 @@ public class JoinIfThenElse extends JoinRule {
          LocationVariable pointer2 = (LocationVariable) heap2.sub(1).op();
          
          if (pointer1.equals(pointer2)) {
+            // Same objects are created: Join.
+            
             Term joinedSubHeap = joinHeaps(subHeap1, subHeap2, state1, state2, services);
             return tb.func((Function) heap1.op(), joinedSubHeap, tb.var(pointer1));
          }
+         
+         // "else" case is fallback at end of method:
+         // if-then-else of heaps.
          
       }
 
