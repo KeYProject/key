@@ -22,8 +22,6 @@ import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
-import org.key_project.jmlediting.profile.jmlref.validator.IJMLValidationContext;
-import org.key_project.jmlediting.profile.jmlref.validator.JMLValidationContext;
 import org.key_project.util.eclipse.Logger;
 
 /**
@@ -68,9 +66,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
             final IJMLParser parser = JMLPreferencesHelper
                   .getProjectActiveJMLProfile(res.getProject()).createParser();
             try {
-               final IASTNode parseResult = parser.parse(source, jmlComment);
-               final IJMLValidationContext jmlContext = new JMLValidationContext(
-                     parseResult, res);
+               parser.parse(source, jmlComment);
                // Throw away the result, here only a parse exception is
                // interesting
             }
@@ -121,11 +117,16 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          ParseErrorMarkerUpdater.removeErrorMarkers(res);
          // Detect all comments in the file and then parse it
          final CommentLocator locator = new CommentLocator(source);
-         for (final CommentRange jmlComment : locator.findJMLCommentRanges()) {
+         final List<CommentRange> jmlComments = locator.findJMLCommentRanges();
+         for (final CommentRange jmlComment : jmlComments) {
             final IJMLParser parser = JMLPreferencesHelper
                   .getProjectActiveJMLProfile(res.getProject()).createParser();
             try {
-               parser.parse(source, jmlComment);
+               final IASTNode parseResult = parser.parse(source, jmlComment);
+               final IJMLValidationContext jmlContext = new JMLValidationContext(
+                     parseResult, res, jmlComments.subList(
+                           jmlComments.indexOf(jmlComment) + 1,
+                           jmlComments.size()));
                // Throw away the result, here only a parse exception is
                // interesting
             }
