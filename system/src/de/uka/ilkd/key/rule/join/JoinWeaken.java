@@ -120,14 +120,24 @@ public class JoinWeaken extends JoinRule {
                         rightSide1));
             
          } else {
+            Sort heapSort = (Sort) services.getNamespaces().sorts().lookup("Heap");
             
-            // Apply weakening to fresh constant: Different values
-            final Function skolemConstant =
-                  getNewScolemConstantForPrefix(varNamePrefix, v.sort(), services);
-            
-            newElementaryUpdates = newElementaryUpdates.prepend(
-                  tb.elementary(
-                        v, tb.func(skolemConstant)));
+            if (v.sort().equals(heapSort)) {
+               
+               Term joinedHeaps = joinHeaps(rightSide1, rightSide2, state1, state2, services);
+               newElementaryUpdates = newElementaryUpdates.prepend(tb.elementary(v, joinedHeaps));
+               
+            } else {
+               
+               // Apply weakening to fresh constant: Different values
+               final Function skolemConstant =
+                     getNewScolemConstantForPrefix(varNamePrefix, v.sort(), services);
+               
+               newElementaryUpdates = newElementaryUpdates.prepend(
+                     tb.elementary(
+                           v, tb.func(skolemConstant)));
+               
+            }
             
          }
          
@@ -141,6 +151,117 @@ public class JoinWeaken extends JoinRule {
                   createSimplifiedDisjunctivePathCondition(state1.second, state2.second, services);
       
       return new SymbolicExecutionState(newSymbolicState, newPathCondition);
+   }
+   
+   /**
+    * Joins two heaps by total weakening. Tries to shift
+    * the weakening as deeply into the heap as possible.
+    * 
+    * @param heap1 The first heap term.
+    * @param heap2 The second heap term.
+    * @param state1 SE state for the first heap term.
+    * @param state2 SE state for the second heap term
+    * @param services The services object.
+    * @return A joined heap term.
+    */
+   private Term joinHeaps(
+         Term heap1,
+         Term heap2,
+         SymbolicExecutionState state1,
+         SymbolicExecutionState state2,
+         Services services) {
+      
+      //TODO: Parts of this code appear redundantly in different join rules;
+      //      it could be sensible to extract those into an own method.
+      
+      TermBuilder tb = services.getTermBuilder();      
+      
+      if (heap1.equals(heap2)) {
+         // Keep equal heaps
+         return heap1;
+      }
+      
+      if (!(heap1.op() instanceof Function) ||
+            !(heap2.op() instanceof Function)) {
+         // Covers the case of two different symbolic heaps
+         final Function skolemConstant =
+               getNewScolemConstantForPrefix("heap", heap1.sort(), services);
+         
+         return tb.func(skolemConstant);
+      }
+      
+      Function storeFunc = (Function) services.getNamespaces().functions().lookup("store");
+      Function createFunc = (Function) services.getNamespaces().functions().lookup("create");
+      //Note: Check if there are other functions that should be covered.
+      //      Unknown functions are treated by if-then-else procedure.
+      
+      if (((Function) heap1.op()).equals(storeFunc) &&
+            ((Function) heap2.op()).equals(storeFunc)) {
+         
+         // Store operations.
+         
+         // Decompose the heap operations.
+         Term subHeap1 = heap1.sub(0);
+         LocationVariable pointer1 = (LocationVariable) heap1.sub(1).op();
+         Function field1 = (Function) heap1.sub(2).op();
+         Term value1 = heap1.sub(3);
+         
+         Term subHeap2 = heap2.sub(0);
+         LocationVariable pointer2 = (LocationVariable) heap2.sub(1).op();
+         Function field2 = (Function) heap2.sub(2).op();
+         Term value2 = heap2.sub(3);
+         
+         if (pointer1.equals(pointer2) && field1.equals(field2)) {
+            // Potential for deep merge: Access of same object / field.
+            
+            Term joinedSubHeap = joinHeaps(subHeap1, subHeap2, state1, state2, services);
+            Term joinedVal = null;
+            
+            if (value1.equals(value2)) {
+               // Idempotency...
+               joinedVal = value1;
+               
+            } else {
+               
+               // if-then-else
+               Function skolemConstant = getNewScolemConstantForPrefix(
+                     field1.name().toString(),
+                     ((Function) value1.op()).sort(),
+                     services);
+               
+               joinedVal = tb.func(skolemConstant);
+               
+            }
+            
+            return tb.func((Function) heap1.op(), joinedSubHeap, tb.var(pointer1), tb.func(field1), joinedVal);
+         }
+         
+      } else if (((Function) heap1.op()).equals(createFunc) &&
+            ((Function) heap2.op()).equals(createFunc)) {
+         
+         // Create operations.
+         
+         // Decompose the heap operations.
+         Term subHeap1 = heap1.sub(0);
+         LocationVariable pointer1 = (LocationVariable) heap1.sub(1).op();
+         
+         Term subHeap2 = heap2.sub(0);
+         LocationVariable pointer2 = (LocationVariable) heap2.sub(1).op();
+         
+         if (pointer1.equals(pointer2)) {
+            // Same objects are created: Join.
+            
+            Term joinedSubHeap = joinHeaps(subHeap1, subHeap2, state1, state2, services);
+            return tb.func((Function) heap1.op(), joinedSubHeap, tb.var(pointer1));
+         }
+         
+         // "else" case is fallback at end of method
+         
+      }
+
+      final Function skolemConstant =
+            getNewScolemConstantForPrefix("heap", heap1.sort(), services);
+      return tb.func(skolemConstant);
    }
 
    @Override
