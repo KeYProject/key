@@ -147,7 +147,7 @@ public class JoinIfThenElse extends JoinRule {
             } else {
                
                newElementaryUpdates = newElementaryUpdates.prepend(
-                     createIfThenElseTerm(v, state1, state2, services));
+                     createIfThenElseUpdate(v, state1, state2, services));
                
             }
             
@@ -161,12 +161,26 @@ public class JoinIfThenElse extends JoinRule {
       
    }
    
+   /**
+    * Joins two heaps by if-then-else construction. Tries to shift
+    * the if-then-else as deeply into the heap as possible.
+    * 
+    * @param heap1 The first heap term.
+    * @param heap2 The second heap term.
+    * @param state1 SE state for the first heap term.
+    * @param state2 SE state for the second heap term
+    * @param services The services object.
+    * @return A joined heap term.
+    */
    private Term joinHeaps(
          Term heap1,
          Term heap2,
          SymbolicExecutionState state1,
          SymbolicExecutionState state2,
          Services services) {
+      
+      //TODO: Parts of this code appear redundantly in different join rules;
+      //      it could be sensible to extract those into an own method.
       
       TermBuilder tb = services.getTermBuilder();
       
@@ -176,7 +190,7 @@ public class JoinIfThenElse extends JoinRule {
       
       if (!(heap1.op() instanceof Function) ||
             !(heap2.op() instanceof Function)) {
-         tb.ife(state1.getPathCondition(), heap1, heap2);
+         return createIfThenElseTerm(state1, state2, heap1, heap2, services);
       }
       
       Function storeFunc = (Function) services.getNamespaces().functions().lookup("store");
@@ -203,7 +217,7 @@ public class JoinIfThenElse extends JoinRule {
             if (value1.equals(value2)) {
                joinedVal = value1;
             } else {
-               joinedVal = tb.ife(state1.getPathCondition(), value1, value2);
+               joinedVal = createIfThenElseTerm(state1, state2, value1, value2, services);
             }
             
             return tb.func((Function) heap1.op(), joinedSubHeap, tb.var(pointer1), tb.func(field1), joinedVal);
@@ -224,8 +238,8 @@ public class JoinIfThenElse extends JoinRule {
          }
          
       }
-      
-      return tb.ife(state1.getPathCondition(), heap1, heap2);
+
+      return createIfThenElseTerm(state1, state2, heap1, heap2, services);
    }
    
    /**
@@ -246,7 +260,7 @@ public class JoinIfThenElse extends JoinRule {
     * @return An elementary update like <code>{ v := \if (c1) \then (t1) \else (t2) }</code>,
     *    where the cI are the path conditions of stateI.
     */
-   static Term createIfThenElseTerm (
+   static Term createIfThenElseUpdate (
          final LocationVariable v,
          final SymbolicExecutionState state1,
          final SymbolicExecutionState state2,
@@ -269,9 +283,47 @@ public class JoinIfThenElse extends JoinRule {
    }
    
    /**
+    * Creates an if-then-else term for the variable v. If t1 is
+    * the right side for v in state1, and t2 is the right side
+    * in state1, the resulting term corresponds to
+    * <code>\if (c1) \then (t1) \else (t2)</code>, where
+    * c1 is the path condition of state1. However, the method also
+    * tries an optimization: The path condition c2 of state2 could
+    * be used if it is shorter than c1. Moreover, equal parts of c1
+    * and c2 could be omitted, since the condition shall only distinguish
+    * between the states.
+    * 
+    * @param state1 First state to evaluate.
+    * @param state2 Second state to evaluate.
+    * @param services The services object.
+    * @return An if then else term like <code>\if (c1) \then (t1) \else (t2)</code>,
+    *    where the cI are the path conditions of stateI.
+    */
+   static Term createIfThenElseTerm (
+         final SymbolicExecutionState state1,
+         final SymbolicExecutionState state2,
+         final Term ifTerm,
+         final Term elseTerm,
+         final Services services) {
+      
+      TermBuilder tb = services.getTermBuilder();
+      
+      Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
+            createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm, elseTerm, services);
+      
+      Term cond     = distFormAndRightSidesForITEUpd.first;
+      Term ifForm   = distFormAndRightSidesForITEUpd.second;
+      Term elseForm = distFormAndRightSidesForITEUpd.third;
+      
+      // Construct the update for the symbolic state
+      return tb.ife(cond, ifForm, elseForm);
+      
+   }
+   
+   /**
     * Creates the input for an if-then-else update for the variable v. If t1 is
     * the right side for v in state1, and t2 is the right side in state1, the
-    * elements of the resulting triple can be used to construct an elementary
+    * elements of the resulting quadruple can be used to construct an elementary
     * update corresponding to
     * <code>{ v := \if (c1) \then (t1) \else (t2) }</code>, where c1 is the path
     * condition of state1. However, the method also tries an optimization: The
@@ -316,6 +368,44 @@ public class JoinIfThenElse extends JoinRule {
          rightSide2 = tb.var(v);
       }
       
+      return createDistFormAndRightSidesForITEUpd(
+            state1, state2, rightSide1, rightSide2, services);
+   }
+   
+   /**
+    * Creates the input for an if-then-else update. The elements of the resulting
+    * quadruple can be used to construct an elementary update corresponding to
+    * <code>{ v := \if (c1) \then (ifTerm) \else (elseTerm) }</code>, where c1 is the path
+    * condition of state1. However, the method also tries an optimization: The
+    * path condition c2 of state2 could be used if it is shorter than c1.
+    * Moreover, equal parts of c1 and c2 could be omitted, since the condition
+    * shall only distinguish between the states. The first element of the triple
+    * is the discriminating condition, the second and third elements are the
+    * respective parts for the if and else branch.
+    * 
+    * @param state1
+    *           First state to evaluate.
+    * @param state2
+    *           Second state to evaluate.
+    * @param ifTerm The if term.
+    * @param elseTerm The else term.
+    * @param services
+    *           The services object.
+    * @return Input to construct an elementary update like
+    *         <code>{ v := \if (first) \then (second) \else (third) }</code>,
+    *         where first, second and third are the respective components of
+    *         the returned triple. The fourth component indicates whether the
+    *         path condition of the first (fourth component = false) or the
+    *         second (fourth component = true) state was used as a basis for
+    *         the condition (first component).
+    */
+   static Quadruple<Term, Term, Term, Boolean> createDistFormAndRightSidesForITEUpd (
+         SymbolicExecutionState state1,
+         SymbolicExecutionState state2,
+         Term ifTerm,
+         Term elseTerm,
+         Services services) {
+      
       // We only need the distinguishing subformula; the equal part
       // is not needed. For soundness, it suffices that the "distinguishing"
       // formula is implied by the original path condition; for completeness,
@@ -355,8 +445,8 @@ public class JoinIfThenElse extends JoinRule {
       
       return new Quadruple<Term, Term, Term, Boolean> (
             distinguishingFormula,
-            commuteSides ? rightSide2 : rightSide1,
-            commuteSides ? rightSide1 : rightSide2,
+            commuteSides ? elseTerm : ifTerm,
+            commuteSides ? ifTerm : elseTerm,
             commuteSides);
       
    }

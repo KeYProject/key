@@ -115,7 +115,7 @@ public abstract class JoinWithLatticeAbstraction extends JoinRule {
             // Apply if-then-else construction: Different values
             
             newElementaryUpdates = newElementaryUpdates.prepend(
-                  JoinIfThenElse.createIfThenElseTerm(v, state1, state2, services));
+                  JoinIfThenElse.createIfThenElseUpdate(v, state1, state2, services));
             
          } else {
             
