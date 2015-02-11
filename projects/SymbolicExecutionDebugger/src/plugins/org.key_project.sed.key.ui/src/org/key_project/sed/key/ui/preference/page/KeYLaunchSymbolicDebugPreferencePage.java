@@ -73,6 +73,8 @@ public class KeYLaunchSymbolicDebugPreferencePage extends FieldEditorPreferenceP
       });
       BooleanFieldEditor sigEdit = new BooleanFieldEditor(KeYSEDPreferences.SHOW_SIGNATURE_ON_METHOD_RETURN_NODES, "Show signature instead of only the name on method &return nodes", SWT.NONE, spacer);
       addField(sigEdit);
+      BooleanFieldEditor truthEvaluationEdit = new BooleanFieldEditor(KeYSEDPreferences.TRUTH_VALUE_EVALUATION_ENABLED, "Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)", SWT.NONE, spacer);
+      addField(truthEvaluationEdit);
 
       group = SWTFactory.createGroup(getFieldEditorParent(), "Variables", 1, 1, GridData.FILL_HORIZONTAL);
       final Composite variablesSpacer = SWTFactory.createComposite(group, 2, 1, GridData.FILL_HORIZONTAL);
@@ -87,6 +89,11 @@ public class KeYLaunchSymbolicDebugPreferencePage extends FieldEditorPreferenceP
             variablesEditor.setEnabled(varEdit.getBooleanValue(), variablesSpacer);
          }
       });
+      
+      group = SWTFactory.createGroup(getFieldEditorParent(), "Source Code", 1, 1, GridData.FILL_HORIZONTAL);
+      Composite sourceCodeSpacer = SWTFactory.createComposite(group, 1, 1, GridData.FILL_HORIZONTAL);
+      BooleanFieldEditor highlightReachedCode = new BooleanFieldEditor(KeYSEDPreferences.HIGHLIGHT_REACHED_SOURCE_CODE, "Highlight reached source code during symbolic execution", SWT.NONE, sourceCodeSpacer);
+      addField(highlightReachedCode);
       
       group = SWTFactory.createGroup(getFieldEditorParent(), "KeY", 1, 1, GridData.FILL_HORIZONTAL);
       Composite keySpacer = SWTFactory.createComposite(group, 1, 1, GridData.FILL_HORIZONTAL);

@@ -30,8 +30,8 @@ import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector.ChoiceEntry;
-import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**

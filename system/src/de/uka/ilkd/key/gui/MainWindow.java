@@ -417,6 +417,11 @@ public final class MainWindow extends JFrame  {
 
         // load preferred sizes from system preferences
         setName("mainWindow");
+
+        // bugfix: If this is not here, KeY starts with a 0x0 window if invoked
+        // for the first time.
+        setSize(1000, 600);
+
         loadPreferences(this);
     }
 

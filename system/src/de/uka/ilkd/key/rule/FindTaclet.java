@@ -189,10 +189,11 @@ public abstract class FindTaclet extends Taclet {
      * @param services the Services encapsulating all java information
      * @param matchCond the MatchConditions with all required instantiations 
      */
-    protected abstract void applyReplacewith(TermLabelState termLabelState, TacletGoalTemplate gt, SequentChangeInfo currentSequent,
+    protected abstract void applyReplacewith(Goal goal, TermLabelState termLabelState, TacletGoalTemplate gt, SequentChangeInfo currentSequent,
 					     PosInOccurrence posOfFind,
 					     Services services,
-					     MatchConditions matchCond);
+					     MatchConditions matchCond,
+					     TacletApp tacletApp);
 
 
     /**
@@ -208,7 +209,9 @@ public abstract class FindTaclet extends Taclet {
     protected abstract void applyAdd(TermLabelState termLabelState, Sequent add, SequentChangeInfo sequentChangeInfo,
 				     PosInOccurrence posOfFind,
 				     Services services,
-				     MatchConditions matchCond);
+				     MatchConditions matchCond,
+				     Goal goal,
+				     TacletApp tacletApp);
 
 
     /**  
@@ -252,13 +255,17 @@ public abstract class FindTaclet extends Taclet {
 			      currentSequent,
 			      tacletApp.posInOccurrence(),
 			      services,
-			      mc );
+			      mc,
+			      goal,
+			      (TacletApp) ruleApp);
 
-	    applyReplacewith(termLabelState, gt,
+	    applyReplacewith(currentGoal, 
+	             termLabelState, gt,
 	             currentSequent,
 	             tacletApp.posInOccurrence(),
 	             services,
-	             mc );
+	             mc,
+	             (TacletApp) ruleApp);
 
 	    applyAddrule( gt.rules(),
 			      currentGoal,

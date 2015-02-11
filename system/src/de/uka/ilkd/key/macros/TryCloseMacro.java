@@ -37,6 +37,28 @@ import de.uka.ilkd.key.proof.Proof;
  */
 public class TryCloseMacro extends AbstractProofMacro {
 
+    private static class TryCloseProgressBarListener extends ProgressBarListener {
+
+        private int notClosedGoals = 0;
+
+        private TryCloseProgressBarListener(ProofMacro macro, int numberGoals, int numberSteps, ProverTaskListener l) {
+            super(macro, numberGoals, numberSteps, l);
+        }
+
+        @Override
+        protected String getMessageSuffix() {
+            if(notClosedGoals == 0)
+            return super.getMessageSuffix();
+            else
+                return super.getMessageSuffix() + ", " + notClosedGoals + " goal(s) remain(s) open.";
+        }
+
+        private void incrementNotClosedGoals() {
+            notClosedGoals++;
+        }
+
+    }
+
     /**
      * Instantiates a new try close macro.
      * No changes to the max number of steps.
@@ -124,7 +146,7 @@ public class TryCloseMacro extends AbstractProofMacro {
         macroAdapter.setNumberSteps(getNumberSteps());
         //
         // The observer to handle the progress bar
-        final ProofMacroListener pml =  new ProgressBarListener(macroAdapter, goals.size(),
+        final TryCloseProgressBarListener pml =  new TryCloseProgressBarListener(macroAdapter, goals.size(),
                                                                 getNumberSteps(), listener);
         final ImmutableList<Goal> ignoredOpenGoals =
                 setDifference(proof.openGoals(), goals);
@@ -146,6 +168,7 @@ public class TryCloseMacro extends AbstractProofMacro {
                 // retreat if not closed
                 if(!node.isClosed()) {
                     proof.pruneProof(node);
+                    pml.incrementNotClosedGoals();
                     //closedGoal = null;
                 } else {
                     //closedGoal = goal;

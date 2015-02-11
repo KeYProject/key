@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.io.File;
 
 import de.uka.ilkd.key.proof.io.RuleSource;
 
@@ -35,16 +36,19 @@ public class Includes {
     private final List<String> ldtIncludes;
     /** contains mappings from filenames to RuleSources */
     private final HashMap<String, RuleSource> name2Source;
+    private final List<File> files;
 
     public Includes(){
 	includes = new LinkedList<String>();
 	ldtIncludes = new LinkedList<String>();
 	name2Source = new LinkedHashMap<String, RuleSource>();
+	files = new LinkedList<File>();
     }
 
     private void put(String name, RuleSource source, List<String> list){
 	if(!list.contains(name)){
 	    list.add(name);
+	    files.add(source.file());
 	    name2Source.put(name, source);
 	}
     }
@@ -64,6 +68,10 @@ public class Includes {
      */
     public RuleSource get(String name){
 	return name2Source.get(name);
+    }
+    
+    public List<File> getFiles() {
+    	return files;
     }
 
     /** removes the filename <code>name</code> and its mapping. */

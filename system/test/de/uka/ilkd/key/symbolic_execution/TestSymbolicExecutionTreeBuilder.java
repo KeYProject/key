@@ -45,6 +45,28 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  * @author Martin Hentschel
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
+   
+   /**
+    * Tests example: examples/_testcase/set/assumesUserInputTest in the Symbolic Execution Profile
+    */
+   public void testAssumesUserInputTest() throws Exception {
+      doSETTestAndDispose(keyRepDirectory, 
+                "examples/_testcase/set/assumesUserInputTest/test/AssumesUserInputTest.proof", 
+                "examples/_testcase/set/assumesUserInputTest/oracle/AssumesUserInputTest.xml", 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false);
+   }
+   
    /**
     * Tests example: examples/_testcase/set/symbolicExecutionCompletionsTest
     */
@@ -1506,6 +1528,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
 
@@ -1529,6 +1552,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
 
@@ -1545,6 +1569,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 ALL_IN_ONE_RUN,
+                false,
                 false,
                 false,
                 false,
@@ -1575,6 +1600,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1598,6 +1624,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 false,
+                false,
                 false);
    }
    
@@ -1614,6 +1641,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false,
                 false,
                 ALL_IN_ONE_RUN,
+                false,
                 false,
                 false,
                 false,

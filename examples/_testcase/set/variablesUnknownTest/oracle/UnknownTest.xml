@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <variable name="heapAtPre" isArrayIndex="false">
-      <value name="heapAtPre {true}" typeString="Heap" valueString="heapAtPre" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+      <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
    <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
@@ -47,7 +47,7 @@
                <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="next" isArrayIndex="false">
-                        <value name="next {or(and(not(equals(u_3,self)),or(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null),not(equals(boolean::select(heap,endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),java.lang.Object::&lt;created&gt;),TRUE)))),and(not(equals(u_3,self)),not(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(and(not(equals(u_3,self)),or(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null),not(equals(boolean::select(heap,endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),java.lang.Object::&lt;created&gt;),TRUE)))),and(not(equals(u_3,self)),not(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null))))">
+                        <value name="next {or(and(not(equals(u_3,self)),equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null)),and(not(equals(u_3,self)),not(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(and(not(equals(u_3,self)),equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null)),and(not(equals(u_3,self)),not(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null))))">
                         </value>
                      </variable>
                      <variable name="previous" isArrayIndex="false">

@@ -38,7 +38,7 @@ import de.uka.ilkd.key.util.Pair;
  * and {@link LoopInvariantGraphitiPropertySection}.
  * @author Martin Hentschel
  */
-public class LoopInvariantComposite extends AbstractPredicateComposite {
+public class LoopInvariantComposite extends AbstractTruthValueComposite {
    /**
     * Constructor.
     * @param parent The parent {@link Composite}.

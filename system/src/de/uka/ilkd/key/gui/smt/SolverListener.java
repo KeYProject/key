@@ -69,7 +69,7 @@ public class SolverListener implements SolverLauncherListener {
 
         private static final int RESOLUTION = 1000;
 
-        private class InternSMTProblem {
+        public static class InternSMTProblem {
                 final int problemIndex;
                 final int solverIndex;
                 final SMTSolver solver;
@@ -145,6 +145,14 @@ public class SolverListener implements SolverLauncherListener {
                         return solver.getException() != null;
                 }
                 
+                public SMTSolver getSolver() {
+                        return solver;
+                }
+
+                public LinkedList<Information> getInformation() {
+                        return information;
+                }
+
                 @Override
                 public String toString() {
                         return solver.name() +" applied on "+problem.getName();
@@ -177,13 +185,17 @@ public class SolverListener implements SolverLauncherListener {
                 }
                 if (!problemsWithException.isEmpty()) {
                 	 for(InternSMTProblem problem : problemsWithException){
-                		progressDialog.addInformation("Exception for "+problem.toString()+".", Color.RED,problem);
+                		progressDialog.addInformation(createExceptionTitle(problem), Color.RED,problem);
                 	 }
                 } else {
                         if (settings.getModeOfProgressDialog() == ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE) {
                                 applyEvent(launcher);
                         }
                 }
+        }
+        
+        public static String createExceptionTitle(InternSMTProblem problem) {
+           return "Exception for "+problem.toString()+".";
         }
 
         private String getTitle(SMTProblem p) {
@@ -550,22 +562,27 @@ public class SolverListener implements SolverLauncherListener {
 
 		
 		public void addWarning(SolverType type) {
-			StringBuffer message = new StringBuffer();
-			message.append("You are using a version of "+type.getName()+
-					         " which has not been tested for this version of KeY.\nIt can therefore be that" +
-					         " errors occur that would not occur\nusing " +
-					         (type.getSupportedVersions().length > 1 ? 
-					         "one of the following versions:\n" :
-					        	 "the following version:\n"));
-			for (String v: type.getSupportedVersions()){
-			    message.append(v + ", ");
-			}
-			message.deleteCharAt(message.lastIndexOf(","));
-			
-			progressDialog.addInformation("Warning: Your version of "+type.toString()+" may not be supported by KeY.", Color.ORANGE,message.toString());			
-				
-		
+			progressDialog.addInformation(computeSolverTypeWarningTitle(type), Color.ORANGE, computeSolverTypeWarningMessage(type));			
 		}
+		
+		public static String computeSolverTypeWarningTitle(SolverType type) {
+		   return "Warning: Your version of "+type.toString()+" may not be supported by KeY.";
+		}
+		
+      public static String computeSolverTypeWarningMessage(SolverType type) {
+         StringBuffer message = new StringBuffer();
+         message.append("You are using a version of "+type.getName()+
+                        " which has not been tested for this version of KeY.\nIt can therefore be that" +
+                        " errors occur that would not occur\nusing " +
+                        (type.getSupportedVersions().length > 1 ? 
+                        "one of the following versions:\n" :
+                         "the following version:\n"));
+         for (String v: type.getSupportedVersions()){
+             message.append(v + ", ");
+         }
+         message.deleteCharAt(message.lastIndexOf(","));
+         return message.toString();
+      }
 		
 		private class ProgressDialogListenerImpl implements ProgressDialogListener {
             

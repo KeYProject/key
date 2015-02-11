@@ -430,6 +430,7 @@ provable: ./standard_key/pred_log/jbyteIfEx.key
 provable: ./standard_key/prop_log/allClausesLength4.key
 provable: ./standard_key/prop_log/allClausesLength5.key
 provable: ./standard_key/prop_log/doubleNeg.key
+provable: ./standard_key/prop_log/liarsville.key
 provable: ./standard_key/prop_log/simplest.key
 provable: ./standard_key/prop_log/contraposition.key
 provable: ./standard_key/quantifiers/elimination0.key

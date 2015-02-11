@@ -6,23 +6,23 @@
    </variable>
    <methodCall name="&lt;call ConditionalValuesTest.mainNext(b)&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="b" isArrayIndex="false">
-         <value name="b {not(equals(b,null))}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(b,null))">
-         </value>
          <value name="b {equals(b,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(b,null)">
+         </value>
+         <value name="b {not(equals(b,null))}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(b,null))">
          </value>
       </variable>
       <statement name="b.x.value=2;" pathCondition="true" pathConditionChanged="false">
          <variable name="b" isArrayIndex="false">
-            <value name="b {not(equals(b,null))}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(b,null))">
-            </value>
             <value name="b {equals(b,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(b,null)">
+            </value>
+            <value name="b {not(equals(b,null))}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(b,null))">
             </value>
          </variable>
          <branchCondition name="not(equals(b,null))" pathCondition="not(equals(b,null))" pathConditionChanged="true" branchCondition="not(equals(b,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <variable name="b" isArrayIndex="false">
                <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="x" isArrayIndex="false">
-                     <value name="x {or(not(equals(boolean::select(heap,ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),java.lang.Object::&lt;created&gt;),TRUE)),equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(not(equals(boolean::select(heap,ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),java.lang.Object::&lt;created&gt;),TRUE)),equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))">
+                     <value name="x {equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null)">
                      </value>
                      <value name="x {not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))">
                      </value>

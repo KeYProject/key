@@ -48,6 +48,7 @@ import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicE
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
@@ -763,5 +764,13 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    @Override
    public void setParent(ISEDDebugNode parent) {
       super.setParent(parent);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isTruthValueEvaluationEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
    }
 }

@@ -52,6 +52,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.TermTransformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
@@ -894,17 +895,19 @@ public abstract class Taclet implements Rule, Named {
 				      Services services,
 				      MatchConditions mc,
 				      PosInOccurrence applicationPosInOccurrence,
-				      TacletLabelHint labelHint) {
-	final SyntacticalReplaceVisitor srVisitor =
-	    new SyntacticalReplaceVisitor(termLabelState, 
-	                                       services,
-                                          mc.getInstantiations(),
-                                          applicationPosInOccurrence,
-                                          this,
-                                          labelHint);
-	term.execPostOrder(srVisitor);
-
-	return srVisitor.getTerm();
+				      TacletLabelHint labelHint,
+				      Goal goal, 
+				      TacletApp tacletApp) {
+       final SyntacticalReplaceVisitor srVisitor =
+             new SyntacticalReplaceVisitor(termLabelState, 
+                                                services,
+                                                mc.getInstantiations(),
+                                                applicationPosInOccurrence,
+                                                this,
+                                                labelHint,
+                                                goal);
+         term.execPostOrder(srVisitor);
+         return srVisitor.getTerm();
     }
 
     /**
@@ -948,12 +951,14 @@ public abstract class Taclet implements Rule, Named {
 			       Services           services,
 			       MatchConditions    matchCond,
 			       PosInOccurrence applicationPosInOccurrence,
-			       TacletLabelHint labelHint) { 
+			       TacletLabelHint labelHint,
+			       Goal goal,
+			       TacletApp tacletApp) { 
 
        final SVInstantiations svInst = matchCond.getInstantiations ();
 
        Term instantiatedFormula = syntacticalReplace(termLabelState, schemaFormula.formula(), 
-             services, matchCond, applicationPosInOccurrence, new TacletLabelHint(labelHint, schemaFormula));
+             services, matchCond, applicationPosInOccurrence, new TacletLabelHint(labelHint, schemaFormula), goal, tacletApp);
 
        if (!svInst.getUpdateContext().isEmpty()) {
           instantiatedFormula = services.getTermBuilder().applyUpdatePairsSequential(svInst.getUpdateContext(), 
@@ -976,14 +981,14 @@ public abstract class Taclet implements Rule, Named {
      * @return the instanted formulas of the semisquent as list
      */
     protected ImmutableList<SequentFormula> instantiateSemisequent(TermLabelState termLabelState, Semisequent semi, Services services,
-            MatchConditions matchCond, PosInOccurrence applicationPosInOccurrence, TacletLabelHint labelHint) {       
+            MatchConditions matchCond, PosInOccurrence applicationPosInOccurrence, TacletLabelHint labelHint, Goal goal, TacletApp tacletApp) {       
         
        // TODO: use mutable list
         ImmutableList<SequentFormula> replacements = ImmutableSLList.<SequentFormula>nil();
 
         for (SequentFormula sf : semi) {
             replacements = replacements.append
-                (instantiateReplacement(termLabelState, sf, services, matchCond, applicationPosInOccurrence, labelHint));           
+                (instantiateReplacement(termLabelState, sf, services, matchCond, applicationPosInOccurrence, labelHint, goal, tacletApp));           
         }
         
         return replacements;
@@ -1010,8 +1015,10 @@ public abstract class Taclet implements Rule, Named {
             PosInOccurrence pos,
             Services services, 
             MatchConditions matchCond,
-            TacletLabelHint labelHint) {
-       final ImmutableList<SequentFormula> replacements = instantiateSemisequent(termLabelState, semi, services, matchCond, pos, labelHint);
+            TacletLabelHint labelHint,
+            Goal goal,
+            TacletApp tacletApp) {
+       final ImmutableList<SequentFormula> replacements = instantiateSemisequent(termLabelState, semi, services, matchCond, pos, labelHint, goal, tacletApp);
        currentSequent.combine(currentSequent.sequent().changeFormula(replacements, pos));
     }
 
@@ -1038,9 +1045,11 @@ public abstract class Taclet implements Rule, Named {
              Services services, 
              MatchConditions matchCond,
              PosInOccurrence applicationPosInOccurrence,
-             TacletLabelHint labelHint) {
+             TacletLabelHint labelHint,
+             Goal goal,
+             TacletApp tacletApp) {
        final ImmutableList<SequentFormula> replacements = 
-             instantiateSemisequent(termLabelState, semi, services, matchCond, applicationPosInOccurrence, labelHint);
+             instantiateSemisequent(termLabelState, semi, services, matchCond, applicationPosInOccurrence, labelHint, goal, tacletApp);
        
        if (pos != null) {
           currentSequent.combine(currentSequent.sequent().addFormula(replacements, pos));
@@ -1073,8 +1082,10 @@ public abstract class Taclet implements Rule, Named {
 			      Services services, 
 			      MatchConditions matchCond,
 			      PosInOccurrence applicationPosInOccurrence,
-			      TacletLabelHint labelHint) { 
-	    addToPos(termLabelState, semi, currentSequent, pos, true, services, matchCond, applicationPosInOccurrence, labelHint);
+			      TacletLabelHint labelHint,
+			      Goal goal,
+			      TacletApp tacletApp) { 
+	    addToPos(termLabelState, semi, currentSequent, pos, true, services, matchCond, applicationPosInOccurrence, labelHint, goal, tacletApp);
     }
 
     /**
@@ -1101,8 +1112,10 @@ public abstract class Taclet implements Rule, Named {
 			     Services services, 
 			     MatchConditions matchCond,
 			     PosInOccurrence applicationPosInOccurrence,
-			     TacletLabelHint labelHint) {
-       addToPos(termLabelState, semi, currentSequent, pos, false, services, matchCond, applicationPosInOccurrence, labelHint);
+			     TacletLabelHint labelHint,
+			     Goal goal,
+			     TacletApp tacletApp) {
+       addToPos(termLabelState, semi, currentSequent, pos, false, services, matchCond, applicationPosInOccurrence, labelHint, goal, tacletApp);
     }
 
     protected abstract Taclet setName(String s);

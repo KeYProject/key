@@ -36,6 +36,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.junit.Test;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -48,7 +49,28 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * Tests for {@link JDTUtil}
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public class JDTUtilTest extends TestCase {
+   /**
+    * Tests {@link JDTUtil#ensureValidJavaTypeName(String, IJavaProject)}
+    */
+   @Test
+   public void testEnsureValidJavaTypeName() throws Exception {
+      IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testEnsureValidJavaTypeName");
+      TestUtilsUtil.createFile(javaProject.getProject().getFolder(JDTUtil.getSourceFolderName()), "MyClass", "public class MyClass {}");
+      // Validate null
+      assertNull(JDTUtil.ensureValidJavaTypeName(null, null));
+      assertNull(JDTUtil.ensureValidJavaTypeName(null, javaProject));
+      // Validate empty String
+      assertEquals("MyClass", JDTUtil.ensureValidJavaTypeName("MyClass", null));
+      assertEquals("MyClass", JDTUtil.ensureValidJavaTypeName("MyClass", javaProject));
+      assertTrue(JavaConventionsUtil.validateJavaTypeName("MyClass", javaProject).isOK());
+      // Validate invalid name
+      assertEquals("_M_y_C_lass__", JDTUtil.ensureValidJavaTypeName("(M)y[C]lass{}", null));
+      assertEquals("_M_y_C_lass__", JDTUtil.ensureValidJavaTypeName("(M)y[C]lass{}", javaProject));
+      assertTrue(JavaConventionsUtil.validateJavaTypeName("_M_y_C_lass__", javaProject).isOK());
+   }
+   
    /**
     * Tests {@link JDTUtil#isInSourceFolder(IResource)}.
     */
@@ -332,7 +354,7 @@ public class JDTUtilTest extends TestCase {
         // Create initial java project
         IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testAddClasspathEntry");
         IFolder src = javaProject.getProject().getFolder("src");
-        IClasspathEntry[] defaultEntries = TestUtilsUtil.getDefaultJRELibrary();
+        IClasspathEntry[] defaultEntries = JDTUtil.getDefaultJRELibrary();
         IClasspathEntry[] entries = javaProject.getRawClasspath();
         assertEquals(1 + defaultEntries.length, entries.length);
         assertEquals(src.getFullPath(), entries[0].getPath());

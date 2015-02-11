@@ -29,7 +29,7 @@ import de.uka.ilkd.key.util.Pair;
  * and {@link PostconditionGraphitiPropertySection}.
  * @author Martin Hentschel
  */
-public class PostconditionComposite extends AbstractPredicateComposite {
+public class PostconditionComposite extends AbstractTruthValueComposite {
    /**
     * Constructor.
     * @param parent The parent {@link Composite}.

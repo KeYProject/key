@@ -32,6 +32,7 @@ import org.key_project.util.jdt.JDTUtil;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -430,5 +431,13 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
    @Override
    public void setParent(ISEDDebugNode parent) {
       super.setParent(parent);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isTruthValueEvaluationEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
    }
 }

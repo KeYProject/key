@@ -101,6 +101,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
                            false, 
                            false, 
                            false, 
+                           true,
                            8, 
                            executor);
    }

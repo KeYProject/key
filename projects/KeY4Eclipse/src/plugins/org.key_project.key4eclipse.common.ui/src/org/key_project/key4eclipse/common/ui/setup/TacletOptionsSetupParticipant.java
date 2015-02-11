@@ -24,8 +24,8 @@ import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.util.eclipse.JobUtil;
 import org.key_project.util.eclipse.setup.ISetupParticipant;
 
-import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**

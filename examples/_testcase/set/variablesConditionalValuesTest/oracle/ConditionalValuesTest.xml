@@ -72,13 +72,13 @@
                      </value>
                   </variable>
                   <variable name="y" isArrayIndex="false">
-                     <value name="y {not(equals(y,x))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,x))">
-                     </value>
                      <value name="y {equals(y,x)}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="equals(y,x)">
                         <variable name="value" isArrayIndex="false">
                            <value name="value {equals(y,x)}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,x)">
                            </value>
                         </variable>
+                     </value>
+                     <value name="y {not(equals(y,x))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,x))">
                      </value>
                   </variable>
                   <statement name="return x.value+y.value;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false">
@@ -93,15 +93,15 @@
                         </value>
                      </variable>
                      <variable name="y" isArrayIndex="false">
-                        <value name="y {not(equals(y,x))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,x))">
-                           <variable name="value" isArrayIndex="false">
-                              <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                              </value>
-                           </variable>
-                        </value>
                         <value name="y {equals(y,x)}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="equals(y,x)">
                            <variable name="value" isArrayIndex="false">
                               <value name="value {equals(y,x)}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,x)">
+                              </value>
+                           </variable>
+                        </value>
+                        <value name="y {not(equals(y,x))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,x))">
+                           <variable name="value" isArrayIndex="false">
+                              <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
@@ -118,15 +118,15 @@
                            </value>
                         </variable>
                         <variable name="y" isArrayIndex="false">
-                           <value name="y {not(equals(y,x))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,x))">
-                              <variable name="value" isArrayIndex="false">
-                                 <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                                 </value>
-                              </variable>
-                           </value>
                            <value name="y {equals(y,x)}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="equals(y,x)">
                               <variable name="value" isArrayIndex="false">
                                  <value name="value {equals(y,x)}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,x)">
+                                 </value>
+                              </variable>
+                           </value>
+                           <value name="y {not(equals(y,x))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,x))">
+                              <variable name="value" isArrayIndex="false">
+                                 <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
@@ -143,15 +143,15 @@
                               </value>
                            </variable>
                            <variable name="y" isArrayIndex="false">
-                              <value name="y {not(equals(y,x))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,x))">
-                                 <variable name="value" isArrayIndex="false">
-                                    <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                                    </value>
-                                 </variable>
-                              </value>
                               <value name="y {equals(y,x)}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="equals(y,x)">
                                  <variable name="value" isArrayIndex="false">
                                     <value name="value {equals(y,x)}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,x)">
+                                    </value>
+                                 </variable>
+                              </value>
+                              <value name="y {not(equals(y,x))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,x))">
+                                 <variable name="value" isArrayIndex="false">
+                                    <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>

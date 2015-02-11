@@ -14,6 +14,7 @@
 package org.key_project.sed.key.ui.property;
 
 import org.eclipse.jface.viewers.IFilter;
+import org.key_project.sed.key.core.model.KeYMethodContract;
 
 /**
  * {@link IFilter} implementation used to define if a {@link PreconditionPropertySection}
@@ -26,6 +27,7 @@ public class PreconditionTreeFilter implements IFilter {
     */
    @Override
    public boolean select(Object toTest) {
-      return PreconditionPropertySection.getDebugNode(toTest) != null;
+      KeYMethodContract node = PreconditionPropertySection.getDebugNode(toTest);
+      return node != null && node.isTruthValueEvaluationEnabled();
    }
 }

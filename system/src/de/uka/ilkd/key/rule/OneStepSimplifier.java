@@ -224,7 +224,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
      * locally at the given position using the given taclet index.
      * @param protocol
      */
-    private SequentFormula simplifyPos(Services services,
+    private SequentFormula simplifyPos(Goal goal, Services services,
                     PosInOccurrence pos,
                     int indexNr,
                     Protocol protocol) {
@@ -244,7 +244,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
                 }
             }
             RewriteTaclet taclet = (RewriteTaclet) app.rule();
-            SequentFormula result = taclet.getRewriteResult(new TermLabelState(), services, app);
+            SequentFormula result = taclet.getRewriteResult(goal, new TermLabelState(), services, app);
             if(protocol != null) {
                 protocol.add(app);
             }
@@ -261,12 +261,12 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
      * index.
      * @param protocol
      */
-    private SequentFormula simplifySub(Services services,
+    private SequentFormula simplifySub(Goal goal, Services services,
                     PosInOccurrence pos,
                     int indexNr, Protocol protocol) {
         for(int i = 0, n = pos.subTerm().arity(); i < n; i++) {
             SequentFormula result
-            = simplifyPosOrSub(services, pos.down(i), indexNr, protocol);
+            = simplifyPosOrSub(goal, services, pos.down(i), indexNr, protocol);
             if(result != null) {
                 return result;
             }
@@ -280,7 +280,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
      * subterms using the given taclet index.
      * @param protocol
      */
-    private SequentFormula simplifyPosOrSub(Services services,
+    private SequentFormula simplifyPosOrSub(Goal goal, Services services,
                     PosInOccurrence pos,
                     int indexNr, Protocol protocol) {
         final Term term = pos.subTerm();
@@ -290,14 +290,14 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
 
         SequentFormula result;
         if(bottomUp[indexNr]) {
-            result = simplifySub(services, pos, indexNr, protocol);
+            result = simplifySub(goal, services, pos, indexNr, protocol);
             if(result == null) {
-                result = simplifyPos(services, pos, indexNr, protocol);
+                result = simplifyPos(goal, services, pos, indexNr, protocol);
             }
         } else {
-            result = simplifyPos(services, pos, indexNr, protocol);
+            result = simplifyPos(goal, services, pos, indexNr, protocol);
             if(result == null) {
-                result = simplifySub(services, pos, indexNr, protocol);
+                result = simplifySub(goal, services, pos, indexNr, protocol);
             }
         }
 
@@ -443,7 +443,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
             PosInOccurrence pos = new PosInOccurrence(cf,
                             PosInTerm.getTopLevel(),
                             inAntecedent);
-            result = simplifyPosOrSub(services, pos, i, protocol);
+            result = simplifyPosOrSub(goal, services, pos, i, protocol);
             if(result != null) {
                 return result;
             }

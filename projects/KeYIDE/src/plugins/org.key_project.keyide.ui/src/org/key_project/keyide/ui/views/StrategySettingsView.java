@@ -22,8 +22,8 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.PageBookView;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
-import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.StrategySettings;
 
 /**
  * <p>

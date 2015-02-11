@@ -133,7 +133,7 @@ public class WindowUserInterface extends AbstractUserInterface {
                     (ApplyStrategyInfo) info.getResult();
 
             Proof proof = info.getProof();
-            if (!proof.closed()) {
+            if (!proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
                 Goal g = result.nonCloseableGoal();
                 if (g == null) {
                     g = proof.openGoals().head();
@@ -154,7 +154,7 @@ public class WindowUserInterface extends AbstractUserInterface {
                 resetStatus(this);
                 assert info instanceof ProofMacroFinishedInfo;
                 Proof proof = info.getProof();
-                if (!proof.closed()) {
+                if (!proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
                     Goal g = proof.openGoals().head();
                     mainWindow.getMediator().goalChosen(g);
                     if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
