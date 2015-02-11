@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call LoopInvariantWithSplittingQuery.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
-      <loopInvariant name="invariant: magic(x) &gt;= 0;
-variant: magic(x)
+      <loopInvariant name="invariant: LoopInvariantWithSplittingQuery.magic(x) &gt;= 0;
+variant: LoopInvariantWithSplittingQuery.magic(x)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
          <branchCondition name="update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
     x_50=magic(x);
@@ -31,7 +31,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
     x_50=magic(x);
     b_5=x_50&gt;0;
   }
-}\] (and(equals(b_5,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false">
+}\] (and(equals(b_5,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false" blockOpened="true">
                      <statement name="return x_33;" pathCondition="not(or(leq(x_0,Z(neglit(1(#)))),not(imp(geq(x_0,Z(0(#))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
     x_50=magic(x);
     b_5=x_50&gt;0;
@@ -57,7 +57,9 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                               </termination>
                            </statement>
                         </methodReturn>
+                        <completedBlockEntry path="/0/0/0/0/0/0" conditionString="true"/>
                      </statement>
+                     <blockCompletionEntry path="/0/0/0/0/0/0/0"/>
                   </branchStatement>
                   <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
                </methodCall>
@@ -76,7 +78,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
     x_50=magic(x);
     b_5=x_50&gt;0;
   }
-}\] (and(equals(b_5,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false">
+}\] (and(equals(b_5,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))))))" pathConditionChanged="false" blockOpened="true">
                      <statement name="return -x_24;" pathCondition="not(or(geq(x_0,Z(0(#))),not(imp(leq(x_0,Z(neglit(1(#)))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
     x_50=magic(x);
     b_5=x_50&gt;0;
@@ -102,7 +104,9 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                               </termination>
                            </statement>
                         </methodReturn>
+                        <completedBlockEntry path="/0/0/0/1/0/0" conditionString="true"/>
                      </statement>
+                     <blockCompletionEntry path="/0/0/0/1/0/0/0"/>
                   </branchStatement>
                   <methodReturnEntry path="/0/0/0/1/0/0/0/0"/>
                </methodCall>

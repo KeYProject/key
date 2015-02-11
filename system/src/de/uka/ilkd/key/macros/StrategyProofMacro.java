@@ -14,10 +14,10 @@
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.ApplyStrategy;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Proof;
@@ -42,7 +42,7 @@ import de.uka.ilkd.key.strategy.Strategy;
  */
 public abstract class StrategyProofMacro extends AbstractProofMacro {
 
-    protected abstract Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc);
+    protected abstract Strategy createStrategy(Proof proof, PosInOccurrence posInOcc);
 
     /**
      * {@inheritDoc}
@@ -57,6 +57,11 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
         return goals != null && !goals.isEmpty();
+    }
+
+    @Override
+    public boolean isApplicableWithoutPosition() {
+        return true;
     }
 
     /**
@@ -75,7 +80,8 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      * If the automation is interrupted, report the interruption as an exception.
      */
     @Override
-    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+    public ProofMacroFinishedInfo applyTo(Proof proof,
+                                          KeYMediator mediator,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
@@ -85,8 +91,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
             return null;
         }
 
-        final Proof proof = goals.head().proof();
-        final IGoalChooser goalChooser = mediator.getProfile().getSelectedGoalChooserBuilder().create();
+        final IGoalChooser goalChooser = proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create();
         final ApplyStrategy applyStrategy = new ApplyStrategy(goalChooser);
         final ImmutableList<Goal> ignoredOpenGoals =
                 setDifference(proof.openGoals(), goals);
@@ -117,7 +122,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
 
         // set a new strategy.
         Strategy oldStrategy = proof.getActiveStrategy();
-        proof.setActiveStrategy(createStrategy(mediator, posInOcc));
+        proof.setActiveStrategy(createStrategy(mediator.getInteractiveProver().getProof(), posInOcc));
 
         ProofMacroFinishedInfo info =
                 new ProofMacroFinishedInfo(this, goals, proof);

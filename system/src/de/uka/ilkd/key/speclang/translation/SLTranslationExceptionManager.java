@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.speclang.translation;    
+package de.uka.ilkd.key.speclang.translation;
 
 import antlr.ANTLRException;
 import antlr.LLkParser;
@@ -24,23 +24,23 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
 
 
 /**
- * Some common exception / position management functionality used 
+ * Some common exception / position management functionality used
  * by SL translation parsers.
  */
 public class SLTranslationExceptionManager {
-    
+
     private final String fileName;
     private final Position offsetPos;
     private final int line;
     private final int column;
-    
-    
+
+
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
-    
-    public SLTranslationExceptionManager(LLkParser parser, 
-                                         String fileName, 
+
+    public SLTranslationExceptionManager(LLkParser parser,
+                                         String fileName,
                                          Position offsetPos) {
 	int line;
 	int column;
@@ -66,40 +66,40 @@ public class SLTranslationExceptionManager {
         this.fileName  = fileName;
         this.offsetPos = offsetPos;
     }
-    
-    
-    
+
+
+
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
-    
-    private Position createAbsolutePosition(int relativeLine, 
+
+    private Position createAbsolutePosition(int relativeLine,
                                             int relativeColumn) {
         int absoluteLine = offsetPos.getLine() + relativeLine - 1;
-        int absoluteColumn = (relativeLine == 1 ? offsetPos.getColumn() : 1) 
+        int absoluteColumn = (relativeLine == 1 ? offsetPos.getColumn() : 1)
                              + relativeColumn - 1;
-        return new Position(absoluteLine, absoluteColumn); 
+        return new Position(absoluteLine, absoluteColumn);
     }
-    
+
     private Position createAbsolutePosition(final Position pos) {
 	return this.createAbsolutePosition(pos.getLine(), pos.getColumn());
     }
 
-    
+
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
-        
+
     /**
      * Creates a string with the position information of the passed token.
      */
     public PositionedString createPositionedString(String text, Token t) {
-        return new PositionedString(text, 
-                                    fileName, 
-                                    createAbsolutePosition(t.getLine(), 
+        return new PositionedString(text,
+                                    fileName,
+                                    createAbsolutePosition(t.getLine(),
                                                            t.getColumn()));
-    }   
-    
+    }
+
     public PositionedString createPositionedString(String text,
 	    org.antlr.runtime.Token t) {
 	return new PositionedString(text, fileName, createAbsolutePosition(
@@ -109,7 +109,7 @@ public class SLTranslationExceptionManager {
     /**
      * Creates a string with position information from the given relative
      * position.
-     * 
+     *
      * @param text
      *            the {@link String}
      * @param pos
@@ -121,28 +121,28 @@ public class SLTranslationExceptionManager {
 	    final Position pos) {
 	return new PositionedString(text, fileName, createAbsolutePosition(pos));
     }
-    
+
     /**
      * Creates a string with the current absolute position information
      */
     public PositionedString createPositionedString(String text) {
-        return new PositionedString(text, 
-                                    fileName, 
+        return new PositionedString(text,
+                                    fileName,
                                     createAbsolutePosition(this.line, this.column));
     }
-    
-    
+
+
     /**
-     * Creates an SLTranslationException with current absolute position 
+     * Creates an SLTranslationException with current absolute position
      * information.
      */
     public SLTranslationException createException(String message) {
-        return new SLTranslationException(message, 
-                                          fileName, 
+        return new SLTranslationException(message,
+                                          fileName,
                                           createAbsolutePosition(this.line, this.column));
     }
-            
-    
+
+
     /**
      * Creates an SLTranslationException with the position information of the
      * passed token.
@@ -161,7 +161,7 @@ public class SLTranslationExceptionManager {
     }
 
     /**
-     * Creates an SLTranslationException with current absolute position 
+     * Creates an SLTranslationException with current absolute position
      * information.
      */
     public SLTranslationException createException(String message, Throwable cause){
@@ -169,11 +169,11 @@ public class SLTranslationExceptionManager {
         result.initCause(cause);
         return result;
     }
-    
+
     /**
      * Creates an SLTranslationException with the position information of the
      * passed token.
-     * 
+     *
      * @param cause the exception which causes the new exception to be created.
      */
     public SLTranslationException createException(String message, Token t, Throwable cause) {
@@ -181,22 +181,22 @@ public class SLTranslationExceptionManager {
         result.initCause(cause);
         return result;
     }
-    
-    
+
+
     /**
-     * Creates an SLWarningException with current absolute position 
+     * Creates an SLWarningException with current absolute position
      * information.
      */
     public SLTranslationException createWarningException(String message) {
-        return new SLWarningException(message, 
-                                      fileName, 
+        return new SLWarningException(message,
+                                      fileName,
                                       createAbsolutePosition(this.line, this.column));
     }
-    
+
     public SLTranslationException createWarningException(String message, Token t) {
         return new SLWarningException(new PositionedString(message, t));
     }
-    
+
     public SLTranslationException createWarningException(String message,
 	    org.antlr.runtime.Token t) {
 	return new SLWarningException(new PositionedString(message, t));
@@ -214,23 +214,23 @@ public class SLTranslationExceptionManager {
         } else {
             pos = createAbsolutePosition(this.line, this.column);
         }
-        
-        return new SLTranslationException(e.getMessage() 
-                                          + " (" 
-                                          + e.getClass().getName() 
-                                          + ")", 
-                                          fileName, 
+
+        return new SLTranslationException(e.getMessage()
+                                          + " ("
+                                          + e.getClass().getName()
+                                          + ")",
+                                          fileName,
                                           pos,
-                                          e.getStackTrace());
+                                          e);
     }
 
     public SLTranslationException convertException(
-	    org.antlr.runtime.RecognitionException e) {
+	    String message, org.antlr.runtime.RecognitionException e) {
 	Position pos;
 	pos = createAbsolutePosition(e.line, e.charPositionInLine);
 
-	return new SLTranslationException(e.getMessage() + " ("
+	return new SLTranslationException(message + " ("
 		+ e.getClass().getName() + ")", fileName, pos,
-		e.getStackTrace());
+		e);
     }
 }

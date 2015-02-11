@@ -22,8 +22,8 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import de.uka.ilkd.key.gui.AutoModeListener;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.AutoModeListener;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.actions.ExceptionFailureNotificationDialog;
 import de.uka.ilkd.key.gui.notification.actions.GeneralFailureJTextPaneDisplay;
 import de.uka.ilkd.key.gui.notification.actions.GeneralInformationJTextPaneDisplay;

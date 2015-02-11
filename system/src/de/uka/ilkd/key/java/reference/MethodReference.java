@@ -108,8 +108,12 @@ public class MethodReference extends JavaNonTerminalProgramElement
     }
     
     public SourceElement getFirstElement() {
-        return (prefix == null) 
-	    ? getChildAt(0).getFirstElement() : prefix.getFirstElement();
+        return (prefix == null) ? getChildAt(0).getFirstElement() : prefix.getFirstElement();
+    }
+
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+        return (prefix == null) ? getChildAt(0).getFirstElement() : prefix.getFirstElementIncludingBlocks();
     }
 
 

@@ -33,16 +33,19 @@ import org.eclipse.debug.internal.ui.viewers.update.DefaultSelectionPolicy;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDGroupable;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.event.ISEDAnnotationLinkListener;
 import org.key_project.sed.core.model.event.SEDAnnotationLinkEvent;
 import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
 import org.key_project.sed.core.util.SEDAnnotationUtil;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 
 /**
@@ -346,6 +349,51 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
       return getDebugTarget().computeHitBreakpoints(this);
    }
    
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition getGroupStartCondition(final ISEDDebugNode startNode) throws DebugException {
+      ISEDBranchCondition[] conditions = getGroupStartConditions();
+      return ArrayUtil.search(conditions, new IFilter<ISEDBranchCondition>() {
+         @Override
+         public boolean select(ISEDBranchCondition element) {
+            try {
+               return element.getParent() == startNode;
+            }
+            catch (DebugException e) {
+               return false;
+            }
+         }
+      });
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition getInnerMostVisibleGroupStartCondition() throws DebugException {
+      ISEDBranchCondition result = null;
+      ISEDBranchCondition[] startConditions = getGroupStartConditions();
+      if (startConditions != null) {
+         // Find first collapsed condition.
+         int i = 0;
+         while (result == null && i < startConditions.length) {
+            ISEDDebugNode parent = startConditions[i].getParent();
+            if (parent instanceof ISEDGroupable) {
+               if (((ISEDGroupable) parent).isCollapsed()) {
+                  result = startConditions[i];
+               }
+            }
+         }
+         // Return last branch condition if not of them is collapsed.
+         if (result == null && startConditions.length >= 1) {
+            result = startConditions[startConditions.length - 1];
+         }
+      }
+      return result;
+   }
+
    /**
     * {@inheritDoc}
     */

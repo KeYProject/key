@@ -198,4 +198,37 @@ public interface ISEDDebugNode extends ISEDDebugElement {
     * @throws DebugException Occurred Exception.
     */
    public ISEDConstraint[] getConstraints() throws DebugException;
+   
+   /**
+    * Returns the conditions under which an {@link ISEDGroupable} {@link ISEDDebugNode} is completed by this {@link ISEDDebugNode}.
+    * <p>
+    * The conditions are ordered by the occurrence in the tree. 
+    * This means that the node at the second index is a parent or grand parent of the node at the first index and so on.
+    * @return The conditions under which an {@link ISEDGroupable} {@link ISEDDebugNode} is completed by this {@link ISEDDebugNode}.
+    * @exception DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public ISEDBranchCondition[] getGroupStartConditions() throws DebugException;
+   
+   /**
+    * Returns the inner most visible group start condition.
+    * @return The inner most visible group start condition or {@code null} if not available.
+    * @exception DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public ISEDBranchCondition getInnerMostVisibleGroupStartCondition() throws DebugException;
+   
+   /**
+    * Returns the condition under which the given {@link ISEDDebugNode} is completed by this {@link ISEDDebugNode}.
+    * @return The condition under which the given {@link ISEDDebugNode} is completed by this {@link ISEDDebugNode}.
+    * @exception DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public ISEDBranchCondition getGroupStartCondition(ISEDDebugNode startNode) throws DebugException;
 }

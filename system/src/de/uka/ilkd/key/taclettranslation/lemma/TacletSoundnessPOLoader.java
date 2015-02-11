@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.taclettranslation.lemma;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -305,7 +306,7 @@ public class TacletSoundnessPOLoader {
                         assert tacletLoader instanceof TacletLoader.TacletFromFileLoader;
                         TacletLoader loader =
                                         new TacletLoader.TacletFromFileLoader((TacletLoader.TacletFromFileLoader)
-                                                        tacletLoader,originalConfig);
+                                                        tacletLoader,originalConfig.copy());
                         ImmutableSet<Taclet> unfilteredResult = loader.loadTaclets();
                         resultingTacletsForOriginalProof = computeCommonTaclets(unfilteredResult, resultingTaclets);
                 }
@@ -329,15 +330,22 @@ public class TacletSoundnessPOLoader {
                         ImmutableSet<Taclet> axioms, 
                         ImmutableSet<Taclet> loadedTaclets) {
 
-              tacletLoader.manageAvailableTaclets(originalConfig, 
-                        loadedTaclets, tacletsToProve);
 
                 ProofObligationCreator creator = new ProofObligationCreator();
+
+
+                List<Taclet> tacletsToProveList = new ArrayList<Taclet>();
+                for (Taclet taclet : tacletsToProve) {
+                    tacletsToProveList.add(taclet);
+                }
 
                 InitConfig[] proofConfigs = new InitConfig[tacletsToProve.size()];
                 for (int i = 0; i<proofConfigs.length; i++) {
                    proofConfigs[i] = originalConfig.deepCopy();
                    proofConfigs[i].registerRules(tacletsToProve, AxiomJustification.INSTANCE);
+
+                   tacletLoader.manageAvailableTaclets(proofConfigs[i], tacletsToProveList.get(i));
+
                 }
                 
                 ProofAggregate p = creator.create(tacletsToProve, proofConfigs, axioms, listeners);

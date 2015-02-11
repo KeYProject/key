@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call self.compute(k)&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (this.h*2&gt;k)" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (this.h*2&gt;k)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" pathCondition="gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" pathConditionChanged="true" branchCondition="gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="this.l=r.nl.m+r.x;" pathCondition="gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" pathConditionChanged="false">
                <branchCondition name="not(equals(Refer::select(heap,null,StaticMember::$r),null))" pathCondition="and(gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),not(equals(Refer::select(heap,null,StaticMember::$r),null)))" pathConditionChanged="true" branchCondition="not(equals(Refer::select(heap,null,StaticMember::$r),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -12,11 +12,15 @@
                            </termination>
                         </methodReturn>
                      </statement>
+                     <completedBlockEntry path="/0/0" conditionString="and(gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),not(equals(Refer::select(heap,null,StaticMember::$r),null)))"/>
                   </statement>
                </branchCondition>
                <branchCondition name="equals(Refer::select(heap,null,StaticMember::$r),null)" pathCondition="and(gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),equals(Refer::select(heap,null,StaticMember::$r),null))" pathConditionChanged="true" branchCondition="equals(Refer::select(heap,null,StaticMember::$r),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),equals(Refer::select(heap,null,StaticMember::$r),null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                  </termination>
+                  <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call self.compute(k)&gt;&gt;" pathCondition="and(gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),equals(Refer::select(heap,null,StaticMember::$r),null))" pathConditionChanged="false" methodReturnCondition="and(gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),equals(Refer::select(heap,null,StaticMember::$r),null))">
+                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),equals(Refer::select(heap,null,StaticMember::$r),null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                     </termination>
+                     <completedBlockEntry path="/0/0" conditionString="and(gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),equals(Refer::select(heap,null,StaticMember::$r),null))"/>
+                  </exceptionalMethodReturn>
                </branchCondition>
             </statement>
          </branchCondition>
@@ -31,19 +35,27 @@
                         </methodReturn>
                      </branchCondition>
                      <branchCondition name="equals(Refer::select(heap,null,StaticMember::$r),null)" pathCondition="and(leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),equals(Refer::select(heap,null,StaticMember::$r),null))" pathConditionChanged="true" branchCondition="equals(Refer::select(heap,null,StaticMember::$r),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),equals(Refer::select(heap,null,StaticMember::$r),null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                        </termination>
+                        <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call self.compute(k)&gt;&gt;" pathCondition="and(leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),equals(Refer::select(heap,null,StaticMember::$r),null))" pathConditionChanged="false" methodReturnCondition="and(leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),equals(Refer::select(heap,null,StaticMember::$r),null))">
+                           <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),equals(Refer::select(heap,null,StaticMember::$r),null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                           </termination>
+                        </exceptionalMethodReturn>
                      </branchCondition>
                   </statement>
+                  <completedBlockEntry path="/0/0" conditionString="leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)"/>
                </statement>
             </statement>
          </branchCondition>
+         <blockCompletionEntry path="/0/0/0/0/0/0"/>
+         <blockCompletionEntry path="/0/0/0/0/1/0"/>
+         <blockCompletionEntry path="/0/0/1/0/0"/>
       </branchStatement>
       <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/1/0"/>
       <methodReturnEntry path="/0/0/1/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0/0/0/1/0"/>
    </methodCall>
    <terminationEntry path="/0/0/0/0/0/0/0/0/0"/>
-   <terminationEntry path="/0/0/0/0/1/0"/>
+   <terminationEntry path="/0/0/0/0/1/0/0"/>
    <terminationEntry path="/0/0/1/0/0/0/0/0/0"/>
-   <terminationEntry path="/0/0/1/0/0/0/1/0"/>
+   <terminationEntry path="/0/0/1/0/0/0/1/0/0"/>
 </start>

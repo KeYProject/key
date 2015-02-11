@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <branchStatement name="if (asdf&lt;0)" pathCondition="true" pathConditionChanged="false">
+   <branchStatement name="if (asdf&lt;0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
       <branchCondition name="lt(asdf,Z(0(#)))" pathCondition="lt(asdf,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(asdf,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
          <statement name="x=x*-1;" pathCondition="lt(asdf,Z(0(#)))" pathConditionChanged="false">
             <statement name="x+=2;" pathCondition="lt(asdf,Z(0(#)))" pathConditionChanged="false">
                <termination name="&lt;end&gt;" pathCondition="lt(asdf,Z(0(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                </termination>
+               <completedBlockEntry path="/0" conditionString="lt(asdf,Z(0(#)))"/>
             </statement>
          </statement>
       </branchCondition>
@@ -14,9 +15,12 @@
             <statement name="return x;" pathCondition="gt(asdf,Z(neglit(1(#))))" pathConditionChanged="false">
                <termination name="&lt;end&gt;" pathCondition="gt(asdf,Z(neglit(1(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                </termination>
+               <completedBlockEntry path="/0" conditionString="gt(asdf,Z(neglit(1(#))))"/>
             </statement>
          </statement>
       </branchCondition>
+      <blockCompletionEntry path="/0/0/0/0"/>
+      <blockCompletionEntry path="/0/1/0/0"/>
    </branchStatement>
    <terminationEntry path="/0/0/0/0/0"/>
    <terminationEntry path="/0/1/0/0/0"/>

@@ -115,7 +115,8 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    protected void performActionOnBlockContract(final StatementBlock oldBlock, final StatementBlock newBlock) {
+    protected void performActionOnBlockContract(final StatementBlock oldBlock,
+                                                final StatementBlock newBlock) {
         //do nothing
     }
     
@@ -396,7 +397,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    public void performActionOnFor(For x) {
+    public void performActionOnFor(final For x) {
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
                 For newFor = new For(changeList);
@@ -407,7 +408,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
     
-    public void performActionOnEnhancedFor(EnhancedFor x) {
+    public void performActionOnEnhancedFor(final EnhancedFor x) {
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
                 EnhancedFor enhancedFor = new EnhancedFor(changeList);
@@ -891,6 +892,16 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
                 return new ShiftRight(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnUnsignedShiftRight(UnsignedShiftRight x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new UnsignedShiftRight(changeList);
             }
         };
         def.doAction(x);

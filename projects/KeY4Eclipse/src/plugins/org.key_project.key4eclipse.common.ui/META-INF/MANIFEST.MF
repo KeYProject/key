@@ -10,6 +10,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ui.forms,
  org.eclipse.ui.editors;bundle-version="3.7.0",
+ org.eclipse.ui.ide;bundle-version="3.7.0",
  org.eclipse.jface.text;bundle-version="3.7.2",
  org.eclipse.jdt.core;bundle-version="3.7.0";resolution:=optional,
  org.eclipse.jdt.ui;bundle-version="3.7.0";resolution:=optional,
@@ -20,6 +21,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.key4eclipse.common.ui.composite,
+ org.key_project.key4eclipse.common.ui.counterExample,
  org.key_project.key4eclipse.common.ui.decorator,
  org.key_project.key4eclipse.common.ui.dialog,
  org.key_project.key4eclipse.common.ui.expression,
@@ -28,6 +30,7 @@ Export-Package: org.key_project.key4eclipse.common.ui.composite,
  org.key_project.key4eclipse.common.ui.property,
  org.key_project.key4eclipse.common.ui.provider,
  org.key_project.key4eclipse.common.ui.starter,
+ org.key_project.key4eclipse.common.ui.testGeneration,
  org.key_project.key4eclipse.common.ui.util,
  org.key_project.key4eclipse.common.ui.wizard,
  org.key_project.key4eclipse.common.ui.wizard.page

@@ -472,6 +472,7 @@ TOKEN :
 | < INTERFACE: "interface" >
 | < LOCSET: "\\locset">
 | < LONG: "long" >
+| < MAP: "\\map" >
 | < METHODFRAME: "method-frame" >
 | < NATIVE: "native" >
 | < NEW: "new" >
@@ -610,7 +611,13 @@ TOKEN :
  >
 }
 
-
+// token for all map symbols except "\\map_empty"
+TOKEN :
+{
+ < MAP_FUNCTION:
+    "\\map_get" | "\\map_singleton" | "\\map_override" | "\\seq_2_map" | "\\map_remove" | "\\map_update" | "\\in_domain" | "\\domain_implies_created" | "\\map_size" | "\\is_finite"
+ >
+}
 
 /* SEPARATORS */
 
@@ -1983,6 +1990,7 @@ TypeReference PrimitiveType() :
   | "\\locset"
   | "\\seq"
   | "\\free"
+  | "\\map"
   )
   {
     Identifier id = factory.createIdentifier(token.image);
@@ -2698,7 +2706,7 @@ Expression UnaryExpression() :
 |
   result = ADTGetter()
 |
-  result = EmbeddedDLExpression()
+  result = GeneralEscapeExpression()
 )
   {
     checkConstruction(result);
@@ -3246,26 +3254,25 @@ Expression ADTConstructor() :
   }
 }
 
-Expression EmbeddedDLExpression() :
+Expression GeneralEscapeExpression() :
 {
    List<Expression> arguments = new ArrayList<Expression>();
    Expression expr;
    Token t;
 }
 {
-    t=<DL_EMBEDDED_FUNCTION> "("
+    (t=<DL_EMBEDDED_FUNCTION> | t=<MAP_FUNCTION> ) "("
       (
         expr = Expression() { arguments.add(expr); }
         ( "," expr = Expression() { arguments.add(expr); } )*
       )?  ")"
 
     {
-      // strip leading "\dl_"
-      String functionName = t.image.substring(4);
-      DLEmbeddedExpression result = new DLEmbeddedExpression(functionName, arguments);
+      EscapeExpression result = EscapeExpression.getEscapeExpression(t.image, arguments);
       setPrefixInfo(result);
       return result;
     }
+    
 }
 
 PrimarySuffixReturnValue PrimarySuffix() :
@@ -3401,6 +3408,7 @@ Literal Literal() :
 | result = NullLiteral()
 | result = EmptySetLiteral()
 | result = EmptySeqLiteral()
+| result = EmptyMapLiteral()
 
 )
   {
@@ -3468,6 +3476,18 @@ EmptySeqLiteral EmptySeqLiteral() :
   }
 }
 
+EmptyMapLiteral EmptyMapLiteral() :
+{
+    EmptyMapLiteral result;
+}
+{
+  "\\map_empty"
+  {
+      result = EmptyMapLiteral.INSTANCE;
+      setPrefixInfo(result);
+      return result;
+  }
+}
 
 ASTList<Expression> Arguments() :
 {

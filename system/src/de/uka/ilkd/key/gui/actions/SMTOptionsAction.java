@@ -15,18 +15,15 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.EventObject;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 
-import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.IconFactory;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.gui.smt.SMTSettingsModel;
 import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
@@ -34,6 +31,9 @@ import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
 
 
 /**
@@ -58,7 +58,7 @@ public SMTOptionsAction(MainWindow mainWindow) {
             SettingsListener listener = new SettingsListener(){
 
                 @Override
-                public void settingsChanged(GUIEvent event) {
+                public void settingsChanged(EventObject event) {
                         if(event.getSource() instanceof ProofIndependentSMTSettings ||
                                 event.getSource() instanceof ProofDependentSMTSettings)
                         mainWindow.updateSMTSelectMenu();

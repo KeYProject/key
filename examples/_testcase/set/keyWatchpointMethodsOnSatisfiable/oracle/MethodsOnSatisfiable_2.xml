@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call MethodsOnSatisfiable.doSomething()&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (x_global&gt;=0)" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (x_global&gt;=0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
       </branchStatement>
    </methodCall>
 </start>

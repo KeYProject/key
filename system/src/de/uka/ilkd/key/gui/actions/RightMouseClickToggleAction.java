@@ -16,10 +16,14 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
-@SuppressWarnings("serial")
 public class RightMouseClickToggleAction extends MainWindowAction {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1299838459448346807L;
 
     public RightMouseClickToggleAction(MainWindow mainWindow) {
         super(mainWindow);

@@ -30,7 +30,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.junit.Test;
@@ -55,44 +54,6 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
  * @author Martin Hentschel
  */
 public class KeYUtilTest extends AbstractSetupTestCase {
-   /**
-    * {@link KeYUtil#getSourceLocation(IProject)}
-    */
-   @Test
-   public void testGetSourceLocation() throws Exception {
-      // Test null
-      try {
-         KeYUtil.getSourceLocation(null);
-         fail();
-      }
-      catch (Exception e) {
-         assertEquals("Project not defined.", e.getMessage());
-      }
-      // Test general project
-      IProject generalProject = TestUtilsUtil.createProject("KeYUtilTest_testGetSourceLocation_general");
-      try {
-         KeYUtil.getSourceLocation(generalProject);
-         fail();
-      }
-      catch (Exception e) {
-         assertEquals("The project \"" + generalProject.getName() + "\" is no Java project.", e.getMessage());
-      }
-      // Test java project
-      IJavaProject javaProject = TestUtilsUtil.createJavaProject("KeYUtilTest_testGetSourceLocation_java");
-      IFolder src = javaProject.getProject().getFolder("src");
-      IFolder secondolder = TestUtilsUtil.createFolder(javaProject.getProject(), "secondSrc");
-      assertEquals(ResourceUtil.getLocation(src), KeYUtil.getSourceLocation(javaProject.getProject()));
-      // Test java project with multiple source paths
-      JDTUtil.addClasspathEntry(javaProject, JavaCore.newSourceEntry(secondolder.getFullPath()));
-      try {
-         KeYUtil.getSourceLocation(javaProject.getProject());
-         fail();
-      }
-      catch (Exception e) {
-         assertEquals("Multiple source paths are not supported.", e.getMessage());
-      }
-   }
-   
    /**
     * Tests {@link KeYUtil#getProgramMethod(IMethod, de.uka.ilkd.key.java.JavaInfo)}
     */

@@ -1,41 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_3ef47968-0a57-41d9-92ad-32c040793cbc" name="min(int, int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_b5c783c5-aa3d-4ad5-81d1-acc354bace56" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_882dd615-9462-4730-8d1f-343cd9f5a835" name="&lt;call self.min(i,j)&gt;" pathCondition="true" lineNumber="-1" charStart="413" charEnd="416" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodesWithSignature\src\SimpleIf.java">
-            <sedStatement xml:id="_80aef095-3dfe-403b-8b0f-01977e39e325" name="int result;" pathCondition="true" lineNumber="-1" charStart="436" charEnd="447" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodesWithSignature\src\SimpleIf.java">
-               <sedBranchStatement xml:id="_45023d87-39db-404c-b45e-d481efaaae22" name="if (i&lt;j)" pathCondition="true" lineNumber="-1" charStart="451" charEnd="462" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodesWithSignature\src\SimpleIf.java">
-                  <sedBranchCondition xml:id="_8a4448c2-b449-46f4-b389-5c098fc588c4" name="gt(j,i)" pathCondition="gt(j,i)">
-                     <sedStatement xml:id="_1f2bdfc7-f6fc-41ff-8c9c-75f066cf164c" name="result_1=i;" pathCondition="gt(j,i)" lineNumber="-1" charStart="468" charEnd="479" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodesWithSignature\src\SimpleIf.java">
-                        <sedStatement xml:id="_3ea1ed76-9d41-4228-8d04-24486f549874" name="return result_1;" pathCondition="gt(j,i)" lineNumber="-1" charStart="519" charEnd="533" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodesWithSignature\src\SimpleIf.java">
-                           <sedMethodReturn xml:id="_c4cbb642-c55f-40e6-b070-54dec3c3d423" name="&lt;return i as result of self.min(i,j)&gt;" pathCondition="gt(j,i)" lineNumber="-1" charStart="413" charEnd="416" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodesWithSignature\src\SimpleIf.java" methodReturnConditionRef="_20867a50-4824-4272-a942-beb0e762be45">
-                              <sedTermination xml:id="_0fba9674-e534-47c1-a64b-b4e63399a765" name="&lt;end&gt;" pathCondition="gt(j,i)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodesWithSignature\src\SimpleIf.java" verified="true">
+   <sedTarget xml:id="_ab8528e0-b2ad-4876-8209-408f3ddefb17" name="min(int, int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_e7924e92-a961-4466-b48d-62e85ca3ca52" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf\src\SimpleIf.java">
+         <sedMethodCall xml:id="_360a1b92-6db3-41c8-a603-3d70459a4ea7" name="&lt;call self.min(i,j)&gt;" pathCondition="true" lineNumber="-1" charStart="413" charEnd="416" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf\src\SimpleIf.java" groupable="true">
+            <sedStatement xml:id="_3c482b29-7004-45c9-99bd-b728cc1a6b1b" name="int result;" pathCondition="true" lineNumber="-1" charStart="436" charEnd="447" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf\src\SimpleIf.java">
+               <sedBranchStatement xml:id="_3860916b-5529-4884-8205-e82e32bfcfb9" name="if (i&lt;j)" pathCondition="true" lineNumber="-1" charStart="451" charEnd="462" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf\src\SimpleIf.java" groupable="true">
+                  <sedBranchCondition xml:id="_7e15996a-60f2-4319-ba92-b9f219cbf85f" name="gt(j,i)" pathCondition="gt(j,i)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf\src\SimpleIf.java">
+                     <sedStatement xml:id="_5fe174d1-2ae3-4e20-a5e3-26646a098a8a" name="result_1=i;" pathCondition="gt(j,i)" lineNumber="-1" charStart="468" charEnd="479" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf\src\SimpleIf.java">
+                        <sedStatement xml:id="_fdaf47b7-8572-4b4e-ad79-270dcfbe1a34" name="return result_1;" pathCondition="gt(j,i)" lineNumber="-1" charStart="519" charEnd="533" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf\src\SimpleIf.java">
+                           <sedMethodReturn xml:id="_1b09dca2-77f3-4eeb-a6ce-541e0e64694a" name="&lt;return i as result of self.min(i,j)&gt;" pathCondition="gt(j,i)" lineNumber="-1" charStart="413" charEnd="416" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf\src\SimpleIf.java" methodReturnConditionRef="_a7b4609c-53c5-4a4b-a91e-35427ca4856c">
+                              <sedTermination xml:id="_dba2f67e-e334-47a7-8aab-4b8e05de3a7c" name="&lt;end&gt;" pathCondition="gt(j,i)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf\src\SimpleIf.java" verified="true">
                               </sedTermination>
+                              <sedGroupEndConditionReference nodeIdRef="_a7b4609c-53c5-4a4b-a91e-35427ca4856c"/>
                            </sedMethodReturn>
                         </sedStatement>
+                        <sedGroupEndConditionReference nodeIdRef="_c310b312-f934-4b91-b39b-c223ef34800b"/>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_cbfa7a9b-5709-4ada-83ab-0d72f5e1762d" name="leq(j,i)" pathCondition="leq(j,i)">
-                     <sedStatement xml:id="_6d0b7593-7c09-4ae2-84b6-91c078bd6f3f" name="result_1=j;" pathCondition="leq(j,i)" lineNumber="-1" charStart="499" charEnd="510" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodesWithSignature\src\SimpleIf.java">
-                        <sedStatement xml:id="_c051c4cc-ee18-40c1-8d8a-e34d60c3e1c9" name="return result_1;" pathCondition="leq(j,i)" lineNumber="-1" charStart="519" charEnd="533" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodesWithSignature\src\SimpleIf.java">
-                           <sedMethodReturn xml:id="_80ddb05b-8092-4da3-95c9-19d5bd2703ff" name="&lt;return j as result of self.min(i,j)&gt;" pathCondition="leq(j,i)" lineNumber="-1" charStart="413" charEnd="416" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodesWithSignature\src\SimpleIf.java" methodReturnConditionRef="_9cca9fb2-9198-4955-aac0-c7cc3d366e8f">
-                              <sedTermination xml:id="_efae99a1-aebf-4b53-ac84-527dcc035b95" name="&lt;end&gt;" pathCondition="leq(j,i)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodesWithSignature\src\SimpleIf.java" verified="true">
+                  <sedBranchCondition xml:id="_3155090e-10ef-4c16-806d-632a3866c3d5" name="leq(j,i)" pathCondition="leq(j,i)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf\src\SimpleIf.java">
+                     <sedStatement xml:id="_8657e655-66aa-4d35-9b15-c7e4a137e87b" name="result_1=j;" pathCondition="leq(j,i)" lineNumber="-1" charStart="499" charEnd="510" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf\src\SimpleIf.java">
+                        <sedStatement xml:id="_89b9797a-44d8-4391-8107-ca24e5a7ce0b" name="return result_1;" pathCondition="leq(j,i)" lineNumber="-1" charStart="519" charEnd="533" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf\src\SimpleIf.java">
+                           <sedMethodReturn xml:id="_2a8788b2-a76b-42a7-ba3a-daba6c879e4b" name="&lt;return j as result of self.min(i,j)&gt;" pathCondition="leq(j,i)" lineNumber="-1" charStart="413" charEnd="416" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf\src\SimpleIf.java" methodReturnConditionRef="_cc72c399-8bff-44d8-9516-8fa4e1655fad">
+                              <sedTermination xml:id="_c325490f-0844-4d04-bed5-12038d99ce71" name="&lt;end&gt;" pathCondition="leq(j,i)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf\src\SimpleIf.java" verified="true">
                               </sedTermination>
+                              <sedGroupEndConditionReference nodeIdRef="_cc72c399-8bff-44d8-9516-8fa4e1655fad"/>
                            </sedMethodReturn>
                         </sedStatement>
+                        <sedGroupEndConditionReference nodeIdRef="_975340bd-71ad-4e1e-bb1e-f5976dc9eec0"/>
                      </sedStatement>
                   </sedBranchCondition>
+                  <sedGroupEndCondition xml:id="_c310b312-f934-4b91-b39b-c223ef34800b" name="gt(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                     <sedChildReference nodeIdRef="_5fe174d1-2ae3-4e20-a5e3-26646a098a8a"/>
+                  </sedGroupEndCondition>
+                  <sedGroupEndCondition xml:id="_975340bd-71ad-4e1e-bb1e-f5976dc9eec0" name="leq(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                     <sedChildReference nodeIdRef="_8657e655-66aa-4d35-9b15-c7e4a137e87b"/>
+                  </sedGroupEndCondition>
                </sedBranchStatement>
             </sedStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_20867a50-4824-4272-a942-beb0e762be45" name="gt(j,i)" pathCondition="true">
-               <sedChildReference nodeIdRef="_c4cbb642-c55f-40e6-b070-54dec3c3d423"/>
+            <sedMethodCallMethodReturnCondition xml:id="_a7b4609c-53c5-4a4b-a91e-35427ca4856c" name="gt(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_1b09dca2-77f3-4eeb-a6ce-541e0e64694a"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_9cca9fb2-9198-4955-aac0-c7cc3d366e8f" name="leq(j,i)" pathCondition="true">
-               <sedChildReference nodeIdRef="_80ddb05b-8092-4da3-95c9-19d5bd2703ff"/>
+            <sedMethodCallMethodReturnCondition xml:id="_cc72c399-8bff-44d8-9516-8fa4e1655fad" name="leq(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_2a8788b2-a76b-42a7-ba3a-daba6c879e4b"/>
             </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_a7b4609c-53c5-4a4b-a91e-35427ca4856c" name="gt(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_1b09dca2-77f3-4eeb-a6ce-541e0e64694a"/>
+            </sedGroupEndCondition>
+            <sedGroupEndCondition xml:id="_cc72c399-8bff-44d8-9516-8fa4e1655fad" name="leq(j,i)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_2a8788b2-a76b-42a7-ba3a-daba6c879e4b"/>
+            </sedGroupEndCondition>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_0fba9674-e534-47c1-a64b-b4e63399a765"/>
-         <sedTerminationEntry nodeIdRef="_efae99a1-aebf-4b53-ac84-527dcc035b95"/>
+         <sedTerminationEntry nodeIdRef="_dba2f67e-e334-47a7-8aab-4b8e05de3a7c"/>
+         <sedTerminationEntry nodeIdRef="_c325490f-0844-4d04-bed5-12038d99ce71"/>
       </sedThread>
    </sedTarget>
 </launch>

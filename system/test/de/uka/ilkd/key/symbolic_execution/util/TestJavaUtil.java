@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.util;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -27,6 +28,50 @@ import junit.framework.TestCase;
  * @author Martin Hentschel
  */
 public class TestJavaUtil extends TestCase {
+   /**
+    * Tests {@link JavaUtil#binaryInsert(List, Object, java.util.Comparator)}.
+    */
+   public void testBinaryInsert() {
+      Comparator<String> comparator = new Comparator<String>() {
+         @Override
+         public int compare(String o1, String o2) {
+            return o1.compareTo(o2);
+         }
+      };
+      List<String> list = new LinkedList<String>();
+      JavaUtil.binaryInsert(list, "C", comparator);
+      assertList(list, "C");
+      JavaUtil.binaryInsert(list, "A", comparator);
+      assertList(list, "A", "C");
+      JavaUtil.binaryInsert(list, "F", comparator);
+      assertList(list, "A", "C", "F");
+      JavaUtil.binaryInsert(list, "B", comparator);
+      assertList(list, "A", "B", "C", "F");
+      JavaUtil.binaryInsert(list, "D", comparator);
+      assertList(list, "A", "B", "C", "D", "F");
+      JavaUtil.binaryInsert(list, "E", comparator);
+      assertList(list, "A", "B", "C", "D", "E", "F");
+      JavaUtil.binaryInsert(list, "D", comparator);
+      assertList(list, "A", "B", "C", "D", "D", "E", "F");
+      JavaUtil.binaryInsert(list, "A", comparator);
+      assertList(list, "A", "A", "B", "C", "D", "D", "E", "F");
+      JavaUtil.binaryInsert(list, "F", comparator);
+      assertList(list, "A", "A", "B", "C", "D", "D", "E", "F", "F");
+   }
+   
+   /**
+    * Ensures that the given {@link List} contains the expected elements.
+    * @param actual The actual {@link List}.
+    * @param expected The expected elements.
+    */
+   protected static <T> void assertList(List<T> actual, String... expected) {
+      assertEquals(expected.length, actual.size());
+      int i = 0;
+      for (T actualElement : actual) {
+         assertEquals(expected[i], actualElement);
+         i++;
+      }
+   }
    
    /**
     * Tests for {@link ArrayUtil#search(Object[], IFilter)}.

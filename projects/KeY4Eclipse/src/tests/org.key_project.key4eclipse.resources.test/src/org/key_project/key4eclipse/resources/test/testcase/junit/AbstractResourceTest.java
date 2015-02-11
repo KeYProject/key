@@ -23,7 +23,7 @@ import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 
@@ -76,7 +76,8 @@ public class AbstractResourceTest extends AbstractSetupTestCase {
    public void setUp() throws Exception {
       super.setUp();
       // Store current settings
-      oldAutoBuildEnabled = KeY4EclipseResourcesTestUtil.enableAutoBuild(false);
+      oldAutoBuildEnabled = KeY4EclipseResourcesTestUtil.isAutoBuilding();
+      KeY4EclipseResourcesTestUtil.enableAutoBuild(true);
       spToRestore = ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
       maxStepsToRestore = ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getMaxSteps();
       // Update settings

@@ -16,13 +16,16 @@ package org.key_project.sed.core.provider;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.internal.ui.model.elements.ElementContentProvider;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentProvider;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdate;
 import org.eclipse.debug.ui.IDebugUIConstants;
+import org.key_project.sed.core.model.ISEDBaseMethodReturn;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDGroupable;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.util.ISEDConstants;
@@ -117,6 +120,15 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
             return EMPTY;
          }
       }
+      else if (ISEDConstants.ID_CALL_STATE.equals(context.getId())) {
+         if (parent instanceof ISEDBaseMethodReturn) {
+            IVariable[] callState = ((ISEDBaseMethodReturn)parent).getCallStateVariables();
+            return callState != null ? callState : EMPTY; 
+         }
+         else {
+            return EMPTY;
+         }
+      }
       else if (ISEDConstants.ID_METHOD_RETURN_CONDITIONS.equals(context.getId())) {
          if (parent instanceof ISEDMethodCall) {
             Object root = context.getProperty(ISEDConstants.PRESENTATION_CONTEXT_PROPERTY_INPUT);
@@ -131,6 +143,40 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
          if (parent instanceof ISEDBranchCondition) {
             ISEDDebugNode[] children = ((ISEDDebugNode)parent).getChildren();
             return children != null ? children : EMPTY; 
+         }
+         else {
+            return EMPTY;
+         }
+      }
+      else if (ISEDConstants.ID_GROUP_END_CONDITIONS.equals(context.getId())) {
+         Object root = context.getProperty(ISEDConstants.PRESENTATION_CONTEXT_PROPERTY_INPUT);
+         if (parent == root) {
+            ISEDBranchCondition[] conditions = ((ISEDGroupable)parent).getGroupEndConditions();
+            return conditions != null ? conditions : EMPTY; 
+         }
+         else if (parent instanceof ISEDBranchCondition) {
+            ISEDBranchCondition[] conditions = ((ISEDGroupable)root).getGroupEndConditions();
+            if (ArrayUtil.contains(conditions, parent)) { // Otherwise branch condition children as child of end condition would be shown.
+               ISEDDebugNode[] children = ((ISEDDebugNode)parent).getChildren();
+               return children != null ? children : EMPTY; 
+            }
+            else {
+               return EMPTY;
+            }
+         }
+         else {
+            return EMPTY;
+         }
+      }
+      else if (ISEDConstants.ID_GROUP_START_CONDITIONS.equals(context.getId())) {
+         Object root = context.getProperty(ISEDConstants.PRESENTATION_CONTEXT_PROPERTY_INPUT);
+         if (parent == root) {
+            ISEDBranchCondition[] conditions = ((ISEDDebugNode)parent).getGroupStartConditions();
+            return conditions != null ? conditions : EMPTY; 
+         }
+         else if (parent instanceof ISEDBranchCondition) {
+            ISEDDebugNode parentParent = ((ISEDDebugNode)parent).getParent();
+            return parentParent != null ? new Object[] {parentParent} : EMPTY; 
          }
          else {
             return EMPTY;
@@ -278,7 +324,10 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
              IDebugUIConstants.ID_VARIABLE_VIEW.equals(id) ||
              IDebugUIConstants.ID_REGISTER_VIEW.equals(id) ||
              ISEDConstants.ID_CALL_STACK.equals(id) ||
-             ISEDConstants.ID_METHOD_RETURN_CONDITIONS.equals(id);
+             ISEDConstants.ID_CALL_STATE.equals(id) ||
+             ISEDConstants.ID_METHOD_RETURN_CONDITIONS.equals(id) ||
+             ISEDConstants.ID_GROUP_START_CONDITIONS.equals(id) ||
+             ISEDConstants.ID_GROUP_END_CONDITIONS.equals(id);
    }
    
    /**
@@ -304,6 +353,40 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
       }
       else {
          return super.hasChildren(element, context, monitor);
+      }
+   }
+
+   /**
+    * Checks if the given {@link ISEDDebugNode} is shown.
+    * @param element The {@link ISEDDebugNode} to check.
+    * @return {@code true} is shown, {@code false} is not shown.
+    * @throws DebugException Occurred Exception.
+    */
+   public boolean isShown(ISEDDebugNode element) throws DebugException {
+      if (element != null) {
+         boolean shown = true;
+         while (element != null && shown) {
+            ISEDDebugNode parent = element.getParent();
+            if (parent instanceof ISEDGroupable) {
+               ISEDGroupable groupable = (ISEDGroupable) parent;
+               if (groupable.isCollapsed()) {
+                  if (parent instanceof ISEDDebugNode &&
+                      ArrayUtil.contains(((ISEDDebugNode) parent).getChildren(), element)) {
+                     shown = false;
+                  }                  
+               }
+               else {
+                  if (ArrayUtil.contains(((ISEDGroupable) parent).getGroupEndConditions(), element)) {
+                     shown = false;
+                  }
+               }
+            }
+            element = parent;
+         }
+         return shown;
+      }
+      else {
+         return false;
       }
    }
 }

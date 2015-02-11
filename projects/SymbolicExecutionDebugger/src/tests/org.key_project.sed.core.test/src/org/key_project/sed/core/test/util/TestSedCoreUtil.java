@@ -14,8 +14,10 @@
 package org.key_project.sed.core.test.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Arrays;
@@ -79,6 +81,8 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
+import org.key_project.sed.core.model.ISEDBaseMethodReturn;
+import org.key_project.sed.core.model.ISEDGroupable;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchStatement;
 import org.key_project.sed.core.model.ISEDConstraint;
@@ -1046,6 +1050,27 @@ public final class TestSedCoreUtil {
          if (compareConstraints) {
             compareConstraints(expected.getConstraints(), current.getConstraints(), compareVariables, compareConstraints);
          }
+         // Compare group starts
+         compareConditions(expected.getGroupStartConditions(), current.getGroupStartConditions(), compareReferences, compareId, compareVariables, compareCallStack, compareConstraints);
+         // Compare group ends
+         if (expected instanceof ISEDGroupable) {
+            assertTrue(current instanceof ISEDGroupable);
+            assertEquals(((ISEDGroupable) expected).isGroupable(), ((ISEDGroupable) current).isGroupable());
+            compareConditions(((ISEDGroupable) expected).getGroupEndConditions(), ((ISEDGroupable) current).getGroupEndConditions(), compareReferences, compareId, compareVariables, compareCallStack, compareConstraints);
+         }
+         else {
+            assertFalse(current instanceof ISEDGroupable);
+         }
+         // Compare call states
+         if (expected instanceof ISEDBaseMethodReturn) {
+            assertTrue(current instanceof ISEDBaseMethodReturn);
+            if (compareVariables) {
+               compareVariables(((ISEDBaseMethodReturn) expected).getCallStateVariables(), ((ISEDBaseMethodReturn) current).getCallStateVariables(), compareVariables, compareConstraints);
+            }
+         }
+         else {
+            assertFalse(current instanceof ISEDBaseMethodReturn);
+         }
          // Compare parent
          if (compareReferences) {
             compareNode(expected.getParent(), current.getParent(), false, compareId, compareVariables, compareCallStack, compareConstraints);
@@ -1528,11 +1553,11 @@ public final class TestSedCoreUtil {
                                            boolean compareConstraints) throws DebugException {
       compareStackFrame(expected, current, compareVariables, compareConstraints);
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack, compareConstraints);
-      compareMethodReturnConditions(expected.getMethodReturnConditions(), current.getMethodReturnConditions(), compareReferences, compareId, compareVariables, compareCallStack, compareConstraints);
+      compareConditions(expected.getMethodReturnConditions(), current.getMethodReturnConditions(), compareReferences, compareId, compareVariables, compareCallStack, compareConstraints);
    }
 
    /**
-    * Compares the given method return conditions.
+    * Compares the given conditions.
     * @param expected The expected conditions.
     * @param current The current conditions.
     * @param compareReferences Compare also the containment hierarchy?
@@ -1542,13 +1567,13 @@ public final class TestSedCoreUtil {
     * @param compareConstraints Compare constraints?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareMethodReturnConditions(ISEDBranchCondition[] expected, 
-                                                       ISEDBranchCondition[] current, 
-                                                       boolean compareReferences, 
-                                                       boolean compareId, 
-                                                       boolean compareVariables, 
-                                                       boolean compareCallStack,
-                                                       boolean compareConstraints) throws DebugException {
+   protected static void compareConditions(ISEDBranchCondition[] expected, 
+                                           ISEDBranchCondition[] current, 
+                                           boolean compareReferences, 
+                                           boolean compareId, 
+                                           boolean compareVariables, 
+                                           boolean compareCallStack,
+                                           boolean compareConstraints) throws DebugException {
       if (expected != null) {
          assertNotNull(current);
          assertEquals(expected.length, current.length);

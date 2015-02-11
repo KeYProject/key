@@ -30,7 +30,7 @@ public interface IProgramMethod extends IObserverFunction, SourceElement, Progra
    public abstract MethodDeclaration getMethodDeclaration();
 
    /**     
-    * returns the KeYJavaType of the <tt>i</tt>-th paramter declaration. This method 
+    * returns the KeYJavaType of the <tt>i</tt>-th parameter declaration. This method
     * does not care about the invoker as argSort does.      
     * @param i the int specifying the parameter position
     * @return the KeYJavaType of the <tt>i</tt>-th parameter
@@ -57,6 +57,8 @@ public interface IProgramMethod extends IObserverFunction, SourceElement, Progra
    public abstract KeYJavaType getReturnType();
 
    public abstract ProgramElementName getProgramElementName();
+
+   public abstract String getUniqueName();
 
    public abstract String getFullName();
 

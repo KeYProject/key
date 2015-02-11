@@ -28,14 +28,14 @@ public class SWTBotCustomizationTabTest extends AbstractSWTBotKeYPropertyTabTest
     */
    @Test
    public void testValuesAndTabExistence() throws Exception {
-      doFlatStepsTest("SWTBotCustomizationTabTest_testValuesAndTabExistence", createFixedExampleSteps());
+      doAllNodeTypesTest("SWTBotCustomizationTabTest_testValuesAndTabExistence", createAllNodeTypesSteps());
    }
    
    /**
     * Creates the test steps to execute.
     * @return The created test steps.
     */
-   public static ITestSteps createFixedExampleSteps() {
+   public static ITestSteps createAllNodeTypesSteps() {
       return new ITestSteps() {
          @Override
          public void assertThread(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
@@ -58,8 +58,28 @@ public class SWTBotCustomizationTabTest extends AbstractSWTBotKeYPropertyTabTest
          }
 
          @Override
+         public void assertTermination(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.hasTabItem("Customization"));
+         }
+
+         @Override
          public void assertLaunch(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertTrue(tabs.selectTabItem("Customization"));
+         }
+
+         @Override
+         public void assertMethodContract(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.hasTabItem("Customization"));
+         }
+
+         @Override
+         public void assertLoopInvariant(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.hasTabItem("Customization"));
+         }
+
+         @Override
+         public void assertLoopBodyTermination(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.hasTabItem("Customization"));
          }
       };
    }

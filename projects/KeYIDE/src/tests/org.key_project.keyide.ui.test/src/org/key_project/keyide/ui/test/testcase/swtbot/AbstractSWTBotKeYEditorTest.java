@@ -13,6 +13,8 @@
 
 package org.key_project.keyide.ui.test.testcase.swtbot;
 
+import java.io.File;
+
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
@@ -21,6 +23,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.ui.IEditorPart;
+import org.key_project.key4eclipse.common.ui.util.EclipseUserInterfaceCustomization;
 import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
@@ -38,7 +41,7 @@ import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
@@ -60,7 +63,8 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
     * Opens a {@link Proof} in a {@link KeYEditor} and executes the given {@link IKeYEditorTestSteps}. 
     * @param projectName The project name to use.
     * @param pathToSourceFilesInBundle The path to the plug-in to the source files to extract into the created project.
-    * @param contractName The name of the contract to prove.
+    * @param isContract {@code true} is contract, {@code false} is proof file.
+    * @param contractNameOrProofFile The name of the contract to prove or the path to the proof file to load.
     * @param timeoutFactor Increase the timeout by this factor.
     * @param startAutoMode Start the auto mode before the {@link KeYEditor} will be opened?
     * @param steps The {@link IKeYEditorTestSteps} to execute.
@@ -68,7 +72,8 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
     */
    protected void doEditorTest(String projectName,
                                String pathToSourceFilesInBundle,
-                               String contractName,
+                               boolean isContract,
+                               String contractNameOrProofFile,
                                long timeoutFactor,
                                boolean startAutoMode,
                                IKeYEditorTestSteps steps) throws Exception {
@@ -76,7 +81,7 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       SWTBotPreferences.TIMEOUT = originalTimeout * timeoutFactor;
       try {
-         doEditorTest(projectName, pathToSourceFilesInBundle, contractName, startAutoMode, steps);
+         doEditorTest(projectName, pathToSourceFilesInBundle, isContract, contractNameOrProofFile, startAutoMode, steps);
       }
       finally {
          // Restore original timeout
@@ -88,14 +93,16 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
     * Opens a {@link Proof} in a {@link KeYEditor} and executes the given {@link IKeYEditorTestSteps}. 
     * @param projectName The project name to use.
     * @param pathToSourceFilesInBundle The path to the plug-in to the source files to extract into the created project.
-    * @param contractName The name of the contract to prove.
+    * @param isContract {@code true} is contract, {@code false} is proof file.
+    * @param contractNameOrProofFile The name of the contract to prove or the path to the proof file to load.
     * @param startAutoMode Start the auto mode before the {@link KeYEditor} will be opened?
     * @param steps The {@link IKeYEditorTestSteps} to execute.
     * @throws Exception Occurred Exception.
     */
    protected void doEditorTest(String projectName,
                                String pathToSourceFilesInBundle,
-                               String contractName,
+                               boolean isContract,
+                               String contractNameOrProofFile,
                                boolean startAutoMode,
                                IKeYEditorTestSteps steps) throws Exception {
       // Define required settings
@@ -116,9 +123,17 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
       Proof proof = null;
       SWTBotEditor editor = null;
       try {
-         environment = KeYEnvironment.load(ResourceUtil.getLocation(src), null, null);
-         Contract contract = environment.getSpecificationRepository().getContractByName(contractName);
-         proof = environment.createProof(contract.createProofObl(environment.getInitConfig(), contract));
+         if (isContract) {
+            environment = KeYEnvironment.load(ResourceUtil.getLocation(src), null, null, EclipseUserInterfaceCustomization.getInstance());
+            Contract contract = environment.getSpecificationRepository().getContractByName(contractNameOrProofFile);
+            assertNotNull(contract);
+            proof = environment.createProof(contract.createProofObl(environment.getInitConfig(), contract));
+         }
+         else {
+            environment = KeYEnvironment.load(new File(ResourceUtil.getLocation(src), contractNameOrProofFile), null, null, EclipseUserInterfaceCustomization.getInstance());
+            proof = environment.getLoadedProof();
+            assertNotNull(proof);
+         }
          if (startAutoMode) {
             environment.getUi().startAndWaitForAutoMode(proof);
          }

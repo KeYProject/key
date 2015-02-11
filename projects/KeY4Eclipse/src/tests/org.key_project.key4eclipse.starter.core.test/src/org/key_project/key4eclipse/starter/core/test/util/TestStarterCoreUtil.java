@@ -61,7 +61,7 @@ public final class TestStarterCoreUtil {
       final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
       final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
       // Get local file for the eclipse resource
-      final File location = KeYUtil.getSourceLocation(project);
+      final File location = KeYResourceProperties.getSourceClassPathLocation(project);
       Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
       // Load environment
       KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath);

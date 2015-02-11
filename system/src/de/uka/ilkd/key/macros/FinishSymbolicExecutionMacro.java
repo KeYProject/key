@@ -13,15 +13,16 @@
 
 package de.uka.ilkd.key.macros;
 
-import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.Strategy;
 
@@ -64,6 +65,11 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
      * recursively descent into the term to detect a modality.
      */
     private static boolean hasModality(Term term) {
+        if(term.containsLabel(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)) {
+            // ignore self composition terms
+            return false;
+        }
+
         if(term.op() instanceof Modality) {
             return true;
         }
@@ -78,9 +84,9 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
         return new FilterSymbexStrategy(
-                mediator.getInteractiveProver().getProof().getActiveStrategy());
+                proof.getActiveStrategy());
     }
 
     /**

@@ -369,7 +369,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
          throw new IOException("Method signature has not valid order of chracters \"(\" and \")\".");
       }
       String name = signature.substring(0, breaketsStart);
-      String[] types = signature.substring(breaketsStart + 1, breaketsEnd).split(",");
+      String parameters = signature.substring(breaketsStart + 1, breaketsEnd);
+      String[] types = parameters.isEmpty() ? new String[0] : parameters.split(",");
       // Find container and parameter types
       KeYJavaType type = javaInfo.getKeYJavaType(className.trim());
       if (type == null) {

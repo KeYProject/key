@@ -16,7 +16,6 @@ package de.uka.ilkd.key.symbolic_execution.util;
 import java.io.File;
 import java.util.HashMap;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -25,6 +24,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 
 /**
@@ -36,8 +37,8 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
     * Tests {@link SymbolicExecutionUtil#improveReadability(de.uka.ilkd.key.logic.Term)}
     */
    public void testImproveReadability() {
-      KeYEnvironment<?> environment = KeYEnvironment.load(new File(keyRepDirectory, "examples/_testcase/proofReferences/InnerAndAnonymousTypeTest"), null, null);
       try {
+          KeYEnvironment<?> environment = KeYEnvironment.load(new File(keyRepDirectory, "examples/_testcase/proofReferences/InnerAndAnonymousTypeTest"), null, null);
          Services services = environment.getServices();
          IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
          Sort intSort = integerLDT.targetSort();
@@ -102,9 +103,11 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
          Term expectedComplex = TB.and(aleqb,
                                        TB.or(agtb, ageqb));
          assertTerm(expectedComplex, SymbolicExecutionUtil.improveReadability(complex, services));
+         environment.dispose();
+      } catch (ProblemLoaderException e) {
+          fail();
       }
       finally {
-         environment.dispose();
       }
    }
 

@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.parser;
 
+import org.antlr.runtime.RecognitionException;
+
 
 /** 
  * This class represents a location in a file.  It consists of a
@@ -27,11 +29,17 @@ public final class Location {
 
     /* --- constructors --- */
 
-    /** @param filename the filename may be null. */
+    /**
+     * @param filename the filename may be null.
+     */
     public Location(String filename, int line, int column) {
         this.filename = filename;
         this.line = line;
         this.column = column;
+    }
+
+    public Location(RecognitionException re) {
+        this(re.input.getSourceName(), re.line, re.charPositionInLine);
     }
 
 
@@ -51,6 +59,7 @@ public final class Location {
     }
 
     /** Internal string representation. Do not rely on format! */
+    @Override
     public String toString() {
         return "[" + filename + ":" + line + "," + column + "]";
     }

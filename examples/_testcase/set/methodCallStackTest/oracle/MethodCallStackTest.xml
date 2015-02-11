@@ -5,7 +5,7 @@
          <callStackEntry path="/0"/>
          <methodCall name="&lt;call MethodCallStackTest.positive(x_2)&gt;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <branchStatement name="if (x_2&gt;=0)" pathCondition="true" pathConditionChanged="false">
+            <branchStatement name="if (x_2&gt;=0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                <callStackEntry path="/0/0/0"/>
                <callStackEntry path="/0"/>
                <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -23,7 +23,7 @@
                            <callStackEntry path="/0"/>
                            <methodCall name="&lt;call MethodCallStackTest.positive(x_7)&gt;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false">
                               <callStackEntry path="/0"/>
-                              <branchStatement name="if (x_7&gt;=0)" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false">
+                              <branchStatement name="if (x_7&gt;=0)" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" blockOpened="true">
                                  <callStackEntry path="/0/0/0/0/0/0/0/0/0"/>
                                  <callStackEntry path="/0"/>
                                  <branchCondition name="gt(y,Z(neglit(1(#))))" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="true" branchCondition="gt(y,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -48,6 +48,7 @@
                                              </methodReturn>
                                           </statement>
                                        </methodReturn>
+                                       <completedBlockEntry path="/0/0/0/0/0/0/0/0/0/0" conditionString="gt(y,Z(neglit(1(#))))"/>
                                     </statement>
                                  </branchCondition>
                                  <branchCondition name="lt(y,Z(0(#)))" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="lt(y,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -72,14 +73,18 @@
                                              </methodReturn>
                                           </statement>
                                        </methodReturn>
+                                       <completedBlockEntry path="/0/0/0/0/0/0/0/0/0/0" conditionString="lt(y,Z(0(#)))"/>
                                     </statement>
                                  </branchCondition>
+                                 <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                 <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/1/0"/>
                               </branchStatement>
                               <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                               <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/1/0/0"/>
                            </methodCall>
                         </statement>
                      </methodReturn>
+                     <completedBlockEntry path="/0/0/0/0" conditionString="gt(x,Z(neglit(1(#))))"/>
                   </statement>
                </branchCondition>
                <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -97,7 +102,7 @@
                            <callStackEntry path="/0"/>
                            <methodCall name="&lt;call MethodCallStackTest.positive(x_5)&gt;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
                               <callStackEntry path="/0"/>
-                              <branchStatement name="if (x_5&gt;=0)" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
+                              <branchStatement name="if (x_5&gt;=0)" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" blockOpened="true">
                                  <callStackEntry path="/0/0/0/0/1/0/0/0/0"/>
                                  <callStackEntry path="/0"/>
                                  <branchCondition name="gt(y,Z(neglit(1(#))))" pathCondition="and(leq(x,Z(neglit(1(#)))),geq(y,Z(0(#))))" pathConditionChanged="true" branchCondition="gt(y,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -122,6 +127,7 @@
                                              </methodReturn>
                                           </statement>
                                        </methodReturn>
+                                       <completedBlockEntry path="/0/0/0/0/1/0/0/0/0/0" conditionString="gt(y,Z(neglit(1(#))))"/>
                                     </statement>
                                  </branchCondition>
                                  <branchCondition name="lt(y,Z(0(#)))" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="lt(y,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -146,16 +152,22 @@
                                              </methodReturn>
                                           </statement>
                                        </methodReturn>
+                                       <completedBlockEntry path="/0/0/0/0/1/0/0/0/0/0" conditionString="lt(y,Z(0(#)))"/>
                                     </statement>
                                  </branchCondition>
+                                 <blockCompletionEntry path="/0/0/0/0/1/0/0/0/0/0/0/0"/>
+                                 <blockCompletionEntry path="/0/0/0/0/1/0/0/0/0/0/1/0"/>
                               </branchStatement>
                               <methodReturnEntry path="/0/0/0/0/1/0/0/0/0/0/0/0/0"/>
                               <methodReturnEntry path="/0/0/0/0/1/0/0/0/0/0/1/0/0"/>
                            </methodCall>
                         </statement>
                      </methodReturn>
+                     <completedBlockEntry path="/0/0/0/0" conditionString="lt(x,Z(0(#)))"/>
                   </statement>
                </branchCondition>
+               <blockCompletionEntry path="/0/0/0/0/0/0"/>
+               <blockCompletionEntry path="/0/0/0/0/1/0"/>
             </branchStatement>
             <methodReturnEntry path="/0/0/0/0/0/0/0"/>
             <methodReturnEntry path="/0/0/0/0/1/0/0"/>

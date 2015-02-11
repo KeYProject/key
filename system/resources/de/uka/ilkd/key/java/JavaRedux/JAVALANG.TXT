@@ -4,6 +4,7 @@ java.lang.ArithmeticException
 java.lang.ArrayIndexOutOfBoundsException
 java.lang.ArrayStoreException
 java.lang.AssertionError
+java.lang.Character
 java.lang.Class
 java.lang.ClassCastException
 java.lang.CloneNotSupportedException

@@ -9,8 +9,6 @@ import java.util.Set;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -21,6 +19,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.Function;
@@ -28,6 +27,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -42,6 +42,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.profile.SimplifyTermProfile;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
@@ -75,14 +76,14 @@ public final class SideProofUtil {
       Sequent sequentToProve = Sequent.EMPTY_SEQUENT;
       for (SequentFormula sf : goalSequent.antecedent()) {
          if (sf != currentSF) {
-            if (!SideProofUtil.containsModalityOrQuery(sf)) {
+            if (!containsModalityOrQuery(sf)) {
                sequentToProve = sequentToProve.addFormula(sf, true, false).sequent();
             }
          }
       }
       for (SequentFormula sf : goalSequent.succedent()) {
          if (sf != currentSF) {
-            if (!SideProofUtil.containsModalityOrQuery(sf)) {
+            if (!containsModalityOrQuery(sf)) {
                sequentToProve = sequentToProve.addFormula(sf, false, false).sequent();
             }
          }
@@ -99,6 +100,7 @@ public final class SideProofUtil {
     * </p>
     * @param services The {@link Services} to use.
     * @param proof The {@link Proof} from on which the side proof si performed.
+    * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
     * @param sequentToProve The {@link Sequent} to prove in a side proof.
     * @param label The {@link TermLabel} which is used to compute the result.
     * @param description The side proof description.
@@ -109,6 +111,7 @@ public final class SideProofUtil {
     */
    public static List<Pair<Term, Node>> computeResults(Services services, 
                                                        Proof proof, 
+                                                       ProofEnvironment sideProofEnvironment,
                                                        Sequent sequentToProve, 
                                                        TermLabel label, 
                                                        String description,
@@ -118,7 +121,7 @@ public final class SideProofUtil {
                                                        String splittingOption,
                                                        boolean addNamesToServices) throws ProofInputException {
       // Execute side proof
-      ApplyStrategyInfo info = SideProofUtil.startSideProof(proof, sequentToProve, methodTreatment, loopTreatment, queryTreatment, splittingOption, true);
+      ApplyStrategyInfo info = startSideProof(proof, sideProofEnvironment, sequentToProve, methodTreatment, loopTreatment, queryTreatment, splittingOption);
       try {
          // Extract results and conditions from side proof
          List<Pair<Term, Node>> conditionsAndResultsMap = new LinkedList<Pair<Term, Node>>();
@@ -153,7 +156,7 @@ public final class SideProofUtil {
          return conditionsAndResultsMap;
       }
       finally {
-         SideProofUtil.disposeOrStore(description, info);
+         disposeOrStore(description, info);
       }
    }
    
@@ -166,6 +169,7 @@ public final class SideProofUtil {
     * </p>
     * @param services The {@link Services} to use.
     * @param proof The {@link Proof} from on which the side proof si performed.
+    * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
     * @param sequentToProve The {@link Sequent} to prove in a side proof.
     * @param operator The {@link Operator} which is used to compute the result.
     * @param description The side proof description.
@@ -176,6 +180,7 @@ public final class SideProofUtil {
     */
    public static List<Triple<Term, Set<Term>, Node>> computeResultsAndConditions(Services services, 
                                                                                  Proof proof, 
+                                                                                 ProofEnvironment sideProofEnvironment, 
                                                                                  Sequent sequentToProve, 
                                                                                  Operator operator, 
                                                                                  String description,
@@ -185,10 +190,10 @@ public final class SideProofUtil {
                                                                                  String splittingOption,
                                                                                  boolean addNamesToServices) throws ProofInputException {
       // Execute side proof
-      ApplyStrategyInfo info = SideProofUtil.startSideProof(proof, sequentToProve, methodTreatment, loopTreatment, queryTreatment, splittingOption, true);
+      ApplyStrategyInfo info = startSideProof(proof, sideProofEnvironment, sequentToProve, methodTreatment, loopTreatment, queryTreatment, splittingOption);
       try {
          // Extract relevant things
-         Set<Operator> relevantThingsInSequentToProve = SideProofUtil.extractRelevantThings(info.getProof().getServices(), sequentToProve);
+         Set<Operator> relevantThingsInSequentToProve = extractRelevantThings(info.getProof().getServices(), sequentToProve);
          // Extract results and conditions from side proof
          List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap = new LinkedList<Triple<Term, Set<Term>, Node>>();
          for (Goal resultGoal : info.getProof().openGoals()) {
@@ -211,7 +216,7 @@ public final class SideProofUtil {
                      }
                   }
                }
-               if (!SideProofUtil.isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
+               if (!isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
                   if (resultConditions.add(sf.formula()) && addNamesToServices) {
                      addNewNamesToNamespace(services, sf.formula());
                   }
@@ -236,7 +241,7 @@ public final class SideProofUtil {
                   }
                }
                if (result == null) {
-                  if (!SideProofUtil.isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
+                  if (!isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
                      if (resultConditions.add(services.getTermBuilder().not(sf.formula())) && addNamesToServices) {
                         addNewNamesToNamespace(services, sf.formula());
                      }
@@ -251,7 +256,7 @@ public final class SideProofUtil {
          return conditionsAndResultsMap;
       }
       finally {
-         SideProofUtil.disposeOrStore(description, info);
+         disposeOrStore(description, info);
       }
    }
    
@@ -544,59 +549,61 @@ public final class SideProofUtil {
    /**
     * Starts a site proof for the given {@link Sequent}.
     * @param proof The parent {@link Proof} of the site proof to do.
+    * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
     * @param sequentToProve The {@link Sequent} to prove.
     * @return The proof result represented as {@link ApplyStrategyInfo} instance.
     * @throws ProofInputException Occurred Exception
     */
    public static ApplyStrategyInfo startSideProof(Proof proof,
-                                                  Sequent sequentToProve,
-                                                  boolean useSimplifyTermProfile) throws ProofInputException {
+                                                  ProofEnvironment sideProofEnvironment,
+                                                  Sequent sequentToProve) throws ProofInputException {
       return startSideProof(proof, 
+                            sideProofEnvironment,
                             sequentToProve, 
                             StrategyProperties.METHOD_NONE,
                             StrategyProperties.LOOP_NONE,
                             StrategyProperties.QUERY_OFF,
-                            StrategyProperties.SPLITTING_OFF,
-                            useSimplifyTermProfile);
+                            StrategyProperties.SPLITTING_OFF);
    }
    
    /**
     * Starts a site proof for the given {@link Sequent}.
     * @param proof The parent {@link Proof} of the site proof to do.
+    * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
     * @param sequentToProve The {@link Sequent} to prove.
     * @return The proof result represented as {@link ApplyStrategyInfo} instance.
     * @throws ProofInputException Occurred Exception
     */
    public static ApplyStrategyInfo startSideProof(Proof proof,
+                                                  ProofEnvironment sideProofEnvironment,
                                                   Sequent sequentToProve,
                                                   String methodTreatment,
                                                   String loopTreatment,
                                                   String queryTreatment,
-                                                  String splittingOption,
-                                                  boolean useSimplifyTermProfile) throws ProofInputException {
-      ProofStarter starter = createSideProof(proof, sequentToProve, useSimplifyTermProfile);
+                                                  String splittingOption) throws ProofInputException {
+      ProofStarter starter = createSideProof(sideProofEnvironment, sequentToProve, null);
       return startSideProof(proof, starter, methodTreatment, loopTreatment, queryTreatment, splittingOption);
    }
    
    /**
     * Creates a new {@link ProofStarter} which contains a new site proof
     * of the given {@link Proof}.
-    * @param proof The given {@link Proof}.
+    * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
     * @param sequentToProve The {@link Sequent} to proof in a new site proof.
+    * @param proofName An optional name for the newly created {@link Proof}.
     * @return The created {@link ProofStarter} with the site proof.
     * @throws ProofInputException Occurred Exception.
     */
-   public static ProofStarter createSideProof(Proof proof,
-                                              Sequent sequentToProve, 
-                                              boolean useSimplifyTermProfile) throws ProofInputException {
+   public static ProofStarter createSideProof(ProofEnvironment sideProofEnvironment,
+                                              Sequent sequentToProve,
+                                              String proofName) throws ProofInputException {
       // Make sure that valid parameters are given
       assert sequentToProve != null;
       // Create ProofStarter
       ProofStarter starter = new ProofStarter(false);
       // Configure ProofStarter
       //TODO: Avoid proof environment use only InitConfig
-      ProofEnvironment env = cloneProofEnvironmentWithOwnOneStepSimplifier(proof, useSimplifyTermProfile); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
-      starter.init(sequentToProve, env);
+      starter.init(sequentToProve, sideProofEnvironment, proofName);
       return starter;
    }
    
@@ -692,15 +699,19 @@ public final class SideProofUtil {
     */
    public static Term extractOperatorTerm(Node node, final Operator operator) {
       assert node != null;
-      // Search formula with the given operator in sequent
+      // Search formula with the given operator in sequent (or in some cases below the updates)
       SequentFormula sf = JavaUtil.search(node.sequent(), new IFilter<SequentFormula>() {
          @Override
          public boolean select(SequentFormula element) {
-            return JavaUtil.equals(element.formula().op(), operator);
+            Term term = element.formula();
+            term = TermBuilder.goBelowUpdates(term);
+            return JavaUtil.equals(term.op(), operator);
          }
       });
       if (sf != null) {
-         return sf.formula();
+         Term term = sf.formula();
+         term = TermBuilder.goBelowUpdates(term);
+         return term;
       }
       else {
          return null;
@@ -715,7 +726,7 @@ public final class SideProofUtil {
     * @param source The {@link Proof} to copy its {@link ProofEnvironment}.
     * @return The created {@link ProofEnvironment} which is a copy of the environment of the given {@link Proof} but with its own {@link OneStepSimplifier} instance.
     */
-   public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(Proof source, boolean useSimplifyTermProfile) {
+   public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(final Proof source, final boolean useSimplifyTermProfile) {
       assert source != null;
       assert !source.isDisposed();
       // Get required source instances
@@ -730,7 +741,7 @@ public final class SideProofUtil {
                Profile sourceProfile = sourceInitConfig.getProfile();
                if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
                   ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
-                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations()); // Make sure that the term labels of symbolic execution are also supported by the new environment.
+                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations(SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(source))); // Make sure that the term labels of symbolic execution are also supported by the new environment.
                   return result;
                }
                else {
@@ -746,7 +757,7 @@ public final class SideProofUtil {
                Profile sourceProfile = sourceInitConfig.getProfile();
                if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
                   ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
-                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations()); // Make sure that the term labels of symbolic execution are also supported by the new environment.
+                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations(SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(source))); // Make sure that the term labels of symbolic execution are also supported by the new environment.
                   return result;
                }
                else {

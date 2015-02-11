@@ -31,9 +31,11 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -55,7 +57,7 @@ public abstract class AbstractPO implements IPersistablePO {
 
     protected final TermBuilder tb; 
     protected final InitConfig environmentConfig;
-    protected final Services environmentServices;
+    protected Services environmentServices;
     protected final JavaInfo javaInfo;
     protected final HeapLDT heapLDT;
     protected final SpecificationRepository specRepos;
@@ -325,6 +327,9 @@ public abstract class AbstractPO implements IPersistablePO {
     private Proof createProof(String proofName,
                               Term poTerm,
                               InitConfig proofConfig) {
+        if (proofConfig == null) {
+            proofConfig = environmentConfig.deepCopy();
+        }
         final JavaModel javaModel = proofConfig.getServices().getJavaModel();
         createProofHeader(javaModel.getModelDir(),
                           javaModel.getClassPath(),
@@ -335,7 +340,26 @@ public abstract class AbstractPO implements IPersistablePO {
                                 header,
                                 proofConfig.createTacletIndex(),
                                 proofConfig.createBuiltInRuleIndex(),
-                                proofConfig );
+                                proofConfig);
+        assert proof.openGoals().size() == 1 : "expected one first open goal";
+        final boolean isInfFlowProof =
+                (this instanceof InfFlowPO);
+//        ||
+//                // this is a hack and has to be changed by time
+//                proof.getSettings().getStrategySettings().getActiveStrategyProperties()
+//                                   .getProperty(StrategyProperties.INF_FLOW_CHECK_PROPERTY)
+//                                   .equals(StrategyProperties.INF_FLOW_CHECK_TRUE);
+        if (isInfFlowProof) {
+            StrategyInfoUndoMethod undo =
+                    new StrategyInfoUndoMethod() {
+                @Override
+                public void undo(
+                        de.uka.ilkd.key.util.properties.Properties strategyInfos) {
+                    strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true);
+                }
+            };
+            proof.openGoals().head().addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true, undo);
+        }
         return proof;
     }
 

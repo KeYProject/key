@@ -67,6 +67,10 @@ public class ThisReference
         return (prefix == null) ? this : prefix.getFirstElement();
     }
 
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+        return (prefix == null) ? this : prefix.getFirstElementIncludingBlocks();
+    }
 
     /**
      *      Returns the number of children of this node.

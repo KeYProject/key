@@ -46,6 +46,7 @@ import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
@@ -688,6 +689,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 	doDefaultAction(x);
     }
 
+    @Override
     public void performActionOnModulo(Modulo x) {
 	doDefaultAction(x);
     }
@@ -984,6 +986,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     @Override    
     public void performActionOnTransactionStatement(TransactionStatement x) {
     doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnEmptyMapLiteral(EmptyMapLiteral x) {
+        doDefaultAction(x);
     }
 
 }

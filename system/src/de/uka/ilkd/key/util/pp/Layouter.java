@@ -324,9 +324,7 @@ public class Layouter {
     /** Ends the innermost block.
      * @return this
      **/
-    public Layouter end() 
-	throws IOException
-    {
+    public Layouter end() throws IOException {
 	if (delimStack.isEmpty()) {
 	    /* then stream is also empty, so output */
 	    out.closeBlock();

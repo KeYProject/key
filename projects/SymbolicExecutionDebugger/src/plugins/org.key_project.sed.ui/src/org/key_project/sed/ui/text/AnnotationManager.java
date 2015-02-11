@@ -33,6 +33,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.sourcesummary.ISEDSourceModel;
 import org.key_project.sed.core.sourcesummary.ISEDSourceRange;
@@ -115,12 +116,17 @@ public class AnnotationManager implements IDisposable {
     * Constructor.
     * @param debugView The {@link IDebugView} to work with.
     */
-   public AnnotationManager(IDebugView debugView) {
+   public AnnotationManager(final IDebugView debugView) {
       Assert.isNotNull(debugView);
       this.debugView = debugView;
       DebugPlugin.getDefault().addDebugEventListener(debugListener);
       debugView.getViewer().addSelectionChangedListener(selectionListener);
-      updateAnnotations(debugView.getViewer().getSelection());
+      debugView.getSite().getShell().getDisplay().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            updateAnnotations(debugView.getViewer().getSelection());
+         }
+      });
       debugView.getSite().getPage().addPartListener(partListener);
    }
 
@@ -215,12 +221,14 @@ public class AnnotationManager implements IDisposable {
             ITextEditor te = (ITextEditor)editor;
             IDocumentProvider provider = te.getDocumentProvider();
             IAnnotationModel model = provider.getAnnotationModel(editor.getEditorInput());
-            Iterator<?> iter = model.getAnnotationIterator();
-            while (iter.hasNext()) {
-               Object next = iter.next();
-               if (next instanceof SymbolicallyReachedAnnotation) {
-                  SymbolicallyReachedAnnotation annotation = (SymbolicallyReachedAnnotation)next;
-                  removeTarget(model, annotation, target);
+            if (model != null) {
+               Iterator<?> iter = model.getAnnotationIterator();
+               while (iter.hasNext()) {
+                  Object next = iter.next();
+                  if (next instanceof SymbolicallyReachedAnnotation) {
+                     SymbolicallyReachedAnnotation annotation = (SymbolicallyReachedAnnotation)next;
+                     removeTarget(model, annotation, target);
+                  }
                }
             }
          }
@@ -303,9 +311,11 @@ public class AnnotationManager implements IDisposable {
       if (annotatedDebugTargets != null) {
          for (DebugEvent event : events) {
             if (DebugEvent.SUSPEND == event.getKind() && 
-                event.getSource() instanceof ISEDDebugTarget &&
-                annotatedDebugTargets.contains(event.getSource())) {
-               updateAnnotations((ISEDDebugTarget)event.getSource());
+                event.getSource() instanceof ISEDDebugElement) {
+               ISEDDebugTarget target = ((ISEDDebugElement) event.getSource()).getDebugTarget();
+               if (annotatedDebugTargets.contains(target)) {
+                  updateAnnotations(target);
+               }
             }
          }
       }

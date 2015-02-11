@@ -17,7 +17,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.key4eclipse.resources.test.testcase.junit.AutoDeleteTests;
 import org.key_project.key4eclipse.resources.test.testcase.junit.BuilderTests;
-import org.key_project.key4eclipse.resources.test.testcase.junit.HideMetaFilesTests;
 import org.key_project.key4eclipse.resources.test.testcase.junit.KeYResourcesUtilTest;
 import org.key_project.key4eclipse.resources.test.testcase.junit.MarkerTests;
 import org.key_project.key4eclipse.resources.test.testcase.junit.ProjectInfoManagementTest;
@@ -32,7 +31,6 @@ import org.key_project.key4eclipse.resources.test.testcase.junit.ProofMetaFileWr
 @Suite.SuiteClasses({
    AutoDeleteTests.class,
    BuilderTests.class,
-   HideMetaFilesTests.class,
    KeYResourcesUtilTest.class,
    MarkerTests.class,
    ProjectInfoManagementTest.class,

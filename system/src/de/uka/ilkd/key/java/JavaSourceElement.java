@@ -93,6 +93,11 @@ public abstract class JavaSourceElement implements SourceElement {
         return this;
     }
 
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       return getFirstElement();
+    }
+
     /**
      *        Finds the source element that occurs last in the source.  The
      *        default implementation returns this element, which is correct

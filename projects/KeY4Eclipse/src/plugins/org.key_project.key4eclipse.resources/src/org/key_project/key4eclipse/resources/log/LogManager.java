@@ -82,7 +82,7 @@ public class LogManager {
             }
             else {
                logFile.create(new ByteArrayInputStream(content.getBytes()), true, null);
-               logFile.setCharset(CHARSET, null);
+//               logFile.setCharset(CHARSET, null); // TODO: Setting charset requires full project access and causes trouble during build
             }
          }
       }

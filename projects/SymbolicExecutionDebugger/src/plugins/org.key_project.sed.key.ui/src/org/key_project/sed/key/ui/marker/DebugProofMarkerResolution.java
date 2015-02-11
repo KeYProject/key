@@ -3,6 +3,7 @@ package org.key_project.sed.key.ui.marker;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.swt.graphics.Image;
 import org.key_project.key4eclipse.resources.marker.AbstractProofMarkerResolution;
 import org.key_project.sed.key.core.util.KeySEDUtil;
@@ -60,6 +61,7 @@ public class DebugProofMarkerResolution extends AbstractProofMarkerResolution {
     */
    @Override
    protected void run(IMarker marker, IFile proofFile) throws Exception {
-      KeYLaunchShortcut.launch(proofFile, KeySEDUtil.MODE);
+      IMethod method = findMethod(marker, proofFile);
+      KeYLaunchShortcut.launch(proofFile, method, KeySEDUtil.MODE);
    }
 }

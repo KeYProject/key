@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.proof.Node;
@@ -22,7 +22,6 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -57,14 +56,6 @@ public class ExecutionLoopInvariant extends AbstractExecutionNode<SourceElement>
    @Override
    public String getElementType() {
       return "Loop Invariant";
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected IExecutionVariable[] lazyComputeVariables() {
-      return SymbolicExecutionUtil.createExecutionVariables(this);
    }
 
    /**

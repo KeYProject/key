@@ -26,55 +26,49 @@ package org.key_project.key4eclipse.resources.ui.wizard;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.internal.ui.wizards.JavaProjectWizard;
-import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.jface.wizard.Wizard;
+import org.key_project.key4eclipse.common.ui.wizard.AbstractNewJavaProjectWizard;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
 import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.ObjectUtil;
 
-
-@SuppressWarnings("restriction")
-public class KeYProjectWizard extends JavaProjectWizard {
-   
-   /**
-    * The Constructor that sets the Window Title of the Wizard to "New KeYProject"
-    */
-   public KeYProjectWizard(){
-      super();
-      this.setWindowTitle("New KeY Project");
-   }
-   
-   
+/**
+ * {@link Wizard} to create a new KeY project.
+ * @author Martin Hentschel
+ */
+public class KeYProjectWizard extends AbstractNewJavaProjectWizard {
    /**
     * {@inheritDoc}
     */
    @Override
-   public void addPages(){
-      super.addPages();
-      try {
-         Object obj = ObjectUtil.get(this, "fFirstPage");
-         if(obj instanceof WizardPage) {
-            ((WizardPage)obj).setTitle("Create a KeY Project");
-         }
-         else {
-            LogUtil.getLogger().logWarning("API has changed");
-         }
-      }
-      catch (Exception e) {
-         LogUtil.getLogger().logError(e);
-         LogUtil.getLogger().openErrorDialog(getShell(), e);
-      }
+   protected String computeWindowTitle() {
+      return "New KeY Project";
    }
-   
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected String computeDescription() {
+      return "Create a KeY project in the workspace or in an external location.";
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected String computeTitle() {
+      return "Create a KeY Project";
+   }
    
    /**
     * {@inheritDoc}
     */
+   @SuppressWarnings("restriction")
    @Override
    public boolean performFinish(){
-      boolean result = super.performFinish();
-      if (result) {
+      boolean done = super.performFinish();
+      if (done) {
          IProject project = getCreatedElement().getJavaProject().getProject();
          try {
             IProjectDescription description = project.getDescription();
@@ -86,6 +80,6 @@ public class KeYProjectWizard extends JavaProjectWizard {
             LogUtil.getLogger().createErrorStatus(e);
          }
       }
-      return result;
+      return done;
    }
 }

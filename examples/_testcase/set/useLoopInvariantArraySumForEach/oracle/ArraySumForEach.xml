@@ -3,7 +3,7 @@
    <methodCall name="&lt;call ArraySumForEach.sum(array)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
-         <loopStatement name="for (int value : array)" pathCondition="true" pathConditionChanged="false">
+         <loopStatement name="for (int value : array)" pathCondition="true" pathConditionChanged="false" blockOpened="false">
             <callStackEntry path="/0"/>
             <loopInvariant name="invariant: i &gt;= 0
 &amp; (  i &lt;= array.length

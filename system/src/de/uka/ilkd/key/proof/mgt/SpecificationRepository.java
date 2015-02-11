@@ -79,6 +79,7 @@ import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.speclang.StatementWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
@@ -114,10 +115,10 @@ public final class SpecificationRepository {
             new LinkedHashMap<KeYJavaType, ImmutableSet<InitiallyClause>>();
     private final Map<ProofOblInput, ImmutableSet<Proof>> proofs =
             new LinkedHashMap<ProofOblInput, ImmutableSet<Proof>>();
-    private final Map<LoopStatement, LoopInvariant> loopInvs =
-            new LinkedHashMap<LoopStatement, LoopInvariant>();
-    private final Map<StatementBlock, ImmutableSet<BlockContract>> blockContracts =
-            new LinkedHashMap<StatementBlock, ImmutableSet<BlockContract>>();
+    private final Map<Pair<LoopStatement, Integer>, LoopInvariant> loopInvs =
+            new LinkedHashMap<Pair<LoopStatement, Integer>, LoopInvariant>();
+    private final Map<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>> blockContracts =
+            new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>>();
     private final Map<IObserverFunction, IObserverFunction> unlimitedToLimited =
             new LinkedHashMap<IObserverFunction, IObserverFunction>();
     private final Map<IObserverFunction, IObserverFunction> limitedToUnlimited =
@@ -416,8 +417,8 @@ public final class SpecificationRepository {
     }
 
     private void registerContract(Contract contract) {
-        final Pair<KeYJavaType, IObserverFunction> target = new Pair<KeYJavaType, IObserverFunction>(
-                contract.getKJT(), contract.getTarget());
+        final Pair<KeYJavaType, IObserverFunction> target =
+                new Pair<KeYJavaType,IObserverFunction>(contract.getKJT(), contract.getTarget());
         registerContract(contract, target);
     }
 
@@ -512,16 +513,15 @@ public final class SpecificationRepository {
     /** Removes the contract from the repository, but keeps its target. */
     private void unregisterContract(Contract contract) {
         final KeYJavaType kjt = contract.getKJT();
-        final Pair<KeYJavaType, IObserverFunction> tp = new Pair<KeYJavaType, IObserverFunction>(
-                kjt, contract.getTarget());
+        final Pair<KeYJavaType, IObserverFunction> tp =
+                new Pair<KeYJavaType, IObserverFunction>(kjt, contract.getTarget());
         contracts.put(tp, contracts.get(tp).remove(contract));
         if (contract instanceof FunctionalOperationContract) {
-            final Pair<KeYJavaType, IProgramMethod> tp2 = new Pair<KeYJavaType, IProgramMethod>(
-                    tp.first, (IProgramMethod) tp.second);
-            operationContracts.put(
-                    tp2,
-                    operationContracts.get(tp2).remove(
-                            (FunctionalOperationContract) contract));
+            final Pair<KeYJavaType, IProgramMethod> tp2 =
+                    new Pair<KeYJavaType, IProgramMethod>(tp.first, (IProgramMethod) tp.second);
+            operationContracts.put(tp2,
+                                   operationContracts.get(tp2).remove(
+                                           (FunctionalOperationContract) contract));
             if (!getWdChecks(contract.getKJT(), contract.getTarget()).isEmpty()) {
                 ImmutableSet<WellDefinednessCheck> wdcs =
                         getWdChecks(contract.getKJT(), contract.getTarget());
@@ -544,8 +544,11 @@ public final class SpecificationRepository {
      * Creates a new contract if there is none yet.
      * @param inv initially clause
      * @param kjt constructors of this type are added a post-condition
+     * @throws SLTranslationException during contract construction from history
+     *    constraint
      */
-    private void createContractsFromInitiallyClause(InitiallyClause inv, KeYJavaType kjt) {
+    private void createContractsFromInitiallyClause(InitiallyClause inv, KeYJavaType kjt)
+                throws SLTranslationException {
         if (!kjt.equals(inv.getKJT()))
             inv = inv.setKJT(kjt);
         for (IProgramMethod pm : services.getJavaInfo().getConstructors(kjt)) {
@@ -560,8 +563,7 @@ public final class SpecificationRepository {
                                 .add((FunctionalOperationContract) old);
                 }
                 if (oldFuncContracts.isEmpty()) {
-                    final FunctionalOperationContract iniContr = cf.func(pm,
-                            inv);
+                    final FunctionalOperationContract iniContr = cf.func(pm, inv);
                     addContractNoInheritance(iniContr);
                     assert getContracts(kjt, pm).size() ==
                             (WellDefinednessCheck.isOn() ? 2 : 1) + oldContracts.size();
@@ -766,15 +768,14 @@ public final class SpecificationRepository {
      * Returns all registered (atomic) operation contracts for the passed
      * operation which refer to the passed modality.
      */
-    public ImmutableSet<FunctionalOperationContract> getOperationContracts(
-            KeYJavaType kjt, IProgramMethod pm, Modality modality) {
-        ImmutableSet<FunctionalOperationContract> result = getOperationContracts(
-                kjt, pm);
+    public ImmutableSet<FunctionalOperationContract> getOperationContracts(KeYJavaType kjt,
+                                                                           IProgramMethod pm,
+                                                                           Modality modality) {
+        ImmutableSet<FunctionalOperationContract> result = getOperationContracts(kjt, pm);
         final boolean transactionModality =
                 (modality == Modality.DIA_TRANSACTION || modality == Modality.BOX_TRANSACTION);
         final Modality matchModality = transactionModality ?
-                ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA
-                        : Modality.BOX)
+                ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA : Modality.BOX)
                         : modality;
         for (FunctionalOperationContract contract : result) {
             if (!contract.getModality().equals(matchModality)
@@ -1005,8 +1006,9 @@ public final class SpecificationRepository {
     /**
      * Adds postconditions raising from initially clauses to all constructors.
      * <b>Warning</b>: To be called after all contracts have been registered.
+     * @throws SLTranslationException may be thrown during contract extraction
      */
-    public void createContractsFromInitiallyClauses() {
+    public void createContractsFromInitiallyClauses() throws SLTranslationException {
         for (KeYJavaType kjt : initiallyClauses.keySet()) {
             for (InitiallyClause inv : initiallyClauses.get(kjt)) {
                 createContractsFromInitiallyClause(inv, kjt);
@@ -1162,7 +1164,9 @@ public final class SpecificationRepository {
                     }
                     for(FunctionalOperationContract fop : lookupContracts) {
                         Term representsFromContract =
-                                fop.getRepresentsAxiom(heaps.get(0), selfVar, paramVars, tb.resultVar(pm, false), atPreVars, services);
+                                fop.getRepresentsAxiom(heaps.get(0), selfVar, paramVars,
+                                                       tb.resultVar(pm, false), atPreVars,
+                                                       services);
                         Term preContract = fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
                         if(preContract == null) preContract = tb.tt();
                         if(representsFromContract != null) {
@@ -1338,6 +1342,29 @@ public final class SpecificationRepository {
     /**
      * Returns the PO that the passed proof is about, or null.
      */
+    public ContractPO getContractPOForProof(Proof proof) {
+        ProofOblInput po = getProofOblInput(proof);
+        if (po != null && po instanceof ContractPO) {
+            return (ContractPO)po;
+        } else {
+            return null;
+        }
+    }
+
+
+    /**
+     * Returns the PO that the passed contract is about, or null.
+     */
+    public ContractPO getPO(Contract c) {
+        for (ProofOblInput po : proofs.keySet()) {
+            if (po instanceof ContractPO
+                && ((ContractPO) po).getContract().equals(c)) {
+                return (ContractPO) po;
+            }
+        }
+        return null;
+    }
+
     public ContractPO getPOForProof(Proof proof) {
         for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs
                 .entrySet()) {
@@ -1349,6 +1376,7 @@ public final class SpecificationRepository {
         }
         return null;
     }
+
 
     /**
      * Returns the {@link ProofOblInput} from which the given {@link Proof} was
@@ -1367,15 +1395,6 @@ public final class SpecificationRepository {
             }
         }
         return null;
-    }
-
-    public ContractPO getContractPOForProof(Proof proof) {
-        ProofOblInput po = getProofOblInput(proof);
-        if (po != null && po instanceof ContractPO) {
-            return (ContractPO)po;
-        } else {
-            return null;
-        }
     }
 
     /**
@@ -1416,7 +1435,15 @@ public final class SpecificationRepository {
      * Returns the registered loop invariant for the passed loop, or null.
      */
     public LoopInvariant getLoopInvariant(LoopStatement loop) {
-        return loopInvs.get(loop);
+        final int line = loop.getStartPosition().getLine();
+        Pair<LoopStatement, Integer> l =
+                new Pair<LoopStatement, Integer>(loop, line);
+        LoopInvariant inv = loopInvs.get(l);
+        if (inv == null && line != -1) {
+            l = new Pair<LoopStatement, Integer>(loop, -1);
+            inv = loopInvs.get(l);
+        }
+        return inv;
     }
 
     /**
@@ -1440,28 +1467,37 @@ public final class SpecificationRepository {
      * Registers the passed loop invariant, possibly overwriting an older
      * registration for the same loop.
      */
-    public void addLoopInvariant(LoopInvariant inv) {
-        LoopStatement loop = inv.getLoop();
-        loopInvs.put(loop, inv);
-    }
-
-    public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
-        if (blockContracts.get(block) == null) {
-            return DefaultImmutableSet.<BlockContract> nil();
-        } else {
-            return blockContracts.get(block);
+    public void addLoopInvariant(final LoopInvariant inv) {
+        final LoopStatement loop = inv.getLoop();
+        final int line = loop.getStartPosition().getLine();
+        Pair<LoopStatement, Integer> l =
+                new Pair<LoopStatement, Integer> (loop, line);
+        loopInvs.put(l, inv);
+        if (line != -1) {
+            l = new Pair<LoopStatement, Integer> (loop, -1);
+            loopInvs.put(l, inv);
         }
     }
 
-    public ImmutableSet<BlockContract> getBlockContracts(
-            final StatementBlock block, final Modality modality) {
+    public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
+        final Pair<StatementBlock, Integer> b =
+                new Pair<StatementBlock, Integer>(block, block.getStartPosition().getLine());
+        final ImmutableSet<BlockContract> contracts = blockContracts.get(b);
+        if (contracts == null) {
+            return DefaultImmutableSet.<BlockContract> nil();
+        } else {
+            return contracts;
+        }
+    }
+
+    public ImmutableSet<BlockContract> getBlockContracts(final StatementBlock block,
+                                                         final Modality modality) {
         ImmutableSet<BlockContract> result = getBlockContracts(block);
         final Modality matchModality = getMatchModality(modality);
         for (BlockContract contract : result) {
             if (!contract.getModality().equals(matchModality)
-                    || (modality.transaction()
-                            && !contract.isTransactionApplicable() && !contract
-                                .isReadOnly(services))) {
+                    || (modality.transaction() && !contract.isTransactionApplicable()
+                            && !contract.isReadOnly(services))) {
                 result = result.remove(contract);
             }
         }
@@ -1470,7 +1506,9 @@ public final class SpecificationRepository {
 
     public void addBlockContract(final BlockContract contract) {
         final StatementBlock block = contract.getBlock();
-        blockContracts.put(block, getBlockContracts(block).add(contract));
+        final Pair<StatementBlock, Integer> b =
+                new Pair<StatementBlock, Integer> (block, block.getStartPosition().getLine());
+        blockContracts.put(b, getBlockContracts(block).add(contract));
     }
 
     public void addSpecs(ImmutableSet<SpecificationElement> specs) {

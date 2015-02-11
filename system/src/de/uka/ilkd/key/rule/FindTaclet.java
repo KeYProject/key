@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -76,15 +77,44 @@ public abstract class FindTaclet extends Taclet {
      * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the
      * prefix for each SchemaVariable in the Taclet
      */
+    public FindTaclet(Name name,
+                      TacletApplPart applPart,
+                      ImmutableList<TacletGoalTemplate> goalTemplates,
+                      ImmutableList<RuleSet> ruleSets,
+                      TacletAttributes attrs,
+                      Term find,
+                      ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+                      ImmutableSet<Choice> choices,
+                      boolean surviveSymbExec) {
+        super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,
+              choices, surviveSymbExec);
+        this.find = find;
+    }
+    
+    /** creates a FindTaclet 
+     * @param name the Name of the taclet
+     * @param applPart the TacletApplPart that contains the if-sequent, the
+     * not-free and new-vars conditions 
+     * @param goalTemplates a IList<TacletGoalTemplate> that contains all goaltemplates of
+     * the taclet (these are the instructions used to create new goals when
+     * applying the Taclet)
+     * @param ruleSets a IList<RuleSet> that contains all rule sets the Taclet
+     *      is attached to
+     * @param attrs the TacletAttributes encoding if the Taclet is non-interactive,
+     * recursive or something like that
+     * @param find the Term that is the pattern that has to be found in a
+     * sequent and the places where it matches the Taclet can be applied
+     * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the
+     * prefix for each SchemaVariable in the Taclet
+     */
     public FindTaclet(Name name, TacletApplPart applPart,  
 		      ImmutableList<TacletGoalTemplate> goalTemplates, 
 		      ImmutableList<RuleSet> ruleSets,
 		      TacletAttributes attrs, Term find,
 		      ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
 		      ImmutableSet<Choice> choices){
-	super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap,
-	      choices);
-	this.find = find;
+	this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
+             choices, false);
     }
     
     /** returns the find term of the taclet to be matched */
@@ -151,6 +181,7 @@ public abstract class FindTaclet extends Taclet {
 
     /** CONSTRAINT NOT USED 
      * applies the replacewith part of Taclets
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param gt TacletGoalTemplate used to get the replaceexpression 
      * in the Taclet
      * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
@@ -158,14 +189,16 @@ public abstract class FindTaclet extends Taclet {
      * @param services the Services encapsulating all java information
      * @param matchCond the MatchConditions with all required instantiations 
      */
-    protected abstract void applyReplacewith(TacletGoalTemplate gt, SequentChangeInfo currentSequent,
+    protected abstract void applyReplacewith(Goal goal, TermLabelState termLabelState, TacletGoalTemplate gt, SequentChangeInfo currentSequent,
 					     PosInOccurrence posOfFind,
 					     Services services,
-					     MatchConditions matchCond);
+					     MatchConditions matchCond,
+					     TacletApp tacletApp);
 
 
     /**
      * adds the sequent of the add part of the Taclet to the goal sequent
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param add the Sequent to be added
      * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
      * @param posOfFind the PosInOccurrence describes the place where to add
@@ -173,10 +206,12 @@ public abstract class FindTaclet extends Taclet {
      * @param services the Services encapsulating all java information
      * @param matchCond the MatchConditions with all required instantiations 
      */
-    protected abstract void applyAdd(Sequent add, SequentChangeInfo sequentChangeInfo,
+    protected abstract void applyAdd(TermLabelState termLabelState, Sequent add, SequentChangeInfo sequentChangeInfo,
 				     PosInOccurrence posOfFind,
 				     Services services,
-				     MatchConditions matchCond);
+				     MatchConditions matchCond,
+				     Goal goal,
+				     TacletApp tacletApp);
 
 
     /**  
@@ -189,7 +224,7 @@ public abstract class FindTaclet extends Taclet {
     public ImmutableList<Goal> apply(Goal     goal,
 			    Services services,
 			    RuleApp  ruleApp) {
-
+   final TermLabelState termLabelState = new TermLabelState();
 	// Number without the if-goal eventually needed
 	int                          numberOfNewGoals = goalTemplates().size();
 
@@ -216,17 +251,21 @@ public abstract class FindTaclet extends Taclet {
 	    // add first because we want to use pos information that
 	    // is lost applying replacewith
 	    
-	    applyAdd( gt.sequent(),
+	    applyAdd(termLabelState, gt.sequent(),
 			      currentSequent,
 			      tacletApp.posInOccurrence(),
 			      services,
-			      mc );
+			      mc,
+			      goal,
+			      (TacletApp) ruleApp);
 
-	    applyReplacewith( gt,
+	    applyReplacewith(currentGoal, 
+	             termLabelState, gt,
 	             currentSequent,
 	             tacletApp.posInOccurrence(),
 	             services,
-	             mc );
+	             mc,
+	             (TacletApp) ruleApp);
 
 	    applyAddrule( gt.rules(),
 			      currentGoal,

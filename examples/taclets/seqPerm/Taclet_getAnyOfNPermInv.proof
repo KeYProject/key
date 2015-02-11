@@ -2,34 +2,36 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Sat Apr 12 00:12:09 CEST 2014
+#Tue Oct 14 09:27:57 CEST 2014
 [StrategyProperty]VBT_PHASE=VBT_SYM_EX
 [SMTSettings]useUninterpretedMultiplication=true
 [SMTSettings]SelectedTaclets=
-[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
-[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY
-[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_EXPAND
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
-[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_INSTANTIATE
-[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
 [SMTSettings]instantiateHierarchyAssumptions=true
 [StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
-[StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF
-[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_EXPAND
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT
 [StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
 [StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
 [StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_RESTRICTED
 [Strategy]Timeout=-1
 [Strategy]MaximumNumberOfAutomaticApplications=10000
 [SMTSettings]integersMaximum=2147483645
-[Choice]DefaultChoices=JavaCard-JavaCard\\:off , bigint-bigint\\:on , programRules-programRules\\:Java , intRules-intRules\\:arithmeticSemanticsIgnoringOF , sequences-sequences\\:on , runtimeExceptions-runtimeExceptions\\:allow , integerSimplificationRules-integerSimplificationRules\\:full , reach-reach\\:on , assertions-assertions\\:on , initialisation-initialisation\\:enableStaticInitialisation , modelFields-modelFields\\:treatAsAxiom , optimisedSelectRules-optimisedSelectRules\\:on , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , Strings-Strings\\:on
+[Choice]DefaultChoices=assertions-assertions\\:on , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:allow , JavaCard-JavaCard\\:on , Strings-Strings\\:on , modelFields-modelFields\\:treatAsAxiom , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , moreSeqRules-moreSeqRules\\:on
 [SMTSettings]useConstantsForBigOrSmallIntegers=true
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
-[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
+[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
 [SMTSettings]maxGenericSorts=2
 [SMTSettings]integersMinimum=-2147483645
+[SMTSettings]invariantForall=false
 [SMTSettings]UseBuiltUniqueness=false
 [SMTSettings]explicitTypeHierarchy=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
@@ -38,18 +40,20 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Sat Apr 12 00:12:09 CEST 2014
+#Tue Oct 14 09:27:57 CEST 2014
 name=getAnyOfNPermInv
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
 
 \proof {
 (keyLog "0" (keyUser "mattze" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+(keyLog "1" (keyUser "daniel" ) (keyVersion "7b6a4d606b29c3810d7091c61ced95b1eb3cd625"))
+(keyLog "2" (keyUser "daniel" ) (keyVersion "7b6a4d606b29c3810d7091c61ced95b1eb3cd625"))
 
-(autoModeTime "500")
+(autoModeTime "824")
 
 (branch "dummy ID"
-(builtin "One Step Simplification" (formula "1"))
+(builtin "One Step Simplification" (formula "1") (newnames "f_s1,f_i3"))
 (rule "notRight" (formula "1"))
 (rule "andLeft" (formula "1"))
 (rule "notLeft" (formula "2"))
@@ -73,26 +77,28 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 (rule "polySimp_elimSub" (formula "4") (term "1,1,0,1"))
 (rule "times_zero_2" (formula "4") (term "1,1,1,0,1"))
 (rule "add_zero_right" (formula "4") (term "1,1,0,1"))
-(rule "inEqSimp_ltToLeq" (formula "4") (term "1,0,1"))
-(rule "polySimp_mulComm0" (formula "4") (term "1,0,0,1,0,1"))
-(rule "polySimp_addComm1" (formula "4") (term "0,1,0,1"))
-(rule "inEqSimp_commuteLeq" (formula "4") (term "0,0,1"))
-(rule "replace_known_left" (formula "4") (term "0,0,1") (ifseqformula "1"))
-(builtin "One Step Simplification" (formula "4"))
 (rule "getOfSeqDef" (formula "4") (term "0"))
 (rule "castDel" (formula "4") (term "1,0"))
 (rule "add_zero_right" (formula "4") (term "1,1,0"))
 (rule "polySimp_elimSub" (formula "4") (term "1,1,0,0"))
-(rule "times_zero_2" (formula "4") (term "1,1,1,0,0"))
+(rule "mul_literals" (formula "4") (term "1,1,1,0,0"))
 (rule "add_zero_right" (formula "4") (term "1,1,0,0"))
+(rule "inEqSimp_ltToLeq" (formula "4") (term "1,0,1"))
+(rule "polySimp_mulComm0" (formula "4") (term "1,0,0,1,0,1"))
+(rule "polySimp_addComm1" (formula "4") (term "0,1,0,1"))
 (rule "inEqSimp_ltToLeq" (formula "4") (term "1,0,0"))
 (rule "eqSymm" (formula "4"))
 (rule "polySimp_mulComm0" (formula "4") (term "1,0,0,1,0,1"))
 (rule "eqSymm" (formula "4"))
 (rule "polySimp_addComm1" (formula "4") (term "0,1,0,0"))
 (rule "inEqSimp_commuteLeq" (formula "4") (term "0,0,0"))
+(rule "eqSymm" (formula "4"))
+(rule "replace_known_left" (formula "4") (term "0,0,1") (ifseqformula "1"))
+(builtin "One Step Simplification" (formula "4"))
+(rule "inEqSimp_commuteLeq" (formula "4") (term "0,0,0"))
 (rule "replace_known_left" (formula "4") (term "0,0,0") (ifseqformula "1"))
 (builtin "One Step Simplification" (formula "4"))
+(rule "eqSymm" (formula "4"))
 (rule "inEqSimp_sepNegMonomial0" (formula "4") (term "0,1"))
 (rule "polySimp_mulLiterals" (formula "4") (term "0,0,1"))
 (rule "polySimp_elimOne" (formula "4") (term "0,0,1"))
@@ -100,7 +106,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 (builtin "One Step Simplification" (formula "4"))
 (rule "orRight" (formula "4"))
 (rule "inEqSimp_leqRight" (formula "4"))
-(rule "times_zero_1" (formula "1") (term "1,0,0"))
+(rule "mul_literals" (formula "1") (term "1,0,0"))
 (rule "add_zero_right" (formula "1") (term "0,0"))
 (rule "polySimp_addAssoc" (formula "1") (term "0"))
 (rule "polySimp_addAssoc" (formula "1") (term "0,0"))
@@ -115,7 +121,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 (rule "polySimp_pullOutFactor1b" (formula "1") (term "0"))
 (rule "add_literals" (formula "1") (term "1,1,0"))
 (rule "times_zero_1" (formula "1") (term "1,0"))
-(rule "add_zero_right" (formula "1") (term "0"))
+(rule "add_literals" (formula "1") (term "0"))
 (rule "leq_literals" (formula "1"))
 (rule "closeFalse" (formula "1"))
 )

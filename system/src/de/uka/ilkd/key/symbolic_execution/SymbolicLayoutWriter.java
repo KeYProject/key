@@ -116,13 +116,13 @@ public class SymbolicLayoutWriter extends AbstractWriter {
 
    /**
     * Attribute name to store {@link ISymbolicValue#isArrayIndex()} and
-    * {@link ISymbolicObject#isArrayIndex()}.
+    * {@link ISymbolicAssociation#getArrayIndexString()}.
     */
    public static final String ATTRIBUTE_IS_ARRAY_INDEX = "isArrayIndex";
 
    /**
-    * Attribute name to store {@link ISymbolicValue#getArrayIndex()} and
-    * {@link ISymbolicObject#getArrayIndex()}.
+    * Attribute name to store {@link ISymbolicValue#getArrayIndexString()} and
+    * {@link ISymbolicAssociation#getArrayIndexString()}.
     */
    public static final String ATTRIBUTE_ARRAY_INDEX = "arrayIndex";
 
@@ -265,7 +265,7 @@ public class SymbolicLayoutWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_NAME, value.getName());
       attributeValues.put(ATTRIBUTE_PROGRAM_VARIABLE, value.getProgramVariableString());
       attributeValues.put(ATTRIBUTE_IS_ARRAY_INDEX, value.isArrayIndex() + "");
-      attributeValues.put(ATTRIBUTE_ARRAY_INDEX, value.getArrayIndex() + "");
+      attributeValues.put(ATTRIBUTE_ARRAY_INDEX, value.getArrayIndexString());
       attributeValues.put(ATTRIBUTE_VALUE, value.getValueString());
       attributeValues.put(ATTRIBUTE_TYPE, value.getTypeString());
       if (value.getConditionString() != null) {
@@ -286,7 +286,7 @@ public class SymbolicLayoutWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_NAME, association.getName());
       attributeValues.put(ATTRIBUTE_PROGRAM_VARIABLE, association.getProgramVariableString());
       attributeValues.put(ATTRIBUTE_IS_ARRAY_INDEX, association.isArrayIndex() + "");
-      attributeValues.put(ATTRIBUTE_ARRAY_INDEX, association.getArrayIndex() + "");
+      attributeValues.put(ATTRIBUTE_ARRAY_INDEX, association.getArrayIndexString());
       attributeValues.put(ATTRIBUTE_TARGET, computeObjectId(model, association.getTarget()));
       if (association.getConditionString() != null) {
          attributeValues.put(ATTRIBUTE_CONDITION, association.getConditionString());

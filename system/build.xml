@@ -9,6 +9,7 @@
   <property name="dist.dir"  value="${basedir}/binary" />
   <property name="gen.dir"  value="${basedir}/genSrc" />
   <property name="docs.dir"  value="${basedir}/doc"   />
+  <property name="examples.dir"  value="${basedir}/proofExamples"   />
 
   <condition property="ext.dir" value="${env.KEY_LIB}">
   	<isset property="env.KEY_LIB"/>
@@ -122,6 +123,18 @@
 	    <include name="KeYJMLPreLexer.g"/>
 	  </srcfiles>
 	</uptodate>
+	
+	<uptodate property="jmllexer.notRequired"
+		  targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation/KeYJMLLexer.java"
+		  srcFile="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmllexer.g"/>
+		  
+	<uptodate property="jmlparser.notRequired"
+		  targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation/KeYJMLParser.java">
+	  <srcfiles dir="${src.dir}/de/uka/ilkd/key/speclang/jml/translation">
+	    <include name="jmllexer.g"/>
+	    <include name="jmlparser.g"/>
+	  </srcfiles>
+	</uptodate>
 
 	<!-- no uptodate checks are needed for the javacc/antlr tasks, it is built-in there -->
   </target>
@@ -182,10 +195,39 @@
   </target>
 
   <target name="jar" depends="compile">
-  	 <jar destfile="${basedir}/key.jar"
-  	       basedir="${build.dir}"
-  	       manifest="${basedir}/resources/MANIFEST.MF"
-  	  />
+    <jar destfile="${basedir}/key.jar"
+  	 basedir="${build.dir}"
+  	 manifest="${basedir}/resources/MANIFEST.MF" />
+  </target>
+
+  <target name="examples.jar" depends="prepare" 
+          description="Create the collection of example files as needed by the example browser">
+    
+    <loadfile srcFile="${examples.dir}/index/samplesIndex.txt" property="exs.patterns">
+      <filterchain>
+        <striplinecomments>
+          <comment value="#"/>
+        </striplinecomments>
+        <containsregex pattern="."/>
+        <replaceregex pattern="/[^/]+.txt *$" replace="/**, "/>
+        <striplinebreaks/>
+      </filterchain>
+    </loadfile>
+
+    <jar destfile="examples.jar" basedir="${examples.dir}" 
+         includes="${exs.patterns}, index/samplesIndex.txt"/>
+  </target>
+
+  <target name="standalone-jar" depends="jar, examples.jar">
+    <jar destfile="${basedir}/key-standalone.jar">
+      <fileset dir="${build.dir}"/>
+      <zipfileset excludes="META-INF/**" src="${ext.dir}/antlr.jar"/>
+      <zipfileset excludes="META-INF/**" src="${ext.dir}/recoderKey.jar"/>
+      <fileset file="examples.jar" />
+      <manifest>
+        <attribute name="Main-Class" value="de.uka.ilkd.key.core.WebstartMain"/>
+      </manifest>
+    </jar>
   </target>
 	
     <target name="keylexer" unless="keylexer.notRequired">
@@ -223,27 +265,22 @@
       <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.g" />
     </java>
   </target>
+  
+    <target name="jmllexer" unless="jmllexer.notRequired">
+        <java classpath="${ext.dir}/antlr.jar" fork="true" failonerror="true" classname="antlr.Tool">
+            <arg value="-o" />
+            <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation" />
+            <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmllexer.g" />
+        </java>
+    </target>
 
-	<target name="jmllexer">
-	     <antlr
-	         target="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmllexer.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-	  </target>
-
-
-	  <target name="jmlparser"  depends="jmllexer">
-	     <antlr
-	         target="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmlparser.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-	  </target>
+    <target name="jmlparser"  depends="jmllexer" unless="jmlparser.notRequired">
+        <java classpath="${ext.dir}/antlr.jar" fork="true" failonerror="true" classname="antlr.Tool">
+            <arg value="-o" />
+            <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation" />
+            <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmlparser.g" />
+        </java>
+    </target>
 
 
   <target name="schemajavaparser"> 

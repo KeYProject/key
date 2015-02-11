@@ -34,15 +34,15 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
-import de.uka.ilkd.key.gui.configuration.PathConfig;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.utilities.BracketMatchingTextArea;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExceptionHandlerException;
 
 public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
@@ -356,7 +356,6 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 		closeDialog();
 	    } else if (e.getSource() == applyButton) {		      
 		try {
-		    try {
 			pushAllInputToModel();
 			TacletApp app = model[current()].createTacletApp();
 			if (app == null) {
@@ -368,22 +367,14 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 			    return ;
 			}
 			mediator().applyInteractive(app, goal);
-		    } catch (ExceptionHandlerException ex){
-			throw ex;
-		    } catch(Exception ex) {			
-			(mediator().getExceptionHandler()).reportException(ex); 
-		    }
-		}  catch (ExceptionHandlerException ex) { 
-		    Exception exc = (Exception) ((mediator().getExceptionHandler()).getExceptions()).get(0);
+		}  catch (Exception exc) {
 		    if (exc instanceof SVInstantiationExceptionWithPosition) {
                         errorPositionKnown(exc.getMessage(),
                                 ((SVInstantiationExceptionWithPosition) exc).getRow(),
                                 ((SVInstantiationExceptionWithPosition) exc).getColumn(),
                                 ((SVInstantiationExceptionWithPosition) exc).inIfSequent());
 		    }
-		    ExceptionDialog.showDialog(TacletMatchCompletionDialog.this, 
-		            mediator().getExceptionHandler().getExceptions());
-		    mediator().getExceptionHandler().clear();
+		    ExceptionDialog.showDialog(TacletMatchCompletionDialog.this, exc);
 		    return ;
 		} 
 		InstantiationFileHandler.saveListFor(model[current()]);

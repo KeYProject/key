@@ -2,34 +2,36 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Sat Apr 26 14:18:44 CEST 2014
+#Tue Oct 14 09:34:21 CEST 2014
 [StrategyProperty]VBT_PHASE=VBT_SYM_EX
 [SMTSettings]useUninterpretedMultiplication=true
 [SMTSettings]SelectedTaclets=
-[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_NONE
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
 [StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
-[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_NONE
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
 [StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
-[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_COMPLETION
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
 [SMTSettings]instantiateHierarchyAssumptions=true
 [StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
 [StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
 [StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT
 [StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
 [StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
-[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_RESTRICTED
 [Strategy]Timeout=-1
 [Strategy]MaximumNumberOfAutomaticApplications=10000
 [SMTSettings]integersMaximum=2147483645
-[Choice]DefaultChoices=JavaCard-JavaCard\\:on , programRules-programRules\\:Java , intRules-intRules\\:arithmeticSemanticsIgnoringOF , runtimeExceptions-runtimeExceptions\\:ban , assertions-assertions\\:on , modelFields-modelFields\\:showSatisfiability , initialisation-initialisation\\:disableStaticInitialisation , Strings-Strings\\:on , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , optimisedSelectRules-optimisedSelectRules\\:on , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off
+[Choice]DefaultChoices=assertions-assertions\\:on , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:allow , JavaCard-JavaCard\\:on , Strings-Strings\\:on , modelFields-modelFields\\:treatAsAxiom , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , moreSeqRules-moreSeqRules\\:on
 [SMTSettings]useConstantsForBigOrSmallIntegers=true
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
-[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
+[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
 [SMTSettings]maxGenericSorts=2
 [SMTSettings]integersMinimum=-2147483645
+[SMTSettings]invariantForall=false
 [SMTSettings]UseBuiltUniqueness=false
 [SMTSettings]explicitTypeHierarchy=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
@@ -38,7 +40,7 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Sat Apr 26 14:18:44 CEST 2014
+#Tue Oct 14 09:34:21 CEST 2014
 name=seqNPermRight
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
@@ -48,14 +50,16 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 (keyLog "1" (keyUser "Stijn" ) (keyVersion "5570769721c52ee00aff0bbfe18f32d3baba33db"))
 (keyLog "2" (keyUser "Stijn" ) (keyVersion "5570769721c52ee00aff0bbfe18f32d3baba33db"))
 (keyLog "3" (keyUser "Stijn" ) (keyVersion "5570769721c52ee00aff0bbfe18f32d3baba33db"))
+(keyLog "4" (keyUser "daniel" ) (keyVersion "7b6a4d606b29c3810d7091c61ced95b1eb3cd625"))
+(keyLog "5" (keyUser "daniel" ) (keyVersion "7b6a4d606b29c3810d7091c61ced95b1eb3cd625"))
 
 (autoModeTime "148415")
 
 (branch "dummy ID"
-(rule "impRight" (formula "1") (userinteraction))
+(rule "impRight" (formula "1") (newnames "v_iv,v_jv,f_s") (userinteraction))
 (rule "andLeft" (formula "1") (userinteraction))
 (rule "andLeft" (formula "1") (userinteraction))
-(rule "seqNPermDefReplace" (formula "4") (inst "iv=iv") (inst "jv=jv") (userinteraction))
+(rule "seqNPermDefReplace" (formula "4") (inst "jv=jv") (inst "iv=iv") (userinteraction))
 (rule "cut" (inst "cutFormula=\\forall int N;
   \\forall Seq s;
     (   seqLen(s) = N
@@ -1185,9 +1189,9 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
                   (rule "commute_or" (formula "10") (term "0"))
                   (rule "commute_or_2" (formula "8") (term "0,0,0"))
                   (rule "andRight" (formula "14"))
-                  (branch
+                  (branch "Case 1"
                      (rule "andRight" (formula "14"))
-                     (branch
+                     (branch "Case 1"
                         (rule "allRight" (formula "14") (inst "sk=v_iv_6"))
                         (rule "allRight" (formula "14") (inst "sk=v_jv_2"))
                         (rule "orRight" (formula "14"))
@@ -2229,7 +2233,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
                            )
                         )
                      )
-                     (branch
+                     (branch "Case 2"
                         (rule "allRight" (formula "14") (inst "sk=v_iv_5"))
                         (rule "orRight" (formula "14"))
                         (rule "orRight" (formula "14"))
@@ -2694,7 +2698,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
                         )
                      )
                   )
-                  (branch
+                  (branch "Case 2"
                      (rule "allRight" (formula "14") (inst "sk=v_iv_4"))
                      (rule "orRight" (formula "14"))
                      (rule "orRight" (formula "14"))
@@ -4929,9 +4933,9 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
                (rule "commute_or" (formula "4") (term "0"))
                (rule "commute_or_2" (formula "2") (term "0,0,0"))
                (rule "andRight" (formula "8"))
-               (branch
+               (branch "Case 1"
                   (rule "andRight" (formula "8"))
-                  (branch
+                  (branch "Case 1"
                      (rule "allRight" (formula "8") (inst "sk=v_iv_3"))
                      (rule "allRight" (formula "8") (inst "sk=v_jv_1"))
                      (rule "orRight" (formula "8"))
@@ -5151,7 +5155,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
                         )
                      )
                   )
-                  (branch
+                  (branch "Case 2"
                      (rule "allRight" (formula "8") (inst "sk=v_iv_2"))
                      (rule "orRight" (formula "8"))
                      (rule "orRight" (formula "8"))
@@ -5344,7 +5348,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
                      )
                   )
                )
-               (branch
+               (branch "Case 2"
                   (rule "allRight" (formula "8") (inst "sk=v_iv_1"))
                   (rule "orRight" (formula "8"))
                   (rule "orRight" (formula "8"))

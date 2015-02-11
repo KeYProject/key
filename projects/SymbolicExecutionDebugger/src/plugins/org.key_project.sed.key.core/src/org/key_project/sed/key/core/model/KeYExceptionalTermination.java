@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.impl.AbstractSEDExceptionalTermination;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -28,6 +29,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -35,7 +37,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination implements IKeYSEDDebugNode<IExecutionTermination> {
+public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination implements IKeYTerminationNode<IExecutionTermination> {
    /**
     * The {@link IExecutionTermination} to represent by this debug node.
     */
@@ -60,6 +62,11 @@ public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination
     * The contained KeY variables.
     */
    private KeYVariable[] variables;
+   
+   /**
+    * The conditions under which a group ending in this node starts.
+    */
+   private SEDMemoryBranchCondition[] groupStartConditions;
 
    /**
     * Constructor.
@@ -271,5 +278,26 @@ public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination
       else {
          return null;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         if (groupStartConditions == null) {
+            groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
+         }
+         return groupStartConditions;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isTruthValueEvaluationEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
    }
 }

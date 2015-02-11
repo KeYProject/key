@@ -48,7 +48,7 @@ import org.key_project.util.jdt.JDTUtil;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.nodeviews.TacletMenu;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -83,7 +83,7 @@ public final class KeYIDEUtil {
            if (method != null && method.exists()) {
                // Load location
                final IProject project = method.getResource().getProject();
-               final File location = KeYUtil.getSourceLocation(project);
+               final File location = KeYResourceProperties.getSourceClassPathLocation(project);
                final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
                final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
                  

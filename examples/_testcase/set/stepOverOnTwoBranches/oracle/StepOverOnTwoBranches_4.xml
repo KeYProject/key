@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call self.main(a)&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (a==0)" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (a==0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="equals(a,Z(0(#)))" pathCondition="equals(a,Z(0(#)))" pathConditionChanged="true" branchCondition="equals(a,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="int i = 2;" pathCondition="equals(a,Z(0(#)))" pathConditionChanged="false">
             </statement>

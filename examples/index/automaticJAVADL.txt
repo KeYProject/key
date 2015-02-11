@@ -182,6 +182,7 @@ provable: ./heap/simple/operation_contracts.key
 provable: ./heap/simple/select_store.key
 provable: ./heap/simple/selection_sort.key
 provable: ./heap/simple/seq.key
+provable: ./heap/simple/oldForParams.key
 provable: ./heap/SmansEtAl/ArrayList_add.key
 provable: ./heap/SmansEtAl/ArrayList_ArrayList.key
 provable: ./heap/SmansEtAl/ArrayList_footprint.key
@@ -429,6 +430,7 @@ provable: ./standard_key/pred_log/jbyteIfEx.key
 provable: ./standard_key/prop_log/allClausesLength4.key
 provable: ./standard_key/prop_log/allClausesLength5.key
 provable: ./standard_key/prop_log/doubleNeg.key
+provable: ./standard_key/prop_log/liarsville.key
 provable: ./standard_key/prop_log/simplest.key
 provable: ./standard_key/prop_log/contraposition.key
 provable: ./standard_key/quantifiers/elimination0.key
@@ -487,6 +489,8 @@ provable: ./standard_key/strings/substring2.key
 provable: ./standard_key/strings/substring3.key
 provable: ./standard_key/strings/substring4.key
 provable: ./standard_key/strings/substring5.key
+provable: ./standard_key/types/disjoint.key
+
 provable: ./_testcase/classpath/classpath.key
 
 notprovable: ./heap/inconsistent_represents/MyClass_m.key

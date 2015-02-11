@@ -15,8 +15,8 @@ package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -41,7 +41,7 @@ public abstract class AbstractProofMacro implements ProofMacro {
      * A value of -1 means no changes.
      */
     private int numberSteps = -1;
-
+    
     private static ImmutableList<Goal> getGoals(Node node) {
         if (node == null) {
             // can happen during initialisation
@@ -87,11 +87,21 @@ public abstract class AbstractProofMacro implements ProofMacro {
                                           ProverTaskListener listener) throws InterruptedException {
         return applyTo(mediator, getGoals(node), posInOcc, listener);
     }
+    
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
+       return applyTo(!goals.isEmpty() ? goals.head().proof() : mediator.getInteractiveProver().getProof(), mediator, goals, posInOcc, listener);
+    }
 
+    @Override
+    public boolean isApplicableWithoutPosition() {
+        return false;
+    }
 
     @Override
     public final javax.swing.KeyStroke getKeyStroke() {
         return KeyStrokeManager.get(this);
     }
-    
 }

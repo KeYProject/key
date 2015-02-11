@@ -109,7 +109,7 @@ public class SchemaVariableFactory {
     public static SkolemTermSV createSkolemTermSV(Name name, Sort s) {
 	return new SkolemTermSV(name, s);
     }
-    
+
     /**
      * creates a LabelSchemaVariable
      */

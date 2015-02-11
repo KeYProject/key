@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
@@ -82,14 +83,20 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
     * </p>
     * @param services The {@link Services} to use.
     * @param goal The {@link Goal} on which this {@link BuiltInRule} should be applied on.
+    * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
     * @param sequentToProve The {@link Sequent} to prove in a side proof.
     * @param newPredicate The {@link Function} which is used to compute the result.
     * @return The found result {@link Term} and the conditions.
     * @throws ProofInputException Occurred Exception.
     */
-   protected List<Triple<Term, Set<Term>, Node>> computeResultsAndConditions(Services services, Goal goal, Sequent sequentToProve, Function newPredicate) throws ProofInputException {
+   protected List<Triple<Term, Set<Term>, Node>> computeResultsAndConditions(Services services, 
+                                                                             Goal goal, 
+                                                                             ProofEnvironment sideProofEnvironment,
+                                                                             Sequent sequentToProve, 
+                                                                             Function newPredicate) throws ProofInputException {
       return SideProofUtil.computeResultsAndConditions(services, 
                                                        goal.proof(), 
+                                                       sideProofEnvironment,
                                                        sequentToProve, 
                                                        newPredicate, 
                                                        "Side proof rule on node " + goal.node().serialNr() + ".", 

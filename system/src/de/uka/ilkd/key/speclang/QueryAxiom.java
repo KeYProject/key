@@ -134,46 +134,47 @@ public final class QueryAxiom extends ClassAxiom {
 	final SchemaVariable selfSV
 		= target.isStatic()
 		  ? null
-	          : SchemaVariableFactory.createTermSV(new Name("self"), 
-                                	               kjt.getSort(), 
-                                	               false, 
-                                	               false);
-	final SchemaVariable[] paramSVs 
+	          : SchemaVariableFactory.createTermSV(new Name("self"),
+                                                       kjt.getSort(),
+                                                       false,
+                                                       false);
+	final SchemaVariable[] paramSVs
 		= new SchemaVariable[target.getNumParams()];
 	for(int i = 0; i < paramSVs.length; i++) {
 	    paramSVs[i]
-	    	= SchemaVariableFactory.createTermSV(new Name("p" + i), 
-						     target.getParamType(i)
-						           .getSort(), 
-						     false, 
-						     false);
+	            = SchemaVariableFactory.createTermSV(new Name("p" + i),
+						         target.getParamType(i)
+						                   .getSort(),
+						         false,
+						         false);
 	}
-	final SchemaVariable skolemSV 
+	final SchemaVariable skolemSV
 		= SchemaVariableFactory.createSkolemTermSV(
-					new Name(target.getName() + "_sk"), 
-					target.sort());	
-	
+					new Name(target.getName() + "_sk"),
+					target.sort());
+
 	//create schema variables for program variables
 	final ProgramSV selfProgSV
 		= target.isStatic() 
 		  ? null
 	          : SchemaVariableFactory.createProgramSV(
-	        	  	new ProgramElementName("#self"), 
-				ProgramSVSort.VARIABLE, 
-				false);
+	                  new ProgramElementName("#self"),
+	                  ProgramSVSort.VARIABLE,
+	                  false);
 	final ProgramSV[] paramProgSVs = new ProgramSV[target.getNumParams()];
-	for(int i = 0; i < paramProgSVs.length; i++) {	    
-	    paramProgSVs[i] = SchemaVariableFactory.createProgramSV(
-		    		new ProgramElementName("#p" + i), 
-		    		ProgramSVSort.VARIABLE, 
-		    		false);
+	for(int i = 0; i < paramProgSVs.length; i++) {
+	    paramProgSVs[i] =
+	            SchemaVariableFactory.createProgramSV(
+	                    new ProgramElementName("#p" + i),
+	                    ProgramSVSort.VARIABLE,
+	                    false);
 	}
-	final ProgramSV resultProgSV 
+	final ProgramSV resultProgSV
 		= SchemaVariableFactory.createProgramSV(
-				new ProgramElementName("#res"), 
-				ProgramSVSort.VARIABLE, 
+				new ProgramElementName("#res"),
+				ProgramSVSort.VARIABLE,
 				false);
-	
+
 	//create update and postcondition linking schema variables and 
 	//program variables
 	Term update = null;
@@ -191,13 +192,15 @@ public final class QueryAxiom extends ClassAxiom {
 	}
 	update = target.isStatic() 
 	         ? update 
-                 : TB.parallel(update, 
-                	       TB.elementary(selfProgSV, TB.var(selfSV)));
+                 : TB.parallel(update,
+                               TB.elementary(selfProgSV,
+                		       	     TB.var(selfSV)));
 	for(int i = 0; i < paramSVs.length; i++) {
-	    update = TB.parallel(update, 
-		                 TB.elementary(paramProgSVs[i], TB.var(paramSVs[i])));
+	    update = TB.parallel(update,
+		                 TB.elementary(paramProgSVs[i],
+		                	       TB.var(paramSVs[i])));
 	}
-	final Term post = TB.imp(TB.reachableValue(TB.var(resultProgSV), 
+	final Term post = TB.imp(TB.reachableValue(TB.var(resultProgSV),
 						   target.getReturnType()),
 	                  	 TB.equals(TB.var(skolemSV), TB.var(resultProgSV)));
 	
@@ -208,9 +211,9 @@ public final class QueryAxiom extends ClassAxiom {
 		                	       .toArray(
 		                      new KeYJavaType[target.getNumParams()]));	
 	final IProgramMethod targetImpl 
-		= services.getJavaInfo().getProgramMethod(kjt, 
+		= services.getJavaInfo().getProgramMethod(kjt,
 							  target.getName(), 
-							  sig, 
+							  sig,
 							  kjt);
 	final MethodBodyStatement mbs
 		= new MethodBodyStatement(targetImpl,
@@ -225,10 +228,9 @@ public final class QueryAxiom extends ClassAxiom {
 	if(target.isStatic()) {
 	    ifSeq = null;
 	} else {
-	    final Term ifFormula 
-	    	= TB.exactInstance(kjt.getSort(), TB.var(selfSV));
+	    final Term ifFormula = TB.exactInstance(kjt.getSort(), TB.var(selfSV));
 	    final SequentFormula ifCf = new SequentFormula(ifFormula);
-	    final Semisequent ifSemiSeq 
+	    final Semisequent ifSemiSeq
 	    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
 	    ifSeq = Sequent.createAnteSequent(ifSemiSeq);
 	}

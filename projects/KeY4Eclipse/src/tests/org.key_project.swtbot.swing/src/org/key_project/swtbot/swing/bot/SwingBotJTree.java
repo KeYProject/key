@@ -96,4 +96,42 @@ public class SwingBotJTree extends AbstractSwingBotComponent<JTree> {
          }
       });
    }
+
+   /**
+    * Selects the specified element.
+    * @param pathTexts The texts along the path to the elements to select.
+    */
+   public void select(final String... pathTexts) {
+      SaveSwingUtil.invokeAndWait(new Runnable() {
+         @Override
+         public void run() {
+            Object[] pathData = new Object[pathTexts.length + 1];
+            pathData[0] = component.getModel().getRoot();
+            for (int i = 1; i < pathData.length; i++) {
+               pathData[i] = searchChild(pathData[i - 1], pathTexts[i - 1]);
+            }
+            component.setSelectionPath(new TreePath(pathData));
+         }
+      });
+   }
+   
+   /**
+    * Searches the child with the given text.
+    * @param parent The parent to search child at.
+    * @param text The text of the child to search.
+    * @return The found child or {@code null} if not found.
+    */
+   public Object searchChild(Object parent, String text) {
+      int childCount = component.getModel().getChildCount(parent);
+      Object result = null;
+      int i = 0;
+      while (result == null && i < childCount) {
+         Object child = component.getModel().getChild(parent, i);
+         if (child != null && child.toString().equals(text)) {
+            result = child;
+         }
+         i++;
+      }
+      return result;
+   }
 }

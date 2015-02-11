@@ -118,18 +118,18 @@ public class BuiltInRuleAppIndex {
         }
     }
 
-
     private void scanSimplificationRule ( BuiltInRule rule, 
                                           Goal goal, 
                                           boolean antec, 
                                           SequentFormula cfma, 
                                           NewRuleListener listener ) {
-        final PosInOccurrence    pos = new PosInOccurrence 
-		( cfma, PosInTerm.getTopLevel(), antec );
-        if(rule instanceof UseDependencyContractRule || rule instanceof QueryExpand || rule instanceof QuerySideProofRule) {//HACK
+        final PosInOccurrence pos = new PosInOccurrence( cfma, PosInTerm.getTopLevel(), antec );
+        if(rule instanceof UseDependencyContractRule
+                || rule instanceof QueryExpand
+                || rule instanceof QuerySideProofRule) {//HACK
             scanSimplificationRule(rule, goal, pos, listener);
         } else if (rule.isApplicable ( goal, pos ) ) {
-            IBuiltInRuleApp app = rule.createApp( pos, goal.proof().getServices() );                            
+            IBuiltInRuleApp app = rule.createApp( pos, goal.proof().getServices() );
             listener.ruleAdded ( app, pos );
         }
     }

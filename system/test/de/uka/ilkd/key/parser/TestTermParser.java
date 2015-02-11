@@ -13,19 +13,10 @@
 
 package de.uka.ilkd.key.parser;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import junit.framework.TestCase;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
@@ -36,22 +27,9 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
-import de.uka.ilkd.key.util.DefaultExceptionHandler;
 
-
-public class TestTermParser extends TestCase {
-    
-    private static TermFactory tf;
-
-    private static TermBuilder tb;
-
-    private static NamespaceSet nss;
-
-    private static Services serv;
-
-    private static Recoder2KeY r2k;
+public class TestTermParser extends AbstractTestTermParser {
 
     private static Sort elem,list;
 
@@ -61,22 +39,30 @@ public class TestTermParser extends TestCase {
 
     private static Term t_x,t_y,t_z,t_xs,t_ys;
     private static Term t_headxs,t_tailys,t_nil;
+    
+    private final Recoder2KeY r2k;
 
     public TestTermParser(String name) {
 	super(name);
+        r2k = new Recoder2KeY(services, nss);
+        r2k.parseSpecialClasses();
+    }
+    
+    @Override
+    protected Services getServices() {
+        return TacletForTests.services();
     }
 
     @Override
-    public void setUp() {
-	if(serv != null) {
-	    return;
-	}
-	serv = TacletForTests.services ();
-	tb = serv.getTermBuilder();
-	tf = tb.tf();
-	nss = serv.getNamespaces();
-	r2k = new Recoder2KeY(serv, nss);
-	r2k.parseSpecialClasses();	
+    public void setUp() {	
+        
+        /*
+         * Setting up only static variables here. It needs to be called only once.
+         */
+        if (elem != null) {
+            return;
+        }
+        
 	parseDecls("\\sorts { boolean; elem; list; int; int_sort; numbers;  }\n" +
 		   "\\functions {\n" +
 		   "  elem head(list);\n" +
@@ -119,6 +105,7 @@ public class TestTermParser extends TestCase {
 		   );
        
         elem = lookup_sort("elem");
+        assert elem != null;
 	list = lookup_sort("list");
 
 	head = lookup_func("head"); tail = lookup_func("tail");
@@ -138,97 +125,14 @@ public class TestTermParser extends TestCase {
 	t_tailys = tf.createTerm(tail,new Term[]{t_ys}, null, null);
 	t_nil = tf.createTerm(nil);
     }
-
-    Sort lookup_sort(String name) {
-	return (Sort)nss.sorts().lookup(new Name(name));
-    }
     
-    Function lookup_func(String name) {
-	return (Function)nss.functions().lookup(new Name(name));
-    }
-
-    LogicVariable declareVar(String name,Sort sort) {
-	LogicVariable v = new LogicVariable(new Name(name),sort);
-	nss.variables().add(v);
-	return v;
-    }
-    
-
-    private KeYParserF stringDeclParser(String s) {
-        // fills namespaces 
-        new Recoder2KeY(TacletForTests.services (), nss).parseSpecialClasses();
-	return new KeYParserF(ParserMode.DECLARATION,
-		new KeYLexerF(s,
-			"No file. Call of parser from parser/TestTermParser.java",
-			null),
-		serv, nss);
-    }
-
-    public void parseDecls(String s) {
-	try {	   
-            stringDeclParser(s).decls();
-	} catch (Exception e) {
-	    StringWriter sw = new StringWriter();
-	    PrintWriter pw = new PrintWriter(sw);
-	    e.printStackTrace(pw);
-	    throw (RuntimeException) 
-                new RuntimeException("Exc while Parsing:\n" + sw ).initCause(e);
-	}
-    }
-
-    public Term parseProblem(String s) {
-	try {	  
-	    new Recoder2KeY(TacletForTests.services (), 
-	                    nss).parseSpecialClasses();	   
-	    return new KeYParserF(ParserMode.PROBLEM,
-		    new KeYLexerF(s,
-			    "No file. Call of parser from parser/TestTermParser.java",
-			    null),
-		    new ParserConfig(serv, nss),
-		    new ParserConfig(serv, nss),
-		    null,
-		    DefaultImmutableSet.<Taclet> nil()).problem();
-	} catch (Exception e) {
-	    StringWriter sw = new StringWriter();
-	    PrintWriter pw = new PrintWriter(sw);
-	    e.printStackTrace(pw);
-	    throw new RuntimeException("Exc while Parsing:\n" + sw );
-	}
-    }
-
-    private KeYParserF stringTermParser(String s) {
-	return new KeYParserF(ParserMode.TERM,
-		new KeYLexerF(s,
-			"No file. Call of parser from parser/TestTermParser.java",
-			new DefaultExceptionHandler()),
-		r2k,
-		serv,
-		nss,
-		new AbbrevMap());
-
-    }
-
-    public Term parseTerm(String s) {
-	try {	  
-	    return stringTermParser(s).term();
-	} catch (Exception e) {
-	    StringWriter sw = new StringWriter();
-	    PrintWriter pw = new PrintWriter(sw);
-	    e.printStackTrace(pw);
-	    throw new RuntimeException("Exc while Parsing:\n" + sw );
-	}
-    }
-    
-
-    public Term parseFma(String s) {
-	try {	    	    
-	    return stringTermParser(s).formula();
-	} catch (Exception e) {
-	    StringWriter sw = new StringWriter();
-	    PrintWriter pw = new PrintWriter(sw);
-	    e.printStackTrace(pw);
-	    throw new RuntimeException("Exc while Parsing:\n" + sw );
-	}
+    @Override
+    protected KeYParserF getParser(String s) {
+        return new KeYParserF(ParserMode.TERM,getLexer(s),
+                r2k,
+                services,
+                nss,
+                new AbbrevMap());
     }
 
     public void test1() {
@@ -262,9 +166,9 @@ public class TestTermParser extends TestCase {
 	      tf.createTerm (cons,t_x,t_nil)));
 	     
 	assertEquals("parse head(cons(x,xs))=head(cons(x,nil))",
-		     t,parseFma("head(cons(x,xs))=head(cons(x,nil))"));
+		     t,parseFormula("head(cons(x,xs))=head(cons(x,nil))"));
 	assertEquals("parse head(cons(x,xs))=head(cons(x,nil))",
-		     t,parseFma("head(cons(x,xs))=head(cons(x,nil()))"));
+		     t,parseFormula("head(cons(x,xs))=head(cons(x,nil()))"));
     }
 
     public void testNotEqual() {
@@ -278,7 +182,7 @@ public class TestTermParser extends TestCase {
 	      tf.createTerm (cons,t_x,t_nil))));
 	     
 	assertEquals("parse head(cons(x,xs))!=head(cons(x,nil))",
-		     t,parseFma("head(cons(x,xs))!=head(cons(x,nil))"));
+		     t,parseFormula("head(cons(x,xs))!=head(cons(x,nil))"));
     }
 
 
@@ -297,7 +201,7 @@ public class TestTermParser extends TestCase {
 
 	     
 	assertEquals("parse x=x | y=y -> z=z & xs =xs <-> ! ys = ys",
-		     t,parseFma("x=x|y=y->z=z&xs=xs<->!ys=ys"));
+		     t,parseFormula("x=x|y=y->z=z&xs=xs<->!ys=ys"));
     }
 
     public void test7() {
@@ -306,7 +210,7 @@ public class TestTermParser extends TestCase {
 	 * then build the formulae. */
 	
 	String s = "\\forall list x; \\forall list l1; ! x = l1";
-	Term t = parseFma(s);
+	Term t = parseFormula(s);
 	
 	LogicVariable thisx = (LogicVariable) t.varsBoundHere(0)
 	    .get(0);
@@ -355,7 +259,7 @@ public class TestTermParser extends TestCase {
 	/* Try something with a prediate */
 	
 	String s = "\\exists list x; !isempty(x)";
-	Term t = parseFma(s);
+	Term t = parseFormula(s);
 	
 	LogicVariable thisx = (LogicVariable) t.varsBoundHere(0)
 	    .get(0);
@@ -484,8 +388,8 @@ public class TestTermParser extends TestCase {
 				+"public T query(){} "
 				+"public static T staticQ(T p){} "
 				+"public static T staticQ() {}}");
-	String s = "\\forall T t;( (t.query()=t & t.query@(T)()=t & T.staticQ()=t "
-	    +"& T.staticQ(t)=t & T.b=t.a@(T) & T.d=t.c@(T) & t.e@(T)=T.f & t.g@(T)=t.h@(T)))";
+	String s = "\\forall T t;( (t.query()=t & t.(T::query)()=t & T.staticQ()=t "
+	    +"& T.staticQ(t)=t & T.b=t.(T::a) & T.d=t.(T::c) & t.(T::e)=T.f & t.(T::g)=t.(T::h)))";
 	parseTerm(s);
     }
 

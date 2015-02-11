@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.ui.BatchMode;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 /**

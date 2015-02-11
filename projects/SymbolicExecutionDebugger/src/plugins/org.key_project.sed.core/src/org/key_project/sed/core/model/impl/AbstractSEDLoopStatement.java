@@ -23,7 +23,7 @@ import org.key_project.sed.core.model.ISEDThread;
  * @author Martin Hentschel
  * @see ISEDLoopStatement
  */
-public abstract class AbstractSEDLoopStatement extends AbstractSEDStackFrameCompatibleDebugNode implements ISEDLoopStatement {
+public abstract class AbstractSEDLoopStatement extends AbstractSEDGroupableStackFrameCompatibleDebugNode implements ISEDLoopStatement {
    /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this loop statement is contained.

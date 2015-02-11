@@ -36,7 +36,7 @@ import org.key_project.key4eclipse.resources.projectinfo.event.IProjectInfoListe
  * @see ObserverFunctionInfo
  * @see ContractInfo
  */
-public class ProjectInfo implements IStatusInfo {
+public class ProjectInfo {
    /**
     * All available {@link IProjectInfoListener}.
     */
@@ -295,74 +295,6 @@ public class ProjectInfo implements IStatusInfo {
       for (IProjectInfoListener l : toInform) {
          l.contractsRemoved(cc, contracts);
       }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isUnspecified() {
-      boolean specified = true;
-      PackageInfo[] packages = getPackages();
-      int i = 0;
-      while (specified && i < packages.length) {
-         if (packages[i].isUnspecified()) {
-            specified = false;
-         }
-         i++;
-      }
-      return !specified;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean hasOpenProof() {
-      boolean allClosed = true;
-      PackageInfo[] packages = getPackages();
-      int i = 0;
-      while (allClosed && i < packages.length) {
-         if (packages[i].hasOpenProof()) {
-            allClosed = false;
-         }
-         i++;
-      }
-      return !allClosed;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isPartOfRecursionCycle() {
-      boolean partOfCycle = false;
-      PackageInfo[] packages = getPackages();
-      int i = 0;
-      while (!partOfCycle && i < packages.length) {
-         if (packages[i].isPartOfRecursionCycle()) {
-            partOfCycle = true;
-         }
-         i++;
-      }
-      return partOfCycle;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean hasUnprovenDependencies() {
-      boolean allDependeniesProven = true;
-      PackageInfo[] packages = getPackages();
-      int i = 0;
-      while (allDependeniesProven && i < packages.length) {
-         if (packages[i].hasUnprovenDependencies()) {
-            allDependeniesProven = false;
-         }
-         i++;
-      }
-      return !allDependeniesProven;
    }
    
    /**

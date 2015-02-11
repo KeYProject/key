@@ -124,6 +124,16 @@ public class LabeledStatement extends JavaStatement
        }
     }
 
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       if (body instanceof StatementBlock) {
+          return body.getFirstElementIncludingBlocks();
+       }
+       else {
+          return body;
+       }
+    }
+
     public SourceElement getLastElement() {
        if (body instanceof StatementBlock) {
           return body.getLastElement();

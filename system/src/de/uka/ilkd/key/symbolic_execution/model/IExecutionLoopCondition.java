@@ -32,7 +32,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopCondition;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionLoopCondition
  */
-public interface IExecutionLoopCondition extends IExecutionNode<LoopStatement> {
+public interface IExecutionLoopCondition extends IExecutionBlockStartNode<LoopStatement> {
    /**
     * Returns the loop expression which is executed.
     * @return The executed loop expression.

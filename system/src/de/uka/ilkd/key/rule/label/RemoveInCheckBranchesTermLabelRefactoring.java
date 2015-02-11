@@ -18,11 +18,12 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
@@ -66,11 +67,13 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     * {@inheritDoc}
     */
    @Override
-   public RefactoringScope defineRefactoringScope(TermServices services,
+   public RefactoringScope defineRefactoringScope(TermLabelState state,
+                                                  Services services,
                                                   PosInOccurrence applicationPosInOccurrence,
                                                   Term applicationTerm,
                                                   Rule rule,
                                                   Goal goal,
+                                                  Object hint, 
                                                   Term tacletTerm) {
       if (goal != null) {
          if (rule instanceof UseOperationContractRule &&
@@ -95,10 +98,13 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     * {@inheritDoc}
     */
    @Override
-   public void refactoreLabels(TermServices services,
+   public void refactoreLabels(TermLabelState state,
+                               Services services,
                                PosInOccurrence applicationPosInOccurrence,
                                Term applicationTerm,
-                               Rule rule,Goal goal,
+                               Rule rule,
+                               Goal goal,
+                               Object hint, 
                                Term tacletTerm,
                                Term term,
                                List<TermLabel> labels) {

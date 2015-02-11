@@ -21,7 +21,7 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.RuleAppListener;
+import de.uka.ilkd.key.core.RuleAppListener;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Proof;
@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.util.Debug;
 
 
 public final class ProofCorrectnessMgt {
@@ -92,7 +93,7 @@ public final class ProofCorrectnessMgt {
      */
     public boolean isContractApplicable(Contract contract) {
         //get the contract which is being verified in our current proof
-	final ContractPO po = specRepos.getPOForProof(proof);
+	final ContractPO po = specRepos.getContractPOForProof(proof);
         if(po == null) {
             return true;
         }
@@ -241,7 +242,7 @@ public final class ProofCorrectnessMgt {
     public void ruleApplied(RuleApp r) {
 	RuleJustification rj = getJustification(r);
 	if(rj==null) {
-	    System.err.println("No justification found for rule " 
+	    Debug.out("No justification found for rule " 
 		               + r.rule().name());
 	    return;
 	}

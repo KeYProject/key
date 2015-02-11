@@ -23,6 +23,25 @@ import de.uka.ilkd.key.symbolic_execution.util.IFilter;
  */
 public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractProofReferenceTestCase {
    /**
+    * Tests "InvariantInOperationContractOfArgument".
+    */
+   public void testInvariantInOperationContractOfArgument() throws Exception {
+      doReferenceMethodTest(keyRepDirectory, 
+                            "examples/_testcase/proofReferences/InvariantInOperationContractOfArgument/InvariantInOperationContractOfArgument.java", 
+                            "InvariantInOperationContractOfArgument",
+                            "main", 
+                            false,
+                            new ClassAxiomAndInvariantProofReferencesAnalyst(),
+                            new IFilter<IProofReference<?>>() {
+                              @Override
+                              public boolean select(IProofReference<?> element) {
+                                 return IProofReference.USE_INVARIANT.equals(element.getKind());
+                              }
+                            },
+                            new ExpectedProofReferences(IProofReference.USE_INVARIANT, "and(geq(int::select(heap,self,Child::$x),Z(0(#))),leq(int::select(heap,self,Child::$x),Z(0(1(#)))))"));
+   }
+   
+   /**
     * Tests "InvariantInOperationContract".
     */
    public void testInvariantInOperationContract() throws Exception {

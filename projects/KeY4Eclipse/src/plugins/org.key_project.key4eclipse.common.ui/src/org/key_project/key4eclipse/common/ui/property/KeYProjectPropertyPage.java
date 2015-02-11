@@ -27,12 +27,14 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -55,10 +57,12 @@ import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
+import org.key_project.util.eclipse.ProjectViewFilter;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.viewer.FileExtensionViewerFilter;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.jdt.JDTUtil;
 
 /**
  * Provides the {@link PropertyPage} that is used to configure KeY specific
@@ -152,6 +156,16 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
     private List<KeYClassPathEntry> classPathEntries;
     
     /**
+     * The source location to load in KeY.
+     */
+    private Text sourceClassPathText;
+    
+    /**
+     * {@link Button} to browse the source class path
+     */
+    private Button selectSourceClassPath;
+    
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -159,6 +173,27 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
         initializeDialogUnits(parent);
         Composite root = new Composite(parent, SWT.NONE);
         root.setLayout(createGridLayout(1, false));
+        // source class path
+        Group sourceClassPathGroup = new Group(root, SWT.NONE);
+        sourceClassPathGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        sourceClassPathGroup.setLayout(new GridLayout(2, false));
+        sourceClassPathGroup.setText("Source class path");
+        sourceClassPathText = new Text(sourceClassPathGroup, SWT.BORDER);
+        sourceClassPathText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        sourceClassPathText.addModifyListener(new ModifyListener() {
+           @Override
+           public void modifyText(ModifyEvent e) {
+               updateValidState();
+           }
+        });
+        selectSourceClassPath = new Button(sourceClassPathGroup, SWT.PUSH);
+        selectSourceClassPath.setText("&...");
+        selectSourceClassPath.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                selectSourceClassPath();
+            }
+        });        
         // boot class path
         Group bootClassPathGroup = new Group(root, SWT.NONE);
         bootClassPathGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -205,7 +240,7 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
             }
         });
         selectBootClassPathButton = new Button(bootClassPathComposite, SWT.PUSH);
-        selectBootClassPathButton.setText("&...");
+        selectBootClassPathButton.setText("...");
         selectBootClassPathButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -300,6 +335,7 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
         try {
             IProject project = getProject();
             if (project != null) {
+                SWTUtil.setText(sourceClassPathText, KeYResourceProperties.getSourceClassPath(project));
                 setUseKind(KeYResourceProperties.getUseBootClassPathKind(project));
                 SWTUtil.setText(bootClassPathText, KeYResourceProperties.getBootClassPath(project));
                 classPathEntries = KeYResourceProperties.getClassPathEntries(project);
@@ -323,7 +359,7 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
         return root;
     }
 
-    /**
+   /**
      * Creates a {@link GridLayout} instance with default settings.
      * @param numColumns The number of columns.
      * @param makeColumnsEqualWidt Make columns equal width.
@@ -519,7 +555,7 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
      */
     protected void selectClassPathEntry(KeYClassPathEntry toSelect) {
        ISelection selection = SWTUtil.createSelection(toSelect);
-        classPathTableViewer.setSelection(selection);
+       classPathTableViewer.setSelection(selection);
     }
 
     /**
@@ -527,29 +563,50 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
      */
     protected void updateValidState() {
         boolean valid = true;
-        // Check boot path
-        UseBootClassPathKind kind = getUseKind();
-        if (UseBootClassPathKind.WORKSPACE.equals(kind)) {
-            valid = new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, bootClassPathText.getText()).isValid();
-            if (!valid) {
-                if (StringUtil.isEmpty(bootClassPathText.getText())) {
-                    setErrorMessage("No workspace boot class path defined.");
-                }
-                else {
-                    setErrorMessage("The workspace boot class path \"" + bootClassPathText.getText() + "\" don't exist.");
-                }
-            }
+        // Check source path
+        if (valid) {
+           String text = sourceClassPathText.getText();
+           if (StringUtil.isTrimmedEmpty(text)) {
+              valid = false;
+              setErrorMessage("No source class path defined.");
+           }
+           else {
+              IResource sourcePath = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(text));
+              if (sourcePath == null || !sourcePath.exists()) {
+                 valid = false;
+                 setErrorMessage("No existing source path defined.");
+              }
+              else if (!getProject().contains(sourcePath)) {
+                 valid = false;
+                 setErrorMessage("Source path not contained in project '" + getProject().getName() + "'.");
+              }
+           }
         }
-        else if (UseBootClassPathKind.EXTERNAL_IN_FILE_SYSTEM.equals(kind)) {
-            valid = new KeYClassPathEntry(KeYClassPathEntryKind.EXTERNAL_IN_FILE_SYSTEM, bootClassPathText.getText()).isValid();
-            if (!valid) {
-                if (StringUtil.isEmpty(bootClassPathText.getText())) {
-                    setErrorMessage("No external boot class path defined.");
-                }
-                else {
-                    setErrorMessage("The external boot class path \"" + bootClassPathText.getText() + "\" don't exist.");
-                }
-            }
+        // Check boot path
+        if (valid) {
+           UseBootClassPathKind kind = getUseKind();
+           if (UseBootClassPathKind.WORKSPACE.equals(kind)) {
+               valid = new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, bootClassPathText.getText()).isValid();
+               if (!valid) {
+                   if (StringUtil.isEmpty(bootClassPathText.getText())) {
+                       setErrorMessage("No workspace boot class path defined.");
+                   }
+                   else {
+                       setErrorMessage("The workspace boot class path \"" + bootClassPathText.getText() + "\" don't exist.");
+                   }
+               }
+           }
+           else if (UseBootClassPathKind.EXTERNAL_IN_FILE_SYSTEM.equals(kind)) {
+               valid = new KeYClassPathEntry(KeYClassPathEntryKind.EXTERNAL_IN_FILE_SYSTEM, bootClassPathText.getText()).isValid();
+               if (!valid) {
+                   if (StringUtil.isEmpty(bootClassPathText.getText())) {
+                       setErrorMessage("No external boot class path defined.");
+                   }
+                   else {
+                       setErrorMessage("The external boot class path \"" + bootClassPathText.getText() + "\" don't exist.");
+                   }
+               }
+           }
         }
         // Validate class paths
         if (valid && classPathEntries != null) {
@@ -570,6 +627,51 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
     }
 
     /**
+     * Opens the dialog to select the source class path.
+     */
+    public void selectSourceClassPath() {
+       try {
+          final List<IResource> sourceLocations = JDTUtil.getSourceResources(getProject());
+          IResource currentResource = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(sourceClassPathText.getText()));
+          IContainer[] result = WorkbenchUtil.openFolderSelection(getShell(), 
+                                                                  "Select source class path", 
+                                                                  "Select a folder, project or create a new one.", 
+                                                                  false, 
+                                                                  new Object[] {currentResource}, 
+                                                                  Collections.singleton(new ProjectViewFilter(getProject()) {
+                                                                     @Override
+                                                                     public boolean select(Viewer viewer, Object parentElement, Object element) {
+                                                                        if (super.select(viewer, parentElement, element)) {
+                                                                           return isParentOfOrChild((IResource) element);
+                                                                        }
+                                                                        else {
+                                                                           return false;
+                                                                        }
+                                                                     }
+                                                                     
+                                                                     protected boolean isParentOfOrChild(IResource element) {
+                                                                        boolean accept = false;
+                                                                        Iterator<IResource> iter = sourceLocations.iterator();
+                                                                        while (!accept && iter.hasNext()) {
+                                                                           IResource next = iter.next();
+                                                                           if (element.contains(next) || next.contains(element)) {
+                                                                              accept = true;
+                                                                           }
+                                                                        }
+                                                                        return accept;
+                                                                     }
+                                                                  }));
+          if (result != null && result.length == 1) {
+             sourceClassPathText.setText(result[0].getFullPath().toString());
+          }
+      }
+      catch (JavaModelException e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+      }
+    }
+
+   /**
      * Opens the dialog to select the boot class path.
      */
     public void selectBootClassPath() {
@@ -686,6 +788,7 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
     public boolean performOk() {
         try {
             IProject project = getProject();
+            KeYResourceProperties.setSourceClassPath(project, sourceClassPathText.getText());
             KeYResourceProperties.setUseBootClassPathKind(project, getUseKind());
             KeYResourceProperties.setBootClassPath(project, bootClassPathText.getText());
             KeYResourceProperties.setClassPathEntries(project, classPathEntries);
@@ -703,6 +806,7 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
      */
     @Override
     protected void performDefaults() {
+        SWTUtil.setText(sourceClassPathText, KeYResourceProperties.getDefaultSourceClassPath(getProject()));
         setUseKind(UseBootClassPathKind.KEY_DEFAULT);
         SWTUtil.setText(bootClassPathText, null);
         classPathEntries.clear();

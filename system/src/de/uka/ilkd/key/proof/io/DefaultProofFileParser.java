@@ -23,8 +23,7 @@ import java.util.Vector;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -56,6 +55,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 
@@ -68,7 +68,7 @@ public class DefaultProofFileParser implements IProofFileParser {
     private static final String ERROR_LOADING_PROOF_LINE = "Error loading proof.\n";
     private static final String NOT_APPLICABLE = " not available or not applicable in this context.";
 
-    private final DefaultProblemLoader loader;
+    private final AbstractProblemLoader loader;
    private Proof proof = null;
    private Iterator<Node> children = null;
 
@@ -99,7 +99,7 @@ public class DefaultProofFileParser implements IProofFileParser {
    private List<Throwable> errors = new LinkedList<Throwable>();
 
 
-   public DefaultProofFileParser(DefaultProblemLoader loader, Proof proof, KeYMediator mediator) {
+   public DefaultProofFileParser(AbstractProblemLoader loader, Proof proof, KeYMediator mediator) {
       super();
       this.proof = proof;
       this.mediator = mediator;
@@ -124,7 +124,7 @@ public class DefaultProofFileParser implements IProofFileParser {
 
 // note: Expressions without parameters only emit the endExpr signal
    @Override
-   public void beginExpr(char id, String s) throws ProblemLoaderException {
+   public void beginExpr(char id, String s) {
 
        //start no new commands until the ignored branch closes
        //count sub-branches though
@@ -215,7 +215,11 @@ public class DefaultProofFileParser implements IProofFileParser {
        case 'c' : //contract
            currContract = proof.getServices().getSpecificationRepository().getContractByName(s);
            if(currContract == null) {
-               throw new ProblemLoaderException(loader, "Error loading proof: contract \"" + s + "\" not found.");
+               // XXX: changed from throwing this exception
+               final ProblemLoaderException e = new ProblemLoaderException(loader, "Error loading proof: contract \"" + s + "\" not found.");
+               reportError(ERROR_LOADING_PROOF_LINE+
+                               ", goal "+currGoal.node().serialNr()+
+                               ", rule "+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        case 'x' : //ifInst (for built in rules)
@@ -245,7 +249,7 @@ public class DefaultProofFileParser implements IProofFileParser {
 
 
    @Override
-   public void endExpr(char id, int linenr) throws ProblemLoaderException {
+   public void endExpr(char id, int linenr) {
        //System.out.println("end "+id);
 
        //read no new commands until ignored branch closes
@@ -413,7 +417,6 @@ public class DefaultProofFileParser implements IProofFileParser {
 
        final ImmutableSet<IBuiltInRuleApp> ruleApps =
            mediator.getBuiltInRuleApplications(currTacletName, pos);
-
        if (ruleApps.size() != 1) {
            if (ruleApps.size() < 1) {
                throw new BuiltInConstructionException

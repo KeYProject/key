@@ -25,18 +25,95 @@ import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
+import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
  * Tests the launch configuration default values.
  * @author Martin Hentschel
  */
 public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTestCase {
+   /**
+    * Tests the launch where truth value evaluation is enabled.
+    */
+   @Test
+   public void testTruthValueEvaluationEnabled() throws Exception {
+      doTruthValueEvaluationTest("SWTBotLaunchDefaultPreferencesTest_testTruthValueEvaluationEnabled", true);
+   }
+
+   /**
+    * Tests the launch where truth value evaluation is disabled.
+    */
+   @Test
+   public void testTruthValueEvaluationDisabled() throws Exception {
+      doTruthValueEvaluationTest("SWTBotLaunchDefaultPreferencesTest_testTruthValueEvaluationDisabled", false);
+   }
+   
+   /**
+    * Does the test steps of {@link #testTruthValueEvaluationEnabled()}
+    * and {@link #testTruthValueEvaluationDisabled()}.
+    * @param projectName The project name to use.
+    * @param truthValueEvaluationEnabled Is truth value evaluation enabled?
+    * @throws Exception Occurred Exception
+    */
+   protected void doTruthValueEvaluationTest(String projectName, 
+                                             final boolean truthValueEvaluationEnabled) throws Exception {
+      boolean originalTruthValueEvaluationEnabled = KeYSEDPreferences.isTruthValueEvaluationEnabled();
+      try {
+         KeYSEDPreferences.setUsePrettyPrinting(true);
+         // Set preference
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
+         if (truthValueEvaluationEnabled) {
+            preferenceShell.bot().checkBox("Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)").select();
+         }
+         else {
+            preferenceShell.bot().checkBox("Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)").deselect();
+         }
+         preferenceShell.bot().button("OK").click();
+         assertEquals(truthValueEvaluationEnabled, KeYSEDPreferences.isTruthValueEvaluationEnabled());
+         // Launch something
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
+            @Override
+            public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+               // Get debug target TreeItem
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
+               // Check launch
+               Object threadObject = TestUtilsUtil.getTreeItemData(item);
+               assertTrue(threadObject instanceof IKeYSEDDebugNode);
+               assertEquals(truthValueEvaluationEnabled, ((IKeYSEDDebugNode<?>) threadObject).isTruthValueEvaluationEnabled());
+            }
+         };
+         doKeYDebugTargetTest(projectName,
+                              "data/unicodeTest/test",
+                              true,
+                              true,
+                              createMethodSelector("UnicodeTest", "magic", "Z", "Z"),
+                              null,
+                              null,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              null,
+                              Boolean.TRUE,
+                              Boolean.TRUE,
+                              8, 
+                              executor);
+      }
+      finally {
+         // Restore original value
+         KeYSEDPreferences.setTruthValueEvaluationEnabled(originalTruthValueEvaluationEnabled);
+         assertEquals(originalTruthValueEvaluationEnabled, KeYSEDPreferences.isTruthValueEvaluationEnabled());
+      }
+   }
+   
    /**
     * Tests the launch where unicode signs are used.
     */
@@ -537,6 +614,88 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          // Restore original value
          KeYSEDPreferences.setShowMethodReturnValuesInDebugNode(originalShowMethodReturnValuesInDebugNodes);
          assertEquals(originalShowMethodReturnValuesInDebugNodes, KeYSEDPreferences.isShowMethodReturnValuesInDebugNode());
+      }
+   }
+   /**
+    * Tests the launch where variables are based on the sequent.
+    */
+   @Test
+   public void testVariablesBasedOnSequent() throws Exception {
+      doVariablesComputationTest("SWTBotLaunchDefaultPreferencesTest_testVariablesBasedOnSequent", true);
+   }
+
+   /**
+    * Tests the launch where variables are based on the visible type structure.
+    */
+   @Test
+   public void testVariablesBasedOnVisibleTypeStructure() throws Exception {
+      doVariablesComputationTest("SWTBotLaunchDefaultPreferencesTest_testVariablesBasedOnVisibleTypeStructure", false);
+   }
+   
+   /**
+    * Does the test steps of {@link #testVariablesBasedOnSequent()}
+    * and {@link #testVariablesBasedOnVisibleTypeStructure()}.
+    * @param projectName The project name to use.
+    * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
+    * @throws Exception Occurred Exception
+    */
+   protected void doVariablesComputationTest(String projectName, 
+                                             final boolean variablesAreOnlyComputedFromUpdates) throws Exception {
+      boolean originalSetting = KeYSEDPreferences.isVariablesAreOnlyComputedFromUpdates();
+      boolean originalShowVariablesSetting = KeYSEDPreferences.isShowVariablesOfSelectedDebugNode();
+      try {
+         KeYSEDPreferences.setVariablesAreOnlyComputedFromUpdates(false);
+         KeYSEDPreferences.setShowVariablesOfSelectedDebugNode(true);
+         // Set preference
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
+         if (variablesAreOnlyComputedFromUpdates) {
+            preferenceShell.bot().comboBox(0).setSelection("Based on sequent");
+         }
+         else {
+            preferenceShell.bot().comboBox(0).setSelection("Based on visible type structure");
+         }
+         preferenceShell.bot().button("OK").click();
+         assertEquals(variablesAreOnlyComputedFromUpdates, KeYSEDPreferences.isVariablesAreOnlyComputedFromUpdates());
+         // Launch something
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
+            @Override
+            public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+               // Get debug target TreeItem
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
+               // Do run
+               resume(bot, item, target);
+               if (variablesAreOnlyComputedFromUpdates) {
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/arrayVariables/oracle/ArrayVariablesTest_sequent.xml", true, false, false);
+               }
+               else {
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/arrayVariables/oracle/ArrayVariablesTest_structure.xml", true, false, false);
+               }
+            }
+         };
+         doKeYDebugTargetTest(projectName,
+                              "data/arrayVariables/test",
+                              true,
+                              true,
+                              createMethodSelector("ArrayVariablesTest", "arrayTest", "[I"),
+                              null,
+                              null,
+                              Boolean.FALSE,
+                              Boolean.TRUE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              8, 
+                              executor);
+      }
+      finally {
+         // Restore original value
+         KeYSEDPreferences.setVariablesAreOnlyComputedFromUpdates(originalSetting);
+         assertEquals(originalSetting, KeYSEDPreferences.isVariablesAreOnlyComputedFromUpdates());
+         KeYSEDPreferences.setShowVariablesOfSelectedDebugNode(originalShowVariablesSetting);
+         assertEquals(originalShowVariablesSetting, KeYSEDPreferences.isShowVariablesOfSelectedDebugNode());
       }
    }
 }

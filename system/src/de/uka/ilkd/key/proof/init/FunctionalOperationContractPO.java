@@ -401,7 +401,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                        initConfig, (FunctionalOperationContract)contract, addUninterpretedPredicate, addSymbolicExecutionLabel);
            }
            else {
-               po = contract.createProofObl(initConfig, contract);
+               po = contract.createProofObl(initConfig);
            }
            return new LoadedPOContainer(po, proofNum);
        }

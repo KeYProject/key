@@ -15,7 +15,7 @@ package org.key_project.sed.key.core.setup;
 
 import org.key_project.util.eclipse.setup.ISetupParticipant;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 

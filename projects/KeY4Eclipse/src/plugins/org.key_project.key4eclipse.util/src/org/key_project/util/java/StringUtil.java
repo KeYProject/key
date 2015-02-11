@@ -239,4 +239,23 @@ public final class StringUtil {
       }
       return sb.toString();
    }
+
+   /**
+    * Performs a trim only on the right side.
+    * @param text The text to trim its right side.
+    * @return The trimmed text.
+    */
+   public static String trimRight(String text) {
+      if (text != null) {
+         char[] content = text.toCharArray();
+         int newLength = content.length;
+         while (newLength >= 1 && Character.isWhitespace(content[newLength - 1])) {
+            newLength--;
+         }
+         return newLength == text.length() ? text : text.substring(0, newLength);
+      }
+      else {
+         return null;
+      }
+   }
 }

@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -33,7 +33,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -89,6 +89,10 @@ public interface UserInterface
      * @param bootClassPath the boot class path to use. 
      */
     void loadProblem(File file, List<File> classPath, File bootClassPath);
+    
+    void setSaveOnly(boolean s);
+
+    boolean isSaveOnly();
 
     void setMacro(ProofMacro macro);
 
@@ -99,6 +103,8 @@ public interface UserInterface
     public ProverTaskListener getListener();
 
     boolean applyMacro();
+
+    public void saveAll(InitConfig initConfig, File file) throws ProofInputException;
 
     /** 
      * called to open the build in examples 
@@ -137,17 +143,23 @@ public interface UserInterface
     KeYMediator getMediator();
     
     /**
-     * Opens a java file in this {@link UserInterface} and returns the instantiated {@link DefaultProblemLoader}
+     * <p>
+     * Opens a java file in this {@link UserInterface} and returns the instantiated {@link AbstractProblemLoader}
      * which can be used to instantiated proofs programmatically.
+     * </p>
+     * <p>
+     * <b>The loading is performed in the {@link Thread} of the caller!</b>
+     * </p>
      * @param profile An optional {@link Profile} to use. If it is {@code null} the default profile {@link KeYMediator#getDefaultProfile()} is used.
      * @param file The java file to open.
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
      * @param poPropertiesToForce Some optional {@link Properties} for the PO which extend or overwrite saved PO {@link Properties}.
-     * @return The opened {@link DefaultProblemLoader}.
+     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
+     * @return The opened {@link AbstractProblemLoader}.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    DefaultProblemLoader load(Profile profile, File file, List<File> classPaths, File bootClassPath, Properties poPropertiesToForce) throws ProblemLoaderException;
+    AbstractProblemLoader load(Profile profile, File file, List<File> classPaths, File bootClassPath, Properties poPropertiesToForce, boolean forceNewProfileOfNewProofs) throws ProblemLoaderException;
     
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterface} for the given
@@ -204,6 +216,14 @@ public interface UserInterface
      */
     void removeProof(Proof proof);
 
+    /**
+     * save proof in file. If autoSave is on, this will potentially overwrite already
+     * existing proof files with the same name. Otherwise the save dialog pops up.
+     * For loaded proofs both are turned off by default, i.e. only manual saving is
+     * possible, and the save dialog never pops up automatically (except for hitting
+     * the "Save ..." or "Save current proof" button).
+     */
+    File saveProof(Proof proof, String fileExtension);
     
     /**
      * This method is called if no {@link LoadedPOContainer} was created

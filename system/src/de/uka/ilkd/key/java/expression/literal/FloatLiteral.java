@@ -21,6 +21,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.ldt.FloatLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -110,6 +112,11 @@ public class FloatLiteral extends Literal {
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
 	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
+    }
+
+    @Override
+    public Name getLDTName() {
+        return FloatLDT.NAME;
     }
 
 }

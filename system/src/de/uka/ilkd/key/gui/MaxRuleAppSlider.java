@@ -22,6 +22,7 @@ import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import de.uka.ilkd.key.core.KeYMediator;
 
 public class MaxRuleAppSlider extends JSlider {
     /**

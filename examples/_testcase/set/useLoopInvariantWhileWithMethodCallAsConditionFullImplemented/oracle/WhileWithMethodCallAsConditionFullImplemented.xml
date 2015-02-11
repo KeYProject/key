@@ -27,7 +27,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                         <branchStatement name="if (i_4&lt;0)" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
     b_3=goOnNice(array,i);
   }
-}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))),equals(array,null)))" pathConditionChanged="false">
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))),equals(array,null)))" pathConditionChanged="false" blockOpened="true">
                            <statement name="return i_4&lt;array_4.length;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
     b_3=goOnNice(array,i);
   }
@@ -54,7 +54,9 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                                     </statement>
                                  </statement>
                               </methodReturn>
+                              <completedBlockEntry path="/0/0/0/0/0/0/0/0" conditionString="true"/>
                            </statement>
+                           <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0"/>
                         </branchStatement>
                         <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0"/>
                      </methodCall>
@@ -70,7 +72,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                         <branchStatement name="if (i_3&lt;0)" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
     b_3=goOnNice(array,i);
   }
-}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="false">
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="false" blockOpened="true">
                            <statement name="return i_3&lt;array_3.length;" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
     b_3=goOnNice(array,i);
   }
@@ -92,8 +94,10 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
 }\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                                     </termination>
                                  </exceptionalMethodReturn>
+                                 <completedBlockEntry path="/0/0/0/0/0/1/0/0" conditionString="true"/>
                               </exceptionalMethodReturn>
                            </statement>
+                           <blockCompletionEntry path="/0/0/0/0/0/1/0/0/0/0"/>
                         </branchStatement>
                         <methodReturnEntry path="/0/0/0/0/0/1/0/0/0/0"/>
                      </methodCall>

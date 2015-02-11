@@ -26,61 +26,57 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
 class MainStatusLine extends JPanel {
-    private static final String DEFAULT_STATUSLINE = "Integrated Deductive Software Design: Ready";
+
     private static final long serialVersionUID = -4324361226332870737L;
     private JLabel       text;
     private JPanel       progressPanel;
     private JProgressBar progressBar;
     private int          max             = 0;
-    //private JButton      abortButton;
     private boolean      phantomBoxAdded = false;
 
     MainStatusLine ( String p_initialText,
-		     Font   p_font ) {
-	setLayout ( new BoxLayout ( this, BoxLayout.X_AXIS ) );
+                    Font   p_font ) {
+        setLayout ( new BoxLayout ( this, BoxLayout.X_AXIS ) );
 
-	setBorder(new BevelBorder(BevelBorder.LOWERED));
-	setBackground(Color.gray);
-	setFont(p_font);
-	setOpaque(false);
+        setBorder(new BevelBorder(BevelBorder.LOWERED));
+        setBackground(Color.gray);
+        setFont(p_font);
+        setOpaque(false);
 
-	text = new JLabel( p_initialText );
+        text = new JLabel( p_initialText );
 
-	text.setIcon(IconFactory.keyLogo(35,20));
-	   
-	add ( Box.createHorizontalGlue () );
-	add ( text );
-	add ( Box.createHorizontalGlue () );
+        text.setIcon(IconFactory.keyLogo(35,20));
 
-	createProgressPanel ();
-	progressPanel.setVisible ( false );
-	add ( progressPanel );
+        add ( Box.createHorizontalGlue () );
+        add ( text );
+        add ( Box.createHorizontalGlue () );
 
-	setVisible(true);
+        createProgressPanel ();
+        progressPanel.setVisible ( false );
+        add ( progressPanel );
+
+        setVisible(true);
     }
 
     private void createProgressPanel () {
-	Dimension s;
+        Dimension s;
 
-	progressPanel = new JPanel ();
-	progressPanel.setLayout ( new BoxLayout ( progressPanel,
-						  BoxLayout.X_AXIS ) );
+        progressPanel = new JPanel ();
+        progressPanel.setLayout ( new BoxLayout ( progressPanel,
+                        BoxLayout.X_AXIS ) );
 
-	progressBar = new JProgressBar(0, max);
-	progressBar.setValue(0);
-	progressBar.setStringPainted(true);
+        progressBar = new JProgressBar(0, max);
+        progressBar.setValue(0);
+        progressBar.setStringPainted(true);
 
-	s = new Dimension ( Short.MAX_VALUE, Short.MAX_VALUE );
-	progressBar.setMaximumSize ( s );
+        s = new Dimension ( Short.MAX_VALUE, Short.MAX_VALUE );
+        progressBar.setMaximumSize ( s );
 
-	progressBar.setEnabled(true);
-	progressPanel.add(progressBar);
+        progressBar.setEnabled(true);
+        progressPanel.add(progressBar);
 
-//	s = new Dimension ( 5, 5 );
-//	progressPanel.add ( Box.createRigidArea ( s ) );
-
-	s = new Dimension ( 100, Short.MAX_VALUE );
-	progressPanel.setMaximumSize ( s );	    
+        s = new Dimension ( 100, Short.MAX_VALUE );
+        progressPanel.setMaximumSize ( s );	    
     }
 
     /**
@@ -92,9 +88,8 @@ class MainStatusLine extends JPanel {
      * Make the status line display a standard message
      */
     public void reset () {
-	setProgressPanelVisible ( false );
-	setStatusText (DEFAULT_STATUSLINE 
-            + "  (Hint: "+TipOfTheDay.get()+")");
+        setProgressPanelVisible ( false );
+        setStatusText ("Hint: "+TipOfTheDay.get());
     }
 
     /**
@@ -102,7 +97,7 @@ class MainStatusLine extends JPanel {
      * <code>setMaximum</code> of <code>ProgressBar</code>)
      */
     public void setProgressBarMaximum(int value){
-	progressBar.setMaximum(value);
+        progressBar.setMaximum(value);
     }
 
     /**
@@ -122,26 +117,27 @@ class MainStatusLine extends JPanel {
      * Set the visibility of the progress bar and the abort button
      */
     public void setProgressPanelVisible ( boolean p_visible ) {
-	progressPanel.setVisible ( p_visible );
+        progressPanel.setVisible ( p_visible );
 
-	if ( p_visible ) {
-	    setProgress ( 0 );
+        if ( p_visible ) {
+            setProgress ( 0 );
 
-	    // To avoid later resizing of the status line, add an
-	    // invisible element with the same height as the abort button
-	    if ( !phantomBoxAdded ) {
-		phantomBoxAdded = true;
-		ComponentListener phantomAdder = new ComponentAdapter () {
-			public void componentResized(ComponentEvent e) {
-			    progressPanel.removeComponentListener ( this );
-			    Dimension s = progressPanel.getSize ();
-			    s           = new Dimension ( 0, (int)s.getHeight () );
-			    add(Box.createRigidArea(s));
-			}
-		    };
-		progressPanel.addComponentListener ( phantomAdder );
-	    }
-	}
+            // To avoid later resizing of the status line, add an
+            // invisible element with the same height as the abort button
+            if ( !phantomBoxAdded ) {
+                phantomBoxAdded = true;
+                ComponentListener phantomAdder = new ComponentAdapter () {
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        progressPanel.removeComponentListener ( this );
+                        Dimension s = progressPanel.getSize ();
+                        s           = new Dimension ( 0, (int)s.getHeight () );
+                        add(Box.createRigidArea(s));
+                    }
+                };
+                progressPanel.addComponentListener ( phantomAdder );
+            }
+        }
     }
 
     /**
@@ -149,6 +145,6 @@ class MainStatusLine extends JPanel {
      * anything else
      */
     public void setStatusText(String s) {
-	text.setText(s);
+        text.setText(s);
     }
 }

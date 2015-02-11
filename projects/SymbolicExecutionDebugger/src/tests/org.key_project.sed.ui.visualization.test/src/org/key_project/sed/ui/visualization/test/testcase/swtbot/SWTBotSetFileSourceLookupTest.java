@@ -76,6 +76,6 @@ public class SWTBotSetFileSourceLookupTest extends AbstractSWTBotSetFileTest {
                     "data/Number/test", 
                     "Number.set",
                     steps,
-                    new PathReplacement("D:\\Forschung\\Development\\SymbolicExecutionDebugger\\runtime-SymbolicExecutionDebugger.product\\SED Examples\\src\\Number.java", "Number.java"));
+                    new PathReplacement("D:\\Forschung\\Development\\KeY_Master\\runtime-SymbolicExecutionDebugger.product\\MartinBugs\\src\\Number.java", "Number.java"));
    }
 }

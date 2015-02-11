@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -202,12 +203,14 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
             queryConditionTerm = equalitySF.formula().sub(0); 
          }
          // Compute sequent for side proof to compute query in.
+         final ProofEnvironment sideProofEnv = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(goal.proof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
+         final Services sideProofServices = sideProofEnv.getServicesForEnvironment();
          Sequent sequentToProve = SideProofUtil.computeGeneralSequentToProve(goalSequent, equalitySF);
-         Function newPredicate = createResultFunction(services, queryTerm.sort());
-         Term newTerm = services.getTermBuilder().func(newPredicate, queryTerm);
+         Function newPredicate = createResultFunction(sideProofServices, queryTerm.sort());
+         Term newTerm = sideProofServices.getTermBuilder().func(newPredicate, queryTerm);
          sequentToProve = sequentToProve.addFormula(new SequentFormula(newTerm), false, false).sequent();
          // Compute results and their conditions
-         List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap = computeResultsAndConditions(services, goal, sequentToProve, newPredicate);
+         List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap = computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve, newPredicate);
          // Create new single goal in which the query is replaced by the possible results
          ImmutableList<Goal> goals = goal.split(1);
          Goal resultGoal = goals.head();

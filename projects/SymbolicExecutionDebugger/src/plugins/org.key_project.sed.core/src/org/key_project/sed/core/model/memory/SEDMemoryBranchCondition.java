@@ -80,6 +80,11 @@ public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition impleme
     * The contained variables.
     */
    private final List<IVariable> variables = new LinkedList<IVariable>();
+   
+   /**
+    * The known group start conditions.
+    */
+   private final List<ISEDBranchCondition> groupStartConditions = new LinkedList<ISEDBranchCondition>();
 
    /**
     * Constructor.
@@ -301,5 +306,23 @@ public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition impleme
    @Override
    public IVariable[] getVariables() throws DebugException {
       return variables.toArray(new IVariable[variables.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition[] getGroupStartConditions() throws DebugException {
+      return groupStartConditions.toArray(new ISEDBranchCondition[groupStartConditions.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addGroupStartCondition(ISEDBranchCondition groupStartCondition) {
+      if (groupStartCondition != null) {
+         groupStartConditions.add(groupStartCondition);
+      }
    }
 }

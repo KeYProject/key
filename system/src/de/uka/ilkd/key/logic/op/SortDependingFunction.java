@@ -51,7 +51,7 @@ public final class SortDependingFunction extends Function {
 	      instantiateResultSort(template, sortDependingOn),
 	      instantiateArgSorts(template, sortDependingOn),
 	      null,
-	      template.unique);
+	      template.unique, false);
 	this.template = template;
 	this.sortDependingOn = sortDependingOn;
     }
@@ -171,7 +171,7 @@ public final class SortDependingFunction extends Function {
 	assert !(sort instanceof ProgramSVSort);
 	assert sort != AbstractTermTransformer.METASORT;
 	
-	SortDependingFunction result 
+	SortDependingFunction result
 		= (SortDependingFunction) 
 		      services.getNamespaces()
 	                      .lookup(instantiateName(getKind(), 
@@ -241,7 +241,7 @@ public final class SortDependingFunction extends Function {
 
         final SortDependingFunction sdp = (SortDependingFunction)subst;   
         if(!isSimilar(sdp)) {
-            Debug.out("FAILED. Sort depending symbols not similar.", this, subst);            
+            Debug.out("FAILED. Sort depending symbols not similar.", this, subst);
             return null;
         }
         
@@ -254,7 +254,7 @@ public final class SortDependingFunction extends Function {
             return null;
         }
         
-        return result;        
+        return result;
     }
     
     

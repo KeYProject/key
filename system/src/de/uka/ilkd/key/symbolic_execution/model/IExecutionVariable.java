@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
@@ -42,15 +43,27 @@ public interface IExecutionVariable extends IExecutionElement {
    
    /**
     * Returns the index in the parent array if an array cell value is represented.
-    * @return The index in the parent array or {@code -1} if no array cell value is represented.
+    * @return The index in the parent array or {@code null} if no array cell value is represented.
     */
-   public int getArrayIndex();
+   public Term getArrayIndex();
+   
+   /**
+    * Returns the human readable index in the parent array if an array cell value is represented.
+    * @return The human readable index in the parent array or {@code null} if no array cell value is represented.
+    */
+   public String getArrayIndexString();
    
    /**
     * Checks if the current value is part of a parent array.
     * @return {@code true} is array cell value, {@code false} is a "normal" value.
     */
    public boolean isArrayIndex();
+   
+   /**
+    * Returns the optional additional condition considered during value computation.
+    * @return The optional additional condition considered during value computation.
+    */
+   public Term getAdditionalCondition();
    
    /**
     * Returns the parent {@link IExecutionValue} if available.
@@ -63,4 +76,11 @@ public interface IExecutionVariable extends IExecutionElement {
     * @return The possible values of this {@link IExecutionVariable}.
     */
    public IExecutionValue[] getValues() throws ProofInputException;
+   
+   /**
+    * Creates recursive a term which can be used to determine the value
+    * of {@link #getProgramVariable()}.
+    * @return The created term.
+    */
+   public Term createSelectTerm();
 }

@@ -31,5 +31,5 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopStatement;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionLoopStatement
  */
-public interface IExecutionLoopStatement extends IExecutionNode<LoopStatement> {
+public interface IExecutionLoopStatement extends IExecutionBlockStartNode<LoopStatement> {
 }

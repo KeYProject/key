@@ -56,7 +56,6 @@ public class Do extends LoopStatement {
         super(guard, body, pos);	
     }
 
- 
     public SourceElement getLastElement() {
         return this;
     }

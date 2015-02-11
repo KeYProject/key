@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -28,7 +28,6 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -153,7 +152,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
             }
          }
          else {
-            branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true);
+            branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true, true);
          }
          // Format branch condition
          formatedBranchCondition = formatTerm(branchCondition, services);
@@ -257,7 +256,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
          Term[] result = new Term[mergedProofNodes.size()];
          Iterator<Node> iter = mergedProofNodes.iterator();
          for (int i = 0; i < result.length; i++) {
-            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), true);
+            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), true, true);
          }
          return result;
       }
@@ -288,14 +287,6 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
    @Override
    protected IExecutionConstraint[] lazyComputeConstraints() {
       return SymbolicExecutionUtil.createExecutionConstraints(this);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected IExecutionVariable[] lazyComputeVariables() {
-      return SymbolicExecutionUtil.createExecutionVariables(this);
    }
 
    /**

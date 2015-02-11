@@ -71,19 +71,16 @@ public class LemmataHandler implements TacletFilter {
                 println(options.toString());
 
                 File file = new File(options.getPathOfRuleFile());
-                File fileForDefinitions =  options.getPathOfRuleFile() != "" ? new File(options.getPathOfDefinitionFile()) :file;
                 Collection<File> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
                 
                 final ProblemInitializer problemInitializer = new ProblemInitializer(null,
-                                new Services(profile,
-                                                new KeYRecoderExcHandler()),
+                                new Services(profile),
                                 new Listener());
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(null,
                                                       new Listener(),
                                                       problemInitializer,
                                                       profile,
-                                                      fileForDefinitions ,
                                                       file,
                                                       filesForAxioms);
                 

@@ -41,6 +41,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           true,
                           false,
                           false,
+                          false,
                           false);
    }
    /**
@@ -61,6 +62,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           false,
                           false,
                           false,
@@ -88,6 +90,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           true,
                           false,
                           false,
+                          false,
                           false);
    }
    
@@ -109,6 +112,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           false,
                           false,
                           false,
@@ -136,6 +140,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           true,
                           false,
                           false,
+                          false,
                           false);
    }
 
@@ -157,6 +162,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           false,
                           false,
                           false,
@@ -184,6 +190,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           true,
                           false,
                           false,
+                          false,
                           false);
    }
 
@@ -205,6 +212,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           false,
                           false,
                           false,
@@ -232,6 +240,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           true,
                           false,
                           false,
+                          false,
                           false);
    }
 
@@ -253,6 +262,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           false,
                           false,
                           false,
@@ -280,6 +290,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           true,
                           false,
                           false,
+                          false,
                           false);
    }
 
@@ -301,6 +312,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           false,
                           false,
                           false,
@@ -328,6 +340,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           true,
                           false,
                           false,
+                          false,
                           false);
    }
 
@@ -349,6 +362,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           false,
                           false,
                           false,
@@ -376,6 +390,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           true,
                           false,
                           false,
+                          false,
                           false);
    }
 
@@ -397,6 +412,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           true,
+                          false,
                           false,
                           false,
                           false,
@@ -424,6 +440,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           true,
                           false,
                           false,
+                          false,
                           false);
    }
 
@@ -446,6 +463,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           true,
                           true,
                           true,
+                          false,
                           false,
                           false,
                           false);
@@ -472,6 +490,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           true,
                           false,
                           false,
+                          false,
                           false);
    }
 
@@ -496,6 +515,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           false,
+                          false,
                           false);
    }
 
@@ -514,6 +534,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,
@@ -544,6 +565,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           false,
+                          false,
                           false);
    }
 
@@ -562,6 +584,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           true,
                           ALL_IN_ONE_RUN,
+                          false,
                           false,
                           false,
                           false,
@@ -591,6 +614,7 @@ public class TestSymbolicExecutionStrategy extends AbstractSymbolicExecutionTest
                           false,
                           false,
                           true,
+                          false,
                           false,
                           false);
    }

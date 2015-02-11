@@ -2,9 +2,9 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call IdenticalTermsDuringProof.mid(x,y,z)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int mid = z;" pathCondition="true" pathConditionChanged="false">
-         <branchStatement name="if (y&lt;z)" pathCondition="true" pathConditionChanged="false">
+         <branchStatement name="if (y&lt;z)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
             <branchCondition name="gt(z,y)" pathCondition="gt(z,y)" pathConditionChanged="true" branchCondition="gt(z,y)" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <branchStatement name="if (x&lt;=y)" pathCondition="gt(z,y)" pathConditionChanged="false">
+               <branchStatement name="if (x&lt;=y)" pathCondition="gt(z,y)" pathConditionChanged="false" blockOpened="true">
                   <branchCondition name="geq(y,x)" pathCondition="and(geq(y,x),gt(z,y))" pathConditionChanged="true" branchCondition="geq(y,x)" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <statement name="mid=y;" pathCondition="and(geq(y,x),gt(z,y))" pathConditionChanged="false">
                         <statement name="return mid;" pathCondition="and(geq(y,x),gt(z,y))" pathConditionChanged="false">
@@ -13,6 +13,8 @@
                               </termination>
                            </methodReturn>
                         </statement>
+                        <completedBlockEntry path="/0/0/0" conditionString="and(geq(y,x),gt(z,y))"/>
+                        <completedBlockEntry path="/0/0/0/0/0" conditionString="geq(y,x)"/>
                      </statement>
                   </branchCondition>
                   <branchCondition name="lt(y,x)" pathCondition="and(lt(y,x),gt(z,y))" pathConditionChanged="true" branchCondition="lt(y,x)" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -22,7 +24,11 @@
                            </termination>
                         </methodReturn>
                      </statement>
+                     <completedBlockEntry path="/0/0/0" conditionString="gt(z,y)"/>
+                     <completedBlockEntry path="/0/0/0/0/0" conditionString="true"/>
                   </branchCondition>
+                  <blockCompletionEntry path="/0/0/0/0/0/0/0"/>
+                  <blockCompletionEntry path="/0/0/0/0/0/1"/>
                </branchStatement>
             </branchCondition>
             <branchCondition name="leq(z,y)" pathCondition="leq(z,y)" pathConditionChanged="true" branchCondition="leq(z,y)" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -33,8 +39,12 @@
                         </termination>
                      </methodReturn>
                   </statement>
+                  <completedBlockEntry path="/0/0/0" conditionString="leq(z,y)"/>
                </statement>
             </branchCondition>
+            <blockCompletionEntry path="/0/0/0/0/0/0/0"/>
+            <blockCompletionEntry path="/0/0/0/1/0"/>
+            <blockCompletionEntry path="/0/0/0/0/0/1"/>
          </branchStatement>
       </statement>
       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0"/>

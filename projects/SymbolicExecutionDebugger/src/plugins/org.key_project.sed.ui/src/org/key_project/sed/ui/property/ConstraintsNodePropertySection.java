@@ -29,4 +29,12 @@ public class ConstraintsNodePropertySection extends AbstractSEDDebugNodeProperty
    protected ISEDDebugNodeTabContent createContent() {
       return new ConstraintsTabComposite();
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean shouldUseExtraSpace() {
+      return true;
+   }
 }

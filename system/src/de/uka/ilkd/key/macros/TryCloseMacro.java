@@ -15,11 +15,11 @@ package de.uka.ilkd.key.macros;
 
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.ApplyStrategy;
-import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.ApplyStrategy;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -36,6 +36,28 @@ import de.uka.ilkd.key.proof.Proof;
  * @author mattias ulbrich
  */
 public class TryCloseMacro extends AbstractProofMacro {
+
+    private static class TryCloseProgressBarListener extends ProgressBarListener {
+
+        private int notClosedGoals = 0;
+
+        private TryCloseProgressBarListener(ProofMacro macro, int numberGoals, int numberSteps, ProverTaskListener l) {
+            super(macro, numberGoals, numberSteps, l);
+        }
+
+        @Override
+        protected String getMessageSuffix() {
+            if(notClosedGoals == 0)
+            return super.getMessageSuffix();
+            else
+                return super.getMessageSuffix() + ", " + notClosedGoals + " goal(s) remain(s) open.";
+        }
+
+        private void incrementNotClosedGoals() {
+            notClosedGoals++;
+        }
+
+    }
 
     /**
      * Instantiates a new try close macro.
@@ -81,11 +103,17 @@ public class TryCloseMacro extends AbstractProofMacro {
         return goals != null && !goals.isEmpty();
     }
 
+    @Override
+    public boolean isApplicableWithoutPosition() {
+        return true;
+    }
+    
     /*
      * Run the automation on the goal. Retreat if not successful.
      */
     @Override
-    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+    public ProofMacroFinishedInfo applyTo(Proof proof,
+                                          KeYMediator mediator,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
@@ -100,7 +128,6 @@ public class TryCloseMacro extends AbstractProofMacro {
         final ApplyStrategy applyStrategy =
                 new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
         // assert: all goals have the same proof
-        final Proof proof = goals.head().proof();
 
         //
         // set the max number of steps if given
@@ -119,7 +146,7 @@ public class TryCloseMacro extends AbstractProofMacro {
         macroAdapter.setNumberSteps(getNumberSteps());
         //
         // The observer to handle the progress bar
-        final ProofMacroListener pml =  new ProgressBarListener(macroAdapter, goals.size(),
+        final TryCloseProgressBarListener pml =  new TryCloseProgressBarListener(macroAdapter, goals.size(),
                                                                 getNumberSteps(), listener);
         final ImmutableList<Goal> ignoredOpenGoals =
                 setDifference(proof.openGoals(), goals);
@@ -141,6 +168,7 @@ public class TryCloseMacro extends AbstractProofMacro {
                 // retreat if not closed
                 if(!node.isClosed()) {
                     proof.pruneProof(node);
+                    pml.incrementNotClosedGoals();
                     //closedGoal = null;
                 } else {
                     //closedGoal = goal;

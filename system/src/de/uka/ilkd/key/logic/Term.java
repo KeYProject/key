@@ -60,6 +60,12 @@ public interface Term extends SVSubstitute, Sorted {
     public Operator op();
     
     /**
+     * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f")
+     * casted to the passed type.
+     */
+    public <T> T op(Class<T> opClass) throws IllegalArgumentException;
+    
+    /**
      * The subterms.
      */
     public ImmutableArray<Term> subs();
@@ -155,6 +161,13 @@ public interface Term extends SVSubstitute, Sorted {
      * @return list of labels (maybe be empty but never <code>null</code>
      */
     public ImmutableArray<TermLabel> getLabels();
+    
+    /**
+     * Returns the first {@link TermLabel} with the given {@link Name}.
+     * @param termLabelName The {@link Name} of the {@link TermLabel} to search.
+     * @return The first found {@link TermLabel} or {@code null} if not available.
+     */
+    public TermLabel getLabel(Name termLabelName);
     
     /**
      * Returns a serial number for a term. The serial number is not persistent.

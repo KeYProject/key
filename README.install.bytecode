@@ -7,6 +7,8 @@
 (1) Requirements: 
 -----------------
 
+Hardware:	2 GB RAM
+
 Operating Systems: Linux/Unix 
                    Mac OS X
                    Windows NT or newer
@@ -29,19 +31,19 @@ Optionally, KeY can make use of the following binaries:
   At the KeY homepage you can find the following parts:
 
    * README-xxx.txt: this file
-   * KeY-xxx.tgz or KeY-xxx.zip: 
+   * KeY-xxx.tgz or KeY-xxx.zip:
                 the KeY-system in the jar-file version. That is the
                 distribution version without the source code.
-   * KeYExtLib-xxx.tgz or KeYExtLib-xxx.zip: 
-                contains the external libraries (see above) 
+   * KeYExtLib-xxx.tgz or KeYExtLib-xxx.zip:
+                contains the external libraries (see above)
 
-   where xxx stands for the current version.
+	where xxx stands for the current version.
 
 
 (3) Installation (Byte Code)
 ----------------------------
 
-	1) Copy the KeY-xxx.tgz or KeY-xxx.zip to a temporary directory; 
+	1) Copy the KeY-xxx.tgz or KeY-xxx.zip to a temporary directory;
 	   Here: tmp/
 
 	2) Unpack KeY.tgz 
@@ -49,7 +51,7 @@ Optionally, KeY can make use of the following binaries:
 		Linux: 
 		   tar -xzvf KeY-xxx.tgz 
 
-		Windows (use your favorite unpack program, e.g. WinZip) 
+		Windows (use your favorite unpack program, e.g. WinZip)
 
 	3) The following files should be found in the directory (tmp/):
 		setup.jar key.jar LICENSE.TXT

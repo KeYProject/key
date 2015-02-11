@@ -1451,7 +1451,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 		|| (pe instanceof ConstructorReference);
     }
 
-    public ProgramElement getSVWithSort(ExtList l, Class alternative) {
+    public ProgramElement getSVWithSort(ExtList l, Class<?> alternative) {
         for (final Object o : l) {
 	    if (o instanceof SchemaVariable
 		&& (((SchemaVariable)o).sort()==this)) {

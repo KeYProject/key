@@ -15,7 +15,7 @@ import org.key_project.util.jdt.JDTUtil;
  * Represents an observer function as known by KeY.
  * @author Martin Hentschel
  */
-public class ObserverFunctionInfo extends AbstractContractContainer implements IStatusInfo {
+public class ObserverFunctionInfo extends AbstractContractContainer {
    /**
     * The {@link TypeInfo} in which this {@link ObserverFunctionInfo} is contained in.
     */
@@ -132,14 +132,6 @@ public class ObserverFunctionInfo extends AbstractContractContainer implements I
       else {
          return null;
       }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isUnspecified() {
-      return false;
    }
 
    /**

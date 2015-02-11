@@ -19,7 +19,7 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.*;
-import java.util.HashMap;
+import java.util.EventObject;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -55,14 +55,13 @@ import javax.swing.tree.TreeSelectionModel;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.AutoModeListener;
-import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.core.AutoModeListener;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.core.RuleAppListener;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.IconFactory;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.KeYSelectionEvent;
-import de.uka.ilkd.key.gui.KeYSelectionListener;
-import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
@@ -487,23 +486,24 @@ public class ProofTreeView extends JPanel {
 
     // listens to gui events
     class GUIProofTreeGUIListener implements GUIListener,
-                                             java.io.Serializable {
-	/**
-         *
-         */
-        private static final long serialVersionUID = -7767170815005302177L;
-    /** invoked if a frame that wants modal access is opened */
-	public void modalDialogOpened(GUIEvent e) {
-	    delegateView.setEnabled(false);
-	}
+    java.io.Serializable {
 
-	/** invoked if a frame that wants modal access is closed */
-	public void modalDialogClosed(GUIEvent e) {
-	    delegateView.setEnabled(true);
-	}
-	public void shutDown(GUIEvent e) {
+        private static final long serialVersionUID = 4224100114740308297L;
+        /** invoked if a frame that wants modal access is opened */
+        @Override
+        public void modalDialogOpened(EventObject e) {
+            delegateView.setEnabled(false);
+        }
 
-	}
+        /** invoked if a frame that wants modal access is closed */
+        @Override
+        public void modalDialogClosed(EventObject e) {
+            delegateView.setEnabled(true);
+        }
+        @Override
+        public void shutDown(EventObject e) {
+
+        }
     }
 
     class GUIProofTreeProofListener implements AutoModeListener,
@@ -538,6 +538,7 @@ public class ProofTreeView extends JPanel {
 
 	/** the selected proof has changed (e.g. a new proof has been
 	 * loaded) */
+        @Override
 	public void selectedProofChanged(KeYSelectionEvent e) {
 	    Debug.out("ProofTreeView: initialize with new proof");
 	    lastGoalNode = null;

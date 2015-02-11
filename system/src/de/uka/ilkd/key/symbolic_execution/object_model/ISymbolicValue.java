@@ -43,10 +43,16 @@ public interface ISymbolicValue extends ISymbolicElement {
    public boolean isArrayIndex();
    
    /**
-    * Returns the represented array index or {@code -1} if a program variable is represented..
-    * @return The represented array index or {@code -1} if a program variable is represented..
+    * Returns the represented array index or {@code null} if a program variable is represented..
+    * @return The represented array index or {@code null} if a program variable is represented..
     */
-   public int getArrayIndex();
+   public Term getArrayIndex();
+   
+   /**
+    * Returns the human readable array index or {@code null} if a program variable is represented..
+    * @return The human readable array index or {@code null} if a program variable is represented..
+    */
+   public String getArrayIndexString();
    
    /**
     * Returns the represented {@link IProgramVariable} or {@code null} if an array index is represented.

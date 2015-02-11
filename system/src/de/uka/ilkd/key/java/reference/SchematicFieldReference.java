@@ -155,6 +155,11 @@ public class SchematicFieldReference extends FieldReference
         return (prefix == null) ? (ProgramSV)schemaVariable : prefix.getFirstElement();
     }
 
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+        return (prefix == null) ? (ProgramSV)schemaVariable : prefix.getFirstElementIncludingBlocks();
+    }
+
     public ProgramElementName getProgramElementName() {
 	return (ProgramElementName) schemaVariable.name();
     }

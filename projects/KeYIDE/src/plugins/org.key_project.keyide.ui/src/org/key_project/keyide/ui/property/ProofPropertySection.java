@@ -15,7 +15,7 @@ package org.key_project.keyide.ui.property;
 
 import java.util.List;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Proof.Statistics;

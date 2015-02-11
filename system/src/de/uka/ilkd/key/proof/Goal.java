@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -40,6 +39,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.util.properties.MapProperties;
+import de.uka.ilkd.key.util.properties.Properties;
+import de.uka.ilkd.key.util.properties.Properties.Property;
+import java.util.ArrayList;
 
 /**
  *  A proof is represented as a tree of nodes containing sequents. The initial
@@ -81,30 +84,41 @@ public final class Goal  {
     /** a goal has been excluded from automatic rule application iff automatic == false */
     private boolean automatic = true;
 
+    /**
+     * If an application of a rule added some information for the strategy,
+     * then this information is stored in this map.
+     */
+    private final Properties strategyInfos;
+
+
     /** creates a new goal referencing the given node */
-    private Goal( Node                    node,
-		  RuleAppIndex            ruleAppIndex,
-		  ImmutableList<RuleApp>           appliedRuleApps,
-		  FormulaTagManager       tagManager,
-		  AutomatedRuleApplicationManager ruleAppManager ) {
-	this.node            = node;
-	this.ruleAppIndex    = ruleAppIndex;
-	this.appliedRuleApps = appliedRuleApps;
-	this.tagManager      = tagManager;
-	this.goalStrategy    = null;
-        this.ruleAppIndex.setup ( this );
-        setRuleAppManager ( ruleAppManager );
+    private Goal(Node node,
+                 RuleAppIndex ruleAppIndex,
+                 ImmutableList<RuleApp> appliedRuleApps,
+                 FormulaTagManager tagManager,
+                 AutomatedRuleApplicationManager ruleAppManager,
+                 Properties strategyInfos) {
+        this.node = node;
+        this.ruleAppIndex = ruleAppIndex;
+        this.appliedRuleApps = appliedRuleApps;
+        this.tagManager = tagManager;
+        this.goalStrategy = null;
+        this.ruleAppIndex.setup(this);
+        this.strategyInfos = strategyInfos;
+        setRuleAppManager(ruleAppManager);
     }
 
-    private Goal( Node                    node,
-            RuleAppIndex            ruleAppIndex,
-            ImmutableList<RuleApp>           appliedRuleApps,
-            AutomatedRuleApplicationManager ruleAppManager ) {
+    private Goal(Node node,
+                 RuleAppIndex ruleAppIndex,
+                 ImmutableList<RuleApp> appliedRuleApps,
+                 AutomatedRuleApplicationManager ruleAppManager,
+                 Properties strategyInfos) {
       this.node            = node;
       this.ruleAppIndex    = ruleAppIndex;
       this.appliedRuleApps = appliedRuleApps;
       this.goalStrategy    = null;
       this.ruleAppIndex.setup ( this );
+      this.strategyInfos = strategyInfos;
       setRuleAppManager ( ruleAppManager );
       this.tagManager      = new FormulaTagManager ( this );;
       }
@@ -117,7 +131,8 @@ public final class Goal  {
                ruleAppIndex,
                ImmutableSLList.<RuleApp>nil(),
                null,
-               new QueueRuleApplicationManager () );
+               new QueueRuleApplicationManager (),
+               new MapProperties());
         tagManager = new FormulaTagManager ( this );
     }
 
@@ -228,7 +243,8 @@ public final class Goal  {
     }
 
     public void setGlobalProgVars(ImmutableSet<ProgramVariable> s) {
-        assert node.proof().getNamespaces().contains(names(s)) : "\""+names(s)+ "\" not found in namespace.";
+        assert node.proof().getNamespaces().contains(names(s)) :
+                    "\""+names(s)+ "\" not found in namespace.";
         node.setGlobalProgVars(s);
     }
 
@@ -436,31 +452,40 @@ public final class Goal  {
         setGlobalProgVars(s);
     }
 
-
     /**
      * clones the goal (with copy of tacletindex and ruleAppIndex)
      * @param node the new Node to which the goal is attached
      * @return Object the clone
      */
     @SuppressWarnings("unchecked")
-    public Goal clone(Node node) {    
+    public Goal clone(Node node) {
         Goal clone;
         if (node.sequent() != this.node.sequent()) {
-            clone = new Goal ( node,
-                    ruleAppIndex.copy (),
+            clone = new Goal (node,
+                    ruleAppIndex.copy(),
                     appliedRuleApps,
-                    ruleAppManager.copy () );
+                    ruleAppManager.copy(),
+                    strategyInfos.clone());
         } else {
-            clone = new Goal ( node,
-                    ruleAppIndex.copy (),
+            clone = new Goal (node,
+                    ruleAppIndex.copy(),
                     appliedRuleApps,
-                    getFormulaTagManager ().copy (),
-                    ruleAppManager.copy () );
+                    getFormulaTagManager().copy(),
+                    ruleAppManager.copy(),
+                    strategyInfos.clone());
         }
         clone.listeners = (List<GoalListener>)
                 ((ArrayList<GoalListener>) listeners).clone();
         clone.automatic = this.automatic;
         return clone;
+    }
+
+    /** like the clone method but returns right type
+     * @return Goal clone of this Goal
+     * @throws CloneNotSupportedException 
+     */
+    public Goal copy() throws CloneNotSupportedException {
+        return (Goal)clone();
     }
 
     
@@ -563,15 +588,15 @@ public final class Goal  {
         proof.getServices().saveNameRecorder(n);
 
         if (goalList != null){
-        if (goalList.isEmpty() ) {
-            proof.closeGoal ( this );
-        } else {
-            proof.replace ( this, goalList );
-            if ( ruleApp instanceof TacletApp &&
-                    ((TacletApp)ruleApp).taclet ().closeGoal () )
-                // the first new goal is the one to be closed
-                proof.closeGoal ( goalList.head () );
-        }
+            if (goalList.isEmpty() ) {
+                proof.closeGoal ( this );
+            } else {
+                proof.replace ( this, goalList );
+                if ( ruleApp instanceof TacletApp &&
+                        ((TacletApp)ruleApp).taclet ().closeGoal () )
+                    // the first new goal is the one to be closed
+                    proof.closeGoal ( goalList.head () );
+            }
         }
 
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
@@ -596,5 +621,22 @@ public final class Goal  {
             names = names.add(elem.name());
         }
         return names;
+    }
+
+    public <T> T getStrategyInfo(Property<T> property) {
+        return strategyInfos.get(property);
+    }
+
+
+    public <T> void addStrategyInfo(Property<T> property,
+                                    T info,
+                                    StrategyInfoUndoMethod undoMethod) {
+        strategyInfos.put(property, info);
+        node.addStrategyInfoUndoMethod(undoMethod);
+    }
+
+
+    public void undoStrategyInfoAdd(StrategyInfoUndoMethod undoMethod) {
+        undoMethod.undo(strategyInfos);
     }
 }

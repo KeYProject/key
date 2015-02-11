@@ -18,10 +18,10 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
@@ -64,18 +64,31 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
     protected abstract boolean allowOSS();
 
     @Override
-    protected PropExpansionStrategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
-        return new PropExpansionStrategy(mediator.getInteractiveProver().getProof().getActiveStrategy(),
-                        getAdmittedRuleNames(), allowOSS());
+    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+        return new PropExpansionStrategy(proof.getActiveStrategy(),
+                                         getAdmittedRuleNames(), allowOSS());
+    }
+    
+    /**
+     * Checks whether the application of the passed rule is ok in the given
+     * context.
+     * 
+     * @param ruleApp   rule to be applied
+     * @param pio       context
+     * @param goal      context
+     * @return          true if rule may be applied
+     */
+    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
+        return true;
     }
 
     /**
      * This strategy accepts all rule apps for which the rule name is in the
      * admitted set and rejects everything else.
      */
-    private static class PropExpansionStrategy implements Strategy {
+    private class PropExpansionStrategy implements Strategy {
 
-        private static final Name NAME = new Name(PropExpansionStrategy.class.getSimpleName());
+        private final Name NAME = new Name(PropExpansionStrategy.class.getSimpleName());
 
         private final Set<String> admittedRuleNames;
         private final Strategy delegate;

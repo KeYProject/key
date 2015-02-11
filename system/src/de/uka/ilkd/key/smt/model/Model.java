@@ -14,10 +14,13 @@
 package de.uka.ilkd.key.smt.model;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.Stack;
 
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.ProblemTypeInformation;
@@ -65,6 +68,8 @@ public class Model {
 		reversedConstants = new HashMap<String, String>();
 		sequences = new LinkedList<Sequence>();
 	}
+	
+	
 	
 	
 	
@@ -564,6 +569,178 @@ public class Model {
 
 	}
 	
+	public Set<ObjectVal> getNecessaryPrestateObjects(String location){
+		Set<ObjectVal> result = new HashSet<ObjectVal>();
+		
+		String[] l = location.split("\\.");
+		//System.out.println("location: "+location);
+		String objName = l[0];
+		String nullString = "#o0";
+		
+		Heap heap = null;
+		for(Heap h : heaps){
+			if(h.getName().equals("heap")){
+				heap = h;
+			}
+		}
+		ObjectVal o = getObject(constants.get(objName), heap);
+		int i = 1;
+		while(!o.equals(nullString) && i < l.length){			
+			result.add(o);
+			//System.out.println(o.getName()+"."+l[i]);
+			String pointed = o.getFieldUsingSimpleName(l[i]);
+			if(pointed == null){
+				break;
+			}
+			
+			
+			o = getObject(pointed, heap);
+			i++;			
+		}	
+		
+		return result;		
+	}
+	
+	public ObjectVal findObject(String ref){
+		String[] l = ref.split("\\.");
+		//System.out.println("location: "+location);
+		String objName = l[0];
+		String nullString = "#o0";
+		
+		Heap heap = null;
+		for(Heap h : heaps){
+			if(h.getName().equals("heap")){
+				heap = h;
+			}
+		}
+		ObjectVal o = getObject(constants.get(objName), heap);
+		int i = 1;
+		while(!o.equals(nullString) && i < l.length){			
+			
+			//System.out.println(o.getName()+"."+l[i]);
+			String pointed = o.getFieldUsingSimpleName(l[i]);
+			if(pointed == null){
+				break;
+			}
+			
+			
+			o = getObject(pointed, heap);
+			i++;			
+		}
+		
+		return o;
+	}
+	
+	public void removeUnnecessaryObjects(){
+			
+		//System.out.println("Start cleaning...");
+		Set<String> objConstants = new HashSet<String>();
+		
+		for(String c : constants.keySet()){
+			
+			if(types.getTypeForConstant(c)==null) continue;
+			
+			if(types.getTypeForConstant(c).getId().equals(SMTObjTranslator.OBJECT_SORT)){
+				objConstants.add(constants.get(c));
+			}
+		}
+		
+		//System.out.println("Found: "+objConstants);
+		
+		for(Heap h : heaps){
+			Set<ObjectVal> reachable = new HashSet<ObjectVal>();
+			for(String o : objConstants){
+				reachable.addAll(getReachableObjects(o, h));
+			}			
+						
+			h.getObjects().clear();
+			h.getObjects().addAll(reachable);			
+			
+		}
+		
+	}
+	
+	public Set<ObjectVal> getReachableObjects(String name, Heap heap){
+		
+		Set<ObjectVal> result = new HashSet<ObjectVal>();		
+		Stack<ObjectVal> scheduled = new Stack<ObjectVal>();
+		
+		
+		
+		ObjectVal init = getObject(name, heap);
+		
+		if(init == null){
+			return null;
+		}
+		
+		scheduled.push(init);
+		
+		
+		while(!scheduled.isEmpty()){
+			ObjectVal o = scheduled.pop();
+			
+			if(result.contains(o)){
+				continue;
+			}
+			
+			result.add(o);
+			
+			Set<ObjectVal> pointed = pointsTo(o.getName(), heap);
+			
+			for(ObjectVal p : pointed){
+				
+				if(result.contains(p)){
+					continue;
+				}
+				
+				scheduled.push(p);
+				
+			}	
+			
+		}		
+		
+		return result;
+		
+		
+	}
+	
+	public Set<ObjectVal> pointsTo(String name, Heap heap){
+		
+		Set<ObjectVal> result = new HashSet<ObjectVal>();
+		
+		ObjectVal o = getObject(name, heap);
+		
+		if(o == null){
+			return result;
+		}
+		
+		for(Entry<String, String> e : o.getFieldvalues().entrySet()){
+			
+			String val = e.getValue();
+			ObjectVal pointed = getObject(val, heap);
+			
+			if(pointed !=null){
+				result.add(pointed);
+			}			
+		}	
+		
+		return result;
+	}
+	
+	public ObjectVal getObject(String name, Heap heap){
+		//System.out.println(name+"@"+heap.getName());
+		for(ObjectVal o : heap.getObjects()){
+			
+			if(o.getName().startsWith(name)){
+				return o;
+			}
+			
+		}
+		
+		return null;
+		
+		
+	}
 	
 	
 	

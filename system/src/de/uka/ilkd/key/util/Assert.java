@@ -27,7 +27,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public final class Assert {
     
     private static boolean assertionsEnabled () {
-        return de.uka.ilkd.key.gui.Main.class.desiredAssertionStatus();
+        return de.uka.ilkd.key.core.Main.class.desiredAssertionStatus();
     }
     
     /**

@@ -37,7 +37,8 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
     	this(rule, pio,  null, "SMT Rule App");
     }
 
-    private RuleAppSMT(SMTRule rule, PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts, String title) {
+    private RuleAppSMT(SMTRule rule, PosInOccurrence pio,
+                       ImmutableList<PosInOccurrence> ifInsts, String title) {
         super(rule, pio, ifInsts);
         this.title = title;
     }

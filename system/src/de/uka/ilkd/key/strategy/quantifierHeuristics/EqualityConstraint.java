@@ -29,6 +29,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -192,8 +193,11 @@ public class EqualityConstraint implements Constraint {
      */
     private Term instantiate ( Term p ) {
 	SyntacticalReplaceVisitor srVisitor =
-	    new SyntacticalReplaceVisitor(new Services(new JavaProfile()), // Any services can be used because it is only used for allquantor instantiation. TODO: Rewrite quantifier heuristics and strategies 
+	    new SyntacticalReplaceVisitor(new TermLabelState(),
+	                                  new Services(new JavaProfile()), // Any services can be used because it is only used for allquantor instantiation. TODO: Rewrite quantifier heuristics and strategies 
 	                                  this, 
+	                                  null,
+	                                  null,
 	                                  null,
 	                                  null);
 	p.execPostOrder ( srVisitor );

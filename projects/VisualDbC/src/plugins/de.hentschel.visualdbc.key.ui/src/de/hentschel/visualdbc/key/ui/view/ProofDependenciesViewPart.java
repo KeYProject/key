@@ -51,7 +51,7 @@ import de.hentschel.visualdbc.key.ui.editor.DbcModelEditorInput;
 import de.hentschel.visualdbc.key.ui.editor.NothingActionBarContributor;
 import de.hentschel.visualdbc.key.ui.util.LogUtil;
 import de.hentschel.visualdbc.key.ui.util.ProofReferenceModelCreator;
-import de.uka.ilkd.key.gui.AutoModeListener;
+import de.uka.ilkd.key.core.AutoModeListener;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;

@@ -18,6 +18,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,17 +34,19 @@ import de.uka.ilkd.key.smt.model.LocationSet;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
 import de.uka.ilkd.key.smt.model.Sequence;
+import de.uka.ilkd.key.util.Pair;
 
 public class CETree {
-
     /**
      * A comparator that sort ignoRiNG cASe.
      * Used to sort labels.
      */
-    private static final Comparator<? super String> IGNORECASE_COMPARATOR =
-            new Comparator<String>() {
-        public int compare(String o1, String o2) {
-            return o1.compareToIgnoreCase(o2);
+    private static final Comparator<? super Pair<? super String, ? super String>> IGNORECASE_COMPARATOR =
+            new Comparator<Pair<? super String, ? super String>>() {
+        public int compare(Pair<? super String, ? super String> o1, Pair<? super String, ? super String> o2) {
+            String first = o1.first + "=" + o1.second;
+            String second = o2.first + "=" + o2.second;
+            return first.compareToIgnoreCase(second);
         }
     };
 
@@ -63,7 +66,8 @@ public class CETree {
 	public CETree(Model model) {
 		super();
 		this.model = model;
-		model.addAliases();
+		model.removeUnnecessaryObjects();
+		model.addAliases();		
 		initTree();
 	}
 
@@ -121,54 +125,30 @@ public class CETree {
 	 */
 	private void addObjectProperties(ObjectVal ov,
 			DefaultMutableTreeNode object) {
-		//Type			
-		String sortName = ov.getSort() == null ? "java.lang.Object" : ov.getSort().name().toString();
-		sortName = Model.removePipes(sortName);
-		DefaultMutableTreeNode sort = new DefaultMutableTreeNode("Type="+sortName);								
-//		DefaultMutableTreeNode sortValue = new DefaultMutableTreeNode(sortName);
-//		sort.add(sortValue);
-		object.add(sort);
-
-		//Exact Instance				
-		boolean ei = ov.isExactInstance();
-		DefaultMutableTreeNode exactInstance = new DefaultMutableTreeNode("Exact Instance="+ei);
-//		DefaultMutableTreeNode exactInstanceValue = new DefaultMutableTreeNode(ei);
-//		exactInstance.add(exactInstanceValue);
-		object.add(exactInstance);	
-
-		//Length				
-		int l = ov.getLength();
-		DefaultMutableTreeNode length = new DefaultMutableTreeNode("Length="+l);
-//		DefaultMutableTreeNode lengthValue = new DefaultMutableTreeNode(l);
-//		length.add(lengthValue);
-		object.add(length);	
-
+	   String sortName = computeSortName(ov);
+	   // General properties
+	   List<Pair<String, String>> objectProperties = computeObjectProperties(ov, sortName);
+	   for (Pair<String, String> property : objectProperties) {
+	      DefaultMutableTreeNode node = new DefaultMutableTreeNode(property.first + "=" + property.second);     
+	      object.add(node);
+	   }
 		//Fields
 		DefaultMutableTreeNode fields = new DefaultMutableTreeNode("Fields");
 		object.add(fields);
-        List<String> labels = new ArrayList<String>();
-
-        for(Entry<String,String> e : ov.getFieldvalues().entrySet()) {
-            labels.add(Model.removePipes(e.getKey())+"="+e.getValue());
-        }
-
-        // sort the labels alphabetically
-        Collections.sort(labels, IGNORECASE_COMPARATOR);
-
-        for(String label : labels){
-            DefaultMutableTreeNode name = new DefaultMutableTreeNode(label);
-            fields.add(name);
+      List<Pair<String, String>> fieldsLabels = computeFields(ov);
+      for(Pair<String, String> label : fieldsLabels){
+         DefaultMutableTreeNode name = new DefaultMutableTreeNode(label.first + "=" + label.second);
+         fields.add(name);
 		}
 
 		//Array Fields
-		if(sortName.endsWith("[]")){
+		if(hasArrayFields(sortName)){
 			DefaultMutableTreeNode arrayFields = new DefaultMutableTreeNode("Array Fields");
 			object.add(arrayFields);
-			for(int i = 0; i< ov.getLength(); ++i){					
-				DefaultMutableTreeNode arrayField = new DefaultMutableTreeNode("["+i+"]="+ov.getArrayValue(i));
-				//DefaultMutableTreeNode arrayFieldValue = new DefaultMutableTreeNode(ov.getArrayValue(i));
-				//arrayField.add(arrayFieldValue);
-				arrayFields.add(arrayField);					
+			List<String> arrayFieldLabels = computeArrayFields(ov);
+			for (String field : arrayFieldLabels) {
+            DefaultMutableTreeNode arrayField = new DefaultMutableTreeNode(field);
+            arrayFields.add(arrayField);              
 			}
 		}
 
@@ -176,20 +156,75 @@ public class CETree {
 		//Fun Values
 		DefaultMutableTreeNode functionValues = new DefaultMutableTreeNode("Functions");
 		object.add(functionValues);
-		for(Entry<String,String> e : ov.getFunValues().entrySet()){
-			DefaultMutableTreeNode fun = new DefaultMutableTreeNode(Model.removePipes(e.getKey())+"="+e.getValue());
-			//DefaultMutableTreeNode funValue =  new DefaultMutableTreeNode(e.getValue());
-			//fun.add(funValue);
-			functionValues.add(fun);
+		List<Pair<String, String>> functionLabels = computeFunctions(ov);
+		for (Pair<String, String> functionLabel : functionLabels) {
+         DefaultMutableTreeNode fun = new DefaultMutableTreeNode(functionLabel.first + "=" + functionLabel.second);
+         functionValues.add(fun);
 		}
 	}
+   
+   public static List<Pair<String, String>> computeFunctions(ObjectVal ov) {
+      List<Pair<String, String>> result = new LinkedList<Pair<String, String>>();
+      for(Entry<String,String> e : ov.getFunValues().entrySet()){
+         result.add(new Pair<String, String>(Model.removePipes(e.getKey()), e.getValue()));
+      }
+      return result;
+   }
+	
+	public static List<String> computeArrayFields(ObjectVal ov) {
+	   List<String> result = new LinkedList<String>();
+	   for(int i = 0; i < ov.getLength(); ++i){              
+         result.add("["+i+"]="+ov.getArrayValue(i)); 
+      }
+	   return result;
+	}
+	
+	public static boolean hasArrayFields(String sortName) {
+	   return sortName.endsWith("[]");
+	}
+	
+	public static String computeSortName(ObjectVal ov) {
+      return ov.getSort() == null ? "java.lang.Object" : ov.getSort().name().toString();
+   }
+
+   public static List<Pair<String, String>> computeObjectProperties(ObjectVal ov, String sortName) {
+	   List<Pair<String, String>> result = new LinkedList<Pair<String, String>>();
+      //Type         
+      sortName = Model.removePipes(sortName);
+      result.add(new Pair<String, String>("Type", sortName));
+
+      //Exact Instance           
+      boolean ei = ov.isExactInstance();
+      result.add(new Pair<String, String>("Exact Instance", ei + ""));
+
+      //Length          
+      int l = ov.getLength();
+      result.add(new Pair<String, String>("Length", l + ""));
+	   return result;
+	}
+   
+   public static List<Pair<String, String>> computeFields(ObjectVal ov) {
+        List<Pair<String, String>> labels = new ArrayList<Pair<String, String>>();
+
+        for(Entry<String,String> e : ov.getFieldvalues().entrySet()) {
+            labels.add(new Pair<String, String>(Model.removePipes(e.getKey()), e.getValue()));
+        }
+
+        // sort the labels alphabetically
+        Collections.sort(labels, IGNORECASE_COMPARATOR);
+        return labels;
+   }
 
 	private void fillLocsets(DefaultMutableTreeNode locsets){
 		for(LocationSet ls : model.getLocsets()){
-			DefaultMutableTreeNode locset = new DefaultMutableTreeNode(Model.removePipes(ls.getName()));
+			DefaultMutableTreeNode locset = new DefaultMutableTreeNode(computeLocationSetName(ls));
 			locsets.add(locset);
 			addLocSetProperties(ls, locset);		
 		}
+	}
+	
+	public static String computeLocationSetName(LocationSet ls) {
+	   return Model.removePipes(ls.getName());
 	}
 
 	/**
@@ -198,23 +233,36 @@ public class CETree {
 	 */
 	private void addLocSetProperties(LocationSet ls,
 			DefaultMutableTreeNode locset) {
-		for(int i = 0; i< ls.size(); ++i){
-			Location l = ls.get(i);
-			String locationName = "("+Model.removePipes(l.getObjectID())+", "+Model.removePipes(l.getFieldID())+")";
+	   List<String> locationNames = computeLocationSetProperties(ls);
+		for (String locationName : locationNames) {
 			DefaultMutableTreeNode locationNode = new DefaultMutableTreeNode(locationName);
 			locset.add(locationNode);
 		}
+	}
+	
+	public static List<String> computeLocationSetProperties(LocationSet ls) {
+	   List<String> result = new LinkedList<String>();
+	   for(int i = 0; i< ls.size(); ++i){
+         Location l = ls.get(i);
+         String locationName = "("+Model.removePipes(l.getObjectID())+", "+Model.removePipes(l.getFieldID())+")";
+         result.add(locationName);
+      }
+	   return result;
 	}
 
 	private void fillSequences(DefaultMutableTreeNode sequences){
 
 		for(Sequence s : model.getSequences()){
-			DefaultMutableTreeNode sequence = new DefaultMutableTreeNode(Model.removePipes(s.getName()));
+			DefaultMutableTreeNode sequence = new DefaultMutableTreeNode(computeSequenceName(s));
 			sequences.add(sequence);
 			addSequenceProperties(s, sequence);
 		}
 
 
+	}
+	
+	public static String computeSequenceName(Sequence s) {
+	   return Model.removePipes(s.getName());
 	}
 
 	/**
@@ -223,38 +271,45 @@ public class CETree {
 	 */
 	private void addSequenceProperties(Sequence s,
 			DefaultMutableTreeNode sequence) {
-		DefaultMutableTreeNode length = new DefaultMutableTreeNode("Length="+s.getLength());
-//		DefaultMutableTreeNode lengthValue = new DefaultMutableTreeNode(s.getLength());
-//		length.add(lengthValue);
-		sequence.add(length);
+	   List<String> labels = computeSequenceProperties(s);
+	   for (String label : labels) {
+         DefaultMutableTreeNode node = new DefaultMutableTreeNode(label);
+         sequence.add(node);
+	   }
+	}
+	
+	public static List<String> computeSequenceProperties(Sequence s) {
+	   List<String> result = new LinkedList<String>();
+	   result.add("Length="+s.getLength());
 
-		for(int i = 0; i < s.getLength(); ++i){
-
-			DefaultMutableTreeNode arrField = new DefaultMutableTreeNode("["+i+"]="+Model.removePipes(s.get(i)));
-			//			DefaultMutableTreeNode arrValue = new DefaultMutableTreeNode(s.get(i));
-			//			arrField.add(arrValue);
-			sequence.add(arrField);
-
-		}
+      for(int i = 0; i < s.getLength(); ++i){
+         result.add("["+i+"]="+Model.removePipes(s.get(i)));
+      }
+      return result;
 	}
 
 	private void fillConstants(DefaultMutableTreeNode constants) {
+        List<Pair<String, String>> labels = computeConstantLabels(model);
 
-		Map<String, String> map = model.getConstants();
-        List<String> labels = new ArrayList<String>();
-
-        for(Entry<String,String> e : map.entrySet()) {
-            labels.add(Model.removePipes(e.getKey())+"="+e.getValue());
-        }
-
-        // sort the labels alphabetically
-        Collections.sort(labels, IGNORECASE_COMPARATOR);
-
-        for(String label : labels){
-            DefaultMutableTreeNode name = new DefaultMutableTreeNode(label);
+        for(Pair<String, String> label : labels){
+            DefaultMutableTreeNode name = new DefaultMutableTreeNode(label.first + "=" + label.second);
 			constants.add(name);
 		}
 
+	}
+	
+	public static List<Pair<String, String>> computeConstantLabels(Model model) {
+	   Map<String, String> map = model.getConstants();
+      List<Pair<String, String>> labels = new ArrayList<Pair<String, String>>();
+
+      for(Entry<String,String> e : map.entrySet()) {
+          labels.add(new Pair<String, String>(Model.removePipes(e.getKey()), e.getValue()));
+      }
+      
+      // sort the labels alphabetically
+      Collections.sort(labels, IGNORECASE_COMPARATOR);
+      
+      return labels;
 	}
 
 	private class CEMouseAdapter extends MouseAdapter {

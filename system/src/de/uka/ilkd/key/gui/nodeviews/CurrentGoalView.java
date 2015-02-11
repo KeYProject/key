@@ -21,6 +21,7 @@ import java.awt.dnd.DropTarget;
 
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -30,6 +31,7 @@ import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
+import java.util.EventObject;
 import java.util.LinkedList;
 
 /**
@@ -84,7 +86,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
              * invoked if a frame that wants modal access is opened
              */
             @Override
-            public void modalDialogOpened(GUIEvent e) {
+            public void modalDialogOpened(EventObject e) {
 
                 // enable textual DnD in case that the opened model dialog
                 // is the ApplyTacletDialog
@@ -100,7 +102,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
              * invoked if a frame that wants modal access is closed
              */
             @Override
-            public void modalDialogClosed(GUIEvent e) {
+            public void modalDialogClosed(EventObject e) {
                 if (e.getSource() instanceof ApplyTacletDialog) {
                     // disable drag'n'drop ...
                     listener.setModalDragNDropEnabled(false);
@@ -116,7 +118,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
              * invoked if the user wants to abort the proving session
              */
             @Override
-            public void shutDown(GUIEvent e) {
+            public void shutDown(EventObject e) {
             }
         };
 
@@ -155,7 +157,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
 
         updateHighlights.clear();
-        Range[] ranges = getLogicPrinter().getPositionTable().getUpdateRanges();
+        Range[] ranges = getLogicPrinter().getInitialPositionTable().getUpdateRanges();
 
         if (ranges != null) {
             for (Range range : ranges) {
@@ -226,9 +228,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         lastHighlightedCaretPos = correctedViewToModel(p);
     }
 
-    /**
-     * makes the last caret position visible (if possible)
-     */
     void restorePosition() {
         int lastHighlightedCaretPosTmp = lastHighlightedCaretPos;
         if (!(lastHighlightedCaretPosTmp < 0 || getDocument() == null
@@ -243,9 +242,9 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     public void setPrinter(Goal goal) {
         filter = new IdentitySequentPrintFilter(goal.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(null),
-                getMediator().getNotationInfo(),
-                mediator.getServices(),
-                getVisibleTermLabels()));
+                                                    getMediator().getNotationInfo(),
+                                                    mediator.getServices(),
+                                                    getVisibleTermLabels()));
     }
 
     protected SequentPrintFilter getSequentPrintFilter() {

@@ -50,7 +50,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
@@ -87,6 +86,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
@@ -121,15 +121,17 @@ import org.key_project.util.eclipse.setup.SetupStartup;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithResult;
+import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.internal.ContextMenuHelper;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -224,7 +226,7 @@ public class TestUtilsUtil {
             try {
                JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
                IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(project.getFullPath())};
-               entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
+               entries = ArrayUtil.addAll(entries, JDTUtil.getDefaultJRELibrary());
                page.init(javaProject, project.getFullPath(), entries, false);
                page.configureJavaProject(null);
             }
@@ -255,50 +257,7 @@ public class TestUtilsUtil {
     * @throws InterruptedException Occurred Exception.
     */
    public static IJavaProject createJavaProject(String name) throws CoreException, InterruptedException {
-      IProject project = createProject(name);
-      final IFolder bin = project.getFolder("bin");
-      if (!bin.exists()) {
-         bin.create(true, true, null);
-      }
-      final IFolder src = project.getFolder("src");
-      if (!src.exists()) {
-         src.create(true, true, null);
-      }
-      final IJavaProject javaProject = JavaCore.create(project); 
-      IRunnableWithException run = new AbstractRunnableWithException() {
-         @Override
-         public void run() {
-            try {
-               JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
-               IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(src.getFullPath())};
-               entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
-               page.init(javaProject, bin.getFullPath(), entries, false);
-               page.configureJavaProject(null);
-            }
-            catch (Exception e) {
-               setException(e);
-            }
-         }
-      };
-      Display.getDefault().syncExec(run);
-      if (run.getException() instanceof CoreException) {
-         throw (CoreException)run.getException();
-      }
-      else if (run.getException() instanceof InterruptedException) {
-         throw (InterruptedException)run.getException();
-      }
-      else if (run.getException() != null) {
-         throw new CoreException(new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(run.getException()));
-      }
-      return javaProject;
-   }
-   
-   /**
-    * Returns the default JRE library entries.
-    * @return The default JRE library entries.
-    */
-   public static IClasspathEntry[] getDefaultJRELibrary() {
-       return PreferenceConstants.getDefaultJRELibrary();
+      return JDTUtil.createJavaProject(name);
    }
 
    /**
@@ -1861,6 +1820,26 @@ public class TestUtilsUtil {
    }
 
    /**
+    * Selects the given text in the given {@link SWTBotStyledText}.
+    * @param styledText The {@link SWTBotStyledText} to select text in.
+    * @param text The text to select.
+    * @return The x and y coordinate of the selected text.
+    */
+   public static Point selectText(final SWTBotStyledText styledText, 
+                                  final String text) {
+      return syncExec(new Result<Point>() {
+         @Override
+         public Point run() {
+            int index = styledText.widget.getText().indexOf(text);
+            styledText.widget.setCaretOffset(index);
+            styledText.widget.setSelection(index, index + text.length());
+            int offset = styledText.widget.getCaretOffset();
+            return styledText.widget.getLocationAtOffset(offset);
+         }
+      });
+   }
+   
+   /**
     * Ensures that the given arrays contain the same elements.
     * @param expected The first array.
     * @param actual The second array.
@@ -1940,6 +1919,41 @@ public class TestUtilsUtil {
          @Override
          public String getFailureMessage() {
             return "Timed out waiting for " + table + " to contain at least " + minRowCount + " rows.";
+         }
+      });
+   }
+
+   /**
+    * Compares the given {@link String}s ignoring white space.
+    * @param expected The expected text.
+    * @param actual The actual text.
+    */
+   public static void assertEqualsIgnoreWhiteSpace(String expected, String actual) {
+      if (!StringUtil.equalIgnoreWhiteSpace(expected, actual)) {
+         assertEquals(expected, actual);
+      }
+   }
+
+   /**
+    * Waits until the given {@link IProject} exists and is open.
+    * @param bot The {@link SWTBot} to use.
+    * @param project The {@link IProject} to wait for.
+    */
+   public static void waitForProject(SWTBot bot, final IProject project) {
+      assertNotNull(project);
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return project.exists() && project.isOpen();
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "Timed out waiting for " + project + " to exist and to be open.";
          }
       });
    }

@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -59,7 +60,6 @@ public final class LocationVariable extends ProgramVariable
     }
 
 
-
     public LocationVariable(ProgramElementName name, Sort s) {
         super(name, s, null, null, false, false, false);
     }
@@ -68,5 +68,17 @@ public final class LocationVariable extends ProgramVariable
     @Override
     public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
         v.performActionOnLocationVariable(this);
+    }
+
+
+    @Override
+    public UpdateableOperator rename(Name name) {
+        if (getKeYJavaType() != null) {
+        return new LocationVariable(new ProgramElementName(name.toString()),
+                                    getKeYJavaType(), getContainerType(),
+                                    isStatic(), isModel());
+        } else {
+            return new LocationVariable(new ProgramElementName(name.toString()), sort());
+        }
     }
 }

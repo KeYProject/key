@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_5d058b13-36cf-4f82-977f-2665e7a72652" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_6141aa0d-d117-4ba1-8fb0-4b4bb96d6dfe" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_86a57ecf-b905-40da-92b2-4ed39e97b74e" name="&lt;call self.main()&gt;" pathCondition="true" lineNumber="-1" charStart="41" charEnd="45" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java">
-            <sedStatement xml:id="_bf015bee-5587-4f1b-acf6-18657acef54e" name="throw new RuntimeException ();" pathCondition="true" lineNumber="-1" charStart="53" charEnd="82" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java">
-               <sedExceptionalTermination xml:id="_1d73dd9d-f5b6-418e-b5ca-f4311c90ec8c" name="&lt;uncaught java.lang.RuntimeException&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java" verified="true">
-               </sedExceptionalTermination>
+   <sedTarget xml:id="_e311c7d7-3ab8-443d-8d6c-2f0e90d65d7b" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_ebb41b0e-3961-4347-9356-70af2180b2b2" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java">
+         <sedMethodCall xml:id="_8cf02981-f47f-45f3-a40e-62daae966989" name="&lt;call self.main()&gt;" pathCondition="true" lineNumber="-1" charStart="41" charEnd="45" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java" groupable="true">
+            <sedStatement xml:id="_1b496024-41df-4bef-a069-c6fc7e2d2d8b" name="throw new RuntimeException ();" pathCondition="true" lineNumber="-1" charStart="53" charEnd="82" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java">
+               <sedExceptionalMethodReturn xml:id="_074352a5-6001-4575-a778-1e9dd04fc49f" name="&lt;exceptional return of &lt;call self.main()&gt;&gt;" pathCondition="true" lineNumber="-1" charStart="41" charEnd="45" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java" methodReturnConditionRef="_1ffadbcd-a892-4249-aae7-9df4d43d2750">
+                  <sedExceptionalTermination xml:id="_ea388630-c8c2-41eb-ad16-8927ce962111" name="&lt;uncaught java.lang.RuntimeException&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java" verified="true">
+                  </sedExceptionalTermination>
+                  <sedGroupEndConditionReference nodeIdRef="_1ffadbcd-a892-4249-aae7-9df4d43d2750"/>
+               </sedExceptionalMethodReturn>
             </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_1ffadbcd-a892-4249-aae7-9df4d43d2750" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_074352a5-6001-4575-a778-1e9dd04fc49f"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_1ffadbcd-a892-4249-aae7-9df4d43d2750" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_074352a5-6001-4575-a778-1e9dd04fc49f"/>
+            </sedGroupEndCondition>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_1d73dd9d-f5b6-418e-b5ca-f4311c90ec8c"/>
+         <sedTerminationEntry nodeIdRef="_ea388630-c8c2-41eb-ad16-8927ce962111"/>
       </sedThread>
    </sedTarget>
 </launch>

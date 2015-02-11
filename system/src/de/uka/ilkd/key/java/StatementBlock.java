@@ -82,6 +82,24 @@ public class StatementBlock extends JavaStatement
 	this(new ImmutableArray<Statement>(body));
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || !(o instanceof StatementBlock)) {
+            return false;
+        }
+        StatementBlock block = (StatementBlock)o;
+
+        return super.equals(block)
+                && (this.getStartPosition().equals(Position.UNDEFINED) ||
+                        block.getStartPosition().equals(Position.UNDEFINED) ||
+                        this.getStartPosition().getLine() == block.getStartPosition().getLine());
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
     private ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends Statement> b) {
         return computePrefixElements(b,0,this);
     }
@@ -232,6 +250,12 @@ public class StatementBlock extends JavaStatement
         return (e instanceof StatementBlock) ? e.getFirstElement() : e;
     }
 
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       if (isEmpty()) return this;
+       else return getBody().get(0);
+    }
+
     public int getPrefixLength() {
         return prefixElementArray.size();
     }
@@ -250,8 +274,4 @@ public class StatementBlock extends JavaStatement
         }
         return firstActiveChildPos;
     }
-
-
-
-
 }

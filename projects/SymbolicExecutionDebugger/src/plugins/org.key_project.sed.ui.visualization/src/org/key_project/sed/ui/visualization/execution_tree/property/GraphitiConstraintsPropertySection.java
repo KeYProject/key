@@ -30,4 +30,12 @@ public class GraphitiConstraintsPropertySection extends AbstractGraphitiDebugNod
    protected ISEDDebugNodeTabContent createContent() {
       return new ConstraintsTabComposite();
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean shouldUseExtraSpace() {
+      return true;
+   }
 }

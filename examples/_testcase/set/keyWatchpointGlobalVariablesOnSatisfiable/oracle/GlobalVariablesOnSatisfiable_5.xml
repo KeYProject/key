@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call GlobalVariablesOnSatisfiable.doSomething()&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (x_global&gt;=0)" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (x_global&gt;=0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="gt(int::select(heap,null,GlobalVariablesOnSatisfiable::$x_global),Z(neglit(1(#))))" pathCondition="gt(int::select(heap,null,GlobalVariablesOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(int::select(heap,null,GlobalVariablesOnSatisfiable::$x_global),Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="main(x_global);" pathCondition="gt(int::select(heap,null,GlobalVariablesOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false">
                <methodCall name="&lt;call GlobalVariablesOnSatisfiable.main(x_2)&gt;" pathCondition="gt(int::select(heap,null,GlobalVariablesOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false">
-                  <branchStatement name="if (x_2&gt;=0)" pathCondition="gt(int::select(heap,null,GlobalVariablesOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false">
+                  <branchStatement name="if (x_2&gt;=0)" pathCondition="gt(int::select(heap,null,GlobalVariablesOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false" blockOpened="true">
                      <statement name="return 42;" pathCondition="gt(int::select(heap,null,GlobalVariablesOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false">
                      </statement>
                   </branchStatement>
@@ -15,7 +15,7 @@
          <branchCondition name="lt(int::select(heap,null,GlobalVariablesOnSatisfiable::$x_global),Z(0(#)))" pathCondition="lt(int::select(heap,null,GlobalVariablesOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="true" branchCondition="lt(int::select(heap,null,GlobalVariablesOnSatisfiable::$x_global),Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="main(x_global);" pathCondition="lt(int::select(heap,null,GlobalVariablesOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false">
                <methodCall name="&lt;call GlobalVariablesOnSatisfiable.main(x_3)&gt;" pathCondition="lt(int::select(heap,null,GlobalVariablesOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false">
-                  <branchStatement name="if (x_3&gt;=0)" pathCondition="lt(int::select(heap,null,GlobalVariablesOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false">
+                  <branchStatement name="if (x_3&gt;=0)" pathCondition="lt(int::select(heap,null,GlobalVariablesOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false" blockOpened="true">
                      <statement name="return -4711;" pathCondition="lt(int::select(heap,null,GlobalVariablesOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false">
                      </statement>
                   </branchStatement>

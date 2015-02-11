@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.rule.label;
 
-import java.util.List;
+import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -50,7 +51,8 @@ public class LoopInvariantNormalBehaviorTermLabelUpdate implements TermLabelUpda
     * {@inheritDoc}
     */
    @Override
-   public void updateLabels(Services services,
+   public void updateLabels(TermLabelState state,
+                            Services services,
                             PosInOccurrence applicationPosInOccurrence,
                             Term applicationTerm,
                             Term modalityTerm,
@@ -62,7 +64,7 @@ public class LoopInvariantNormalBehaviorTermLabelUpdate implements TermLabelUpda
                             ImmutableArray<Term> newTermSubs,
                             ImmutableArray<QuantifiableVariable> newTermBoundVars,
                             JavaBlock newTermJavaBlock,
-                            List<TermLabel> labels) {
+                            Set<TermLabel> labels) {
       if (rule instanceof WhileInvariantRule &&
           "LoopBodyImplication".equals(hint) &&
           SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {

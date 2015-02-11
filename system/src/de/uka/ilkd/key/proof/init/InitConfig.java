@@ -22,7 +22,6 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
@@ -39,6 +38,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
+import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
  * an instance of this class describes the initial configuration of the prover.
@@ -121,7 +121,7 @@ public class InitConfig {
      * to the used program model
      * @return the Services of this initial configuration
      */
-    public Services getServices() {
+    public final Services getServices() {
         return services;
     }
 
@@ -391,12 +391,12 @@ public class InitConfig {
 
     
     public void setSettings(ProofSettings newSettings) {
-      this.settings = newSettings;	  
-	}
+        this.settings = newSettings;
+    }
     
     
     public ProofSettings getSettings() {
-       return settings;
+        return settings;
     }
 
 
@@ -439,6 +439,7 @@ public class InitConfig {
     
     
 
+    @Override
     public String toString() {
         return
             "Namespaces:" + namespaces() +"\n" +

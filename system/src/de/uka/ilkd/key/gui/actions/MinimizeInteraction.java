@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /*
  * Is this a legacy option?

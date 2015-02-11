@@ -21,9 +21,9 @@ import java.util.List;
  * @author Martin Hentschel
  */
 public interface IProofFileParser {
-   void beginExpr(char eid, String str) throws ProblemLoaderException;
+   void beginExpr(char eid, String str);
 
-   void endExpr(char eid, int stringLiteralLine) throws ProblemLoaderException;
+   void endExpr(char eid, int stringLiteralLine);
 
    String getStatus();
 

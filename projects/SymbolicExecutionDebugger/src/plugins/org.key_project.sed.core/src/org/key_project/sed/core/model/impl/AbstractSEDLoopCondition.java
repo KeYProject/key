@@ -23,7 +23,7 @@ import org.key_project.sed.core.model.ISEDThread;
  * @author Martin Hentschel
  * @see ISEDLoopCondition
  */
-public abstract class AbstractSEDLoopCondition extends AbstractSEDStackFrameCompatibleDebugNode implements ISEDLoopCondition {
+public abstract class AbstractSEDLoopCondition extends AbstractSEDGroupableStackFrameCompatibleDebugNode implements ISEDLoopCondition {
    /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this loop condition is contained.

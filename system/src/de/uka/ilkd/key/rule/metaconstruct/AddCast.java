@@ -37,6 +37,6 @@ public final class AddCast extends AbstractTermTransformer {
 	
 	return sub.sort().extendsTrans(sort) 
 	       ? sub 
-	       : services.getTermBuilder().cast(services, sort, sub);
+	       : services.getTermBuilder().cast(sort, sub);
     }
 }

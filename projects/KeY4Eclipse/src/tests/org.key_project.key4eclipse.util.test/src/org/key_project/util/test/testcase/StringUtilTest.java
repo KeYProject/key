@@ -26,6 +26,37 @@ import org.key_project.util.java.StringUtil;
  */
 public class StringUtilTest extends TestCase {
    /**
+    * Tests {@link StringUtil#trimRight(String)}.
+    */
+   @Test
+   public void testTrimRight() {
+      // Test empty stuff
+      assertEquals(null, StringUtil.trimRight(null));
+      assertEquals("", StringUtil.trimRight(""));
+      assertEquals("", StringUtil.trimRight(" "));
+      assertEquals("", StringUtil.trimRight("\t"));
+      assertEquals("", StringUtil.trimRight("\n"));
+      assertEquals("", StringUtil.trimRight("\r"));
+      assertEquals("", StringUtil.trimRight("           "));
+      // Test without whitespaces
+      assertEquals("a", StringUtil.trimRight("a"));
+      assertEquals("hello", StringUtil.trimRight("hello"));
+      assertEquals("hello world!", StringUtil.trimRight("hello world!"));
+      // Test leading whitespaces
+      assertEquals("  a", StringUtil.trimRight("  a"));
+      assertEquals("  hello", StringUtil.trimRight("  hello"));
+      assertEquals("  hello world!", StringUtil.trimRight("  hello world!"));
+      // Test right whitespaces
+      assertEquals("a", StringUtil.trimRight("a  "));
+      assertEquals("hello", StringUtil.trimRight("hello  "));
+      assertEquals("hello world!", StringUtil.trimRight("hello world!  "));
+      // Test left and right whitespaces
+      assertEquals("  a", StringUtil.trimRight("  a "));
+      assertEquals("  hello", StringUtil.trimRight("  hello\t"));
+      assertEquals("  hello world!", StringUtil.trimRight("  hello world! \t\n "));
+   }
+   
+   /**
     * Tests {@link StringUtil#fillString(String, char, int)}.
     */
    @Test

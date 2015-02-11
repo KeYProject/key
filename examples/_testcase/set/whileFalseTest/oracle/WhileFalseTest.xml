@@ -2,8 +2,8 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
-         <loopStatement name="while ( false )" pathCondition="true" pathConditionChanged="false">
-            <loopCondition name="false" pathCondition="true" pathConditionChanged="false">
+         <loopStatement name="while ( false )" pathCondition="true" pathConditionChanged="false" blockOpened="false">
+            <loopCondition name="false" pathCondition="true" pathConditionChanged="false" blockOpened="false">
                <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">

@@ -63,7 +63,7 @@ public class ProofFileLightweightLabelDecorator extends BaseLabelProvider implem
    @Override
    public void decorate(Object element, IDecoration decoration) {
       try {
-         if (element instanceof IFile) {
+         if (element instanceof IFile && KeYResourcesUtil.isProofFile((IFile) element)) {
             IFile file = (IFile) element;
             List<IFile> cycle = KeYResourcesUtil.getProofRecursionCycle(file);
             if (!CollectionUtil.isEmpty(cycle)) {

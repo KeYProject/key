@@ -346,6 +346,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                      ScaleFeature.createScaled ( FindDepthFeature.INSTANCE, 10.0 ) ) );        
         bindRuleSet ( d, "simplify", -4500 );        
         bindRuleSet ( d, "simplify_enlarging", -2000 );
+        bindRuleSet ( d, "simplify_ENLARGING", -1900 );
         bindRuleSet ( d, "simplify_expression", -100 );
         bindRuleSet ( d, "executeIntegerAssignment", -100 );
 
@@ -356,6 +357,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
 
         setupSelectSimplification(d);
+
+        bindRuleSet (d, "no_self_application", ifZero ( MatchedIfFeature.INSTANCE,
+                                                        NoSelfApplicationFeature.INSTANCE ) );
+
+        bindRuleSet (d, "find_term_not_in_assumes",
+                ifZero ( MatchedIfFeature.INSTANCE,
+                         not( contains(AssumptionProjection.create(0),
+                                       FocusProjection.INSTANCE) ) ) );
 
         bindRuleSet (d, "update_elim",
                 add( longConst(-8000), ScaleFeature.createScaled ( FindDepthFeature.INSTANCE, 10.0 ) ) ); 
@@ -603,6 +612,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             bindRuleSet ( d, "auto_induction_lemma", inftyConst());           
         }
 
+        bindRuleSet(d, "information_flow_contract_appl", longConst(1000000));
+
+        bindRuleSet(d, "hide", inftyConst());
+
         if (strategyProperties.contains(StrategyProperties.AUTO_INDUCTION_ON) || 
               strategyProperties.contains(StrategyProperties.AUTO_INDUCTION_LEMMA_ON)) {
            bindRuleSet (d, "induction_var", 0);
@@ -652,10 +665,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                       add( applyTF("t1", IsSelectSkolemConstantTermFeature.INSTANCE),
                            longConst(-5500) ) );
         bindRuleSet ( d, "hide_auxiliary_eq",
-                      // hide auxiliary equation after the skolem constatns have
+                      // hide auxiliary equation after the skolem constants have
                       // been replaced by it's computed value
-                      add( applyTF( "auxiliarySK", IsSelectSkolemConstantTermFeature.INSTANCE),
-                           applyTF( "result", rec( any(), add( SimplifiedSelectTermFeature.create(heapLDT),
+                               add( applyTF( "auxiliarySK", IsSelectSkolemConstantTermFeature.INSTANCE),
+                                    applyTF( "result", rec( any(), add( SimplifiedSelectTermFeature.create(heapLDT),
                                                                not( ff.ifThenElse ) ) ) ),
                            not( ContainsTermFeature.create( instOf("result"),
                                                             instOf("auxiliarySK") ) ),

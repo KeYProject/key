@@ -14,6 +14,10 @@ package de.uka.ilkd.key.gui;
 
 import javax.swing.SwingWorker;
 
+import de.uka.ilkd.key.core.InterruptListener;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.ProverTaskListener;
+import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;

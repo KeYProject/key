@@ -406,11 +406,11 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final ProgramVariable pv = (ProgramVariable) forInit.getVariables()
                 .get(0).getProgramVariable();
 
-        final For forLoop = new For(new LoopInitializer[] { forInit },
-                new LessThan(pv,
-                        new FieldReference(length, new ThisReference())),
-                new Expression[] { new PostIncrement(pv) }, assign(
-                        new ArrayReference(new ThisReference(),
+        final For forLoop =
+                new For(new LoopInitializer[] { forInit },
+                        new LessThan(pv, new FieldReference(length, new ThisReference())),
+                        new Expression[] { new PostIncrement(pv) },
+                        assign(new ArrayReference(new ThisReference(),
                                 new Expression[] { pv }), defaultValue));
 
         final StatementBlock body = new StatementBlock(

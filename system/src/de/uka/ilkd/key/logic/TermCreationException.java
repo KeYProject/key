@@ -38,7 +38,7 @@ public class TermCreationException extends RuntimeException {
 	for (int i = 0, n = subs.size(); i < n; i++) {
 	    Term sub = subs.get(i);
 	    assert sub == failed.subs().get(i);
-	}            
+	}
 
 	errorMessage = 
 	    "Building a term failed. Normally there is an arity mismatch " +

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EventObject;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,12 +29,8 @@ import java.util.Vector;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.RuleAppListener;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.gui.configuration.SettingsListener;
+import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.core.RuleAppListener;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -44,6 +41,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.init.InfFlowProofSymbols;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -54,9 +52,14 @@ import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
@@ -136,17 +139,27 @@ public class Proof implements Named {
 
     /** list of rule app listeners */
     private List<RuleAppListener> ruleAppListenerList = Collections.synchronizedList(new ArrayList<RuleAppListener>(10));
+    /**
+     * For saving and loading Information-Flow proofs, we need to remember the
+     * according taclets, program variables, functions and such.
+     */
+    private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
 
     /**
      * Contains all registered {@link ProofDisposedListener}.
      */
     private final List<ProofDisposedListener> proofDisposedListener = new LinkedList<ProofDisposedListener>();
-    
+
     /**
      * The {@link File} under which this {@link Proof} was saved the last time if available or {@code null} otherwise.
      */
     private File proofFile;
-    
+
+    /**
+     * Aggregated proof statistics from other proofs which contributed to this one.
+     */
+    private SideProofStatistics sideProofStatistics = null;
+
     /** 
      * constructs a new empty proof with name 
      */
@@ -156,23 +169,23 @@ public class Proof implements Named {
         this.initConfig = initConfig;
 
         if (initConfig.getSettings() == null) {
-        	// if no settings have been assigned yet, take default settings
+            // if no settings have been assigned yet, take default settings
             initConfig.setSettings( new ProofSettings(ProofSettings.DEFAULT_SETTINGS) );
         }
-        
+
         this.initConfig.getServices().setProof(this);
         this.proofFile = initConfig.getServices().getJavaModel() != null ? initConfig.getServices().getJavaModel().getInitialFile() : null;
 
         settingsListener =
                         new SettingsListener () {
             @Override
-            public void settingsChanged ( GUIEvent config ) {
+            public void settingsChanged ( EventObject config ) {
                 updateStrategyOnGoals();
             }
         };
 
         localMgt = new ProofCorrectnessMgt(this);
-        
+
         initConfig.getSettings().getStrategySettings().addSettingsListener(settingsListener);
 
         pis = ProofIndependentSettings.DEFAULT_INSTANCE;
@@ -244,9 +257,13 @@ public class Proof implements Named {
 
     /**
      * Cut off all reference such that it does not lead to a big memory leak
-     * if someone still holds a refernce to this proof object.
+     * if someone still holds a reference to this proof object.
      */
     public void dispose() {
+        if (isDisposed()) {
+            return;
+        }
+
         // Do required cleanup
         if (getServices() != null) {
             getServices().getSpecificationRepository().removeProof(this);
@@ -289,6 +306,7 @@ public class Proof implements Named {
      * returns the name of the proof. Describes in short what has to be proved.
      * @return the name of the proof
      */
+    @Override
     public Name name() {
         return name;
     }
@@ -413,6 +431,77 @@ public class Proof implements Named {
     }
     public ProofIndependentSettings getProofIndependentSettings(){
         return pis;
+    }
+
+    public InfFlowProofSymbols removeInfFlowProofSymbols() {
+        InfFlowProofSymbols symbols = infFlowSymbols;
+        infFlowSymbols = new InfFlowProofSymbols();
+        return symbols;
+    }
+
+    public InfFlowProofSymbols getIFSymbols() {
+        assert infFlowSymbols != null;
+        return infFlowSymbols;
+    }
+
+    public void addIFSymbol(Object s) {
+        assert s != null;
+        if (s instanceof Term) {
+            infFlowSymbols.add((Term)s);
+        } else if (s instanceof Named) {
+            infFlowSymbols.add((Named)s);
+        } else {
+            throw new UnsupportedOperationException("Not a valid proof symbol for IF proofs.");
+        }
+    }
+
+    public void addLabeledIFSymbol(Object s) {
+        assert s != null;
+        if (s instanceof Term) {
+            infFlowSymbols.addLabeled((Term)s);
+        } else if (s instanceof Named) {
+            infFlowSymbols.addLabeled((Named)s);
+        } else {
+            throw new UnsupportedOperationException("Not a valid proof symbol for IF proofs.");
+        }
+    }
+
+    public void addTotalTerm(Term p) {
+        assert p != null;
+        infFlowSymbols.addTotalTerm(p);
+    }
+
+    public void addLabeledTotalTerm(Term p) {
+        assert p != null;
+        infFlowSymbols.addLabeledTotalTerm(p);
+    }
+
+    public void addGoalTemplates(Taclet t) {
+        assert t != null;
+        ImmutableList<TacletGoalTemplate> temps = t.goalTemplates();
+        assert temps != null;
+        for (TacletGoalTemplate tgt: temps) {
+            for (SequentFormula sf: tgt.sequent().antecedent().toList()) {
+                addLabeledTotalTerm(sf.formula());
+            }
+            for (SequentFormula sf: tgt.sequent().succedent().toList()) {
+                addLabeledTotalTerm(sf.formula());
+            }
+        }
+    }
+
+    public void unionIFSymbols(InfFlowProofSymbols symbols) {
+        assert symbols != null;
+        infFlowSymbols = infFlowSymbols.union(symbols);
+    }
+
+    public void unionLabeledIFSymbols(InfFlowProofSymbols symbols) {
+        assert symbols != null;
+        infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
+    }
+
+    public String printIFSymbols() {
+        return infFlowSymbols.printProofSymbols();
     }
 
     /**
@@ -547,6 +636,7 @@ public class Proof implements Named {
         return root.isClosed() && openGoals.isEmpty();
     }
 
+
     /**
      * This class is responsible for pruning a proof tree at a certain cutting point.
      * It has been introduced to encapsulate the methods that are needed for pruning.
@@ -614,8 +704,15 @@ public class Proof implements Named {
                     }
 
                     firstGoal.pruneToParent();
+
+                    final List<StrategyInfoUndoMethod> undoMethods =
+                            visitedNode.getStrategyInfoUndoMethods();
+                    for (StrategyInfoUndoMethod undoMethod : undoMethods) {
+                        firstGoal.undoStrategyInfoAdd(undoMethod);
+                    }
                 }
             });
+
 
             // do some cleaning and refreshing: Clearing indices, caches....
             refreshGoal(firstGoal,cuttingPoint);
@@ -940,7 +1037,6 @@ public class Proof implements Named {
         return root.countBranches();
     }
 
-
     /** Retrieves a bunch of statistics to the proof tree.
      * This implementation traverses the proof tree only once.
      * Statistics are not cached; don't call this method too often.
@@ -961,6 +1057,138 @@ public class Proof implements Named {
         result.append("\nProoftree:\n");
         result.append(root.toString());
         return result.toString();
+    }
+
+    public boolean hasSideProofs() {
+        return this.sideProofStatistics != null;
+    }
+
+    public void addSideProof(Proof proof) {
+        assert proof != null;
+        if (proof.hasSideProofs()) {
+        	if (this.hasSideProofs()) {
+        		sideProofStatistics = sideProofStatistics.add(proof.sideProofStatistics);
+        	} else {
+        		sideProofStatistics = SideProofStatistics.create(proof.sideProofStatistics);
+        	}
+        	proof.sideProofStatistics = null;
+        }
+        addSideProofStatistics(proof.statistics());
+    }
+
+    private void addSideProofStatistics(Statistics stat) {
+        assert stat != null;
+        if (this.hasSideProofs()) {
+            sideProofStatistics = sideProofStatistics.add(stat);
+        } else {
+            sideProofStatistics = SideProofStatistics.create(stat);
+        }
+    }
+
+    private final static class SideProofStatistics {
+        private final int sideProofs;
+        private final int nodes;
+        private final int branches;
+        private final int interactiveSteps;
+        private final int quantifierInstantiations;
+        private final int ossApps;
+        private final int totalRuleApps;
+        private final int smtSolverApps;
+        private final int dependencyContractApps;
+        private final int operationContractApps;
+        private final int loopInvApps;
+        private final long autoModeTime;
+        private final float timePerStep;
+
+        private SideProofStatistics(int sideProofs,
+                                    int nodes,
+                                    int branches,
+                                    int interactiveSteps,
+                                    int quantifierInstantiations,
+                                    int ossApps,
+                                    int totalRuleApps,
+                                    int smtSolverApps,
+                                    int dependencyContractApps,
+                                    int operationContractApps,
+                                    int loopInvApps,
+                                    long autoModeTime) {
+            this.sideProofs = sideProofs;
+            this.nodes = nodes;
+            this.branches = branches;
+            this.interactiveSteps = interactiveSteps;
+            this.quantifierInstantiations = quantifierInstantiations;
+            this.ossApps = ossApps;
+            this.totalRuleApps = totalRuleApps;
+            this.smtSolverApps = smtSolverApps;
+            this.dependencyContractApps = dependencyContractApps;
+            this.operationContractApps = operationContractApps;
+            this.loopInvApps = loopInvApps;
+            this.autoModeTime = autoModeTime;
+            this.timePerStep = nodes<=sideProofs? .0f: (autoModeTime/(float)(nodes-sideProofs));
+        }
+
+        private static SideProofStatistics create(SideProofStatistics stat) {
+            return new SideProofStatistics(1, stat.nodes,
+                                           stat.branches,
+                                           stat.interactiveSteps,
+                                           stat.quantifierInstantiations,
+                                           stat.ossApps,
+                                           stat.totalRuleApps,
+                                           stat.smtSolverApps,
+                                           stat.dependencyContractApps,
+                                           stat.operationContractApps,
+                                           stat.loopInvApps,
+                                           stat.autoModeTime);
+        }
+
+        private static SideProofStatistics create(Statistics stat) {
+            return new SideProofStatistics(1, stat.nodes,
+                                           stat.branches,
+                                           stat.interactiveSteps,
+                                           stat.quantifierInstantiations,
+                                           stat.ossApps,
+                                           stat.totalRuleApps,
+                                           stat.smtSolverApps,
+                                           stat.dependencyContractApps,
+                                           stat.operationContractApps,
+                                           stat.loopInvApps,
+                                           stat.autoModeTime);
+        }
+
+        private SideProofStatistics add(SideProofStatistics stat) {
+        	return new SideProofStatistics(this.sideProofs + stat.sideProofs,
+        	                                    this.nodes + stat.nodes,
+                                               this.branches + stat.branches,
+                                               this.interactiveSteps + stat.interactiveSteps,
+                                               this.quantifierInstantiations + stat.quantifierInstantiations,
+                                               this.ossApps + stat.ossApps,
+                                               this.totalRuleApps + stat.totalRuleApps,
+                                               this.smtSolverApps + stat.smtSolverApps,
+                                               this.dependencyContractApps + stat.dependencyContractApps,
+                                               this.operationContractApps + stat.operationContractApps,
+                                               this.loopInvApps + stat.loopInvApps,
+                                               this.autoModeTime + stat.autoModeTime);
+        }
+
+        private SideProofStatistics add(Statistics stat) {
+        	return new SideProofStatistics(this.sideProofs+1, this.nodes + stat.nodes,
+                                               this.branches + stat.branches,
+                                               this.interactiveSteps + stat.interactiveSteps,
+                                               this.quantifierInstantiations + stat.quantifierInstantiations,
+                                               this.ossApps + stat.ossApps,
+                                               this.totalRuleApps + stat.totalRuleApps,
+                                               this.smtSolverApps + stat.smtSolverApps,
+                                               this.dependencyContractApps + stat.dependencyContractApps,
+                                               this.operationContractApps + stat.operationContractApps,
+                                               this.loopInvApps + stat.loopInvApps,
+                                               this.autoModeTime + stat.autoModeTime);
+        }
+
+        private SideProofStatistics setAutoModeTime(long autoTime) {
+            return new SideProofStatistics(sideProofs, nodes, branches, interactiveSteps,
+                            quantifierInstantiations, ossApps, totalRuleApps, smtSolverApps,
+                            dependencyContractApps, operationContractApps, loopInvApps, autoTime);
+        }
     }
 
     /**
@@ -987,6 +1215,49 @@ public class Proof implements Named {
         private List<Pair<String, String>> summaryList =
                         new ArrayList<Pair<String, String>>(14);
 
+        private Statistics(int nodes,
+                           int branches,
+                           int interactiveSteps,
+                           int quantifierInstantiations,
+                           int ossApps,
+                           int totalRuleApps,
+                           int smtSolverApps,
+                           int dependencyContractApps,
+                           int operationContractApps,
+                           int loopInvApps,
+                           long autoModeTime,
+                           long time,
+                           float timePerStep) {
+            this.nodes = nodes;
+            this.branches = branches;
+            this.interactiveSteps = interactiveSteps;
+            this.quantifierInstantiations = quantifierInstantiations;
+            this.ossApps = ossApps;
+            this.totalRuleApps = totalRuleApps;
+            this.smtSolverApps = smtSolverApps;
+            this.dependencyContractApps = dependencyContractApps;
+            this.operationContractApps = operationContractApps;
+            this.loopInvApps = loopInvApps;
+            this.autoModeTime = autoModeTime;
+            this.time = time;
+            this.timePerStep = timePerStep;
+        }
+
+        static Statistics create(SideProofStatistics side) {
+        	return new Statistics(side.nodes,
+                                      side.branches,
+                                      side.interactiveSteps,
+                                      side.quantifierInstantiations,
+                                      side.ossApps,
+                                      side.totalRuleApps,
+                                      side.smtSolverApps,
+                                      side.dependencyContractApps,
+                                      side.operationContractApps,
+                                      side.loopInvApps,
+                                      side.autoModeTime,
+                                      System.currentTimeMillis() - Main.getStartTime(),
+                                      side.timePerStep);
+        }
 
         private Statistics(Proof proof) {
             final Iterator<Node> it = proof.root().subtreeIterator();
@@ -1049,27 +1320,38 @@ public class Proof implements Named {
             this.interactiveSteps = tmpInteractive;
             this.quantifierInstantiations = tmpQuant;
             this.ossApps = tmpOss;
-            this.totalRuleApps = tmpNodes + tmpOssCaptured;
+            this.totalRuleApps = tmpNodes + tmpOssCaptured -1;
             this.smtSolverApps = tmpSmt;
             this.dependencyContractApps = tmpDep;
             this.operationContractApps = tmpContr;
             this.loopInvApps = tmpInv;
             this.autoModeTime = proof.getAutoModeTime();
             this.time = System.currentTimeMillis() - Main.getStartTime();
-            timePerStep = autoModeTime/(float)nodes;
+            timePerStep = nodes<=1? .0f: (autoModeTime/(float)(nodes-1));
 
             generateSummary(proof);
         }
 
         private void generateSummary(Proof proof) {
+            final boolean sideProofs = proof.hasSideProofs();
+            final Statistics stat;
+            if (sideProofs) {
+                final long autoTime = proof.getAutoModeTime()
+                        + proof.sideProofStatistics.autoModeTime;
+                final SideProofStatistics side = proof.sideProofStatistics.add(this).setAutoModeTime(autoTime);
+                stat = Statistics.create(side);
+            } else {
+                stat = this;
+            }
+
             final String nodeString =
-                            EnhancedStringBuffer.format(nodes).toString();
+                            EnhancedStringBuffer.format(stat.nodes).toString();
             summaryList.add(new Pair<String, String>("Nodes", nodeString));
             summaryList.add(new Pair<String, String>("Branches",
-                            EnhancedStringBuffer.format(branches).toString()));
+                            EnhancedStringBuffer.format(stat.branches).toString()));
             summaryList.add(new Pair<String, String>("Interactive steps", "" +
-                            interactiveSteps));
-            final long time = proof.getAutoModeTime();
+                            stat.interactiveSteps));
+            final long time = sideProofs ? stat.autoModeTime : proof.getAutoModeTime();
             summaryList.add(new Pair<String, String>("Automode time",
                             EnhancedStringBuffer.formatTime(time).toString()));
             if (time >= 10000) {
@@ -1077,8 +1359,8 @@ public class Proof implements Named {
                                 time +
                                 "ms"));
             }
-            if (nodes > 0) {
-                String avgTime = "" + timePerStep;
+            if (stat.nodes > 0) {
+                String avgTime = "" + stat.timePerStep;
                 // round to 3 digits after point
                 int i = avgTime.indexOf('.')+4;
                 if (i > avgTime.length()) i = avgTime.length();
@@ -1090,19 +1372,19 @@ public class Proof implements Named {
 
             summaryList.add(new Pair<String, String>("Rule applications", ""));
             summaryList.add(new Pair<String, String>("Quantifier instantiations",
-                                                     ""+quantifierInstantiations));
+                                                     ""+stat.quantifierInstantiations));
             summaryList.add(new Pair<String, String>("One-step Simplifier apps", "" +
-                            ossApps));
+                            stat.ossApps));
             summaryList.add(new Pair<String, String>("SMT solver apps", "" +
-                            smtSolverApps));
+                            stat.smtSolverApps));
             summaryList.add(new Pair<String, String>("Dependency Contract apps", "" +
-                            dependencyContractApps));
+                            stat.dependencyContractApps));
             summaryList.add(new Pair<String, String>("Operation Contract apps", "" +
-                            operationContractApps));
+                            stat.operationContractApps));
             summaryList.add(new Pair<String, String>("Loop invariant apps", "" +
-                            loopInvApps));
+                            stat.loopInvApps));
             summaryList.add(new Pair<String, String>("Total rule apps",
-                            EnhancedStringBuffer.format(totalRuleApps).toString()));
+                            EnhancedStringBuffer.format(stat.totalRuleApps).toString()));
         }
 
 

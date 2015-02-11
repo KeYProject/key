@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call ArrayIndexReadAccess.compute(array)&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (array!=null)" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (array!=null)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="not(equals(array,null))" pathCondition="not(equals(array,null))" pathConditionChanged="true" branchCondition="not(equals(array,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <branchStatement name="if (array.length==1)" pathCondition="not(equals(array,null))" pathConditionChanged="false">
+            <branchStatement name="if (array.length==1)" pathCondition="not(equals(array,null))" pathConditionChanged="false" blockOpened="true">
                <branchCondition name="equals(length(array),Z(1(#)))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="true" branchCondition="equals(length(array),Z(1(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <branchStatement name="if (array[0]==42)" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="false">
+                  <branchStatement name="if (array[0]==42)" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="false" blockOpened="true">
                      <branchCondition name="equals(int::select(heap,array,arr(Z(0(#)))),Z(2(4(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),equals(int::select(heap,array,arr(Z(0(#)))),Z(2(4(#))))))" pathConditionChanged="true" branchCondition="equals(int::select(heap,array,arr(Z(0(#)))),Z(2(4(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <statement name="return 42;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),equals(int::select(heap,array,arr(Z(0(#)))),Z(2(4(#))))))" pathConditionChanged="false">
                            <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of ArrayIndexReadAccess.compute(array)&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),equals(int::select(heap,array,arr(Z(0(#)))),Z(2(4(#))))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),equals(int::select(heap,array,arr(Z(0(#)))),Z(2(4(#))))))">
                               <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),equals(int::select(heap,array,arr(Z(0(#)))),Z(2(4(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
+                           <completedBlockEntry path="/0/0" conditionString="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),equals(int::select(heap,array,arr(Z(0(#)))),Z(2(4(#))))))"/>
+                           <completedBlockEntry path="/0/0/0/0" conditionString="imp(geq(length(array),Z(0(#))),and(equals(length(array),Z(1(#))),equals(int::select(heap,array,arr(Z(0(#)))),Z(2(4(#))))))"/>
+                           <completedBlockEntry path="/0/0/0/0/0/0" conditionString="equals(int::select(heap,array,arr(Z(0(#)))),Z(2(4(#))))"/>
                         </statement>
                      </branchCondition>
                      <branchCondition name="not(equals(int::select(heap,array,arr(Z(0(#)))),Z(2(4(#)))))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),not(equals(int::select(heap,array,arr(Z(0(#)))),Z(2(4(#)))))))" pathConditionChanged="true" branchCondition="not(equals(int::select(heap,array,arr(Z(0(#)))),Z(2(4(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -20,8 +23,13 @@
                               <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),not(equals(int::select(heap,array,arr(Z(0(#)))),Z(2(4(#)))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
+                           <completedBlockEntry path="/0/0" conditionString="imp(geq(length(array),Z(0(#))),and(and(not(equals(array,null)),equals(length(array),Z(1(#)))),not(equals(int::select(heap,array,arr(Z(0(#)))),Z(2(4(#)))))))"/>
+                           <completedBlockEntry path="/0/0/0/0" conditionString="imp(geq(length(array),Z(0(#))),and(equals(length(array),Z(1(#))),not(equals(int::select(heap,array,arr(Z(0(#)))),Z(2(4(#)))))))"/>
+                           <completedBlockEntry path="/0/0/0/0/0/0" conditionString="not(equals(int::select(heap,array,arr(Z(0(#)))),Z(2(4(#)))))"/>
                         </statement>
                      </branchCondition>
+                     <blockCompletionEntry path="/0/0/0/0/0/0/0/0"/>
+                     <blockCompletionEntry path="/0/0/0/0/0/0/1/0"/>
                   </branchStatement>
                </branchCondition>
                <branchCondition name="not(equals(length(array),Z(1(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="true" branchCondition="not(equals(length(array),Z(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -30,8 +38,13 @@
                         <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
+                     <completedBlockEntry path="/0/0" conditionString="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))"/>
+                     <completedBlockEntry path="/0/0/0/0" conditionString="not(equals(length(array),Z(1(#))))"/>
                   </statement>
                </branchCondition>
+               <blockCompletionEntry path="/0/0/0/0/0/0/0/0"/>
+               <blockCompletionEntry path="/0/0/0/0/0/0/1/0"/>
+               <blockCompletionEntry path="/0/0/0/0/1/0"/>
             </branchStatement>
          </branchCondition>
          <branchCondition name="equals(array,null)" pathCondition="equals(array,null)" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -40,8 +53,13 @@
                   <termination name="&lt;end&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
+               <completedBlockEntry path="/0/0" conditionString="equals(array,null)"/>
             </statement>
          </branchCondition>
+         <blockCompletionEntry path="/0/0/0/0/0/0/0/0"/>
+         <blockCompletionEntry path="/0/0/0/0/0/0/1/0"/>
+         <blockCompletionEntry path="/0/0/0/0/1/0"/>
+         <blockCompletionEntry path="/0/0/1/0"/>
       </branchStatement>
       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0"/>
       <methodReturnEntry path="/0/0/0/0/0/0/1/0/0"/>

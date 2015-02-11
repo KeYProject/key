@@ -76,7 +76,43 @@ public class AbstractSWTBotGraphitiKeYPropertyTabTest extends AbstractSWTBotKeYP
       super.selectLaunch(debugView);
       TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void selectMethodContract(SWTBotView debugView) throws Exception {
+      super.selectMethodContract(debugView);
+      TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
+   }
    
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void selectTermination(SWTBotView debugView) throws Exception {
+      super.selectTermination(debugView);
+      TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void selectLoopInvariant(SWTBotView debugView) throws Exception {
+      super.selectLoopInvariant(debugView);
+      TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void selectLoopBodyTermination(SWTBotView debugView) throws Exception {
+      super.selectLoopBodyTermination(debugView);
+      TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
+   }
+
    /**
     * Does some test steps on an opened diagram in an editable editor.
     * @param steps The test steps to execute.

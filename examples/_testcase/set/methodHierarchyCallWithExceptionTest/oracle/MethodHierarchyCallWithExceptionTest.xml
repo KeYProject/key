@@ -24,32 +24,45 @@
                            <callStackEntry path="/0/0/0/0/0"/>
                            <callStackEntry path="/0/0/0"/>
                            <callStackEntry path="/0"/>
-                           <statement name="int ae = -1;" pathCondition="true" pathConditionChanged="false">
+                           <exceptionalMethodReturn name="&lt;throw java.lang.RuntimeException&gt;" signature="&lt;exceptional return of &lt;call self.c()&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
+                              <callStackEntry path="/0/0/0/0/0/0/0"/>
+                              <callStackEntry path="/0/0/0/0/0"/>
                               <callStackEntry path="/0/0/0"/>
                               <callStackEntry path="/0"/>
-                              <statement name="int a1 = 1;" pathCondition="true" pathConditionChanged="false">
+                              <exceptionalMethodReturn name="&lt;throw java.lang.RuntimeException&gt;" signature="&lt;exceptional return of &lt;call self.b()&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
+                                 <callStackEntry path="/0/0/0/0/0"/>
                                  <callStackEntry path="/0/0/0"/>
                                  <callStackEntry path="/0"/>
-                                 <methodReturn name="&lt;return of a&gt;" signature="&lt;return of self.a()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of a&gt;" signatureIncludingReturnValue="&lt;return of self.a()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
+                                 <statement name="int ae = -1;" pathCondition="true" pathConditionChanged="false">
                                     <callStackEntry path="/0/0/0"/>
                                     <callStackEntry path="/0"/>
-                                    <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of main&gt;" signatureIncludingReturnValue="&lt;return of self.main()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
+                                    <statement name="int a1 = 1;" pathCondition="true" pathConditionChanged="false">
+                                       <callStackEntry path="/0/0/0"/>
                                        <callStackEntry path="/0"/>
-                                       <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
-                                       </termination>
-                                    </methodReturn>
-                                 </methodReturn>
-                              </statement>
-                           </statement>
+                                       <methodReturn name="&lt;return of a&gt;" signature="&lt;return of self.a()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of a&gt;" signatureIncludingReturnValue="&lt;return of self.a()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
+                                          <callStackEntry path="/0/0/0"/>
+                                          <callStackEntry path="/0"/>
+                                          <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of main&gt;" signatureIncludingReturnValue="&lt;return of self.main()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
+                                             <callStackEntry path="/0"/>
+                                             <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                             </termination>
+                                          </methodReturn>
+                                       </methodReturn>
+                                    </statement>
+                                 </statement>
+                              </exceptionalMethodReturn>
+                           </exceptionalMethodReturn>
                         </statement>
+                        <methodReturnEntry path="/0/0/0/0/0/0/0/0/0"/>
                      </methodCall>
                   </statement>
+                  <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0"/>
                </methodCall>
             </statement>
-            <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
+            <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
          </methodCall>
       </statement>
-      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
-   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

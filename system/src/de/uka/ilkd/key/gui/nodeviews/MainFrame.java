@@ -70,8 +70,6 @@ public final class MainFrame extends JScrollPane {
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
                 "copy");
         getActionMap().put("copy", new CopyToClipboardAction(mainWindow));
-
         setContent(emptySequent);
     }
-
 }

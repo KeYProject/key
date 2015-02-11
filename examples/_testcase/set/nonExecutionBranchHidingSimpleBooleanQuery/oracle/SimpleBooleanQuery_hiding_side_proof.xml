@@ -4,8 +4,9 @@
       <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = magic(x) catch(exc_0)
 pre: true
-post: result_0 = subMagic(x) &amp; exc_0 = null
-mod: empty
+post: result_0 = SimpleBooleanQuery.subMagic(x)
+&amp; exc_0 = null
+mod: {}
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
                <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleBooleanQuery.main(x)&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 

@@ -30,4 +30,12 @@ public class GraphitiAnnotationLinkPropertySection extends AbstractGraphitiDebug
    protected ISEDDebugNodeTabContent createContent() {
       return new AnnotationLinkTabComposite();
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean shouldUseExtraSpace() {
+      return true;
+   }
 }

@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call VerifyMin.min(_x,_y)&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (_x&lt;_y)" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (_x&lt;_y)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="gt(y,x)" pathCondition="gt(y,x)" pathConditionChanged="true" branchCondition="gt(y,x)" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return _x;" pathCondition="gt(y,x)" pathConditionChanged="false">
                <methodReturn name="&lt;return of min&gt;" signature="&lt;return of VerifyMin.min(_x,_y)&gt;" pathCondition="gt(y,x)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="gt(y,x)">
                   <termination name="&lt;end&gt;" pathCondition="gt(y,x)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
+               <completedBlockEntry path="/0/0" conditionString="gt(y,x)"/>
             </statement>
          </branchCondition>
+         <blockCompletionEntry path="/0/0/0/0"/>
       </branchStatement>
       <methodReturnEntry path="/0/0/0/0/0"/>
    </methodCall>

@@ -45,6 +45,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
@@ -340,7 +342,7 @@ public class ChoiceSelector extends JDialog {
          }
        });
     }
-    
+
     /**
      * Creates {@link ChoiceEntry}s for all given choices.
      * @param choices The choices.

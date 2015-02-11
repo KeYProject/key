@@ -2,7 +2,7 @@ package de.uka.ilkd.key.smt.testgen;
 
 import java.io.File;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.macros.TestGenMacro;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.TestConsoleUserInterface;

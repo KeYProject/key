@@ -174,14 +174,12 @@ public class SWTBotKeYUtilTest extends AbstractSetupTestCase {
         IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
         JDTUtil.addClasspathEntry(javaProject, JavaCore.newSourceEntry(secondSrc.getFullPath()));
         IMethod chargeMehtod = TestUtilsUtil.getJdtMethod(javaProject, "banking.PayCard", "charge", Signature.C_INT + "");
-        try {
-            KeYUtil.startProof(chargeMehtod);
-            fail("Multiple source paths are not supported.");
-        }
-        catch (Exception e) {
-            assertTrue(e.getMessage(), e.getMessage().contains("Multiple source paths are not supported."));
-        }
+        KeYUtil.startProofAsync(chargeMehtod);
+        TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null), // selected
+                                     TestKeY4EclipseUtil.createOperationContractId("banking.PayCard", "banking.PayCard", "charge(int)", "0", null));
         javaProject.setRawClasspath(oldEntries, null);
+        KeYUtil.clearProofList(MainWindow.getInstance());
         // Load java project with one source directory
         KeYUtil.startProofAsync(chargeMehtod);
         TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
@@ -360,13 +358,10 @@ public class SWTBotKeYUtilTest extends AbstractSetupTestCase {
         }
         IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
         JDTUtil.addClasspathEntry(javaProject, JavaCore.newSourceEntry(secondSrc.getFullPath()));
-        try {
-            KeYUtil.load(javaProject.getProject());
-            fail("Multiple source paths are not supported.");
-        }
-        catch (Exception e) {
-            assertTrue(e.getMessage(), e.getMessage().contains("Multiple source paths are not supported."));
-        }
+        KeYUtil.loadAsync(javaProject.getProject());
+        TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
+        TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "banking.PayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "banking.PayCard", "charge(int)", "0", null));
+        KeYUtil.clearProofList(MainWindow.getInstance());
         javaProject.setRawClasspath(oldEntries, null);
         // Load java project with one source directory
         KeYUtil.loadAsync(javaProject.getProject());

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 resolve_symlink  ()
-{ 
+{
    TARGET=`ls -l "$1"| awk '/\ ->\ /{print $NF}'`
 
    if [ -n "$TARGET" ] ; then
@@ -47,7 +47,7 @@ JAVA_OPTIONS=""
 #JAVA_OPTIONS='-DKeyDebugFlag=on -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1234'
 
 #
-# Now $KEY_HOME  
+# Now $KEY_HOME
 #
 
 if [ -z "$KEY_HOME" ] ; then
@@ -78,7 +78,7 @@ for i in $key_ext_jars ; do
     current_jar="$KEY_LIB/$i"
     if [ ! -f "$current_jar" ]
     then
-       echo Cannot find $current_jar. 
+       echo Cannot find $current_jar.
        echo Copy or link the file into the
        echo $KEY_LIB directory.
        exit 1
@@ -122,7 +122,7 @@ keysysprops=""
 keyoptions=""
 
 #default values for Java Options Xmx and Xms
-javaOptionXmx="-Xmx2048m";
+javaOptionXmx="-Xmx1024m";
 javaOptionXms="-Xms256m";
 
 while [ $# -ne 0 ]; do
@@ -139,20 +139,20 @@ while [ $# -ne 0 ]; do
 	    list_help
 	    exit;;
 
-        --K-headless) 
-            echo "Warning: --K-headless option is deprecated"
-            shift
-            continue;;
+	--K-headless)
+		echo "Warning: --K-headless option is deprecated"
+		shift
+		continue;;
 
-        --K-keydebug) 
-            keysysprops="${keysysprops}-DKeyDebugFlag=on "
-            shift
-            continue;;
+	--K-keydebug)
+		keysysprops="${keysysprops}-DKeyDebugFlag=on "
+		shift
+		continue;;
 
-        --K-debugclassloader)
-            keysysprops="${keysysprops}-DKeyDebugClassLoader=on "
-            shift
-            continue;;
+	--K-debugclassloader)
+		keysysprops="${keysysprops}-DKeyDebugClassLoader=on "
+		shift
+		continue;;
 
 	--K-debugprefix) keysysprops="${keysysprops}-Dkey.debug.prefix=${2} "
 	    shift
@@ -166,10 +166,10 @@ while [ $# -ne 0 ]; do
 
 	--K-remotedebug)
             if [ ${2} = "wait" ]
-            then 
+            then
                 wait="y"
                 shift
-            else 
+            else
                 wait="n"
             fi
             JAVA_OPTIONS="${JAVA_OPTIONS} -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=${wait},address=${2}"
@@ -179,11 +179,11 @@ while [ $# -ne 0 ]; do
 
 
 	--K-server) keysysprops="${keysysprops}-server "
-            shift
-            continue;;
+		shift
+		continue;;
 
         # -J options following conventions of Java for -J options
-        #special treatment of the options which are also set with deafult 
+        #special treatment of the options which are also set by default
         #values: xms and Xmx
 	--J-Xms*)
 	    option=${1#--J}
@@ -191,7 +191,7 @@ while [ $# -ne 0 ]; do
 	    xms = true;
 	    shift
 	    continue;;
-	    
+
 	--J-Xmx*)
 	    option=${1#--J}
 	    javaOptionXmx=${option}
@@ -203,9 +203,8 @@ while [ $# -ne 0 ]; do
 	    JAVA_OPTIONS="${JAVA_OPTIONS} ${option}"
 	    shift
 	    continue;;
-	    
 
-         # key options beginning with a minus or filenames 
+         # key options beginning with a minus or filenames
          # set headless mode for all of them
 	--auto)
              keysysprops="${keysysprops}-Djava.awt.headless=true "
@@ -223,7 +222,7 @@ while [ $# -ne 0 ]; do
          *) break;;
 
     esac
-done	
+done
 
 
 if [ ! -d "$HOME/.key" ]
@@ -249,8 +248,6 @@ export PATH
 $JAVA $JAVA_OPTIONS $keysysprops \
 -ea:de.uka.ilkd.key... $javaOptionXms $javaOptionXmx \
 -Dkey.home="$KEY_HOME" \
--Dkey.simplify.logdir="$KEY_SIMPLIFY_LOG_DIR" \
--Dkey.ics.logdir="$KEY_ICS_LOG_DIR" \
 -Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler \
 -splash:"$KEY_HOME/system/resources/de/uka/ilkd/key/gui/images/key22.gif" \
--classpath "$keyclasspath" de.uka.ilkd.key.gui.Main "$@"
+-classpath "$keyclasspath" de.uka.ilkd.key.core.Main "$@"

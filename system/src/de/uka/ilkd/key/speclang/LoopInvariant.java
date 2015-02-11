@@ -15,15 +15,18 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.util.InfFlowSpec;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
+
 
 
 /**
@@ -31,34 +34,62 @@ import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
  * predicates, a modifies clause, and a variant term.
  */
 public interface LoopInvariant extends SpecificationElement {
-    
+
     /**
      * Returns the loop to which the invariant belongs.
      */
     public LoopStatement getLoop();
 
-    
+    /**
+     * Returns the contracted function symbol.
+     */
+    public IProgramMethod getTarget();
+
     /** Returns the invariant formula. */
-    public Term getInvariant(LocationVariable heap, Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
+    public Term getInvariant(LocationVariable heap, Term selfTerm,
+                             Map<LocationVariable,Term> atPres, Services services);
+
+    public Term getInvariant(Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
+
+    public Term getInvariant(Services services);
 
     /**
      * Returns the modifies clause.
      */
-    public Term getModifies(LocationVariable heap, Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
-    
+    public Term getModifies(LocationVariable heap, Term selfTerm,
+                            Map<LocationVariable,Term> atPres, Services services);
+
+    public Term getModifies(Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
+
+    /**
+     * Returns the information flow specification clause.
+     */
+    public ImmutableList<InfFlowSpec> getInfFlowSpecs(LocationVariable heap);
+
+    public ImmutableList<InfFlowSpec> getInfFlowSpecs(Services services);
+
+    public ImmutableList<InfFlowSpec> getInfFlowSpecs(LocationVariable heap,
+                                                      Term selfTerm,
+                                                      Map<LocationVariable, Term> atPres,
+                                                      Services services);
+
+    public boolean hasInfFlowSpec(Services services);
+
     /**
      * Returns the variant term. 
      */
     public Term getVariant(Term selfTerm, 
             		   Map<LocationVariable,Term> atPres,
             		   Services services);
-    
+
     /**
-     * Returns the term internally used for self. 
+     * Returns the term internally used for self.
      * Use with care - it is likely that this is *not* the right "self" for you.
      */
     public Term getInternalSelfTerm();
-    
+
+    public Term getModifies();
+
     /**
      * Returns operators internally used for the pre-heap.
      */
@@ -75,15 +106,52 @@ public interface LoopInvariant extends SpecificationElement {
      * Use with care - it is likely that this is *not* the right "self" for you.
      */
     public Term getInternalVariant();
-    
+
     public Map<LocationVariable,Term> getInternalModifies();
+
+    public Map<LocationVariable,
+               ImmutableList<InfFlowSpec>> getInternalInfFlowSpec();
+
+    public LoopInvariant create(LoopStatement loop,
+                                IProgramMethod pm,
+                                KeYJavaType kjt,
+                                Map<LocationVariable,Term> invariants,
+                                Map<LocationVariable,Term> modifies,
+                                Map<LocationVariable,
+                                    ImmutableList<InfFlowSpec>> infFlowSpecs,
+                                Term variant,
+                                Term selfTerm,
+                                ImmutableList<Term> localIns,
+                                ImmutableList<Term> localOuts,
+                                Map<LocationVariable,Term> atPres);
+
+    public LoopInvariant create(LoopStatement loop,
+                                Map<LocationVariable,Term> invariants,
+                                Map<LocationVariable,Term> modifies,
+                                Map<LocationVariable,
+                                    ImmutableList<InfFlowSpec>> infFlowSpecs,
+                                Term variant,
+                                Term selfTerm,
+                                ImmutableList<Term> localIns,
+                                ImmutableList<Term> localOuts,
+                                Map<LocationVariable,Term> atPres);
+
+    public LoopInvariant instantiate(Map<LocationVariable,Term> invariants, Term variant);
+
+    public LoopInvariant configurate(Map<LocationVariable,Term> invariants,
+                                     Map<LocationVariable,Term> modifies,
+                                     Map<LocationVariable,
+                                         ImmutableList<InfFlowSpec>> infFlowSpecs,
+                                     Term variant);
 
     /**
      * Returns a new loop invariant where the loop reference has been
      * replaced with the passed one.
      */
-    public LoopInvariant setLoop(LoopStatement loop); 
-    
+    public LoopInvariant setLoop(LoopStatement loop);
+
+    public LoopInvariant setTarget(IProgramMethod newPM);
+
     /**
      * Returns a new loop invariant where the invariant formula has been
      * replaced with the passed one. Take care: the variables used for
@@ -93,7 +161,7 @@ public interface LoopInvariant extends SpecificationElement {
             			      Term selfTerm,
             			      Map<LocationVariable,Term> atPres,
             			      Services services); 
-    
+
     /** 
      * Loop invariants can be visited like source elements:
      * This method calls the corresponding method of a visitor in order to
@@ -106,7 +174,7 @@ public interface LoopInvariant extends SpecificationElement {
      */
     public String getPlainText(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols);
 
-    public IProgramMethod getTarget();
+    public String getUniqueName();
 
     public KeYJavaType getKJT();
 

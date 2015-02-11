@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
 
 /**
  * This {@link IStopCondition} stops the auto mode when a "step over" is completed.

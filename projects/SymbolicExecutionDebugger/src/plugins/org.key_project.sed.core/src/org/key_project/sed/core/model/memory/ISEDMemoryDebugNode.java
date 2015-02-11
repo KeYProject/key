@@ -13,6 +13,7 @@
 
 package org.key_project.sed.core.model.memory;
 
+import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugNode;
 
@@ -77,4 +78,10 @@ public interface ISEDMemoryDebugNode extends ISEDDebugNode {
     * @param constraint The {@link ISEDConstraint} to add.
     */
    public void addConstraint(ISEDConstraint constraint);
+   
+   /**
+    * Adds the given {@link ISEDBranchCondition} as group start condition.
+    * @param groupStartCondition The {@link ISEDBranchCondition} to add.
+    */
+   public void addGroupStartCondition(ISEDBranchCondition groupStartCondition);
 }

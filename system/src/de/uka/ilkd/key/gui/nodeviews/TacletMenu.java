@@ -35,14 +35,14 @@ import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -71,10 +71,10 @@ import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
-import de.uka.ilkd.key.util.GuiUtilities;
 
 
 /**
@@ -502,7 +502,7 @@ public class TacletMenu extends JMenu {
 	            SMTSettings settings = new SMTSettings(goal.proof().getSettings().getSMTSettings(),
 	                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),goal.proof());
 	            SolverLauncher launcher = new SolverLauncher(settings);
-	            launcher.addListener(new SolverListener(settings));
+	            launcher.addListener(new SolverListener(settings, goal.proof()));
 	            Collection<SMTProblem> list = new LinkedList<SMTProblem>();
 	            list.add(new SMTProblem(goal));
 	           	launcher.launch(solverUnion.getTypes(),

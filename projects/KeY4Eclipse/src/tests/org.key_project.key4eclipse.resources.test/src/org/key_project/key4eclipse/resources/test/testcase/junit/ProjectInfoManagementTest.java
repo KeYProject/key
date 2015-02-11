@@ -38,7 +38,7 @@ public class ProjectInfoManagementTest extends AbstractResourceTest {
    @Test
    public void testDeclaringTypes() throws Exception {
       // Test empty project (step 0)
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProjectInfoManagementTest_testDeclaringTypes", true, true, false, 1, true, true);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProjectInfoManagementTest_testDeclaringTypes", true, false, true, false, 1, true);
       assertProjectInfo(project, "data/ProjectInfoManagementTest/delaringType/step0/oracle/step0.xml");
       IFolder srcFolder = project.getFolder("src");
       assertTrue(srcFolder.exists());
@@ -55,7 +55,7 @@ public class ProjectInfoManagementTest extends AbstractResourceTest {
    @Test
    public void testPackagesAndTypes() throws Exception {
       // Test empty project (step 0)
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProjectInfoManagementTest_testPackagesAndTypes", true, true, false, 1, true, true);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProjectInfoManagementTest_testPackagesAndTypes", true, false, true, false, 1, true);
       assertProjectInfo(project, "data/ProjectInfoManagementTest/packagesAndTypes/step0/oracle/step0.xml");
       IFolder srcFolder = project.getFolder("src");
       assertTrue(srcFolder.exists());
@@ -83,7 +83,7 @@ public class ProjectInfoManagementTest extends AbstractResourceTest {
    @Test
    public void testMethods() throws Exception {
       // Test empty project (step 0)
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProjectInfoManagementTest_testMethods", true, true, false, 1, true, true);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProjectInfoManagementTest_testMethods", true, false, true, false, 1, true);
       assertProjectInfo(project, "data/ProjectInfoManagementTest/methods/step0/oracle/step0.xml");
       IFolder srcFolder = project.getFolder("src");
       assertTrue(srcFolder.exists());
@@ -104,7 +104,7 @@ public class ProjectInfoManagementTest extends AbstractResourceTest {
    @Test
    public void testMethodContracts() throws Exception {
       // Test empty project (step 0)
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProjectInfoManagementTest_testMethodContracts", true, true, false, 1, true, true);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProjectInfoManagementTest_testMethodContracts", true, false, true, false, 1, true);
       assertProjectInfo(project, "data/ProjectInfoManagementTest/methodContracts/step0/oracle/step0.xml");
       IFolder srcFolder = project.getFolder("src");
       assertTrue(srcFolder.exists());
@@ -125,7 +125,7 @@ public class ProjectInfoManagementTest extends AbstractResourceTest {
    @Test
    public void testObserverFunctionsAndContracts() throws Exception {
       // Test empty project (step 0)
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProjectInfoManagementTest_testObserverFunctionsAndContracts", true, true, false, 1, true, true);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProjectInfoManagementTest_testObserverFunctionsAndContracts", true, false, true, false, 1, true);
       assertProjectInfo(project, "data/ProjectInfoManagementTest/observerFunctionsAndContracts/step0/oracle/step0.xml");
       IFolder srcFolder = project.getFolder("src");
       assertTrue(srcFolder.exists());

@@ -157,20 +157,6 @@ public final class SEDUIUtil {
    public static void selectInDebugView(IWorkbenchPart parentPart, 
                                         final IDebugView debugView, 
                                         final List<?> selection) {
-      selectInDebugView(parentPart, debugView, selection, null);
-   }
-
-   /**
-    * Selects the given elements in the given {@link IDebugView}.
-    * @param parentPart The current {@link IWorkbenchPart} which requests the selection change.
-    * @param debugView The {@link IDebugView} to change selection in.
-    * @param selection The new selection to set in the {@link IDebugView}.
-    * @param finishTask An optional {@link Runnable} which is executed after the selection was changed.
-    */
-   public static void selectInDebugView(IWorkbenchPart parentPart, 
-                                        final IDebugView debugView, 
-                                        final List<?> selection,
-                                        final Runnable finishTask) {
       // Make sure that the old selected business objects are different to the new one
       ISelection oldSelection = debugView.getViewer().getSelection();
       if (!selection.equals(SWTUtil.toList(oldSelection))) {
@@ -202,9 +188,6 @@ public final class SEDUIUtil {
                   monitor.beginTask("Select element", 1);
                   ISelection newSelection = SWTUtil.createSelection(selection);
                   SWTUtil.select(debugViewer, newSelection, true);
-                  if (finishTask != null) {
-                     finishTask.run();
-                  }
                   monitor.worked(1);
                   monitor.done();
                   return Status.OK_STATUS;

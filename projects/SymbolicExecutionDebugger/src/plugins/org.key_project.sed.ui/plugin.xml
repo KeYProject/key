@@ -179,6 +179,24 @@
                     id="org.key_project.sed.ui.variablePropertyTab"
                     label="Variable">
               </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.annotationLinks.tab"
+                    category="Debug"
+                    id="org.key_project.sed.ui.groupStarts.tab"
+                    label="Group Starts">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.groupStarts.tab"
+                    category="Debug"
+                    id="org.key_project.sed.ui.groupEnds.tab"
+                    label="Group Ends">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.node.tab"
+                    category="Debug"
+                    id="org.key_project.sed.ui.callState.tab"
+                    label="Call State">
+              </propertyTab>
           </propertyTabs>
       </extension>
        
@@ -228,7 +246,7 @@
               </propertySection>
               <propertySection
                     class="org.key_project.sed.ui.property.ConstraintsNodePropertySection"
-                    filter="org.key_project.sed.ui.property.SEDDebugNodeTreeFilter"
+                    filter="org.key_project.sed.ui.property.ConstraintsTreeFilter"
                     id="org.key_project.sed.ui.property.ConstraintsPropertySection"
                     tab="org.key_project.sed.ui.constraints.tab">
               </propertySection>
@@ -243,6 +261,24 @@
                     filter="org.key_project.sed.ui.property.SEDVariableTreeFilter"
                     id="org.key_project.sed.ui.property.ConstraintsPropertySection"
                     tab="org.key_project.sed.ui.constraints.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.property.GroupEndConditionsPropertySection"
+                    filter="org.key_project.sed.ui.property.GroupableEndTreeFilter"
+                    id="org.key_project.sed.ui.property.GroupEndConditionsPropertySection"
+                    tab="org.key_project.sed.ui.groupEnds.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.property.GroupStartConditionsPropertySection"
+                    filter="org.key_project.sed.ui.property.GroupableStartTreeFilter"
+                    id="org.key_project.sed.ui.property.GroupStartConditionsPropertySection"
+                    tab="org.key_project.sed.ui.groupStarts.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.property.CallStatePropertySection"
+                    filter="org.key_project.sed.ui.property.SEDBaseMethodReturnTreeFilter"
+                    id="org.key_project.sed.ui.property.CallStatePropertySection"
+                    tab="org.key_project.sed.ui.callState.tab">
               </propertySection>
           </propertySections>
       </extension>

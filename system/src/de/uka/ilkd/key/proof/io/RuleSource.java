@@ -16,6 +16,9 @@ import java.io.*;
 
 public abstract class RuleSource {
 
+    // key-file containing ldt declarations
+    public static final String ldtFile = "ldt.key";
+
     public abstract File file();
 
     public boolean isDirectory() {

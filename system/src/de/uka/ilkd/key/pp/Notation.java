@@ -310,7 +310,7 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printFunctionTerm(t.op().name().toString(), t);
+	    sp.printFunctionTerm(t);
 	}
     }
 
@@ -606,7 +606,7 @@ public abstract class Notation {
 	    if (number != null) {
 		sp.printConstant(number);
 	    } else {
-		sp.printFunctionTerm(t.op().name().toString(), t);
+		sp.printFunctionTerm(t);
 	    }
 	}
     }
@@ -650,7 +650,7 @@ public abstract class Notation {
 	    if (charString != null) {
 		sp.printConstant(charString);
 	    } else {
-		sp.printFunctionTerm(t.op().name().toString(), t);
+		sp.printFunctionTerm(t);
 	    }
 	}
     }
@@ -680,6 +680,40 @@ public abstract class Notation {
 	public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printConstant(printStringTerm(t));
 	}
+    }
+
+    /**
+     * The standard concrete syntax for sequence singletons.
+     */
+    public static final class SeqSingletonNotation extends Notation {
+        final String lDelimiter, rDelimiter;
+
+	public SeqSingletonNotation(String lDelimiter, String rDelimiter) {
+	    super(130);
+            this.lDelimiter = lDelimiter;
+            this.rDelimiter = rDelimiter;
+	}
+
+	public void print(Term t, LogicPrinter sp) throws IOException {
+	    sp.printSeqSingleton(t, lDelimiter, rDelimiter);
+	}
+    }
+    
+    public static final class SeqGetNotation extends Notation {
+
+        public SeqGetNotation() {
+            /*
+             * Not sure what value to choose here.
+             * (Kai Wallisch 10/2014)
+             */
+            super(130);
+        }
+
+        @Override
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printSeqGet(t);
+        }
+
     }
 
 }

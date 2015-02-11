@@ -31,5 +31,5 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchStatement;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionBranchStatement
  */
-public interface IExecutionBranchStatement extends IExecutionNode<BranchStatement> {
+public interface IExecutionBranchStatement extends IExecutionBlockStartNode<BranchStatement> {
 }

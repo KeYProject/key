@@ -50,6 +50,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private ImmutableList<Triple<PositionedString,PositionedString,PositionedString>> abbreviations =
             ImmutableSLList.<Triple<PositionedString,PositionedString,PositionedString>>nil();
 
+    private ImmutableList<PositionedString> infFlowSpecs =
+            ImmutableSLList.<PositionedString>nil();
+    
     private Map<String, ImmutableList<PositionedString>>
       accessibles = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
@@ -93,6 +96,49 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         res.setPosition(assertStm);
         return res;
     }
+    
+    /**
+     * Merge clauses of two spec cases.
+     * Keep behavior of this one.
+     * @param tsc
+     */
+    public TextualJMLSpecCase merge(TextualJMLSpecCase tsc) {
+        TextualJMLSpecCase res = clone();
+        res.addRequires(tsc.getRequires());
+        res.addEnsures(tsc.getEnsures());
+        res.addSignals(tsc.getSignals());
+        res.addSignalsOnly(tsc.getSignalsOnly());
+        res.addAssignable(tsc.getAssignable());
+        res.addAccessible(tsc.getAccessible());
+        res.addInfFlowSpecs(tsc.getInfFlowSpecs());
+        res.addDiverges(tsc.getDiverges());
+        res.addMeasuredBy(tsc.getMeasuredBy());
+        return res;
+    }
+    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
+    public TextualJMLSpecCase clone() {
+        TextualJMLSpecCase res = new TextualJMLSpecCase(getMods(), getBehavior());
+        res.requires = new LinkedHashMap(requires);
+        res.ensures = new LinkedHashMap(ensures);
+        res.signals = signals;
+        res.signalsOnly = signalsOnly;
+        res.assignables = new LinkedHashMap(assignables);
+        res.accessibles = new LinkedHashMap(accessibles);
+        res.infFlowSpecs = infFlowSpecs;
+        res.depends = depends;
+        res.diverges = diverges;
+        res.abbreviations = abbreviations;
+        res.axioms = new LinkedHashMap(axioms);
+        res.breaks = breaks;
+        res.continues = continues;
+        res.returns = returns;
+        res.measuredBy = measuredBy;
+        res.name = name;
+        res.workingSpace = workingSpace;
+        return res;
+    }
 
 
     public void addName(PositionedString n) {
@@ -124,6 +170,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addAssignable(PositionedString ps) {
         addGeneric(assignables, ps);
+    }
+    
+    public void addAssignable(ImmutableList<PositionedString> l) {
+        for (PositionedString ps: l)
+            addAssignable(ps);
     }
 
     public void addAccessible(PositionedString ps) {
@@ -182,6 +233,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         setPosition(ps);
     }
 
+    public void addDiverges(ImmutableList<PositionedString> l) {
+        for (PositionedString ps: l)
+            addDiverges(ps);
+    }
 
     public void addDepends(PositionedString ps) {
         depends = depends.append(ps);
@@ -237,6 +292,16 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 	           addAxioms(ps);
         }
     }
+
+    public void addInfFlowSpecs(PositionedString ps) {
+        infFlowSpecs = infFlowSpecs.append(ps);
+    }
+
+
+    public void addInfFlowSpecs(ImmutableList<PositionedString> l) {
+        infFlowSpecs = infFlowSpecs.append(l);
+    }
+
 
     public Behavior getBehavior() {
         return behavior;
@@ -337,6 +402,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
+    public ImmutableList<PositionedString> getInfFlowSpecs() {
+        return infFlowSpecs;
+    }
+
+
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
@@ -416,6 +486,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("returns: ").append(it.next()).append("\n");
         }
+        it = infFlowSpecs.iterator();
+        while (it.hasNext()) {
+            sb.append("determines: ").append(it.next()).append("\n");
+        }
         return sb.toString();
     }
 
@@ -440,7 +514,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && depends.equals(sc.depends)
                && breaks.equals(sc.breaks)
                && continues.equals(sc.continues)
-               && returns.equals(sc.returns);
+               && returns.equals(sc.returns)
+               && infFlowSpecs.equals(sc.infFlowSpecs);
     }
 
 
@@ -460,6 +535,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + depends.hashCode()
                + breaks.hashCode()
                + continues.hashCode()
-               + returns.hashCode();
+               + returns.hashCode()
+               + infFlowSpecs.hashCode();
     }
 }

@@ -16,7 +16,7 @@ import org.key_project.util.jdt.JDTUtil;
  * Represents a method as known by KeY.
  * @author Martin Hentschel
  */
-public class MethodInfo extends AbstractContractContainer implements IStatusInfo {
+public class MethodInfo extends AbstractContractContainer {
    /**
     * The parent {@link TypeInfo} in which this {@link MethodInfo} is contained in.
     */
@@ -179,14 +179,6 @@ public class MethodInfo extends AbstractContractContainer implements IStatusInfo
       else {
          return null;
       }
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isUnspecified() {
-      return countContracts() == 0;
    }
 
    /**

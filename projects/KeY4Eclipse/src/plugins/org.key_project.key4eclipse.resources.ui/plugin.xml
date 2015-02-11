@@ -5,21 +5,34 @@
          id="org.key_project.key4eclipse.resources.ui.KeYProjectWizard"
          name="KeYProjectWizard"
          point="org.eclipse.ui.newWizards">
+      <category
+            id="org.key_project.key4eclipse.resources.ui.KeYCategory"
+            name="KeY">
+      </category>
       <wizard
             category="org.key_project.key4eclipse.resources.ui.KeYCategory"
             class="org.key_project.key4eclipse.resources.ui.wizard.KeYProjectWizard"
+            finalPerspective="org.eclipse.jdt.ui.JavaPerspective"
             icon="icons/logo16.gif"
             id="org.key_project.key4eclipse.resources.ui.keyprojectwizard"
             name="KeY Project"
             project="true">
          <description>
-            Create a KeY project
+            Create a KeY project.
          </description>
       </wizard>
-      <category
-            id="org.key_project.key4eclipse.resources.ui.KeYCategory"
-            name="KeY">
-      </category>
+      <wizard
+            category="org.eclipse.ui.Examples/org.key_project.key4eclipse.common.ui.example.category"
+            class="org.key_project.key4eclipse.resources.ui.wizard.KeYResourceExampleNewWizard"
+            finalPerspective="org.eclipse.jdt.ui.JavaPerspective"
+            icon="icons/logo16.gif"
+            id="org.key_project.key4eclipse.resources.ui.wizard.KeYResourceExampleNewWizard"
+            name="KeY Project Example"
+            project="true">
+         <description>
+            Create a new KeY Project filled with example content.
+         </description>
+      </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -27,7 +40,8 @@
             allPopups="true"
             locationURI="popup:org.eclipse.ui.popup.any?after=additions">
          <command
-               commandId="org.key_project.key4eclipse.resources.ui.convertToKeYProject"
+               commandId="org.key_project.key4eclipse.resources.ui.convertToKeYProjectCommand"
+               icon="icons/logo16.gif"
                label="Convert to KeY Project"
                style="push">
             <visibleWhen
@@ -35,39 +49,62 @@
                <iterate
                      ifEmpty="false"
                      operator="and">
-                  <or>
-                     <and>
-                        <instanceof
-                              value="org.eclipse.core.resources.IProject">
-                        </instanceof>
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.core.resources.projectNature"
+                           value="org.eclipse.jdt.core.javanature">
+                     </test>
+                     <not>
                         <test
                               forcePluginActivation="true"
                               property="org.eclipse.core.resources.projectNature"
-                              value="org.eclipse.jdt.core.javanature">
+                              value="org.key_project.key4eclipse.resources.KeYProjectNature">
                         </test>
-                        <not>
-                           <test
-                                 forcePluginActivation="true"
-                                 property="org.eclipse.core.resources.projectNature"
-                                 value="org.key_project.key4eclipse.resources.KeYProjectNature">
-                           </test>
-                        </not>
-                     </and>
-                     <and>
-                        <instanceof
-                              value="org.eclipse.jdt.core.IJavaProject">
-                        </instanceof>
-                        <adapt
-                              type="org.eclipse.core.resources.IProject">
-                           <not>
-                              <test
-                                    forcePluginActivation="true"
-                                    property="org.eclipse.core.resources.projectNature"
-                                    value="org.key_project.key4eclipse.resources.KeYProjectNature">
-                              </test>
-                           </not>
-                        </adapt>
-                     </and>
+                     </not>
+                  </adapt>
+                  <or>
+                     <instanceof
+                           value="org.eclipse.jdt.core.IJavaProject">
+                     </instanceof>
+                     <instanceof
+                           value="org.eclipse.core.resources.IProject">
+                     </instanceof>
+                  </or>
+               </iterate>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.key_project.key4eclipse.resources.ui.buildOutdatedProofsCommand"
+               icon="icons/logo16.gif"
+               label="Build outdated proofs"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.core.resources.projectNature"
+                           value="org.eclipse.jdt.core.javanature">
+                     </test>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.core.resources.projectNature"
+                           value="org.key_project.key4eclipse.resources.KeYProjectNature">
+                     </test>
+                  </adapt>
+                  <or>
+                     <instanceof
+                           value="org.eclipse.jdt.core.IJavaProject">
+                     </instanceof>
+                     <instanceof
+                           value="org.eclipse.core.resources.IProject">
+                     </instanceof>
                   </or>
                </iterate>
             </visibleWhen>
@@ -76,11 +113,19 @@
    </extension>
    <extension
          point="org.eclipse.ui.commands">
+      <category
+            id="org.key_project.key4eclipse.resources.ui.category"
+            name="KeY Resources">
+      </category>
       <command
-            categoryId="org.key_project.key4eclipse.common.ui.category"
-            description="Add functionality of a KeY project to the current project."
-            id="org.key_project.key4eclipse.resources.ui.convertToKeYProject"
+            categoryId="org.key_project.key4eclipse.resources.ui.category"
+            id="org.key_project.key4eclipse.resources.ui.convertToKeYProjectCommand"
             name="Convert to KeY Project.">
+      </command>
+      <command
+            categoryId="org.key_project.key4eclipse.resources.ui.category"
+            id="org.key_project.key4eclipse.resources.ui.buildOutdatedProofsCommand"
+            name="Build outdated proofs">
       </command>
       <command
             categoryId="org.key_project.key4eclipse.common.ui.category"
@@ -111,7 +156,11 @@
    <extension
          point="org.eclipse.ui.commandImages">
       <image
-            commandId="org.key_project.key4eclipse.resources.ui.convertToKeYProject"
+            commandId="org.key_project.key4eclipse.resources.ui.convertToKeYProjectCommand"
+            icon="icons/logo16.gif">
+      </image>
+      <image
+            commandId="org.key_project.key4eclipse.resources.ui.buildOutdatedProofsCommand"
             icon="icons/logo16.gif">
       </image>
       <image
@@ -126,45 +175,65 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="org.key_project.key4eclipse.resources.ui.handlers.ConvertJavaToKeYProjectHandler"
-            commandId="org.key_project.key4eclipse.resources.ui.convertToKeYProject">
+            class="org.key_project.key4eclipse.resources.ui.handler.ConvertJavaToKeYProjectHandler"
+            commandId="org.key_project.key4eclipse.resources.ui.convertToKeYProjectCommand">
          <enabledWhen>
             <iterate
                   ifEmpty="false"
                   operator="and">
-               <or>
-                  <and>
-                     <instanceof
-                           value="org.eclipse.core.resources.IProject">
-                     </instanceof>
+               <adapt
+                     type="org.eclipse.core.resources.IResource">
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.core.resources.projectNature"
+                        value="org.eclipse.jdt.core.javanature">
+                  </test>
+                  <not>
                      <test
                            forcePluginActivation="true"
                            property="org.eclipse.core.resources.projectNature"
-                           value="org.eclipse.jdt.core.javanature">
+                           value="org.key_project.key4eclipse.resources.KeYProjectNature">
                      </test>
-                     <not>
-                        <test
-                              forcePluginActivation="true"
-                              property="org.eclipse.core.resources.projectNature"
-                              value="org.key_project.key4eclipse.resources.KeYProjectNature">
-                        </test>
-                     </not>
-                  </and>
-                  <and>
-                     <instanceof
-                           value="org.eclipse.jdt.core.IJavaProject">
-                     </instanceof>
-                     <adapt
-                           type="org.eclipse.core.resources.IProject">
-                        <not>
-                           <test
-                                 forcePluginActivation="true"
-                                 property="org.eclipse.core.resources.projectNature"
-                                 value="org.key_project.key4eclipse.resources.KeYProjectNature">
-                           </test>
-                        </not>
-                     </adapt>
-                  </and>
+                  </not>
+               </adapt>
+               <or>
+                  <instanceof
+                        value="org.eclipse.jdt.core.IJavaProject">
+                  </instanceof>
+                  <instanceof
+                        value="org.eclipse.core.resources.IProject">
+                  </instanceof>
+               </or>
+            </iterate>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.key_project.key4eclipse.resources.ui.handler.ManualBuildHandler"
+            commandId="org.key_project.key4eclipse.resources.ui.buildOutdatedProofsCommand">
+         <enabledWhen>
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <adapt
+                     type="org.eclipse.core.resources.IResource">
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.core.resources.projectNature"
+                        value="org.eclipse.jdt.core.javanature">
+                  </test>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.core.resources.projectNature"
+                        value="org.key_project.key4eclipse.resources.KeYProjectNature">
+                  </test>
+               </adapt>
+               <or>
+                  <instanceof
+                        value="org.eclipse.jdt.core.IJavaProject">
+                  </instanceof>
+                  <instanceof
+                        value="org.eclipse.core.resources.IProject">
+                  </instanceof>
                </or>
             </iterate>
          </enabledWhen>
@@ -209,6 +278,36 @@
             name="Proof Meta Text Editor">
       </editor>
    </extension>
+      <extension
+            point="org.eclipse.jdt.ui.javaElementFilters">
+         <filter
+               class="org.key_project.key4eclipse.resources.ui.propertypages.ProofmetaFilter"
+               enabled="true"
+               id="org.key_project.key4eclipse.resources.propertypages.proofmetafilter.packageexplorer"
+               name="Poofmeta Filter"
+               targetId="org.eclipse.jdt.ui.PackageExplorer"></filter>
+      </extension>
+      <extension
+            point="org.eclipse.ui.navigator.navigatorContent">
+         <commonFilter
+               activeByDefault="true"
+               class="org.key_project.key4eclipse.resources.ui.propertypages.ProofmetaFilter"
+               id="org.key_project.key4eclipse.resources.propertypages.proofmetafilter.projectexplorer"
+               name="Proofmeta Filter"
+               visibleInUI="true">
+         </commonFilter>
+      </extension>
+      <extension
+            point="org.eclipse.ui.navigator.viewer">
+         <viewerContentBinding
+               viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+            <includes>
+               <contentExtension
+                     pattern="org.key_project.key4eclipse.resources.propertypages.proofmetafilter.projectexplorer">
+               </contentExtension>
+            </includes>
+         </viewerContentBinding>
+      </extension>
       <extension
             point="org.eclipse.ui.views">
          <category

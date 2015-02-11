@@ -101,7 +101,7 @@ public class SWTBotKeYSourceCodeLookupTest extends AbstractSetupTestCase {
          ISEDDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Click on "Resume" and wait until step was executed.
          final SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
-         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+         DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
                SWTBotMenu menuItem = item.contextMenu("Resume"); 
@@ -199,7 +199,7 @@ public class SWTBotKeYSourceCodeLookupTest extends AbstractSetupTestCase {
          ILaunch launch = target.getLaunch();
          // Click on "Resume" and wait until step was executed.
          final SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
-         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+         DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
                SWTBotMenu menuItem = item.contextMenu("Resume"); 

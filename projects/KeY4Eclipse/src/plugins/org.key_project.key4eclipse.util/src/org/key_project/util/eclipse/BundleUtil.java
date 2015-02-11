@@ -139,6 +139,25 @@ public final class BundleUtil {
    }
    
    /**
+    * Creates the given file with the content provided by the plug-in.
+    * @param file The {@link IFile} to create.
+    * @param bundleId The plug-in which provides the content.
+    * @param pathInBundle The path in the plug-in to the content.
+    * @throws CoreException Occurred Exception.
+    * @throws IOException Occurred Exception.
+    */
+   public static void extractFromBundleToWorkspace(String bundleId, String pathInBundle, IFile file) throws CoreException, IOException {
+      if (file != null) {
+         if (file.exists()) {
+            file.setContents(BundleUtil.openInputStream(bundleId, pathInBundle), true, false, null);
+         }
+         else {
+            file.create(BundleUtil.openInputStream(bundleId, pathInBundle), true, null);
+         }
+      }
+   }
+   
+   /**
     * Extracts or files and folders form the bundle into the workspace target.
     * @param bundleId The ID of the bundle to extract from.
     * @param pathInBundle The path in the bundle.

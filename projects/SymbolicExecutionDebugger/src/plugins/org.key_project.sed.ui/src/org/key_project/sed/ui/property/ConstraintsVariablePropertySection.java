@@ -28,4 +28,12 @@ public class ConstraintsVariablePropertySection extends AbstractVariableProperty
    protected IVariableTabContent createContent() {
       return new ConstraintsTabComposite();
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean shouldUseExtraSpace() {
+      return true;
+   }
 }

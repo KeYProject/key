@@ -5,7 +5,7 @@
          <callStackEntry path="/0"/>
          <methodCall name="&lt;call ArrayAverage.sum(array_1)&gt;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <branchStatement name="if (array_1==null)" pathCondition="true" pathConditionChanged="false">
+            <branchStatement name="if (array_1==null)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                <callStackEntry path="/0/0/0"/>
                <callStackEntry path="/0"/>
                <branchCondition name="equals(array,null)" pathCondition="equals(array,null)" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -22,6 +22,7 @@
                            <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                            </termination>
                         </exceptionalMethodReturn>
+                        <completedBlockEntry path="/0/0/0/0" conditionString="equals(array,null)"/>
                      </exceptionalMethodReturn>
                   </statement>
                </branchCondition>
@@ -31,7 +32,7 @@
                   <statement name="int sum = 0;" pathCondition="not(equals(array,null))" pathConditionChanged="false">
                      <callStackEntry path="/0/0/0"/>
                      <callStackEntry path="/0"/>
-                     <loopStatement name="for ( int i = 0; i&lt;array_1.length; i++ )" pathCondition="not(equals(array,null))" pathConditionChanged="false">
+                     <loopStatement name="for ( int i = 0; i&lt;array_1.length; i++ )" pathCondition="not(equals(array,null))" pathConditionChanged="false" blockOpened="true">
                         <callStackEntry path="/0/0/0"/>
                         <callStackEntry path="/0"/>
                         <statement name="int i = 0;" pathCondition="not(equals(array,null))" pathConditionChanged="false">
@@ -98,10 +99,15 @@ as result of ArrayAverage.average(array)&gt;" isReturnValueComputed="true" metho
                                  </statement>
                               </branchCondition>
                            </loopInvariant>
+                           <completedBlockEntry path="/0/0/0/0" conditionString="not(equals(array,null))"/>
+                           <completedBlockEntry path="/0/0/0/0/1/0/0" conditionString="true"/>
                         </statement>
+                        <blockCompletionEntry path="/0/0/0/0/1/0/0/0"/>
                      </loopStatement>
                   </statement>
                </branchCondition>
+               <blockCompletionEntry path="/0/0/0/0/0/0/0"/>
+               <blockCompletionEntry path="/0/0/0/0/1/0/0/0"/>
             </branchStatement>
             <methodReturnEntry path="/0/0/0/0/0/0/0"/>
             <methodReturnEntry path="/0/0/0/0/1/0/0/0/0/1/0/0"/>

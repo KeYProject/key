@@ -71,7 +71,7 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.XMLUtil;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;

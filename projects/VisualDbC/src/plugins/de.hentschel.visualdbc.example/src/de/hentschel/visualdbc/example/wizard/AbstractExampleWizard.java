@@ -22,7 +22,7 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.key_project.key4eclipse.common.ui.wizard.AbstractNewJavaProjectWizard;
+import org.key_project.key4eclipse.common.ui.wizard.AbstractNewJavaExampleProjectWizard;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyDriver;
 import de.hentschel.visualdbc.dbcmodel.DbcModel;
@@ -33,7 +33,7 @@ import de.hentschel.visualdbc.dbcmodel.DbcProperty;
  * java projects.
  * @author Martin Hentschel
  */
-public abstract class AbstractExampleWizard extends AbstractNewJavaProjectWizard {
+public abstract class AbstractExampleWizard extends AbstractNewJavaExampleProjectWizard {
    /**
     * Updates the location in the model file.
     * @param modelFile The model file to update.

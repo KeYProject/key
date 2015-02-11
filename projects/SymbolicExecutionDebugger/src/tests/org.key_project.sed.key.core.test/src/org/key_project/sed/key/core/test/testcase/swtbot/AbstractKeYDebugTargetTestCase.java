@@ -316,7 +316,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          assertTrue(leafStep.canStepInto());
          launchTreeItem.select();
          // Click on "Step Into" and wait until step was executed.
-         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+         DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
                SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Into"); 
@@ -379,7 +379,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          assertTrue(leafStep.canStepOver());
          launchTreeItem.select();
          // Click on "Step Over" and wait until step was executed.
-         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+         DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
                SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Over"); 
@@ -433,7 +433,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          assertTrue(leafStep.canStepReturn());
          launchTreeItem.select();
          // Click on "Step Return" and wait until step was executed.
-         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+         DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
                SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Return"); 
@@ -487,7 +487,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          assertTrue(leafStep.canResume());
          launchTreeItem.select();
          // Click on "Resume" and wait until step was executed.
-         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+         DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
                SWTBotMenu menuItem = launchTreeItem.contextMenu("Resume"); 
@@ -999,6 +999,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
     * @param usePrettyPrinting Use pretty printing?
+    * @param truthValueEvaluationEnabled Truth value evaluation enabled?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetProofFileTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -1014,6 +1015,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
                                        Boolean usePrettyPrinting,
+                                       Boolean truthValueEvaluationEnabled,
                                        int timeoutFactor,
                                        IKeYDebugTargetProofFileTestExecutor executor) throws Exception {
       // Create bot
@@ -1046,7 +1048,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * timeoutFactor;
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(file, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting);
+         TestSEDKeyCoreUtil.launchKeY(file, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting, truthValueEvaluationEnabled);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();

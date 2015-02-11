@@ -273,26 +273,6 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
          return false;
       }
    }
-   
-   /**
-    * This method should be called after an {@link ISEDThread} is resumed.
-    * @param thread The resumed {@link ISEDThread}.
-    */
-   public void threadResumed(ISEDThread thread) {
-      if (!isSuspended()) {
-         fireResumeEvent(DebugEvent.CLIENT_REQUEST);
-      }
-   }
-   
-   /**
-    * This method should be called after an {@link ISEDThread} is suspended.
-    * @param thread The suspended {@link ISEDThread}.
-    */
-   public void threadSuspended(ISEDThread thread) {
-      if (isSuspended()) {
-         fireSuspendEvent(DebugEvent.CLIENT_REQUEST);
-      }
-   }
 
    /**
     * {@inheritDoc}

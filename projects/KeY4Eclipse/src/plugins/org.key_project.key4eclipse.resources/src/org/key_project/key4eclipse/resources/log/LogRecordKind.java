@@ -1,5 +1,7 @@
 package org.key_project.key4eclipse.resources.log;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.key_project.key4eclipse.resources.builder.KeYProjectBuildJob;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuilder;
 
 /**
@@ -15,5 +17,10 @@ public enum LogRecordKind {
    /**
     * Times logged by {@link KeYProjectBuilder#clean(IProgressMonitor)}
     */
-   CLEAN
+   CLEAN, 
+
+   /**
+    * Times logged by {@link KeYProjectBuildJob}.
+    */
+   JOB
 }

@@ -15,7 +15,7 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.Toolkit;
 
 import javax.swing.*;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 

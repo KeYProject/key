@@ -66,6 +66,7 @@ import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
@@ -888,12 +889,16 @@ public class Recoder2KeYConverter {
         ExtList children = collectChildren(e);
 	return new SeqReverse(children);
     }
+    
+    public EmptyMapLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral e) {
+        return EmptyMapLiteral.INSTANCE;
+    }
 
     /**
      * Resolve the function symbol which is embedded here to its logical
      * counterpart.
      */
-    public DLEmbeddedExpression convert(de.uka.ilkd.key.java.recoderext.DLEmbeddedExpression e) {
+    public DLEmbeddedExpression convert(de.uka.ilkd.key.java.recoderext.EscapeExpression e) {
         ExtList children = collectChildren(e);
         String name = e.getFunctionName();
         Named named = namespaceSet.functions().lookup(new Name(name));

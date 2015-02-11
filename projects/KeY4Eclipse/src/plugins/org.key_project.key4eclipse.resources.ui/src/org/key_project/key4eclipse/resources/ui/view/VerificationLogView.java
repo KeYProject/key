@@ -160,13 +160,8 @@ public class VerificationLogView extends AbstractLinkableViewPart {
    protected List<IProject> computeProjectsToShow() {
       List<IProject> result = new LinkedList<IProject>();
       for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
-         try {
-            if (project.exists() && project.isOpen() && KeYResourcesUtil.isKeYProject(project)) {
-               result.add(project);
-            }
-         }
-         catch (CoreException e) {
-            LogUtil.getLogger().logError(e);
+         if (project.exists() && project.isOpen() && KeYResourcesUtil.isKeYProject(project)) {
+            result.add(project);
          }
       }
       return result;
@@ -200,7 +195,7 @@ public class VerificationLogView extends AbstractLinkableViewPart {
                }
             });
          }
-         tabFolder.getDisplay().syncExec(new Runnable() {
+         tabFolder.getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
                updateShownTabs();
