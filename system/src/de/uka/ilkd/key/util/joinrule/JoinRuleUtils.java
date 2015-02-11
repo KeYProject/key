@@ -26,6 +26,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -442,6 +443,61 @@ public class JoinRuleUtils {
       return result;
    }
    
+
+   
+   /**
+    * Find a location variable for the given one that is unique for the
+    * branch corresponding to the given goal, but not necessarily globally
+    * unique. The variable with the first branch-unique name w.r.t. a
+    * numeric index is returned.
+    * 
+    * @param var Variable to get a branch-unique correspondent for.
+    * @param startLeaf The leaf of the branch.
+    * @return The first indexed PV that is unique w.r.t. the given branch,
+    *    but not with the global variable registry.
+    */
+   public static LocationVariable getBranchUniqueLocVar(
+         LocationVariable var,
+         Node startLeaf) {
+      
+      // Find the node where the variable was introduced
+      Node intrNode = getIntroducingNodeforLocVar(var, startLeaf);
+      
+      String base = stripIndex(var.name().toString());
+      
+      int newCounter = 0;
+      String branchUniqueName = base;
+      while (!isUniqueInGlobals(branchUniqueName.toString(), intrNode.getGlobalProgVars()) ||
+            (lookupVarInNS(branchUniqueName) != null &&
+               !lookupVarInNS(branchUniqueName).sort().equals(var.sort()))) {
+         newCounter += 1;
+         branchUniqueName = base + "_" + newCounter;
+      }
+      
+      LocationVariable branchUniqueVar = lookupVarInNS(branchUniqueName);
+      
+      return branchUniqueVar == null ? var : branchUniqueVar;
+   }
+
+   /**
+    * Finds the node, from the given leaf on, where the variable
+    * was introduced.
+    * 
+    * @param var Variable to find introducing node for.
+    * @param node Leaf to start from.
+    * @return The node where the variable was introduced.
+    */
+   public static Node getIntroducingNodeforLocVar(
+         LocationVariable var, Node node) {
+      
+      while (!node.root() && node.getGlobalProgVars().contains(var)) {
+         node = node.parent();
+      }
+      
+      return node;      
+      
+   }
+   
    ///////////////////////////////////////////////////
    ////////////////// GENERAL LOGIC //////////////////
    ////////////////// (Provability) //////////////////
@@ -576,11 +632,11 @@ public class JoinRuleUtils {
     */
    public static boolean equalsModBranchUniqueRenaming(
          SourceElement se1, SourceElement se2,
-         Goal goal,
+         Node node,
          Services services) {
       
       LocVarReplBranchUniqueMap replMap = new LocVarReplBranchUniqueMap(
-            goal, new HashSet<LocationVariable>());
+            node, new HashSet<LocationVariable>());
       
       ProgVarReplaceVisitor replVisitor1 =
             new ProgVarReplaceVisitor((ProgramElement) se1, replMap, services);
@@ -590,7 +646,7 @@ public class JoinRuleUtils {
       replVisitor1.start();
       replVisitor2.start();
       
-      return replVisitor1.result().equals(replVisitor2.result());
+      return replVisitor1.result().equalsModRenaming(replVisitor2.result(), new NameAbstractionTable());
    }
    
    ///////////////////////////////////////////////////
@@ -790,7 +846,7 @@ public class JoinRuleUtils {
       SymbolicExecutionStateWithProgCnt triple =
             sequentToSETriple(goal, pio, services);
       
-      return new SymbolicExecutionState(triple.first, triple.second);
+      return new SymbolicExecutionState(triple.first, triple.second, goal.node());
    }
    
    /**
@@ -842,7 +898,7 @@ public class JoinRuleUtils {
       // Replace location variables in program counter by their
       // branch-unique versions
       LocVarReplBranchUniqueMap replMap = new LocVarReplBranchUniqueMap(
-            goal, getLocationVariables(postCondition));
+            goal.node(), getLocationVariables(postCondition));
       
       ProgVarReplaceVisitor replVisitor =
             new ProgVarReplaceVisitor(programCounter, replMap, services);
@@ -869,7 +925,8 @@ public class JoinRuleUtils {
       return new SymbolicExecutionStateWithProgCnt(
             tb.parallel(newElementaries),                  // Update
             joinListToAndTerm(pathConditionSet, services), // Path Condition
-            progCntAndPostCond);                           // Program Counter and Post Condition
+            progCntAndPostCond,                            // Program Counter and Post Condition
+            goal.node());                                  // CorrespondingGoal
    }
    
    ///////////////////////////////////////////////////
@@ -1179,10 +1236,10 @@ public class JoinRuleUtils {
     * @return The PV with the given name in the global namespace,
     *    or null if there is none.
     */
-   private static ProgramVariable lookupVarInNS(String name) {
-      return (ProgramVariable) mediator().progVar_ns().lookup(new Name(name));
+   private static LocationVariable lookupVarInNS(String name) {
+      return (LocationVariable) mediator().progVar_ns().lookup(new Name(name));
    }
-   
+
    /**
     * Visitor for collecting program locations in a Java block.
     * 
@@ -1227,11 +1284,11 @@ public class JoinRuleUtils {
    extends HashMap<ProgramVariable, ProgramVariable> {
       private static final long serialVersionUID = 2305410114265133879L;
       
-      private Goal goal = null;
+      private Node node = null;
       private HashSet<LocationVariable> doNotRename = null;
       
-      public LocVarReplBranchUniqueMap(Goal goal, HashSet<LocationVariable> doNotRename) {
-         this.goal = goal;
+      public LocVarReplBranchUniqueMap(Node goal, HashSet<LocationVariable> doNotRename) {
+         this.node = goal;
          this.doNotRename = doNotRename;
       }
       
@@ -1259,26 +1316,7 @@ public class JoinRuleUtils {
                return var;
             }
             
-            // Find the node where the variable was introduced
-            Node intrNode = goal.node();
-            while (!intrNode.root() && intrNode.getGlobalProgVars().contains(var)) {
-               intrNode = intrNode.parent();
-            }
-            
-            String base = stripIndex(var.name().toString());
-            
-            int newCounter = 0;
-            String branchUniqueName = base;
-            while (!isUniqueInGlobals(branchUniqueName.toString(), intrNode.getGlobalProgVars()) ||
-                  (lookupVarInNS(branchUniqueName) != null &&
-                     !lookupVarInNS(branchUniqueName).sort().equals(var.sort()))) {
-               newCounter += 1;
-               branchUniqueName = base + "_" + newCounter;
-            }
-            
-            ProgramVariable branchUniqueVar = lookupVarInNS(branchUniqueName);
-            
-            return branchUniqueVar == null ? var : branchUniqueVar;
+            return getBranchUniqueLocVar(var, node);
          } else {
             return null;
          }

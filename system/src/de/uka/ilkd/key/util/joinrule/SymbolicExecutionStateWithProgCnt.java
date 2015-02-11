@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.util.joinrule;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.Triple;
 
 /**
@@ -14,6 +15,8 @@ import de.uka.ilkd.key.util.Triple;
  */
 public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> {
 
+   private Node correspondingNode = null;
+   
    /**
     * @param symbolicState The symbolic state (parallel update).
     * @param pathCondition The path condition (formula).
@@ -23,6 +26,19 @@ public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> 
    public SymbolicExecutionStateWithProgCnt(
          Term symbolicState, Term pathCondition, Term programCounter) {
       super(symbolicState, pathCondition, programCounter);
+   }
+   
+   /**
+    * @param symbolicState The symbolic state (parallel update).
+    * @param pathCondition The path condition (formula).
+    * @param programCounter The program counter: Formula with non-empty
+    *    Java block and post condition as only sub term.
+    * @param correspondingNode The node corresponding to this SE state.
+    */
+   public SymbolicExecutionStateWithProgCnt(
+         Term symbolicState, Term pathCondition, Term programCounter, Node correspondingNode) {
+      this(symbolicState, pathCondition, programCounter);
+      this.correspondingNode = correspondingNode;
    }
    
    /**
@@ -44,6 +60,20 @@ public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> 
     */
    public Term getProgramCounter() {
       return third;
+   }
+   
+   /**
+    * @return The node corresponding to this SE state.
+    */
+   public Node getCorrespondingNode() {
+      return correspondingNode;
+   }
+   
+   /**
+    * @param The node corresponding to this SE state.
+    */
+   public void setCorrespondingNode(Node correspondingNode) {
+      this.correspondingNode = correspondingNode;
    }
    
 }
