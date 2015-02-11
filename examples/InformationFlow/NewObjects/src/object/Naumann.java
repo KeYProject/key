@@ -26,7 +26,7 @@ public class Naumann {
               \new_objects  m_result; */
         { m_result = new Node[10]; }
         int i = 0;
-        /*@ loop_invariant 0 <= i && i <= m_result.length;
+        /*@ loop_invariant 0 <= i && i <= m_result.length && m_result.length == 10;
             loop_invariant m_result != null && \typeof(m_result) == \type(Node[]);
             assignable  m_result[*];
             decreases   m_result.length - i;

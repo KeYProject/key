@@ -21,7 +21,7 @@ public class BankAccount {
       @ determines customerViewOnBankAccount \by  \itself;
       @ assignable \strictly_nothing;
       @*/
-    int getId() {
+    public int getId() {
         return id;
     }
 
@@ -29,7 +29,7 @@ public class BankAccount {
       @ determines customerViewOnBankAccount \by  \itself;
       @ assignable \strictly_nothing;
       @*/
-    int getBalance() {
+    public int getBalance() {
         return balance;
     }
 
@@ -38,9 +38,12 @@ public class BankAccount {
       @            \declassifies amount;
       @ assignable balance, customerViewOnBankAccount;
       @*/
-    void depositMoney(int amount) {
+    public void depositMoney(int amount) {
         this.balance = this.balance - amount;
-        //@ set customerViewOnBankAccount = \seq_concat(\seq_singleton(this), \seq_concat(\seq_singleton(balance), \seq_singleton(id)));
-        ;
+        /*@ set customerViewOnBankAccount =
+                    \seq_concat(\seq_singleton(this),
+                    \seq_concat(\seq_singleton(balance),
+                                \seq_singleton(id)));
+        */;
     }
 }
