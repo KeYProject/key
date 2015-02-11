@@ -6,6 +6,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
+import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+
 /**
  * This class implements some methods of the {@link IJMLProfile} in a generic
  * way.
@@ -17,11 +20,11 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
 
    /**
     * Helper class for a tuple of key and type class.
-    * 
+    *
     * @author Moritz Lichter
     *
     */
-   private static class TypedKey {
+   private static final class TypedKey {
       private final Object key;
       private final Class<?> contentType;
 
@@ -76,6 +79,15 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
    }
 
    /**
+    * A set containing all supported keywords.
+    */
+   private final Set<IKeyword> supportedKeywords = new HashSet<IKeyword>();
+   /**
+    * The set containing all supported keywords.
+    */
+   private final Set<IJMLPrimary> supportedPrimaries = new HashSet<IJMLPrimary>();
+
+   /**
     * A map which stores the extensions registered to this profile.
     */
    private final Map<TypedKey, Set<?>> extensions = new HashMap<TypedKey, Set<?>>();
@@ -88,8 +100,38 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
       if (extensionSet == null) {
          return Collections.emptySet();
       }
-      return extensionSet;
+      return Collections.unmodifiableSet(extensionSet);
 
+   }
+
+   @Override
+   public Set<IKeyword> getSupportedKeywords() {
+      return Collections.unmodifiableSet(this.supportedKeywords);
+   }
+
+   @Override
+   public Set<IJMLPrimary> getSupportedPrimaries() {
+      return Collections.unmodifiableSet(this.supportedPrimaries);
+   }
+
+   /**
+    * Returns the modifiable version of the keywords set to allow subclasses to
+    * access them.
+    *
+    * @return the modifiable keywords set
+    */
+   protected final Set<IKeyword> getSupportedKeywordsInternal() {
+      return this.supportedKeywords;
+   }
+
+   /**
+    * Returns the modifiable version of the primaries set to allow subclasses to
+    * access them.
+    *
+    * @return the modifiable primaries set
+    */
+   protected final Set<IJMLPrimary> getSupportedPrimariesInternal() {
+      return this.supportedPrimaries;
    }
 
    /**
@@ -104,7 +146,7 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
     * @param <T>
     *           the type of the extension
     */
-   protected <T> void putExtension(final Object key, final T newValue,
+   protected final <T> void putExtension(final Object key, final T newValue,
          final Class<T> clazz) {
       final TypedKey tKey = new TypedKey(key, clazz);
       @SuppressWarnings("unchecked")
@@ -115,4 +157,5 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
       extensionSet.add(newValue);
       this.extensions.put(tKey, extensionSet);
    }
+
 }

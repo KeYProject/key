@@ -1,15 +1,10 @@
 package org.key_project.jmlediting.profile.jmlref;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
-import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
-import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.BehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.ExceptionalBehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.NormalBehaviorKeyword;
@@ -63,43 +58,36 @@ import org.key_project.jmlediting.profile.jmlref.visibility.SpecPublicKeyword;
 public class JMLReferenceProfile extends AbstractJMLProfile {
 
    /**
-    * A set containing all supported keywords.
-    */
-   private final Set<IKeyword> supportedKeywords;
-   /**
-    * The set containing all supported keywords.
-    */
-   private final Set<IJMLPrimary> supportedPrimaries;
-
-   /**
     * Creates a new profile instance with the given supported keyword.
     *
     * @param lang
     *           the keyword locale for AE/BE
     */
    public JMLReferenceProfile(final KeywordLocale lang) {
-      this.supportedKeywords = new HashSet<IKeyword>(Arrays.asList(
-            new EnsuresKeyword(), new AssignableKeyword(),
-            new AccessibleKeyword(), new RequiresKeyword(),
-            new BehaviorKeyword(lang), new ExceptionalBehaviorKeyword(lang),
-            new NormalBehaviorKeyword(lang), new AlsoKeyword(),
-            new HelperKeyword(), new PureKeyword(), new PrivateKeyword(),
-            new ProtectedKeyword(), new PublicKeyword(),
-            new SpecProtectedKeyword(), new SpecPublicKeyword(),
-            new EverythingKeyword(), new NothingKeyword(),
-            new NotSpecifiedKeyword(), new ResultKeyword(), new OldKeyword(),
-            new SameKeyword(), new ForallQuantifierKeyword(),
-            new ExistentialQuantifierKeyword(), new MinQuantifierKeyword(),
-            new MaxQuantifierKeyword(), new ProductQuantifierKeyword(),
-            new SumQuantifierKeyword(), new NumOfQuantifierKeyword(),
-            new NonNullKeyword(), new NullableKeyword(),
-            new InvariantKeyword(), new LoopInvariantKeyword(),
-            new DecreasingKeyword(), new InvariantForKeyword(),
-            new SuchThatKeyword(), new SetKeyword(), new ModelKeyword(),
-            new GhostKeyword(), new RepresentsKeyword()));
+      this.getSupportedKeywordsInternal().addAll(
+            Arrays.asList(new EnsuresKeyword(), new AssignableKeyword(),
+                  new AccessibleKeyword(), new RequiresKeyword(),
+                  new BehaviorKeyword(lang), new ExceptionalBehaviorKeyword(
+                        lang), new NormalBehaviorKeyword(lang),
+                  new AlsoKeyword(), new HelperKeyword(), new PureKeyword(),
+                  new PrivateKeyword(), new ProtectedKeyword(),
+                  new PublicKeyword(), new SpecProtectedKeyword(),
+                  new SpecPublicKeyword(), new EverythingKeyword(),
+                  new NothingKeyword(), new NotSpecifiedKeyword(),
+                  new ResultKeyword(), new OldKeyword(), new SameKeyword(),
+                  new ForallQuantifierKeyword(),
+                  new ExistentialQuantifierKeyword(),
+                  new MinQuantifierKeyword(), new MaxQuantifierKeyword(),
+                  new ProductQuantifierKeyword(), new SumQuantifierKeyword(),
+                  new NumOfQuantifierKeyword(), new NonNullKeyword(),
+                  new NullableKeyword(), new InvariantKeyword(),
+                  new LoopInvariantKeyword(), new DecreasingKeyword(),
+                  new InvariantForKeyword(), new SuchThatKeyword(),
+                  new SetKeyword(), new ModelKeyword(), new GhostKeyword(),
+                  new RepresentsKeyword()));
 
-      this.supportedPrimaries = new HashSet<IJMLPrimary>(Arrays.asList(
-            new KeywordJMLPrimary(), new QuantifierPrimary()));
+      this.getSupportedPrimariesInternal().addAll(
+            Arrays.asList(new KeywordJMLPrimary(), new QuantifierPrimary()));
 
    }
 
@@ -122,32 +110,8 @@ public class JMLReferenceProfile extends AbstractJMLProfile {
    }
 
    @Override
-   public final Set<IKeyword> getSupportedKeywords() {
-      return Collections.unmodifiableSet(this.supportedKeywords);
-   }
-
-   @Override
-   public Set<IJMLPrimary> getSupportedPrimaries() {
-      return Collections.unmodifiableSet(this.supportedPrimaries);
-   }
-
-   @Override
    public IJMLParser createParser() {
       return new DefaultJMLParser(this);
-   }
-
-   /**
-    * Returns the modifiable version of the keyword set to allow subclasses to
-    * modify them.
-    *
-    * @return the modifiable keyword set
-    */
-   protected final Set<IKeyword> getSupportedKeywordsInternal() {
-      return this.supportedKeywords;
-   }
-
-   protected final Set<IJMLPrimary> getSupportedPrimariesInternal() {
-      return this.supportedPrimaries;
    }
 
 }
