@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.util.joinrule;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.util.Triple;
 
 /**
@@ -14,6 +15,8 @@ import de.uka.ilkd.key.util.Triple;
  */
 public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> {
 
+   private Goal correspondingGoal = null;
+   
    /**
     * @param symbolicState The symbolic state (parallel update).
     * @param pathCondition The path condition (formula).
@@ -23,6 +26,19 @@ public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> 
    public SymbolicExecutionStateWithProgCnt(
          Term symbolicState, Term pathCondition, Term programCounter) {
       super(symbolicState, pathCondition, programCounter);
+   }
+   
+   /**
+    * @param symbolicState The symbolic state (parallel update).
+    * @param pathCondition The path condition (formula).
+    * @param programCounter The program counter: Formula with non-empty
+    *    Java block and post condition as only sub term.
+    * @param correspondingGoal The goal corresponding to this SE state.
+    */
+   public SymbolicExecutionStateWithProgCnt(
+         Term symbolicState, Term pathCondition, Term programCounter, Goal correspondingGoal) {
+      this(symbolicState, pathCondition, programCounter);
+      this.correspondingGoal = correspondingGoal;
    }
    
    /**
@@ -44,6 +60,13 @@ public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> 
     */
    public Term getProgramCounter() {
       return third;
+   }
+   
+   /**
+    * @return The goal corresponding to this SE state.
+    */
+   public Goal getCorrespondingGoal() {
+      return correspondingGoal;
    }
    
 }

@@ -134,18 +134,31 @@ public class JoinIfThenElse extends JoinRule {
             
          } else {
             
+            Sort heapSort = (Sort) services.getNamespaces().sorts().lookup("Heap");
+            
             // Apply if-then-else construction: Different values
-            if (v.name().toString().equals("heap")) {
+            if (v.sort().equals(heapSort)) {
                
                Function storeFunc = (Function) services.getNamespaces().functions().lookup("store");
                Function createFunc = (Function) services.getNamespaces().functions().lookup("create");
                //TODO add further functions, e.g. anon
                
-               if (((Function) rightSide1.op()).equals(storeFunc)) {
-                  Term subHeap = rightSide1.sub(0);
-                  LocationVariable object = (LocationVariable) rightSide1.sub(1).op();
-                  Function field = (Function) rightSide1.sub(2).op();
-                  Term value = rightSide1.sub(3);
+               if (((Function) rightSide1.op()).equals(storeFunc) &&
+                     ((Function) rightSide2.op()).equals(storeFunc)) {
+                  Term subHeap1 = rightSide1.sub(0);
+                  LocationVariable object1 = (LocationVariable) rightSide1.sub(1).op();
+                  Function field1 = (Function) rightSide1.sub(2).op();
+                  Term value1 = rightSide1.sub(3);
+                  
+                  Term subHeap2 = rightSide2.sub(0);
+                  LocationVariable object2 = (LocationVariable) rightSide2.sub(1).op();
+                  Function field2 = (Function) rightSide2.sub(2).op();
+                  Term value2 = rightSide2.sub(3);
+                  
+                  // Check whether the variables point to the same
+                  // object in both states. We judge that they do
+                  // if they are created at nodes with the same
+                  // program counters modulo renaming.
                }
                
                

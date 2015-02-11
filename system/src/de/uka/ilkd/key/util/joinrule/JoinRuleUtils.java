@@ -829,7 +829,7 @@ public class JoinRuleUtils {
       SymbolicExecutionStateWithProgCnt triple =
             sequentToSETriple(goal, pio, services);
       
-      return new SymbolicExecutionState(triple.first, triple.second);
+      return new SymbolicExecutionState(triple.first, triple.second, goal);
    }
    
    /**
@@ -908,7 +908,8 @@ public class JoinRuleUtils {
       return new SymbolicExecutionStateWithProgCnt(
             tb.parallel(newElementaries),                  // Update
             joinListToAndTerm(pathConditionSet, services), // Path Condition
-            progCntAndPostCond);                           // Program Counter and Post Condition
+            progCntAndPostCond,                            // Program Counter and Post Condition
+            goal);                                         // CorrespondingGoal
    }
    
    ///////////////////////////////////////////////////
