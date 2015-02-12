@@ -450,4 +450,12 @@ public class AnnotationPropertySection extends AbstractSEDDebugTargetPropertySec
       }
       super.dispose();
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean shouldUseExtraSpace() {
+      return true;
+   }
 }

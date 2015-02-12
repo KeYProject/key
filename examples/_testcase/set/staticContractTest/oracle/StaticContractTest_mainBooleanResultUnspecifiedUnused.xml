@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="StaticContractTest.mainBooleanResultUnspecifiedUnused(x);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call StaticContractTest.mainBooleanResultUnspecifiedUnused(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <operationContract name="result_0 = booleanResultUnspecified(x) catch(exc_0)
 pre: true
 post: exc_0 = null
 mod: allLocs
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-         <methodReturn name="&lt;return of StaticContractTest.mainBooleanResultUnspecifiedUnused(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of StaticContractTest.mainBooleanResultUnspecifiedUnused(x);&gt;" isReturnValueComputed="true">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+         <methodReturn name="&lt;return of mainBooleanResultUnspecifiedUnused&gt;" signature="&lt;return of StaticContractTest.mainBooleanResultUnspecifiedUnused(x)&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of mainBooleanResultUnspecifiedUnused&gt;" signatureIncludingReturnValue="&lt;return of StaticContractTest.mainBooleanResultUnspecifiedUnused(x)&gt;" isReturnValueComputed="true" methodReturnCondition="true">
             <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
             </termination>
          </methodReturn>
       </operationContract>
+      <methodReturnEntry path="/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0"/>
 </start>

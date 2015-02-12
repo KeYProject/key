@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="SimpleConditionExample.somethingLocalMain();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call SimpleConditionExample.somethingLocalMain()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int y = 42;" pathCondition="true" pathConditionChanged="false">
          <statement name="int x = somethingLocal(y);" pathCondition="true" pathConditionChanged="false">
-            <methodCall name="SimpleConditionExample.somethingLocal(x_2);" pathCondition="true" pathConditionChanged="false">
+            <methodCall name="&lt;call SimpleConditionExample.somethingLocal(x_2)&gt;" pathCondition="true" pathConditionChanged="false">
                <statement name="int y = x_2*x_2;" pathCondition="true" pathConditionChanged="false">
                   <statement name="x_2++;" pathCondition="true" pathConditionChanged="false">
                      <statement name="return y_1;" pathCondition="true" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of SimpleConditionExample.somethingLocal(x_2);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                        <methodReturn name="&lt;return of somethingLocal&gt;" signature="&lt;return of SimpleConditionExample.somethingLocal(x_2)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                            <statement name="somethingLocal(x);" pathCondition="true" pathConditionChanged="false">
                            </statement>
                         </methodReturn>
                      </statement>
                   </statement>
                </statement>
+               <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
             </methodCall>
          </statement>
       </statement>

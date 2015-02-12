@@ -67,12 +67,14 @@ public class TriggersSet {
     }
 
     static TriggersSet create(Term allTerm, Services services) {
-        TriggersSet trs = services.getCaches().getTriggerSetCache().get(allTerm);
+        final Map<Term, TriggersSet> triggerSetCache = services.getCaches().getTriggerSetCache();
+		TriggersSet trs = triggerSetCache.get(allTerm);
         if (trs == null) {
             // add check whether it is in PCNF
             trs = new TriggersSet(allTerm, services);
-            services.getCaches().getTriggerSetCache().put(allTerm, trs);
-        }         return trs;
+            triggerSetCache.put(allTerm, trs);
+        }   
+        return trs;
     }
 
     /**

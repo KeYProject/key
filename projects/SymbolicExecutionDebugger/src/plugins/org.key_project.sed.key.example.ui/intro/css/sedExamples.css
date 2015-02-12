@@ -1,0 +1,6 @@
+a#openSEDExamples img {
+   background-image : url(graphics/sed.gif);
+}
+a#openSEDExamples:hover img {
+   background-image : url(graphics/sed_hov.gif);
+}

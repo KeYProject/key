@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_95091266-9700-4236-9d9f-8f6fe8963461" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_30e63c7e-4a02-46b0-8c58-0a72aa547c20" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_c0e36c2e-c28f-4c63-89ba-46656a0309a6" name="self.main(a);" pathCondition="true" lineNumber="-1" charStart="46" charEnd="50" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
-            <sedStatement xml:id="_a0e6c9bd-d8a0-4cfe-964d-edbfb386a9df" name="firstLevel(a);" pathCondition="true" lineNumber="-1" charStart="63" charEnd="77" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
+   <sedTarget xml:id="_a28785c4-0605-4c87-aa17-57bdbb0e0347" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_012aaffe-2cfa-4f00-91f7-da4d97e418b0" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
+         <sedMethodCall xml:id="_c1ed9edf-9290-4f26-a258-983a98ac107d" name="&lt;call self.main(a)&gt;" pathCondition="true" lineNumber="-1" charStart="46" charEnd="50" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java" groupable="true">
+            <sedStatement xml:id="_35c39a2d-a0ad-41f9-8193-85caa13ffcff" name="firstLevel(a);" pathCondition="true" lineNumber="-1" charStart="63" charEnd="77" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
             </sedStatement>
          </sedMethodCall>
       </sedThread>

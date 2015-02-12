@@ -18,7 +18,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 public class ToggleConfirmExitAction extends MainWindowAction {
 

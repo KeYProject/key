@@ -4,7 +4,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.debug.internal.ui.DebugUIPlugin;
+import org.eclipse.debug.ui.DebugUITools;
+import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.swt.graphics.Image;
@@ -12,7 +13,6 @@ import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.event.ISEDAnnotationLinkListener;
 import org.key_project.sed.core.annotation.event.SEDAnnotationLinkEvent;
-import org.key_project.sed.ui.util.SEDImages;
 import org.key_project.util.eclipse.swt.viewer.AbstractLabelProvider;
 
 /**
@@ -20,7 +20,6 @@ import org.key_project.util.eclipse.swt.viewer.AbstractLabelProvider;
  * {@link ISEDAnnotationLink}s of an {@link ISEDAnnotation}. 
  * @author Martin Hentschel
  */
-@SuppressWarnings("restriction")
 public class AnnotationAnnotationLinkLabelProvider extends AbstractLabelProvider implements ITableLabelProvider {
    /**
     * The {@link ISEDAnnotation} which provides the shown {@link ISEDAnnotationLink}s.
@@ -53,6 +52,11 @@ public class AnnotationAnnotationLinkLabelProvider extends AbstractLabelProvider
    };
    
    /**
+    * The used {@link IDebugModelPresentation} to compute text and images.
+    */
+   private final IDebugModelPresentation debugModelPresentation = DebugUITools.newDebugModelPresentation();
+   
+   /**
     * Constructor.
     * @param annotation The {@link ISEDAnnotation} which provides the shown {@link ISEDAnnotationLink}s.
     */
@@ -73,7 +77,7 @@ public class AnnotationAnnotationLinkLabelProvider extends AbstractLabelProvider
       if (element instanceof ISEDAnnotationLink) {
          ISEDAnnotationLink link = (ISEDAnnotationLink)element;
          if (columnIndex == 0) {
-            return SEDImages.getNodeImage(link.getTarget());
+            return debugModelPresentation.getImage(link.getTarget());
          }
          else {
             return null;
@@ -92,7 +96,7 @@ public class AnnotationAnnotationLinkLabelProvider extends AbstractLabelProvider
       if (element instanceof ISEDAnnotationLink) {
          ISEDAnnotationLink link = (ISEDAnnotationLink)element;
          if (columnIndex == 0) {
-            return DebugUIPlugin.getDefaultLabelProvider().getText(link.getTarget());
+            return debugModelPresentation.getText(link.getTarget());
          }
          else {
             return annotation.getType().getAdditionalLinkColumnValue(columnIndex - 1, link);
@@ -135,6 +139,9 @@ public class AnnotationAnnotationLinkLabelProvider extends AbstractLabelProvider
       annotation.removeAnnotationLinkListener(annotationListener);
       for (ISEDAnnotationLink link : annotation.getLinks()) {
          link.removePropertyChangeListener(linksListener);
+      }
+      if (debugModelPresentation != null) {
+         debugModelPresentation.dispose();
       }
    }
 }

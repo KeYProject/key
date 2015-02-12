@@ -73,6 +73,15 @@ provable: ./heap/block_contracts/Simple__unnecessaryLoopInvariant.key
 # provable: ./heap/block_contracts/GreatestCommonDivisor.key
 provable: ./standard_key/java_dl/jml-assert/assert.key
 
+# Tests for Java Card (should also include the API, pending fix to bug #1475)
+
+provable: ./heap/javacard/updateBalance0.key
+provable: ./heap/javacard/updateBalance1.key
+provable: ./heap/javacard/setArray1.key
+provable: ./heap/javacard/setArray2.key
+# For this only "half" of the proof is done (see bug #1475), but it makes sure that the PO with two subproofs is initialisable:
+provable: ./heap/javacard/arrayFillNonAtomic.key
+
 # Other tests:
 provable: ./heap/coincidence_count/project.key
 provable: ./heap/fm12_01_LRS/lcp.key
@@ -173,6 +182,7 @@ provable: ./heap/simple/operation_contracts.key
 provable: ./heap/simple/select_store.key
 provable: ./heap/simple/selection_sort.key
 provable: ./heap/simple/seq.key
+provable: ./heap/simple/oldForParams.key
 provable: ./heap/SmansEtAl/ArrayList_add.key
 provable: ./heap/SmansEtAl/ArrayList_ArrayList.key
 provable: ./heap/SmansEtAl/ArrayList_footprint.key
@@ -420,6 +430,7 @@ provable: ./standard_key/pred_log/jbyteIfEx.key
 provable: ./standard_key/prop_log/allClausesLength4.key
 provable: ./standard_key/prop_log/allClausesLength5.key
 provable: ./standard_key/prop_log/doubleNeg.key
+provable: ./standard_key/prop_log/liarsville.key
 provable: ./standard_key/prop_log/simplest.key
 provable: ./standard_key/prop_log/contraposition.key
 provable: ./standard_key/quantifiers/elimination0.key
@@ -478,6 +489,8 @@ provable: ./standard_key/strings/substring2.key
 provable: ./standard_key/strings/substring3.key
 provable: ./standard_key/strings/substring4.key
 provable: ./standard_key/strings/substring5.key
+provable: ./standard_key/types/disjoint.key
+
 provable: ./_testcase/classpath/classpath.key
 
 notprovable: ./heap/inconsistent_represents/MyClass_m.key
@@ -521,5 +534,88 @@ provable: ./heap/model_methods/Recell_Recell_footprint.key
 provable: ./heap/model_methods/Recell_Recell_post_set.key
 provable: ./heap/model_methods/Recell_set.key
 provable: ./heap/model_methods/Recell_undo.key
+
+# Permission heap problems:
+
+provable: ./heap/permissions/permissions_method0.key
+provable: ./heap/permissions/permissions_method1.key
+provable: ./heap/permissions/permissions_method3.key
+provable: ./heap/permissions/permissions_setAB.key
+provable: ./heap/permissions/permissionProperties.key
+
+provable: ./heap/permissions/threads/AFilter_AFilter.key
+provable: ./heap/permissions/threads/AFilter_initPost_accessible.key
+provable: ./heap/permissions/threads/AFilter_inv_accessible1.key
+provable: ./heap/permissions/threads/AFilter_inv_accessible2.key
+provable: ./heap/permissions/threads/AFilter_joinTransfer_accessible.key
+provable: ./heap/permissions/threads/AFilter_joinTransfer_contract.key
+provable: ./heap/permissions/threads/AFilter_postJoin_accessible.key
+provable: ./heap/permissions/threads/AFilter_preStart_accessible.key
+provable: ./heap/permissions/threads/AFilter_startTransfer_accessible.key
+provable: ./heap/permissions/threads/AFilter_startTransfer_contract.key
+provable: ./heap/permissions/threads/AFilter_stateInv_accessible.key
+provable: ./heap/permissions/threads/AFilter_staticPermissions_accessible.key
+provable: ./heap/permissions/threads/AFilter_workingPermissions_accessible.key
+provable: ./heap/permissions/threads/BFilter_BFilter.key
+provable: ./heap/permissions/threads/BFilter_initPost_accessible.key
+provable: ./heap/permissions/threads/BFilter_inv_accessible1.key
+provable: ./heap/permissions/threads/BFilter_inv_accessible2.key
+provable: ./heap/permissions/threads/BFilter_joinTransfer_accessible.key
+provable: ./heap/permissions/threads/BFilter_joinTransfer_contract.key
+provable: ./heap/permissions/threads/BFilter_postJoin_accessible.key
+provable: ./heap/permissions/threads/BFilter_preStart_accessible.key
+provable: ./heap/permissions/threads/BFilter_startTransfer_accessible.key
+provable: ./heap/permissions/threads/BFilter_startTransfer_contract.key
+provable: ./heap/permissions/threads/BFilter_stateInv_accessible.key
+provable: ./heap/permissions/threads/BFilter_staticPermissions_accessible.key
+provable: ./heap/permissions/threads/BFilter_workingPermissions_accessible.key
+provable: ./heap/permissions/threads/Fib_Fib.key
+provable: ./heap/permissions/threads/Fib_initPost_accessible.key
+provable: ./heap/permissions/threads/Fib_inv1_accessible.key
+provable: ./heap/permissions/threads/Fib_inv2_accessible.key
+provable: ./heap/permissions/threads/Fib_joinTransfer_accessible.key
+provable: ./heap/permissions/threads/Fib_joinTransfer_contract.key
+provable: ./heap/permissions/threads/Fib_postJoin_accessible.key
+provable: ./heap/permissions/threads/Fib_preStart_accessible.key
+provable: ./heap/permissions/threads/Fib_startTransfer_accessible.key
+provable: ./heap/permissions/threads/Fib_startTransfer_contract.key
+provable: ./heap/permissions/threads/Fib_workingPermissions_accessible.key
+provable: ./heap/permissions/threads/Plotter_initPost_accessible.key
+provable: ./heap/permissions/threads/Plotter_inv_accessible1.key
+provable: ./heap/permissions/threads/Plotter_inv_accessible2.key
+provable: ./heap/permissions/threads/Plotter_joinTransfer_accessible.key
+provable: ./heap/permissions/threads/Plotter_joinTransfer_contract.key
+provable: ./heap/permissions/threads/Plotter_Plotter.key
+provable: ./heap/permissions/threads/Plotter_postJoin_accessible.key
+provable: ./heap/permissions/threads/Plotter_preStart_accessible.key
+provable: ./heap/permissions/threads/Plotter_startTransfer_accessible.key
+provable: ./heap/permissions/threads/Plotter_stateInv_accessible.key
+provable: ./heap/permissions/threads/Plotter_workingPermissions_accessible.key
+provable: ./heap/permissions/threads/Sampler_initPost_accessible.key
+provable: ./heap/permissions/threads/Sampler_inv_accessible1.key
+provable: ./heap/permissions/threads/Sampler_inv_accessible2.key
+provable: ./heap/permissions/threads/Sampler_joinTransfer_accessible.key
+provable: ./heap/permissions/threads/Sampler_joinTransfer_contract.key
+provable: ./heap/permissions/threads/Sampler_postJoin_accessible.key
+provable: ./heap/permissions/threads/Sampler_preStart_accessible.key
+provable: ./heap/permissions/threads/Sampler_run.key
+provable: ./heap/permissions/threads/Sampler_Sampler.key
+provable: ./heap/permissions/threads/Sampler_startTransfer_accessible.key
+provable: ./heap/permissions/threads/Sampler_startTransfer_contract.key
+provable: ./heap/permissions/threads/Sampler_stateInv_accessible.key
+provable: ./heap/permissions/threads/Sampler_staticPermissions_accessible.key
+provable: ./heap/permissions/threads/Sampler_workingPermissions_accessible.key
+
+# These need (a lot of) interaction at the moment:
+# provable: ./heap/permissions/threads/AFilter_run.key
+# provable: ./heap/permissions/threads/BFilter_run.key
+# provable: ./heap/permissions/threads/Fib_run.key
+# provable: ./heap/permissions/threads/Plotter_run.key
+# provable: ./heap/permissions/threads/Main_main.key
+
+# Should be provable, but isn't at the moment:
+# provable: ./heap/permissions/threads/Plotter_staticPermissions_accessible.key
+# Is provable, but very heavy (~400000 steps)
+# provable: ./heap/permissions/threads/Plotter_startTransfer_contract.key
 
 # End -- please do not remove this line.

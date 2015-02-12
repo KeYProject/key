@@ -579,7 +579,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
                 = new RuleJustificationBySpec(contract);
         final ComplexRuleJustificationBySpec cjust
                 = (ComplexRuleJustificationBySpec)
-                    goal.proof().env().getJustifInfo().getJustification(this);
+                    goal.proof().getInitConfig().getJustifInfo().getJustification(this);
         cjust.add(ruleApp, just);
 
         if(!useful) {
@@ -589,7 +589,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         //prepare cut formula
   	    final ContractPO po
 		    = services.getSpecificationRepository()
-			    .getPOForProof(goal.proof());
+			    .getContractPOForProof(goal.proof());
 	    final Term mbyOk;
 	    if(po != null && /* po.getMbyAtPre() != null && */ mby != null) {
 //	        mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),

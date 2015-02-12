@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.ResourceUtil.IFileOpener;
@@ -39,6 +40,82 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class ResourceUtilTest extends TestCase {
+   /**
+    * Tests {@link ResourceUtil#createFolder(org.eclipse.core.resources.IContainer, String)}.
+    */
+   @Test
+   public void testCreateFolder() throws CoreException {
+      IProject project = TestUtilsUtil.createProject("ResourceUtilTest_testCreateFolder");
+      // Test invalid parameter
+      IFolder folder = ResourceUtil.createFolder(null, null);
+      assertNull(folder);
+      folder = ResourceUtil.createFolder(project, "");
+      assertNull(folder);
+      folder = ResourceUtil.createFolder(null, "myFolder");
+      assertNull(folder);
+      // Test not existing folder
+      folder = ResourceUtil.createFolder(project, "myFolder");
+      assertNotNull(folder);
+      assertTrue(folder.exists());
+      // Test existing folder
+      folder = ResourceUtil.createFolder(project, "myFolder");
+      assertNotNull(folder);
+      assertTrue(folder.exists());
+   }
+   
+   /**
+    * Tests {@link ResourceUtil#createProject(String)}.
+    */
+   @Test
+   public void testCreateProject() throws CoreException {
+      // Test null
+      IProject project = ResourceUtil.createProject(null);
+      assertNull(project);
+      // Test not existing project
+      project = ResourceUtil.createProject("ResourceUtilTest_testCreateProject");
+      assertNotNull(project);
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      // Test existing but closed project
+      project.close(null);
+      project = ResourceUtil.createProject("ResourceUtilTest_testCreateProject");
+      assertNotNull(project);
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      // Test existing and open project
+      project = ResourceUtil.createProject("ResourceUtilTest_testCreateProject");
+      assertNotNull(project);
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      // Test project recreation
+      project.delete(true, null);
+      project = ResourceUtil.createProject("ResourceUtilTest_testCreateProject");
+      assertNotNull(project);
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+   }
+   
+   /**
+    * Tests {@link ResourceUtil#getWorkspaceLocation()}
+    * @throws CoreException Occurred Exception
+    */
+   @Test
+   public void testGetWorkspaceLocation() throws CoreException {
+      File location = ResourceUtil.getWorkspaceLocation();
+      assertNotNull(location);
+      assertTrue(location.isDirectory());
+      // Make sure that test project does not exist
+      String projectName = "ResourceUtilTest_testGetWorkspaceLocation";
+      File projectLocation = new File(location, projectName);
+      assertFalse(projectLocation.isDirectory());
+      // Create project
+      IProject project = TestUtilsUtil.createProject(projectName);
+      assertTrue(projectLocation.isDirectory());
+      // Delete project
+      project.delete(true, null);
+      assertFalse(projectLocation.isDirectory());
+   }
+   
    /**
     * Tests {@link ResourceUtil#validateWorkspaceFileName(String)}
     */
@@ -92,12 +169,12 @@ public class ResourceUtilTest extends TestCase {
             assertEquals("Target \"" + notExistingFolder + "\" does not exist.", e.getMessage());
          }
          // Test null source
-         ResourceUtil.copyIntoWorkspace(project, null, (File[])null);
-         ResourceUtil.copyIntoWorkspace(project, null, (File)null);
+         ResourceUtil.copyIntoWorkspace(project, null, null, (File[])null);
+         ResourceUtil.copyIntoWorkspace(project, null, null, (File)null);
          assertEquals(1, project.members().length); // .project file
          assertTrue(projectFile.exists());
          // Copy initial content
-         ResourceUtil.copyIntoWorkspace(project, null, tempDir.listFiles());
+         ResourceUtil.copyIntoWorkspace(project, null, null, tempDir.listFiles());
          assertEquals(4, project.members().length);
          assertTrue(projectFile.exists());
          IFolder targetEmptyFolder = project.getFolder("emptyFolder");
@@ -117,6 +194,22 @@ public class ResourceUtilTest extends TestCase {
          assertEquals("SubSubFileA.txt", ResourceUtil.readFrom(targetSubSubFileA));
          IFile targetSubSubFileB = targetSubSubDir.getFile("SubSubFileB.txt");
          assertEquals("SubSubFileB.txt", ResourceUtil.readFrom(targetSubSubFileB));
+         // Test different source directories
+         IProject projectSubSubDir = TestUtilsUtil.createProject("ResourceUtilTest_testCopyIntoWorkspace_sourceDirectory0");
+         ResourceUtil.copyIntoWorkspace(projectSubSubDir, null, subSubDir, subSubDir.listFiles());
+         assertEquals(2, targetSubSubDir.members().length);
+         assertEquals("SubSubFileA.txt", ResourceUtil.readFrom(projectSubSubDir.getFile("SubSubFileA.txt")));
+         assertEquals("SubSubFileB.txt", ResourceUtil.readFrom(projectSubSubDir.getFile("SubSubFileB.txt")));
+         IProject projectSubDir = TestUtilsUtil.createProject("ResourceUtilTest_testCopyIntoWorkspace_sourceDirectory1");
+         ResourceUtil.copyIntoWorkspace(projectSubDir, null, subDir, subSubDir.listFiles());
+         assertEquals(2, projectSubDir.members().length);
+         assertEquals("SubSubFileA.txt", ResourceUtil.readFrom(projectSubDir.getFile(new Path("subSubFolder/SubSubFileA.txt"))));
+         assertEquals("SubSubFileB.txt", ResourceUtil.readFrom(projectSubDir.getFile(new Path("subSubFolder/SubSubFileB.txt"))));
+         IProject projectTmpDir = TestUtilsUtil.createProject("ResourceUtilTest_testCopyIntoWorkspace_sourceDirectory2");
+         ResourceUtil.copyIntoWorkspace(projectTmpDir, null, tempDir, subSubDir.listFiles());
+         assertEquals(2, projectTmpDir.members().length);
+         assertEquals("SubSubFileA.txt", ResourceUtil.readFrom(projectTmpDir.getFile(new Path("subFolder/subSubFolder/SubSubFileA.txt"))));
+         assertEquals("SubSubFileB.txt", ResourceUtil.readFrom(projectTmpDir.getFile(new Path("subFolder/subSubFolder/SubSubFileB.txt"))));
          // Prepare temporary directory for adding new files and folders
          IOUtil.delete(tempDir);
          new File(tempDir, "newEmptyFolder").mkdirs();
@@ -125,7 +218,7 @@ public class ResourceUtilTest extends TestCase {
          newSubDir.mkdirs();
          IOUtil.writeTo(new FileOutputStream(new File(newSubDir, "NewSubFile.txt")), "NewSubFile.txt");
          // Add new content
-         ResourceUtil.copyIntoWorkspace(project, null, tempDir.listFiles());
+         ResourceUtil.copyIntoWorkspace(project, null, null, tempDir.listFiles());
          assertEquals(7, project.members().length);
          assertTrue(projectFile.exists());
          assertTrue(targetEmptyFolder.exists());
@@ -154,7 +247,7 @@ public class ResourceUtilTest extends TestCase {
          IOUtil.writeTo(new FileOutputStream(new File(newSubDir, "NewSubFile.txt")), "NewSubFile-Changed.txt");
          IOUtil.writeTo(new FileOutputStream(new File(tempDir, "Text.txt")), "Text-Changed.txt");
          // Replace some files
-         ResourceUtil.copyIntoWorkspace(project, null, tempDir.listFiles());
+         ResourceUtil.copyIntoWorkspace(project, null, null, tempDir.listFiles());
          assertEquals(7, project.members().length);
          assertTrue(projectFile.exists());
          assertTrue(targetEmptyFolder.exists());
@@ -182,7 +275,7 @@ public class ResourceUtilTest extends TestCase {
                return new ByteArrayInputStream(content.getBytes());
             }
          };
-         ResourceUtil.copyIntoWorkspace(project, opener, tempDir.listFiles());
+         ResourceUtil.copyIntoWorkspace(project, opener, null, tempDir.listFiles());
          assertEquals(7, project.members().length);
          assertTrue(projectFile.exists());
          assertTrue(targetEmptyFolder.exists());
@@ -203,7 +296,6 @@ public class ResourceUtilTest extends TestCase {
          assertEquals("NewSubFile-Changed.txt-Modified", ResourceUtil.readFrom(targetNewSubFile));
       }
       finally {
-         System.out.println(tempDir);
          IOUtil.delete(tempDir);
       }
    }

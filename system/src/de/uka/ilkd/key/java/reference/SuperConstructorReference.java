@@ -125,6 +125,11 @@ public class SuperConstructorReference extends SpecialConstructorReference
     public SourceElement getFirstElement() {
         return (prefix == null) ? this : prefix.getFirstElement();
     }
+
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+        return (prefix == null) ? this : prefix.getFirstElementIncludingBlocks();
+    }
     
 
     @Override

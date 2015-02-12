@@ -1,0 +1,92 @@
+\profile "Java Profile";
+
+\settings {
+"#Proof-Settings-Config-File
+#Tue Aug 19 11:11:20 CEST 2014
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_EXPAND
+[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_ON
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=1000
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=Strings-Strings\\:on , reach-reach\\:on , JavaCard-JavaCard\\:off , assertions-assertions\\:on , bigint-bigint\\:on , intRules-intRules\\:javaSemantics , programRules-programRules\\:Java , initialisation-initialisation\\:enableStaticInitialisation , modelFields-modelFields\\:showSatisfiability , sequences-sequences\\:on , integerSimplificationRules-integerSimplificationRules\\:full , runtimeExceptions-runtimeExceptions\\:allow , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_NONCLOSE
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]invariantForall=false
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\javaSource "../../src";
+
+\proofObligation "#Proof Obligation Settings
+#Tue Aug 19 11:11:20 CEST 2014
+name=Magic[Magic\\:\\:magic()].JML normal_behavior operation contract.0
+contract=Magic[Magic\\:\\:magic()].JML normal_behavior operation contract.0
+class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
+";
+
+\proof {
+(keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+
+(autoModeTime "78")
+
+(branch "dummy ID"
+(builtin "One Step Simplification" (formula "1") (newnames "heapAtPre"))
+(rule "impRight" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "notLeft" (formula "2"))
+(rule "assignment" (formula "7"))
+(rule "Class_invariant_axiom_for_Magic" (formula "5") (inst "sk=sk_0") (ifseqformula "3"))
+(branch "Use Axiom"
+   (rule "true_left" (formula "5"))
+   (rule "methodBodyExpand" (formula "6") (term "1") (newnames "heapBefore_magic,savedHeapBefore_magic"))
+   (builtin "One Step Simplification" (formula "6"))
+   (rule "methodCallReturn" (formula "6") (term "1"))
+   (rule "assignment" (formula "6") (term "1"))
+   (builtin "One Step Simplification" (formula "6"))
+   (rule "methodCallEmpty" (formula "6") (term "1"))
+   (rule "tryEmpty" (formula "6") (term "1"))
+   (rule "emptyModality" (formula "6") (term "1"))
+   (builtin "One Step Simplification" (formula "6"))
+   (rule "Class_invariant_axiom_for_Magic" (formula "6") (inst "sk=sk_1") (ifseqformula "3"))
+   (branch "Use Axiom"
+      (rule "closeTrue" (formula "6"))
+   )
+   (branch "Show Axiom Satisfiability"
+      (builtin "One Step Simplification" (formula "6"))
+      (rule "closeTrue" (formula "6"))
+   )
+)
+(branch "Show Axiom Satisfiability"
+   (builtin "One Step Simplification" (formula "6"))
+   (rule "closeTrue" (formula "6"))
+)
+)
+
+}

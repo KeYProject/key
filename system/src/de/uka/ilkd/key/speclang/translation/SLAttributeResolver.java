@@ -39,6 +39,8 @@ public final class SLAttributeResolver extends SLExpressionResolver {
     
     private ProgramVariable lookupVisibleAttribute(String name,
 	    					   KeYJavaType containingType) {
+        assert containingType.getJavaType() instanceof TypeDeclaration:
+            "type " + containingType + " is primitive, lookup for " + name;
 	final TypeDeclaration td
 		= (TypeDeclaration) containingType.getJavaType();
 	//lookup locally

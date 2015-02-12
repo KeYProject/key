@@ -18,6 +18,8 @@ import java.util.List;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
+import org.key_project.sed.core.model.ISEDBranchCondition;
+import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDStatement;
@@ -74,6 +76,16 @@ public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemo
     * The method call stack.
     */
    private ISEDDebugNode[] callStack;
+   
+   /**
+    * The contained {@link ISEDConstraint}s.
+    */
+   private final List<ISEDConstraint> constraints = new LinkedList<ISEDConstraint>();
+   
+   /**
+    * The known group start conditions.
+    */
+   private final List<ISEDBranchCondition> groupStartConditions = new LinkedList<ISEDBranchCondition>();
    
    /**
     * Constructor.
@@ -277,5 +289,41 @@ public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemo
    @Override
    public void setCallStack(ISEDDebugNode[] callStack) {
       this.callStack = callStack;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addConstraint(ISEDConstraint constraint) {
+      if (constraint != null) {
+         constraints.add(constraint);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDConstraint[] getConstraints() throws DebugException {
+      return constraints.toArray(new ISEDConstraint[constraints.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition[] getGroupStartConditions() throws DebugException {
+      return groupStartConditions.toArray(new ISEDBranchCondition[groupStartConditions.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addGroupStartCondition(ISEDBranchCondition groupStartCondition) {
+      if (groupStartCondition != null) {
+         groupStartConditions.add(groupStartCondition);
+      }
    }
 }

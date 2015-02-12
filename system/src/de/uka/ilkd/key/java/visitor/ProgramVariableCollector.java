@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java.visitor;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
@@ -25,6 +26,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
  * Walks through a java AST in depth-left-fist-order.
@@ -106,6 +108,25 @@ public class ProgramVariableCollector extends JavaASTVisitor {
            }
         }
 
+       //information flow (TODO: does this really belong here?)
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            ImmutableList<InfFlowSpec> infFlowSpecs =
+                   x.getInfFlowSpecs(heap, selfTerm, atPres, services);
+            if (infFlowSpecs != null) {
+                for (InfFlowSpec infFlowSpec : infFlowSpecs) {
+                    for (Term t: infFlowSpec.preExpressions) {
+                        t.execPostOrder(tpvc);
+                    }
+                    for (Term t: infFlowSpec.postExpressions) {
+                        t.execPostOrder(tpvc);
+                    }
+                    for (Term t: infFlowSpec.newObjects) {
+                        t.execPostOrder(tpvc);
+                    }
+                }
+            }
+        }
+
         //variant
         Term v = x.getVariant(selfTerm, atPres, services);
         if(v != null) {
@@ -135,6 +156,18 @@ public class ProgramVariableCollector extends JavaASTVisitor {
             Term modifiesClause = x.getModifiesClause(heap, services);
             if (modifiesClause != null) {
                 modifiesClause.execPostOrder(collector);
+            }
+        }
+        ImmutableList<InfFlowSpec> infFlowSpecs = x.getInfFlowSpecs();
+        for (InfFlowSpec ts : infFlowSpecs) {
+            for (Term t : ts.preExpressions) {
+                t.execPostOrder(collector);
+            }
+            for (Term t : ts.postExpressions) {
+                t.execPostOrder(collector);
+            }
+            for (Term t : ts.newObjects) {
+                t.execPostOrder(collector);
             }
         }
         result.addAll(collector.result());

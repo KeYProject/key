@@ -66,6 +66,18 @@
             id="org.key_project.keyide.ui.commands.applyrule"
             name="Apply Rule">
       </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Generate test cases for open goals"
+            id="org.key_project.keyide.ui.commands.generateTestCases"
+            name="Generate test cases">
+      </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Search for a counterexample for the selected goal."
+            id="org.key_project.keyide.ui.commands.counterexample"
+            name="Counterexample">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
@@ -84,6 +96,14 @@
       <image
             commandId="org.key_project.keyide.ui.commands.applyrule"
             icon="icons/interactiveAppLogo16.png">
+      </image>
+      <image
+            commandId="org.key_project.keyide.ui.commands.generateTestCases"
+            icon="icons/testGeneration.png">
+      </image>
+      <image
+            commandId="org.key_project.keyide.ui.commands.counterexample"
+            icon="icons/counterExample.png">
       </image>
    </extension>
    <extension
@@ -171,6 +191,47 @@
             class="org.key_project.keyide.ui.handlers.BreakpointToggleHandler"
             commandId="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand">
       </handler>
+      <handler
+            class="org.key_project.keyide.ui.handlers.GenerateTestCasesHandler"
+            commandId="org.key_project.keyide.ui.commands.generateTestCases">
+         <enabledWhen>
+            <with
+                  variable="activeEditor">
+               <and>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.isNotAutoMode"
+                        value="true">
+                  </test>
+               </and>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.key_project.keyide.ui.handlers.CounterExampleHandler"
+            commandId="org.key_project.keyide.ui.commands.counterexample">
+         <enabledWhen>
+            <and>
+               <with
+                     variable="activeMenuSelection">
+                  <and>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.key_project.keyide.ui.isGoal">
+                     </test>
+                  </and>
+               </with>
+               <with
+                     variable="activeEditor">
+                  <test
+                        forcePluginActivation="true"
+                        property="org.key_project.keyide.ui.canPruneProof"
+                        value="true">
+                  </test>
+               </with>
+            </and>
+         </enabledWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -228,6 +289,22 @@
                        </with>
                     </visibleWhen>
                  </command>
+                 <command
+                       commandId="org.key_project.keyide.ui.commands.generateTestCases"
+                       icon="icons/testGeneration.png"
+                       id="org.key_project.keyide.ui.commands.generateTestCasesCommand"
+                       label="Generate test cases"
+                       tooltip="Generate test cases for open goals">
+                    <visibleWhen
+                          checkEnabled="false">
+                       <with
+                             variable="activeEditorId">
+                          <equals
+                                value="org.key_project.keyide.ui.editor">
+                          </equals>
+                       </with>
+                    </visibleWhen>
+                 </command>
          </toolbar>
       </menuContribution>
       <menuContribution
@@ -237,6 +314,34 @@
                commandId="org.key_project.keyide.ui.commands.pruneProof"
                icon="icons/prune16.png"
                label="Prune Proof"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <or>
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
+                        <adapt
+                              type="de.uka.ilkd.key.proof.Node">
+                        </adapt>
+                     </iterate>
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
+                        <adapt
+                              type="org.key_project.keyide.ui.providers.BranchFolder">
+                        </adapt>
+                     </iterate>
+                  </or>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.key_project.keyide.ui.commands.counterexample"
+               icon="icons/counterExample.png"
+               label="Counterexample"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -428,6 +533,13 @@
             namespace="org.key_project.keyide.ui"
             properties="proofIsNotClosed"
             type="org.eclipse.ui.IEditorPart">
+      </propertyTester>
+      <propertyTester
+            class="org.key_project.keyide.ui.propertyTester.GoalPropertyTester"
+            id="org.key_project.keyide.ui.GoalPropertyTester"
+            namespace="org.key_project.keyide.ui"
+            properties="isGoal"
+            type="org.eclipse.jface.viewers.IStructuredSelection">
       </propertyTester>
    </extension>
       <extension

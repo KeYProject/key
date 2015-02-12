@@ -13,66 +13,24 @@
 
 package de.uka.ilkd.key.parser;
 
-import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.TokenStream;
 
-import antlr.Token;
+@SuppressWarnings("serial")
+public class NotDeclException extends KeYSemanticException {
 
-public class NotDeclException extends RecognitionException {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -237567578063439448L;
-    String cat;
-    String undeclared_symbol;
-    String addtl;
-    private String fileName;
-    
-    public NotDeclException(String cat, Token t, String filename) {
-	this.cat      = cat;
-	this.fileName = filename;
-	this.undeclared_symbol = t.getText();
-	this.line     = t.getLine();
-	this.charPositionInLine   = t.getColumn();
+    public NotDeclException(TokenStream input, String cat, String undeclared_symbol, String addtl) {
+        super(input, input.getSourceName(), getMessage(cat, undeclared_symbol, addtl));
     }
 
-    public NotDeclException(String cat, String undeclared_symbol, 
-			    String filename, int line, int column, String addtl) {
-	this.fileName = filename;
-	this.cat      = cat;
-	this.undeclared_symbol = undeclared_symbol;
-	this.line     = line;
-	this.charPositionInLine   = column;
-	this.addtl    = addtl;
-    }
-
-    public NotDeclException(String cat, String undeclared_symbol, 
-		    String filename, int line, int column) {
-    	this(cat, undeclared_symbol, filename, line, column, "");
-    }
-    
-    /**
-     * Returns a clean error message (no line number/column information)
-     * @deprecated
-     */
-    @Deprecated
-    public String getErrorMessage ()
-    {
-	return getMessage();
+    public NotDeclException(TokenStream input, String cat, String undeclared_symbol) {
+        this(input, cat, undeclared_symbol, "");
     }
 
     /**
      * Returns a clean error message (no line number/column information)
      */
-    public String getMessage () {
-	String errmsg = cat + "\n\t" + undeclared_symbol + "\n";
-	return errmsg + "not declared "+addtl;
+    private static String getMessage(String cat, String undeclaredSymbol, String addtl) {
+        return cat + "\n\t" + undeclaredSymbol + "\n" + "not declared "+addtl;
     }
-    
-    /**
-     * Returns a string representation of this exception.
-     */
-    public String toString() {
-	return this.fileName+"("+this.line+", "+this.charPositionInLine+"): "
-	    +getMessage();
-    }
+
 }

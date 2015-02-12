@@ -15,7 +15,7 @@ package org.key_project.key4eclipse.starter.core.util;
 
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.UserInterface;

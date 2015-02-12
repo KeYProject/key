@@ -50,6 +50,7 @@ import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
@@ -183,7 +184,7 @@ public class PrettyPrinter {
     protected StringBuffer outBuf;
     protected boolean noLinefeed=false;
     protected boolean noSemicolons=false;
-    /**Enforces the output of real Java syntax that can be compiled. See also {@link de.uka.ilkd.key.unittest.ppAndJavaASTExtension.CompilableJavaCardPP}*/
+    /**Enforces the output of real Java syntax that can be compiled. See also {@link de.uka.ilkd.key.testgen.pp.unittest.ppAndJavaASTExtension.CompilableJavaCardPP}*/
      
     protected Type classToPrint = null;
 
@@ -3079,6 +3080,13 @@ public class PrettyPrinter {
         // Mark statement end ...
     markEnd(0,x);
 
+        printFooter(x);
+    }
+
+    public void printEmptyMapLiteral(EmptyMapLiteral x) throws IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        write("\\map_empty");
         printFooter(x);
     }
 

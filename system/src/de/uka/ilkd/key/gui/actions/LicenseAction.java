@@ -25,7 +25,7 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -53,7 +53,7 @@ public class LicenseAction extends MainWindowAction {
             "LICENSE.TXT"); 
         StringBuffer sb=new StringBuffer();
         try {
-            InputStreamReader inp = new InputStreamReader(lic.openStream(), "utf8");
+            InputStreamReader inp = new InputStreamReader(lic.openStream(), "UTF-8");
             int c;
             while ((c=inp.read()) > 0) {
                 sb.append((char)c);

@@ -199,16 +199,8 @@ public class ApplyTacletDialogModel {
                 
 	try {	    
 	    rapp = createTacletApp();
-	} catch (SVInstantiationException ime) {
-            return "Rule is not applicable.\n Detail:" + 
-            ime.getMessage();
-	}  catch (IllegalInstantiationException iie) {
-            return "Rule is not applicable.\n Detail:" + 
-            iie.getMessage();
-        } catch(de.uka.ilkd.key.util.ExceptionHandlerException e){        
-	    services.getExceptionHandler().clear();
-	    return "Rule is not applicable.\n Detail:" + 
-	    e.getCause().getMessage();
+	} catch (Exception e) {
+            return "Rule is not applicable.\n Detail:" + e.getMessage();
 	}
        	
 	if ( rapp.complete () )

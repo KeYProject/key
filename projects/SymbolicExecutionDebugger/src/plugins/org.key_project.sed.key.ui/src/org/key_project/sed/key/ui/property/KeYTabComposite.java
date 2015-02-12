@@ -29,7 +29,7 @@ import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.StringUtil;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Node;
 
@@ -112,6 +112,11 @@ public class KeYTabComposite extends Composite {
          name = keyNode.serialNr() + ": " + keyNode.name(); // Copied from ProofRenderer
       }
       SWTUtil.setText(nodeText, name);
-      sequentViewerDecorator.showNode(keyNode, mediator);
+      if (keyNode != null && !keyNode.proof().isDisposed()) {
+         sequentViewerDecorator.showNode(keyNode, mediator);
+      }
+      else {
+         sequentViewerDecorator.showNode(null, mediator);
+      }
    }
 }

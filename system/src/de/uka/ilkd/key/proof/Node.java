@@ -70,8 +70,15 @@ public class Node  {
      * lemma or by applying a taclet with an addrule section on this node,
      * then these taclets are stored in this list
      */
-    private ImmutableSet<NoPosTacletApp>  localIntroducedRules = DefaultImmutableSet.<NoPosTacletApp>nil();
+    private ImmutableSet<NoPosTacletApp>  localIntroducedRules =
+            DefaultImmutableSet.<NoPosTacletApp>nil();
 
+    /**
+     * Holds the undo methods for the information added by rules to the
+     * {@link Goal#strategyInfos}.
+     */
+    private List<StrategyInfoUndoMethod>  undoInfoForStrategyInfo =
+            new ArrayList<StrategyInfoUndoMethod>();
 
     /** creates an empty node that is root and leaf.
      */
@@ -371,21 +378,27 @@ public class Node  {
 	return -1;
     }
 
-    private int getIntroducedRulesCount() {
+    public StringBuffer getUniqueTacletId() {
+        StringBuffer id = new StringBuffer();
         int c = 0;
         Node n = this;
 
         while (n != null) {
             c += n.localIntroducedRules.size();
+                      
+            if (n.parent != null && n.parent.childrenCount() > 1) {
+               id.append(n.siblingNr);
+            }
+            
             n = n.parent;
-        }
-        return c;
+        }    
+        
+        id.append("_").append(c);
+        
+        return id;
     }
 
-    public int getUniqueTacletNr() {
-        return getIntroducedRulesCount();
-    }
-
+    
     /** helps toString method
      * @param prefix needed to keep track if a line has to be printed
      * @param tree the tree representation we want to add this subtree
@@ -585,6 +598,21 @@ public class Node  {
         return siblingNr;
     }
 
+    public List<StrategyInfoUndoMethod> getStrategyInfoUndoMethods() {
+        return undoInfoForStrategyInfo;
+    }
+
+    public void addStrategyInfoUndoMethod(StrategyInfoUndoMethod undoMethod) {
+        undoInfoForStrategyInfo.add(undoMethod);
+    }
+
+    /** Iterator over children.
+     * Use <code>leavesIterator()</code> if you need to iterate over leaves instead.
+     */
+    public Iterator<Node> iterator() {
+        return childrenIterator();
+    }
+
     // inner iterator class
     private static class NodeIterator implements Iterator<Node> {
 	private Iterator<Node> it;
@@ -656,4 +684,4 @@ public class Node  {
                     "structure this way is not allowed.");
         }
     }
- }
+}

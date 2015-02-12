@@ -26,6 +26,11 @@ import javax.swing.border.TitledBorder;
  */
 class SequentViewPanel extends JPanel {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -4052156449188977483L;
+
     protected SequentViewPanel(SequentView sequentView) {
 
         setLayout(new GridBagLayout());

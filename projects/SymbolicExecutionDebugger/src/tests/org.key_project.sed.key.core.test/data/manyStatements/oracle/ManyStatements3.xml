@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_08164f72-eb3a-4743-bda4-489332fb29e7" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_faa27f75-6d85-49cd-a85e-997cf1af7ea1" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_4976812b-6324-4c90-9a30-7aca01fda804" name="self.main();" pathCondition="true" lineNumber="-1" charStart="45" charEnd="49" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest_testDifferentValues\src\ManyStatements.java">
-            <sedStatement xml:id="_5d2f72ac-ff58-4939-be9b-4bb4403180ac" name="int a = 1;" pathCondition="true" lineNumber="-1" charStart="57" charEnd="67" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest_testDifferentValues\src\ManyStatements.java">
-               <sedStatement xml:id="_4ab0988c-15de-4cd9-970e-2615b38419b3" name="int b = 1;" pathCondition="true" lineNumber="-1" charStart="71" charEnd="81" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest_testDifferentValues\src\ManyStatements.java">
+   <sedTarget xml:id="_ed600429-1911-429b-add2-65dbef134ec3" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_67ac1ee9-43c1-4497-8d8e-1fabdfd91089" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest_testDifferentValues\src\ManyStatements.java">
+         <sedMethodCall xml:id="_94656aef-5771-41ce-b55d-3802636c78fc" name="&lt;call self.main()&gt;" pathCondition="true" lineNumber="-1" charStart="45" charEnd="49" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest_testDifferentValues\src\ManyStatements.java" groupable="true">
+            <sedStatement xml:id="_1dd4f813-b0d6-46be-8e70-edc56b213e0d" name="int a = 1;" pathCondition="true" lineNumber="-1" charStart="57" charEnd="67" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest_testDifferentValues\src\ManyStatements.java">
+               <sedStatement xml:id="_25f4fc61-e903-4700-ab57-4855e0d913ad" name="int b = 1;" pathCondition="true" lineNumber="-1" charStart="71" charEnd="81" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest_testDifferentValues\src\ManyStatements.java">
                </sedStatement>
             </sedStatement>
          </sedMethodCall>

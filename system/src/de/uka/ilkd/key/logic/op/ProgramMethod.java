@@ -42,6 +42,7 @@ import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -147,6 +148,11 @@ public final class ProgramMethod extends ObserverFunction
     @Override
     public SourceElement getFirstElement(){
 	return this;
+    }
+
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       return getFirstElement();
     }
 
     @Override
@@ -332,13 +338,26 @@ public final class ProgramMethod extends ObserverFunction
    public ProgramElementName getProgramElementName() {
 	return getMethodDeclaration().getProgramElementName();
     }
-    
+
+   /* (non-Javadoc)
+    * @see de.uka.ilkd.key.logic.op.IProgramMethod#getUniqueName()
+    */
+   @Override
+   public String getUniqueName() {
+       return getName() + "_" +
+              Math.abs(ContractFactory.generateContractTypeName("",
+                                                                getContainerType(),
+                                                                this,
+                                                                getContainerType()
+                                                                ).hashCode());
+    } // Included HashCode to make IF-Predicates unique and still reproducible
+
     /* (non-Javadoc)
     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getFullName()
     */
    @Override
    public String getFullName() {
-    	return getMethodDeclaration().getFullName();
+       return getMethodDeclaration().getFullName();
     }
 
     /* (non-Javadoc)

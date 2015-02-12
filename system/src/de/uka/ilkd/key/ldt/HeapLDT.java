@@ -40,6 +40,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -57,7 +58,8 @@ public final class HeapLDT extends LDT {
     public static final Name STORE_NAME = new Name("store");
     public static final Name BASE_HEAP_NAME = new Name("heap");
     public static final Name SAVED_HEAP_NAME = new Name("savedHeap");
-    public static final Name[] VALID_HEAP_NAMES = { BASE_HEAP_NAME, SAVED_HEAP_NAME };
+    public static final Name PERMISSION_HEAP_NAME = new Name("permissions");
+    public static final Name[] VALID_HEAP_NAMES = { BASE_HEAP_NAME, SAVED_HEAP_NAME, PERMISSION_HEAP_NAME };
 
 
     
@@ -128,6 +130,14 @@ public final class HeapLDT extends LDT {
         heaps = ImmutableSLList.<LocationVariable>nil()
         		 .append((LocationVariable) progVars.lookup(BASE_HEAP_NAME))
         		 .append((LocationVariable) progVars.lookup(SAVED_HEAP_NAME));
+        if(services instanceof Services) {
+            Services s = (Services)services;
+            if(s.getProfile() instanceof JavaProfile) {
+                if(((JavaProfile)s.getProfile()).withPermissions()) {
+                    heaps = heaps.append((LocationVariable) progVars.lookup(PERMISSION_HEAP_NAME));
+                }
+            }
+        }
         wellFormed = new LinkedHashMap<Sort,Function>();
         wellFormed.put((Sort)sorts.lookup(new Name("Heap")), addFunction(services, "wellFormed"));
     }
@@ -159,7 +169,7 @@ public final class HeapLDT extends LDT {
      * Given a constant symbol representing a field, this method returns a
      * simplified name of the constant symbol to be used for pretty printing.
      */
-    public String getPrettyFieldName(Named fieldSymbol) {
+    public static String getPrettyFieldName(Named fieldSymbol) {
 	String name = fieldSymbol.name().toString();
 	int index = name.indexOf("::");
 	if(index == -1) {
@@ -178,7 +188,7 @@ public final class HeapLDT extends LDT {
      * Extracts the name of the enclosing class from the name of a constant
      * symbol representing a field.
      */
-    public String getClassName(Function fieldSymbol) {
+    public static String getClassName(Function fieldSymbol) {
 	String name = fieldSymbol.name().toString();
 	int index = name.indexOf("::");
 	if(index == -1) {
@@ -330,6 +340,10 @@ public final class HeapLDT extends LDT {
             }
         }
         return null;
+    }
+
+    public LocationVariable getPermissionHeap() {
+    	return heaps.size() > 2 ? heaps.tail().tail().head() : null;
     }
 
     /**

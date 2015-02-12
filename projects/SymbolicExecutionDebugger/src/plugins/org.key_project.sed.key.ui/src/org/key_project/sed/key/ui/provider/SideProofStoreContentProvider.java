@@ -78,7 +78,7 @@ public class SideProofStoreContentProvider implements ILazyContentProvider {
     * @param e The event.
     */
    protected void handleProofAdded(SideProofStoreEvent e) {
-      SWTUtil.add(viewer, e.getEntries());
+      SWTUtil.addAsync(viewer, e.getEntries()); // Has to be asynchronous because side proofs might be performed in the UI thread which can cause dead locks with synchronous invocation.
    }
 
    /**

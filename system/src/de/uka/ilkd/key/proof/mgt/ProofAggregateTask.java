@@ -54,7 +54,7 @@ public class ProofAggregateTask extends DefaultMutableTreeNode
     }
     
     public ProofEnvironment getProofEnv() {
-        return proofs[0].proof().env();
+        return proofs[0].proof().getEnv();
     }
     
     public ProofAggregate getProofList() {
@@ -82,5 +82,10 @@ public class ProofAggregateTask extends DefaultMutableTreeNode
     
     public void decoupleFromEnv() {
         getProofEnv().removeProofList(proofList);
+    }
+
+    @Override
+    public TaskTreeNode[] getChildren() {
+        return proofs;
     }
 }

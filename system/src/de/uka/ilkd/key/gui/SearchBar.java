@@ -39,6 +39,10 @@ import javax.swing.event.DocumentListener;
  */
 public abstract class SearchBar extends JPanel {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -4821960226273983607L;
     public JTextField searchField = new JTextField(20);
     private JButton prev;
     private JButton next;

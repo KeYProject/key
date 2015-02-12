@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="SimpleConstructorTest.main();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call SimpleConstructorTest.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="SimpleConstructorTest obj = new SimpleConstructorTest (42);" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
-         <methodCall name="SimpleConstructorTest(var);" pathCondition="true" pathConditionChanged="false">
+         <methodCall name="&lt;call SimpleConstructorTest(var)&gt;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
             <statement name="this.x=var;" pathCondition="true" pathConditionChanged="false">
-               <callStackEntry path="/0"/>
                <callStackEntry path="/0/0/0"/>
-               <methodReturn name="&lt;return of SimpleConstructorTest(var);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of SimpleConstructorTest(var);&gt;" isReturnValueComputed="true">
-                  <callStackEntry path="/0"/>
+               <callStackEntry path="/0"/>
+               <methodReturn name="&lt;return of SimpleConstructorTest&gt;" signature="&lt;return of SimpleConstructorTest(var)&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of SimpleConstructorTest&gt;" signatureIncludingReturnValue="&lt;return of SimpleConstructorTest(var)&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                   <callStackEntry path="/0/0/0"/>
+                  <callStackEntry path="/0"/>
                   <statement name="return obj.x;" pathCondition="true" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
-                     <methodReturn name="&lt;return of SimpleConstructorTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of SimpleConstructorTest.main();&gt;" isReturnValueComputed="true">
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleConstructorTest.main()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of SimpleConstructorTest.main()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                         <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                         </methodReturnValue>
                         <callStackEntry path="/0"/>
@@ -23,7 +23,10 @@
                   </statement>
                </methodReturn>
             </statement>
+            <methodReturnEntry path="/0/0/0/0/0"/>
          </methodCall>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0"/>
 </start>

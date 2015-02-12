@@ -35,11 +35,11 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
+import de.uka.ilkd.key.util.InfFlowSpec;
 
 public final class SimpleBlockContract implements BlockContract {
 
-    public static BlockContract combine(ImmutableSet<BlockContract> contracts, Services services)
-    {
+    public static BlockContract combine(ImmutableSet<BlockContract> contracts, Services services) {
         return new Combinator(contracts, services).combine();
     }
 
@@ -47,10 +47,13 @@ public final class SimpleBlockContract implements BlockContract {
     private final List<Label> labels;
     private final IProgramMethod method;
     private final Modality modality;
+    private Term instantiationSelf;
 
     private final Map<LocationVariable, Term> preconditions;
     private final Map<LocationVariable, Term> postconditions;
     private final Map<LocationVariable, Term> modifiesClauses;
+    private ImmutableList<InfFlowSpec> infFlowSpecs;
+
 
     private final Variables variables;
 
@@ -65,6 +68,7 @@ public final class SimpleBlockContract implements BlockContract {
                                final Map<LocationVariable, Term> preconditions,
                                final Map<LocationVariable, Term> postconditions,
                                final Map<LocationVariable, Term> modifiesClauses,
+                               final ImmutableList<InfFlowSpec> infFlowSpecs,
                                final Variables variables,
                                final boolean transactionApplicable,
                                final Map<LocationVariable,Boolean> hasMod)
@@ -87,7 +91,8 @@ public final class SimpleBlockContract implements BlockContract {
         this.modality = modality;
         this.preconditions = preconditions;
         this.postconditions = postconditions;
-        this.modifiesClauses = modifiesClauses;
+        this.modifiesClauses = modifiesClauses;        
+        this.infFlowSpecs = infFlowSpecs;
         this.variables = variables;
         this.transactionApplicable = transactionApplicable;
         this.hasMod = hasMod;
@@ -147,8 +152,23 @@ public final class SimpleBlockContract implements BlockContract {
     public boolean hasModifiesClause(LocationVariable heap) {
         return hasMod.get(heap);
     }
-    
-    
+
+
+    @Override
+    public Variables getVariables() {
+        return variables;
+    }
+
+
+    @Override
+    public Terms getVariablesAsTerms(Services services) {
+        Term selfTerm = (this.variables.self != null ?
+                         services.getTermBuilder().var(this.variables.self) :
+                         null);
+        return variables.termify(selfTerm);
+    }
+
+
     @Override
     public Term getPrecondition(final LocationVariable heap,
                                 final ProgramVariable self,
@@ -192,9 +212,9 @@ public final class SimpleBlockContract implements BlockContract {
     }
 
     @Override
-    public Term getPostcondition(final LocationVariable heap, final Variables variables,
-                                 final Services services)
-    {
+    public Term getPostcondition(final LocationVariable heap,
+                                 final Variables variables,
+                                 final Services services) {
         assert heap != null;
         assert variables != null;
         assert (variables.self == null) == (this.variables.self == null);
@@ -206,8 +226,7 @@ public final class SimpleBlockContract implements BlockContract {
 
     @Override
     public Term getPostcondition(final LocationVariable heapVariable, final Term heap,
-                                 final Terms terms, final Services services)
-    {
+                                 final Terms terms, final Services services) {
         assert heapVariable != null;
         assert heap != null;
         assert terms != null;
@@ -225,23 +244,23 @@ public final class SimpleBlockContract implements BlockContract {
     }
 
     @Override
-    public Term getModifiesClause(final LocationVariable heap, final ProgramVariable self,
-                                  final Services services)
-    {
+    public Term getModifiesClause(final LocationVariable heap,
+                                  final ProgramVariable self,
+                                  final Services services) {
         assert heap != null;
         assert (self == null) == (variables.self == null);
         assert services != null;
-        final Map<ProgramVariable, ProgramVariable> replacementMap = createReplacementMap(
-            new Variables(self, null, null, null, null, null, null, null, services), services
-        );
+        final Map<ProgramVariable, ProgramVariable> replacementMap =
+                createReplacementMap(new Variables(self, null, null, null, null,
+                                                   null, null, null, services),
+                                     services);
         final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(modifiesClauses.get(heap));
     }
 
     @Override
     public Term getModifiesClause(final LocationVariable heapVariable, final Term heap,
-                                  final Term self, final Services services)
-    {
+                                  final Term self, final Services services) {
         assert heapVariable != null;
         assert heap != null;
         assert (self == null) == (variables.self == null);
@@ -259,19 +278,39 @@ public final class SimpleBlockContract implements BlockContract {
         return getModifiesClause(heap, variables.self, services);
     }
 
+
     @Override
+    public Term getPre(Services services) {
+        return preconditions.get(services.getTypeConverter().getHeapLDT().getHeap());
+    }
+
     public Term getRequires(LocationVariable heap) {
         return preconditions.get(heap);
     }
 
 
     @Override
+    public Term getPost(Services services) {
+        return postconditions.get(services.getTypeConverter().getHeapLDT().getHeap());
+    }
+
     public Term getEnsures(LocationVariable heap) {
         return postconditions.get(heap);
     }
 
 
     @Override
+    public Term getMod(Services services) {
+        return modifiesClauses.get(services.getTypeConverter().getHeapLDT().getHeap());
+    }
+
+
+    @Override
+    public ImmutableList<InfFlowSpec> getInfFlowSpecs() {
+        return infFlowSpecs;
+    }
+
+
     public Term getAssignable(LocationVariable heap) {
         return modifiesClauses.get(heap);
     }
@@ -284,20 +323,27 @@ public final class SimpleBlockContract implements BlockContract {
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "Block Contract";
     }
 
     @Override
-    public String getDisplayName()
-    {
-        return getName();
+    public String getUniqueName() {
+        if (getTarget() != null)
+            return "Block Contract " + getBlock().getStartPosition().getLine() +
+                    " " + getTarget().getUniqueName();
+        else
+            return "Block Contract " + getBlock().getStartPosition().getLine() +
+                    " " + Math.abs(getBlock().hashCode());
     }
 
     @Override
-    public String getHtmlText(final Services services)
-    {
+    public String getDisplayName() {
+        return "Block Contract";
+    }
+
+    @Override
+    public String getHtmlText(final Services services) {
         assert services != null;
         // TODO Clean up.
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
@@ -374,16 +420,19 @@ public final class SimpleBlockContract implements BlockContract {
                                 final Map<LocationVariable,Term> newPreconditions,
                                 final Map<LocationVariable,Term> newPostconditions,
                                 final Map<LocationVariable,Term> newModifiesClauses,
-                                final Variables newVariables)
-    {
-        return new SimpleBlockContract(newBlock, labels, method, modality, newPreconditions,
-                                       newPostconditions, newModifiesClauses, newVariables,
-                                       transactionApplicable, hasMod);
+                                final ImmutableList<InfFlowSpec> newinfFlowSpecs,
+                                final Variables newVariables) {
+        return new SimpleBlockContract(newBlock, labels, method, modality,
+                                       newPreconditions, newPostconditions,
+                                       newModifiesClauses, newinfFlowSpecs,
+                                       newVariables, transactionApplicable,
+                                       hasMod);
     }
 
     @Override 
     public BlockContract setBlock(StatementBlock newBlock) {
-        return update(newBlock, preconditions, postconditions, modifiesClauses, variables);
+        return update(newBlock, preconditions, postconditions, modifiesClauses,
+                      infFlowSpecs, variables);
     }
 
     public BlockContract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
@@ -391,7 +440,8 @@ public final class SimpleBlockContract implements BlockContract {
         assert newKJT.equals(newPM.getContainerType());
         return new SimpleBlockContract(block, labels, (IProgramMethod)newPM, modality,
                                        preconditions, postconditions, modifiesClauses,
-                                       variables, transactionApplicable, hasMod);
+                                       infFlowSpecs, variables, transactionApplicable,
+                                       hasMod);
     }
 
     public OriginalVariables getOrigVars() {
@@ -428,9 +478,9 @@ public final class SimpleBlockContract implements BlockContract {
         return super.hashCode();
     }*/
 
-    private Map<ProgramVariable, ProgramVariable> createReplacementMap(final Variables newVariables,
-                                                                       final Services services)
-    {
+    private Map<ProgramVariable, ProgramVariable>
+                createReplacementMap(final Variables newVariables,
+                                     final Services services) {
         final VariableReplacementMap result = new VariableReplacementMap();
         result.replaceSelf(variables.self, newVariables.self, services);
         result.replaceFlags(variables.breakFlags, newVariables.breakFlags, services);
@@ -439,15 +489,17 @@ public final class SimpleBlockContract implements BlockContract {
         result.replaceVariable(variables.result, newVariables.result, services);
         result.replaceVariable(variables.exception, newVariables.exception, services);
         result.replaceRemembranceHeaps(variables.remembranceHeaps,
-                                       newVariables.remembranceHeaps, services);
+                                       newVariables.remembranceHeaps,
+                                       services);
         result.replaceRemembranceLocalVariables(variables.remembranceLocalVariables,
-                                                newVariables.remembranceLocalVariables, services);
+                                                newVariables.remembranceLocalVariables,
+                                                services);
         return result;
     }
 
-    private Map<Term, Term> createReplacementMap(final Term newHeap, final Terms newTerms,
-                                                 final Services services)
-    {
+    private Map<Term, Term> createReplacementMap(final Term newHeap,
+                                                 final Terms newTerms,
+                                                 final Services services) {
         final TermReplacementMap result = new TermReplacementMap();
         result.replaceHeap(newHeap, services);
         result.replaceSelf(variables.self, newTerms.self, services);
@@ -457,11 +509,46 @@ public final class SimpleBlockContract implements BlockContract {
         result.replaceVariable(variables.result, newTerms.result, services);
         result.replaceVariable(variables.exception, newTerms.exception, services);
         result.replaceRemembranceHeaps(variables.remembranceHeaps,
-                                       newTerms.remembranceHeaps, services);
+                                       newTerms.remembranceHeaps,
+                                       services);
         result.replaceRemembranceLocalVariables(variables.remembranceLocalVariables,
-                                                newTerms.remembranceLocalVariables, services);
+                                                newTerms.remembranceLocalVariables,
+                                                services);
         return result;
     }
+
+
+    @Override
+    public boolean hasMby() {
+        return false;
+    }
+
+    @Override
+    public boolean hasInfFlowSpecs() {
+        return infFlowSpecs != null;
+    }
+
+    @Override
+    public void setInstantiationSelf(Term selfInstantiation) {
+        this.instantiationSelf = selfInstantiation;
+    }
+
+    @Override
+    public Term getInstantiationSelfTerm(TermServices services) {
+        if (instantiationSelf != null) {
+            return instantiationSelf;
+        } else if (variables.self != null) {
+            return services.getTermBuilder().var(variables.self);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public IProgramMethod getTarget() {
+        return method;
+    }
+
 
     private abstract static class ReplacementMap<S extends Sorted> extends LinkedHashMap<S, S> {
 
@@ -476,8 +563,8 @@ public final class SimpleBlockContract implements BlockContract {
         }
 
         public void replaceFlags(final Map<Label, ProgramVariable> oldFlags,
-                                 final Map<Label, S> newFlags, TermServices services)
-        {
+                                 final Map<Label, S> newFlags,
+                                 TermServices services) {
             if (newFlags != null) {
                 assert newFlags.size() == oldFlags.size();
                 for (Map.Entry<Label, ProgramVariable> oldFlag : oldFlags.entrySet()) {
@@ -498,8 +585,7 @@ public final class SimpleBlockContract implements BlockContract {
                                                       LocationVariable> oldRemembranceHeaps,
                                             final Map<LocationVariable,
                                                       ? extends S> newRemembranceHeaps,
-                                            final Services services)
-        {
+                                            final Services services) {
             if (newRemembranceHeaps != null) {
                 for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                     if (newRemembranceHeaps.get(heap) != null) {
@@ -576,6 +662,7 @@ public final class SimpleBlockContract implements BlockContract {
         private final Variables variables;
         private final Map<LocationVariable, Term> requires;
         private final Map<LocationVariable, Term> ensures;
+        private final ImmutableList<InfFlowSpec> infFlowSpecs;
         private final Map<Label, Term> breaks;
         private final Map<Label, Term> continues;
         private final Term returns;
@@ -593,6 +680,7 @@ public final class SimpleBlockContract implements BlockContract {
                        final Variables variables,
                        final Map<LocationVariable, Term> requires,
                        final Map<LocationVariable, Term> ensures,
+                       final ImmutableList<InfFlowSpec> infFlowSpecs,
                        final Map<Label, Term> breaks,
                        final Map<Label, Term> continues,
                        final Term returns,
@@ -601,8 +689,7 @@ public final class SimpleBlockContract implements BlockContract {
                        final Term diverges,
                        final Map<LocationVariable, Term> assignables,
                        final Map<LocationVariable,Boolean> hasMod,
-                       final Services services)
-        {
+                       final Services services) {
             super(services.getTermFactory(), services);
             this.block = block;
             this.labels = labels;
@@ -611,6 +698,7 @@ public final class SimpleBlockContract implements BlockContract {
             this.variables = variables;
             this.requires = requires;
             this.ensures = ensures;
+            this.infFlowSpecs = infFlowSpecs;
             this.breaks = breaks;
             this.continues = continues;
             this.returns = returns;
@@ -622,13 +710,12 @@ public final class SimpleBlockContract implements BlockContract {
             this.hasMod = hasMod;
         }
 
-        public ImmutableSet<BlockContract> create()
-        {
-            return create(buildPreconditions(), buildPostconditions(), buildModifiesClauses());
+        public ImmutableSet<BlockContract> create() {
+            return create(buildPreconditions(), buildPostconditions(),
+                          buildModifiesClauses(), infFlowSpecs);
         }
 
-        private Map<LocationVariable, Term> buildPreconditions()
-        {
+        private Map<LocationVariable, Term> buildPreconditions() {
             final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
             for (LocationVariable heap : heaps) {
                 if (requires.get(heap) != null) {
@@ -638,8 +725,7 @@ public final class SimpleBlockContract implements BlockContract {
             return result;
         }
 
-        private Map<LocationVariable, Term> buildPostconditions()
-        {
+        private Map<LocationVariable, Term> buildPostconditions() {
             final Map<LocationVariable,Term> postconditions =
                     new LinkedHashMap<LocationVariable,Term>();
             for (LocationVariable heap : heaps) {
@@ -650,16 +736,14 @@ public final class SimpleBlockContract implements BlockContract {
             return postconditions;
         }
 
-        private Term buildPostcondition(final LocationVariable heap)
-        {
+        private Term buildPostcondition(final LocationVariable heap) {
             final Term breakPostcondition =
                     conditionPostconditions(variables.breakFlags, breaks);
             final Term continuePostcondition =
                     conditionPostconditions(variables.continueFlags, continues);
             final Term returnPostcondition =
                     conditionPostcondition(variables.returnFlag, returns);
-            final Term throwPostcondition =
-                    buildThrowPostcondition();
+            final Term throwPostcondition = buildThrowPostcondition();
             // TODO Why do we handle the two cases differently? Surely has something to do with transactions.
             if (heap == services.getTypeConverter().getHeapLDT().getHeap()) {
                 if (behavior == Behavior.NORMAL_BEHAVIOR) {
@@ -701,18 +785,17 @@ public final class SimpleBlockContract implements BlockContract {
         }
 
         private Term conditionPostconditions(final Map<Label, ProgramVariable> flags,
-                                             final Map<Label, Term> postconditions)
-        {
+                                             final Map<Label, Term> postconditions) {
             Term result = tt();
             for (Label label : flags.keySet()) {
-                result = and(result, conditionPostcondition(flags.get(label),
-                             postconditions.get(label)));
+                result = and(result,
+                             conditionPostcondition(flags.get(label),
+                                                    postconditions.get(label)));
             }
             return result;
         }
 
-        private Term conditionPostcondition(final ProgramVariable flag, final Term postcondition)
-        {
+        private Term conditionPostcondition(final ProgramVariable flag, final Term postcondition) {
             Term result = tt();
             if (flag != null) {
                 result = imp(
@@ -818,10 +901,11 @@ public final class SimpleBlockContract implements BlockContract {
             return assignables;
         }
 
-        private ImmutableSet<BlockContract> create(final Map<LocationVariable, Term> preconditions,
-                                                   final Map<LocationVariable, Term> postconditions,
-                                                   final Map<LocationVariable, Term> modifiesClauses)
-        {
+        private ImmutableSet<BlockContract>
+                    create(final Map<LocationVariable, Term> preconditions,
+                           final Map<LocationVariable, Term> postconditions,
+                           final Map<LocationVariable, Term> modifiesClauses,
+                           final ImmutableList<InfFlowSpec> infFlowSpecs) {
             ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
             final boolean transactionApplicable =
                     modifiesClauses.get(
@@ -830,17 +914,16 @@ public final class SimpleBlockContract implements BlockContract {
                 new SimpleBlockContract(
                     block, labels, method, diverges.equals(ff()) ? Modality.DIA : Modality.BOX,
                     preconditions, postconditions, modifiesClauses,
-                    variables, transactionApplicable, hasMod
-                )
-            );
+                    infFlowSpecs, variables, transactionApplicable, hasMod)
+                );
             if (ifDivergesConditionCannotBeExpressedByAModality()) {
                 result = result.add(
                     new SimpleBlockContract(
                         block, labels, method, Modality.DIA,
                         addNegatedDivergesConditionToPreconditions(preconditions),
-                        postconditions, modifiesClauses, variables, transactionApplicable, hasMod
-                    )
-                );
+                        postconditions, modifiesClauses, infFlowSpecs,
+                        variables, transactionApplicable, hasMod)
+                    );
             }
             return result;
         }
@@ -851,8 +934,7 @@ public final class SimpleBlockContract implements BlockContract {
         }
 
         private Map<LocationVariable, Term> addNegatedDivergesConditionToPreconditions(
-                final Map<LocationVariable, Term> preconditions)
-        {
+                final Map<LocationVariable, Term> preconditions) {
             final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
             for (LocationVariable heap : heaps) {
                 if (preconditions.get(heap) != null) {
@@ -875,8 +957,7 @@ public final class SimpleBlockContract implements BlockContract {
         private final Map<LocationVariable, Term> postconditions;
         private final Map<LocationVariable, Term> modifiesClauses;
 
-        public Combinator(final ImmutableSet<BlockContract> contracts, final Services services)
-        {
+        public Combinator(final ImmutableSet<BlockContract> contracts, final Services services) {
             super(services.getTermFactory(), services);
             this.contracts = sort(contracts);
             preconditions = new LinkedHashMap<LocationVariable, Term>();
@@ -897,8 +978,7 @@ public final class SimpleBlockContract implements BlockContract {
         }
 
         // Similar to ContractFactory#union.
-        private BlockContract combine()
-        {
+        private BlockContract combine() {
             assert contracts.length > 0;
             if (contracts.length == 1) {
                 return contracts[0];
@@ -922,8 +1002,9 @@ public final class SimpleBlockContract implements BlockContract {
             }
             return new SimpleBlockContract(head.getBlock(), head.getLabels(),
                                            head.getMethod(), head.getModality(), preconditions,
-                                           postconditions, modifiesClauses, placeholderVariables,
-                                           head.isTransactionApplicable(), hasMod);
+                                           postconditions, modifiesClauses, head.getInfFlowSpecs(),
+                                           placeholderVariables, head.isTransactionApplicable(),
+                                           hasMod);
         }
 
         private void addConditionsFrom(final BlockContract contract)
@@ -935,8 +1016,7 @@ public final class SimpleBlockContract implements BlockContract {
             }
         }
 
-        private Term addPreconditionFrom(final BlockContract contract, final LocationVariable heap)
-        {
+        private Term addPreconditionFrom(final BlockContract contract, final LocationVariable heap) {
             final Term precondition =
                     contract.getPrecondition(heap, placeholderVariables.self,
                                              placeholderVariables.remembranceHeaps, services);
@@ -947,8 +1027,7 @@ public final class SimpleBlockContract implements BlockContract {
         }
 
         private void addPostconditionFrom(final Term precondition, final BlockContract contract,
-                                          final LocationVariable heap)
-        {
+                                          final LocationVariable heap) {
             final Term unconditionalPostcondition =
                     contract.getPostcondition(heap, placeholderVariables, services);
             if (unconditionalPostcondition != null) {
@@ -960,8 +1039,8 @@ public final class SimpleBlockContract implements BlockContract {
             }
         }
 
-        private void addModifiesClauseFrom(final BlockContract contract, final LocationVariable heap)
-        {
+        private void addModifiesClauseFrom(final BlockContract contract,
+                                           final LocationVariable heap) {
             final Term additionalModifiesClause =
                     contract.getModifiesClause(heap, placeholderVariables.self, services);
             if (additionalModifiesClause != null) {
@@ -971,8 +1050,7 @@ public final class SimpleBlockContract implements BlockContract {
             }
         }
 
-        private Term orPossiblyNull(final Term currentCondition, final Term additionalCondition)
-        {
+        private Term orPossiblyNull(final Term currentCondition, final Term additionalCondition) {
             if (currentCondition == null) {
                 return additionalCondition;
             }
@@ -981,8 +1059,7 @@ public final class SimpleBlockContract implements BlockContract {
             }
         }
 
-        private Term andPossiblyNull(final Term currentCondition, final Term additionalCondition)
-        {
+        private Term andPossiblyNull(final Term currentCondition, final Term additionalCondition) {
             if (currentCondition == null) {
                 return additionalCondition;
             }
@@ -992,8 +1069,7 @@ public final class SimpleBlockContract implements BlockContract {
         }
 
         private Term unionPossiblyNull(final Term currentLocationSet,
-                                       final Term additionalLocationSet)
-        {
+                                       final Term additionalLocationSet) {
             if (currentLocationSet == null){
                 return additionalLocationSet;
             }

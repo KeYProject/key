@@ -62,8 +62,7 @@ public class TestTacletTranslator extends TestCase {
     private KeYParserF stringTacletParser(String s) {
 	return new KeYParserF(ParserMode.TACLET,
 		new KeYLexerF(s,
-			"No file. parser/TestTacletParser.stringTacletParser(" + s + ")",
-			null),
+			"No file. parser/TestTacletParser.stringTacletParser(" + s + ")"),
 		services, nss);
     }
 
@@ -71,8 +70,7 @@ public class TestTacletTranslator extends TestCase {
         try {
 	    KeYParserF p = new KeYParserF(ParserMode.DECLARATION,
 		    new KeYLexerF(s,
-			    "No file. parser/TestTacletParser.stringDeclParser(" + s + ")",
-			    null),
+			    "No file. parser/TestTacletParser.stringDeclParser(" + s + ")"),
 		   services, nss);
             p.decls();
         } catch (Exception e) {

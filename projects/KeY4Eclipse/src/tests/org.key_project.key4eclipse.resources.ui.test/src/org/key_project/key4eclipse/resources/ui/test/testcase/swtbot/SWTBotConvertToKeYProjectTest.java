@@ -20,7 +20,8 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IViewPart;
 import org.junit.Test;
-import org.key_project.key4eclipse.resources.ui.handlers.ConvertJavaToKeYProjectHandler;
+import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
+import org.key_project.key4eclipse.resources.ui.handler.ConvertJavaToKeYProjectHandler;
 import org.key_project.key4eclipse.resources.ui.test.util.KeY4EclipseResourcesUiTestUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -79,7 +80,7 @@ public class SWTBotConvertToKeYProjectTest extends AbstractSetupTestCase {
          SWTBotView view = bot.viewById(viewId);
          TestUtilsUtil.selectInTree(view.bot().tree(), project.getProject().getName());
          TestUtilsUtil.clickContextMenu(view.bot().tree(), "Convert to KeY Project");
-         TestUtilsUtil.waitForBuild();
+         KeY4EclipseResourcesTestUtil.waitBuild();
          KeY4EclipseResourcesUiTestUtil.assertKeYNature(project.getProject());
       }
       finally {

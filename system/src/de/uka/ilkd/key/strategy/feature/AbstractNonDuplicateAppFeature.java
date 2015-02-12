@@ -15,6 +15,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -81,17 +82,20 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
 
         
         // compare the if-sequent instantiations
-        if ( newApp.ifFormulaInstantiations () == null
-                || cmp.ifFormulaInstantiations () == null ) {  
-            if ( newApp.ifFormulaInstantiations () != null
-                    || cmp.ifFormulaInstantiations () != null ) { 
+       final ImmutableList<IfFormulaInstantiation> newAppIfFmlInstantiations = newApp.ifFormulaInstantiations ();
+       final ImmutableList<IfFormulaInstantiation> cmpIfFmlInstantiations = cmp.ifFormulaInstantiations ();
+       if ( newAppIfFmlInstantiations == null
+                || cmpIfFmlInstantiations == null ) {  
+            if ( newAppIfFmlInstantiations != null
+                    || cmpIfFmlInstantiations != null ) { 
                 return false;
             } 
         } else { 
-            final Iterator<IfFormulaInstantiation> it0 =
-                newApp.ifFormulaInstantiations ().iterator ();
+
+           final Iterator<IfFormulaInstantiation> it0 =
+                newAppIfFmlInstantiations.iterator ();
             final Iterator<IfFormulaInstantiation> it1 =
-                cmp.ifFormulaInstantiations ().iterator ();
+                cmpIfFmlInstantiations.iterator ();
 
             while ( it0.hasNext () ) {
                 // this test should be improved

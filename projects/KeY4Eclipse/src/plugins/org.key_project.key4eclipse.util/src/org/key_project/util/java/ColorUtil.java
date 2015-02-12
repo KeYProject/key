@@ -1,5 +1,6 @@
 package org.key_project.util.java;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
 /**
@@ -11,6 +12,15 @@ public class ColorUtil {
     * Forbid instances.
     */
    private ColorUtil() {
+   }
+   
+   /**
+    * Converts the given {@link Color} into a hex string.
+    * @param rgb The {@link Color} to convert.
+    * @return The hex values.
+    */
+   public static String toHexRGBString(Color color) {
+      return toHexRGBString(color.getRGB());
    }
    
    /**

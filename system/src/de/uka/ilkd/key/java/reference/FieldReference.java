@@ -167,6 +167,11 @@ public class FieldReference extends VariableReference
         return (prefix == null) ? variable : prefix.getFirstElement();
     }
 
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       return (prefix == null) ? variable : prefix.getFirstElementIncludingBlocks();
+    }
+
     /** pretty print */
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printFieldReference(this);

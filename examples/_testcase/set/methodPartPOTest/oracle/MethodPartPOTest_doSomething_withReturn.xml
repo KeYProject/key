@@ -3,11 +3,11 @@
    <statement name="x=1*asdf;" pathCondition="true" pathConditionChanged="false">
       <statement name="int y = 2+MethodPartPOTest.CONSTANT+this.field;" pathCondition="true" pathConditionChanged="false">
          <statement name="int doubleValue = doubleValue(x);" pathCondition="true" pathConditionChanged="false">
-            <methodCall name="self.doubleValue(value);" pathCondition="true" pathConditionChanged="false">
+            <methodCall name="&lt;call self.doubleValue(value)&gt;" pathCondition="true" pathConditionChanged="false">
                <statement name="int result;" pathCondition="true" pathConditionChanged="false">
                   <statement name="result_1=value+value;" pathCondition="true" pathConditionChanged="false">
                      <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of self.doubleValue(value);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                        <methodReturn name="&lt;return of doubleValue&gt;" signature="&lt;return of self.doubleValue(value)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                            <statement name="int z = x+y+doubleValue;" pathCondition="true" pathConditionChanged="false">
                               <statement name="return z;" pathCondition="true" pathConditionChanged="false">
                                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -18,8 +18,10 @@
                      </statement>
                   </statement>
                </statement>
+               <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
             </methodCall>
          </statement>
       </statement>
    </statement>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

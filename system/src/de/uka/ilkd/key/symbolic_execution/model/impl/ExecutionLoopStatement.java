@@ -16,7 +16,7 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.statement.Do;
 import de.uka.ilkd.key.java.statement.EnhancedFor;
@@ -24,17 +24,17 @@ import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * The default implementation of {@link IExecutionLoopStatement}.
  * @author Martin Hentschel
  */
-public class ExecutionLoopStatement extends AbstractExecutionStateNode<LoopStatement> implements IExecutionLoopStatement {
+public class ExecutionLoopStatement extends AbstractExecutionBlockStartNode<LoopStatement> implements IExecutionLoopStatement {
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
@@ -96,8 +96,8 @@ public class ExecutionLoopStatement extends AbstractExecutionStateNode<LoopState
     * {@inheritDoc}
     */
    @Override
-   protected IExecutionVariable[] lazyComputeVariables() {
-      return SymbolicExecutionUtil.createExecutionVariables(this);
+   protected IExecutionConstraint[] lazyComputeConstraints() {
+      return SymbolicExecutionUtil.createExecutionConstraints(this);
    }
 
    /**

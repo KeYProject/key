@@ -83,6 +83,21 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
     }
 
 
+    /**
+     * Convert the list to a Java array (O(n))
+     */
+    @Override
+    public <S> S[] toArray(Class<S> type) {
+        S[] result = (S[]) Array.newInstance(type, size());
+        ImmutableList<T> rest = this;
+        for (int i = 0; i<size(); i++) {
+            result[i] = (S) rest.head();
+            rest = rest.tail();
+        }
+        return result;
+    }
+
+
     /** prepends array (O(n))
      * @param array the array of the elements to be prepended
      * @return IList<T> the new list

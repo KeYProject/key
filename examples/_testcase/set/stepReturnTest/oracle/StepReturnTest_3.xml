@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.main(a);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.main(a)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="firstLevel(a);" pathCondition="true" pathConditionChanged="false">
       </statement>
    </methodCall>

@@ -18,11 +18,10 @@ import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 
 /**
  * This property tester can be used to make sure that an {@link IKeYSEDDebugNode} 
- * contains an {@link IExecutionStateNode}. 
+ * contains an {@link IExecutionNode}. 
  * @author Martin Hentschel
  */
 public class KeYSEDDebugNodeHasExecutionStateNodePropertyTester extends PropertyTester {
@@ -40,12 +39,12 @@ public class KeYSEDDebugNodeHasExecutionStateNodePropertyTester extends Property
                        Object[] args, 
                        Object expectedValue) {
       if (receiver instanceof IKeYSEDDebugNode<?>) {
-         IExecutionNode node = ((IKeYSEDDebugNode<?>)receiver).getExecutionNode();
+         IExecutionNode<?> node = ((IKeYSEDDebugNode<?>)receiver).getExecutionNode();
          if (ArrayUtil.contains(args, NOT_DISPOSED_ARGUMENT)) {
-            return node instanceof IExecutionStateNode<?> && !node.isDisposed();
+            return node instanceof IExecutionNode<?> && !node.isDisposed();
          }
          else {
-            return node instanceof IExecutionStateNode<?>;
+            return node instanceof IExecutionNode<?>;
          }
       }
       else {

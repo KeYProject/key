@@ -213,7 +213,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
         
         final ProgramVariable paramLength = new LocationVariable(
-                new ProgramElementName("length"), integerType);
+                new ProgramElementName("length"), integerType, true);
 
         final ParameterDeclaration param = new ParameterDeclaration(
                 new Modifier[0], new TypeRef(integerType),
@@ -406,11 +406,11 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final ProgramVariable pv = (ProgramVariable) forInit.getVariables()
                 .get(0).getProgramVariable();
 
-        final For forLoop = new For(new LoopInitializer[] { forInit },
-                new LessThan(pv,
-                        new FieldReference(length, new ThisReference())),
-                new Expression[] { new PostIncrement(pv) }, assign(
-                        new ArrayReference(new ThisReference(),
+        final For forLoop =
+                new For(new LoopInitializer[] { forInit },
+                        new LessThan(pv, new FieldReference(length, new ThisReference())),
+                        new Expression[] { new PostIncrement(pv) },
+                        assign(new ArrayReference(new ThisReference(),
                                 new Expression[] { pv }), defaultValue));
 
         final StatementBlock body = new StatementBlock(

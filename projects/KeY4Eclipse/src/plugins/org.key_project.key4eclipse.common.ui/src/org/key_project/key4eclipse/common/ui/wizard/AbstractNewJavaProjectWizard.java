@@ -13,14 +13,14 @@
 
 package org.key_project.key4eclipse.common.ui.wizard;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.wizards.JavaProjectWizard;
-import org.eclipse.jdt.internal.ui.wizards.NewWizardMessages;
+import org.eclipse.jface.wizard.WizardPage;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * Provides a basic functionality for new wizards that are based on 
@@ -33,47 +33,49 @@ public abstract class AbstractNewJavaProjectWizard extends JavaProjectWizard {
     * Constructor.
     */
    public AbstractNewJavaProjectWizard() {
-      setWindowTitle(NewWizardMessages.JavaProjectWizard_title + " with content from " + getExampleName());
+      setWindowTitle(computeWindowTitle());
    }
    
    /**
-    * Returns the example name.
-    * @return The name of the example.
+    * Computes the window title.
+    * @return The window title to set.
     */
-   protected abstract String getExampleName();
+   protected abstract String computeWindowTitle();
    
    /**
     * {@inheritDoc}
     */
    @Override
-   public boolean performFinish() {
+   public void addPages(){
+      super.addPages();
       try {
-         // Create java project
-         boolean done = super.performFinish();
-         // Check if the project was created
-         if (done) {
-            // Get source code directory
-            IResource sourceDirectory = getSourceDirectory();
-            // Check if a source code directory was found
-            if (sourceDirectory instanceof IContainer) {
-               done = createExampleContent((IContainer)sourceDirectory);
-            }
+         Object obj = ObjectUtil.get(this, "fFirstPage");
+         if(obj instanceof WizardPage) {
+            WizardPage page = (WizardPage) obj;
+            page.setTitle(computeTitle());
+            page.setDescription(computeDescription());
          }
-         return done;
+         else {
+            LogUtil.getLogger().logWarning("API has changed");
+         }
       }
       catch (Exception e) {
          LogUtil.getLogger().logError(e);
-         return false;
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
       }
    }
-
+   
    /**
-    * Adds the example content to the given source directory.
-    * @param sourceDirectory The given source directory.
-    * @return {@code true} = close wizard, {@code false} = keep wizard opened.
-    * @throws Exception Occurred Exception.
+    * Computes the description.
+    * @return The description to set.
     */
-   protected abstract boolean createExampleContent(IContainer sourceDirectory) throws Exception;
+   protected abstract String computeDescription();
+   
+   /**
+    * Computes the title.
+    * @return The title to set.
+    */
+   protected abstract String computeTitle();
 
    /**
     * Returns the {@link IResource} that will contain java source code.

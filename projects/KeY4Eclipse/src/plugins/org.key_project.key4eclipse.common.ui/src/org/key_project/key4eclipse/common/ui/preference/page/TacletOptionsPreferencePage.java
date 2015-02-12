@@ -21,12 +21,12 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.ui.IWorkbench;
 import org.key_project.key4eclipse.util.KeYExampleUtil;
 
-import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Preference page to edit the taclet options.
@@ -73,7 +73,7 @@ public class TacletOptionsPreferencePage extends AbstractChoicePreferencePage {
     * @throws ProblemLoaderException
     */
    public static void loadChoiceSettings() throws ProblemLoaderException {
-      KeYEnvironment<CustomConsoleUserInterface> env = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null);
+      KeYEnvironment<CustomUserInterface> env = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null);
       env.dispose();
    }
    

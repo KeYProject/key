@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<project name="ProjectInfoManagementTest_testMethods">
+   <package name="(default package)" path="/ProjectInfoManagementTest_testMethods/src">
+      <type name="ClassWithoutPackage" path="/ProjectInfoManagementTest_testMethods/src/ClassWithoutPackage.java">
+         <method displayName="ClassWithoutPackage()" name="ClassWithoutPackage" declaringType="ClassWithoutPackage" declaringFilePath="/ProjectInfoManagementTest_testMethods/src/ClassWithoutPackage.java" parameterTypes="">
+         </method>
+         <method displayName="m()" name="m" declaringType="ClassWithoutPackage" declaringFilePath="/ProjectInfoManagementTest_testMethods/src/ClassWithoutPackage.java" parameterTypes="">
+         </method>
+      </type>
+   </package>
+   <package name="hello" path="/ProjectInfoManagementTest_testMethods/src/hello">
+      <type name="ClassInHello" path="/ProjectInfoManagementTest_testMethods/src/hello/ClassInHello.java">
+         <method displayName="ClassInHello()" name="ClassInHello" declaringType="hello.ClassInHello" declaringFilePath="/ProjectInfoManagementTest_testMethods/src/hello/ClassInHello.java" parameterTypes="">
+         </method>
+         <method displayName="m()" name="m" declaringType="hello.ClassInHello" declaringFilePath="/ProjectInfoManagementTest_testMethods/src/hello/ClassInHello.java" parameterTypes="">
+         </method>
+      </type>
+   </package>
+   <package name="hello.world" path="/ProjectInfoManagementTest_testMethods/src/hello/world">
+      <type name="ClassInHelloWorld" path="/ProjectInfoManagementTest_testMethods/src/hello/world/ClassInHelloWorld.java">
+         <method displayName="ClassInHelloWorld()" name="ClassInHelloWorld" declaringType="hello.world.ClassInHelloWorld" declaringFilePath="/ProjectInfoManagementTest_testMethods/src/hello/world/ClassInHelloWorld.java" parameterTypes="">
+         </method>
+         <method displayName="m()" name="m" declaringType="hello.world.ClassInHelloWorld" declaringFilePath="/ProjectInfoManagementTest_testMethods/src/hello/world/ClassInHelloWorld.java" parameterTypes="">
+         </method>
+      </type>
+   </package>
+</project>

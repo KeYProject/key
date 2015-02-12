@@ -53,6 +53,7 @@ public class ExecutionTreeImageProvider extends AbstractImageProvider {
        addImageFilePath(IExecutionTreeImageConstants.IMG_LOOP_STATEMENT, ROOT_FOLDER_FOR_IMG + "loop_statement.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_METHOD_CALL, ROOT_FOLDER_FOR_IMG + "method_call.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_METHOD_RETURN, ROOT_FOLDER_FOR_IMG + "method_return.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_EXCEPTIONAL_METHOD_RETURN, ROOT_FOLDER_FOR_IMG + "exceptional_method_return.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_STATEMENT, ROOT_FOLDER_FOR_IMG + "statement.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_TERMINATION, ROOT_FOLDER_FOR_IMG + "termination.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_TERMINATION_NOT_VERIFIED, ROOT_FOLDER_FOR_IMG + "termination_not_verified.gif");

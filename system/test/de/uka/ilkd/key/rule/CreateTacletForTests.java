@@ -15,7 +15,6 @@ package de.uka.ilkd.key.rule;
 
 
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
@@ -300,8 +299,7 @@ public class CreateTacletForTests extends TestCase {
 	try{
 	    KeYParserF parser=
 		new KeYParserF(ParserMode.PROBLEM,new KeYLexerF(test1,
-			"No file. CreateTacletForTests.setUp(" + test1 + ")",
-			null));
+			"No file. CreateTacletForTests.setUp(" + test1 + ")"));
 	    t_test1=parser.problem();
 	} catch (Exception e) {
 	    System.err.println("Parser Error or Input Error");
@@ -372,8 +370,7 @@ public class CreateTacletForTests extends TestCase {
     
     private KeYParserF stringDeclParser(String s) {
 	return new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s,
-			"No file. CreateTacletForTests.stringDeclParser(" + s + ")",
-			null),
+			"No file. CreateTacletForTests.stringDeclParser(" + s + ")"),
 		services, nss);
     }
 
@@ -391,8 +388,7 @@ public class CreateTacletForTests extends TestCase {
      
     private KeYParserF stringTacletParser(String s) {
 	return new KeYParserF(ParserMode.TACLET, new KeYLexerF(s,
-			"No file. CreateTacletForTests.stringTacletParser(" + s + ")",
-			null),
+			"No file. CreateTacletForTests.stringTacletParser(" + s + ")"),
 		services,
 		nss);
     }

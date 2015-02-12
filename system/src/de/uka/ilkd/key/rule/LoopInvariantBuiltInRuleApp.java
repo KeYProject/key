@@ -27,6 +27,7 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -37,9 +38,9 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 
 /**
  * The built in rule app for the loop invariant rule.
@@ -48,9 +49,11 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private final While loop;
 
-    private final LoopInvariant inv;
-
+    private LoopInvariant inv;
     private final List<LocationVariable> heapContext;
+    private IFProofObligationVars infFlowVars;
+    private ExecutionContext executionContext;
+    private Term guard;
 
    private final TermServices services;
 
@@ -96,8 +99,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     	// the guard is expected to be of the form "i < x" and we want to retrieve "i".
     	assert guard.getChildCount() == 1 : "child count: "+guard.getChildCount();
     	ProgramElement guardStatement = guard.getChildAt(0);
-    	skipIndex = !(guardStatement instanceof LessThan);
-    	Expression loopIndex = skipIndex? null: (Expression) ((LessThan)guard.getChildAt(0)).getChildAt(0);
+	skipIndex = !(guardStatement instanceof LessThan);
+	Expression loopIndex = skipIndex ? null :
+	    (Expression) ((LessThan)guard.getChildAt(0)).getChildAt(0);
     	skipIndex = skipIndex || !( loopIndex instanceof ProgramVariable);
 		final Term loopIdxVar = skipIndex? null: tb.var((ProgramVariable)loopIndex);
     	
@@ -105,7 +109,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 		Statement body = loop.getBody();
 		skipValues = !(body instanceof StatementBlock);
 		StatementBlock block = skipValues? null: ((StatementBlock)body);
-		Statement last = (skipValues || block.getStatementCount() < 2) ? null: block.getStatementAt(1); // get the second statement
+		Statement last = (skipValues || block.getStatementCount() < 2) ? null :
+		    block.getStatementAt(1); // get the second statement
 		skipValues = skipValues || !(last instanceof CopyAssignment);
 		CopyAssignment assignment = skipValues? null: ((CopyAssignment) last);
 		ProgramElement lhs = skipValues? null: assignment.getChildAt(0);
@@ -136,10 +141,11 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 			    	Term[] newSubs = new Term[subs.size()];
 			    	for (int i= 0; i < subs.size(); i++)
 			    		newSubs[i] = replace(subs.get(i));
-				return tb.tf().createTerm(
-				        visited.op(), new ImmutableArray<Term>(newSubs),
-				        visited.boundVars(), visited.javaBlock(),
-				        visited.getLabels());
+				return tb.tf().createTerm(visited.op(),
+				                          new ImmutableArray<Term>(newSubs),
+				                          visited.boundVars(),
+				                          visited.javaBlock(),
+				                          visited.getLabels());
 			    }
 			}
 		}
@@ -204,18 +210,12 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             v.visit(var);
             var = v.getResult();
         }}
-		return new LoopInvariantImpl(rawInv.getLoop(), rawInv.getTarget(),
-		                             rawInv.getKJT(), newInvs,
-		                             rawInv.getInternalModifies(), var,
-		                             rawInv.getInternalSelfTerm(),
-		                             rawInv.getInternalAtPres());
-    	
+        return rawInv.instantiate(newInvs, var);    	
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence pio, LoopInvariant inv, TermServices services) {
         this(rule, pio, null, inv, null, services);
-
     }
 
     public boolean complete() {
@@ -276,7 +276,22 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopInvariant inv) {
+        assert inv != null;
+        if (this.loop == (While)inv.getLoop())
+            this.inv = inv;
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext, services);
+    }
+    
+    public void setInformationFlowProofObligationVars(IFProofObligationVars vars) {
+        this.infFlowVars = vars;
+    }
+
+    public void setGuard(Term guard) {
+        this.guard = guard;
+    }
+
+    public void setExecutionContext(ExecutionContext context) {
+        this.executionContext = context;
     }
 
     @Override
@@ -284,10 +299,14 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         if (inv != null) {
             return this;
         }
-        final LoopInvariant inv = retrieveLoopInvariantFromSpecification(goal.proof().getServices());
+        final Services services = goal.proof().getServices();
+        LoopInvariant inv = retrieveLoopInvariantFromSpecification(services);
         Modality m = (Modality)programTerm().op();
         boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION); 
-        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, HeapContext.getModHeaps(goal.proof().getServices(), transaction), services);
+        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv,
+                                               HeapContext.getModHeaps(services,
+                                                                       transaction),
+                                               services);
     }
 
     public boolean variantAvailable() {
@@ -303,4 +322,15 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
       return heapContext;
     }   
 
+    public IFProofObligationVars getInformationFlowProofObligationVars() {
+        return infFlowVars;
+    }
+
+    public Term getGuard() {
+        return guard;
+    }
+
+    public ExecutionContext getExecutionContext() {
+        return executionContext;
+    }
 }

@@ -64,7 +64,10 @@ public class SWTBotChangeEnabled extends AbstractKeYDebugTargetTestCase {
             Boolean.FALSE,
             Boolean.FALSE,
             Boolean.FALSE,
-            8,
+            Boolean.FALSE,
+            Boolean.TRUE,
+            Boolean.FALSE,
+            8, 
             executor);   
    } 
 }

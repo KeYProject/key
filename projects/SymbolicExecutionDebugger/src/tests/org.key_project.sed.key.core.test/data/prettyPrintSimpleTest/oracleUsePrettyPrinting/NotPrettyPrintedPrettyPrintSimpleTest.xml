@@ -1,27 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_6a9768d6-3f6f-4474-b83d-ca33a19fc513" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_d982e918-cb03-438b-86d5-dd91ff8a25c1" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_0f45f777-a3c0-4abf-893f-f428fb1d97c4" name="PrettyPrintSimpleTest.main(x);" pathCondition="true" lineNumber="-1" charStart="59" charEnd="63" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUsePrettyPrinting\src\PrettyPrintSimpleTest.java">
-            <sedBranchStatement xml:id="_73ddbb5d-0d35-4797-b6d5-e5497dd0d7b9" name="if (x&gt;0)" pathCondition="true" lineNumber="-1" charStart="76" charEnd="137" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUsePrettyPrinting\src\PrettyPrintSimpleTest.java">
-               <sedBranchCondition xml:id="_31b90ece-00a1-43d2-aa04-ea851db5f658" name="geq(x,Z(1(#)))" pathCondition="gt(x,Z(0(#)))">
-                  <sedStatement xml:id="_331cb6fb-3019-4854-8ca3-30eec6ce53ed" name="return 1;" pathCondition="gt(x,Z(0(#)))" lineNumber="-1" charStart="93" charEnd="102" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUsePrettyPrinting\src\PrettyPrintSimpleTest.java">
-                     <sedMethodReturn xml:id="_aa268207-c30f-4966-81ba-9374485d00ef" name="&lt;return of PrettyPrintSimpleTest.main(x);&gt;" pathCondition="gt(x,Z(0(#)))" lineNumber="-1" charStart="59" charEnd="63" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUsePrettyPrinting\src\PrettyPrintSimpleTest.java">
-                        <sedTermination xml:id="_869991fa-3969-44fd-92c5-bb817fa8b724" name="&lt;end&gt;" pathCondition="gt(x,Z(0(#)))" verified="true">
+   <sedTarget xml:id="_26eacf05-c101-4d0f-8da6-b19944900927" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_2af6fe6b-e31b-4a96-bdf6-fcfccf00a7f7" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUsePrettyPrinting\src\PrettyPrintSimpleTest.java">
+         <sedMethodCall xml:id="_8d842ccb-9675-4c7f-9bcd-f79bf634af8a" name="&lt;call PrettyPrintSimpleTest.main(x)&gt;" pathCondition="true" lineNumber="-1" charStart="59" charEnd="63" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUsePrettyPrinting\src\PrettyPrintSimpleTest.java" groupable="true">
+            <sedBranchStatement xml:id="_1f991c7e-a0ef-4a36-9424-155bb00717e9" name="if (x&gt;0)" pathCondition="true" lineNumber="-1" charStart="76" charEnd="87" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUsePrettyPrinting\src\PrettyPrintSimpleTest.java" groupable="true">
+               <sedBranchCondition xml:id="_1b01fb76-b943-43d9-8d9f-54b0766b4734" name="gt(x,Z(0(#)))" pathCondition="gt(x,Z(0(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUsePrettyPrinting\src\PrettyPrintSimpleTest.java">
+                  <sedStatement xml:id="_26676ebb-c7bb-45d8-81b4-2847201a5bce" name="return 1;" pathCondition="gt(x,Z(0(#)))" lineNumber="-1" charStart="93" charEnd="102" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUsePrettyPrinting\src\PrettyPrintSimpleTest.java">
+                     <sedMethodReturn xml:id="_730bf37c-77ad-451d-b495-7d094e5acfee" name="&lt;return of PrettyPrintSimpleTest.main(x)&gt;" pathCondition="gt(x,Z(0(#)))" lineNumber="-1" charStart="59" charEnd="63" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUsePrettyPrinting\src\PrettyPrintSimpleTest.java" methodReturnConditionRef="_52729cbf-e049-489f-b926-8aa72db66265">
+                        <sedTermination xml:id="_ec3bc1da-b485-434a-b2b0-74f1625ebde7" name="&lt;end&gt;" pathCondition="gt(x,Z(0(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUsePrettyPrinting\src\PrettyPrintSimpleTest.java" verified="true">
                         </sedTermination>
+                        <sedGroupEndConditionReference nodeIdRef="_52729cbf-e049-489f-b926-8aa72db66265"/>
                      </sedMethodReturn>
+                     <sedGroupEndConditionReference nodeIdRef="_8e55ffd5-e924-490b-9249-26249d9b8d3e"/>
                   </sedStatement>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_6797fd16-8c78-4bc0-b93b-0891ba7f01fb" name="leq(x,Z(0(#)))" pathCondition="lt(x,Z(1(#)))">
-                  <sedStatement xml:id="_9238aabe-d411-40e6-aaac-949092a890b3" name="return -1;" pathCondition="lt(x,Z(1(#)))" lineNumber="-1" charStart="122" charEnd="132" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUsePrettyPrinting\src\PrettyPrintSimpleTest.java">
-                     <sedMethodReturn xml:id="_aabc7697-cba2-40fb-bb7d-385e9a0af79c" name="&lt;return of PrettyPrintSimpleTest.main(x);&gt;" pathCondition="lt(x,Z(1(#)))" lineNumber="-1" charStart="59" charEnd="63" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUsePrettyPrinting\src\PrettyPrintSimpleTest.java">
-                        <sedTermination xml:id="_e52f6a11-115b-494f-89b0-4c10d4758a84" name="&lt;end&gt;" pathCondition="lt(x,Z(1(#)))" verified="true">
+               <sedBranchCondition xml:id="_b2b436d4-d033-42fa-95e6-1dea356d1a1a" name="lt(x,Z(1(#)))" pathCondition="lt(x,Z(1(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUsePrettyPrinting\src\PrettyPrintSimpleTest.java">
+                  <sedStatement xml:id="_c59bd8d0-f1eb-424b-af7a-8dc5d4d680da" name="return -1;" pathCondition="lt(x,Z(1(#)))" lineNumber="-1" charStart="122" charEnd="132" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUsePrettyPrinting\src\PrettyPrintSimpleTest.java">
+                     <sedMethodReturn xml:id="_314b8150-c86d-45c0-beba-6e50c24c2492" name="&lt;return of PrettyPrintSimpleTest.main(x)&gt;" pathCondition="lt(x,Z(1(#)))" lineNumber="-1" charStart="59" charEnd="63" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUsePrettyPrinting\src\PrettyPrintSimpleTest.java" methodReturnConditionRef="_60f0ab43-e3b1-4385-ae46-a5160134a60c">
+                        <sedTermination xml:id="_e5288693-9405-4e79-93fc-f609a082acbe" name="&lt;end&gt;" pathCondition="lt(x,Z(1(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUsePrettyPrinting\src\PrettyPrintSimpleTest.java" verified="true">
                         </sedTermination>
+                        <sedGroupEndConditionReference nodeIdRef="_60f0ab43-e3b1-4385-ae46-a5160134a60c"/>
                      </sedMethodReturn>
+                     <sedGroupEndConditionReference nodeIdRef="_ba05390b-3c50-4fe5-8fe8-45a66912719f"/>
                   </sedStatement>
                </sedBranchCondition>
+               <sedGroupEndCondition xml:id="_8e55ffd5-e924-490b-9249-26249d9b8d3e" name="gt(x,Z(0(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                  <sedChildReference nodeIdRef="_26676ebb-c7bb-45d8-81b4-2847201a5bce"/>
+               </sedGroupEndCondition>
+               <sedGroupEndCondition xml:id="_ba05390b-3c50-4fe5-8fe8-45a66912719f" name="lt(x,Z(1(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                  <sedChildReference nodeIdRef="_c59bd8d0-f1eb-424b-af7a-8dc5d4d680da"/>
+               </sedGroupEndCondition>
             </sedBranchStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_52729cbf-e049-489f-b926-8aa72db66265" name="gt(x,Z(0(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_730bf37c-77ad-451d-b495-7d094e5acfee"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedMethodCallMethodReturnCondition xml:id="_60f0ab43-e3b1-4385-ae46-a5160134a60c" name="lt(x,Z(1(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_314b8150-c86d-45c0-beba-6e50c24c2492"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_52729cbf-e049-489f-b926-8aa72db66265" name="gt(x,Z(0(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_730bf37c-77ad-451d-b495-7d094e5acfee"/>
+            </sedGroupEndCondition>
+            <sedGroupEndCondition xml:id="_60f0ab43-e3b1-4385-ae46-a5160134a60c" name="lt(x,Z(1(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_314b8150-c86d-45c0-beba-6e50c24c2492"/>
+            </sedGroupEndCondition>
          </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_ec3bc1da-b485-434a-b2b0-74f1625ebde7"/>
+         <sedTerminationEntry nodeIdRef="_e5288693-9405-4e79-93fc-f609a082acbe"/>
       </sedThread>
    </sedTarget>
 </launch>

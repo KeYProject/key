@@ -9,6 +9,7 @@
                 <root id="src.genSrc.dir" name="genSrc"/>
                 <root id="src.proof.dir" name="resources proof"/>
                 <root id="src.gui.dir" name="resources gui"/>
+                <root id="src.META-INF.dir" name="META-INF"/>
             </source-roots>
             <test-roots>
                 <root id="test.test.dir" name="test"/>

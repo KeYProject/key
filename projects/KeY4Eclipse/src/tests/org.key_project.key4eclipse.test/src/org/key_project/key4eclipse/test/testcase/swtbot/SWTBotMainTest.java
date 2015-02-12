@@ -21,7 +21,7 @@ import org.key_project.swtbot.swing.bot.SwingBotJFrame;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 
 /**

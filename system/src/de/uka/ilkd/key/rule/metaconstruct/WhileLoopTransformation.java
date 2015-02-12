@@ -522,7 +522,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    IForUpdates updates = null;
 
 	    //the unchanged updates need to be extracted to initialize the
-	    //remainding 'for' statement
+	    //remaining 'for' statement
 	    IForUpdates unchangedUpdates = x.getIForUpdates();
 
 	    Guard guard;

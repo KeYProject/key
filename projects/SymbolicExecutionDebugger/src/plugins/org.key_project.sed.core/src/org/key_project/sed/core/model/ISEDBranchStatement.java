@@ -34,6 +34,6 @@ import org.key_project.sed.core.model.memory.SEDMemoryBranchStatement;
  * @author Martin Hentschel
  * @see ISEDDebugNode
  */
-public interface ISEDBranchStatement extends ISEDDebugNode, IStackFrame {
+public interface ISEDBranchStatement extends ISEDDebugNode, IStackFrame, ISEDGroupable {
 
 }

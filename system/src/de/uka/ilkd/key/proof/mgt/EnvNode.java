@@ -65,4 +65,9 @@ public class EnvNode extends DefaultMutableTreeNode implements TaskTreeNode{
 	// do nothing
     }
 
+    @Override
+    public TaskTreeNode[] getChildren() {
+        return NO_CHILDREN;
+    }
+
 }

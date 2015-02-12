@@ -1,1 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><ProofMetaFile><proofFileMD5>b86c3057633d1091e88ccb368195ad36</proofFileMD5><type>aPackage.A<NotASubType>aPackage.B</NotASubType></type></ProofMetaFile>
+<?xml version="1.0" encoding="UTF-8"?>
+<proofMetaFile proofFileMD5="b86c3057633d1091e88ccb368195ad36">
+<usedTypes>
+<type name="aPackage.A">
+<NotASubType name="aPackage.B"/>
+</type>
+</usedTypes>
+</proofMetaFile>

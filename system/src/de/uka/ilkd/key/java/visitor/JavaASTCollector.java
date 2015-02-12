@@ -24,7 +24,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 public class JavaASTCollector extends JavaASTWalker {
 
     /** the type of nodes to be collected */
-    private Class type;
+    private Class<?> type;
     /** the list of found elements */
     private ImmutableList<ProgramElement> resultList = 
 	ImmutableSLList.<ProgramElement>nil();
@@ -34,7 +34,7 @@ public class JavaASTCollector extends JavaASTWalker {
      * @param type the Class representing the type of nodes that have
      * to be collected
      */
-    public JavaASTCollector(ProgramElement root, Class type) {
+    public JavaASTCollector(ProgramElement root, Class<?> type) {
 	super(root);
 	this.type = type;
     }

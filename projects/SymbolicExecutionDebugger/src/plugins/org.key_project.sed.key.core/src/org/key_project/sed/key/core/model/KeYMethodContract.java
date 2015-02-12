@@ -21,9 +21,10 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodContract;
-import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDMethodContract;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.jdt.JDTUtil;
@@ -31,6 +32,7 @@ import org.key_project.util.jdt.JDTUtil;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -63,27 +65,46 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     * The contained KeY variables.
     */
    private KeYVariable[] variables;
+   
+   /**
+    * The constraints
+    */
+   private KeYConstraint[] constraints;
 
    /**
     * The method call stack.
     */
    private IKeYSEDDebugNode<?>[] callStack;
+   
+   /**
+    * The conditions under which a group ending in this node starts.
+    */
+   private SEDMemoryBranchCondition[] groupStartConditions;
 
    /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this method contract is contained.
     * @param parent The parent in that this node is contained as child.
-    * @param thread The {@link ISEDThread} in that this node is contained.
+    * @param thread The {@link KeYThread} in that this node is contained.
     * @param executionNode The {@link IExecutionMethodContract} to represent by this debug node.
     */
    public KeYMethodContract(KeYDebugTarget target, 
                             IKeYSEDDebugNode<?> parent, 
-                            ISEDThread thread, 
+                            KeYThread thread, 
                             IExecutionOperationContract executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      target.registerDebugNode(this);
       initializeAnnotations();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYThread getThread() {
+      return (KeYThread)super.getThread();
    }
    
    /**
@@ -108,7 +129,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
    @Override
    public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
-         IExecutionNode[] executionChildren = executionNode.getChildren();
+         IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
             children = KeYModelUtil.createChildren(this, executionChildren);
          }
@@ -223,6 +244,27 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
          return variables;
       }
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasConstraints() throws DebugException {
+      return !isTerminated() && super.hasConstraints();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYConstraint[] getConstraints() throws DebugException {
+      synchronized (this) {
+         if (constraints == null) {
+            constraints = KeYModelUtil.createConstraints(this, executionNode);
+         }
+         return constraints;
+      }
+   }
 
    /**
     * {@inheritDoc}
@@ -231,6 +273,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
    public boolean hasVariables() throws DebugException {
       try {
          return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                !executionNode.isDisposed() && 
                 SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
                 super.hasVariables();
       }
@@ -257,7 +300,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public boolean canStepInto() {
-      return getDebugTarget().canStepInto(this);
+      return getThread().canStepInto(this);
    }
 
    /**
@@ -265,7 +308,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public void stepInto() throws DebugException {
-      getDebugTarget().stepInto(this);
+      getThread().stepInto(this);
    }
 
    /**
@@ -273,7 +316,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public boolean canStepOver() {
-      return getDebugTarget().canStepOver(this);
+      return getThread().canStepOver(this);
    }
 
    /**
@@ -281,7 +324,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public void stepOver() throws DebugException {
-      getDebugTarget().stepOver(this);
+      getThread().stepOver(this);
    }
 
    /**
@@ -289,7 +332,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public boolean canStepReturn() {
-      return getDebugTarget().canStepReturn(this);
+      return getThread().canStepReturn(this);
    }
 
    /**
@@ -297,7 +340,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public void stepReturn() throws DebugException {
-      getDebugTarget().stepReturn(this);
+      getThread().stepReturn(this);
    }
    
    /**
@@ -305,7 +348,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public boolean canResume() {
-      return getDebugTarget().canResume(this);
+      return getThread().canResume(this);
    }
    
    /**
@@ -313,7 +356,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public void resume() throws DebugException {
-      getDebugTarget().resume(this);
+      getThread().resume(this);
    }
 
    /**
@@ -321,7 +364,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public boolean canSuspend() {
-      return getDebugTarget().canSuspend(this);
+      return getThread().canSuspend(this);
    }
 
    /**
@@ -329,7 +372,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public void suspend() throws DebugException {
-      getDebugTarget().suspend(this);
+      getThread().suspend(this);
    }
 
    /**
@@ -367,5 +410,34 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
    @Override
    public boolean isNotNullCheckComplied() {
       return getExecutionNode().isNotNullCheckComplied();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         if (groupStartConditions == null) {
+            groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
+         }
+         return groupStartConditions;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setParent(ISEDDebugNode parent) {
+      super.setParent(parent);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isTruthValueEvaluationEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
    }
 }

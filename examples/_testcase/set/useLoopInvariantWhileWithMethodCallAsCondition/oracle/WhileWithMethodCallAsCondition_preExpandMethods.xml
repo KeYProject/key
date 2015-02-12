@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="WhileWithMethodCallAsCondition.size(array);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call WhileWithMethodCallAsCondition.size(array)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
@@ -9,17 +9,27 @@
 variant: javaSubInt(array.length, i)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
-               <methodCall name="WhileWithMethodCallAsCondition.goOnNice(array_3,i_3);" pathCondition="true" pathConditionChanged="false">
+               <methodCall name="&lt;call WhileWithMethodCallAsCondition.goOnNice(array_3,i_3)&gt;" pathCondition="true" pathConditionChanged="false">
                   <callStackEntry path="/0"/>
                   <statement name="throw new RuntimeException ();" pathCondition="true" pathConditionChanged="false">
-                     <callStackEntry path="/0"/>
                      <callStackEntry path="/0/0/0/0/0"/>
-                     <termination name="&lt;uncaught java.lang.RuntimeException&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                     </termination>
+                     <callStackEntry path="/0"/>
+                     <exceptionalMethodReturn name="&lt;throw java.lang.RuntimeException&gt;" signature="&lt;exceptional return of &lt;call WhileWithMethodCallAsCondition.goOnNice(array_3,i_3)&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
+                        <callStackEntry path="/0/0/0/0/0"/>
+                        <callStackEntry path="/0"/>
+                        <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call WhileWithMethodCallAsCondition.size(array)&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
+                           <callStackEntry path="/0"/>
+                           <termination name="&lt;uncaught java.lang.RuntimeException&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                           </termination>
+                        </exceptionalMethodReturn>
+                     </exceptionalMethodReturn>
                   </statement>
+                  <methodReturnEntry path="/0/0/0/0/0/0/0"/>
                </methodCall>
             </loopInvariant>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0"/>
 </start>

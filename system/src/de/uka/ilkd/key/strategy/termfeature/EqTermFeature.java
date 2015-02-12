@@ -39,6 +39,6 @@ public class EqTermFeature extends BinaryTermFeature {
     }
     
     protected boolean filter(Term term, Services services) {
-        return term.equals ( pattern.getContent () );
+        return term.equalsModRenaming( pattern.getContent () );
     }
 }

@@ -49,7 +49,7 @@ public final class MainFrame extends JScrollPane {
             getViewport().setViewPosition(oldSequentViewPosition);
 
             // Additional option to show taclet info in case of: sequentView instanceof InnerNodeView
-            ProofTreeView ptv = mainWindow.getProofView();
+            ProofTreeView ptv = mainWindow.getProofTreeView();
             if (ptv != null) {
                 ptv.tacletInfoToggle.setSequentView(sequentView);
             }
@@ -70,8 +70,6 @@ public final class MainFrame extends JScrollPane {
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
                 "copy");
         getActionMap().put("copy", new CopyToClipboardAction(mainWindow));
-
         setContent(emptySequent);
     }
-
 }

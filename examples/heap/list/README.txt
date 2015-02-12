@@ -1,3 +1,14 @@
+example.name = List with Observers
+example.path = Dynamic Frames
+example.additionalFile.1 = src/List.java
+example.additionalFile.2 = src/ArrayList.java
+example.additionalFile.3 = src/LinkedList.java
+example.additionalFile.4 = src/Node.java
+example.additionalFile.5 = src/ListIterator.java
+example.additionalFile.6 = src/Client.java
+example.additionalFile.7 = src/MySet.java
+
+
 A list interface with iterators, an array list and a linked list implementation, a set class built on top of the list, and another client that uses the list. 
 
 Note that unlike the array list, the *linked* list is experimental and unfinished. Another (perhaps more promising) approach to dealing with linked lists can be found in the "vstte10_03_LinkedList" and "vstte10_05_Queue" examples. 

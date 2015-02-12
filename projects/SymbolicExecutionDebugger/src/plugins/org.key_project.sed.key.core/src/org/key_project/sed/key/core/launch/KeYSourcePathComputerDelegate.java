@@ -34,15 +34,18 @@ import org.eclipse.debug.core.sourcelookup.containers.ExternalArchiveSourceConta
 import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.WorkspaceSourceContainer;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.launching.sourcelookup.containers.JavaProjectSourceContainer;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.ArrayUtil;
+
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.io.KeYFile;
 
 /**
  * {@link ISourcePathComputerDelegate} for the Symbolic Execution Debugger
@@ -59,6 +62,11 @@ public class KeYSourcePathComputerDelegate implements ISourcePathComputerDelegat
         if (method != null) {
            List<ISourceContainer> result = new LinkedList<ISourceContainer>();
            IProject project = method.getResource().getProject();
+           // Add Key source path
+           IResource sourceLocation = KeYResourceProperties.getSourceClassPathResource(project);
+           if (sourceLocation != null) {
+              result.add(createSourceContainer(sourceLocation));
+           }
            // Add KeY boot class path if defined.
            UseBootClassPathKind kind = KeYResourceProperties.getUseBootClassPathKind(project);
            if (UseBootClassPathKind.WORKSPACE.equals(kind)) {
@@ -83,19 +91,57 @@ public class KeYSourcePathComputerDelegate implements ISourcePathComputerDelegat
                  result.add(createSourceContainer(file));
               }
            }
-           // Add source project, functionality was adapted from JavaSourceLookupUtil
-           IJavaProject javaProject = method.getJavaProject();
-           if (javaProject.exists()) {
-              result.add(new JavaProjectSourceContainer(javaProject));
-           }
-           else {
-              result.add(new ProjectSourceContainer(project, false));
-           }
            return result.toArray(new ISourceContainer[result.size()]);
         }
         else {
-           return new ISourceContainer[] {new WorkspaceSourceContainer()};
+           String proofFileToContinue = KeySEDUtil.getFileToLoadValue(configuration);
+           if (proofFileToContinue != null) {
+              try {
+                 IFile locationFile = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(proofFileToContinue));
+                 KeYFile keyFile = new KeYFile("Location Extraction", ResourceUtil.getLocation(locationFile), null, JavaProfile.getDefaultProfile());
+                 String javaPath = keyFile.readJavaPath();
+                 File bootClassPath = keyFile.readBootClassPath();
+                 List<File> classPaths = keyFile.readClassPath();
+                 List<ISourceContainer> result = new LinkedList<ISourceContainer>();
+                 if (javaPath != null) {
+                    addSourceContainerForFile(result, new File(javaPath));
+                 }
+                 if (classPaths != null) {
+                    for (File file : classPaths) {
+                       addSourceContainerForFile(result, file);
+                    }
+                 }
+                 if (bootClassPath != null) {
+                    addSourceContainerForFile(result, bootClassPath);
+                 }
+                 return result.toArray(new ISourceContainer[result.size()]);
+              }
+              catch (Exception e) {
+                 return new ISourceContainer[] {new WorkspaceSourceContainer()};
+              }
+           }
+           else {
+              return new ISourceContainer[] {new WorkspaceSourceContainer()};
+           }
         }
+    }
+    
+    /**
+     * Adds for the given {@link File} the best matching {@link ISourceContainer} to the {@link List}.
+     * @param toFill The {@link List} to fill.
+     * @param file The {@link File} to create {@link ISourceContainer} for.
+     * @throws CoreException Occurred Exception.
+     */
+    protected void addSourceContainerForFile(List<ISourceContainer> toFill, File file) throws CoreException {
+       IResource[] resources = ResourceUtil.findResourceForLocation(file);
+       if (!ArrayUtil.isEmpty(resources)) {
+          for (IResource resource : resources) {
+             toFill.add(createSourceContainer(resource));
+          }
+       }
+       else {
+          toFill.add(createSourceContainer(file));
+       }
     }
     
    /**

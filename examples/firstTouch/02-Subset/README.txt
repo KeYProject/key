@@ -1,3 +1,6 @@
+example.name = Transitivity of Subset
+example.path = Getting Started
+
 Transitivity of Subset
 
 This is a purely first-order predicate logic problem from the TPTP collection.

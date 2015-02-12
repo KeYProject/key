@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -36,7 +38,8 @@ class TermImpl implements Term {
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST
         = new ImmutableArray<TermLabel>();
     
-    private static int serialNumberCounter =0;
+    private static AtomicInteger serialNumberCounter = new AtomicInteger();
+    private final int serialNumber = serialNumberCounter.incrementAndGet();
 
     //content
     private final Operator op;
@@ -44,7 +47,6 @@ class TermImpl implements Term {
     private final ImmutableArray<QuantifiableVariable> boundVars;
     private final JavaBlock javaBlock;
 
-    private int serialNumber = serialNumberCounter++;
     //caches
     private static enum ThreeValuedTruth { TRUE, FALSE, UNKNOWN }
     private int depth = -1;
@@ -119,12 +121,12 @@ class TermImpl implements Term {
 	    freeVars = freeVars.union(subFreeVars);	   
 	}
     }
-    
-    
+
+
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
-    
+
     /**
      * Checks whether the Term is valid on the top level. If this is
      * the case this method returns the Term unmodified. Otherwise a
@@ -132,8 +134,8 @@ class TermImpl implements Term {
      */
     public Term checked() {
     	if(op().validTopLevel(this)) {
-	    return this;	    
-	} else {	   	    
+	    return this;
+	} else {
 	    throw new TermCreationException(op(), this);
 	}
     }    
@@ -141,6 +143,19 @@ class TermImpl implements Term {
     @Override
     public Operator op() {
         return op;
+    }
+    
+    
+    @Override
+    public <T> T op(Class<T> opClass)
+            throws IllegalArgumentException {
+        if (!opClass.isInstance(op)) {
+            throw new IllegalArgumentException(
+                    "Operator does not match the expected type:\n"
+                    + "Operator type was: " + op.getClass() + "\n"
+                    + "Expected type was: " + opClass);
+        }
+        return opClass.cast(op);
     }
     
     
@@ -262,17 +277,14 @@ class TermImpl implements Term {
     
 
     @Override
-    public boolean equalsModRenaming(Object o) {
-        if(o == this) {
-            return true;
-        }       
-        if (!(o instanceof Term)) {
-	    return false;
-	}
-	return unifyHelp ( this, ((Term) o),
-           ImmutableSLList.<QuantifiableVariable>nil(), 
-           ImmutableSLList.<QuantifiableVariable>nil(),
-           null);
+    public final boolean equalsModRenaming(Term o) {
+       if(o == this) {
+          return true;
+       }       
+       return unifyHelp ( this, o,
+             ImmutableSLList.<QuantifiableVariable>nil(), 
+             ImmutableSLList.<QuantifiableVariable>nil(),
+             null);
     }
     
     // 
@@ -299,10 +311,11 @@ class TermImpl implements Term {
 	final int ownNum = indexOf(ownVar, ownBoundVars);
 	final int cmpNum = indexOf(cmpVar, cmpBoundVars);
 
-	if (ownNum == -1 && cmpNum == -1)
+	if (ownNum == -1 && cmpNum == -1) {
 	    // if both variables are not bound the variables have to be the
 	    // same object
 	    return ownVar == cmpVar;
+    }
 
 	// otherwise the variables have to be bound at the same point (and both
 	// be bound)
@@ -318,8 +331,9 @@ class TermImpl implements Term {
 	    ImmutableList<QuantifiableVariable> list) {
 	int res = 0;
 	while (!list.isEmpty()) {
-	    if (list.head() == var)
+	    if (list.head() == var) {
 		return res;
+        }
 	    ++res;
 	    list = list.tail();
 	}
@@ -345,26 +359,31 @@ class TermImpl implements Term {
 	    ImmutableList<QuantifiableVariable> cmpBoundVars,
 	    NameAbstractionTable nat) {
 
-	if (t0 == t1 && ownBoundVars.equals(cmpBoundVars))
+	if (t0 == t1 && ownBoundVars.equals(cmpBoundVars)) {
 	    return true;
+    }
 
 	final Operator op0 = t0.op();
 
-	if (op0 instanceof QuantifiableVariable)
+	if (op0 instanceof QuantifiableVariable) {
 	    return handleQuantifiableVariable(t0, t1, ownBoundVars,
 		    cmpBoundVars);
+    }
 
 	final Operator op1 = t1.op();
 
-	if (!(op0 instanceof ProgramVariable) && op0 != op1)
+	if (!(op0 instanceof ProgramVariable) && op0 != op1) {
 	    return false;
+    }
 
-	if (t0.sort() != t1.sort() || t0.arity() != t1.arity())
+	if (t0.sort() != t1.sort() || t0.arity() != t1.arity()) {
 	    return false;
+    }
 
 	nat = handleJava(t0, t1, nat);
-	if (nat == FAILED)
+	if (nat == FAILED) {
 	    return false;
+    }
 
 	return descendRecursively(t0, t1, ownBoundVars, cmpBoundVars, nat);
     }
@@ -374,8 +393,9 @@ class TermImpl implements Term {
 	    ImmutableList<QuantifiableVariable> cmpBoundVars) {
 	if (!((t1.op() instanceof QuantifiableVariable) && compareBoundVariables(
 	        (QuantifiableVariable) t0.op(), (QuantifiableVariable) t1.op(),
-	        ownBoundVars, cmpBoundVars)))
+	        ownBoundVars, cmpBoundVars))) {
 	    return false;
+    }
 	return true;
     }
 
@@ -411,40 +431,44 @@ class TermImpl implements Term {
     }
 
     private boolean descendRecursively(Term t0, Term t1,
-	    ImmutableList<QuantifiableVariable> ownBoundVars,
-	    ImmutableList<QuantifiableVariable> cmpBoundVars,
-	    NameAbstractionTable nat) {
+          ImmutableList<QuantifiableVariable> ownBoundVars,
+          ImmutableList<QuantifiableVariable> cmpBoundVars,
+          NameAbstractionTable nat) {
 
-	for (int i = 0; i < t0.arity(); i++) {
-	    ImmutableList<QuantifiableVariable> subOwnBoundVars = ownBoundVars;
-	    ImmutableList<QuantifiableVariable> subCmpBoundVars = cmpBoundVars;
+       for (int i = 0; i < t0.arity(); i++) {
+          ImmutableList<QuantifiableVariable> subOwnBoundVars = ownBoundVars;
+          ImmutableList<QuantifiableVariable> subCmpBoundVars = cmpBoundVars;
 
-	    if (t0.varsBoundHere(i).size() != t1.varsBoundHere(i).size())
-		return false;
-	    for (int j = 0; j < t0.varsBoundHere(i).size(); j++) {
-		final QuantifiableVariable ownVar = t0.varsBoundHere(i).get(j);
-		final QuantifiableVariable cmpVar = t1.varsBoundHere(i).get(j);
-		if (ownVar.sort() != cmpVar.sort())
-		    return false;
+          if (t0.varsBoundHere(i).size() != t1.varsBoundHere(i).size()) {
+             return false;
+        }
+          for (int j = 0; j < t0.varsBoundHere(i).size(); j++) {
+             final QuantifiableVariable ownVar = t0.varsBoundHere(i).get(j);
+             final QuantifiableVariable cmpVar = t1.varsBoundHere(i).get(j);
+             if (ownVar.sort() != cmpVar.sort()) {
+                return false;
+            }
 
-		subOwnBoundVars = subOwnBoundVars.prepend(ownVar);
-		subCmpBoundVars = subCmpBoundVars.prepend(cmpVar);
-	    }
+             subOwnBoundVars = subOwnBoundVars.prepend(ownVar);
+             subCmpBoundVars = subCmpBoundVars.prepend(cmpVar);
+          }
 
-	    boolean newConstraint = unifyHelp(t0.sub(i), t1.sub(i),
-		    subOwnBoundVars, subCmpBoundVars, nat);
+          boolean newConstraint = unifyHelp(t0.sub(i), t1.sub(i),
+                subOwnBoundVars, subCmpBoundVars, nat);
 
-	    if (!newConstraint)
-		return false;
-	}
+          if (!newConstraint) {
+             return false;
+       }
+       }
 
-	return true;
+       return true;
     }
 
     private static NameAbstractionTable checkNat(NameAbstractionTable nat) {
-	if (nat == null)
-	    return new NameAbstractionTable();
-	return nat;
+       if (nat == null) {
+          return new NameAbstractionTable();
+    }
+       return nat;
     }
     
     // end of equals modulo renaming logic
@@ -455,28 +479,31 @@ class TermImpl implements Term {
      */
     @Override
     public boolean equals(Object o) {
-	if(o == this) {
-	    return true;
-	}
-	
-	if(!(o instanceof Term)
-	    || hashCode() != o.hashCode()) {
-	    return false;	
-	}
-	final Term t = (Term) o;
-	
-	return op().equals(t.op())
-	       && t.hasLabels() == hasLabels()
-		   && subs().equals(t.subs())
-	       && boundVars().equals(t.boundVars())
-	       && javaBlock().equals(t.javaBlock());
+       if(o == this) {
+          return true;
+       }
+       
+
+       if(o == null || o.getClass() != getClass()
+             || hashCode() != o.hashCode()) {
+          return false;	
+       }
+       
+       final TermImpl t = (TermImpl) o;
+
+       return op.equals(t.op)
+             && t.hasLabels() == hasLabels()
+             && subs.equals(t.subs)
+             && boundVars.equals(t.boundVars)
+             && javaBlock.equals(t.javaBlock);
     }
 
 
     @Override
     public int hashCode(){
         if(hashcode == -1) {
-            hashcode = 5;
+            // compute into local variable first to be thread-safe.
+            int hashcode = 5;
             hashcode = hashcode*17 + op().hashCode();
             hashcode = hashcode*17 + subs().hashCode();
             hashcode = hashcode*17 + boundVars().hashCode();            
@@ -485,6 +512,7 @@ class TermImpl implements Term {
             if(hashcode == -1) {
         	hashcode = 0;
             }
+            this.hashcode = hashcode;
         }
         return hashcode;
     }
@@ -548,6 +576,11 @@ class TermImpl implements Term {
     @Override
     public boolean containsLabel(TermLabel label) {
         return false;
+    }
+
+    @Override
+    public TermLabel getLabel(Name termLabelName) {
+       return null;
     }
 
     @Override

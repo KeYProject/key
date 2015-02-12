@@ -1,33 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_d5618396-7146-409b-851c-9a1da741d1b4" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_a518c66f-9b2c-4fb1-8d46-f36903b30b1e" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_26e0db9d-4269-4e55-9566-cc09a0590d72" name="SimpleIntQuery.main(x);" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java">
-            <sedStatement xml:id="_d957a93d-374c-4cbc-8a0e-958eaba46dc2" name="int magicValue = magic(x);" pathCondition="true" lineNumber="-1" charStart="69" charEnd="95" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java">
-               <sedMethodContract xml:id="_f767c9b1-2eb0-4117-914f-c51fa1601902" name="result_0 = magic(x) catch(exc_0)
+   <sedTarget xml:id="_9fcdf2d1-d702-4979-9586-8d79fd305bd5" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_99189b73-6e4f-46e4-8144-aed9de9c39b3" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java">
+         <sedMethodCall xml:id="_03d4a0c4-4371-4bff-8618-a386b1012810" name="&lt;call SimpleIntQuery.main(x)&gt;" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java" groupable="true">
+            <sedStatement xml:id="_7d81b3ac-01da-466d-bd02-e28579860e32" name="int magicValue = magic(x);" pathCondition="true" lineNumber="-1" charStart="69" charEnd="95" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java">
+               <sedMethodContract xml:id="_a4c80297-54c6-4f45-b18a-9b5b5f552bc8" name="result_0 = magic(x) catch(exc_0)
 pre: true
-post: result_0 = subMagic(x) &amp; exc_0 = null
-mod: empty
-termination: diamond" pathCondition="true" lineNumber="-1" charStart="477" charEnd="482" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-                  <sedBranchCondition xml:id="_c9944f85-27bf-434f-a8ad-b44bf0d21c45" name="geq(x,Z(0(#)))" pathCondition="gt(x,Z(neglit(1(#))))">
-                     <sedStatement xml:id="_d88fe4c2-fee6-4dee-b637-5f2459a82758" name="return magicValue;" pathCondition="gt(x,Z(neglit(1(#))))" lineNumber="-1" charStart="102" charEnd="120" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java">
-                        <sedMethodReturn xml:id="_874c5b48-ad6a-48f6-90bc-c29cc49fe729" name="&lt;return Z(2(4(#))) as result of SimpleIntQuery.main(x);&gt;" pathCondition="gt(x,Z(neglit(1(#))))" lineNumber="-1" charStart="52" charEnd="56" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java">
-                           <sedTermination xml:id="_fcd93b1b-39f9-4ed6-b328-77bde38de9bc" name="&lt;end&gt;" pathCondition="gt(x,Z(neglit(1(#))))" verified="true">
+post: result_0 = SimpleIntQuery.subMagic(x) &amp; exc_0 = null
+mod: {}
+termination: diamond" pathCondition="true" lineNumber="-1" charStart="477" charEnd="482" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+                  <sedBranchCondition xml:id="_53d14937-2daa-411e-9ca5-1359f54953fb" name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java">
+                     <sedStatement xml:id="_57f4a8a6-2e7b-45af-8333-fd25a192fe5c" name="return magicValue;" pathCondition="gt(x,Z(neglit(1(#))))" lineNumber="-1" charStart="102" charEnd="120" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java">
+                        <sedMethodReturn xml:id="_beacd962-fa2b-4892-ba23-35aeeee8cd98" name="&lt;return Z(2(4(#))) as result of SimpleIntQuery.main(x)&gt;" pathCondition="gt(x,Z(neglit(1(#))))" lineNumber="-1" charStart="52" charEnd="56" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java" methodReturnConditionRef="_78fad2db-d984-4ac6-b3e5-0464a4caaefe">
+                           <sedTermination xml:id="_6efbbf3c-0d45-4d6a-a014-36570265d56b" name="&lt;end&gt;" pathCondition="gt(x,Z(neglit(1(#))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java" verified="true">
                            </sedTermination>
+                           <sedGroupEndConditionReference nodeIdRef="_78fad2db-d984-4ac6-b3e5-0464a4caaefe"/>
                         </sedMethodReturn>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_e0113abf-c8ff-4edd-95ac-f2a035faacad" name="leq(x,Z(neglit(1(#))))" pathCondition="lt(x,Z(0(#)))">
-                     <sedStatement xml:id="_209ea92d-24ed-49f3-b70d-d3cbf7905c4d" name="return magicValue;" pathCondition="lt(x,Z(0(#)))" lineNumber="-1" charStart="102" charEnd="120" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java">
-                        <sedMethodReturn xml:id="_b2afa217-00de-41ec-a47c-c0b22d2ec4fe" name="&lt;return Z(neglit(1(1(7(4(#)))))) as result of SimpleIntQuery.main(x);&gt;" pathCondition="lt(x,Z(0(#)))" lineNumber="-1" charStart="52" charEnd="56" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java">
-                           <sedTermination xml:id="_9fa9a214-e0e2-4723-8cb6-d4ca0452a0d4" name="&lt;end&gt;" pathCondition="lt(x,Z(0(#)))" verified="true">
+                  <sedBranchCondition xml:id="_8bc27536-628a-4e98-bfd5-007b7ef2873f" name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java">
+                     <sedStatement xml:id="_bd9731af-3f4c-41cd-8ca0-7de112ba603e" name="return magicValue;" pathCondition="lt(x,Z(0(#)))" lineNumber="-1" charStart="102" charEnd="120" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java">
+                        <sedMethodReturn xml:id="_9b6df202-2ded-4f28-b83c-ebd37dfe6b5f" name="&lt;return Z(neglit(1(1(7(4(#)))))) as result of SimpleIntQuery.main(x)&gt;" pathCondition="lt(x,Z(0(#)))" lineNumber="-1" charStart="52" charEnd="56" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java" methodReturnConditionRef="_6f7063e5-598f-4151-b551-1c5940f02f1b">
+                           <sedTermination xml:id="_f983952d-e55d-4039-a054-150462b258df" name="&lt;end&gt;" pathCondition="lt(x,Z(0(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingOff\src\SimpleIntQuery.java" verified="true">
                            </sedTermination>
+                           <sedGroupEndConditionReference nodeIdRef="_6f7063e5-598f-4151-b551-1c5940f02f1b"/>
                         </sedMethodReturn>
                      </sedStatement>
                   </sedBranchCondition>
                </sedMethodContract>
             </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_78fad2db-d984-4ac6-b3e5-0464a4caaefe" name="gt(x,Z(neglit(1(#))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_beacd962-fa2b-4892-ba23-35aeeee8cd98"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedMethodCallMethodReturnCondition xml:id="_6f7063e5-598f-4151-b551-1c5940f02f1b" name="lt(x,Z(0(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_9b6df202-2ded-4f28-b83c-ebd37dfe6b5f"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_78fad2db-d984-4ac6-b3e5-0464a4caaefe" name="gt(x,Z(neglit(1(#))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_beacd962-fa2b-4892-ba23-35aeeee8cd98"/>
+            </sedGroupEndCondition>
+            <sedGroupEndCondition xml:id="_6f7063e5-598f-4151-b551-1c5940f02f1b" name="lt(x,Z(0(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_9b6df202-2ded-4f28-b83c-ebd37dfe6b5f"/>
+            </sedGroupEndCondition>
          </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_6efbbf3c-0d45-4d6a-a014-36570265d56b"/>
+         <sedTerminationEntry nodeIdRef="_f983952d-e55d-4039-a054-150462b258df"/>
       </sedThread>
    </sedTarget>
 </launch>

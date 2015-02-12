@@ -2,32 +2,35 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Thu Apr 17 15:52:38 CEST 2014
+#Fri Jul 11 13:57:35 CEST 2014
 [StrategyProperty]VBT_PHASE=VBT_SYM_EX
 [SMTSettings]useUninterpretedMultiplication=true
 [SMTSettings]SelectedTaclets=
-[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
-[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_EXPAND
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
-[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
-[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_INSTANTIATE
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
 [SMTSettings]instantiateHierarchyAssumptions=true
 [StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
-[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
-[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_EXPAND
 [StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
-[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_RESTRICTED
 [Strategy]Timeout=-1
-[Strategy]MaximumNumberOfAutomaticApplications=10000
+[Strategy]MaximumNumberOfAutomaticApplications=1000
 [SMTSettings]integersMaximum=2147483645
-[Choice]DefaultChoices=JavaCard-JavaCard\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:ban , assertions-assertions\\:on , modelFields-modelFields\\:treatAsAxiom , initialisation-initialisation\\:disableStaticInitialisation , Strings-Strings\\:on , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , optimisedSelectRules-optimisedSelectRules\\:on , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off
+[Choice]DefaultChoices=wdChecks-wdChecks\\:off , initialisation-initialisation\\:disableStaticInitialisation , reach-reach\\:on , sequences-sequences\\:on , Strings-Strings\\:on , runtimeExceptions-runtimeExceptions\\:allow , wdOperator-wdOperator\\:L , JavaCard-JavaCard\\:off , integerSimplificationRules-integerSimplificationRules\\:full , modelFields-modelFields\\:showSatisfiability , assertions-assertions\\:on , bigint-bigint\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java
 [SMTSettings]useConstantsForBigOrSmallIntegers=true
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
 [SMTSettings]maxGenericSorts=2
 [SMTSettings]integersMinimum=-2147483645
+[SMTSettings]invariantForall=false
 [SMTSettings]UseBuiltUniqueness=false
 [SMTSettings]explicitTypeHierarchy=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
@@ -36,18 +39,19 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Thu Apr 17 15:52:38 CEST 2014
+#Fri Jul 11 13:57:35 CEST 2014
 name=getOfArray2seq
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
 
 \proof {
 (keyLog "0" (keyUser "mattias" ) (keyVersion "e5095ad740f809525e4c4689dcc12514a0ca06cc"))
+(keyLog "1" (keyUser "bubel" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "1436")
+(autoModeTime "1490")
 
 (branch "dummy ID"
-(rule "notRight" (formula "1") (userinteraction))
+(rule "notRight" (formula "1") (newnames "f_h,f_a,f_idx") (userinteraction))
 (rule "andLeft" (formula "1"))
 (rule "notLeft" (formula "2"))
 (rule "cut" (inst "cutFormula=  f_h
@@ -55,7 +59,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
         f_a,
         arr(f_idx),
         any::select(f_h, f_a, arr(f_idx)))") (userinteraction))
-(branch "CUT: f_h = store(f_h, f_a, arr(f_idx), any::select(f_h, f_a, arr(f_idx))) TRUE"
+(branch "CUT: f_h = f_h[f_a[f_idx] := f_a[f_idx]@f_h] TRUE"
    (rule "applyEqRigid" (formula "3") (term "0,0,0") (ifseqformula "1") (userinteraction))
    (rule "applyEqRigid" (formula "3") (term "0,1") (ifseqformula "1") (userinteraction))
    (rule "selectOfStore" (formula "3") (term "1") (userinteraction))
@@ -81,8 +85,8 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
    (builtin "One Step Simplification" (formula "4"))
    (rule "closeTrue" (formula "4"))
 )
-(branch "CUT: f_h = store(f_h, f_a, arr(f_idx), any::select(f_h, f_a, arr(f_idx))) FALSE"
-   (rule "equalityToSelect" (formula "2") (inst "ov=ov") (inst "fv=fv") (userinteraction))
+(branch "CUT: f_h = f_h[f_a[f_idx] := f_a[f_idx]@f_h] FALSE"
+   (rule "equalityToSelect" (formula "2") (inst "fv=fv") (inst "ov=ov") (userinteraction))
    (builtin "One Step Simplification" (formula "1"))
    (rule "andLeft" (formula "1"))
    (rule "allRight" (formula "3") (inst "sk=ov_2"))
@@ -109,7 +113,17 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
    (rule "applyEq" (formula "6") (term "0") (ifseqformula "1"))
    (rule "pullOutSelect" (formula "2") (term "1,0") (inst "selectSK=arr_9"))
    (rule "commute_and" (formula "3") (term "0,0"))
-   (rule "arrayLengthIsAShort" (formula "6") (term "0"))
+   (rule "pullOutSelect" (formula "4") (term "0") (inst "selectSK=arr_0"))
+   (rule "applyEqReverse" (formula "9") (term "1") (ifseqformula "5"))
+   (rule "hideAuxiliaryEq" (formula "5"))
+   (rule "pullOutSelect" (formula "2") (term "0") (inst "selectSK=arr_1"))
+   (rule "applyEqReverse" (formula "4") (term "1,0") (ifseqformula "3"))
+   (rule "hideAuxiliaryEq" (formula "3"))
+   (rule "pullOutSelect" (formula "1") (term "0") (inst "selectSK=fv_2_2"))
+   (rule "applyEqReverse" (formula "4") (term "2,0") (ifseqformula "2"))
+   (rule "applyEqReverse" (formula "8") (term "0") (ifseqformula "2"))
+   (rule "hideAuxiliaryEq" (formula "2"))
+   (rule "arrayLengthIsAnInt" (formula "6") (term "0"))
    (builtin "One Step Simplification" (formula "6"))
    (rule "true_left" (formula "6"))
    (rule "arrayLengthNotNegative" (formula "6") (term "0"))
@@ -118,7 +132,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
       (rule "andLeft" (formula "3"))
       (rule "applyEqReverse" (formula "10") (term "1") (ifseqformula "5"))
       (rule "hideAuxiliaryEq" (formula "5"))
-      (rule "applyEq" (formula "1") (term "1,0") (ifseqformula "4"))
+      (rule "applyEqRigid" (formula "1") (term "1,0") (ifseqformula "4"))
       (rule "applyEq" (formula "1") (term "2,0") (ifseqformula "3"))
       (rule "applyEq" (formula "1") (term "0") (ifseqformula "2"))
       (rule "applyEqReverse" (formula "9") (term "0") (ifseqformula "1"))
@@ -130,5 +144,4 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
    )
 )
 )
-
 }

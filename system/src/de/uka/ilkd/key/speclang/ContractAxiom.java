@@ -117,6 +117,23 @@ public final class ContractAxiom extends ClassAxiom {
                                                services);
     }
 
+    @Override
+    public boolean equals(Object o) {
+       if (o == null || this.getClass() != o.getClass()) return false;
+       final ContractAxiom other = (ContractAxiom) o;
+       
+       if (!name.equals(other.name)) return false;
+       if (!target.equals(other.target)) return false;
+       if (!kjt.equals(other.kjt)) return false;
+       
+       return true;
+    }
+    
+    @Override
+    public int hashCode() {
+       return 17*(name.hashCode() + 17 * target.hashCode());
+    }
+    
     public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(Services services) {
         return MiscTools.collectObservers(originalPre).union(MiscTools.collectObservers(originalPost));
     }

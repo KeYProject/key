@@ -23,7 +23,7 @@ import org.key_project.sed.core.model.ISEDThread;
  * @author Martin Hentschel
  * @see ISEDMethodCall
  */
-public abstract class AbstractSEDMethodCall extends AbstractSEDStackFrameCompatibleDebugNode implements ISEDMethodCall {
+public abstract class AbstractSEDMethodCall extends AbstractSEDGroupableStackFrameCompatibleDebugNode implements ISEDMethodCall {
    /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this method call is contained.

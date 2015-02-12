@@ -31,7 +31,7 @@ public final class CharListNotation extends Notation {
 	    try {
 		sp.printConstant(translateTerm(t));
 	    } catch (IllegalArgumentException exc) {
-		sp.printFunctionTerm(t.op().name().toString(), t);
+		sp.printFunctionTerm(t);
 	    }
 	}
     }

@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
-import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -66,15 +66,15 @@ public abstract class AbstractProfile implements Profile {
 
     protected AbstractProfile(String standardRuleFilename,
             ImmutableSet<GoalChooserBuilder> supportedGCB) {
-        standardRules = new RuleCollection(RuleSource
-                .initRuleFile(standardRuleFilename),
+        standardRules = new RuleCollection(RuleSourceFactory
+                .fromBuildInRule(standardRuleFilename),
                 initBuiltInRules());
         strategies = getStrategyFactories();
         this.supportedGCB = supportedGCB;
         this.supportedGC = extractNames(supportedGCB);
         this.prototype = getDefaultGoalChooserBuilder();
         assert( this.prototype!=null );
-        this.termLabelManager = new TermLabelManager(computeTermLabelConfiguration());
+        initTermLabelManager();
     }
 
     public AbstractProfile(String standardRuleFilename) {
@@ -83,6 +83,13 @@ public abstract class AbstractProfile implements Profile {
                 add(new DefaultGoalChooserBuilder()).
                 add(new DepthFirstGoalChooserBuilder()).
                 add(new SymbolicExecutionGoalChooserBuilder()));
+    }
+
+    /**
+     * Initializes the {@link TermLabelManager}.
+     */
+    protected void initTermLabelManager() {
+       this.termLabelManager = new TermLabelManager(computeTermLabelConfiguration());
     }
 
     /**
@@ -230,6 +237,8 @@ public abstract class AbstractProfile implements Profile {
    public static Profile getDefaultInstanceForName(String name) {
       if (JavaProfile.NAME.equals(name)) {
          return JavaProfile.getDefaultInstance();
+      }else if (JavaProfile.NAME_WITH_PERMISSIONS.equals(name)) {
+         return JavaProfile.getDefaultInstance(true);
       }
       else if (SymbolicExecutionJavaProfile.NAME.equals(name)) {
          return SymbolicExecutionJavaProfile.getDefaultInstance();

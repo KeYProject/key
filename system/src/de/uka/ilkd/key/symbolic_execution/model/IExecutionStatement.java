@@ -30,5 +30,5 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStatement;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionStatement
  */
-public interface IExecutionStatement extends IExecutionStateNode<SourceElement> {
+public interface IExecutionStatement extends IExecutionNode<SourceElement> {
 }

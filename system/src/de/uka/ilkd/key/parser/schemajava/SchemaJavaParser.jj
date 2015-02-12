@@ -2121,6 +2121,7 @@ TypeReference PrimitiveType() :
      | "\\free"
      | "\\bigint"
      | "\\real"
+     | "\\map"
      )
 	{
         String type = token.image;

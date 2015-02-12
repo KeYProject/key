@@ -14,17 +14,18 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -56,6 +57,13 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
+import de.uka.ilkd.key.smt.SolverLauncher;
+import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 
@@ -68,7 +76,7 @@ public class DefaultProofFileParser implements IProofFileParser {
     private static final String ERROR_LOADING_PROOF_LINE = "Error loading proof.\n";
     private static final String NOT_APPLICABLE = " not available or not applicable in this context.";
 
-    private final DefaultProblemLoader loader;
+    private final AbstractProblemLoader loader;
    private Proof proof = null;
    private Iterator<Node> children = null;
 
@@ -85,9 +93,6 @@ public class DefaultProofFileParser implements IProofFileParser {
    private int currIfInstFormula;
    private PosInTerm currIfInstPosInTerm;
    private String status = "";
-
-
-   private KeYMediator mediator;
    
    
    /** a value == 1 means the current branch is ignored; a value > 1 means that the "skipBranch - 1" parent branch of the
@@ -99,17 +104,16 @@ public class DefaultProofFileParser implements IProofFileParser {
    private List<Throwable> errors = new LinkedList<Throwable>();
 
 
-   public DefaultProofFileParser(DefaultProblemLoader loader, Proof proof, KeYMediator mediator) {
+   public DefaultProofFileParser(AbstractProblemLoader loader, Proof proof) {
       super();
       this.proof = proof;
-      this.mediator = mediator;
       this.loader = loader;
       currNode = proof.root(); // initialize loader
       children = currNode.childrenIterator(); // --"--
    }
 
-   public DefaultProofFileParser(Proof proof, KeYMediator mediator) {
-       this(null, proof, mediator);
+   public DefaultProofFileParser(Proof proof) {
+       this(null, proof);
    }
 
    /**
@@ -121,10 +125,17 @@ public class DefaultProofFileParser implements IProofFileParser {
        return status;
    }
 
+   /**
+    * returns the most recent selected goal 
+    */
+   public Goal getLastSelectedGoal() {
+	   return currGoal;
+   }
+   
 
 // note: Expressions without parameters only emit the endExpr signal
    @Override
-   public void beginExpr(char id, String s) throws ProblemLoaderException {
+   public void beginExpr(char id, String s) {
 
        //start no new commands until the ignored branch closes
        //count sub-branches though
@@ -142,7 +153,6 @@ public class DefaultProofFileParser implements IProofFileParser {
            if (currNode == null) currNode = children.next();
            // otherwise we already fetched the node at branch point
            currGoal      = proof.getGoal(currNode);
-           mediator.getSelectionModel().setSelectedGoal(currGoal);
            currTacletName= s;
            // set default state
            currFormula   = 0;
@@ -203,24 +213,27 @@ public class DefaultProofFileParser implements IProofFileParser {
            loadPreferences(s);
            break;
        case 'n' : //BuiltIn rules
-           if (currNode == null) currNode = children.next();
-           currGoal      = proof.getGoal(currNode);
-           mediator.getSelectionModel().setSelectedGoal(currGoal);
-           currTacletName = s;
-           // set default state
-           currFormula   = 0;
-           currPosInTerm = PosInTerm.getTopLevel();
-           builtinIfInsts = null;
+    	   if (currNode == null) currNode = children.next();
+    	   currGoal      = proof.getGoal(currNode);
+    	   currTacletName = s;
+    	   // set default state
+    	   currFormula   = 0;
+    	   currPosInTerm = PosInTerm.getTopLevel();
+    	   builtinIfInsts = null;
            break;
        case 'c' : //contract
            currContract = proof.getServices().getSpecificationRepository().getContractByName(s);
            if(currContract == null) {
-               throw new ProblemLoaderException(loader, "Error loading proof: contract \"" + s + "\" not found.");
+               // XXX: changed from throwing this exception
+               final ProblemLoaderException e = new ProblemLoaderException(loader, "Error loading proof: contract \"" + s + "\" not found.");
+               reportError(ERROR_LOADING_PROOF_LINE+
+                               ", goal "+currGoal.node().serialNr()+
+                               ", rule "+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        case 'x' : //ifInst (for built in rules)
            if(builtinIfInsts == null) {
-        builtinIfInsts = ImmutableSLList.<PosInOccurrence>nil();
+        	   builtinIfInsts = ImmutableSLList.<PosInOccurrence>nil();
            }
            currIfInstFormula = 0;
            currIfInstPosInTerm = PosInTerm.getTopLevel();
@@ -245,7 +258,7 @@ public class DefaultProofFileParser implements IProofFileParser {
 
 
    @Override
-   public void endExpr(char id, int linenr) throws ProblemLoaderException {
+   public void endExpr(char id, int linenr) {
        //System.out.println("end "+id);
 
        //read no new commands until ignored branch closes
@@ -364,9 +377,31 @@ public class DefaultProofFileParser implements IProofFileParser {
                               throws SkipSMTRuleException,
                                      BuiltInConstructionException {
 
-        if ("SMTRule".equals(currTacletName)) {
-            status = "Your proof has been loaded, but SMT solvers have not been run";
-            throw new SkipSMTRuleException();
+        if (RuleAppSMT.rule.name().toString().equals(currTacletName)) {
+           boolean error = false;
+           final SMTProblem smtProblem = new SMTProblem(currGoal);
+           try {
+        	   SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
+                       ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), proof);
+               SolverLauncher launcher = new SolverLauncher(settings);
+               //launcher.addListener(new SolverListener(settings, proof));
+               SolverTypeCollection active = ProofIndependentSettings
+       		        .DEFAULT_INSTANCE.getSMTSettings().computeActiveSolverUnion();
+               ArrayList<SMTProblem> problems = new ArrayList<SMTProblem>();
+               problems.add(smtProblem);
+               launcher.launch(active.getTypes(),                       
+            		   problems,
+                       proof.getServices()); 
+           } catch (Exception e) {
+        	   error = true;
+           }
+        	if (error || smtProblem.getFinalResult().isValid() != ThreeValuedTruth.VALID)
+        	{        	
+        	   status = "Your proof has been loaded, but SMT solvers have not been run";
+        	   throw new SkipSMTRuleException();
+           } else {
+        	   return RuleAppSMT.rule.createApp(null, proof.getServices());
+           }
         }
 
 
@@ -382,38 +417,36 @@ public class DefaultProofFileParser implements IProofFileParser {
         throw new BuiltInConstructionException(e);
            }
        }
-
+       
        if (currContract != null) {
-          AbstractContractRuleApp contractApp = null;
+    	   AbstractContractRuleApp contractApp = null;
 
-          BuiltInRule useContractRule;
-          if (currContract instanceof OperationContract) {
-             useContractRule = UseOperationContractRule.INSTANCE;
-             contractApp = (((UseOperationContractRule)useContractRule).createApp(pos)).setContract(currContract);
-          }
-          else {
-             useContractRule = UseDependencyContractRule.INSTANCE;
-             contractApp = (((UseDependencyContractRule)useContractRule).createApp(pos)).setContract(currContract);
-          }
-          
-          if (contractApp.check(currGoal.proof().getServices()) == null) {
-              throw new BuiltInConstructionException
-              ("Cannot apply contract: " + currContract);
-          } else {
-              ourApp = contractApp;
-          }
-          
-           currContract = null;
-           if(builtinIfInsts != null) {
-               ourApp = ourApp.setIfInsts(builtinIfInsts);
-        builtinIfInsts = null;
-           }
-           return ourApp;
+    	   BuiltInRule useContractRule;
+    	   if (currContract instanceof OperationContract) {
+    		   useContractRule = UseOperationContractRule.INSTANCE;
+    		   contractApp = (((UseOperationContractRule)useContractRule).createApp(pos)).setContract(currContract);
+    	   }
+    	   else {
+    		   useContractRule = UseDependencyContractRule.INSTANCE;
+    		   contractApp = (((UseDependencyContractRule)useContractRule).createApp(pos)).setContract(currContract);
+    	   }
+
+    	   if (contractApp.check(currGoal.proof().getServices()) == null) {
+    		   throw new BuiltInConstructionException
+    		   ("Cannot apply contract: " + currContract);
+    	   } else {
+    		   ourApp = contractApp;
+    	   }
+
+    	   currContract = null;
+    	   if(builtinIfInsts != null) {
+    		   ourApp = ourApp.setIfInsts(builtinIfInsts);
+    		   builtinIfInsts = null;
+    	   }
+    	   return ourApp;
        }
 
-       final ImmutableSet<IBuiltInRuleApp> ruleApps =
-           mediator.getBuiltInRuleApplications(currTacletName, pos);
-
+       final ImmutableSet<IBuiltInRuleApp> ruleApps = collectAppsForRule(currTacletName, currGoal, pos) ;
        if (ruleApps.size() != 1) {
            if (ruleApps.size() < 1) {
                throw new BuiltInConstructionException
@@ -432,18 +465,30 @@ public class DefaultProofFileParser implements IProofFileParser {
        builtinIfInsts = null;
        return ourApp;
    }
+   
+   private ImmutableSet<IBuiltInRuleApp> collectAppsForRule(String ruleName, Goal g, PosInOccurrence pos) {
+	   ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
+
+       for (final IBuiltInRuleApp app : g.ruleAppIndex().getBuiltInRules(g, pos)) {
+           if (app.rule().name().toString().equals(ruleName)) {
+               result = result.add(app);
+           }
+       }
+	   
+	   return result;
+   }
 
    private TacletApp constructApp() throws AppConstructionException {
        TacletApp ourApp = null;
        PosInOccurrence pos = null;
 
-       Taclet t = proof.env().getInitConfig().lookupActiveTaclet(new Name(currTacletName));
+       Taclet t = proof.getInitConfig().lookupActiveTaclet(new Name(currTacletName));
        if (t==null) {
            ourApp = currGoal.indexOfTaclets().lookup(currTacletName);
        } else {
            ourApp = NoPosTacletApp.createNoPosTacletApp(t);
        }
-       Services services = mediator.getServices();
+       Services services = proof.getServices();
 
 
        if (currFormula != 0) { // otherwise we have no pos

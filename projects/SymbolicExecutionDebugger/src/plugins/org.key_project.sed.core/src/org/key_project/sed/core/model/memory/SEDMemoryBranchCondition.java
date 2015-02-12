@@ -17,7 +17,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.model.ISEDBranchCondition;
+import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
@@ -28,7 +30,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDBranchCondition;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition implements ISEDMemoryDebugNode {
+public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryDebugNode {
    /**
     * The contained child nodes.
     */
@@ -48,6 +50,41 @@ public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition impleme
     * The method call stack.
     */
    private ISEDDebugNode[] callStack;
+   
+   /**
+    * The contained {@link ISEDConstraint}s.
+    */
+   private final List<ISEDConstraint> constraints = new LinkedList<ISEDConstraint>();
+
+   /**
+    * The source path.
+    */
+   private String sourcePath;
+   
+   /**
+    * The line number.
+    */
+   private int lineNumber = -1;
+
+   /**
+    * The index of the start character.
+    */
+   private int charStart = -1;
+   
+   /**
+    * The index of the end character.
+    */
+   private int charEnd = -1;
+   
+   /**
+    * The contained variables.
+    */
+   private final List<IVariable> variables = new LinkedList<IVariable>();
+   
+   /**
+    * The known group start conditions.
+    */
+   private final List<ISEDBranchCondition> groupStartConditions = new LinkedList<ISEDBranchCondition>();
 
    /**
     * Constructor.
@@ -171,5 +208,121 @@ public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition impleme
    @Override
    public void setCallStack(ISEDDebugNode[] callStack) {
       this.callStack = callStack;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addConstraint(ISEDConstraint constraint) {
+      if (constraint != null) {
+         constraints.add(constraint);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDConstraint[] getConstraints() throws DebugException {
+      return constraints.toArray(new ISEDConstraint[constraints.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getSourcePath() {
+      return sourcePath;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getLineNumber() throws DebugException {
+      return lineNumber;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharStart() throws DebugException {
+      return charStart;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharEnd() throws DebugException {
+      return charEnd;
+   }
+   
+   /**
+    * Sets the line number.
+    * @param lineNumber The line number or {@code -1} if it is unknown.
+    */
+   public void setLineNumber(int lineNumber) {
+      this.lineNumber = lineNumber;
+   }
+
+   /**
+    * Sets the index of the start character.
+    * @param charStart The index or {@code -1} if it is unknown.
+    */
+   public void setCharStart(int charStart) {
+      this.charStart = charStart;
+   }
+
+   /**
+    * Sets the index of the end character.
+    * @param charEnd The index or {@code -1} if it is unknown.
+    */
+   public void setCharEnd(int charEnd) {
+      this.charEnd = charEnd;
+   }
+   
+   /**
+    * Sets the source path.
+    * @param sourcePath The source path to set.
+    */
+   public void setSourcePath(String sourcePath) {
+      this.sourcePath = sourcePath;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addVariable(IVariable variable) {
+      variables.add(variable);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IVariable[] getVariables() throws DebugException {
+      return variables.toArray(new IVariable[variables.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition[] getGroupStartConditions() throws DebugException {
+      return groupStartConditions.toArray(new ISEDBranchCondition[groupStartConditions.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addGroupStartCondition(ISEDBranchCondition groupStartCondition) {
+      if (groupStartCondition != null) {
+         groupStartConditions.add(groupStartCondition);
+      }
    }
 }

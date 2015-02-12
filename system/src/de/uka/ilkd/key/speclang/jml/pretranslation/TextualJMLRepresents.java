@@ -29,6 +29,7 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
         super(mods);
         assert represents != null;
         this.represents = represents;
+        setPosition(represents);
     }
     
     public TextualJMLRepresents (ImmutableList<String> mods, PositionedString represents, String name){

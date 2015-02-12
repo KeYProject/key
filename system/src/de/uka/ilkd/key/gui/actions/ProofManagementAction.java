@@ -16,8 +16,8 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-import de.uka.ilkd.key.gui.KeYSelectionEvent;
-import de.uka.ilkd.key.gui.KeYSelectionListener;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
@@ -59,8 +59,8 @@ public final class ProofManagementAction extends MainWindowAction {
 
     private boolean enabled() {
 	return getMediator().getSelectedProof() != null
-	        && getMediator().getSelectedProof().getJavaModel() != null
-	        && !getMediator().getSelectedProof().getJavaModel().isEmpty();
+	        && getMediator().getSelectedProof().getServices().getJavaModel() != null
+	        && !getMediator().getSelectedProof().getServices().getJavaModel().isEmpty();
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -73,7 +73,7 @@ public final class ProofManagementAction extends MainWindowAction {
 		    new GeneralFailureEvent("Please load a proof first"));
 	} else {
 	    ProofManagementDialog
-                    .showInstance(getMediator().getSelectedProof().env().getInitConfig());
+                    .showInstance(getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment());
 	}
     }
 }

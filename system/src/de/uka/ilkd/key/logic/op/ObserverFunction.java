@@ -54,8 +54,7 @@ public class ObserverFunction extends Function implements IObserverFunction {
 	            	    ImmutableArray<KeYJavaType> paramTypes,
 	            	    int heapCount,
 	            	    int stateCount) {
-	super(new ProgramElementName(baseName, 
-		                     container.getSort().toString()),
+	super(createName(baseName, container),
               sort, 
               getArgSorts(heapSort, container, isStatic, paramTypes, heapCount, stateCount));
 	assert type == null || type.getSort() == sort;
@@ -66,6 +65,10 @@ public class ObserverFunction extends Function implements IObserverFunction {
 	this.paramTypes = paramTypes;
 	this.heapCount = heapCount;
 	this.stateCount = stateCount;
+    }
+    
+    public static ProgramElementName createName(String baseName, KeYJavaType container) {
+       return new ProgramElementName(baseName, container.getSort().toString());
     }
     
     

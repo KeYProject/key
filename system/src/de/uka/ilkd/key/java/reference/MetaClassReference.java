@@ -123,8 +123,12 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
     }
 
     public SourceElement getFirstElement() {
-        return (typeReference == null) ? 
-	    this : typeReference.getFirstElement();
+        return (typeReference == null) ? this : typeReference.getFirstElement();
+    }
+
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       return (typeReference == null) ? this : typeReference.getFirstElementIncludingBlocks();
     }
 
     /** calls the corresponding method of a visitor in order to

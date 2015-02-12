@@ -145,8 +145,7 @@ class StdPredicateEstimator implements PredicateEstimator{
     private Term translate(String estimation, Services services){
             try {
             KeYParserF parser =
-                    new KeYParserF (ParserMode.TERM, new KeYLexerF ( estimation, "",
-                                     services.getExceptionHandler() ),
+                    new KeYParserF (ParserMode.TERM, new KeYLexerF ( estimation, ""),
                                      services,   // should not be needed
                                      services.getNamespaces() );
                 return parser.term();

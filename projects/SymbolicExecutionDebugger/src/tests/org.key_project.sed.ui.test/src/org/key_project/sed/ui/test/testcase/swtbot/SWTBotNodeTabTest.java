@@ -17,6 +17,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
@@ -65,6 +66,14 @@ public class SWTBotNodeTabTest extends AbstractSWTBotPropertyTabTest {
             assertTrue(tabs.selectTabItem("Node"));
             assertEquals("return -1", propertiesView.bot().text(0).getText());
             assertEquals("pc14", propertiesView.bot().text(1).getText());
+            assertEquals("A Return Condition", propertiesView.bot().text(2).getText());
+         }
+
+         @Override
+         public void assertMethodCall(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDMethodCall methodCall) throws Exception {
+            assertTrue(tabs.selectTabItem("Node"));
+            assertEquals("foo(result)", propertiesView.bot().text(0).getText());
+            assertEquals("pc11", propertiesView.bot().text(1).getText());
          }
       };
    }

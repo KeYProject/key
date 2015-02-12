@@ -1,3 +1,13 @@
+example.name = List with Sequences
+example.path = Dynamic Frames
+example.additionalFile.1 = src/List.java
+example.additionalFile.2 = src/ArrayList.java
+example.additionalFile.3 = src/LinkedList.java
+example.additionalFile.4 = src/Node.java
+example.additionalFile.5 = src/TestList.java
+example.additionalFile.6 = src/SimplifiedLL.java
+
+
 A list interface with addition and removal operation, an array list
 and a linked list implementation, and a test class that uses the list
 in a non-trivial way.

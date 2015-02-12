@@ -18,7 +18,7 @@ package org.key_project.key4eclipse.resources.io;
  * @author Stefan Käsdorf
  */
 @SuppressWarnings("serial")
-public class ProofMetaFileContentException extends Exception{
+public class ProofMetaFileContentException extends ProofMetaFileException{
    
    /**
     * The Constructor

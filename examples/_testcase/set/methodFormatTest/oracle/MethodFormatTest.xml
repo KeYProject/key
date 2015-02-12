@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="MethodFormatTest.main();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call MethodFormatTest.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="return a();" pathCondition="true" pathConditionChanged="false">
-         <methodCall name="MethodFormatTest.a();" pathCondition="true" pathConditionChanged="false">
+         <methodCall name="&lt;call MethodFormatTest.a()&gt;" pathCondition="true" pathConditionChanged="false">
             <statement name="return b();" pathCondition="true" pathConditionChanged="false">
-               <methodCall name="MethodFormatTest.b();" pathCondition="true" pathConditionChanged="false">
+               <methodCall name="&lt;call MethodFormatTest.b()&gt;" pathCondition="true" pathConditionChanged="false">
                   <statement name="return c();" pathCondition="true" pathConditionChanged="false">
-                     <methodCall name="MethodFormatTest.c();" pathCondition="true" pathConditionChanged="false">
+                     <methodCall name="&lt;call MethodFormatTest.c()&gt;" pathCondition="true" pathConditionChanged="false">
                         <statement name="return d();" pathCondition="true" pathConditionChanged="false">
-                           <methodCall name="MethodFormatTest.d();" pathCondition="true" pathConditionChanged="false">
+                           <methodCall name="&lt;call MethodFormatTest.d()&gt;" pathCondition="true" pathConditionChanged="false">
                               <statement name="return e();" pathCondition="true" pathConditionChanged="false">
-                                 <methodCall name="MethodFormatTest.e();" pathCondition="true" pathConditionChanged="false">
+                                 <methodCall name="&lt;call MethodFormatTest.e()&gt;" pathCondition="true" pathConditionChanged="false">
                                     <statement name="return f();" pathCondition="true" pathConditionChanged="false">
-                                       <methodCall name="MethodFormatTest.f();" pathCondition="true" pathConditionChanged="false">
+                                       <methodCall name="&lt;call MethodFormatTest.f()&gt;" pathCondition="true" pathConditionChanged="false">
                                           <statement name="return g();" pathCondition="true" pathConditionChanged="false">
-                                             <methodCall name="MethodFormatTest.g();" pathCondition="true" pathConditionChanged="false">
+                                             <methodCall name="&lt;call MethodFormatTest.g()&gt;" pathCondition="true" pathConditionChanged="false">
                                                 <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
-                                                   <methodReturn name="&lt;return of MethodFormatTest.g();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.g();&gt;" isReturnValueComputed="true">
+                                                   <methodReturn name="&lt;return of g&gt;" signature="&lt;return of MethodFormatTest.g()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of g&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.g()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                       <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                       </methodReturnValue>
-                                                      <methodReturn name="&lt;return of MethodFormatTest.f();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.f();&gt;" isReturnValueComputed="true">
+                                                      <methodReturn name="&lt;return of f&gt;" signature="&lt;return of MethodFormatTest.f()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of f&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.f()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                          <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                          </methodReturnValue>
-                                                         <methodReturn name="&lt;return of MethodFormatTest.e();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.e();&gt;" isReturnValueComputed="true">
+                                                         <methodReturn name="&lt;return of e&gt;" signature="&lt;return of MethodFormatTest.e()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of e&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.e()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                             <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                             </methodReturnValue>
-                                                            <methodReturn name="&lt;return of MethodFormatTest.d();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.d();&gt;" isReturnValueComputed="true">
+                                                            <methodReturn name="&lt;return of d&gt;" signature="&lt;return of MethodFormatTest.d()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of d&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.d()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                                <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                                </methodReturnValue>
-                                                               <methodReturn name="&lt;return of MethodFormatTest.c();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.c();&gt;" isReturnValueComputed="true">
+                                                               <methodReturn name="&lt;return of c&gt;" signature="&lt;return of MethodFormatTest.c()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of c&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.c()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                                   <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                                   </methodReturnValue>
-                                                                  <methodReturn name="&lt;return of MethodFormatTest.b();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.b();&gt;" isReturnValueComputed="true">
+                                                                  <methodReturn name="&lt;return of b&gt;" signature="&lt;return of MethodFormatTest.b()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of b&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.b()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                                      <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                                      </methodReturnValue>
-                                                                     <methodReturn name="&lt;return of MethodFormatTest.a();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.a();&gt;" isReturnValueComputed="true">
+                                                                     <methodReturn name="&lt;return of a&gt;" signature="&lt;return of MethodFormatTest.a()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of a&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.a()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                                         <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                                         </methodReturnValue>
-                                                                        <methodReturn name="&lt;return of MethodFormatTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.main();&gt;" isReturnValueComputed="true">
+                                                                        <methodReturn name="&lt;return of main&gt;" signature="&lt;return of MethodFormatTest.main()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodFormatTest.main()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                                            <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                                                            </methodReturnValue>
                                                                            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -51,19 +51,28 @@
                                                       </methodReturn>
                                                    </methodReturn>
                                                 </statement>
+                                                <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                              </methodCall>
                                           </statement>
+                                          <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                        </methodCall>
                                     </statement>
+                                    <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                  </methodCall>
                               </statement>
+                              <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                            </methodCall>
                         </statement>
+                        <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                      </methodCall>
                   </statement>
+                  <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                </methodCall>
             </statement>
+            <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
          </methodCall>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

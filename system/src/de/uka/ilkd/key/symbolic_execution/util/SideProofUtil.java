@@ -8,30 +8,47 @@ import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.mgt.RuleJustification;
+import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.profile.SimplifyTermProfile;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.Triple;
 
@@ -59,14 +76,14 @@ public final class SideProofUtil {
       Sequent sequentToProve = Sequent.EMPTY_SEQUENT;
       for (SequentFormula sf : goalSequent.antecedent()) {
          if (sf != currentSF) {
-            if (!SideProofUtil.containsModalityOrQuery(sf)) {
+            if (!containsModalityOrQuery(sf)) {
                sequentToProve = sequentToProve.addFormula(sf, true, false).sequent();
             }
          }
       }
       for (SequentFormula sf : goalSequent.succedent()) {
          if (sf != currentSF) {
-            if (!SideProofUtil.containsModalityOrQuery(sf)) {
+            if (!containsModalityOrQuery(sf)) {
                sequentToProve = sequentToProve.addFormula(sf, false, false).sequent();
             }
          }
@@ -75,44 +92,72 @@ public final class SideProofUtil {
    }
    
    /**
-    * Starts the side proof and evaluates the {@link Sequent} to prove into a single {@link Term}.
+    * <p>
+    * Starts the side proof and extracts the result {@link Term}.
+    * </p>
+    * <p>
+    * New used names are automatically added to the {@link Namespace} of the {@link Services}.
+    * </p>
     * @param services The {@link Services} to use.
     * @param proof The {@link Proof} from on which the side proof si performed.
+    * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
     * @param sequentToProve The {@link Sequent} to prove in a side proof.
-    * @param operator The {@link Operator} which is used to compute the result.
+    * @param label The {@link TermLabel} which is used to compute the result.
     * @param description The side proof description.
     * @param splittingOption The splitting options to use.
-    * @return The result {@link Term}.
+    * @param addNamesToServices {@code true} defines that used names in result and conditions are added to the namespace of the given {@link Services}, {@code false} means that names are not added.
+    * @return The found result {@link Term} and the conditions.
     * @throws ProofInputException Occurred Exception.
     */
-   public static Term evaluateInSideProof(Services services, 
-                                          Proof proof, 
-                                          Sequent sequentToProve, 
-                                          Operator operator, 
-                                          String description, 
-                                          String splittingOption) throws ProofInputException {
-      List<Triple<Term, Set<Term>, Node>> resultValuesAndConditions = SideProofUtil.computeResultsAndConditions(services, 
-                                                                                                                proof, 
-                                                                                                                sequentToProve, 
-                                                                                                                operator, 
-                                                                                                                description, 
-                                                                                                                StrategyProperties.METHOD_NONE, // Stop at methods to avoid endless executions and scenarios in which a precondition or null pointer check can't be shown
-                                                                                                                StrategyProperties.LOOP_NONE, // Stop at loops to avoid endless executions and scenarios in which the invariant can't be shown to be initially valid or preserved.
-                                                                                                                StrategyProperties.QUERY_OFF, // Stop at queries to to avoid endless executions and scenarios in which a precondition or null pointer check can't be shown
-                                                                                                                splittingOption, 
-                                                                                                                false);
-      ImmutableList<Term> goalCondtions = ImmutableSLList.<Term>nil();
-      for (Triple<Term, Set<Term>, Node> triple : resultValuesAndConditions) {
-         List<Term> negatedGoalConditions = new LinkedList<Term>();
-         for (Term term : triple.second) {
-            negatedGoalConditions.add(services.getTermBuilder().not(term));
+   public static List<Pair<Term, Node>> computeResults(Services services, 
+                                                       Proof proof, 
+                                                       ProofEnvironment sideProofEnvironment,
+                                                       Sequent sequentToProve, 
+                                                       TermLabel label, 
+                                                       String description,
+                                                       String methodTreatment,
+                                                       String loopTreatment,
+                                                       String queryTreatment,
+                                                       String splittingOption,
+                                                       boolean addNamesToServices) throws ProofInputException {
+      // Execute side proof
+      ApplyStrategyInfo info = startSideProof(proof, sideProofEnvironment, sequentToProve, methodTreatment, loopTreatment, queryTreatment, splittingOption);
+      try {
+         // Extract results and conditions from side proof
+         List<Pair<Term, Node>> conditionsAndResultsMap = new LinkedList<Pair<Term, Node>>();
+         for (Goal resultGoal : info.getProof().openGoals()) {
+            if (SymbolicExecutionUtil.hasApplicableRules(resultGoal)) {
+               throw new IllegalStateException("Not all applicable rules are applied.");
+            }
+            Sequent sequent = resultGoal.sequent();
+            List<Term> results = new LinkedList<Term>();
+            for (SequentFormula sf : sequent.antecedent()) {
+               if (sf.formula().containsLabel(label)) {
+                  Term result = sf.formula();
+                  result = services.getTermBuilder().not(result);
+                  results.add(result);
+               }
+            }
+            for (SequentFormula sf : sequent.succedent()) {
+               if (sf.formula().containsLabel(label)) {
+                  Term result = sf.formula();
+                  results.add(result);
+               }
+            }
+            Term result;
+            if (results.isEmpty()) {
+               result = services.getTermBuilder().tt();
+            }
+            else {
+               result = services.getTermBuilder().or(results);
+            }
+            conditionsAndResultsMap.add(new Pair<Term, Node>(result, resultGoal.node()));
          }
-         Term conditionsTerm = services.getTermBuilder().or(negatedGoalConditions);
-         Term goalCondition = services.getTermBuilder().or(conditionsTerm, triple.first);
-         goalCondition = SymbolicExecutionUtil.replaceSkolemConstants(triple.third.sequent(), goalCondition, services);
-         goalCondtions = goalCondtions.append(goalCondition);
+         return conditionsAndResultsMap;
       }
-      return services.getTermBuilder().and(goalCondtions);
+      finally {
+         disposeOrStore(description, info);
+      }
    }
    
    /**
@@ -124,6 +169,7 @@ public final class SideProofUtil {
     * </p>
     * @param services The {@link Services} to use.
     * @param proof The {@link Proof} from on which the side proof si performed.
+    * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
     * @param sequentToProve The {@link Sequent} to prove in a side proof.
     * @param operator The {@link Operator} which is used to compute the result.
     * @param description The side proof description.
@@ -134,6 +180,7 @@ public final class SideProofUtil {
     */
    public static List<Triple<Term, Set<Term>, Node>> computeResultsAndConditions(Services services, 
                                                                                  Proof proof, 
+                                                                                 ProofEnvironment sideProofEnvironment, 
                                                                                  Sequent sequentToProve, 
                                                                                  Operator operator, 
                                                                                  String description,
@@ -143,10 +190,10 @@ public final class SideProofUtil {
                                                                                  String splittingOption,
                                                                                  boolean addNamesToServices) throws ProofInputException {
       // Execute side proof
-      ApplyStrategyInfo info = SideProofUtil.startSideProof(proof, sequentToProve, methodTreatment, loopTreatment, queryTreatment, splittingOption);
+      ApplyStrategyInfo info = startSideProof(proof, sideProofEnvironment, sequentToProve, methodTreatment, loopTreatment, queryTreatment, splittingOption);
       try {
          // Extract relevant things
-         Set<Operator> relevantThingsInSequentToProve = SideProofUtil.extractRelevantThings(info.getProof().getServices(), sequentToProve);
+         Set<Operator> relevantThingsInSequentToProve = extractRelevantThings(info.getProof().getServices(), sequentToProve);
          // Extract results and conditions from side proof
          List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap = new LinkedList<Triple<Term, Set<Term>, Node>>();
          for (Goal resultGoal : info.getProof().openGoals()) {
@@ -169,7 +216,7 @@ public final class SideProofUtil {
                      }
                   }
                }
-               if (!SideProofUtil.isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
+               if (!isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
                   if (resultConditions.add(sf.formula()) && addNamesToServices) {
                      addNewNamesToNamespace(services, sf.formula());
                   }
@@ -194,7 +241,7 @@ public final class SideProofUtil {
                   }
                }
                if (result == null) {
-                  if (!SideProofUtil.isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
+                  if (!isIrrelevantCondition(services, sequentToProve, relevantThingsInSequentToProve, sf)) {
                      if (resultConditions.add(services.getTermBuilder().not(sf.formula())) && addNamesToServices) {
                         addNewNamesToNamespace(services, sf.formula());
                      }
@@ -209,7 +256,7 @@ public final class SideProofUtil {
          return conditionsAndResultsMap;
       }
       finally {
-         SideProofUtil.disposeOrStore(description, info);
+         disposeOrStore(description, info);
       }
    }
    
@@ -336,7 +383,7 @@ public final class SideProofUtil {
     * @return The found relevant things.
     */
    public static Set<Operator> extractRelevantThings(final Services services, 
-                                                 Sequent sequentToProve) {
+                                                     Sequent sequentToProve) {
       final Set<Operator> result = new HashSet<Operator>();
       for (SequentFormula sf : sequentToProve) {
          sf.formula().execPreOrder(new DefaultVisitor() {
@@ -391,14 +438,42 @@ public final class SideProofUtil {
     * @return {@code true} {@link SequentFormula} is relevant condition, {@code false} {@link SequentFormula} is not a relevant condition.
     */
    public static boolean isIrrelevantCondition(Services services, 
-                                           Sequent initialSequent, 
-                                           Set<Operator> relevantThingsInSequentToProve, 
-                                           SequentFormula sf) {
+                                               Sequent initialSequent, 
+                                               Set<Operator> relevantThingsInSequentToProve, 
+                                               SequentFormula sf) {
       return initialSequent.antecedent().contains(sf) || // Conditions which already exist in the initial sequent are irrelevant
              initialSequent.succedent().contains(sf) || // Conditions which already exist in the initial sequent are irrelevant
+//             isInOrOfAntecedent(initialSequent, sf) ||
              containsModalityOrQuery(sf) || // Conditions with modalities or queries are irrelevant
              containsIrrelevantThings(services, sf, relevantThingsInSequentToProve); // Conditions which contains not relevant things are irrelevant
    }
+
+//   public static boolean isInOrOfAntecedent(Sequent initialSequent, SequentFormula sf) {
+//      Term term = sf.formula();
+//      boolean result = false;
+//      Iterator<SequentFormula> iter = initialSequent.antecedent().iterator();
+//      while (!result && iter.hasNext()) {
+//         SequentFormula next = iter.next();
+//         if (isInOr(next.formula(), term)) {
+//            result = true;
+//         }
+//      }
+//      return result;
+//   }
+//
+//   public static boolean isInOr(Term term, Term toCheck) {
+//      if (term.op() == Junctor.OR) {
+//         boolean result = false;
+//         Iterator<Term> iter = term.subs().iterator();
+//         while (!result && iter.hasNext()) {
+//            result = isInOr(iter.next(), toCheck);
+//         }
+//         return result;
+//      }
+//      else {
+//         return term == toCheck;
+//      }
+//   }
 
    /**
     * Checks if the given {@link SequentFormula} contains irrelevant things
@@ -474,13 +549,16 @@ public final class SideProofUtil {
    /**
     * Starts a site proof for the given {@link Sequent}.
     * @param proof The parent {@link Proof} of the site proof to do.
+    * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
     * @param sequentToProve The {@link Sequent} to prove.
     * @return The proof result represented as {@link ApplyStrategyInfo} instance.
     * @throws ProofInputException Occurred Exception
     */
    public static ApplyStrategyInfo startSideProof(Proof proof,
+                                                  ProofEnvironment sideProofEnvironment,
                                                   Sequent sequentToProve) throws ProofInputException {
       return startSideProof(proof, 
+                            sideProofEnvironment,
                             sequentToProve, 
                             StrategyProperties.METHOD_NONE,
                             StrategyProperties.LOOP_NONE,
@@ -491,37 +569,41 @@ public final class SideProofUtil {
    /**
     * Starts a site proof for the given {@link Sequent}.
     * @param proof The parent {@link Proof} of the site proof to do.
+    * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
     * @param sequentToProve The {@link Sequent} to prove.
     * @return The proof result represented as {@link ApplyStrategyInfo} instance.
     * @throws ProofInputException Occurred Exception
     */
    public static ApplyStrategyInfo startSideProof(Proof proof,
+                                                  ProofEnvironment sideProofEnvironment,
                                                   Sequent sequentToProve,
                                                   String methodTreatment,
                                                   String loopTreatment,
                                                   String queryTreatment,
                                                   String splittingOption) throws ProofInputException {
-      ProofStarter starter = createSideProof(proof, sequentToProve);
+      ProofStarter starter = createSideProof(sideProofEnvironment, sequentToProve, null);
       return startSideProof(proof, starter, methodTreatment, loopTreatment, queryTreatment, splittingOption);
    }
    
    /**
     * Creates a new {@link ProofStarter} which contains a new site proof
     * of the given {@link Proof}.
-    * @param proof The given {@link Proof}.
+    * @param sideProofEnvironment The given {@link ProofEnvironment} of the side proof.
     * @param sequentToProve The {@link Sequent} to proof in a new site proof.
+    * @param proofName An optional name for the newly created {@link Proof}.
     * @return The created {@link ProofStarter} with the site proof.
     * @throws ProofInputException Occurred Exception.
     */
-   public static ProofStarter createSideProof(Proof proof,
-                                              Sequent sequentToProve) throws ProofInputException {
+   public static ProofStarter createSideProof(ProofEnvironment sideProofEnvironment,
+                                              Sequent sequentToProve,
+                                              String proofName) throws ProofInputException {
       // Make sure that valid parameters are given
       assert sequentToProve != null;
       // Create ProofStarter
       ProofStarter starter = new ProofStarter(false);
       // Configure ProofStarter
-      ProofEnvironment env = SymbolicExecutionUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(proof); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
-      starter.init(sequentToProve, env);
+      //TODO: Avoid proof environment use only InitConfig
+      starter.init(sequentToProve, sideProofEnvironment, proofName);
       return starter;
    }
    
@@ -617,19 +699,99 @@ public final class SideProofUtil {
     */
    public static Term extractOperatorTerm(Node node, final Operator operator) {
       assert node != null;
-      // Search formula with the given operator in sequent
+      // Search formula with the given operator in sequent (or in some cases below the updates)
       SequentFormula sf = JavaUtil.search(node.sequent(), new IFilter<SequentFormula>() {
          @Override
          public boolean select(SequentFormula element) {
-            return JavaUtil.equals(element.formula().op(), operator);
+            Term term = element.formula();
+            term = TermBuilder.goBelowUpdates(term);
+            return JavaUtil.equals(term.op(), operator);
          }
       });
       if (sf != null) {
-         return sf.formula();
+         Term term = sf.formula();
+         term = TermBuilder.goBelowUpdates(term);
+         return term;
       }
       else {
          return null;
       }
+   }
+   
+   /**
+    * Creates a copy of the {@link ProofEnvironment} of the given {@link Proof}
+    * which has his own {@link OneStepSimplifier} instance. Such copies are
+    * required for instance during parallel usage of site proofs because
+    * {@link OneStepSimplifier} has an internal state.
+    * @param source The {@link Proof} to copy its {@link ProofEnvironment}.
+    * @return The created {@link ProofEnvironment} which is a copy of the environment of the given {@link Proof} but with its own {@link OneStepSimplifier} instance.
+    */
+   public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(final Proof source, final boolean useSimplifyTermProfile) {
+      assert source != null;
+      assert !source.isDisposed();
+      // Get required source instances
+      final InitConfig sourceInitConfig = source.getInitConfig();
+      final RuleJustificationInfo sourceJustiInfo = sourceInitConfig.getJustifInfo();
+      // Create new profile which has separate OneStepSimplifier instance
+      JavaProfile profile;
+      if (useSimplifyTermProfile) {
+         profile = new SimplifyTermProfile() {
+            @Override
+            protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
+               Profile sourceProfile = sourceInitConfig.getProfile();
+               if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
+                  ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
+                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations(SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(source))); // Make sure that the term labels of symbolic execution are also supported by the new environment.
+                  return result;
+               }
+               else {
+                  return super.computeTermLabelConfiguration();
+               }
+            }
+         };
+      }
+      else {
+         profile = new JavaProfile() {
+            @Override
+            protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
+               Profile sourceProfile = sourceInitConfig.getProfile();
+               if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
+                  ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
+                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations(SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(source))); // Make sure that the term labels of symbolic execution are also supported by the new environment.
+                  return result;
+               }
+               else {
+                  return super.computeTermLabelConfiguration();
+               }
+            }
+         };
+      }
+      // Create new InitConfig
+      final InitConfig initConfig = new InitConfig(source.getServices().copy(profile, false));
+      // Set modified taclet options in which runtime exceptions are banned.
+      ImmutableSet<Choice> choices = sourceInitConfig.getActivatedChoices();
+      choices = choices.remove(new Choice("allow", "runtimeExceptions"));
+      choices = choices.add(new Choice("ban", "runtimeExceptions"));
+      initConfig.setActivatedChoices(choices);
+      // Initialize InitConfig with settings from the original InitConfig.
+      final ProofSettings clonedSettings = sourceInitConfig.getSettings() != null ? new ProofSettings(sourceInitConfig.getSettings()) : null;
+      initConfig.setSettings(clonedSettings);
+      initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
+      initConfig.setTaclets(sourceInitConfig.getTaclets());
+      // Create new ProofEnvironment and initialize it with values from initial one.
+      ProofEnvironment env = new ProofEnvironment(initConfig);
+      for (Taclet taclet : initConfig.activatedTaclets()) {
+         initConfig.getJustifInfo().addJustification(taclet, sourceJustiInfo.getJustification(taclet));
+      }
+      for (BuiltInRule rule : initConfig.builtInRules()) {
+         RuleJustification origJusti = sourceJustiInfo.getJustification(rule);
+         if (origJusti == null) {
+            assert rule instanceof OneStepSimplifier;
+            origJusti = AxiomJustification.INSTANCE;
+         }
+         initConfig.getJustifInfo().addJustification(rule, origJusti);
+      }
+      return env;
    }
 
    /**

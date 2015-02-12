@@ -16,6 +16,7 @@ package org.key_project.util.test.util;
 import static org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable.syncExec;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -48,10 +49,10 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
@@ -67,7 +68,9 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.results.ArrayResult;
 import org.eclipse.swtbot.swt.finder.results.BoolResult;
+import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.results.WidgetResult;
 import org.eclipse.swtbot.swt.finder.utils.MessageFormat;
@@ -75,10 +78,12 @@ import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
+import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
@@ -107,15 +112,17 @@ import org.key_project.util.eclipse.setup.SetupStartup;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithResult;
+import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.internal.ContextMenuHelper;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -209,7 +216,7 @@ public class TestUtilsUtil {
             try {
                JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
                IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(project.getFullPath())};
-               entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
+               entries = ArrayUtil.addAll(entries, JDTUtil.getDefaultJRELibrary());
                page.init(javaProject, project.getFullPath(), entries, false);
                page.configureJavaProject(null);
             }
@@ -240,50 +247,7 @@ public class TestUtilsUtil {
     * @throws InterruptedException Occurred Exception.
     */
    public static IJavaProject createJavaProject(String name) throws CoreException, InterruptedException {
-      IProject project = createProject(name);
-      final IFolder bin = project.getFolder("bin");
-      if (!bin.exists()) {
-         bin.create(true, true, null);
-      }
-      final IFolder src = project.getFolder("src");
-      if (!src.exists()) {
-         src.create(true, true, null);
-      }
-      final IJavaProject javaProject = JavaCore.create(project); 
-      IRunnableWithException run = new AbstractRunnableWithException() {
-         @Override
-         public void run() {
-            try {
-               JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
-               IClasspathEntry[] entries = new IClasspathEntry[] {JavaCore.newSourceEntry(src.getFullPath())};
-               entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
-               page.init(javaProject, bin.getFullPath(), entries, false);
-               page.configureJavaProject(null);
-            }
-            catch (Exception e) {
-               setException(e);
-            }
-         }
-      };
-      Display.getDefault().syncExec(run);
-      if (run.getException() instanceof CoreException) {
-         throw (CoreException)run.getException();
-      }
-      else if (run.getException() instanceof InterruptedException) {
-         throw (InterruptedException)run.getException();
-      }
-      else if (run.getException() != null) {
-         throw new CoreException(new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(run.getException()));
-      }
-      return javaProject;
-   }
-   
-   /**
-    * Returns the default JRE library entries.
-    * @return The default JRE library entries.
-    */
-   public static IClasspathEntry[] getDefaultJRELibrary() {
-       return PreferenceConstants.getDefaultJRELibrary();
+      return JDTUtil.createJavaProject(name);
    }
 
    /**
@@ -1511,7 +1475,7 @@ public class TestUtilsUtil {
       bot.waitUntil(new ICondition() {
          @Override
          public boolean test() throws Exception {
-            return mediator.autoMode();
+            return mediator.isInAutoMode();
          }
          
          @Override
@@ -1534,7 +1498,7 @@ public class TestUtilsUtil {
       bot.waitUntil(new ICondition() {
          @Override
          public boolean test() throws Exception {
-            return !mediator.autoMode();
+            return !mediator.isInAutoMode();
          }
          
          @Override
@@ -1673,5 +1637,252 @@ public class TestUtilsUtil {
          throw run.getException();
       }
       return run.getResult();
+   }
+
+   /**
+    * Waits until the {@link SWTBotTreeItem} is expanded.
+    * @param bot The {@link SWTWorkbenchBot} to use. 
+    * @param item The {@link SWTBotTreeItem} to wait for.
+    */
+   public static void waitUntilExpanded(SWTWorkbenchBot bot, SWTBotTreeItem item) {
+      bot.waitUntil(new ExpandedCondition(item));
+   }
+   
+   /**
+    * {@link ICondition} used by {@link TestUtilsUtil#waitUntilExpanded(SWTWorkbenchBot, SWTBotTreeItem)}.
+    * @author Martin Hentschel
+    */
+   private static class ExpandedCondition implements ICondition {
+      /**
+       * The {@link SWTBotTreeItem} to wait for.
+       */
+      private final SWTBotTreeItem item;
+      
+      /**
+       * Constructor.
+       * @param item The {@link SWTBotTreeItem} to wait for.
+       */
+      public ExpandedCondition(SWTBotTreeItem item) {
+         this.item = item;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean test() throws Exception {
+         return item.isExpanded();
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void init(SWTBot bot) {
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFailureMessage() {
+         return "Item " + item + " is not expanded.";
+      }
+   }
+
+   /**
+    * Waits until the item is deselected.
+    * @param bot The {@link SWTBot} to use.
+    * @param item The {@link SWTBotTreeItem} to wait for a selection change. 
+    */
+   public static void waitUntilDeselected(SWTBot bot, SWTBotTreeItem item) {
+      bot.waitUntil(new DeslectedCondition(item));
+   }
+   
+   /**
+    * {@link ICondition} used by {@link TestUtilsUtil#waitUntilDeselected(SWTBot, SWTBotTreeItem)}.
+    * @author Martin Hentschel
+    */
+   private static class DeslectedCondition implements ICondition {
+      /**
+       * The {@link SWTBotTreeItem} to wait for.
+       */
+      private final SWTBotTreeItem item;
+      
+      /**
+       * Constructor.
+       * @param item The {@link SWTBotTreeItem} to wait for.
+       */
+      public DeslectedCondition(SWTBotTreeItem item) {
+         this.item = item;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean test() throws Exception {
+         TreeItem[] selection = syncExec(new ArrayResult<TreeItem>() {
+            @Override
+            public TreeItem[] run() {
+               return item.widget.getParent().getSelection();
+            }
+         });
+         return !ArrayUtil.contains(selection, item.widget);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void init(SWTBot bot) {
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFailureMessage() {
+         return "Item " + item + " is still selected.";
+      }
+   }
+
+   /**
+    * Selects the given text in the given {@link SWTBotStyledText}.
+    * @param styledText The {@link SWTBotStyledText} to select text in.
+    * @param text The text to select.
+    * @return The x and y coordinate of the selected text.
+    */
+   public static Point selectText(final SWTBotStyledText styledText, 
+                                  final String text) {
+      return syncExec(new Result<Point>() {
+         @Override
+         public Point run() {
+            int index = styledText.widget.getText().indexOf(text);
+            styledText.widget.setCaretOffset(index);
+            styledText.widget.setSelection(index, index + text.length());
+            int offset = styledText.widget.getCaretOffset();
+            return styledText.widget.getLocationAtOffset(offset);
+         }
+      });
+   }
+   
+   /**
+    * Ensures that the given arrays contain the same elements.
+    * @param expected The first array.
+    * @param actual The second array.
+    */
+   public static <T> void assertArrayEquals(T[] expected, T[] actual) {
+      if (expected != null) {
+         assertNotNull(actual);
+         assertEquals(expected.length, actual.length);
+         for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i], actual[i]);
+         }
+      }
+      else {
+         assertNull(actual);
+      }
+   }
+
+   /**
+    * Performs {@link WorkbenchUtil#selectAndReveal(IResource)} thread save.
+    * @param file The {@link IFile} to select.
+    */
+   public static void selectAndReveal(final IFile file) {
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            WorkbenchUtil.selectAndReveal(file);
+         }
+      });
+   }
+
+   /**
+    * Returns the foreground {@link Color}.
+    * @param item The {@link SWTBotTreeItem}.
+    * @return The foreground {@link Color} of the given {@link SWTBotTreeItem}.
+    */
+   public static Color getForeground(final SWTBotTreeItem item) {
+      return syncExec(new Result<Color>() {
+         @Override
+         public Color run() {
+            return item.widget.getForeground();
+         }
+      });
+   }
+
+   /**
+    * Returns the data of the given {@link AbstractSWTBotControl} meaning
+    * {@link Widget#getData()}.
+    * @param control The {@link AbstractSWTBotControl} to read its data.
+    * @return The read data.
+    */
+   public static Object getData(final AbstractSWTBotControl<?> control) {
+      return syncExec(new Result<Object>() {
+         @Override
+         public Object run() {
+            return control.widget.getData();
+         }
+      });
+   }
+
+   /**
+    * Waits until the {@link SWTBotTable} contains at least some rows.
+    * @param bot The {@link SWTBot} to use.
+    * @param table The {@link SWTBotTable} to test.
+    * @param minRowCount The epected minimal number of rows to wait for.
+    */
+   public static void waitUntilTableHasAtLeastRows(SWTBot bot, final SWTBotTable table, final int minRowCount) {
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return table.rowCount() >= minRowCount;
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "Timed out waiting for " + table + " to contain at least " + minRowCount + " rows.";
+         }
+      });
+   }
+
+   /**
+    * Compares the given {@link String}s ignoring white space.
+    * @param expected The expected text.
+    * @param actual The actual text.
+    */
+   public static void assertEqualsIgnoreWhiteSpace(String expected, String actual) {
+      if (!StringUtil.equalIgnoreWhiteSpace(expected, actual)) {
+         assertEquals(expected, actual);
+      }
+   }
+
+   /**
+    * Waits until the given {@link IProject} exists and is open.
+    * @param bot The {@link SWTBot} to use.
+    * @param project The {@link IProject} to wait for.
+    */
+   public static void waitForProject(SWTBot bot, final IProject project) {
+      assertNotNull(project);
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return project.exists() && project.isOpen();
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "Timed out waiting for " + project + " to exist and to be open.";
+         }
+      });
    }
 }

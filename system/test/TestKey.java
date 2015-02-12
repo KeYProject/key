@@ -24,8 +24,10 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.collection.TestMapAsListFromIntegerToString.class,
         de.uka.ilkd.key.collection.TestLeftistHeapOfInteger.class,
         de.uka.ilkd.key.util.TestLexicographicComparator.class,
+        de.uka.ilkd.key.util.TestVersionStringComparator.class,
         de.uka.ilkd.key.util.TestMiscTools.class,
-        de.uka.ilkd.key.util.pp.TestLayouter.class
+        de.uka.ilkd.key.util.pp.TestLayouter.class,
+        de.uka.ilkd.key.util.TestProofStarter.class
     }; 
 
 
@@ -47,8 +49,10 @@ public class TestKey extends TestSuite {
 
     static Class<? extends TestCase>[] parserTests = new Class[] {
         de.uka.ilkd.key.parser.TestDeclParser.class,
-        de.uka.ilkd.key.parser.TestParallelParsing.class,
+//        de.uka.ilkd.key.parser.TestParallelParsing.class,
         de.uka.ilkd.key.parser.TestTermParser.class,
+        de.uka.ilkd.key.parser.TestTermParserHeap.class,
+        de.uka.ilkd.key.parser.TestTermParserSorts.class,
         de.uka.ilkd.key.parser.TestTacletParser.class,
     };
 
@@ -95,14 +99,19 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.smt.test.TestSimplify.class,
         de.uka.ilkd.key.smt.test.TestZ3.class,
         de.uka.ilkd.key.smt.test.TestYices.class,
-        de.uka.ilkd.key.smt.test.TestCvc3.class,
-
+        de.uka.ilkd.key.smt.test.TestCvc3.class
+        //, de.uka.ilkd.key.smt.test.TestCvc4.class  //commented out as test take too long
     };
 
     static Class<? extends TestCase>[] setTests = new Class[] {
         de.uka.ilkd.key.util.TestNodePreorderIterator.class,
+        de.uka.ilkd.key.symbolic_execution.TestConditionalVariables.class,
         de.uka.ilkd.key.symbolic_execution.TestExecutionNodePreorderIterator.class,
         de.uka.ilkd.key.symbolic_execution.TestExecutionNodeWriterAndReader.class,
+        de.uka.ilkd.key.symbolic_execution.TestExecutionVariableExtractor.class,
+        de.uka.ilkd.key.symbolic_execution.TestParallelSiteProofs.class,
+        de.uka.ilkd.key.symbolic_execution.TestTruthValueEvaluationUtil.class,
+        de.uka.ilkd.key.symbolic_execution.TestTruthValueValue.class,
         de.uka.ilkd.key.symbolic_execution.TestSymbolicLayoutExtractor.class,
         de.uka.ilkd.key.symbolic_execution.TestSymbolicLayoutWriterAndReader.class,
         de.uka.ilkd.key.symbolic_execution.TestSymbolicExecutionTreeBuilder.class,
@@ -118,6 +127,7 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.symbolic_execution.util.TestProofUserManager.class,
         de.uka.ilkd.key.symbolic_execution.util.TestSideProofStore.class,
         de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class
+        
     };
     
     static Class<? extends TestCase>[] breakpointTests = new Class[] {
@@ -147,6 +157,7 @@ public class TestKey extends TestSuite {
 
     public static TestSuite createSuite(Class<? extends TestCase>[] testClasses, final String msg) {
         TestSuite suite = new TestSuite() {
+            @Override
             public void run(TestResult result) {
                 System.out.print("[" + msg + "]: ");
                 super.run(result);
@@ -164,7 +175,6 @@ public class TestKey extends TestSuite {
 
     public static junit.framework.Test suite() {
 	de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
-	de.uka.ilkd.key.gui.MainWindow.setVisibleMode(false);
 
         TestSuite suite = new TestSuite();
         suite.addTest(createSuite(utilityTests, "Testing Utilities and Collections"));

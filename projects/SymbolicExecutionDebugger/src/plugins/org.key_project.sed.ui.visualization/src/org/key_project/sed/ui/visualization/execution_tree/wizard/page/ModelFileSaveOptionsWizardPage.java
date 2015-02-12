@@ -33,6 +33,11 @@ public class ModelFileSaveOptionsWizardPage extends WizardPage {
     * Defines if call stack will be saved or not.
     */
    private Button saveCallStackButton;
+   
+   /**
+    * Defines if constraints will be saved or not.
+    */
+   private Button saveConstraintsButton;
 
    /**
     * Constructor.
@@ -56,6 +61,8 @@ public class ModelFileSaveOptionsWizardPage extends WizardPage {
       saveVariablesButton.setText("Save &variables");
       saveCallStackButton = new Button(root, SWT.CHECK);
       saveCallStackButton.setText("Save call &stack");
+      saveConstraintsButton = new Button(root, SWT.CHECK);
+      saveConstraintsButton.setText("Save c&onstraints");
    }
    
    /**
@@ -72,5 +79,13 @@ public class ModelFileSaveOptionsWizardPage extends WizardPage {
     */
    public boolean isSaveCallStack() {
       return saveCallStackButton.getSelection();
+   }
+   
+   /**
+    * Checks if constraints should be saved.
+    * @return {@code true} save constraints, {@code false} do not save constraints.
+    */
+   public boolean isSaveConstraints() {
+      return saveConstraintsButton.getSelection();
    }
 }

@@ -17,11 +17,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.AbstractKeYlessExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStart;
@@ -29,7 +30,7 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.impl.TreeSettings;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -42,7 +43,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     */
    public void testNodesThreeLevel() throws ProofInputException {
       // Create tree to test
-      Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
+      Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);
       Node l1 = appendNode(proof, root);
       Node l11 = appendNode(proof, l1);
@@ -87,7 +88,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     */
    public void testNodesTwoLevel() throws ProofInputException {
       // Create tree to test
-      Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
+      Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);
       Node l1 = appendNode(proof, root);
       Node l11 = appendNode(proof, l1);
@@ -124,7 +125,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     */
    public void testNodesOneLevel() throws ProofInputException {
       // Create tree to test
-      Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
+      Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);
       Node child1 = appendNode(proof, root);
       Node child2 = appendNode(proof, root);
@@ -147,7 +148,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     * @param proofNode The {@link Node} in KeY's proof tree to represent.
     * @return The created {@link KeYlessStatement}.
     */
-   protected KeYlessStatement createStatement(AbstractKeYlessExecutionNode parent, Node proofNode) {
+   protected KeYlessStatement createStatement(AbstractKeYlessExecutionNode<?> parent, Node proofNode) {
       KeYlessStatement statement = new KeYlessStatement(parent, proofNode.serialNr() + "", null, false);
       parent.addChild(statement);
       return statement;
@@ -158,12 +159,12 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     */
    public void testEmptyRoot() throws ProofInputException {
       // Create tree to test
-      UserInterface ui = new CustomConsoleUserInterface(false);
+      UserInterface ui = new CustomUserInterface(false);
       KeYMediator mediator = new KeYMediator(ui);
-      Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
+      Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);
       // Create execution test model
-      TreeSettings settings = new TreeSettings(false, false);
+      TreeSettings settings = new TreeSettings(false, false, false, false);
       ExecutionStart executionRoot = new ExecutionStart(settings, mediator, root);
       // Test tree
       assertRoot(executionRoot, createExpectedNodes("<start>"));
@@ -177,7 +178,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     * @param expectedRoots The expected values.
     * @throws ProofInputException Occurred Exception. 
     */
-   protected void assertRoot(IExecutionNode element, 
+   protected void assertRoot(IExecutionNode<?> element, 
                              ExpectedNode[] expectedRoots) throws ProofInputException {
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(element);
       assertExpectedNodes(iter, expectedRoots, false);
@@ -199,7 +200,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
          assertNotNull(iter);
          for (ExpectedNode node : expectedRoots) {
             assertTrue(iter.hasNext());
-            IExecutionNode next = iter.next();
+            IExecutionNode<?> next = iter.next();
             assertNotNull(next);
             assertEquals(node.getExpectedName(), next.getName());
             if (iterateOverSubtree) {

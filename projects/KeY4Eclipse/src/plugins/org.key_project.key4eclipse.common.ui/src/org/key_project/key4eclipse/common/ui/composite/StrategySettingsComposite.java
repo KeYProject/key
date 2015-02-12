@@ -13,6 +13,7 @@
 
 package org.key_project.key4eclipse.common.ui.composite;
 
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,16 +45,15 @@ import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.XMLUtil;
 
-import de.uka.ilkd.key.gui.AutoModeListener;
-import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.gui.configuration.SettingsListener;
-import de.uka.ilkd.key.gui.configuration.StrategySettings;
+import de.uka.ilkd.key.core.AutoModeListener;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
+import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -100,7 +100,7 @@ public class StrategySettingsComposite extends Composite {
     */
    private SettingsListener settingsListener = new SettingsListener() {
       @Override
-      public void settingsChanged(GUIEvent e) {
+      public void settingsChanged(EventObject e) {
          updateShownFormThreadSave();
       }
    };
@@ -215,7 +215,7 @@ public class StrategySettingsComposite extends Composite {
             mediator.addAutoModeListener(autoModeListener);
          }
          Name strategyName = proof.getSettings().getStrategySettings().getStrategy();
-         Profile profile = proof.env().getInitConfig().getProfile();
+         Profile profile = proof.getInitConfig().getProfile();
          StrategyFactory factory = strategyName != null ? profile.getStrategyFactory(strategyName) : null;
          if (factory == null) {
             factory = profile.getDefaultStrategyFactory();
@@ -232,7 +232,7 @@ public class StrategySettingsComposite extends Composite {
             }
             data = (FormData)form.getData();
             updateShownContent();
-            setFormEditable(mediator == null || !mediator.autoMode());
+            setFormEditable(mediator == null || !mediator.isInAutoMode());
             layout.topControl = form;
          }
          else {
@@ -443,7 +443,7 @@ public class StrategySettingsComposite extends Composite {
     * Updates the enabled state of the restore default values {@link Button}.
     */
    protected void updateRestoreDefaultEnabled() {
-      if (proof != null && data != null && data.getDefaultButton() != null) {
+      if (proof != null && !proof.isDisposed() && data != null && data.getDefaultButton() != null) {
          boolean defaultMaxRules = data.getMaxStepText() == null ||
                                    getStepsFromText(data.getMaxStepText()) == data.getModel().getDefaultMaxRuleApplications();
          boolean defaultProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties().equals(data.getModel().getDefaultPropertiesFactory().createDefaultStrategyProperties());

@@ -36,18 +36,18 @@ public class ExecutionNodePreorderIterator {
     * The element at that the iteration has started used as end condition
     * to make sure that only over the subtree of the element is iterated.
     */
-   private IExecutionNode start;
+   private IExecutionNode<?> start;
 
    /**
     * The next element or {@code null} if no more elements exists.
     */
-   private IExecutionNode next;
+   private IExecutionNode<?> next;
    
    /**
     * Constructor.
     * @param start The {@link IExecutionNode} to iterate over its sub tree.
     */
-   public ExecutionNodePreorderIterator(IExecutionNode start) {      
+   public ExecutionNodePreorderIterator(IExecutionNode<?> start) {      
       this.start = start;
       this.next = start;
    }
@@ -64,8 +64,8 @@ public class ExecutionNodePreorderIterator {
     * Returns the next {@link IExecutionNode} in the containment hierarchy.
     * @return The next {@link IExecutionNode}.
     */
-   public IExecutionNode next() {
-      IExecutionNode oldNext = next;
+   public IExecutionNode<?> next() {
+      IExecutionNode<?> oldNext = next;
       updateNext();
       return oldNext;
    }
@@ -74,8 +74,8 @@ public class ExecutionNodePreorderIterator {
     * Computes the next element and updates {@link #next()}.
     */
    protected void updateNext() {
-      IExecutionNode newNext = null;
-      IExecutionNode[] children = next.getChildren();
+      IExecutionNode<?> newNext = null;
+      IExecutionNode<?>[] children = next.getChildren();
       if (children.length >= 1) {
          newNext = children[0];
       }
@@ -91,12 +91,12 @@ public class ExecutionNodePreorderIterator {
     * @param node The visited {@link IExecutionNode}.
     * @return The next {@link IExecutionNode} to visit.
     */
-   protected IExecutionNode getNextOnParent(IExecutionNode node) {
-      IExecutionNode parent = node.getParent();
+   protected IExecutionNode<?> getNextOnParent(IExecutionNode<?> node) {
+      IExecutionNode<?> parent = node.getParent();
       while (parent != null) {
          boolean IExecutionNodeFound = false; // Indicates that IExecutionNode was found on the parent.
-         IExecutionNode[] children = parent.getChildren();
-         IExecutionNode nextChildOnParent = null; // The next child on the parent or the last child after iteration has finished
+         IExecutionNode<?>[] children = parent.getChildren();
+         IExecutionNode<?> nextChildOnParent = null; // The next child on the parent or the last child after iteration has finished
          for (int i = 0; i < children.length; i++) {
             nextChildOnParent = children[i];
             if (nextChildOnParent == start) {

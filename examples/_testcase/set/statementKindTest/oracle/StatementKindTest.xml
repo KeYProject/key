@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="foo();" pathCondition="true" pathConditionChanged="false">
-         <methodCall name="self.foo();" pathCondition="true" pathConditionChanged="false">
-            <methodReturn name="&lt;return of self.foo();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+         <methodCall name="&lt;call self.foo()&gt;" pathCondition="true" pathConditionChanged="false">
+            <methodReturn name="&lt;return of foo&gt;" signature="&lt;return of self.foo()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                <statement name="int i;" pathCondition="true" pathConditionChanged="false">
                   <statement name="boolean b = true;" pathCondition="true" pathConditionChanged="false">
                      <statement name="i=0;" pathCondition="true" pathConditionChanged="false">
@@ -16,17 +16,18 @@
                                           <statement name="i/=2;" pathCondition="true" pathConditionChanged="false">
                                              <statement name="i%=4;" pathCondition="true" pathConditionChanged="false">
                                                 <statement name="i=get42();" pathCondition="true" pathConditionChanged="false">
-                                                   <methodCall name="self.get42();" pathCondition="true" pathConditionChanged="false">
+                                                   <methodCall name="&lt;call self.get42()&gt;" pathCondition="true" pathConditionChanged="false">
                                                       <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
-                                                         <methodReturn name="&lt;return of self.get42();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                         <methodReturn name="&lt;return of get42&gt;" signature="&lt;return of self.get42()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                             <statement name="i=(2+4)*2;" pathCondition="true" pathConditionChanged="false">
-                                                               <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                   </termination>
                                                                </methodReturn>
                                                             </statement>
                                                          </methodReturn>
                                                       </statement>
+                                                      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                    </methodCall>
                                                 </statement>
                                              </statement>
@@ -41,7 +42,10 @@
                   </statement>
                </statement>
             </methodReturn>
+            <methodReturnEntry path="/0/0/0/0"/>
          </methodCall>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

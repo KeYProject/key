@@ -2,13 +2,13 @@ package de.uka.ilkd.key.gui.testgen;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.EventObject;
 import java.util.LinkedHashSet;
 import java.util.Properties;
 
-import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.configuration.Settings;
-import de.uka.ilkd.key.gui.configuration.SettingsConverter;
-import de.uka.ilkd.key.gui.configuration.SettingsListener;
+import de.uka.ilkd.key.settings.Settings;
+import de.uka.ilkd.key.settings.SettingsConverter;
+import de.uka.ilkd.key.settings.SettingsListener;
 
 public class TestGenerationSettings implements Settings, Cloneable {
 	// Default Values for option fields
@@ -17,12 +17,18 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	private static final String DEFAULT_OUTPUTPATH = System
 	        .getProperty("user.home") + File.separator + "testFiles";
 	private static final boolean DEFAULT_REMOVEDUPLICATES = true;
+	private static final boolean DEFAULT_USERFL = false;
 	private static final boolean DEFAULT_USEJUNIT = false;
 	private static final boolean DEFAULT_INVARIANTFORALL = true;
+	private static final String DEFAULT_OPENJMLPATH = ".";
+	private static final String DEFAULT_OBJENESISPATH = ".";
 	// Option fields
 	private int maxUnwinds;
 	private String outputPath;
+	private String openjmlPath;
+	private String objenesisPath;
 	private boolean removeDuplicates;
+	private boolean useRFL;
 	private boolean useJunit;
 	private int concurrentProcesses;
 	private boolean invariantForAll;
@@ -31,18 +37,23 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	private static final String propMaxUwinds = "[TestGenSettings]maxUnwinds";
 	private static final String propOutputPath = "[TestGenSettings]OutputPath";
 	private static final String propRemoveDuplicates = "[TestGenSettings]RemoveDuplicates";
+	private static final String propUseRFL = "[TestGenSettings]UseRFL";
 	private static final String propUseJUnit = "[TestGenSettings]UseJUnit";
 	private static final String propConcurrentProcesses = "[TestGenSettings]ConcurrentProcesses";
 	private static final String propInvariantForAll = "[TestGenSettings]InvariantForAll";
-
+	private static final String propOpenjmlPath = "[TestGenSettings]OpenJMLPath";
+	private static final String propObjenesisPath = "[TestGenSettings]ObjenesisPath";
 	public TestGenerationSettings() {
 		listeners = new LinkedHashSet<SettingsListener>();
 		maxUnwinds = TestGenerationSettings.DEFAULT_MAXUNWINDS;
 		outputPath = TestGenerationSettings.DEFAULT_OUTPUTPATH;
 		removeDuplicates = TestGenerationSettings.DEFAULT_REMOVEDUPLICATES;
+		useRFL = TestGenerationSettings.DEFAULT_USERFL;
 		useJunit = TestGenerationSettings.DEFAULT_USEJUNIT;
 		concurrentProcesses = TestGenerationSettings.DEFAULT_CONCURRENTPROCESSES;
 		invariantForAll = TestGenerationSettings.DEFAULT_INVARIANTFORALL;
+		openjmlPath = DEFAULT_OPENJMLPATH;
+		objenesisPath = DEFAULT_OBJENESISPATH;
 	}
 
 	public TestGenerationSettings(TestGenerationSettings data) {
@@ -54,8 +65,12 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		outputPath = data.outputPath;
 		removeDuplicates = data.removeDuplicates;
 		useJunit = data.useJunit;
+		useRFL = data.useRFL;
 		concurrentProcesses = data.concurrentProcesses;
 		invariantForAll = data.invariantForAll;
+		openjmlPath = data.openjmlPath;
+		objenesisPath  = data.objenesisPath;
+		
 	}
 
 	@Override
@@ -69,7 +84,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 
 	public void fireSettingsChanged() {
 		for (final SettingsListener aListenerList : listeners) {
-			aListenerList.settingsChanged(new GUIEvent(this));
+			aListenerList.settingsChanged(new EventObject(this));
 		}
 	}
 
@@ -100,6 +115,9 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		removeDuplicates = SettingsConverter.read(props,
 		        TestGenerationSettings.propRemoveDuplicates,
 		        TestGenerationSettings.DEFAULT_REMOVEDUPLICATES);
+		useRFL  = SettingsConverter.read(props,
+		        TestGenerationSettings.propUseRFL,
+		        TestGenerationSettings.DEFAULT_USERFL);
 		useJunit = SettingsConverter.read(props,
 		        TestGenerationSettings.propUseJUnit,
 		        TestGenerationSettings.DEFAULT_USEJUNIT);
@@ -109,6 +127,13 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		invariantForAll = SettingsConverter.read(props,
 		        TestGenerationSettings.propInvariantForAll,
 		        TestGenerationSettings.DEFAULT_INVARIANTFORALL);
+		openjmlPath = SettingsConverter.read(props,
+		        TestGenerationSettings.propOpenjmlPath,
+		        TestGenerationSettings.DEFAULT_OPENJMLPATH);
+		
+		objenesisPath = SettingsConverter.read(props,
+		        TestGenerationSettings.propObjenesisPath,
+		        TestGenerationSettings.DEFAULT_OBJENESISPATH);
 	}
 
 	public boolean removeDuplicates() {
@@ -135,30 +160,65 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		this.removeDuplicates = removeDuplicates;
 	}
 
+	public void setRFL(boolean useRFL) {
+		this.useRFL = useRFL;
+	}
+
 	public void setUseJunit(boolean useJunit) {
 		this.useJunit = useJunit;
+	}
+	
+	
+
+	public String getObjenesisPath() {
+		return objenesisPath;
+	}
+
+	public void setObjenesisPath(String objenesisPath) {
+		this.objenesisPath = objenesisPath;
+	}
+
+	public String getOpenjmlPath() {
+		return openjmlPath;
+	}
+
+	public void setOpenjmlPath(String openjmlPath) {
+		this.openjmlPath = openjmlPath;
+	}
+
+	public boolean useRFL() {
+		return useRFL;
 	}
 
 	public boolean useJunit() {
 		return useJunit;
 	}
 
+
 	@Override
 	public void writeSettings(Object sender, Properties props) {
+		//System.out.println("Saving: "+maxUnwinds);
 		SettingsConverter.store(props,
 		        TestGenerationSettings.propConcurrentProcesses,
-		        TestGenerationSettings.DEFAULT_CONCURRENTPROCESSES);
+		        concurrentProcesses);
 		SettingsConverter.store(props,
 		        TestGenerationSettings.propInvariantForAll,
-		        TestGenerationSettings.DEFAULT_INVARIANTFORALL);
+		        invariantForAll);
 		SettingsConverter.store(props, TestGenerationSettings.propMaxUwinds,
-		        TestGenerationSettings.DEFAULT_MAXUNWINDS);
+		        maxUnwinds);
 		SettingsConverter.store(props, TestGenerationSettings.propOutputPath,
-		        TestGenerationSettings.DEFAULT_OUTPUTPATH);
+		        outputPath);
 		SettingsConverter.store(props,
 		        TestGenerationSettings.propRemoveDuplicates,
-		        TestGenerationSettings.DEFAULT_REMOVEDUPLICATES);
+		        removeDuplicates);
+		SettingsConverter.store(props,
+		        TestGenerationSettings.propUseRFL,
+		        useRFL);
 		SettingsConverter.store(props, TestGenerationSettings.propUseJUnit,
-		        TestGenerationSettings.DEFAULT_USEJUNIT);
+		        useJunit);
+		SettingsConverter.store(props, TestGenerationSettings.propOpenjmlPath,
+		        openjmlPath);
+		SettingsConverter.store(props, TestGenerationSettings.propObjenesisPath,
+		        objenesisPath);
 	}
 }

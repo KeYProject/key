@@ -23,7 +23,7 @@ import org.key_project.sed.core.model.ISEDThread;
  * @author Martin Hentschel
  * @see ISEDMethodReturn
  */
-public abstract class AbstractSEDMethodReturn extends AbstractSEDStackFrameCompatibleDebugNode implements ISEDMethodReturn {
+public abstract class AbstractSEDMethodReturn extends AbstractSEDBaseMethodReturn implements ISEDMethodReturn {
    /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this method return is contained.

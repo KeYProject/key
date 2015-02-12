@@ -57,6 +57,8 @@ public final class PartialInvAxiom extends ClassAxiom {
 	assert !isStatic || inv.isStatic();
 	this.target = isStatic? services.getJavaInfo().getStaticInv(inv.getKJT())
 	            : services.getJavaInfo().getInv();
+	
+	
 	assert target != null;
     }
     
@@ -65,6 +67,21 @@ public final class PartialInvAxiom extends ClassAxiom {
         this.displayName = displayName;
     }
     
+    
+    @Override
+    public boolean equals(Object o) {
+       if (o == null || this.getClass() != o.getClass()) return false;
+       final PartialInvAxiom other = (PartialInvAxiom) o;
+       
+       if (!target.equals(other.target)) return false;
+       if (!inv.equals(other.inv)) return false;
+       return true;
+    }
+    
+    @Override
+    public int hashCode() {
+       return 17*(inv.hashCode() + 17 * target.hashCode());
+    }
     @Override
     public String getName() {
 	return inv.getName();
@@ -97,7 +114,7 @@ public final class PartialInvAxiom extends ClassAxiom {
 
         for (int i = 0; i < 2; i++) {
             TacletGenerator TG = TacletGenerator.getInstance();
-            Name name = MiscTools.toValidTacletName("Partial inv axiom for "
+            final Name name = MiscTools.toValidTacletName("Partial inv axiom for "
                                                     + (target.isStatic()? "static ": "")
                                                     + inv.getName()
                                                     + (i == 0 ? "" : " EQ"));

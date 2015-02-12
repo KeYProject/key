@@ -82,6 +82,29 @@ public final class ClassAxiomImpl extends ClassAxiom {
 
 
     @Override
+    public boolean equals(Object o) {
+       if (o == null || this.getClass() != o.getClass()) return false;
+       final ClassAxiomImpl other = (ClassAxiomImpl) o;
+       
+       if (isStatic != other.isStatic) return false;
+       if (!name.equals(other.name)) return false;
+       if (!kjt.equals(other.kjt)) return false;
+       if (originalSelfVar != null) {
+          if (other.originalSelfVar == null)  return false;
+          else if (!originalSelfVar.getKeYJavaType().equals(other.originalSelfVar.getKeYJavaType())) { // not interested in names
+             return false;                
+          }
+       }
+       
+       return true;
+    }
+    
+    @Override
+    public int hashCode() {
+       return 17*(name.hashCode() + 17 * kjt.hashCode()) + (isStatic ? 13 : 7);
+    }
+    
+    @Override
     public String getName() {
 	return name;
     }

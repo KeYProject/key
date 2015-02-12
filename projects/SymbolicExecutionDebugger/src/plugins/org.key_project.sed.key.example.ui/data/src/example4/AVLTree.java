@@ -14,15 +14,15 @@ package example4;
  *    </li>
  *    <li>In view 'Debug', click on 'Resume' to start symbolic execution</li>
  *    <li>Select leftmost method return node</li>
- *    <li>Click on context menu item 'Visualize Configurations'</li>
+ *    <li>Click on context menu item 'Visualize Memory Layouts'</li>
  * </ol>
- * The displayed memory configuration in the opened editor shows one possible 
- * AVL tree shape at the selected node. The slider in the bottom toolbar can be 
- * used to inspect different (non-isomorphic) shapes. In all of them can be seen 
- * that a {@link Node#parent} field points to itself, which indicates that the 
- * rotate operation invalidates the parent relationship.
+ * The displayed memory layout in the opened editor shows one possible 
+ * AVL tree layout at the selected node. The slider in the bottom toolbar can be 
+ * used to inspect different (non-isomorphic) layouts. In all of them can be 
+ * seen that a {@link Node#parent} field points to itself, which indicates that 
+ * the rotate operation invalidates the parent relationship.
  * <p> 
- * If of interest, the AVL tree shape before the method was called can be shown 
+ * If of interest, the AVL tree layout before the method was called can be shown 
  * by selecting radio button 'Initial'.
  */
 public class AVLTree {

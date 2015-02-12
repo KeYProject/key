@@ -24,16 +24,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
 
@@ -44,6 +40,11 @@ import de.uka.ilkd.key.util.Triple;
  */
 public class ContractFactory {
 
+    public static final String SYMB_EXEC_CONTRACT_BASENAME =
+            "Symbolic Execution";
+    public static final String INFORMATION_FLOW_CONTRACT_BASENAME =
+            "Non-interference contract";
+    
     private static final String INVALID_ID = "INVALID_ID";
     private static final String UNKNOWN_CONTRACT_IMPLEMENTATION = "unknown contract implementation";
     private static final String CONTRACT_COMBINATION_MARKER = "#";
@@ -63,28 +64,26 @@ public class ContractFactory {
      * Returns another contract like this one, except that the passed term
      * has been added as a postcondition (regardless of termination case).
      */
-    public FunctionalOperationContract addPost(FunctionalOperationContract old,
-            Term addedPost,
-            ProgramVariable selfVar,
-            ProgramVariable resultVar,
-            ProgramVariable excVar,
-            ImmutableList<ProgramVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars) {
+    public FunctionalOperationContract
+                addPost(FunctionalOperationContract old, Term addedPost, ProgramVariable selfVar,
+                        ProgramVariable resultVar, ProgramVariable excVar,
+                        ImmutableList<ProgramVariable> paramVars,
+                        Map<LocationVariable, LocationVariable> atPreVars) {
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
-        addedPost = replaceVariables(addedPost, selfVar, resultVar, excVar, paramVars,
-            atPreVars, foci.originalSelfVar, foci.originalResultVar,
-            foci.originalExcVar, foci.originalParamVars,
-            foci.originalAtPreVars);
+        addedPost = replaceVariables(addedPost, selfVar, resultVar, excVar, paramVars, atPreVars, 
+                                     foci.originalSelfVar, foci.originalResultVar,
+                                     foci.originalExcVar, foci.originalParamVars,
+                                     foci.originalAtPreVars);
 
-        Map<LocationVariable,Term> newPosts = new LinkedHashMap<LocationVariable,Term>(10);
-        for(LocationVariable h : foci.originalPosts.keySet()) {
-            if(h == services.getTypeConverter().getHeapLDT().getHeap()) {
-                newPosts.put(h, tb.andSC(addedPost, foci.originalPosts.get(h)));
-            }else{
-                newPosts.put(h, foci.originalPosts.get(h));
-            }
-        }
+    Map<LocationVariable,Term> newPosts = new LinkedHashMap<LocationVariable,Term>(10);
+    for(LocationVariable h : foci.originalPosts.keySet()) {
+       if(h == services.getTypeConverter().getHeapLDT().getHeap()) {
+          newPosts.put(h, tb.andSC(foci.originalPosts.get(h), addedPost));
+       }else{
+          newPosts.put(h, foci.originalPosts.get(h));
+       }
+    }
 
     //create new contract
     return new FunctionalOperationContractImpl(foci.baseName,
@@ -164,11 +163,10 @@ public class ContractFactory {
                                                    foci.globalDefs,
                                                    foci.id,
                                                    foci.toBeSaved,
-                                                   foci.originalMods.get(
-                                                           services.getTypeConverter().getHeapLDT()
-                                                           .getSavedHeap())
-                                                           != null, services
-                                                   );
+                                                   foci.originalMods
+                                                   .get(services.getTypeConverter()
+                                                           .getHeapLDT().getSavedHeap()) != null,
+                                                   services);
     }
 
     /**
@@ -247,6 +245,32 @@ public class ContractFactory {
                                           Contract.INVALID_ID);
     }
 
+    public InformationFlowContract createInformationFlowContract(
+            KeYJavaType forClass,
+            IProgramMethod pm,
+            KeYJavaType specifiedIn,
+            Modality modality,
+            Term requires,
+            Term measuredBy,
+            Term modifies,
+            boolean hasMod,
+            ProgramVariableCollection progVars,
+            Term accessible,
+            ImmutableList<InfFlowSpec> infFlowSpecs,
+            boolean toBeSaved) {
+        final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        final Term atPre = tb.var(progVars.atPreVars.get(baseHeap));
+        final Term self = progVars.selfVar != null ? tb.var(progVars.selfVar) : null;
+        final ImmutableList<Term> params = tb.var(progVars.paramVars);
+        final Term result = progVars.resultVar != null ? tb.var(
+                progVars.resultVar) : null;
+        final Term exc = progVars.excVar != null ? tb.var(progVars.excVar) : null;
+        return new InformationFlowContractImpl(
+                INFORMATION_FLOW_CONTRACT_BASENAME, forClass, pm, specifiedIn,
+                modality, requires, measuredBy, modifies, hasMod, self, params,
+                result, exc, atPre, accessible, infFlowSpecs, toBeSaved);
+    }
+
     @Override
     public boolean equals (Object o){
         if (o instanceof ContractFactory){
@@ -256,13 +280,8 @@ public class ContractFactory {
         }
     }
 
-    public FunctionalOperationContract func (IProgramMethod pm, InitiallyClause ini){
-        try {
+    public FunctionalOperationContract func (IProgramMethod pm, InitiallyClause ini) throws SLTranslationException{
             return new JMLSpecFactory(services).initiallyClauseToContract(ini, pm);
-        } catch (SLTranslationException e) {
-            services.getExceptionHandler().reportException(e);
-            return null;
-        }
     }
 
     public FunctionalOperationContract func (String baseName,
@@ -555,22 +574,26 @@ public class ContractFactory {
 
     /** replace in original the variables used for self and parameters */
     private Term replaceVariables(Term original, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, Map<LocationVariable,LocationVariable> atPreVars,
-            ProgramVariable originalSelfVar, ImmutableList<ProgramVariable> originalParamVars,
-            Map<LocationVariable,LocationVariable> originalAtPreVars) {
+                                  ImmutableList<ProgramVariable> paramVars,
+                                  Map<LocationVariable,LocationVariable> atPreVars,
+                                  ProgramVariable originalSelfVar,
+                                  ImmutableList<ProgramVariable> originalParamVars, 
+                                  Map<LocationVariable,LocationVariable> originalAtPreVars) {
         return replaceVariables(original,
                                 selfVar, null, null, paramVars, atPreVars,
                                 originalSelfVar, null, null, originalParamVars, originalAtPreVars);
     }
 
     /** replace in original the variables used for self, result, exception, heap, and parameters */
-    private Term replaceVariables(Term original, ProgramVariable selfVar, ProgramVariable resultVar,
-                                  ProgramVariable excVar, ImmutableList<ProgramVariable> paramVars,
-                                  Map<LocationVariable, LocationVariable> atPreVars,
-                                  ProgramVariable originalSelfVar, ProgramVariable originalResultVar,
+    private Term replaceVariables(Term original, ProgramVariable selfVar,
+                                  ProgramVariable resultVar, ProgramVariable excVar,
+                                  ImmutableList<ProgramVariable> paramVars,
+                                  Map<LocationVariable,LocationVariable> atPreVars,
+                                  ProgramVariable originalSelfVar,
+                                  ProgramVariable originalResultVar,
                                   ProgramVariable originalExcVar,
                                   ImmutableList<ProgramVariable> originalParamVars,
-                                  Map<LocationVariable, LocationVariable> originalAtPreVars) {
+                                  Map<LocationVariable,LocationVariable> originalAtPreVars) {
         Map <Operator, Operator> map = new LinkedHashMap<Operator,Operator>();
         addToMap(selfVar, originalSelfVar, map);
         addToMap(resultVar, originalResultVar, map);

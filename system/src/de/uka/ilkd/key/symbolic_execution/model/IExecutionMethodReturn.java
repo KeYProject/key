@@ -31,19 +31,20 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionMethodReturn
  */
-public interface IExecutionMethodReturn extends IExecutionStateNode<SourceElement> {
-   /**
-    * A reference to the {@link IExecutionMethodCall} which is now returned.
-    * @return The call of the now returned method.
-    */
-   public IExecutionMethodCall getMethodCall();
-   
+public interface IExecutionMethodReturn extends IExecutionBaseMethodReturn<SourceElement> {   
    /**
     * Returns the human readable node name including the return value ({@link #getReturnValues()}).
     * @return The human readable node name including the return value.
     * @throws ProofInputException Occurred Exception.
     */
    public String getNameIncludingReturnValue() throws ProofInputException;
+   
+   /**
+    * Returns the human readable signature including the return value ({@link #getReturnValues()}).
+    * @return The human readable signature including the return value.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public String getSignatureIncludingReturnValue() throws ProofInputException;
 
    /**
     * Checks if the values of {@link #getReturnValues()} are already computed.

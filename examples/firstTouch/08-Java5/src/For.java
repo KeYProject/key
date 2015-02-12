@@ -28,10 +28,11 @@ class For implements Iterable {
     for (Object o: f);
   }
 
-  java.util.Iterator iterator () { return it; } 
+  public java.util.Iterator iterator () { return it; } 
 
-  class Trivial extends java.util.Iterator {
-    boolean hasNext() { return true; }
-    Object next() { return null; }
+  class Trivial implements java.util.Iterator {
+    public boolean hasNext() { return true; }
+    public Object next() { return null; }
+	public void remove() { }
   }
 }

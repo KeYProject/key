@@ -57,6 +57,13 @@ public class SWTBotGraphitiNodeTabTest extends AbstractSWTBotGraphitiPropertyTab
          public void assertDiagram(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertFalse(tabs.hasTabItem("Node"));
          }
+
+         @Override
+         public void assertMethodCall(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertTrue(tabs.selectTabItem("Node"));
+            assertEquals("self_0.doSomething(_asdf,_a,_b);", propertiesView.bot().text(0).getText());
+            assertEquals("true", propertiesView.bot().text(1).getText());
+         }
       });
    }
 }

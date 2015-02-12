@@ -18,19 +18,19 @@ import recoder.ProgramFactory;
 import recoder.io.*;
 import recoder.service.*;
 import de.uka.ilkd.key.java.KeYProgModelInfo;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class KeYCrossReferenceServiceConfiguration 
     extends CrossReferenceServiceConfiguration{
 
     protected KeYProgModelInfo kpmi = null;
 
-    public KeYCrossReferenceServiceConfiguration(KeYExceptionHandler keh ) {
+    public KeYCrossReferenceServiceConfiguration(KeYRecoderExcHandler keh ) {
 	super(); // initialises servConf
 	// better not: it might add to the input path of recoder
 	// getProjectSettings().ensureSystemClassesAreInPath();
 	assert keh != null : "The exception handler must not be null";
-	getProjectSettings().setErrorHandler( (recoder.service.ErrorHandler)(keh) );
+        getProjectSettings().setErrorHandler(keh);
     }
 
     public KeYCrossReferenceServiceConfiguration(KeYProgModelInfo kpmi) {

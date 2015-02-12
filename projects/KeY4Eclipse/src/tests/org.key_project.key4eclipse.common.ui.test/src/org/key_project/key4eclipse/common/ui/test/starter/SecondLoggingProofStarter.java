@@ -20,7 +20,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * {@link IProofStarter} which logs the calls of {@link #open(Proof, KeYEnvironment, IMethod)}.
@@ -52,7 +51,7 @@ public class SecondLoggingProofStarter implements IProofStarter, ITestedStarter 
     */
    @Override
    public void open(Proof proof, 
-                    KeYEnvironment<CustomConsoleUserInterface> environment, 
+                    KeYEnvironment<?> environment, 
                     IMethod method,
                     boolean canStartAutomode,
                     boolean canApplyRules,

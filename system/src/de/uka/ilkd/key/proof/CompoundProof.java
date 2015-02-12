@@ -13,11 +13,11 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
-import de.uka.ilkd.key.util.Debug;
 
 public class CompoundProof extends ProofAggregate {
 
@@ -25,24 +25,24 @@ public class CompoundProof extends ProofAggregate {
     
     CompoundProof(ProofAggregate[] proofs, String name) {
         super(name);
-        if (proofs.length<=1) Debug.fail();
+        assert proofs!= null && proofs.length>=1;
         this.proofs=proofs;
     }
 
-    private void addProofsToList(List<Proof> l) {
-        for (int i=0; i<size(); i++) {
-            if (proofs[i] instanceof SingleProof) {
-                l.add(proofs[i].getFirstProof());
-            } else {
-                ((CompoundProof)proofs[i]).addProofsToList(l);
-            }
-        }
+    private void flatten(ProofAggregate p, List<Proof> l) {
+       Collections.addAll(l, p.getProofs()); 
     }
-    
+
+    private void flatten(List<Proof> l) {
+       for (ProofAggregate pa : proofs) {
+          flatten(pa, l);
+       }
+   }
+      
     @Override    
     public Proof[] getProofs() {
         List<Proof> l = new LinkedList<Proof>();
-        addProofsToList(l);
+        flatten(l);
         return l.toArray(new Proof[l.size()]);
     }
         
@@ -76,12 +76,18 @@ public class CompoundProof extends ProofAggregate {
 
     @Override    
     public boolean equals(Object o) {
-        if (!(o instanceof CompoundProof)) return false;
-        CompoundProof cmp = (CompoundProof) o;
-        for (int i=0; i<cmp.size(); i++) {
-            if (!cmp.get(i).equals(get(i))) return false;
-        }
-        return true;
+       if (!super.equals(o)) {
+          return false;
+       }
+       
+       final CompoundProof other = (CompoundProof) o;     
+       
+       for (int i = 0; i<proofs.length; i++) {
+          if (!proofs[i].equals(other.proofs[i])) { 
+             return false;
+          }
+       }
+       return true;
     }
  
    
@@ -89,7 +95,7 @@ public class CompoundProof extends ProofAggregate {
     public int hashCode() {
         int result = 17;
         for (int i=0; i < size(); i++){
-            result = 37 * result + get(i).hashCode();
+            result = 37 * result + proofs[i].hashCode();
         }
         return result;
     }    

@@ -23,6 +23,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -125,6 +127,11 @@ public final class BigintLiteral extends Literal {
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+    }
+
+    @Override
+    public Name getLDTName() {
+        return IntegerLDT.NAME;
     }
 
 }

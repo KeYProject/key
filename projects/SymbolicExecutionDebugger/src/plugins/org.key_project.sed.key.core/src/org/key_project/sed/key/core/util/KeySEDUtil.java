@@ -51,6 +51,7 @@ import org.key_project.util.jdt.JDTUtil;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
  * Provides static utility methods for the Symbolic Execution Debugger
@@ -149,9 +150,34 @@ public final class KeySEDUtil {
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS = "org.key_project.sed.key.core.launch.sed.key.attribute.mergeBranchConditions";
 
     /**
+     * The key of the attribute "use unicode" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_UNICODE = "org.key_project.sed.key.core.launch.sed.key.attribute.useUnicode";
+
+    /**
      * The key of the attribute "use pretty printing" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
      */
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING = "org.key_project.sed.key.core.launch.sed.key.attribute.usePrettyPrinting";
+
+    /**
+     * The key of the attribute "show signature on method return nodes" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES = "org.key_project.sed.key.core.launch.sed.key.attribute.showSignatureOnMethodReturnNodes";
+
+    /**
+     * The key of the attribute about how variables are computed in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_VARIABLES_ARE_COMPUTED_FROM_UPDATES = "org.key_project.sed.key.core.launch.sed.key.attribute.variablesAreOnlyComputedFromUpdates";
+
+    /**
+     * The key of the attribute to store if truth value evaluation is enabled or not.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED = "org.key_project.sed.key.core.launch.sed.key.attribute.truthValueEvaluationEnabled";
+
+    /**
+     * The key of the attribute to store if reached source code is highlighted or not.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE = "org.key_project.sed.key.core.launch.sed.key.attribute.highlightReachedSourceCode";
 
     /**
      * The launch mode supported by the Symbolic Execution Debugger based on KeY.
@@ -321,6 +347,16 @@ public final class KeySEDUtil {
     }
     
     /**
+     * Checks if unicode characters should be used.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} use unicode characters, {@code false} do not use unicode characters.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isUseUnicode(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_UNICODE, KeYSEDPreferences.isUseUnicode()) : KeYSEDPreferences.isUseUnicode();
+    }
+    
+    /**
      * Checks if pretty printing should be used.
      * @param configuration The {@link ILaunchConfiguration} to read from.
      * @return {@code true} use pretty printing, {@code false} do not use pretty printing.
@@ -328,6 +364,46 @@ public final class KeySEDUtil {
      */
     public static boolean isUsePrettyPrinting(ILaunchConfiguration configuration) throws CoreException {
         return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, KeYSEDPreferences.isUsePrettyPrinting()) : KeYSEDPreferences.isUsePrettyPrinting();
+    }
+    
+    /**
+     * Checks if pretty printing should be used.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} use pretty printing, {@code false} do not use pretty printing.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isShowSignatureOnMethodReturnNodes(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, KeYSEDPreferences.isShowSignatureOnMethodReturnNodes()) : KeYSEDPreferences.isShowSignatureOnMethodReturnNodes();
+    }
+
+    /**
+     * Checks if truth value evaluation is enabled or not.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} truth value evaluation enabled, {@code false} truth value evaluation disabled.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isTruthValueEvaluationEnabled(ILaunchConfiguration configuration) throws CoreException {
+       return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, KeYSEDPreferences.isTruthValueEvaluationEnabled()) : KeYSEDPreferences.isTruthValueEvaluationEnabled();
+    }
+
+    /**
+     * Checks if reached source code is highlighted or not.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} reached source code is highlighted, {@code false} reached source code is not highlighted.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isHighlightReachedSourceCode(ILaunchConfiguration configuration) throws CoreException {
+       return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, KeYSEDPreferences.isHighlightReachedSourceCode()) : KeYSEDPreferences.isHighlightReachedSourceCode();
+    }
+    
+    /**
+     * Checks if variables are computed from updates or the visible memory structure.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return  {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isVariablesAreOnlyComputedFromUpdates(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_VARIABLES_ARE_COMPUTED_FROM_UPDATES, KeYSEDPreferences.isVariablesAreOnlyComputedFromUpdates()) : KeYSEDPreferences.isVariablesAreOnlyComputedFromUpdates();
     }
 
     /**
@@ -455,10 +531,11 @@ public final class KeySEDUtil {
     /**
      * Creates a new {@link ILaunchConfiguration}.
      * @param file The {@link IFile} to launch.
+     * @param method The optional {@link IMethod}.
      * @return The new created {@link ILaunchConfiguration}.
      * @throws CoreException Occurred Exception.
      */
-    public static ILaunchConfiguration createConfiguration(IFile file) throws CoreException {
+    public static ILaunchConfiguration createConfiguration(IFile file, IMethod method) throws CoreException {
         ILaunchConfiguration config = null;
         ILaunchConfigurationWorkingCopy wc = null;
         ILaunchConfigurationType configType = getConfigurationType();
@@ -467,6 +544,11 @@ public final class KeySEDUtil {
         wc = configType.newInstance(null, LaunchUtil.getLaunchManager().generateLaunchConfigurationName(name));
         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_NEW_DEBUG_SESSION, false);
         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_FILE_TO_LOAD, path);
+        if (method != null) {
+           wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PROJECT, KeySEDUtil.getProjectValue(method));
+           wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TYPE, KeySEDUtil.getTypeValue(method));
+           wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD, KeySEDUtil.getMethodValue(method));
+        }
         wc.setMappedResources(new IResource[] {file});
         config = wc.doSave();
         return config;

@@ -94,7 +94,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 	    Debug.out("ProgramReplace:", inst);
 	    addChild((ProgramElement)inst);
 	} else if (inst instanceof ImmutableArray/*<ProgramElement>*/) {
-	    final ImmutableArray<ProgramElement> instArray = (ImmutableArray<ProgramElement>)inst;
+	    final ImmutableArray<ProgramElement> instArray = (ImmutableArray<ProgramElement>)inst;        
 	    // the assertion ensures the intended instanceof check from above
 	    assert instArray.size() == 0 || instArray.last() instanceof ProgramElement;
 	    addChildren(instArray);
@@ -112,7 +112,6 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 	}
 	changed();
     }
-
 
     public void performActionOnProgramMetaConstruct(ProgramTransformer x) {
 	ProgramReplaceVisitor trans = new ProgramReplaceVisitor(x.body(), services,

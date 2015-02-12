@@ -33,6 +33,6 @@ import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
  * @author Martin Hentschel
  * @see ISEDDebugNode
  */
-public interface ISEDLoopCondition extends ISEDDebugNode, IStackFrame {
+public interface ISEDLoopCondition extends ISEDDebugNode, IStackFrame, ISEDGroupable {
 
 }

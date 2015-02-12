@@ -17,11 +17,16 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -30,7 +35,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The default implementation of {@link IExecutionBranchCondition}.
  * @author Martin Hentschel
  */
-public class ExecutionBranchCondition extends AbstractExecutionNode implements IExecutionBranchCondition {
+public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElement> implements IExecutionBranchCondition {
    /**
     * The optional additional branch label.
     */
@@ -52,7 +57,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
    private Term pathCondition;
    
    /**
-    * The human readable path condition to reach this term.
+    * The human readable path condition to reach this node.
     */
    private String formatedPathCondition;
    
@@ -133,19 +138,25 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     * @throws ProofInputException Occurred Exception
     */
    protected void lazyComputeBranchCondition() throws ProofInputException {
-      // Compute branch condition
-      if (isMergedBranchCondition()) {
-         // Add all merged branch conditions
-         branchCondition = getServices().getTermBuilder().and(getMergedBranchCondtions());
-         // Simplify merged branch conditions
-         branchCondition = SymbolicExecutionUtil.simplify(getProof(), branchCondition);
-         branchCondition = SymbolicExecutionUtil.improveReadability(branchCondition, getServices());
+      if (!isDisposed()) {
+         final Services services = getServices();
+         // Compute branch condition
+         if (isMergedBranchCondition()) {
+            // Add all merged branch conditions
+            Term[] mergedConditions = getMergedBranchCondtions();
+            branchCondition = services.getTermBuilder().and(mergedBranchCondtions);
+            // Simplify merged branch conditions
+            if (mergedConditions.length >= 2) {
+               branchCondition = SymbolicExecutionUtil.simplify(getProof(), branchCondition);
+               branchCondition = SymbolicExecutionUtil.improveReadability(branchCondition, services);
+            }
+         }
+         else {
+            branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true, true);
+         }
+         // Format branch condition
+         formatedBranchCondition = formatTerm(branchCondition, services);
       }
-      else {
-         branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true);
-      }
-      // Format branch condition
-      formatedBranchCondition = formatTerm(branchCondition);
    }
 
    /**
@@ -172,7 +183,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     */
    @Override
    public String getFormatedPathCondition() throws ProofInputException {
-      if (pathCondition == null) {
+      if (formatedPathCondition == null) {
          lazyComputePathCondition();
       }
       return formatedPathCondition;
@@ -184,21 +195,24 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     * @throws ProofInputException Occurred Exception
     */
    protected void lazyComputePathCondition() throws ProofInputException {
-      // Get path to parent
-      Term parentPath;
-      if (getParent() != null) {
-         parentPath = getParent().getPathCondition();
+      if (!isDisposed()) {
+         final Services services = getServices();
+         // Get path to parent
+         Term parentPath;
+         if (getParent() != null) {
+            parentPath = getParent().getPathCondition();
+         }
+         else {
+            parentPath = services.getTermBuilder().tt();
+         }
+         // Add current branch condition to path
+         pathCondition = services.getTermBuilder().and(parentPath, getBranchCondition());
+         // Simplify path condition
+         pathCondition = SymbolicExecutionUtil.simplify(getProof(), pathCondition);
+         pathCondition = SymbolicExecutionUtil.improveReadability(pathCondition, services);
+         // Format path condition
+         formatedPathCondition = formatTerm(pathCondition, services);
       }
-      else {
-         parentPath = getServices().getTermBuilder().tt();
-      }
-      // Add current branch condition to path
-      pathCondition = getServices().getTermBuilder().and(parentPath, getBranchCondition());
-      // Simplify path condition
-      pathCondition = SymbolicExecutionUtil.simplify(getProof(), pathCondition);
-      pathCondition = SymbolicExecutionUtil.improveReadability(pathCondition, getServices());
-      // Format path condition
-      formatedPathCondition = formatTerm(pathCondition);
    }
 
    /**
@@ -242,7 +256,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
          Term[] result = new Term[mergedProofNodes.size()];
          Iterator<Node> iter = mergedProofNodes.iterator();
          for (int i = 0; i < result.length; i++) {
-            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), true);
+            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), true, true);
          }
          return result;
       }
@@ -265,5 +279,31 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
    @Override
    public String getAdditionalBranchLabel() {
       return additionalBranchLabel;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected IExecutionConstraint[] lazyComputeConstraints() {
+      return SymbolicExecutionUtil.createExecutionConstraints(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected PosInOccurrence lazyComputeModalityPIO() {
+      return SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(getProofNode().sequent());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SourceElement getActiveStatement() {
+      Term modalityTerm = getModalityPIO().subTerm();
+      SourceElement firstStatement = modalityTerm.javaBlock().program().getFirstElement();
+      return NodeInfo.computeActiveStatement(firstStatement);
    }
 }

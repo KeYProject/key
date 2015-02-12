@@ -2,6 +2,8 @@
 # Lines that start with '#' are comments.
 # For a project mostly in C, the following would be a good set of
 # exclude patterns (uncomment them if you want to use them):
+
+projects/**/.gitignore
 *~
 system/genSrc
 system/binary
@@ -36,20 +38,21 @@ system/warning.msg
 tags
 *.tgz
 *.tar
+.*.swp
 /netbeans/eclipse/build/
 /netbeans/eclipse/nbproject/private/
 /netbeans/eclipse/dist/
 *.class
 
 smt-solvers
+*.toc
+*.aux
+*.bbl
+*.blg
+*.len
+*.log
+*.nav
+*.out
+*.snm
 
-/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.toc
-/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.aux
-/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.bbl
-/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.blg
-/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.len
-/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.log
-/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.nav
-/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.out
 /projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.pdf
-/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.snm

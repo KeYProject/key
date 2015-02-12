@@ -4,33 +4,33 @@
       <statement name="int y = computeHelp(xValue);" pathCondition="true" pathConditionChanged="false">
          <methodCall name="Magic42.computeHelp(x_1);" pathCondition="true" pathConditionChanged="false">
             <statement name="int y = (x_1&gt;=0 ?x_1 :-x_1)/2000;" pathCondition="true" pathConditionChanged="false">
-               <branchCondition name="!xValue &lt;= -1" pathCondition="!xValue &lt;= -1" pathConditionChanged="true" branchCondition="!xValue &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <statement name="return 320*y_1+7;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of Magic42.computeHelp(x_1);&gt;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 7 + quotient_1 * 320 as result of Magic42.computeHelp(x_1);&gt;" isReturnValueComputed="true">
-                        <statement name="int res = 0;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                           <loopStatement name="while ( y%2!=0 ) {if (res_1%2==0) {     res_1=2*res_1+(y%2);     y=y/2;   }else  {     res_1=2*res_1;   } }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                              <loopCondition name="y%2!=0" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                 <branchStatement name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                    <statement name="res_1=2*res_1+(y%2);" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                       <statement name="y=y/2;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                          <loopCondition name="y%2!=0" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                             <branchStatement name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                <statement name="res_1=2*res_1;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                   <loopCondition name="y%2!=0" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                      <branchStatement name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                         <statement name="res_1=2*res_1+(y%2);" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                            <statement name="y=y/2;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                               <loopCondition name="y%2!=0" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                                  <branchStatement name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                                     <statement name="res_1=2*res_1;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                                        <loopCondition name="y%2!=0" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                                           <branchStatement name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                                              <statement name="res_1=2*res_1+(y%2);" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                                                 <statement name="y=y/2;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                                                    <loopCondition name="y%2!=0" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                                                       <statement name="return res_1*2;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false">
-                                                                                          <methodReturn name="&lt;return of Magic42.compute(xValue);&gt;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of Magic42.compute(xValue);&gt;" isReturnValueComputed="true">
-                                                                                             <termination name="&lt;end&gt;" pathCondition="!xValue &lt;= -1" pathConditionChanged="false" terminationKind="NORMAL">
+               <branchCondition name="gt(xValue,Z(neglit(1(#))))" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(xValue,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="return 320*y_1+7;" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of computeHelp&gt;" signature="&lt;return of Magic42.computeHelp(x_1);&gt;" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="gt(xValue,Z(neglit(1(#))))">
+                        <statement name="int res = 0;" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                           <loopStatement name="while ( y%2!=0 )" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                              <loopCondition name="y%2!=0" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                 <branchStatement name="if (res_1%2==0)" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                    <statement name="res_1=2*res_1+(y%2);" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                       <statement name="y=y/2;" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                          <loopCondition name="y%2!=0" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                             <branchStatement name="if (res_1%2==0)" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                                <statement name="res_1=2*res_1;" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                                   <loopCondition name="y%2!=0" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                                      <branchStatement name="if (res_1%2==0)" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                                         <statement name="res_1=2*res_1+(y%2);" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                                            <statement name="y=y/2;" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                                               <loopCondition name="y%2!=0" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                                                  <branchStatement name="if (res_1%2==0)" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                                                     <statement name="res_1=2*res_1;" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                                                        <loopCondition name="y%2!=0" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                                                           <branchStatement name="if (res_1%2==0)" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                                                              <statement name="res_1=2*res_1+(y%2);" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                                                                 <statement name="y=y/2;" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                                                                    <loopCondition name="y%2!=0" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                                                                       <statement name="return res_1*2;" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false">
+                                                                                          <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of Magic42.compute(xValue);&gt;" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="gt(xValue,Z(neglit(1(#))))">
+                                                                                             <termination name="&lt;end&gt;" pathCondition="gt(xValue,Z(neglit(1(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                                              </termination>
                                                                                           </methodReturn>
                                                                                        </statement>
@@ -58,33 +58,33 @@
                      </methodReturn>
                   </statement>
                </branchCondition>
-               <branchCondition name="!xValue &gt;= 0" pathCondition="!xValue &gt;= 0" pathConditionChanged="true" branchCondition="!xValue &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <statement name="return 320*y_1+7;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of Magic42.computeHelp(x_1);&gt;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 7 + quotient_0 * 320 as result of Magic42.computeHelp(x_1);&gt;" isReturnValueComputed="true">
-                        <statement name="int res = 0;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                           <loopStatement name="while ( y%2!=0 ) {if (res%2==0) {     res=2*res+(y%2);     y=y/2;   }else  {     res=2*res;   } }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                              <loopCondition name="y%2!=0" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                 <branchStatement name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                    <statement name="res=2*res+(y%2);" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                       <statement name="y=y/2;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                          <loopCondition name="y%2!=0" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                             <branchStatement name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                <statement name="res=2*res;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                   <loopCondition name="y%2!=0" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                      <branchStatement name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                         <statement name="res=2*res+(y%2);" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                            <statement name="y=y/2;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                               <loopCondition name="y%2!=0" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                                  <branchStatement name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                                     <statement name="res=2*res;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                                        <loopCondition name="y%2!=0" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                                           <branchStatement name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                                              <statement name="res=2*res+(y%2);" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                                                 <statement name="y=y/2;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                                                    <loopCondition name="y%2!=0" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                                                       <statement name="return res*2;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false">
-                                                                                          <methodReturn name="&lt;return of Magic42.compute(xValue);&gt;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of Magic42.compute(xValue);&gt;" isReturnValueComputed="true">
-                                                                                             <termination name="&lt;end&gt;" pathCondition="!xValue &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL">
+               <branchCondition name="lt(xValue,Z(0(#)))" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(xValue,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="return 320*y_1+7;" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of computeHelp&gt;" signature="&lt;return of Magic42.computeHelp(x_1);&gt;" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="lt(xValue,Z(0(#)))">
+                        <statement name="int res = 0;" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                           <loopStatement name="while ( y%2!=0 )" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                              <loopCondition name="y%2!=0" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                 <branchStatement name="if (res%2==0)" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                    <statement name="res=2*res+(y%2);" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                       <statement name="y=y/2;" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                          <loopCondition name="y%2!=0" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                             <branchStatement name="if (res%2==0)" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                                <statement name="res=2*res;" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                                   <loopCondition name="y%2!=0" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                                      <branchStatement name="if (res%2==0)" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                                         <statement name="res=2*res+(y%2);" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                                            <statement name="y=y/2;" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                                               <loopCondition name="y%2!=0" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                                                  <branchStatement name="if (res%2==0)" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                                                     <statement name="res=2*res;" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                                                        <loopCondition name="y%2!=0" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                                                           <branchStatement name="if (res%2==0)" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                                                              <statement name="res=2*res+(y%2);" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                                                                 <statement name="y=y/2;" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                                                                    <loopCondition name="y%2!=0" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                                                                       <statement name="return res*2;" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false">
+                                                                                          <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of Magic42.compute(xValue);&gt;" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="lt(xValue,Z(0(#)))">
+                                                                                             <termination name="&lt;end&gt;" pathCondition="lt(xValue,Z(0(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                                              </termination>
                                                                                           </methodReturn>
                                                                                        </statement>
@@ -113,7 +113,11 @@
                   </statement>
                </branchCondition>
             </statement>
+            <methodReturnEntry path="/0/0/0/0/1/0/0"/>
+            <methodReturnEntry path="/0/0/0/0/0/0/0"/>
          </methodCall>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/1/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
 </start>

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 
 /**
@@ -25,21 +26,37 @@ public class TreeSettings implements ITreeSettings {
     * or {@code false} allow that branch conditions contains branch conditions.
     */
    private final boolean mergeBranchConditions;
+
+   /**
+    * {@code true} use unicode characters, {@code false} do not use unicode characters.
+    */
+   private final boolean useUnicode;
    
    /**
     * {@code true} use pretty printing, {@code false} do not use pretty printing.
     */
    private final boolean usePrettyPrinting;
+   
+   /**
+    * {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
+    */
+   private final boolean variablesAreOnlyComputedFromUpdates;
 
    /**
     * Constructor.
-    * @param mergeBranchConditions {@code true} merge branch conditions which means that a branch condition never contains another branch condition
-    * or {@code false} allow that branch conditions contains branch conditions.
+    * @param mergeBranchConditions {@code true} merge branch conditions which means that a branch condition never contains another branch condition or {@code false} allow that branch conditions contains branch conditions.
+    * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
+    * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
     */
-   public TreeSettings(boolean mergeBranchConditions, boolean usePrettyPrinting) {
+   public TreeSettings(boolean mergeBranchConditions, 
+                       boolean useUnicode,
+                       boolean usePrettyPrinting,
+                       boolean variablesAreOnlyComputedFromUpdates) {
       this.mergeBranchConditions = mergeBranchConditions;
+      this.useUnicode = useUnicode;
       this.usePrettyPrinting = usePrettyPrinting;
+      this.variablesAreOnlyComputedFromUpdates = variablesAreOnlyComputedFromUpdates;
    }
 
    /**
@@ -54,7 +71,23 @@ public class TreeSettings implements ITreeSettings {
     * {@inheritDoc}
     */
    @Override
+   public boolean isUseUnicode() {
+      return useUnicode;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public boolean isUsePrettyPrinting() {
       return usePrettyPrinting;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isVariablesAreOnlyComputedFromUpdates() {
+      return variablesAreOnlyComputedFromUpdates;
    }
 }

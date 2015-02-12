@@ -28,15 +28,20 @@ import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
+import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -57,12 +62,12 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    /**
     * The {@link ISourceViewer} to decorate.
     */
-   private ISourceViewer viewer;
+   private final ISourceViewer viewer;
    
    /**
     * The {@link StyledText} provided by {@link #viewer} via {@link ISourceViewer#getTextWidget()}.
     */
-   private StyledText viewerText;
+   private final StyledText viewerText;
    
    /**
     * The currently shown node.
@@ -142,16 +147,72 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     */
    public void showNode(Node node, KeYMediator mediator) {
       this.node = node;
-      filter = new IdentitySequentPrintFilter(node.sequent());
-      printer = new LogicPrinter(new ProgramPrinter(null), 
-                                 mediator.getNotationInfo(), 
-                                 node.proof().getServices());
-      String str = computeText(mediator, node, filter, printer);
+      String str;
+      if (node != null) {
+         filter = new IdentitySequentPrintFilter(node.sequent());
+         printer = new LogicPrinter(new ProgramPrinter(null), 
+                                    mediator.getNotationInfo(), 
+                                    node.proof().getServices());
+         str = computeText(mediator, node, filter, printer);
+      }
+      else {
+         filter = null;
+         printer = null;
+         str = "";
+      }
       viewer.setDocument(new Document(str));
-      if (node.getAppliedRuleApp() != null) {
+      if (node != null && node.getAppliedRuleApp() != null) {
          PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
          setGreenBackground(pio);
       }
+   }
+   
+   /**
+    * Shows the given {@link Term} with help of the given {@link KeYMediator}
+    * in the decorated {@link ISourceViewer}.
+    * @param term The {@link Term} to show.
+    * @param services The {@link Services} to use.
+    * @param mediator The {@link KeYMediator} to use.
+    * @param visibleLabels Optional definition of visible {@link TermLabel}s.
+    * @return The shown text.
+    */
+   public String showSequent(Sequent sequent, 
+                             Services services, 
+                             KeYMediator mediator, 
+                             VisibleTermLabels visibleLabels) {
+      this.node = null;
+      filter = null;
+      if (visibleLabels != null) {
+         printer = new SequentViewLogicPrinter(new ProgramPrinter(null), 
+                                               mediator.getNotationInfo(), 
+                                               services,
+                                               visibleLabels);
+      }
+      else {
+         printer = new LogicPrinter(new ProgramPrinter(null), 
+                                    mediator.getNotationInfo(), 
+                                    services);
+      }
+      String str = computeText(mediator, sequent, printer);
+      viewer.setDocument(new Document(str));
+      return str;
+   }
+   
+   /**
+    * Computes the text to show in the {@link KeYEditor}} which consists
+    * of the sequent including the applied rule.
+    * @param mediator The {@link KeYMediator} to use.
+    * @param node The {@link Node} to use.
+    * @param filter The {@link SequentPrintFilter} to use.
+    * @param printer The {@link LogicPrinter} to use.
+    * @return The text to show.
+    */
+   public static String computeText(KeYMediator mediator, 
+                                    Sequent sequent, 
+                                    LogicPrinter printer) {
+      printer.printSequent(sequent);
+      String s = printer.toString();
+      return StringUtil.trimRight(s);
    }
    
    /**
@@ -168,14 +229,12 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
                                     SequentPrintFilter filter, 
                                     LogicPrinter printer) {
       
-        printer.printSequent (filter);
-        String s = printer.toString();
-             printer=null;
-        RuleApp app = node.getAppliedRuleApp();
-             s += "\nNode Nr "+node.serialNr()+"\n";
-             s += ruleToString(mediator, app, true);
-
-        return s;
+      printer.printSequent(filter);
+      String s = printer.toString();
+      RuleApp app = node.getAppliedRuleApp();
+      s += "\nNode Nr " + node.serialNr() + "\n";
+      s += ruleToString(mediator, app, true);
+      return s;
    }
    
    public static String ruleToString(KeYMediator mediator, RuleApp app, boolean withHeadder) {
@@ -211,12 +270,14 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    
    protected void setGreenBackground(PosInOccurrence pos){
       initializeValuesForGreenBackground();
-      ImmutableList<Integer> path = printer.getPositionTable().pathForPosition(pos, filter);
-      Range range = printer.getPositionTable().rangeForPath(path);
-      marked1.start = range.start();
-      marked1.length = range.end()-range.start();
-      TextPresentation.applyTextPresentation(textPresentation, viewerText);
-      viewer.changeTextPresentation(textPresentation, true);
+      if (pos != null) {
+         ImmutableList<Integer> path = printer.getInitialPositionTable().pathForPosition(pos, filter);
+         Range range = printer.getInitialPositionTable().rangeForPath(path);
+         marked1.start = range.start();
+         marked1.length = range.end()-range.start();
+         TextPresentation.applyTextPresentation(textPresentation, viewerText);
+         viewer.changeTextPresentation(textPresentation, true);
+      }
    }
    
    protected void initializeValuesForGreenBackground(){
@@ -225,7 +286,6 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
       textPresentation = new TextPresentation();
       textPresentation.addStyleRange(marked1);
       viewer.changeTextPresentation(textPresentation, true);
-      
    }
 
    /**
@@ -233,23 +293,25 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * @param e The event.
     */
    protected void handleMouseMoved(MouseEvent e) {
-      // Update selected PosInSequent
-      PosInSequent oldPos = selectedPosInSequent;
-      int textOffset = JFaceTextUtil.getOffsetForCursorLocation(viewer);
-      if (textOffset >= 0) {
-         selectedPosInSequent = printer.getPositionTable().getPosInSequent(textOffset, filter);
-      }
-      else {
-         selectedPosInSequent = null;
-      }
-      // Update shown highlighting if PosInSequent has changed
-      if (!ObjectUtil.equals(oldPos, selectedPosInSequent)) {
-         // Update highlighting only on goals.
-         if (node.getAppliedRuleApp() == null){
-            setBackgroundColorForHover();
+      if (node != null) {
+         // Update selected PosInSequent
+         PosInSequent oldPos = selectedPosInSequent;
+         int textOffset = JFaceTextUtil.getOffsetForCursorLocation(viewer);
+         if (textOffset >= 0) {
+            selectedPosInSequent = printer.getInitialPositionTable().getPosInSequent(textOffset, filter);
          }
-         // Inform listener
-         firePropertyChange(PROP_SELECTED_POS_IN_SEQUENT, oldPos, selectedPosInSequent);
+         else {
+            selectedPosInSequent = null;
+         }
+         // Update shown highlighting if PosInSequent has changed
+         if (!ObjectUtil.equals(oldPos, selectedPosInSequent)) {
+            // Update highlighting only on goals.
+            if (node.getAppliedRuleApp() == null){
+               setBackgroundColorForHover();
+            }
+            // Inform listener
+            firePropertyChange(PROP_SELECTED_POS_IN_SEQUENT, oldPos, selectedPosInSequent);
+         }
       }
    }
 
@@ -257,7 +319,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
       initializeValuesForHover();
       
       int textOffset = JFaceTextUtil.getOffsetForCursorLocation(viewer);
-      Range range = printer.getPositionTable().rangeForIndex(textOffset);
+      Range range = printer.getInitialPositionTable().rangeForIndex(textOffset);
       Range firstStatement = printer.getPositionTable().firstStatementRangeForIndex(textOffset);
       
       if(firstStatement != null){
@@ -328,5 +390,29 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     */
    public PosInSequent getSelectedPosInSequent() {
       return selectedPosInSequent;
+   }
+
+   /**
+    * Returns the used {@link LogicPrinter}.
+    * @return The used {@link LogicPrinter}.
+    */
+   protected LogicPrinter getPrinter() {
+      return printer;
+   }
+
+   /**
+    * Returns the {@link ISourceViewer} in which this decorator is used.
+    * @return The {@link ISourceViewer} in which this decorator is used.
+    */
+   protected ISourceViewer getViewer() {
+      return viewer;
+   }
+
+   /**
+    * Returns the {@link StyledText} of {@link #getViewer()}.
+    * @return The {@link StyledText} of {@link #getViewer()}.
+    */
+   protected StyledText getViewerText() {
+      return viewerText;
    }
 }

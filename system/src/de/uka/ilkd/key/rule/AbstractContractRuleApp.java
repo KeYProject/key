@@ -26,29 +26,27 @@ import de.uka.ilkd.key.util.Pair;
 
 public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
 
-	protected final Contract instantiation;
+    protected final Contract instantiation;
 
-	protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio) {
-		this(rule, pio, null);
-	}
+    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio) {
+        this(rule, pio, null);
+    }
 
-	protected AbstractContractRuleApp(BuiltInRule rule,
-	        PosInOccurrence pio, Contract contract) {
-		this(rule, pio, ImmutableSLList.<PosInOccurrence>nil(), contract);
-	}
-	
-	protected AbstractContractRuleApp(BuiltInRule rule,
-	        PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
-	        Contract contract) {
-		super(rule, pio, ifInsts);
-		this.instantiation = contract;
-	}
+    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio, Contract contract) {
+        this(rule, pio, ImmutableSLList.<PosInOccurrence>nil(), contract);
+    }
 
+    protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio,
+                                      ImmutableList<PosInOccurrence> ifInsts,
+                                      Contract contract) {
+        super(rule, pio, ifInsts);
+        this.instantiation = contract;
+    }
 
     public Contract getInstantiation() {
         return instantiation;
     }
-		
+
     public AbstractContractRuleApp check(Services services) {
         if (instantiation != null && posInOccurrence() != null) {
             IObserverFunction target = instantiation.getTarget();            
@@ -69,19 +67,16 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
         }
         return this;
     }
-    
+
     @Override
     public abstract AbstractContractRuleApp tryToInstantiate(Goal goal);
 
 
     public abstract AbstractContractRuleApp setContract(Contract contract);
 
-	public boolean complete() {
-    	return super.complete() && pio != null && instantiation != null;
+    public boolean complete() {
+        return super.complete() && pio != null && instantiation != null;
     }
 
     public abstract IObserverFunction getObserverFunction(Services services);
-
-
-    
 }

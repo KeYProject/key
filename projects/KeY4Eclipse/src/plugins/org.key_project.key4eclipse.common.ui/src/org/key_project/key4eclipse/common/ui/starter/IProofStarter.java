@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.IMethod;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * Instances of this class are used to start an application
@@ -37,7 +36,7 @@ public interface IProofStarter {
     * @throws Exception Occurred Exception.
     */
    public void open(Proof proof, 
-                    KeYEnvironment<CustomConsoleUserInterface> environment, 
+                    KeYEnvironment<?> environment, 
                     IMethod method,
                     boolean canStartAutomode,
                     boolean canApplyRules,

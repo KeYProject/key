@@ -29,6 +29,7 @@ import org.key_project.util.test.testcase.IOUtilTest;
 import org.key_project.util.test.testcase.JDTUtilTest;
 import org.key_project.util.test.testcase.JobUtilTest;
 import org.key_project.util.test.testcase.LoggerTest;
+import org.key_project.util.test.testcase.NumberUtilTest;
 import org.key_project.util.test.testcase.ObjectUtilTest;
 import org.key_project.util.test.testcase.ResourceUtilTest;
 import org.key_project.util.test.testcase.SWTUtilTest;
@@ -58,6 +59,7 @@ import org.key_project.util.test.testcase.XMLUtilTest;
     JDTUtilTest.class,
     JobUtilTest.class,
     LoggerTest.class,
+    NumberUtilTest.class,
     ObjectUtilTest.class,
     ResourceUtilTest.class,
     ScheduledJobCollectorTest.class,

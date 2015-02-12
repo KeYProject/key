@@ -188,12 +188,14 @@ public class Namespace implements java.io.Serializable {
     * has been found
     */  
     public Named lookup(Name name) {
-	Named symbol=lookupLocally(name);
-	if (symbol==null && parent!=null) {
-	    return parent.lookup(name);
-	} else {
-	    return symbol;
-	}
+        Named symbol = lookupLocally(name);
+        if (symbol != null) {
+            return symbol;
+        }
+        if (parent != null) {
+            return parent.lookup(name);
+        }
+        return null;
     }
     
     /** Convenience method to look up. */
@@ -253,13 +255,13 @@ public class Namespace implements java.io.Serializable {
 	
     }
 
-    public void add(ImmutableList<Named> l) {
+    public void add(Iterable<? extends Named> l) {
         for (Named aL : l) {
             add(aL);
         }
     }
 
-    public <T extends Named> void addSafely(ImmutableSet<T> names) {
+    public <T extends Named> void addSafely(Iterable<T> names) {
         for (Named name : names) {
             addSafely(name);
         }

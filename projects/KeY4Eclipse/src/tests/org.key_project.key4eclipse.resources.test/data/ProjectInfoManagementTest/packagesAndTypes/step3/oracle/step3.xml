@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<project name="ProjectInfoManagementTest_testPackagesAndTypes">
+   <package name="(default package)" path="/ProjectInfoManagementTest_testPackagesAndTypes/src">
+      <type name="A" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/A.java">
+         <method displayName="A()" name="A" declaringType="A" declaringFilePath="/ProjectInfoManagementTest_testPackagesAndTypes/src/A.java" parameterTypes="">
+         </method>
+      </type>
+      <type name="ClassWithoutPackage" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/ClassWithoutPackage.java">
+         <method displayName="ClassWithoutPackage()" name="ClassWithoutPackage" declaringType="ClassWithoutPackage" declaringFilePath="/ProjectInfoManagementTest_testPackagesAndTypes/src/ClassWithoutPackage.java" parameterTypes="">
+         </method>
+      </type>
+      <type name="Z" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/Z.java">
+         <method displayName="Z()" name="Z" declaringType="Z" declaringFilePath="/ProjectInfoManagementTest_testPackagesAndTypes/src/Z.java" parameterTypes="">
+         </method>
+      </type>
+   </package>
+   <package name="hello" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello">
+      <type name="A" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/A.java">
+         <method displayName="A()" name="A" declaringType="hello.A" declaringFilePath="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/A.java" parameterTypes="">
+         </method>
+      </type>
+      <type name="ClassInHello" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/ClassInHello.java">
+         <method displayName="ClassInHello()" name="ClassInHello" declaringType="hello.ClassInHello" declaringFilePath="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/ClassInHello.java" parameterTypes="">
+         </method>
+      </type>
+      <type name="Z" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/Z.java">
+         <method displayName="Z()" name="Z" declaringType="hello.Z" declaringFilePath="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/Z.java" parameterTypes="">
+         </method>
+      </type>
+   </package>
+   <package name="hello.world" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world">
+      <type name="A" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world/A.java">
+         <method displayName="A()" name="A" declaringType="hello.world.A" declaringFilePath="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world/A.java" parameterTypes="">
+         </method>
+      </type>
+      <type name="ClassInHelloWorld" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world/ClassInHelloWorld.java">
+         <method displayName="ClassInHelloWorld()" name="ClassInHelloWorld" declaringType="hello.world.ClassInHelloWorld" declaringFilePath="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world/ClassInHelloWorld.java" parameterTypes="">
+         </method>
+      </type>
+      <type name="Z" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world/Z.java">
+         <method displayName="Z()" name="Z" declaringType="hello.world.Z" declaringFilePath="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world/Z.java" parameterTypes="">
+         </method>
+      </type>
+   </package>
+</project>

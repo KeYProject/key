@@ -46,19 +46,31 @@ public abstract class AbstractDebugNodeSuspendResumeFeature extends AbstractCust
     */
    @Override
    public boolean canExecute(ICustomContext context) {
-      boolean canExecute = false;
+      boolean canExecute = true;
       PictogramElement[] pes = context.getPictogramElements();
+      List<ISuspendResume> supspendResumeToHandle = new LinkedList<ISuspendResume>();
       if (pes != null) {
          int i = 0;
-         while (i < pes.length && !canExecute) {
+         while (i < pes.length && canExecute) {
             Object businessObject = getBusinessObjectForPictogramElement(pes[i]);
             if (businessObject instanceof ISuspendResume) {
-               canExecute = canExecute((ISuspendResume)businessObject);
+               ISuspendResume suspendResume = (ISuspendResume)businessObject;
+               supspendResumeToHandle.add(suspendResume);
+               canExecute = canExecute(suspendResume);
             }
             i++;
          }
       }
-      return canExecute;
+      return canExecute && checkCompatibility(supspendResumeToHandle);
+   }
+   
+   /**
+    * Checks if the found {@link ISuspendResume}s are compatible.
+    * @param supspendResumeToHandle The {@link ISuspendResume}s to check.
+    * @return {@code true} {@link ISuspendResume}s are compatible, {@code false} {ISuspendResume IStep}s are incompatible.
+    */
+   protected boolean checkCompatibility(List<ISuspendResume> supspendResumeToHandle) {
+      return supspendResumeToHandle.size() == 1; // Only exactly one ISuspendResume is executable at the same time
    }
    
    /**

@@ -55,6 +55,11 @@ public class Then extends BranchImp {
         return body.getFirstElement();
     }
 
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+        return body.getFirstElementIncludingBlocks();
+    }
+
     public SourceElement getLastElement() {
         return body.getLastElement();
     }

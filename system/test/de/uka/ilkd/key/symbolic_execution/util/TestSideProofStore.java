@@ -15,7 +15,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofStore.Entry;
 import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -37,7 +37,7 @@ public class TestSideProofStore extends TestCase {
     * </ul>
     */
    @SuppressWarnings("unchecked")
-   public void testProofManagenet() {
+   public void testProofManagement() {
       LoggingProofStoreListener listener = new LoggingProofStoreListener();
       try {
          SideProofStore.DEFAULT_INSTANCE.addProofStoreListener(listener);
@@ -45,12 +45,12 @@ public class TestSideProofStore extends TestCase {
          Services services = new Services(AbstractProfile.getDefaultProfile());
          InitConfig ic = new InitConfig(services);
          ProofEnvironment pe = new ProofEnvironment(ic);
-         Proof p1 = new Proof(services);
-         p1.setProofEnv(pe);
-         Proof p2 = new Proof(services);
-         p2.setProofEnv(pe);
-         Proof p3 = new Proof(services);
-         p3.setProofEnv(pe);
+         Proof p1 = new Proof("TestSideProofStore 1", ic.deepCopy());
+         p1.setEnv(pe);
+         Proof p2 = new Proof("TestSideProofStore 2", ic.deepCopy());
+         p2.setEnv(pe);
+         Proof p3 = new Proof("TestSideProofStore 3", ic.deepCopy());
+         p3.setEnv(pe);
          Proof[] allProofs = new Proof[] {p1, p2, p3};
          // Test initial state
          assertEntries(allProofs, new Proof[0]);
@@ -105,9 +105,9 @@ public class TestSideProofStore extends TestCase {
          assertEquals(entries[i].getDescription(), expectedEntries[i].first);
          assertSame(entries[i].getProof(), expectedEntries[i].second);
          assertSame(entries[i], SideProofStore.DEFAULT_INSTANCE.getEntryAt(i));
-         KeYEnvironment<CustomConsoleUserInterface> ui = entries[i].getEnvironment();
+         KeYEnvironment<CustomUserInterface> ui = entries[i].getEnvironment();
          assertNotNull(ui);
-         KeYEnvironment<CustomConsoleUserInterface> uiAgain = entries[i].getEnvironment();
+         KeYEnvironment<CustomUserInterface> uiAgain = entries[i].getEnvironment();
          assertSame(ui, uiAgain);
          containedProofs.add(expectedEntries[i].second);
          assertFalse(entries[i].getProof().isDisposed());

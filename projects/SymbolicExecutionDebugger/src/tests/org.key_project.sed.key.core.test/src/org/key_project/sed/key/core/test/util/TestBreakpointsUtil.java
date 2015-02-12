@@ -40,13 +40,13 @@ import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
+import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.SymbolicExecutionExceptionBreakpoint;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.FieldWatchpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.LineBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.MethodBreakpoint;
+import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.SymbolicExecutionExceptionBreakpoint;
 
 @SuppressWarnings("restriction")
 public final class TestBreakpointsUtil {

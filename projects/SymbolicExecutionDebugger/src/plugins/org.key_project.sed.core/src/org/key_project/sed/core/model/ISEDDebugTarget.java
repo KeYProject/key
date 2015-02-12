@@ -13,7 +13,11 @@
 
 package org.key_project.sed.core.model;
 
+import java.util.Map;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ITerminate;
 import org.eclipse.debug.core.model.IThread;
@@ -22,6 +26,7 @@ import org.key_project.sed.core.annotation.ISEDAnnotationType;
 import org.key_project.sed.core.model.event.ISEDAnnotationListener;
 import org.key_project.sed.core.model.impl.AbstractSEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.core.sourcesummary.ISEDSourceModel;
 
 /**
  * A debug target is a symbolic debuggable execution context. For example, a debug target
@@ -142,4 +147,31 @@ public interface ISEDDebugTarget extends ISEDDebugElement, IDebugTarget {
     * @param l The {@link ISEDAnnotationListener} to remove.
     */
    public void removeAnnotationListener(ISEDAnnotationListener l);
+   
+   /**
+    * Computes some statistics of this {@link ISEDDebugTarget}.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @return The computed statistics.
+    * @throws DebugException Occurred Exception.
+    */
+   public Map<String, String> computeStatistics(IProgressMonitor monitor) throws DebugException;
+   
+   /**
+    * Returns all currently used {@link IBreakpoint}s.
+    * @return The currently used {@link IBreakpoint}s.
+    */
+   public IBreakpoint[] getBreakpoints();
+   
+   /**
+    * Returns all {@link IBreakpoint}s which are fulfilled in the given {@link ISEDDebugNode}.
+    * @param node The {@link ISEDDebugNode} to check.
+    * @return The fulfilled {@link IBreakpoint}s in the given {@link ISEDDebugNode}.
+    */
+   public IBreakpoint[] computeHitBreakpoints(ISEDDebugNode node) throws DebugException;
+   
+   /**
+    * Returns the {@link ISEDSourceModel} which manages the visited source parts
+    * @return The {@link ISEDSourceModel} or {@code null} if not available.
+    */
+   public ISEDSourceModel getSourceModel();
 }

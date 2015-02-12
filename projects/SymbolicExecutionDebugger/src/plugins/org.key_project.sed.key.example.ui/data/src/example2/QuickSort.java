@@ -51,8 +51,8 @@ public class QuickSort {
 	private int[] numbers;
 
 	public QuickSort(int[] numbers) {
-	   assert numbers != null;
-	   assert numbers.length >= 1;
+		assert numbers != null;
+		assert numbers.length >= 1;
 		this.numbers = numbers;
 	}
 

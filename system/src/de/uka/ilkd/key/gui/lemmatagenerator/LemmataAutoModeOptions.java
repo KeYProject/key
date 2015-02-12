@@ -18,7 +18,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;

@@ -22,26 +22,30 @@ import org.eclipse.ui.IMarkerResolutionGenerator;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 
+import de.uka.ilkd.key.smt.testgen.AbstractTestGenerator;
+
 /**
  * Creates the QuickFixes for the KeY{@link IMarker}.
  * @author Stefan Käsdorf
  */
 public class ProofMarkerResolutionGenerator implements IMarkerResolutionGenerator {
-
-   
    /**
     * {@inheritDoc}
     */
    @Override
    public IMarkerResolution[] getResolutions(IMarker marker) {
       LinkedList<IMarkerResolution> resolutions = new LinkedList<IMarkerResolution>();
-      try{
+      try {
          if (StarterUtil.areFileStartersAvailable()) {
             resolutions.add(new ProofMarkerResolution(marker));
          }
-      } catch (CoreException e){
+         if (AbstractTestGenerator.isSolverAvailable()) {
+            resolutions.add(new GenerateTestCasesResolution(marker));
+         }
+      }
+      catch (CoreException e) {
          LogUtil.getLogger().logError(e);
       }
-      return (IMarkerResolution[])resolutions.toArray(new IMarkerResolution[resolutions.size()]);
+      return resolutions.toArray(new IMarkerResolution[resolutions.size()]);
    }
 }

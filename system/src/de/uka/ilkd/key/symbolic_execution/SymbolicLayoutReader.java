@@ -160,7 +160,7 @@ public class SymbolicLayoutReader {
             if (!(parent instanceof AbstractKeYlessAssociationValueContainer)) {
                throw new SAXException("Found value in wrong hierarchy.");
             }
-            KeYlessValue value = new KeYlessValue(getName(attributes), getProgramVariableString(attributes), isArrayIndex(attributes), getArrayIndex(attributes), getValueString(attributes), getTypeString(attributes), getConditionString(attributes));
+            KeYlessValue value = new KeYlessValue(getName(attributes), getProgramVariableString(attributes), isArrayIndex(attributes), getArrayIndexString(attributes), getValueString(attributes), getTypeString(attributes), getConditionString(attributes));
             ((AbstractKeYlessAssociationValueContainer)parent).addValue(value);
             parentStack.addFirst(value);
          }
@@ -168,7 +168,7 @@ public class SymbolicLayoutReader {
             if (!(parent instanceof AbstractKeYlessAssociationValueContainer)) {
                throw new SAXException("Found association in wrong hierarchy.");
             }
-            KeYlessAssociation association = new KeYlessAssociation(getName(attributes), getProgramVariableString(attributes), isArrayIndex(attributes), getArrayIndex(attributes), getConditionString(attributes));
+            KeYlessAssociation association = new KeYlessAssociation(getName(attributes), getProgramVariableString(attributes), isArrayIndex(attributes), getArrayIndexString(attributes), getConditionString(attributes));
             ((AbstractKeYlessAssociationValueContainer)parent).addAssociation(association);
             parentStack.addFirst(association);
             associationTargetMapping.put(association, getTarget(attributes));
@@ -353,8 +353,8 @@ public class SymbolicLayoutReader {
     * @param attributes The {@link Attributes} which provides the content.
     * @return The value.
     */
-   protected int getArrayIndex(Attributes attributes) {
-      return Integer.parseInt(attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_ARRAY_INDEX));
+   protected String getArrayIndexString(Attributes attributes) {
+      return attributes.getValue(SymbolicLayoutWriter.ATTRIBUTE_ARRAY_INDEX);
    }
 
    /**
@@ -572,7 +572,7 @@ public class SymbolicLayoutReader {
       @Override
       public ISymbolicAssociation getAssociation(IProgramVariable programVariable, 
                                                  boolean isArrayIndex, 
-                                                 int arrayIndex,
+                                                 Term arrayIndex,
                                                  Term condition) {
          return null;
       }
@@ -583,7 +583,7 @@ public class SymbolicLayoutReader {
       @Override
       public ISymbolicValue getValue(IProgramVariable programVariable, 
                                      boolean isArrayIndex, 
-                                     int arrayIndex,
+                                     Term arrayIndex,
                                      Term condition) {
          return null;
       }
@@ -654,7 +654,7 @@ public class SymbolicLayoutReader {
       @Override
       public ISymbolicAssociation getAssociation(IProgramVariable programVariable, 
                                                  boolean isArrayIndex, 
-                                                 int arrayIndex,
+                                                 Term arrayIndex,
                                                  Term condition) {
          return null;
       }
@@ -665,7 +665,7 @@ public class SymbolicLayoutReader {
       @Override
       public ISymbolicValue getValue(IProgramVariable programVariable, 
                                      boolean isArrayIndex, 
-                                     int arrayIndex,
+                                     Term arrayIndex,
                                      Term condition) {
          return null;
       }
@@ -705,7 +705,7 @@ public class SymbolicLayoutReader {
       /**
        * The array index.
        */
-      private int arrayIndex;
+      private String arrayIndexString;
 
       /**
        * The optional condition under which this value is valid.
@@ -717,17 +717,17 @@ public class SymbolicLayoutReader {
        * @param name The name.
        * @param programVariableString The program variable.
        * @param isArrayIndex The is array index flag.
-       * @param arrayIndex The array index.
+       * @param arrayIndexString The array index.
        * @param valueString The value.
        * @param typeString The type.
        * @param conditionString The optional condition under which this value is valid.
        */
-      public KeYlessValue(String name, String programVariableString, boolean isArrayIndex, int arrayIndex, String valueString, String typeString, String conditionString) {
+      public KeYlessValue(String name, String programVariableString, boolean isArrayIndex, String arrayIndexString, String valueString, String typeString, String conditionString) {
          super();
          this.name = name;
          this.programVariableString = programVariableString;
          this.isArrayIndex = isArrayIndex;
-         this.arrayIndex = arrayIndex;
+         this.arrayIndexString = arrayIndexString;
          this.valueString = valueString;
          this.typeString = typeString;
          this.conditionString = conditionString;
@@ -801,8 +801,16 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
-      public int getArrayIndex() {
-         return arrayIndex;
+      public Term getArrayIndex() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getArrayIndexString() {
+         return arrayIndexString;
       }
 
       /**
@@ -851,7 +859,7 @@ public class SymbolicLayoutReader {
       /**
        * The array index.
        */
-      private int arrayIndex;
+      private String arrayIndexString;
 
       /**
        * The optional condition under which this association is valid.
@@ -863,11 +871,11 @@ public class SymbolicLayoutReader {
        * @param name The name.
        * @param programVariableString The program variable.
        * @param isArrayIndex The is array index flag.
-       * @param arrayIndex The array index.
+       * @param arrayIndexString The array index.
        * @param conditionString The optional condition under which this association is valid.
        */
-      public KeYlessAssociation(String name, String programVariableString, boolean isArrayIndex, int arrayIndex, String conditionString) {
-         this(name, programVariableString, isArrayIndex, arrayIndex, null, conditionString);
+      public KeYlessAssociation(String name, String programVariableString, boolean isArrayIndex, String arrayIndexString, String conditionString) {
+         this(name, programVariableString, isArrayIndex, arrayIndexString, null, conditionString);
       }
 
       /**
@@ -875,16 +883,16 @@ public class SymbolicLayoutReader {
        * @param name The name.
        * @param programVariableString The program variable.
        * @param isArrayIndex The is array index flag.
-       * @param arrayIndex The array index.
+       * @param arrayIndexString The array index.
        * @param target The target.
        * @param conditionString The optional condition under which this association is valid.
        */
-      public KeYlessAssociation(String name, String programVariableString, boolean isArrayIndex, int arrayIndex, ISymbolicObject target, String conditionString) {
+      public KeYlessAssociation(String name, String programVariableString, boolean isArrayIndex, String arrayIndexString, ISymbolicObject target, String conditionString) {
          super();
          this.name = name;
          this.programVariableString = programVariableString;
          this.isArrayIndex = isArrayIndex;
-         this.arrayIndex = arrayIndex;
+         this.arrayIndexString = arrayIndexString;
          this.target = target;
          this.conditionString = conditionString;
       }
@@ -941,8 +949,16 @@ public class SymbolicLayoutReader {
        * {@inheritDoc}
        */
       @Override
-      public int getArrayIndex() {
-         return arrayIndex;
+      public Term getArrayIndex() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getArrayIndexString() {
+         return arrayIndexString;
       }
 
       /**

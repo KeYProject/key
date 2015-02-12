@@ -4,4 +4,5 @@
       <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
       </termination>
    </statement>
+   <terminationEntry path="/0/0"/>
 </start>

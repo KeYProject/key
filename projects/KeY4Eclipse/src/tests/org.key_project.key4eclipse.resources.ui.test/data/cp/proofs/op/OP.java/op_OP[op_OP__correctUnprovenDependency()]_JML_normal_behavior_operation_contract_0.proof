@@ -1,0 +1,143 @@
+\profile "Java Profile";
+
+\settings {
+"#Proof-Settings-Config-File
+#Mon Aug 18 17:32:59 CEST 2014
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_EXPAND
+[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_ON
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=1000
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=Strings-Strings\\:on , reach-reach\\:on , JavaCard-JavaCard\\:off , assertions-assertions\\:on , bigint-bigint\\:on , intRules-intRules\\:javaSemantics , programRules-programRules\\:Java , initialisation-initialisation\\:enableStaticInitialisation , modelFields-modelFields\\:showSatisfiability , sequences-sequences\\:on , integerSimplificationRules-integerSimplificationRules\\:full , runtimeExceptions-runtimeExceptions\\:allow , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_NONCLOSE
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]invariantForall=false
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\javaSource "../../../src";
+
+\proofObligation "#Proof Obligation Settings
+#Mon Aug 18 17:32:59 CEST 2014
+name=op.OP[op.OP\\:\\:correctUnprovenDependency()].JML normal_behavior operation contract.0
+contract=op.OP[op.OP\\:\\:correctUnprovenDependency()].JML normal_behavior operation contract.0
+class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
+";
+
+\proof {
+(keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+(keyLog "1" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+(keyLog "2" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+
+(autoModeTime "134")
+
+(branch "dummy ID"
+(rule "impRight" (formula "1") (newnames "heapAtPre") (userinteraction))
+(rule "assignment" (formula "2") (term "1") (userinteraction))
+(rule "methodBodyExpand" (formula "2") (term "1,1") (newnames "heapBefore_correctUnprovenDependency_0,savedHeapBefore_correctUnprovenDependency_0") (userinteraction))
+(rule "returnUnfold" (formula "2") (term "1,1,1") (inst "#v0=x") (userinteraction))
+(rule "variableDeclarationAssign" (formula "2") (term "1,1,1") (userinteraction))
+(rule "variableDeclaration" (formula "2") (term "1,1,1") (newnames "x_4") (userinteraction))
+(builtin "One Step Simplification" (formula "2"))
+(builtin "Use Operation Contract" (formula "2") (newnames "heapBefore_wrong_0,result_0,exc_0,heapAfter_wrong,anon_heap_wrong") (contract "op.OP[op.OP::wrong()].JML normal_behavior operation contract.0"))
+(branch "Post (wrong)"
+   (builtin "One Step Simplification" (formula "3"))
+   (builtin "One Step Simplification" (formula "4"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "4"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "6"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "7"))
+   (rule "andLeft" (formula "9"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "notLeft" (formula "2"))
+   (rule "expand_inInt" (formula "9"))
+   (rule "andLeft" (formula "9"))
+   (rule "replace_int_MIN" (formula "10") (term "0"))
+   (rule "replace_int_MAX" (formula "9") (term "1"))
+   (rule "inEqSimp_commuteLeq" (formula "10"))
+   (rule "assignment" (formula "13") (term "1"))
+   (builtin "One Step Simplification" (formula "13"))
+   (rule "applyEq" (formula "10") (term "0") (ifseqformula "11"))
+   (rule "qeq_literals" (formula "10"))
+   (rule "true_left" (formula "10"))
+   (rule "applyEq" (formula "9") (term "0") (ifseqformula "10"))
+   (rule "leq_literals" (formula "9"))
+   (rule "true_left" (formula "9"))
+   (rule "applyEq" (formula "11") (term "0,1,0") (ifseqformula "9"))
+   (rule "Class_invariant_axiom_for_op_OP" (formula "5") (inst "sk=sk_1") (ifseqformula "3"))
+   (branch "Use Axiom"
+      (rule "true_left" (formula "5"))
+      (rule "methodCallReturn" (formula "10") (term "1"))
+      (rule "assignment" (formula "10") (term "1"))
+      (builtin "One Step Simplification" (formula "10"))
+      (rule "methodCallEmpty" (formula "10") (term "1"))
+      (rule "tryEmpty" (formula "10") (term "1"))
+      (rule "emptyModality" (formula "10") (term "1"))
+      (builtin "One Step Simplification" (formula "10"))
+      (rule "Class_invariant_axiom_for_op_OP" (formula "10") (inst "sk=sk_2") (ifseqformula "3"))
+      (branch "Use Axiom"
+         (rule "closeTrue" (formula "10"))
+      )
+      (branch "Show Axiom Satisfiability"
+         (builtin "One Step Simplification" (formula "10"))
+         (rule "closeTrue" (formula "10"))
+      )
+   )
+   (branch "Show Axiom Satisfiability"
+      (builtin "One Step Simplification" (formula "10"))
+      (rule "closeTrue" (formula "10"))
+   )
+)
+(branch "Exceptional Post (wrong)"
+   (builtin "One Step Simplification" (formula "3"))
+   (builtin "One Step Simplification" (formula "4"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "4"))
+   (rule "selectCreatedOfAnonAsFormulaEQ" (formula "5") (term "1,0") (ifseqformula "4"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "6"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "8"))
+   (rule "andLeft" (formula "7"))
+   (rule "andLeft" (formula "1"))
+   (rule "notLeft" (formula "8"))
+   (rule "close" (formula "11") (ifseqformula "10"))
+)
+(branch "Pre (wrong)"
+   (builtin "One Step Simplification" (formula "2"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "close" (formula "7") (ifseqformula "1"))
+)
+)
+
+}

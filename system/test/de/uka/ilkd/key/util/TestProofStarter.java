@@ -2,11 +2,12 @@ package de.uka.ilkd.key.util;
 
 import java.io.File;
 
-import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Tests for {@link ProofStarter}.
@@ -37,7 +38,7 @@ public class TestProofStarter extends AbstractSymbolicExecutionTestCase {
     * @param oneStepSimplification
     */
    protected void doProofStarter(boolean oneStepSimplification) {
-      KeYEnvironment<CustomConsoleUserInterface> env = null;
+      KeYEnvironment<CustomUserInterface> env = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
          File file = new File(keyRepDirectory, "examples/_testcase/proofStarter/CC/project.key");
@@ -50,6 +51,9 @@ public class TestProofStarter extends AbstractSymbolicExecutionTestCase {
          ApplyStrategyInfo info = ps.start();
          assertNotNull(info);
          assertTrue(proof.closed());
+      } catch (ProblemLoaderException e) {
+          // TODO: this exception was unhandled before -- expected???
+          fail();
       }
       finally {
          setOneStepSimplificationEnabled(null, originalOneStepSimplification);

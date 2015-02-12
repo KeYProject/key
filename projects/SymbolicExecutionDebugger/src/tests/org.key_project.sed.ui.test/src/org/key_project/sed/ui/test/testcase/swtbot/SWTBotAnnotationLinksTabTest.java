@@ -29,6 +29,7 @@ import org.key_project.sed.core.annotation.impl.CommentAnnotationType;
 import org.key_project.sed.core.annotation.impl.SearchAnnotation;
 import org.key_project.sed.core.annotation.impl.SearchAnnotationType;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
@@ -217,6 +218,12 @@ public class SWTBotAnnotationLinksTabTest extends AbstractSWTBotPropertyTabTest 
 
          @Override
          public void assertMethodReturn(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDMethodReturn methodReturn) throws Exception {
+            assertTrue(tabs.selectTabItem("Annotation Links"));
+            assertEquals(0, propertiesView.bot().table().rowCount());
+         }
+
+         @Override
+         public void assertMethodCall(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDMethodCall methodCall) throws Exception {
             assertTrue(tabs.selectTabItem("Annotation Links"));
             assertEquals(0, propertiesView.bot().table().rowCount());
          }

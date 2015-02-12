@@ -27,7 +27,7 @@ import javax.swing.text.Highlighter.HighlightPainter;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
@@ -59,6 +60,10 @@ import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 
 public class InnerNodeView extends SequentView {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -6542881446084654358L;
     private InitialPositionTable posTable;
     public final JTextArea tacletInfo;
     Node node;
@@ -68,9 +73,9 @@ public class InnerNodeView extends SequentView {
         this.node = node;
         filter = new IdentitySequentPrintFilter(node.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(),
-                mainWindow.getMediator().getNotationInfo(),
-                mainWindow.getMediator().getServices(),
-                getVisibleTermLabels()));
+                        mainWindow.getMediator().getNotationInfo(),
+                        mainWindow.getMediator().getServices(),
+                        getVisibleTermLabels()));
         setSelectionColor(new Color(10, 180, 50));
         setBackground(INACTIVE_BACKGROUND_COLOR);
 
@@ -131,11 +136,20 @@ public class InnerNodeView extends SequentView {
             out.append("\\variables");
         } else if (schemaVar instanceof SkolemTermSV) {
             out.append("\\skolemTerm");
+        } else if (schemaVar instanceof TermLabelSV) {
+            out.append("\\termlabel");
         } else {
             out.append("?");
         }
         writeSVModifiers(out, schemaVar);
-        if (!(schemaVar instanceof FormulaSV || schemaVar instanceof UpdateSV)) {
+
+        /*
+         * TODO: Add an explanation for the following if-statement.
+         * (Kai Wallisch 01/2015)
+         */
+        if (!(schemaVar instanceof FormulaSV
+                || schemaVar instanceof UpdateSV
+                || schemaVar instanceof TermLabelSV)) {
             out.append(" ").append(schemaVar.sort().declarationString());
         }
         out.append(" ").append(schemaVar.name());
@@ -194,13 +208,13 @@ public class InnerNodeView extends SequentView {
         if (app != null) {
             s += "The following rule was applied on this node: \n\n";
             if (app.rule() instanceof Taclet) {
-                SequentViewLogicPrinter tacPrinter = new SequentViewLogicPrinter(new ProgramPrinter(null),
+                SequentViewLogicPrinter logicPrinter = new SequentViewLogicPrinter(new ProgramPrinter(null),
                         mediator.getNotationInfo(),
                         mediator.getServices(),
                         true,
                         getVisibleTermLabels());
-                tacPrinter.printTaclet((Taclet) (app.rule()));
-                s += tacPrinter;
+                logicPrinter.printTaclet((Taclet) (app.rule()));
+                s += logicPrinter;
             } else {
                 s = s + app.rule();
             }

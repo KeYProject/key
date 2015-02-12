@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.main(a);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.main(a)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="a++;" pathCondition="true" pathConditionChanged="false">
          <statement name="this.x=this.callee.main(a);" pathCondition="true" pathConditionChanged="false">
             <branchCondition name="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="true" branchCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <methodCall name="b.main(a_1);" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false">
+               <methodCall name="&lt;call b.main(a_1)&gt;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false">
                   <statement name="this.x=a_1+4;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false">
                   </statement>
                </methodCall>
             </branchCondition>
             <branchCondition name="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathConditionChanged="true" branchCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-               </termination>
+               <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call self.main(a)&gt;&gt;" pathCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathConditionChanged="false" methodReturnCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)">
+                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                  </termination>
+               </exceptionalMethodReturn>
             </branchCondition>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/1/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/1/0/0"/>
 </start>

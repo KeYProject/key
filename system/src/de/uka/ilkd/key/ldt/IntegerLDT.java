@@ -79,6 +79,7 @@ public final class IntegerLDT extends LDT {
     private final Function mul;
     private final Function div;
     private final Function mod;
+    private final Function pow;
     private final Function bsum;
     private final Function bprod;
 //    private final Function min; // handled by the \ifEx operator
@@ -97,12 +98,18 @@ public final class IntegerLDT extends LDT {
     private final Function modJlong;
     private final Function divJint;
     private final Function divJlong;
+    
+    private final Function shiftright;
+    private final Function shiftleft;
     private final Function shiftrightJint;
     private final Function shiftrightJlong;
     private final Function shiftleftJint;
     private final Function shiftleftJlong;
     private final Function unsignedshiftrightJint;
     private final Function unsignedshiftrightJlong;
+    private final Function binaryOr;
+    private final Function binaryXOr;
+    private final Function binaryAnd;
     private final Function orJint;
     private final Function orJlong;
     private final Function andJint;
@@ -183,7 +190,8 @@ public final class IntegerLDT extends LDT {
         bsum                = addFunction(services, "bsum");
         bprod               = addFunction(services, "bprod");
         jdiv                = addFunction(services, "jdiv");
-        jmod                = addFunction(services, "jmod");                  
+        jmod                = addFunction(services, "jmod");    
+        pow                 = addFunction(services, "pow");
         unaryMinusJint      = addFunction(services, "unaryMinusJint");
         unaryMinusJlong     = addFunction(services, "unaryMinusJlong");
         addJint             = addFunction(services, "addJint");
@@ -196,6 +204,9 @@ public final class IntegerLDT extends LDT {
         modJlong            = addFunction(services, "modJlong");
         divJint             = addFunction(services, "divJint");
         divJlong            = addFunction(services, "divJlong");
+
+        shiftright          = addFunction(services, "shiftright");
+        shiftleft           = addFunction(services, "shiftleft");
         shiftrightJint      = addFunction(services, "shiftrightJint");
         shiftrightJlong     = addFunction(services, "shiftrightJlong");
         shiftleftJint       = addFunction(services, "shiftleftJint");
@@ -204,6 +215,9 @@ public final class IntegerLDT extends LDT {
                             = addFunction(services, "unsignedshiftrightJint");
         unsignedshiftrightJlong 
                             = addFunction(services, "unsignedshiftrightJlong");
+        binaryOr            = addFunction(services, "binaryOr");
+        binaryAnd           = addFunction(services, "binaryAnd");
+        binaryXOr           = addFunction(services, "binaryXOr");
         orJint              = addFunction(services, "orJint");
         orJlong             = addFunction(services, "orJlong");
         andJint             = addFunction(services, "andJint");
@@ -335,6 +349,11 @@ public final class IntegerLDT extends LDT {
     
     public Function getMod() {
         return mod;
+    }
+    
+    
+    public Function getPow() {
+    	return pow;
     }
     
     
@@ -549,38 +568,43 @@ public final class IntegerLDT extends LDT {
             literalString = 
                 literalString.substring(1);
         }
+        // We have to deal with literals coming both from programs and
+        // the logic. The former can have prefixes ("0" for octal,
+        // "0x" for hex) and suffixes ("L" for long literal). The latter
+        // do not have any of these but can have arbitrary length.
         if (lit instanceof IntLiteral) {
-            if (literalString.startsWith("0x")) {
+            if (literalString.startsWith("0") && !literalString.equals("0")) { // hex or octal literal
                 try {
-                    int i = Integer.parseInt
-                        (literalString.substring(2),16);
+                    long l = Long.decode(literalString);
+                    //the following contortion is necessary to deal with
+                    //valid java programs like int i = 0xffffffff;
+                    //http://stackoverflow.com/questions/4355619/converting-string-to-intger-hex-value-strange-behaviour
+                    if (l>4294967295L) throw new
+                        NumberFormatException("This won't fit into an int");
+                    int i = (int) l;
+                    if (i<0) {
+                        minusFlag = true;
+                        i=-i;
+                    }
                     int_ch=(""+i).toCharArray();
-                }catch(NumberFormatException nfe) {
-                    Debug.fail("Not a hexadecimal constant!");
+                } catch(NumberFormatException nfe) {
+                    Debug.fail("Cannot convert int constant! "+literalString);
                 }
             } else {
-                int_ch = literalString.toCharArray();
-            }            
-            length = int_ch.length; 
-        } else if (lit instanceof LongLiteral) {
-            if (literalString.startsWith("0x")) {
-                try {
-                    // long literals have an 'L' as last sign; we have
-                    // to skip it 
-                    final long l = Long.parseLong
-                        (literalString.substring(2, 
-                                                 literalString.length() - 1), 
-                         16);
-                    int_ch=(""+l).toCharArray();
-                } catch (NumberFormatException nfe) {
-                    Debug.fail("Not a hexadecimal constant!");
-                }
-                length = int_ch.length; 
-            } else {
-                // long literals have an 'L' as last sign; skip it
-                int_ch = literalString.toCharArray();
-                length = int_ch.length - 1; 
+                int_ch=literalString.toCharArray();
             }
+            length = int_ch.length;
+        } else if (lit instanceof LongLiteral) {
+            // long constants have the letter 'l' as final character
+            // need to cut that off (fixes bug #1523)
+            assert Character.toLowerCase(literalString.charAt(literalString.length()-1)) == 'l';
+            try {
+                final long l = Long.decode(literalString.substring(0, literalString.length()-1));
+                int_ch=(""+l).toCharArray();
+            } catch (NumberFormatException nfe) {
+                Debug.fail("Cannot convert long constant! "+literalString);
+            }
+            length = int_ch.length;
         }
         
         for (int i = 0; i < length; i++) {
@@ -728,6 +752,13 @@ public final class IntegerLDT extends LDT {
         return addJint;
     }
     
+    
+    /** 
+     * returns the function symbol representing the bitwise-or for Java int
+     */
+    public Function getBitwiseOrJavaInt() {
+        return orJint;
+    }
    
     /**
      * the function representing the Java operator when one of the
@@ -782,7 +813,7 @@ public final class IntegerLDT extends LDT {
     public Function getJavaBitwiseOrInt() {
         return javaBitwiseOrInt;
     }
-
+    
 
     /**
      * the function representing the Java operator <code>|</code> 

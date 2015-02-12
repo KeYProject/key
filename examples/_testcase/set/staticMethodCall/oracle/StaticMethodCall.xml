@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="StaticMethodCall.main();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call StaticMethodCall.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="doSomething();" pathCondition="true" pathConditionChanged="false">
-         <methodCall name="StaticMethodCall.doSomething();" pathCondition="true" pathConditionChanged="false">
-            <methodReturn name="&lt;return of StaticMethodCall.doSomething();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+         <methodCall name="&lt;call StaticMethodCall.doSomething()&gt;" pathCondition="true" pathConditionChanged="false">
+            <methodReturn name="&lt;return of doSomething&gt;" signature="&lt;return of StaticMethodCall.doSomething()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                <statement name="int x = sub()+sub();" pathCondition="true" pathConditionChanged="false">
-                  <methodCall name="StaticMethodCall.sub();" pathCondition="true" pathConditionChanged="false">
+                  <methodCall name="&lt;call StaticMethodCall.sub()&gt;" pathCondition="true" pathConditionChanged="false">
                      <statement name="return subSub()+2;" pathCondition="true" pathConditionChanged="false">
-                        <methodCall name="StaticMethodCall.subSub();" pathCondition="true" pathConditionChanged="false">
+                        <methodCall name="&lt;call StaticMethodCall.subSub()&gt;" pathCondition="true" pathConditionChanged="false">
                            <statement name="return 2;" pathCondition="true" pathConditionChanged="false">
-                              <methodReturn name="&lt;return of StaticMethodCall.subSub();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                 <methodReturn name="&lt;return of StaticMethodCall.sub();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                    <methodCall name="StaticMethodCall.sub();" pathCondition="true" pathConditionChanged="false">
+                              <methodReturn name="&lt;return of subSub&gt;" signature="&lt;return of StaticMethodCall.subSub()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                 <methodReturn name="&lt;return of sub&gt;" signature="&lt;return of StaticMethodCall.sub()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                    <methodCall name="&lt;call StaticMethodCall.sub()&gt;" pathCondition="true" pathConditionChanged="false">
                                        <statement name="return subSub()+2;" pathCondition="true" pathConditionChanged="false">
-                                          <methodCall name="StaticMethodCall.subSub();" pathCondition="true" pathConditionChanged="false">
+                                          <methodCall name="&lt;call StaticMethodCall.subSub()&gt;" pathCondition="true" pathConditionChanged="false">
                                              <statement name="return 2;" pathCondition="true" pathConditionChanged="false">
-                                                <methodReturn name="&lt;return of StaticMethodCall.subSub();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                   <methodReturn name="&lt;return of StaticMethodCall.sub();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                <methodReturn name="&lt;return of subSub&gt;" signature="&lt;return of StaticMethodCall.subSub()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                   <methodReturn name="&lt;return of sub&gt;" signature="&lt;return of StaticMethodCall.sub()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                       <statement name="return x;" pathCondition="true" pathConditionChanged="false">
-                                                         <methodReturn name="&lt;return of StaticMethodCall.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                         <methodReturn name="&lt;return of main&gt;" signature="&lt;return of StaticMethodCall.main()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                             <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                             </termination>
                                                          </methodReturn>
@@ -26,18 +26,25 @@
                                                    </methodReturn>
                                                 </methodReturn>
                                              </statement>
+                                             <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                           </methodCall>
                                        </statement>
+                                       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                     </methodCall>
                                  </methodReturn>
                               </methodReturn>
                            </statement>
+                           <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0"/>
                         </methodCall>
                      </statement>
+                     <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
                   </methodCall>
                </statement>
             </methodReturn>
+            <methodReturnEntry path="/0/0/0/0"/>
          </methodCall>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

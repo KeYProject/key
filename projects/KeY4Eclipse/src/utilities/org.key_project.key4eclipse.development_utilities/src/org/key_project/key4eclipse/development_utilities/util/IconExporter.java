@@ -50,7 +50,7 @@ import de.uka.ilkd.key.gui.IconFactory;
  * @author Martin Hentschel
  */
 public class IconExporter extends TestCase {
-   private static final String PREFIX = "D:/Forschung/GIT/KeY/";
+   private static final String PREFIX = "D:/Forschung/GIT/KeY_Master/";
    
    @Test
    public void testExportImage() throws Exception {
@@ -61,6 +61,7 @@ public class IconExporter extends TestCase {
       decorateImages(new IconToDecorate(hole17Image, decProofFileImage, 16, 16, 0, 0, "projects/KeY4Eclipse/src/plugins/org.key_project.key4eclipse.common.ui/icons/prooffile16.png")
                      //, new IconToDecorate(hole17Image, decKeYFileImage, 16, 16, 0, 0, "projects/KeY4Eclipse/src/plugins/org.key_project.key4eclipse.common.ui/icons/keyfile16.png")
                      );
+      treatIconsToExport(new IconToExpoert(IconFactory.testGeneration(16), 0, 0, "projects/KeY4Eclipse/src/plugins/org.key_project.key4eclipse.common.ui/icons/testGeneration.png"));
       
       // KeY Resources
       ImageData baseImage = ImageUtil.convertToImageData(ImageUtil.toBufferedImage(IconFactory.keyHole(16, 16), -1, -1));
@@ -88,6 +89,8 @@ public class IconExporter extends TestCase {
                          new IconToExpoert(IconFactory.keyHoleClosed(16, 16), -1, -1, "projects/KeYIDE/src/plugins/org.key_project.keyide.ui/icons/keyproved16.png"),
                          new IconToExpoert(IconFactory.interactiveAppLogo(16), "projects/KeYIDE/src/plugins/org.key_project.keyide.ui/icons/interactiveAppLogo16.png"),
                          new IconToExpoert(IconFactory.pruneLogo(16), "projects/KeYIDE/src/plugins/org.key_project.keyide.ui/icons/prune16.png"));
+      treatIconsToExport(new IconToExpoert(IconFactory.testGeneration(16), 0, 0, "projects/KeYIDE/src/plugins/org.key_project.keyide.ui/icons/testGeneration.png"));
+      treatIconsToExport(new IconToExpoert(IconFactory.counterExample(16), 0, 0, "projects/KeYIDE/src/plugins/org.key_project.keyide.ui/icons/counterExample.png"));
       decorateImages(new IconToDecorate(hole17Image, decProofFileImage, 16, 16, 0, 0, "projects/KeYIDE/src/plugins/org.key_project.keyide.ui/icons/prooffile16.png"));
    }
    

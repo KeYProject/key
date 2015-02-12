@@ -151,7 +151,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
      * the proof immediately. */
     public void setAttentive(boolean b) {
 	Debug.out("setAttentive:", b);
-	if ( b != attentive ) {
+	if ( b != attentive && !proof.isDisposed()) {
 	    if ( b ) {
 		proof.addProofTreeListener(proofTreeListener);
 		//		updateTree(null);

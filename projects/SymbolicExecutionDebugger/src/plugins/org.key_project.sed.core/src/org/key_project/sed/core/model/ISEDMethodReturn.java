@@ -33,6 +33,5 @@ import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
  * @author Martin Hentschel
  * @see ISEDDebugNode
  */
-public interface ISEDMethodReturn extends ISEDDebugNode, IStackFrame {
-
+public interface ISEDMethodReturn extends ISEDBaseMethodReturn {
 }

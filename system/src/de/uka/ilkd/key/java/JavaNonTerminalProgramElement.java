@@ -101,19 +101,7 @@ public abstract class JavaNonTerminalProgramElement
     
     @Override    
     public int hashCode(){
-	if (hashCode == 0) {
-	    int result = 17;
-	    result = 37 * result + getChildCount();
-	    for (int i = 0, cc = getChildCount(); i<cc; i++) {
-	        result = 37 * result + getChildAt(i).hashCode();
-	    }
-	    if (result == 0) { 
-		hashCode = 1;
-	    } else {
-		hashCode = result;
-	    }
-	}
-    	return hashCode;
+	return super.hashCode();
     }
     
   
@@ -122,7 +110,7 @@ public abstract class JavaNonTerminalProgramElement
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         
-        Debug.out("Program match start (template, source)", this, src);
+        Debug.out("Program match start (template, source)", this, src); // this.toString().equals("e")
         
         if (src == null) {
             return null;

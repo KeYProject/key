@@ -98,7 +98,7 @@ public class SWTBotContractTest extends AbstractKeYDebugTargetTestCase {
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
             // Do resume and test created tree
             resume(bot, item, target);
-            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false);
+            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false, false);
          }
       };
       doKeYDebugTargetTest(projectName, 
@@ -112,6 +112,9 @@ public class SWTBotContractTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.TRUE, 
                            Boolean.FALSE,
                            8, 
                            executor);

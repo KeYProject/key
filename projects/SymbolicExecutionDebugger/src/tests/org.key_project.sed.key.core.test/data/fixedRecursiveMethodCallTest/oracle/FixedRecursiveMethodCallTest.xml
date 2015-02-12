@@ -1,47 +1,95 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_d9cda482-2ddf-4829-b64c-8954311c129f" name="decreaseValue()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_59e166bf-312b-4650-ac5c-21c290aaa676" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_313ec027-eed7-48b6-8cd0-05a4656fbf21" name="FixedRecursiveMethodCallTest.decreaseValue();" pathCondition="true" lineNumber="-1" charStart="66" charEnd="79">
-            <sedStatement xml:id="_eb5ebc6e-6c54-4530-87c6-9350a522e2a6" name="return decrease(3);" pathCondition="true" lineNumber="-1" charStart="87" charEnd="106">
-               <sedMethodCall xml:id="_bc1c4de1-0894-495f-884a-bdd70ee6ec7f" name="FixedRecursiveMethodCallTest.decrease(n);" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142">
-                  <sedBranchStatement xml:id="_82baf906-eb9f-4292-9dc4-acb0938a1623" name="if (n&gt;=1)" pathCondition="true" lineNumber="-1" charStart="155" charEnd="201">
-                     <sedStatement xml:id="_486af61c-91e9-43bc-849a-c8e20a532d8f" name="return decrease(n-1);" pathCondition="true" lineNumber="-1" charStart="173" charEnd="196">
-                        <sedMethodCall xml:id="_2e4e4778-1240-41fb-8c50-565fd01cd6a7" name="FixedRecursiveMethodCallTest.decrease(n_1);" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142">
-                           <sedBranchStatement xml:id="_76c2445d-fd48-4c88-992d-9098a69a59a6" name="if (n_1&gt;=1)" pathCondition="true" lineNumber="-1" charStart="155" charEnd="201">
-                              <sedStatement xml:id="_ded73298-a198-4b03-b0f4-f58cfd6905bd" name="return decrease(n_1-1);" pathCondition="true" lineNumber="-1" charStart="173" charEnd="196">
-                                 <sedMethodCall xml:id="_78c54aae-9004-42b3-9976-63db6825eea4" name="FixedRecursiveMethodCallTest.decrease(n_2);" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142">
-                                    <sedBranchStatement xml:id="_082834c1-cb0d-416f-a6cb-adc3a922307e" name="if (n_2&gt;=1)" pathCondition="true" lineNumber="-1" charStart="155" charEnd="201">
-                                       <sedStatement xml:id="_386ad994-78e6-40cc-ac6c-c14e43278b22" name="return decrease(n_2-1);" pathCondition="true" lineNumber="-1" charStart="173" charEnd="196">
-                                          <sedMethodCall xml:id="_474fb9b1-ecd1-4457-b67d-22e065a7a6cc" name="FixedRecursiveMethodCallTest.decrease(n_3);" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142">
-                                             <sedBranchStatement xml:id="_a4a198b6-2fa3-4c80-834c-cfed607cc11a" name="if (n_3&gt;=1)" pathCondition="true" lineNumber="-1" charStart="155" charEnd="201">
-                                                <sedStatement xml:id="_cd48de4b-2d22-45e9-8813-ded6f1f58e46" name="return n_3;" pathCondition="true" lineNumber="-1" charStart="205" charEnd="214">
-                                                   <sedMethodReturn xml:id="_c77c34d0-8692-485f-8025-a400a01b867c" name="&lt;return Z(0(#)) as result of FixedRecursiveMethodCallTest.decrease(n_3);&gt;" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142">
-                                                      <sedMethodReturn xml:id="_4889337d-7e98-4912-aef8-fb03906ab26c" name="&lt;return Z(0(#)) as result of FixedRecursiveMethodCallTest.decrease(n_2);&gt;" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142">
-                                                         <sedMethodReturn xml:id="_045ca1f3-104d-4213-98a8-fd2804eb908a" name="&lt;return Z(0(#)) as result of FixedRecursiveMethodCallTest.decrease(n_1);&gt;" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142">
-                                                            <sedMethodReturn xml:id="_58b11ad8-93ad-4d1e-b495-04530309246f" name="&lt;return Z(0(#)) as result of FixedRecursiveMethodCallTest.decrease(n);&gt;" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142">
-                                                               <sedMethodReturn xml:id="_95772b30-2d39-4699-a480-2eebf47aa02d" name="&lt;return Z(0(#)) as result of FixedRecursiveMethodCallTest.decreaseValue();&gt;" pathCondition="true" lineNumber="-1" charStart="66" charEnd="79">
-                                                                  <sedTermination xml:id="_35a568f1-083c-407a-a4dc-9d69a4020dec" name="&lt;end&gt;" pathCondition="true" verified="true">
+   <sedTarget xml:id="_2515eaf8-5507-465b-a653-bcd7b9ae47f6" name="decreaseValue()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_931d6cad-1fdf-458b-8f1a-1f3992c0951e" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java">
+         <sedMethodCall xml:id="_b57532e3-0687-4cea-b6e8-58ba104296e3" name="&lt;call FixedRecursiveMethodCallTest.decreaseValue()&gt;" pathCondition="true" lineNumber="-1" charStart="66" charEnd="79" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java" groupable="true">
+            <sedStatement xml:id="_f11c4c01-5053-45a5-a4f5-62bf9b733841" name="return decrease(3);" pathCondition="true" lineNumber="-1" charStart="87" charEnd="106" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java">
+               <sedMethodCall xml:id="_2a8221e1-e00e-42ed-ae08-f39872ed0ad7" name="&lt;call FixedRecursiveMethodCallTest.decrease(n)&gt;" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java" groupable="true">
+                  <sedBranchStatement xml:id="_8cf13404-ca3e-4b29-b469-d34f8e16cd47" name="if (n&gt;=1)" pathCondition="true" lineNumber="-1" charStart="155" charEnd="167" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java" groupable="true">
+                     <sedStatement xml:id="_47bb211e-0ca8-447c-8a40-6636dc9f420f" name="return decrease(n-1);" pathCondition="true" lineNumber="-1" charStart="173" charEnd="196" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java">
+                        <sedMethodCall xml:id="_0653a148-4aa1-4409-8cd5-a6fe6ffcb39c" name="&lt;call FixedRecursiveMethodCallTest.decrease(n_1)&gt;" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java" groupable="true">
+                           <sedBranchStatement xml:id="_53f5e101-428e-4db1-8924-31a9cca91a12" name="if (n_1&gt;=1)" pathCondition="true" lineNumber="-1" charStart="155" charEnd="167" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java" groupable="true">
+                              <sedStatement xml:id="_266ad054-1f02-487d-bf21-12a3a881159d" name="return decrease(n_1-1);" pathCondition="true" lineNumber="-1" charStart="173" charEnd="196" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java">
+                                 <sedMethodCall xml:id="_6055ffaa-4a59-405d-b05b-dcab0df6f943" name="&lt;call FixedRecursiveMethodCallTest.decrease(n_2)&gt;" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java" groupable="true">
+                                    <sedBranchStatement xml:id="_94a57e76-3799-4f87-9d02-21b82891b0cf" name="if (n_2&gt;=1)" pathCondition="true" lineNumber="-1" charStart="155" charEnd="167" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java" groupable="true">
+                                       <sedStatement xml:id="_9906769a-7b42-4472-b4d9-35b4fe6d49be" name="return decrease(n_2-1);" pathCondition="true" lineNumber="-1" charStart="173" charEnd="196" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java">
+                                          <sedMethodCall xml:id="_00b65804-bff8-4efd-8388-3e34668d824e" name="&lt;call FixedRecursiveMethodCallTest.decrease(n_3)&gt;" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java" groupable="true">
+                                             <sedBranchStatement xml:id="_5aee3d04-46b4-4116-9289-afe9c0e04048" name="if (n_3&gt;=1)" pathCondition="true" lineNumber="-1" charStart="155" charEnd="167" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java" groupable="false">
+                                                <sedStatement xml:id="_b9420406-695b-458a-97fc-bde1f2bd7aac" name="return n_3;" pathCondition="true" lineNumber="-1" charStart="205" charEnd="214" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java">
+                                                   <sedMethodReturn xml:id="_a3482831-5c60-47cd-a7a5-fdb783f1ff2c" name="&lt;return Z(0(#)) as result of FixedRecursiveMethodCallTest.decrease(n_3)&gt;" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java" methodReturnConditionRef="_9f54267c-311b-43de-9bc2-d8485e6dff8b">
+                                                      <sedMethodReturn xml:id="_ec2ad37e-b12c-4dc4-b75d-8887a82bd429" name="&lt;return Z(0(#)) as result of FixedRecursiveMethodCallTest.decrease(n_2)&gt;" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java" methodReturnConditionRef="_1899fb08-174d-46fb-b9b0-b7505af810a7">
+                                                         <sedMethodReturn xml:id="_dadf31e1-e779-44ad-a314-316a992b984d" name="&lt;return Z(0(#)) as result of FixedRecursiveMethodCallTest.decrease(n_1)&gt;" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java" methodReturnConditionRef="_6869685f-e2f5-48b8-9c59-bf2498a1425c">
+                                                            <sedMethodReturn xml:id="_5e751df4-d007-4613-8ed5-425c5ab88f32" name="&lt;return Z(0(#)) as result of FixedRecursiveMethodCallTest.decrease(n)&gt;" pathCondition="true" lineNumber="-1" charStart="134" charEnd="142" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java" methodReturnConditionRef="_6202aa7d-ee99-42d6-bc57-41595ae092f2">
+                                                               <sedMethodReturn xml:id="_bff824bf-1a7a-40e4-9d33-eb323eabbf19" name="&lt;return Z(0(#)) as result of FixedRecursiveMethodCallTest.decreaseValue()&gt;" pathCondition="true" lineNumber="-1" charStart="66" charEnd="79" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java" methodReturnConditionRef="_ef3d8804-caf6-4f42-b5d2-f7310b746bfe">
+                                                                  <sedTermination xml:id="_8ae9f663-3ad7-486c-9a5a-0c953e3c7b05" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall\src\FixedRecursiveMethodCallTest.java" verified="true">
                                                                   </sedTermination>
+                                                                  <sedGroupEndConditionReference nodeIdRef="_ef3d8804-caf6-4f42-b5d2-f7310b746bfe"/>
                                                                </sedMethodReturn>
+                                                               <sedGroupEndConditionReference nodeIdRef="_6202aa7d-ee99-42d6-bc57-41595ae092f2"/>
                                                             </sedMethodReturn>
+                                                            <sedGroupEndConditionReference nodeIdRef="_e50dc352-b531-4a4f-a8ae-bc2150247780"/>
+                                                            <sedGroupEndConditionReference nodeIdRef="_6869685f-e2f5-48b8-9c59-bf2498a1425c"/>
                                                          </sedMethodReturn>
+                                                         <sedGroupEndConditionReference nodeIdRef="_0ecaf54b-65c0-486a-8f41-f801699a5eab"/>
+                                                         <sedGroupEndConditionReference nodeIdRef="_1899fb08-174d-46fb-b9b0-b7505af810a7"/>
                                                       </sedMethodReturn>
+                                                      <sedGroupEndConditionReference nodeIdRef="_1240304d-85a1-43b2-a19a-b5f7288ae93a"/>
+                                                      <sedGroupEndConditionReference nodeIdRef="_9f54267c-311b-43de-9bc2-d8485e6dff8b"/>
                                                    </sedMethodReturn>
                                                 </sedStatement>
                                              </sedBranchStatement>
+                                             <sedMethodCallMethodReturnCondition xml:id="_9f54267c-311b-43de-9bc2-d8485e6dff8b" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                                <sedChildReference nodeIdRef="_a3482831-5c60-47cd-a7a5-fdb783f1ff2c"/>
+                                             </sedMethodCallMethodReturnCondition>
+                                             <sedGroupEndCondition xml:id="_9f54267c-311b-43de-9bc2-d8485e6dff8b" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                                <sedChildReference nodeIdRef="_a3482831-5c60-47cd-a7a5-fdb783f1ff2c"/>
+                                             </sedGroupEndCondition>
                                           </sedMethodCall>
                                        </sedStatement>
+                                       <sedGroupEndCondition xml:id="_1240304d-85a1-43b2-a19a-b5f7288ae93a" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                          <sedChildReference nodeIdRef="_a3482831-5c60-47cd-a7a5-fdb783f1ff2c"/>
+                                       </sedGroupEndCondition>
                                     </sedBranchStatement>
+                                    <sedMethodCallMethodReturnCondition xml:id="_1899fb08-174d-46fb-b9b0-b7505af810a7" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                       <sedChildReference nodeIdRef="_ec2ad37e-b12c-4dc4-b75d-8887a82bd429"/>
+                                    </sedMethodCallMethodReturnCondition>
+                                    <sedGroupEndCondition xml:id="_1899fb08-174d-46fb-b9b0-b7505af810a7" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                       <sedChildReference nodeIdRef="_ec2ad37e-b12c-4dc4-b75d-8887a82bd429"/>
+                                    </sedGroupEndCondition>
                                  </sedMethodCall>
                               </sedStatement>
+                              <sedGroupEndCondition xml:id="_0ecaf54b-65c0-486a-8f41-f801699a5eab" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                 <sedChildReference nodeIdRef="_ec2ad37e-b12c-4dc4-b75d-8887a82bd429"/>
+                              </sedGroupEndCondition>
                            </sedBranchStatement>
+                           <sedMethodCallMethodReturnCondition xml:id="_6869685f-e2f5-48b8-9c59-bf2498a1425c" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                              <sedChildReference nodeIdRef="_dadf31e1-e779-44ad-a314-316a992b984d"/>
+                           </sedMethodCallMethodReturnCondition>
+                           <sedGroupEndCondition xml:id="_6869685f-e2f5-48b8-9c59-bf2498a1425c" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                              <sedChildReference nodeIdRef="_dadf31e1-e779-44ad-a314-316a992b984d"/>
+                           </sedGroupEndCondition>
                         </sedMethodCall>
                      </sedStatement>
+                     <sedGroupEndCondition xml:id="_e50dc352-b531-4a4f-a8ae-bc2150247780" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                        <sedChildReference nodeIdRef="_dadf31e1-e779-44ad-a314-316a992b984d"/>
+                     </sedGroupEndCondition>
                   </sedBranchStatement>
+                  <sedMethodCallMethodReturnCondition xml:id="_6202aa7d-ee99-42d6-bc57-41595ae092f2" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                     <sedChildReference nodeIdRef="_5e751df4-d007-4613-8ed5-425c5ab88f32"/>
+                  </sedMethodCallMethodReturnCondition>
+                  <sedGroupEndCondition xml:id="_6202aa7d-ee99-42d6-bc57-41595ae092f2" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                     <sedChildReference nodeIdRef="_5e751df4-d007-4613-8ed5-425c5ab88f32"/>
+                  </sedGroupEndCondition>
                </sedMethodCall>
             </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_ef3d8804-caf6-4f42-b5d2-f7310b746bfe" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_bff824bf-1a7a-40e4-9d33-eb323eabbf19"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_ef3d8804-caf6-4f42-b5d2-f7310b746bfe" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_bff824bf-1a7a-40e4-9d33-eb323eabbf19"/>
+            </sedGroupEndCondition>
          </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_8ae9f663-3ad7-486c-9a5a-0c953e3c7b05"/>
       </sedThread>
    </sedTarget>
 </launch>

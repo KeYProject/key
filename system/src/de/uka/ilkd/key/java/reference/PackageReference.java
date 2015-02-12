@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -62,6 +63,11 @@ public class PackageReference extends JavaNonTerminalProgramElement
 
     public SourceElement getFirstElement() {
         return (prefix == null) ? name : prefix.getFirstElement();
+    }
+
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+        return (prefix == null) ? name : prefix.getFirstElementIncludingBlocks();
     }
 
     /**

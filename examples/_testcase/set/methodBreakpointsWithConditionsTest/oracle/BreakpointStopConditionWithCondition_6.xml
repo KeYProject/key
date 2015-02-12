@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="SimpleConditionExample.somethingMain();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call SimpleConditionExample.somethingMain()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int a = 2;" pathCondition="true" pathConditionChanged="false">
          <statement name="int b = 3;" pathCondition="true" pathConditionChanged="false">
             <statement name="return something(a,b);" pathCondition="true" pathConditionChanged="false">
-               <methodCall name="SimpleConditionExample.something(a_1,b_1);" pathCondition="true" pathConditionChanged="false">
+               <methodCall name="&lt;call SimpleConditionExample.something(a_1,b_1)&gt;" pathCondition="true" pathConditionChanged="false">
                   <statement name="return a_1+b_1;" pathCondition="true" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of SimpleConditionExample.something(a_1,b_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of something&gt;" signature="&lt;return of SimpleConditionExample.something(a_1,b_1)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                      </methodReturn>
                   </statement>
+                  <methodReturnEntry path="/0/0/0/0/0/0/0"/>
                </methodCall>
             </statement>
          </statement>

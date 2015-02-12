@@ -38,6 +38,7 @@ header {
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Pair;
     import de.uka.ilkd.key.util.Triple;
+    import de.uka.ilkd.key.util.InfFlowSpec;
 
     import java.math.BigInteger;
     import java.util.List;
@@ -253,6 +254,10 @@ options {
 		return services.getTypeConverter().getHeapLDT().getSavedHeap();
 	}
 
+	private LocationVariable getPermissionHeap() {
+		return services.getTypeConverter().getHeapLDT().getPermissionHeap();
+	}
+
     /**
      * Converts a term so that all of its non-rigid operators refer to the pre-state.
      */
@@ -260,10 +265,11 @@ options {
     private Term convertToOld(final Term term) {
 	    assert atPres != null && atPres.get(getBaseHeap()) != null;
 	    Map<Term, Term> map = new LinkedHashMap<Term, Term>();
-        for (LocationVariable heap : atPres.keySet()) {
-            Term heapAtPre = atPres.get(heap);
-            if (heapAtPre != null) {
-                map.put(tb.var(heap), heapAtPre);
+        for (LocationVariable var : atPres.keySet()) {
+            // caution: That may now also be other variables than only heaps.
+            Term varAtPre = atPres.get(var);
+            if (varAtPre != null) {
+                map.put(tb.var(var), varAtPre);
             }
         }
 	    OpReplacer or = new OpReplacer(map, tb.tf());
@@ -281,6 +287,16 @@ options {
 	return or.replace(term);
     }
 
+    private Term convertToPermission(Term term) throws SLTranslationException {
+        LocationVariable permissionHeap = getPermissionHeap();
+        if(permissionHeap == null) {
+           raiseError("\\permission expression used in a non-permission context and permissions not enabled.");
+        }
+        if(!term.op().name().toString().endsWith("::select")) {
+           raiseError("\\permission expression used with non store-ref expression.");
+        }
+        return tb.select(services.getTypeConverter().getPermissionLDT().targetSort(), tb.var(getPermissionHeap()), term.sub(1), term.sub(2));
+    }
 
     private String createSignatureString(ImmutableList<SLExpression> signature) {
 	if (signature == null || signature.isEmpty()) {
@@ -346,13 +362,15 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = breaksclause
     |   result = continuesclause
     |   result = dependsclause
-    |   result = declassifyclause
     |   result = ensuresclause
     |   result = representsclause
     |   result = axiomsclause
     |   result = requiresclause
     |   result = decreasesclause
-    |   result = respectsclause
+    |   result = separatesclause  // old information flow syntax
+    |   result = determinesclause // new information flow syntax
+    |   result = loopseparatesclause  // old information flow syntax
+    |   result = loopdeterminesclause // new information flow syntax
     |   result = returnsclause
     |   result = signalsclause
     |   result = signalsonlyclause
@@ -374,27 +392,9 @@ assignableclause returns [Term result = null] throws SLTranslationException
     ass:ASSIGNABLE
     ( result=storeRefUnion
         { result = translator.translate(ass.getText(), Term.class, result, services); }
-    | l:LESS_THAN_NOTHING // deprecated
-        { translator.addDeprecatedWarning(l.getText()); result = tb.strictlyNothing(); }
     | STRICTLY_NOTHING
         { result = tb.strictlyNothing(); }
     )
-    ;
-
-
-declassifyclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
-{
-    Term declass = null;
-    Term frompart = null;
-    Term topart = null;
-    Term ifpart = null;
-}
-:
-    del:DECLASSIFY declass = predicate
-    (FROM frompart = storeRefUnion)?
-    (TO topart = storeRefUnion)?
-    (IF ifpart = predicate)?
-    { result = translator.translate(del.getText(), ImmutableList.class, declass, frompart, topart, ifpart, services); }
     ;
 
 
@@ -491,14 +491,80 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
     ;
 
 
-respectsclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
+separatesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException {
+    ImmutableList<Term> sep = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> decl = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> erases = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> tmp;
+}
+:
+    SEPARATES (NOTHING | sep = infflowspeclist)
+    (   (DECLASSIFIES (NOTHING | tmp = infflowspeclist {decl = decl.append(tmp);})) |
+        (ERASES (NOTHING | tmp = infflowspeclist {erases = erases.append(tmp);})) |
+        (NEW_OBJECTS (NOTHING | tmp = infflowspeclist {newObs = newObs.append(tmp);}))
+    )*
+    {decl = sep.append(decl);
+     erases = sep.append(erases);
+     result = new InfFlowSpec(decl, erases, newObs);}
+    ;
+
+
+loopseparatesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException {
+    ImmutableList<Term> sep = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> tmp;
+}
+:
+    LOOP_SEPARATES (NOTHING | sep = infflowspeclist)
+    (   (NEW_OBJECTS (NOTHING | tmp = infflowspeclist {newObs = newObs.append(tmp);}))
+    )*
+    {result = new InfFlowSpec(sep, sep, newObs);}
+    ;
+
+
+determinesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException {
+    ImmutableList<Term> det = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> by = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> decl = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> erases = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> tmp;
+}
+:
+    DETERMINES (NOTHING | det = infflowspeclist)
+    BY (NOTHING | (ITSELF {by = det;}) | by = infflowspeclist)
+    (   (DECLASSIFIES (NOTHING | tmp = infflowspeclist {decl = decl.append(tmp);})) |
+        (ERASES (NOTHING | tmp = infflowspeclist {erases = erases.append(tmp);})) |
+        (NEW_OBJECTS (NOTHING | tmp = infflowspeclist {newObs = newObs.append(tmp);}))
+    )*
+    {det = det.append(erases);
+     by = by.append(decl);
+     result = new InfFlowSpec(by, det, newObs);}
+    ;
+
+
+loopdeterminesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException {
+    ImmutableList<Term> det = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> tmp;
+}
+:
+    LOOP_DETERMINES (NOTHING | det = infflowspeclist)
+    BY ITSELF
+    (   (NEW_OBJECTS (NOTHING | tmp = infflowspeclist {newObs = newObs.append(tmp);}))
+    )*
+    {result = new InfFlowSpec(det, det, newObs);}
+    ;
+
+
+infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
     Term term = null;
 }
 :
-    resp:RESPECTS
-    term = storeref { result = result.append(term); }
-    (COMMA term = storeref { result = result.append(term); })*
-        { result = translator.translate(resp.getText(), ImmutableList.class, result, services); }
+    term = termexpression { result = result.append(term); }
+    (COMMA term = termexpression { result = result.append(term); })*
+        { result = translator.translate("infflowspeclist", ImmutableList.class, result, services); }
     ;
 
 
@@ -1364,7 +1430,7 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
             ImmutableList<SLExpression> preHeapParams = ImmutableSLList.<SLExpression>nil();
             for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
               Term p;
-              if(atPres == null || atPres.get(heap) == null) { p = tb.NULL(); } else { p = atPres.get(heap); }
+              if(atPres == null || atPres.get(heap) == null) { p = tb.var(heap); } else { p = atPres.get(heap); }
               preHeapParams = preHeapParams.append(new SLExpression(p));
             }
             params = params.prepend(preHeapParams);
@@ -1513,6 +1579,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     KeYJavaType typ;
     Term t, t2 = null;
     Token tk = null;
+    boolean nullable = false;
     Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;
 }
 :
@@ -1524,7 +1591,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    result = new SLExpression(tb.var(resultVar), resultVar.getKeYJavaType());
 	}
     |
-	(LPAREN QUANTIFIER) => result=specquantifiedexpression
+	(LPAREN quantifier) => result=specquantifiedexpression
     |
         (LPAREN BSUM) => result=bsumterm
     |
@@ -1549,10 +1616,10 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    }
 	}
     |
-	CREATED LPAREN result=expression RPAREN
-	{
-		raiseNotSupported("\\created is deliberately not supported in this KeY version, you should not need it");
-	}
+        PERMISSION LPAREN result=expression RPAREN
+        {
+            result = new SLExpression(convertToPermission(result.getTerm()));
+        }
     |
 	NONNULLELEMENTS LPAREN result=expression RPAREN
 	{
@@ -1589,6 +1656,18 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         {
             result = translator.translate("\\dl_", SLExpression.class, escape, list, services);
         }
+        
+    |   mapEmpty:MAPEMPTY { result = translator.translateMapExpressionToJDL(mapEmpty,list,services); }
+        
+    |   tk=mapExpression LPAREN ( list=expressionlist )? RPAREN
+		{
+		    result = translator.translateMapExpressionToJDL(tk,list,services);
+		}
+
+    |   s2m:SEQ2MAP LPAREN ( list=expressionlist )? RPAREN
+		{
+		    result = translator.translateMapExpressionToJDL(s2m,list,services);
+		}
 
     |   NOT_MODIFIED LPAREN t=storeRefUnion RPAREN
         {
@@ -1673,6 +1752,11 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 
 	}
 
+	|   STATIC_INVARIANT_FOR LPAREN typ=referencetype RPAREN
+	{
+	    result = translator.translate("\\static_invariant_for", SLExpression.class, services, typ);
+	}
+
     |   ( LPAREN LBLNEG ) => LPAREN lblneg:LBLNEG IDENT result=expression RPAREN
 	{
 	    addIgnoreWarning("\\lblneg",lblneg);
@@ -1734,6 +1818,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         }
     |   UNIONINF
         LPAREN
+        (nullable=boundvarmodifiers)?
         declVars=quantifiedvardecls
         SEMI
         {
@@ -1745,18 +1830,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         RPAREN
         {
                resolverManager.popLocalVariablesNamespace();
-               if(t2 == null) {
-                  // unguarded version
-	          result = new SLExpression(tb.infiniteUnion(
-	          		declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]), t),
-                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
-               } else {
-                  // guarded version
-                  result = new SLExpression(tb.guardedInfiniteUnion(
-                                                       declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]),
-                                                       t2, t),
-                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
-               }
+               result = translator.translate(JMLTranslator.JMLKeyWord.UNIONINF, nullable, declVars, t, t2, services);
         }
 
     |   pd:DISJOINT LPAREN tlist=storeRefList RPAREN {
@@ -1776,14 +1850,43 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 
         }
 
-    |   SEQEMPTY
+    |   (SEQEMPTY
+        | ((LPAREN SEQDEF | LPAREN SEQ) quantifiedvardecls SEMI)
+        | (SEQSINGLETON | SEQ) LPAREN
+        | SEQSUB LPAREN
+        | SEQREVERSE
+        | SEQREPLACE
+        | (tk1:SEQCONTAINS{tk=tk1;}
+          | tk2: SEQCONCAT{tk=tk2;}
+          | tk3: SEQGET{tk=tk3;}
+          | tk4: INDEXOF{tk=tk4;}))
+         => result = sequence    
+    
+    |   LPAREN result=expression RPAREN
+;
+
+
+sequence returns [SLExpression result = null] throws SLTranslationException
+{
+    ImmutableList<SLExpression> list = null;
+    ImmutableList<Term> tlist = null;
+    SLExpression e1 = null;
+    SLExpression e2 = null;
+    SLExpression e3 = null;
+    KeYJavaType typ;
+    Term t, t2;
+    Token tk = null;
+    Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;    
+}
+:
+        SEQEMPTY
         {
             result = new SLExpression(tb.seqEmpty());
         }
-
-    |   SEQSINGLETON LPAREN e1=expression RPAREN
+    |   ((LPAREN SEQDEF | LPAREN SEQ) quantifiedvardecls SEMI) => result=seqdefterm
+    |   (SEQSINGLETON | SEQ) LPAREN list=exprList RPAREN
         {
-            result = new SLExpression(tb.seqSingleton(e1.getTerm()));
+            result = translator.translate("\\seq", SLExpression.class, list, services);
         }
 
     |   SEQSUB LPAREN e1=expression COMMA e2=expression COMMA e3=expression RPAREN
@@ -1805,24 +1908,51 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
             final Term put = tb.seqConcat(ante, tb.seqConcat(insert, post));
             result = new SLExpression(put);
         }
+        
     |   (tk2: SEQCONCAT{tk=tk2;} | tk3: SEQGET{tk=tk3;} | tk4: INDEXOF{tk=tk4;})
         LPAREN e1=expression COMMA e2=expression RPAREN
         {
             result = translator.translate(tk.getText(), SLExpression.class, services, e1, e2);
         }
-    |   LPAREN result=expression RPAREN
 ;
+
+mapExpression returns [Token token = null] :
+  ( MAP_GET
+  | MAP_OVERRIDE
+  | MAP_UPDATE
+  | MAP_REMOVE
+  | IN_DOMAIN
+  | DOMAIN_IMPLIES_CREATED
+  | MAP_SIZE
+  | MAP_SINGLETON
+  | IS_FINITE
+  )
+    { token = LT(-1); }
+  ;
+
+quantifier returns [Token token = null] :
+  ( FORALL
+  | EXISTS
+  | MIN
+  | MAX
+  | NUM_OF
+  | PRODUCT
+  | SUM
+  )
+    { token = LT(0); }
+  ;
 
 specquantifiedexpression returns [SLExpression result = null] throws SLTranslationException
 {
     SLExpression expr;
     Term p = tb.tt();
+    Token q;
     boolean nullable = false;
     Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;
 }
 :
 	LPAREN
-	q:QUANTIFIER
+	q=quantifier
 	(nullable=boundvarmodifiers)?
 	declVars=quantifiedvardecls SEMI
 	{
@@ -1922,7 +2052,6 @@ seqdefterm returns [SLExpression result=null] throws SLTranslationException
         resolverManager.popLocalVariablesNamespace();
         throw ex;
         }
-
 
 quantifiedvardecls returns [Pair<KeYJavaType,ImmutableList<LogicVariable>> result = null]
                    throws SLTranslationException

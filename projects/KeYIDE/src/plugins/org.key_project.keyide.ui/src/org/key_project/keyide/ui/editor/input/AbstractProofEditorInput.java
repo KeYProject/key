@@ -28,7 +28,6 @@ import org.key_project.util.java.StringUtil;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * Defines the basic functionality for {@link IEditorInput}s used for the {@link KeYEditor}.
@@ -38,7 +37,7 @@ public abstract class AbstractProofEditorInput extends PlatformObject implements
    /**
     * The {@link KeYEnvironment} in which the {@link Proof} lives.
     */
-   private KeYEnvironment<CustomConsoleUserInterface> environment;
+   private KeYEnvironment<?> environment;
    
    /**
     * The optional {@link IMethod} from which the proof was started.
@@ -58,7 +57,7 @@ public abstract class AbstractProofEditorInput extends PlatformObject implements
     * @param method An optional {@link IMethod} from which the {@link Proof} was started.
     * @param name The name of this editor input.
     */
-   public AbstractProofEditorInput(KeYEnvironment<CustomConsoleUserInterface> environment, 
+   public AbstractProofEditorInput(KeYEnvironment<?> environment, 
                                    IMethod method,
                                    String name) {
       this.environment = environment;
@@ -126,7 +125,7 @@ public abstract class AbstractProofEditorInput extends PlatformObject implements
     * Gives the {@link KeYEnvironment} of this {@link ProofOblInputEditorInput}.
     * @return The {@link KeYEnvironment} of this {@link ProofOblInputEditorInput}.
     */
-   public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
+   public KeYEnvironment<?> getEnvironment() {
       return environment;
    }
 }

@@ -40,7 +40,7 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.view.AbstractViewBasedView;
 import org.key_project.util.java.CollectionUtil;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.UserInterface;

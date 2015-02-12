@@ -52,6 +52,9 @@ public abstract class AbstractElement implements ISymbolicElement {
     * @return The {@link String} representation of the given {@link Term}.
     */
    protected String formatTerm(Term term, Services services) {
-      return SymbolicExecutionUtil.formatTerm(term, services, settings.isUsePrettyPrinting());
+      return SymbolicExecutionUtil.formatTerm(term, 
+                                              services, 
+                                              settings.isUseUnicode(),
+                                              settings.isUsePrettyPrinting());
    }
 }

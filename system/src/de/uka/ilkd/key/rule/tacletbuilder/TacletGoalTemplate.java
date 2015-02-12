@@ -146,14 +146,19 @@ public class TacletGoalTemplate {
     
     @Override    
     public boolean equals(Object o) {
-	if ( ! ( o instanceof TacletGoalTemplate ) )
-	    return false;
-
-	TacletGoalTemplate other = (TacletGoalTemplate) o;
+       
+       if (o == null) return false;
+       if (o == this) return true;
 	
-	return 
-	    addedSeq.equals(other.addedSeq)
-	    && addedRules.equals(other.addedRules);
+       if (getClass() != this.getClass()) {
+          return false;
+       }
+
+       TacletGoalTemplate other = (TacletGoalTemplate) o;
+	
+       return 
+             addedSeq.equals(other.addedSeq)
+             && addedRules.equals(other.addedRules);
     }
 
 

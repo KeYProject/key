@@ -13,7 +13,7 @@
 
 package org.key_project.sed.core.model;
 
-import org.eclipse.debug.core.model.ITerminate;
+import org.eclipse.debug.core.model.IStackFrame;
 import org.key_project.sed.core.model.impl.AbstractSEDBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 
@@ -29,6 +29,6 @@ import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
  * @author Martin Hentschel
  * @see ISEDDebugNode
  */
-public interface ISEDBranchCondition extends ISEDDebugNode, ITerminate {
+public interface ISEDBranchCondition extends ISEDDebugNode, IStackFrame {
 
 }

@@ -1,3 +1,6 @@
+example.name = Aunt Agatha
+example.path = Getting Started
+
 Dreadbury Mansion (aka Aunt Agatha)
 
 This is a purely first-order predicate logic problem from the TPTP library.

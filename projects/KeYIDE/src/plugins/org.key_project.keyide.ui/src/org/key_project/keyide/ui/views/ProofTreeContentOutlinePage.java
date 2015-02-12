@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -32,15 +33,14 @@ import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
-import de.uka.ilkd.key.gui.AutoModeListener;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.KeYSelectionEvent;
-import de.uka.ilkd.key.gui.KeYSelectionListener;
+import de.uka.ilkd.key.core.AutoModeListener;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * A class to display the correct Outline for the current {@link Proof}
@@ -50,14 +50,14 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 public class ProofTreeContentOutlinePage extends ContentOutlinePage implements ITabbedPropertySheetPageContributor {
    private Proof proof;
    
-   private KeYEnvironment<CustomConsoleUserInterface> environment;
+   private KeYEnvironment<?> environment;
 
    private LazyProofTreeContentProvider contentProvider;
    
    private ProofTreeLabelProvider labelProvider;
    
    /**
-    * {@link KeYSelectionListener} to sync the KeYSelection with the treeselection.
+    * {@link KeYSelectionListener} to sync the KeYSelection with the {@link TreeSelection}.
     */
    private KeYSelectionListener listener = new KeYSelectionListener() {
       @Override
@@ -67,7 +67,9 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
       
       @Override
       public void selectedNodeChanged(KeYSelectionEvent e) {
-         updateSelectedNodeThreadSafe();
+         if (e.getSource().getSelectedNode().proof() == proof) {
+            updateSelectedNodeThreadSafe();
+         }
       }
    };
    
@@ -87,7 +89,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
     * Constructor.
     * @param proof The {@link Proof} for this Outline.
     */
-   public ProofTreeContentOutlinePage(Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment) {
+   public ProofTreeContentOutlinePage(Proof proof, KeYEnvironment<?> environment) {
       this.proof = proof;
       this.environment = environment;
       environment.getMediator().addKeYSelectionListener(listener);
@@ -126,9 +128,9 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
       // Create TreeViewer
       super.createControl(parent);
       getTreeViewer().setUseHashlookup(true);
-      contentProvider = new LazyProofTreeContentProvider(getTreeViewer(), environment, proof);
+      contentProvider = new LazyProofTreeContentProvider();
       getTreeViewer().setContentProvider(contentProvider);
-      labelProvider = new ProofTreeLabelProvider(getTreeViewer(), environment, proof);
+      labelProvider = new ProofTreeLabelProvider(getTreeViewer(), proof);
       getTreeViewer().setLabelProvider(labelProvider);
       getTreeViewer().setInput(proof);
       // Create context menu of TreeViewer
@@ -154,10 +156,12 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
     * @param e The event.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      // Listen for mediator selection changes caused by the user to synchronize them with the shown TreeViewer 
-      environment.getMediator().addKeYSelectionListener(listener);
-      // Make sure that correct selected node is shown
-      updateSelectedNodeThreadSafe();
+      if (e.getSource() == proof) {
+         // Listen for mediator selection changes caused by the user to synchronize them with the shown TreeViewer 
+         environment.getMediator().addKeYSelectionListener(listener);
+         // Make sure that correct selected node is shown
+         updateSelectedNodeThreadSafe();
+      }
    }
    
    /**
@@ -225,12 +229,10 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
    @Override
    public void selectionChanged(SelectionChangedEvent event) {
       // Change selected node of mediator only if content provider is not in refresh phase after stopping the auto mode
-      if (!contentProvider.isRefreshAfterAutoModeStopped()) {
-         Node node = getSelectedNode(event.getSelection());
-         Node mediatorNode = environment.getMediator().getSelectedNode();
-         if (node != mediatorNode) {
-            environment.getMediator().getSelectionModel().setSelectedNode(node);
-         }
+      Node node = getSelectedNode(event.getSelection());
+      Node mediatorNode = environment.getMediator().getSelectedNode();
+      if (node != mediatorNode) {
+         environment.getMediator().getSelectionModel().setSelectedNode(node);
       }
       // Fire event to listener
       super.selectionChanged(event); 

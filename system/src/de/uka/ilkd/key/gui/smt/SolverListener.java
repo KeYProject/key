@@ -14,24 +14,41 @@
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 import de.uka.ilkd.key.smt.SMTSolver.SolverState;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
+import de.uka.ilkd.key.smt.SolverLauncher;
+import de.uka.ilkd.key.smt.SolverLauncherListener;
+import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 public class SolverListener implements SolverLauncherListener {
@@ -45,13 +62,14 @@ public class SolverListener implements SolverLauncherListener {
         private int         finishedCounter;
         private Timer timer = new Timer();
         private final SMTSettings settings;
+        private final Proof smtProof;
         private final static Color RED = new Color(180, 43, 43);
         private final static Color GREEN = new Color(43, 180, 43);
         private static int FILE_ID = 0;
 
         private static final int RESOLUTION = 1000;
 
-        private class InternSMTProblem {
+        public static class InternSMTProblem {
                 final int problemIndex;
                 final int solverIndex;
                 final SMTSolver solver;
@@ -127,6 +145,14 @@ public class SolverListener implements SolverLauncherListener {
                         return solver.getException() != null;
                 }
                 
+                public SMTSolver getSolver() {
+                        return solver;
+                }
+
+                public LinkedList<Information> getInformation() {
+                        return information;
+                }
+
                 @Override
                 public String toString() {
                         return solver.name() +" applied on "+problem.getName();
@@ -135,8 +161,9 @@ public class SolverListener implements SolverLauncherListener {
         }
         
 
-        public SolverListener(SMTSettings settings) {
+        public SolverListener(SMTSettings settings, Proof smtProof) {
                 this.settings = settings;
+                this.smtProof = smtProof;
         }
 
         @Override
@@ -158,13 +185,17 @@ public class SolverListener implements SolverLauncherListener {
                 }
                 if (!problemsWithException.isEmpty()) {
                 	 for(InternSMTProblem problem : problemsWithException){
-                		progressDialog.addInformation("Exception for "+problem.toString()+".", Color.RED,problem);
+                		progressDialog.addInformation(createExceptionTitle(problem), Color.RED,problem);
                 	 }
                 } else {
                         if (settings.getModeOfProgressDialog() == ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE) {
                                 applyEvent(launcher);
                         }
                 }
+        }
+        
+        public static String createExceptionTitle(InternSMTProblem problem) {
+           return "Exception for "+problem.toString()+".";
         }
 
         private String getTitle(SMTProblem p) {
@@ -531,22 +562,27 @@ public class SolverListener implements SolverLauncherListener {
 
 		
 		public void addWarning(SolverType type) {
-			StringBuffer message = new StringBuffer();
-			message.append("You are using a version of "+type.getName()+
-					         " which has not been tested for this version of KeY.\nIt can therefore be that" +
-					         " errors occur that would not occur\nusing " +
-					         (type.getSupportedVersions().length > 1 ? 
-					         "one of the following versions:\n" :
-					        	 "the following version:\n"));
-			for (String v: type.getSupportedVersions()){
-			    message.append(v + ", ");
-			}
-			message.deleteCharAt(message.lastIndexOf(","));
-			
-			progressDialog.addInformation("Warning: Your version of "+type.toString()+" may not be supported by KeY.", Color.ORANGE,message.toString());			
-				
-		
+			progressDialog.addInformation(computeSolverTypeWarningTitle(type), Color.ORANGE, computeSolverTypeWarningMessage(type));			
 		}
+		
+		public static String computeSolverTypeWarningTitle(SolverType type) {
+		   return "Warning: Your version of "+type.toString()+" may not be supported by KeY.";
+		}
+		
+      public static String computeSolverTypeWarningMessage(SolverType type) {
+         StringBuffer message = new StringBuffer();
+         message.append("You are using a version of "+type.getName()+
+                        " which has not been tested for this version of KeY.\nIt can therefore be that" +
+                        " errors occur that would not occur\nusing " +
+                        (type.getSupportedVersions().length > 1 ? 
+                        "one of the following versions:\n" :
+                         "the following version:\n"));
+         for (String v: type.getSupportedVersions()){
+             message.append(v + ", ");
+         }
+         message.deleteCharAt(message.lastIndexOf(","));
+         return message.toString();
+      }
 		
 		private class ProgressDialogListenerImpl implements ProgressDialogListener {
             
@@ -587,10 +623,10 @@ public class SolverListener implements SolverLauncherListener {
             public void discardButtonClicked() {
                     discardEvent(launcher);
                     //remove semantics blasting proof for ce dialog
-                    if(counterexample){
+                    if(counterexample && smtProof != null){
                     	MainWindow mw = MainWindow.getInstance();
                         KeYMediator mediator = mw.getMediator();
-                    	mediator.getUI().removeProof(mediator.getSelectedProof());
+                    	mediator.getUI().removeProof(smtProof);
                     }
                     
             }

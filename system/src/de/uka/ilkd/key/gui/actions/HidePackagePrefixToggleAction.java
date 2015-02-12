@@ -18,8 +18,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 public final class HidePackagePrefixToggleAction extends MainWindowAction {
 
@@ -30,7 +30,7 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
 	setName("Hide Package Prefix");
 	setTooltip("If ticked, class names are written without package prefixes.");
 	final boolean hidePackage = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().hidePackagePrefix();
-	NotationInfo.HIDE_PACKAGE_PREFIX = hidePackage;
+	NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX = hidePackage;
 	setSelected(hidePackage);
     }
 
@@ -38,7 +38,7 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         boolean selected = ((JCheckBoxMenuItem) e.getSource()).isSelected();
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHidePackagePrefix(selected);
-	NotationInfo.HIDE_PACKAGE_PREFIX = selected;
+	NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX = selected;
 	mainWindow.makePrettyView();
     }
 

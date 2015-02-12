@@ -15,6 +15,7 @@ package org.key_project.key4eclipse.common.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.key_project.key4eclipse.common.ui.util.EclipseEditFileActionHandler;
+import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -50,6 +51,7 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
+	   KeYImages.disposeImages();
 		plugin = null;
 		super.stop(context);
 	}

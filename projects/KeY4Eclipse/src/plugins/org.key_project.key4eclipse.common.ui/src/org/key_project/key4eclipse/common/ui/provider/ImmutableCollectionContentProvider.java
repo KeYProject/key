@@ -54,15 +54,15 @@ public class ImmutableCollectionContentProvider extends ArrayContentProvider {
     public Object[] getElements(Object inputElement) {
         if (inputElement instanceof ImmutableArray) {
             ImmutableArray<?> immutable = (ImmutableArray<?>)inputElement;
-            return immutable.toArray(new Object[0]);
+            return immutable.toArray(new Object[immutable.size()]);
         }
         else if (inputElement instanceof ImmutableList) {
             ImmutableList<?> set = (ImmutableList<?>)inputElement;
-            return set.toArray(new Object[0]);
+            return set.toArray(new Object[set.size()]);
         }
         else if (inputElement instanceof ImmutableSet) {
             ImmutableSet<?> set = (ImmutableSet<?>)inputElement;
-            return set.toArray(new Object[0]);
+            return set.toArray(new Object[set.size()]);
         }
         else {
             return super.getElements(inputElement);

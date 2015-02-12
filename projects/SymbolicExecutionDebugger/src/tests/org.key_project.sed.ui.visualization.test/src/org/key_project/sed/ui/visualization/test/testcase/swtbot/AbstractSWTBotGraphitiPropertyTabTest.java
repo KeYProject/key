@@ -22,6 +22,7 @@ import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IPageLayout;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
@@ -113,6 +114,9 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
          // Select diagram
          editor.select(editor.rootEditPart());
          steps.assertDiagram(editor, propertiesView, tabs);
+         // Selet method call
+         editor.select("self_0.doSomething(_asdf,_a,_b);");
+         steps.assertMethodCall(editor, propertiesView, tabs);
       }
       finally {
          editor.close();
@@ -150,5 +154,14 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
        * @throws Exception Occurred Exception.
        */
       public void assertDiagram(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
+
+      /**
+       * Do some assertions on a {@link ISEDMethodCall}.
+       * @param editor The editor.
+       * @param propertiesView The properties view.
+       * @param tabs The properties tabs.
+       * @throws Exception Occurred Exception.
+       */
+      public void assertMethodCall(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
    }
 }

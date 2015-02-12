@@ -35,6 +35,11 @@ public class KeYSEDPreferencesInitializer extends AbstractPreferenceInitializer 
       KeYSEDPreferences.setDefaultShowVariablesOfSelectedDebugNode(true);
       KeYSEDPreferences.setDefaultShowKeYMainWindow(false);
       KeYSEDPreferences.setDefaultMergeBranchConditions(false);
+      KeYSEDPreferences.setDefaultUseUnicode(false);
       KeYSEDPreferences.setDefaultUsePrettyPrinting(true);
+      KeYSEDPreferences.setDefaultShowSignatureOnMethodReturnNodes(false);
+      KeYSEDPreferences.setDefaultVariablesAreOnlyComputedFromUpdates(false);
+      KeYSEDPreferences.setDefaultTruthValueEvaluationEnabled(false);
+      KeYSEDPreferences.setDefaultHighlightReachedSourceCode(true);
    }
 }

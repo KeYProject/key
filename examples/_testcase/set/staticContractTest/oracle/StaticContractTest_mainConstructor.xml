@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="StaticContractTest.mainConstructor();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call StaticContractTest.mainConstructor()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="IntWrapper w = new IntWrapper (42);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="self = new IntWrapper(42) catch(exc_0)
 pre: true
 post: self.value = 42 &amp; self.&lt;inv&gt; &amp; exc_0 = null
 mod: allLocs
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" exceptionTerm="exc_0" selfTerm="self" contractParameters="Z(2(4(#)))" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return w.value;" pathCondition="true" pathConditionChanged="false">
-               <methodReturn name="&lt;return of StaticContractTest.mainConstructor();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of StaticContractTest.mainConstructor();&gt;" isReturnValueComputed="true">
+               <methodReturn name="&lt;return of mainConstructor&gt;" signature="&lt;return of StaticContractTest.mainConstructor()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of mainConstructor&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of StaticContractTest.mainConstructor()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                   <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                   </methodReturnValue>
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -17,5 +17,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
             </statement>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
 </start>

@@ -15,26 +15,34 @@ package de.uka.ilkd.key.ui;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor {
+public interface UserInterface
+    extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor, ProofEnvironmentListener {
 
     /**
      * these methods are called immediately before automode is started to ensure that
@@ -55,7 +63,7 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
 
     /**
      * called to complete and apply a taclet instantiations
-     * @param models the  partial models with all different possible instantiations found automatically
+     * @param models the partial models with all different possible instantiations found automatically
      * @param goal the Goal where to apply
      */
     void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal);
@@ -81,6 +89,22 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @param bootClassPath the boot class path to use. 
      */
     void loadProblem(File file, List<File> classPath, File bootClassPath);
+    
+    void setSaveOnly(boolean s);
+
+    boolean isSaveOnly();
+
+    void setMacro(ProofMacro macro);
+
+    ProofMacro getMacro();
+
+    boolean macroChosen();
+
+    public ProverTaskListener getListener();
+
+    boolean applyMacro();
+
+    public void saveAll(InitConfig initConfig, File file) throws ProofInputException;
 
     /** 
      * called to open the build in examples 
@@ -108,7 +132,7 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * uses KeY.
      * </p>
      * @param profile The {@link Profile} to use.
-     * @return The instantiated {@link ProblemInitializer}.
+    * @return The instantiated {@link ProblemInitializer}.
      */
     ProblemInitializer createProblemInitializer(Profile profile);
     
@@ -119,16 +143,23 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
     KeYMediator getMediator();
     
     /**
-     * Opens a java file in this {@link UserInterface} and returns the instantiated {@link DefaultProblemLoader}
+     * <p>
+     * Opens a java file in this {@link UserInterface} and returns the instantiated {@link AbstractProblemLoader}
      * which can be used to instantiated proofs programmatically.
+     * </p>
+     * <p>
+     * <b>The loading is performed in the {@link Thread} of the caller!</b>
+     * </p>
      * @param profile An optional {@link Profile} to use. If it is {@code null} the default profile {@link KeYMediator#getDefaultProfile()} is used.
      * @param file The java file to open.
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
-     * @return The opened {@link DefaultProblemLoader}.
+     * @param poPropertiesToForce Some optional {@link Properties} for the PO which extend or overwrite saved PO {@link Properties}.
+     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
+     * @return The opened {@link AbstractProblemLoader}.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    DefaultProblemLoader load(Profile profile, File file, List<File> classPaths, File bootClassPath) throws ProblemLoaderException;
+    AbstractProblemLoader load(Profile profile, File file, List<File> classPaths, File bootClassPath, Properties poPropertiesToForce, boolean forceNewProfileOfNewProofs) throws ProblemLoaderException;
     
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterface} for the given
@@ -184,4 +215,31 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @param proof The {@link Proof} to remove.
      */
     void removeProof(Proof proof);
+
+    /**
+     * save proof in file. If autoSave is on, this will potentially overwrite already
+     * existing proof files with the same name. Otherwise the save dialog pops up.
+     * For loaded proofs both are turned off by default, i.e. only manual saving is
+     * possible, and the save dialog never pops up automatically (except for hitting
+     * the "Save ..." or "Save current proof" button).
+     */
+    File saveProof(Proof proof, String fileExtension);
+    
+    /**
+     * This method is called if no {@link LoadedPOContainer} was created
+     * via {@link #createProofObligationContainer()} and can be overwritten
+     * for instance to open the proof management dialog as done by {@link ProblemLoader}.
+     * @return true if the proof obligation was selected, and false if action was aborted
+     */
+     boolean selectProofObligation(InitConfig initConfig);
+
+    /**
+     * registers the proof aggregate at the UI
+     * 
+     * @param proofOblInput the {@link ProofOblInput}
+     * @param proofList the {@link ProofAggregate} 
+     * @param initConfig the {@link InitConfig} to be used
+     * @return the new {@link ProofEnvironment} where the {@link ProofAggregate} has been registered
+     */
+     ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, ProofAggregate proofList, InitConfig initConfig);
 }

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Set;
@@ -20,6 +21,8 @@ import java.util.WeakHashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -105,8 +108,8 @@ public class LexPathOrdering implements TermOrdering {
         if ( oneSubGeq ( p_a, p_b ) ) return GREATER;
         if ( oneSubGeq ( p_b, p_a ) ) return LESS;
         
-        final int opComp = compare ( p_a.op (), p_a.sort (),
-                                     p_b.op (), p_b.sort () );
+        final int opComp = compare ( p_a.op (), p_a.sort (), p_a.getLabels (),
+                                     p_b.op (), p_b.sort (), p_b.getLabels () );
         if ( opComp == 0 ) {
             final CompRes lexComp = compareSubsLex ( p_a, p_b );
             if ( lexComp.eq () ) {
@@ -167,7 +170,12 @@ public class LexPathOrdering implements TermOrdering {
      * @return a number negative, zero or a number positive if <code>p_a</code>
      *         is less than, equal, or greater than <code>p_b</code>
      */
-    private int compare (Operator aOp, Sort aSort, Operator bOp, Sort bSort) {
+    private int compare (Operator aOp,
+                         Sort aSort,
+                         ImmutableArray<TermLabel> aLabels,
+                         Operator bOp,
+                         Sort bSort,
+                         ImmutableArray<TermLabel> bLabels) {
         if ( aOp == bOp ) return 0;
 
         // Search for literals
@@ -188,21 +196,27 @@ public class LexPathOrdering implements TermOrdering {
         v = functionWeighter.compareWeights ( aOp, bOp );
         if ( v != 0 ) return v;
 
-	    // smaller arity is smaller
-	    v = aOp.arity () - bOp.arity ();
-	    if ( v != 0 ) return v;
+        // smaller arity is smaller
+        v = aOp.arity () - bOp.arity ();
+        if ( v != 0 ) return v;
 
-	    // use the names of the symbols
-	    v = aOp.name ().compareTo ( bOp.name () );
-	    if ( v != 0 ) return v;
+        // compare anonHeap labels: if only one term has an anonHeap label,
+        // then this is smaller
+        v = (aLabels.contains(ParameterlessTermLabel.ANON_HEAP_LABEL) ? -1 : 0);
+        v += (bLabels.contains(ParameterlessTermLabel.ANON_HEAP_LABEL) ? 1 : 0);
+        if ( v != 0 ) return v;
 
-	    // HACK: compare the hash values of the two symbols
-	    //return sign ( bOp.hashCode () - aOp.hashCode () );
-	    // The two functions have the same name, consider them
-	    // equal for the sake of this comparison.
-	    // Otherwise the proof is indeterministic as the hash
-	    // codes may change from run to run. (MU)
-	    return 0;
+        // use the names of the symbols
+        v = aOp.name ().compareTo ( bOp.name () );
+        if ( v != 0 ) return v;
+
+        // HACK: compare the hash values of the two symbols
+        //return sign ( bOp.hashCode () - aOp.hashCode () );
+        // The two functions have the same name, consider them
+        // equal for the sake of this comparison.
+        // Otherwise the proof is indeterministic as the hash
+        // codes may change from run to run. (MU)
+        return 0;
     }
 
     
@@ -307,8 +321,6 @@ public class LexPathOrdering implements TermOrdering {
             theoryFunctionNames.add("clEmpty");
             theoryFunctionNames.add("clCons");
             theoryFunctionNames.add("C");
-        
-            theoryFunctionNames.add("empty");
         }
 
 
@@ -350,6 +362,12 @@ public class LexPathOrdering implements TermOrdering {
             
             if ( opStr.equals ( "empty" ) ) return Integer.valueOf ( 0 );
 
+            
+            if ( opStr.equals ("intersect")) return Integer.valueOf ( 6 );
+            if ( opStr.equals ("union")) return Integer.valueOf ( 7 );
+            if ( opStr.equals ("infiniteUnion")) return Integer.valueOf ( 8 );            
+            if ( opStr.equals ("setMinus")) return Integer.valueOf ( 9 );
+            
             return null;
         }
     }

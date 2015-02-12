@@ -17,19 +17,17 @@ package de.uka.ilkd.key.collection;
 
 /** thrown if a duplicate is being added via addUnique() */
 public class NotUniqueException extends Exception {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 6565515240836947955L;
 
+    private static final long serialVersionUID = 6565515240836947955L;
     Object offender;
 
     public NotUniqueException(Object o) {
-	offender = o;
+        offender = o;
     }
 
+    @Override
     public String toString() {
-	return "Tried to add a duplicate object to set. Offender is \n"+
-	offender+"\nof class "+offender.getClass();
+        return "Tried to add a duplicate object to set. Offender is \n"+
+                        offender+"\nof class "+offender.getClass();
     }
 }

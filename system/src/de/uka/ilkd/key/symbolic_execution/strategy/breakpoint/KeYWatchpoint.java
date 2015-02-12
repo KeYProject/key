@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
-import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.SourceElement;
@@ -29,7 +28,9 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -106,8 +107,10 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint{
             Term termForSideProof = replacer.replace(negatedCondition);
             //start side proof
             Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
-            Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
+            final ProofEnvironment sideProofEnv = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), false); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
+            Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, pio, toProof);
             info = SideProofUtil.startSideProof(proof, 
+                                                sideProofEnv,
                                                 sequent, 
                                                 StrategyProperties.METHOD_CONTRACT,
                                                 StrategyProperties.LOOP_INVARIANT,

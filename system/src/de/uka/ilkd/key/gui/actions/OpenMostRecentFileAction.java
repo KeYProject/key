@@ -18,6 +18,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 
 import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 
 /**
@@ -33,7 +34,7 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
 
     public OpenMostRecentFileAction(MainWindow mainWindow) {
 	super(mainWindow);
-        setName("Reload ");
+        setName("Reload");
         setIcon(IconFactory.openMostRecent(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Reload last opened file.");
         setAcceleratorLetter(KeyEvent.VK_R);
@@ -44,7 +45,11 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
         	mainWindow.getRecentFiles().getMostRecent() != null) {
             final String recentFile = mainWindow.getRecentFiles().getMostRecent().getAbsolutePath();
             if (recentFile != null) {
-                mainWindow.loadProblem(new File(recentFile));
+                File file = new File(recentFile);
+                KeYFileChooser fileChooser =
+                        KeYFileChooser.getFileChooser("Select file to load proof or problem");
+                fileChooser.selectFile(file);
+                mainWindow.loadProblem(file);
             }
         }
     }

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<project name="ProjectInfoManagementTest_testPackagesAndTypes">
+   <package name="(default package)" path="/ProjectInfoManagementTest_testPackagesAndTypes/src">
+      <type name="M" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/M.java">
+         <method displayName="M()" name="M" declaringType="M" declaringFilePath="/ProjectInfoManagementTest_testPackagesAndTypes/src/M.java" parameterTypes="">
+         </method>
+      </type>
+   </package>
+   <package name="hello.world" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world">
+      <type name="A" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world/A.java">
+         <method displayName="A()" name="A" declaringType="hello.world.A" declaringFilePath="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world/A.java" parameterTypes="">
+         </method>
+      </type>
+      <type name="M" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world/M.java">
+         <method displayName="M()" name="M" declaringType="hello.world.M" declaringFilePath="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world/M.java" parameterTypes="">
+         </method>
+      </type>
+      <type name="Z" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world/Z.java">
+         <method displayName="Z()" name="Z" declaringType="hello.world.Z" declaringFilePath="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world/Z.java" parameterTypes="">
+         </method>
+      </type>
+   </package>
+   <package name="sometingNew" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/sometingNew">
+      <type name="A" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/sometingNew/A.java">
+         <method displayName="A()" name="A" declaringType="sometingNew.A" declaringFilePath="/ProjectInfoManagementTest_testPackagesAndTypes/src/sometingNew/A.java" parameterTypes="">
+         </method>
+      </type>
+      <type name="ClassInHello" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/sometingNew/ClassInHello.java">
+         <method displayName="ClassInHello()" name="ClassInHello" declaringType="sometingNew.ClassInHello" declaringFilePath="/ProjectInfoManagementTest_testPackagesAndTypes/src/sometingNew/ClassInHello.java" parameterTypes="">
+         </method>
+      </type>
+      <type name="Z" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/sometingNew/Z.java">
+         <method displayName="Z()" name="Z" declaringType="sometingNew.Z" declaringFilePath="/ProjectInfoManagementTest_testPackagesAndTypes/src/sometingNew/Z.java" parameterTypes="">
+         </method>
+      </type>
+   </package>
+</project>

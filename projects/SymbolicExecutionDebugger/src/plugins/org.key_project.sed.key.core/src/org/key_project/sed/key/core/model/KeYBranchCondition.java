@@ -16,14 +16,18 @@ package org.key_project.sed.key.core.model;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISourcePathProvider;
 import org.key_project.sed.core.model.impl.AbstractSEDBranchCondition;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Implementation of {@link ISEDBranchCondition} for the symbolic execution debugger (SED)
@@ -47,22 +51,46 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
    private IKeYSEDDebugNode<?>[] callStack;
    
    /**
+    * The constraints
+    */
+   private KeYConstraint[] constraints;
+   
+   /**
+    * The contained KeY variables.
+    */
+   private KeYVariable[] variables;
+   
+   /**
+    * The conditions under which a group ending in this node starts.
+    */
+   private SEDMemoryBranchCondition[] groupStartConditions;
+   
+   /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param parent The parent in that this node is contained as child.
-    * @param thread The {@link ISEDThread} in that this node is contained.
+    * @param thread The {@link KeYThread} in that this node is contained.
     * @param executionNode The {@link IExecutionBranchCondition} to represent by this debug node.
     */
    public KeYBranchCondition(KeYDebugTarget target, 
                              IKeYSEDDebugNode<?> parent, 
-                             ISEDThread thread, 
+                             KeYThread thread, 
                              IExecutionBranchCondition executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      target.registerDebugNode(this);
       initializeAnnotations();
    }
-   
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYThread getThread() {
+      return (KeYThread)super.getThread();
+   }
+
    /**
     * {@inheritDoc}
     */
@@ -85,7 +113,7 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
    @Override
    public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
-         IExecutionNode[] executionChildren = executionNode.getChildren();
+         IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
             children = KeYModelUtil.createChildren(this, executionChildren);
          }
@@ -152,5 +180,131 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
          }
          return callStack;
       }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasConstraints() throws DebugException {
+      return !isTerminated() && super.hasConstraints();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYConstraint[] getConstraints() throws DebugException {
+      synchronized (this) {
+         if (constraints == null) {
+            constraints = KeYModelUtil.createConstraints(this, executionNode);
+         }
+         return constraints;
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasVariables() throws DebugException {
+      try {
+         return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                !executionNode.isDisposed() && 
+                SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
+                super.hasVariables();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYVariable[] getVariables() throws DebugException {
+      synchronized (this) {
+         if (variables == null) {
+            variables = KeYModelUtil.createVariables(this, executionNode);
+         }
+         return variables;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getLineNumber() throws DebugException {
+      return -1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharStart() throws DebugException {
+      return -1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharEnd() throws DebugException {
+      return -1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getSourcePath() {
+      try {
+         // Return source path of the parent which is not a branch condition.
+         ISEDDebugNode parent = getParent();
+         while (parent != null && parent instanceof ISEDBranchCondition) {
+            parent = parent.getParent();
+         }
+         if (parent instanceof ISourcePathProvider) {
+            return ((ISourcePathProvider) parent).getSourcePath();
+         }
+         else {
+            return null;
+         }
+      }
+      catch (DebugException e) {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         if (groupStartConditions == null) {
+            groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
+         }
+         return groupStartConditions;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setParent(ISEDDebugNode parent) {
+      super.setParent(parent);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isTruthValueEvaluationEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
    }
 }

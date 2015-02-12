@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.InitConfig;
 
 /**
  * Tests for {@link NodePreorderIterator}.
@@ -32,7 +33,7 @@ public class TestNodePreorderIterator extends TestCase {
     */
    public void testNodesThreeLevel() {
       // Create tree to test
-      Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
+      Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);
       Node l1 = appendNode(proof, root);
       Node l11 = appendNode(proof, l1);
@@ -62,7 +63,7 @@ public class TestNodePreorderIterator extends TestCase {
     */
    public void testNodesTwoLevel() {
       // Create tree to test
-      Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
+      Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);
       Node l1 = appendNode(proof, root);
       appendNode(proof, l1);
@@ -87,7 +88,7 @@ public class TestNodePreorderIterator extends TestCase {
     */
    public void testNodesOneLevel() {
       // Create tree to test
-      Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
+      Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);
       appendNode(proof, root);
       appendNode(proof, root);
@@ -103,7 +104,7 @@ public class TestNodePreorderIterator extends TestCase {
     */
    public void testEmptyRoot() {
       // Create tree to test
-      Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
+      Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);
       // Test tree
       assertRoot(root, createExpectedNodes(0));

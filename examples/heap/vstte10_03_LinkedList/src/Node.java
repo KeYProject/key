@@ -12,15 +12,15 @@ class Node {
       @                                    && \subset(next.repr, repr)
       @                                    && \disjoint(this.*, next.repr)
       @                                    && seq[1..seq.length] == next.seq
-      @                                    && next.\inv;
+      @                                    && \invariant_for(next);
       @*/
        
     //@ accessible \inv: repr \measured_by seq.length;
 
 
     /*@ public normal_behaviour
-      @   requires tail == null || tail.\inv;
-      @   ensures \result != null && \result.\inv;
+      @   requires tail == null || \invariant_for(tail);
+      @   ensures \invariant_for(\result);
       @   ensures tail == null ==> \result.seq == \seq_singleton(x);
       @   ensures tail != null ==> \result.seq == \seq_concat(\seq_singleton(x), tail.seq);
       @*/
@@ -47,7 +47,7 @@ class Node {
 	  @                && (jj == null && i == seq.length
 	  @                    || jj != null && jj.\inv && jj.seq == seq[i..seq.length])
 	  @                && (\forall int x; 0 <= x && x < i; seq[x] != 0);
-	  @ assignable \nothing;
+	  @ assignable \strictly_nothing;
 	  @ decreases seq.length - i;
 	  @*/
 	while(jj != null && jj.head != 0) {

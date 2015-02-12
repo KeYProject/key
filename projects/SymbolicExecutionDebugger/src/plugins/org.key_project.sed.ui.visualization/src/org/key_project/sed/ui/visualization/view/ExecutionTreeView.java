@@ -19,8 +19,15 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.internal.ui.viewers.model.TreeModelContentProvider;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdate;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdateListener;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.emf.common.util.URI;
@@ -53,8 +60,9 @@ import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTre
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
-import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
+import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 
@@ -63,6 +71,7 @@ import org.key_project.util.java.ObjectUtil;
  * graphically as Graphiti diagram.
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<ExecutionTreeDiagramEditor, ReadonlyDiagramEditorActionBarContributor> {
    /**
     * The ID of this view.
@@ -102,7 +111,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
    /**
     * Listens for selection changes on {@link #getEditorPart()}.
     */
-   private ISelectionChangedListener editorSelectionListener = new ISelectionChangedListener() {
+   private final ISelectionChangedListener editorSelectionListener = new ISelectionChangedListener() {
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
          handleEditorSelectionChanged(event);
@@ -112,7 +121,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
    /**
     * Listens for selection changes on {@link #getDebugView()}.
     */
-   private ISelectionChangedListener debugViewSelectionListener = new ISelectionChangedListener() {
+   private final ISelectionChangedListener debugViewSelectionListener = new ISelectionChangedListener() {
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
          handleDebugViewSelectionChanged(event);
@@ -120,10 +129,54 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
    };
    
    /**
+    * Listens for changes on the {@link TreeModelContentProvider} of {@link #getDebugView()}.
+    */
+   private final IViewerUpdateListener contentProviderListener = new IViewerUpdateListener() {
+      @Override
+      public void viewerUpdatesComplete() {
+         handleViewerUpdatesComplete();
+      }
+      
+      @Override
+      public void viewerUpdatesBegin() {
+         handleViewerUpdatesBegin();
+      }
+      
+      @Override
+      public void updateStarted(IViewerUpdate update) {
+      }
+      
+      @Override
+      public void updateComplete(IViewerUpdate update) {
+      }
+   };
+   
+   /**
+    * Listens for {@link Job} changes.
+    */
+   private final IJobChangeListener jobChangeListener = new JobChangeAdapter() {
+      @Override
+      public void done(IJobChangeEvent event) {
+         handleJobDone(event);
+      }
+   };
+   
+   /**
+    * Indicates that currently an update is in progress on the content provider of {@link #getDebugView()}.
+    */
+   private boolean viewerUpdateInProgress = false;
+   
+   /**
+    * The last unhandled {@link SelectionChangedEvent} because an update on the content provider of {@link #getDebugView()} was in progress or a {@link Job} was running.
+    */
+   private SelectionChangedEvent eventToHandle;
+   
+   /**
     * Constructor.
     */
    public ExecutionTreeView() {
       setMessage(MESSAGE_DEBUG_VIEW_NOT_OPENED);
+      Job.getJobManager().addJobChangeListener(jobChangeListener);
    }
 
    /**
@@ -163,8 +216,13 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
       editorPart.setGridVisible(false);
       ZoomManager zoomManager = (ZoomManager)editorPart.getAdapter(ZoomManager.class);
       contributor.setZoomManager(zoomManager);
-      if (getDebugView() != null) {
-         updateDiagram(getDebugView().getViewer().getSelection());
+      IDebugView debugView = getDebugView();
+      if (debugView != null) {
+         updateDiagram(debugView.getViewer().getSelection());
+         TreeModelContentProvider cp = SEDUIUtil.getContentProvider(debugView);
+         if (cp != null) {
+            cp.addViewerUpdateListener(contentProviderListener);
+         }
       }
    }
    
@@ -185,14 +243,75 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
    }
 
    /**
+    * When an update on the content provider of {@link #getDebugView()} has started.
+    */
+   protected synchronized void handleViewerUpdatesBegin() {
+      viewerUpdateInProgress = true;
+   }
+
+   /**
+    * When an update on the content provider of {@link #getDebugView()} has finished.
+    */
+   protected synchronized void handleViewerUpdatesComplete() {
+      viewerUpdateInProgress = false;
+      handleEventToHandleNow();
+   }
+
+   /**
+    * When a {@link Job} terminates.
+    * @param event The event.
+    */
+   protected void handleJobDone(IJobChangeEvent event) {
+      handleEventToHandleNow();
+   }
+   
+   /**
+    * Tries to handle an unhandled event now.
+    */
+   protected synchronized void handleEventToHandleNow() {
+      if (eventToHandle != null && !viewerUpdateInProgress && !isJobInProgress()) {
+         final SelectionChangedEvent toHandleNow = eventToHandle;
+         eventToHandle = null;
+         getSite().getShell().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               handleDebugViewSelectionChanged(toHandleNow);
+            }
+         });
+      }
+   }
+
+   /**
     * When the selection on {@link #getDebugView()} has changed.
     * @param event The event.
     */
    protected void handleDebugViewSelectionChanged(SelectionChangedEvent event) {
-      // Make sure that event was provided by debug's viewer and not by something else what can happen if a maximized view is minimized.
-      if (ObjectUtil.equals(event.getSource(), getDebugView().getViewer())) {
-         // Update diagram
-         updateDiagram(event.getSelection());
+      if (viewerUpdateInProgress || isJobInProgress()) {
+         eventToHandle = event;
+      }
+      else {
+         if (event != null) {
+            // Make sure that event was provided by debug's viewer and not by something else what can happen if a maximized view is minimized.
+            if (ObjectUtil.equals(event.getSource(), getDebugView().getViewer())) {
+               // Update diagram
+               updateDiagram(event.getSelection());
+            }
+         }
+      }
+   }
+   
+   /**
+    * Checks if a {@link Job} is in progress.
+    * @return {@code true} {@link Job} is in progress, {@code false} no {@link Job} is in progress.
+    */
+   protected boolean isJobInProgress() {
+      Job[] diagramJobs = AbstractDependingOnObjectsJob.getJobs(getEditorPart());
+      if (ArrayUtil.isEmpty(diagramJobs)) {
+         Job[] debugJobs = AbstractDependingOnObjectsJob.getJobs(getDebugView());
+         return !ArrayUtil.isEmpty(debugJobs);
+      }
+      else {
+         return true;
       }
    }
    
@@ -201,29 +320,31 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     * @param event The event.
     */
    protected void handleEditorSelectionChanged(final SelectionChangedEvent event) {
-      // Check if the selection changed was caused programmatically during synchronization or by the user.
-      if (internalSelectionUpdate) {
-         // Unset the internal flag to make sure that further selection changes
-         // in the diagram are synchronized with the debug view.
-         internalSelectionUpdate = false;
-      }
-      else {
-         // List all selected business objects
-         Object[] elements = SWTUtil.toArray(event.getSelection());
-         final List<Object> businessObjects = new LinkedList<Object>();
-         for (Object element : elements) {
-            // Optional convert GMF instance to Graphiti instance
-            if (element instanceof EditPart) {
-               element = ((EditPart)element).getModel();
-            }
-            // Optional convert Graphiti instance to model (ISEDDebugElement)
-            if (element instanceof PictogramElement) {
-               element = getEditorPart().getDiagramTypeProvider().getFeatureProvider().getBusinessObjectForPictogramElement((PictogramElement)element);
-            }
-            businessObjects.add(element);
+      if (!viewerUpdateInProgress && !isJobInProgress()) {
+         // Check if the selection changed was caused programmatically during synchronization or by the user.
+         if (internalSelectionUpdate) {
+            // Unset the internal flag to make sure that further selection changes
+            // in the diagram are synchronized with the debug view.
+            internalSelectionUpdate = false;
          }
-         // Select in debug viewer
-         SEDUIUtil.selectInDebugView(getEditorPart(), getDebugView(), businessObjects);
+         else {
+            // List all selected business objects
+            Object[] elements = SWTUtil.toArray(event.getSelection());
+            final List<Object> businessObjects = new LinkedList<Object>();
+            for (Object element : elements) {
+               // Optional convert GMF instance to Graphiti instance
+               if (element instanceof EditPart) {
+                  element = ((EditPart)element).getModel();
+               }
+               // Optional convert Graphiti instance to model (ISEDDebugElement)
+               if (element instanceof PictogramElement) {
+                  element = getEditorPart().getDiagramTypeProvider().getFeatureProvider().getBusinessObjectForPictogramElement((PictogramElement)element);
+               }
+               businessObjects.add(element);
+            }
+            // Select in debug viewer
+            SEDUIUtil.selectInDebugView(getEditorPart(), getDebugView(), businessObjects);
+         }
       }
    }
    
@@ -264,7 +385,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                   internalSelectionUpdate = true;
                   editor.selectPictogramElements(new PictogramElement[0]); // If the unset is not executed multiple selection events are thrown during diagram recreation
                   internalSelectionUpdate = true;
-                  // Recrate diagram
+                  // Recreate diagram
                   final IDiagramTypeProvider typeProvider = editor.getDiagramTypeProvider();
                   Assert.isNotNull(typeProvider);
                   final IFeatureProvider featureProvider = typeProvider.getFeatureProvider();
@@ -284,7 +405,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                         setEditorEnabled(true);
                      }
                   });
-                  AbstractWorkbenchPartJob.cancelJobs(editor);
+                  AbstractDependingOnObjectsJob.cancelJobs(editor);
                   editor.executeFeatureInJob("Changing Symbolic Execution Tree", feature, context);
                   // Unset message
                   setMessage(null);
@@ -325,10 +446,18 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
       // Cleanup old view
       if (oldDebugView != null) {
          oldDebugView.getSite().getSelectionProvider().removeSelectionChangedListener(debugViewSelectionListener);
+         TreeModelContentProvider cp = SEDUIUtil.getContentProvider(oldDebugView);
+         if (cp != null) {
+            cp.removeViewerUpdateListener(contentProviderListener);
+         }
       }
       // Handle new view
       if (newDebugView != null) {
          newDebugView.getSite().getSelectionProvider().addSelectionChangedListener(debugViewSelectionListener);
+         TreeModelContentProvider cp = SEDUIUtil.getContentProvider(newDebugView);
+         if (cp != null) {
+            cp.addViewerUpdateListener(contentProviderListener);
+         }
          setMessage(MESSAGE_NO_DEBUG_TARGET_SELECTED);
          updateDiagram(getDebugView().getSite().getSelectionProvider().getSelection());
       }
@@ -342,10 +471,15 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     */
    @Override
    public void dispose() {
+      Job.getJobManager().removeJobChangeListener(jobChangeListener);
       getEditorPart().getSite().getSelectionProvider().removeSelectionChangedListener(editorSelectionListener);
       IDebugView debugView = getDebugView();
       if (debugView != null) {
          debugView.getSite().getSelectionProvider().removeSelectionChangedListener(debugViewSelectionListener);
+         TreeModelContentProvider cp = SEDUIUtil.getContentProvider(debugView);
+         if (cp != null) {
+            cp.removeViewerUpdateListener(contentProviderListener);
+         }
       }
       super.dispose();
    }

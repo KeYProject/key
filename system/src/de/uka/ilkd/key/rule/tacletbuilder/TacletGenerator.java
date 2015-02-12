@@ -394,8 +394,7 @@ public class TacletGenerator {
             functionalRepresentsAddSatisfiabilityBranch(target, services, heapSVs,
                     selfSV, paramSVs, schemaRepresents, tacletBuilder);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
-        result = result.add(tacletBuilder.getTaclet());
-
+        result = result.add(tacletBuilder.getTaclet());        
         //return
         return result;
     }
@@ -704,7 +703,6 @@ public class TacletGenerator {
         TermBuilder TB = services.getTermBuilder();
         ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
         Map<Term, Term> replace = new LinkedHashMap<Term, Term>();
-        Term update = null;
         int i = 0;
         for(ProgramVariable heap : HeapContext.getModHeaps(services, false)) {
                 replace.put(TB.var(heap), TB.var(heapSVs.get(i++)));
@@ -775,6 +773,7 @@ public class TacletGenerator {
     }
 
 
+    @SuppressWarnings("unused")
     private TermAndBoundVarPair createSchemaTerm(Term term,
                                                  TermServices services, Pair<ProgramVariable, SchemaVariable>... varPairs) {
         ImmutableList<ProgramVariable> progVars =

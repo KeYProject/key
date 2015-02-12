@@ -19,8 +19,8 @@ import java.awt.event.KeyEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
+import de.uka.ilkd.key.settings.ProofSettings;
 
 public class TacletOptionsAction extends MainWindowAction {
 
@@ -31,7 +31,7 @@ public class TacletOptionsAction extends MainWindowAction {
 
     public TacletOptionsAction(MainWindow mainWindow) {
 	super(mainWindow);
-	setName("Taclet Options...");
+	setName("Taclet Options");
         setIcon(IconFactory.configure(16));
 	setAcceleratorLetter(KeyEvent.VK_T);
 	

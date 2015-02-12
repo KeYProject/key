@@ -53,6 +53,11 @@ public class SWTBotGraphitiAnnotationLinksTabTest extends AbstractSWTBotGraphiti
          public void assertDiagram(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertFalse(tabs.selectTabItem("Annotation Links"));
          }
+
+         @Override
+         public void assertMethodCall(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.selectTabItem("Annotation Links"));
+         }
       });
    }
 }

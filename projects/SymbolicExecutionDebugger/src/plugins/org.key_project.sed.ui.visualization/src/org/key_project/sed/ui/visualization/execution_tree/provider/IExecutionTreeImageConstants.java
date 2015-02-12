@@ -15,6 +15,7 @@ package org.key_project.sed.ui.visualization.execution_tree.provider;
 
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchStatement;
+import org.key_project.sed.core.model.ISEDExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
@@ -84,6 +85,11 @@ public interface IExecutionTreeImageConstants {
     * Key of the image for {@link ISEDMethodReturn}s.
     */
    public static final String IMG_METHOD_RETURN = PREFIX + "methodReturn";
+
+   /**
+    * Key of the image for {@link ISEDExceptionalMethodReturn}s.
+    */
+   public static final String IMG_EXCEPTIONAL_METHOD_RETURN = PREFIX + "exceptionalMethodReturn";
 
    /**
     * Key of the image for {@link ISEDStatement}s.

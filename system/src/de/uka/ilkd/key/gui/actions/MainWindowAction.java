@@ -15,11 +15,16 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.Toolkit;
 
 import javax.swing.*;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 
 public abstract class MainWindowAction extends AbstractAction {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = -6611537258325987383L;
 
     /**
      * This constant holds the typical key to be used for shortcuts (usually
@@ -35,7 +40,7 @@ public abstract class MainWindowAction extends AbstractAction {
         this.mainWindow = mainWindow;
         putValue(ACCELERATOR_KEY, KeyStrokeManager.get(this));
     }
-
+    
     protected KeYMediator getMediator() {
         return mainWindow.getMediator();
     }

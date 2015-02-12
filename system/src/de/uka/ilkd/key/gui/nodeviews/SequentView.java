@@ -20,7 +20,6 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.ADDITIONAL_HIGHLIGHT_COLOR;
 import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.pp.LogicPrinter;
 
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
@@ -45,6 +44,11 @@ import javax.swing.text.Highlighter;
  */
 public abstract class SequentView extends JTextArea {
     
+    /**
+     *
+     */
+    private static final long serialVersionUID = 5012937393965787981L;
+
     protected static final Color INACTIVE_BACKGROUND_COLOR
             = new Color(UIManager.getColor("Panel.background").getRGB());
 
@@ -76,7 +80,7 @@ public abstract class SequentView extends JTextArea {
 
     private final ConfigChangeListener configChangeListener;
     SequentPrintFilter filter;
-    private LogicPrinter printer;
+    private SequentViewLogicPrinter printer;
     public boolean refreshHighlightning = true;
 
     // the default tag of the highlight
@@ -239,7 +243,7 @@ public abstract class SequentView extends JTextArea {
      *
      * @return The LogicPrinter that is used.
      */
-    public LogicPrinter getLogicPrinter() {
+    public SequentViewLogicPrinter getLogicPrinter() {
         return printer;
     }
 
@@ -266,7 +270,7 @@ public abstract class SequentView extends JTextArea {
         return s;
     }
 
-    public String getHighlightedText() {
+    public String getHighlightedText() {       
         return getHighlightedText(getPosInSequent(getMousePosition()));
     }
 

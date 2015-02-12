@@ -23,4 +23,6 @@ Export-Package: org.key_project.sed.core.annotation,
  org.key_project.sed.core.model.memory,
  org.key_project.sed.core.model.serialization,
  org.key_project.sed.core.provider,
+ org.key_project.sed.core.sourcesummary,
+ org.key_project.sed.core.sourcesummary.impl,
  org.key_project.sed.core.util

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call BranchStatementBlockTest.recursiveMain()&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="return recursiveDecrease(3);" pathCondition="true" pathConditionChanged="false">
+         <methodCall name="&lt;call BranchStatementBlockTest.recursiveDecrease(x_2)&gt;" pathCondition="true" pathConditionChanged="false">
+            <branchStatement name="if (x_2&gt;0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+               <statement name="return recursiveDecrease(x_2-1);" pathCondition="true" pathConditionChanged="false">
+                  <methodCall name="&lt;call BranchStatementBlockTest.recursiveDecrease(x_6)&gt;" pathCondition="true" pathConditionChanged="false">
+                     <branchStatement name="if (x_6&gt;0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+                        <statement name="return recursiveDecrease(x_6-1);" pathCondition="true" pathConditionChanged="false">
+                           <methodCall name="&lt;call BranchStatementBlockTest.recursiveDecrease(x_10)&gt;" pathCondition="true" pathConditionChanged="false">
+                              <branchStatement name="if (x_10&gt;0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+                                 <statement name="return recursiveDecrease(x_10-1);" pathCondition="true" pathConditionChanged="false">
+                                    <methodCall name="&lt;call BranchStatementBlockTest.recursiveDecrease(x_14)&gt;" pathCondition="true" pathConditionChanged="false">
+                                       <branchStatement name="if (x_14&gt;0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+                                          <statement name="return x_14;" pathCondition="true" pathConditionChanged="false">
+                                             <methodReturn name="&lt;return of recursiveDecrease&gt;" signature="&lt;return of BranchStatementBlockTest.recursiveDecrease(x_14)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                <methodReturn name="&lt;return of recursiveDecrease&gt;" signature="&lt;return of BranchStatementBlockTest.recursiveDecrease(x_10)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                   <methodReturn name="&lt;return of recursiveDecrease&gt;" signature="&lt;return of BranchStatementBlockTest.recursiveDecrease(x_6)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                      <methodReturn name="&lt;return of recursiveDecrease&gt;" signature="&lt;return of BranchStatementBlockTest.recursiveDecrease(x_2)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                         <methodReturn name="&lt;return of recursiveMain&gt;" signature="&lt;return of BranchStatementBlockTest.recursiveMain()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                                            </termination>
+                                                         </methodReturn>
+                                                      </methodReturn>
+                                                      <completedBlockEntry path="/0/0/0/0" conditionString="true"/>
+                                                   </methodReturn>
+                                                   <completedBlockEntry path="/0/0/0/0/0/0/0" conditionString="true"/>
+                                                </methodReturn>
+                                                <completedBlockEntry path="/0/0/0/0/0/0/0/0/0/0" conditionString="true"/>
+                                             </methodReturn>
+                                             <completedBlockEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0" conditionString="true"/>
+                                          </statement>
+                                          <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                       </branchStatement>
+                                       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                    </methodCall>
+                                 </statement>
+                                 <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                              </branchStatement>
+                              <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                           </methodCall>
+                        </statement>
+                        <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                     </branchStatement>
+                     <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                  </methodCall>
+               </statement>
+               <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+            </branchStatement>
+            <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+         </methodCall>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+</start>

@@ -31,7 +31,7 @@ public interface Sort extends Named {
     /**
      * Updates are represented as "terms" of this sort.
      */
-    final Sort UPDATE = new SortImpl(new Name("Update"));       
+    final Sort UPDATE = new SortImpl(new Name("Update"));
 
     /**
      * Term labels are represented as "terms" of this sort.

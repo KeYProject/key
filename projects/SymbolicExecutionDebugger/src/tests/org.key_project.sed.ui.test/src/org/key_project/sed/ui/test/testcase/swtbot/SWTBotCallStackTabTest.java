@@ -18,6 +18,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
@@ -69,6 +70,12 @@ public class SWTBotCallStackTabTest extends AbstractSWTBotPropertyTabTest {
             item.doubleClick();
             TestSedCoreUtil.waitForDebugTreeInterface();
             assertEquals("foo(result)", debugTree.selection().get(0, 0));
+         }
+
+         @Override
+         public void assertMethodCall(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDMethodCall methodCall) throws Exception {
+            assertTrue(tabs.selectTabItem("Call Stack"));
+            assertEquals(0, propertiesView.bot().tree().getAllItems().length);
          }
       };
    }

@@ -23,12 +23,12 @@ import java.util.*;
 
 
 
-import de.uka.ilkd.key.gui.configuration.PathConfig;
-import de.uka.ilkd.key.gui.configuration.SettingsListener;
 
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.settings.SettingsListener;
 
 
 
@@ -97,7 +97,7 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
                              return taclets;
                      }
                      
-                     for(Taclet taclet : proof.env().getInitConfig().activatedTaclets()){
+                     for(Taclet taclet : proof.getInitConfig().activatedTaclets()){
                              if(pdSettings.supportedTaclets.contains(taclet.name().toString(),true)){
                                      taclets.add(taclet);
                              }

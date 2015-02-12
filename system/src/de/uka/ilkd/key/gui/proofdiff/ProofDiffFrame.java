@@ -69,7 +69,7 @@ public class ProofDiffFrame extends JFrame {
         public Action(MainWindow mainWindow) {
             super(mainWindow);
             this.mainWindow = mainWindow;
-            putValue(NAME, "Visual node diff ...");
+            putValue(NAME, "Visual node diff");
             // putValue(SMALL_ICON, ...);
             putValue(SHORT_DESCRIPTION, "Open a new proof node diff window.");
         }
@@ -355,6 +355,14 @@ public class ProofDiffFrame extends JFrame {
 
     // This must have been implemented already, somewhere
     private Node findNode(Node node, int number) {
+        if(node.serialNr() == number) {
+            return node;
+        }
+
+        while ((node.serialNr() != number) && (node.childrenCount() == 1)) {
+            node = node.child(0);
+        }
+
         if(node.serialNr() == number) {
             return node;
         }

@@ -17,10 +17,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.key4eclipse.resources.test.testcase.junit.AutoDeleteTests;
 import org.key_project.key4eclipse.resources.test.testcase.junit.BuilderTests;
-import org.key_project.key4eclipse.resources.test.testcase.junit.HideMetaFilesTests;
 import org.key_project.key4eclipse.resources.test.testcase.junit.KeYResourcesUtilTest;
 import org.key_project.key4eclipse.resources.test.testcase.junit.MarkerTests;
+import org.key_project.key4eclipse.resources.test.testcase.junit.ProjectInfoManagementTest;
 import org.key_project.key4eclipse.resources.test.testcase.junit.ProofMetaFileContentExceptionTests;
+import org.key_project.key4eclipse.resources.test.testcase.junit.ProofMetaFileWriterAndReaderTest;
 
 /**
  * Run all contained JUnit 4 test cases.
@@ -30,10 +31,11 @@ import org.key_project.key4eclipse.resources.test.testcase.junit.ProofMetaFileCo
 @Suite.SuiteClasses({
    AutoDeleteTests.class,
    BuilderTests.class,
-   HideMetaFilesTests.class,
    KeYResourcesUtilTest.class,
    MarkerTests.class,
-   ProofMetaFileContentExceptionTests.class
+   ProjectInfoManagementTest.class,
+   ProofMetaFileContentExceptionTests.class,
+   ProofMetaFileWriterAndReaderTest.class
 })
 public class AllResourcesTests {
 }

@@ -73,6 +73,9 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
                               Boolean.FALSE, 
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.TRUE,
+                              Boolean.FALSE,
                               8, 
                               new SideProofsViewTestExecutor(false, false, 0, -1, new int[][] {}));
          // Test with collecting side proofs
@@ -89,6 +92,9 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
                               Boolean.FALSE, 
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.TRUE,
+                              Boolean.FALSE,
                               8, 
                               new SideProofsViewTestExecutor(true, true, 4, 0, new int[][] {{1}, {0, 2}, {0}}));
          // Test without collecting side proofs again
@@ -104,6 +110,9 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
                               Boolean.FALSE, 
                               Boolean.FALSE, 
                               Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.TRUE,
                               Boolean.FALSE,
                               8, 
                               new SideProofsViewTestExecutor(true, false, 0, -1, new int[][] {}));
@@ -185,6 +194,8 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
        */      
       @Override
       public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+         // Make sure that no side proofs are available
+         assertEquals(0, SideProofStore.DEFAULT_INSTANCE.countEntries());
          // Finish symbolic execution
          SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
          resume(bot, item, target);
@@ -192,12 +203,12 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
          // Expand debug tree to initiate side proofs
          TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 0, 0, 2);
          TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 0, 1, 2);
-         TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 1, 0);
+         TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 1, 1);
          // Test collected side proofs
          SWTBotView view = bot.viewById(SideProofsView.VIEW_ID);
          view.setFocus();
          SWTBotTable table = view.bot().table();
-         assertSideProofs(view, table, expectedSideProofsCount);
+         assertMinSideProofs(view, table, expectedSideProofsCount);
          // Open proof
          if (openProofAtIndex >= 0) {
             table.select(openProofAtIndex);
@@ -213,11 +224,18 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
             table.select(toDelete);
             table.contextMenu("Delete").click();
             remaingRows -= toDelete.length;
-            assertSideProofs(view, table, remaingRows);
+            assertMinSideProofs(view, table, remaingRows);
             testProofDisposed(originalEntries);
          }
          // Ensure that deleted proofs are disposed
          testProofDisposed(originalEntries);
+         // Remove missing proofs
+         SideProofStore.DEFAULT_INSTANCE.clearProofs();
+         // Ensure that deleted proofs are disposed
+         assertExactSideProofs(view, table, 0);
+         testProofDisposed(originalEntries);
+         // Make sure that no side proofs are available
+         assertEquals(0, SideProofStore.DEFAULT_INSTANCE.countEntries());
       }
       
       /**
@@ -227,11 +245,28 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
        * @param table The {@link SWTBotTable} which shows the {@link Entry}s.
        * @param expectedSideProofsCount The expected number of side proofs.
        */
-      protected void assertSideProofs(SWTBotView view, SWTBotTable table, int expectedSideProofsCount) {
+      protected void assertExactSideProofs(SWTBotView view, SWTBotTable table, int expectedSideProofsCount) {
          view.bot().waitUntil(Conditions.tableHasRows(table, expectedSideProofsCount));
-         assertEquals(expectedSideProofsCount, table.rowCount());
          Entry[] entries = SideProofStore.DEFAULT_INSTANCE.getEntries();
          assertEquals(expectedSideProofsCount, entries.length);
+         for (int i = 0; i < entries.length; i++) {
+            Object data = TestUtilsUtil.getTableItemData(table.getTableItem(i));
+            assertTrue(data instanceof Entry);
+            assertSame(entries[i], data);
+         }
+      }
+      
+      /**
+       * Makes sure that the {@link Entry}s of {@link SideProofStore#DEFAULT_INSTANCE} 
+       * are shown in the given {@link SWTBotTable}.
+       * @param view The {@link SWTBotView} showing the {@link SideProofsView}.
+       * @param table The {@link SWTBotTable} which shows the {@link Entry}s.
+       * @param expectedSideProofsCount The expected number of side proofs.
+       */
+      protected void assertMinSideProofs(SWTBotView view, SWTBotTable table, int expectedSideProofsCount) {
+         TestUtilsUtil.waitUntilTableHasAtLeastRows(view.bot(), table, expectedSideProofsCount);
+         Entry[] entries = SideProofStore.DEFAULT_INSTANCE.getEntries();
+         assertTrue(entries.length >= expectedSideProofsCount);
          for (int i = 0; i < entries.length; i++) {
             Object data = TestUtilsUtil.getTableItemData(table.getTableItem(i));
             assertTrue(data instanceof Entry);
