@@ -237,6 +237,8 @@ public abstract class AbstractProfile implements Profile {
    public static Profile getDefaultInstanceForName(String name) {
       if (JavaProfile.NAME.equals(name)) {
          return JavaProfile.getDefaultInstance();
+      }else if (JavaProfile.NAME_WITH_PERMISSIONS.equals(name)) {
+         return JavaProfile.getDefaultInstance(true);
       }
       else if (SymbolicExecutionJavaProfile.NAME.equals(name)) {
          return SymbolicExecutionJavaProfile.getDefaultInstance();
