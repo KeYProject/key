@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.profile.jmlref.validator;
+package org.key_project.jmlediting.core.compilation;
 
 import org.key_project.jmlediting.core.utilities.Position;
 
@@ -8,7 +8,7 @@ public abstract class JMLPositionValidator implements IJMLValidator {
 
    /*
     * (non-Javadoc)
-    *
+    * 
     * @see
     * org.key_project.jmlediting.core.validator.JMLValidator#isValid(org.key_project
     * .jmlediting.core.dom.IASTNode)
@@ -18,7 +18,7 @@ public abstract class JMLPositionValidator implements IJMLValidator {
       return this.isValidForPosition(context, this.p);
    }
 
-   abstract boolean isValidForPosition(final IJMLValidationContext context,
-         final Position p);
+   protected abstract boolean isValidForPosition(
+         final IJMLValidationContext context, final Position p);
 
 }

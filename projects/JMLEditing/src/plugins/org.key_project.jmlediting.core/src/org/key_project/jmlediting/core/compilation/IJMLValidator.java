@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.profile.jmlref.validator;
+package org.key_project.jmlediting.core.compilation;
 
 public interface IJMLValidator {
    /**

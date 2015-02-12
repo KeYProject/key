@@ -124,7 +124,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
             try {
                final IASTNode parseResult = parser.parse(source, jmlComment);
                final IJMLValidationContext jmlContext = new JMLValidationContext(
-                     parseResult, res, jmlComments.subList(
+                     parseResult, source, jmlComments.subList(
                            jmlComments.indexOf(jmlComment) + 1,
                            jmlComments.size()));
                // Throw away the result, here only a parse exception is

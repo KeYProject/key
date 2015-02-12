@@ -1,18 +1,20 @@
 package org.key_project.jmlediting.profile.jmlref.validator;
 
 import org.eclipse.jdt.core.dom.ASTParser;
+import org.key_project.jmlediting.core.compilation.IJMLValidationContext;
+import org.key_project.jmlediting.core.compilation.JMLPositionValidator;
 import org.key_project.jmlediting.core.utilities.Position;
 
 public class LoopInvariantValidator extends JMLPositionValidator {
 
    @Override
-   boolean isValidForPosition(final IJMLValidationContext context,
+   protected boolean isValidForPosition(final IJMLValidationContext context,
          final Position p) {
       final org.eclipse.jdt.core.dom.CompilationUnit ast;
       final ASTParser parser = ASTParser
             .newParser(ASTParser.K_COMPILATION_UNIT);
       parser.setKind(ASTParser.K_COMPILATION_UNIT);
-      parser.setSource(context.getCompilationUnit());
+      parser.setSource(context.getSrc().toCharArray());
       parser.setResolveBindings(true);
       ast = (org.eclipse.jdt.core.dom.CompilationUnit) parser.createAST(null);
       // TODO check comment for more jml that is not an invariant -> ret false
@@ -21,8 +23,7 @@ public class LoopInvariantValidator extends JMLPositionValidator {
       // TODO: check them for jml that is not an invariant
       // If Java Code is found between the Loop invariant and the next Loops
       // offset, the invariant is invalid
-      if (this.javaFoundBetween(p, beginLoop, context.getCompilationUnit()
-            .getSource())) {
+      if (this.javaFoundBetween(p, beginLoop, context.getSrc())) {
          return false;
       }
       return true;

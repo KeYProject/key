@@ -1,25 +1,24 @@
-package org.key_project.jmlediting.profile.jmlref.validator;
+package org.key_project.jmlediting.core.compilation;
 
 import java.util.List;
 
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 
 public class JMLValidationContext implements IJMLValidationContext {
 
    private final IASTNode node;
-   private final ICompilationUnit cu;
+   private final String src;
    private final List<CommentRange> jmlComments;
 
    /**
     * @param node
     * @param cu
     */
-   public JMLValidationContext(final IASTNode node, final ICompilationUnit cu,
+   public JMLValidationContext(final IASTNode node, final String src,
          final List<CommentRange> jmlComments) {
       this.node = node;
-      this.cu = cu;
+      this.src = src;
       this.jmlComments = jmlComments;
    }
 
@@ -30,9 +29,9 @@ public class JMLValidationContext implements IJMLValidationContext {
    }
 
    @Override
-   public ICompilationUnit getCompilationUnit() {
+   public String getSrc() {
       // TODO Auto-generated method stub
-      return this.cu;
+      return this.src;
    }
 
    @Override
