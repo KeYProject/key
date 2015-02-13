@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTParser;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.utilities.ASTNodeIndexComparator;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
@@ -18,13 +17,7 @@ public class LoopInvariantValidator extends JMLPositionValidator {
    @Override
    protected boolean validateForPosition(final IJMLValidationContext context,
          final IASTNode node) {
-      final org.eclipse.jdt.core.dom.CompilationUnit ast;
-      final ASTParser parser = ASTParser
-            .newParser(ASTParser.K_COMPILATION_UNIT);
-      parser.setKind(ASTParser.K_COMPILATION_UNIT);
-      parser.setSource(context.getSrc().toCharArray());
-      parser.setResolveBindings(true);
-      ast = (org.eclipse.jdt.core.dom.CompilationUnit) parser.createAST(null);
+      final org.eclipse.jdt.core.dom.CompilationUnit ast = context.getJavaAST();
       final LoopNodeVisitor visitor = new LoopNodeVisitor();
       ast.accept(visitor);
       visitor.visit(ast);

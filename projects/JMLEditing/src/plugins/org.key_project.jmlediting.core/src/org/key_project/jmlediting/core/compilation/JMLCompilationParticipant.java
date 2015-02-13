@@ -15,15 +15,13 @@ import org.eclipse.jdt.core.compiler.ReconcileContext;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 import org.eclipse.jdt.internal.compiler.problem.ProblemSeverities;
 import org.key_project.jmlediting.core.Activator;
-import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserError;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
-import org.key_project.jmlediting.core.validation.IJMLValidationContext;
-import org.key_project.jmlediting.core.validation.JMLValidationContext;
+import org.key_project.jmlediting.core.validation.JMLValidationEngine;
 import org.key_project.util.eclipse.Logger;
 
 /**
@@ -64,7 +62,6 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          // Detect all comments in the file and then parse it
          final CommentLocator locator = new CommentLocator(source);
          for (final CommentRange jmlComment : locator.findJMLCommentRanges()) {
-            final boolean loopKeywordFound = false;
             final IJMLParser parser = JMLPreferencesHelper
                   .getProjectActiveJMLProfile(res.getProject()).createParser();
             try {
@@ -120,15 +117,12 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          // Detect all comments in the file and then parse it
          final CommentLocator locator = new CommentLocator(source);
          final List<CommentRange> jmlComments = locator.findJMLCommentRanges();
+         JMLValidationEngine.validateAll(res, source, jmlComments);
          for (final CommentRange jmlComment : jmlComments) {
             final IJMLParser parser = JMLPreferencesHelper
                   .getProjectActiveJMLProfile(res.getProject()).createParser();
             try {
-               final IASTNode parseResult = parser.parse(source, jmlComment);
-               final IJMLValidationContext jmlContext = new JMLValidationContext(
-                     source, jmlComments.subList(
-                           jmlComments.indexOf(jmlComment) + 1,
-                           jmlComments.size()));
+               parser.parse(source, jmlComment);
                // Throw away the result, here only a parse exception is
                // interesting
             }
