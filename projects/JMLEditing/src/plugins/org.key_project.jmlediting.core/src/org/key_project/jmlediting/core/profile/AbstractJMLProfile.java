@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.key_project.jmlediting.core.validation.IJMLValidator;
+
 /**
  * This class implements some methods of the {@link IJMLProfile} in a generic
  * way.
@@ -17,7 +19,7 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
 
    /**
     * Helper class for a tuple of key and type class.
-    * 
+    *
     * @author Moritz Lichter
     *
     */
@@ -115,4 +117,10 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
       extensionSet.add(newValue);
       this.extensions.put(tKey, extensionSet);
    }
+
+   @Override
+   public Set<IJMLValidator> getValidator() {
+      return Collections.emptySet();
+   }
+
 }

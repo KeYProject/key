@@ -5,6 +5,7 @@ import java.util.Set;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.validation.IJMLValidator;
 
 /**
  * Defines a profile for a JML variant.
@@ -67,5 +68,13 @@ public interface IJMLProfile {
     * @return a new parser to parse JML according to this profile
     */
    IJMLParser createParser();
+
+   /**
+    * Returns a Set of Validators that this Profile provides.
+    *
+    * @return a Set of Validators the Profile provides or an Empty Set if there
+    *         are no Validators.
+    */
+   Set<IJMLValidator> getValidator();
 
 }
