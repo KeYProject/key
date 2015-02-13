@@ -1,8 +1,13 @@
 package org.key_project.jmlediting.profile.jmlref.validator;
 
+import java.util.List;
+
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.key_project.jmlediting.core.compilation.IJMLValidationContext;
 import org.key_project.jmlediting.core.compilation.JMLPositionValidator;
+import org.key_project.jmlediting.core.utilities.ASTNodeIndexComparator;
+import org.key_project.jmlediting.core.utilities.LoopNodeVisitor;
 import org.key_project.jmlediting.core.utilities.Position;
 
 public class LoopInvariantValidator extends JMLPositionValidator {
@@ -17,15 +22,24 @@ public class LoopInvariantValidator extends JMLPositionValidator {
       parser.setSource(context.getSrc().toCharArray());
       parser.setResolveBindings(true);
       ast = (org.eclipse.jdt.core.dom.CompilationUnit) parser.createAST(null);
+      final LoopNodeVisitor visitor = new LoopNodeVisitor();
+      ast.accept(visitor);
+      visitor.visit(ast);
+      visitor.visit(ast);
+      visitor.visit(ast);
+      final List<ASTNode> loopNodes = visitor.getLoopNodes();
+      // TODO: sort loopNodes based on index
+      loopNodes.sort(new ASTNodeIndexComparator());
+      System.out.println(loopNodes.size());
       // TODO check comment for more jml that is not an invariant -> ret false
       // TODO find Loop offset
       // TODO check for JML commments between invariant and loop offset
       // TODO: check them for jml that is not an invariant
       // If Java Code is found between the Loop invariant and the next Loops
       // offset, the invariant is invalid
-      if (this.javaFoundBetween(p, beginLoop, context.getSrc())) {
-         return false;
-      }
+      // if (this.javaFoundBetween(p, beginLoop, context.getSrc())) {
+      // return false;
+      // }
       return true;
    }
 
@@ -68,13 +82,13 @@ public class LoopInvariantValidator extends JMLPositionValidator {
                      final int end = source.indexOf('\n', position);
                      position = end + 1;
                      break;
-                  // Multiline Comment Opener found
+                     // Multiline Comment Opener found
                   case '*':
                      position += 2;
                      state = ScannerState.IN_COMMENT;
                      break;
-                  // wrong combination of signs, ignore because there will be
-                  // compile errors
+                     // wrong combination of signs, ignore because there will be
+                     // compile errors
                   default:
                      position += 1;
                      state = ScannerState.DEFAULT;
@@ -85,7 +99,7 @@ public class LoopInvariantValidator extends JMLPositionValidator {
                   break mainloop;
                }
                break;
-            // no special sign found
+               // no special sign found
             default:
                if (Character.isJavaIdentifierStart(c)) {
                   return true;
@@ -106,7 +120,7 @@ public class LoopInvariantValidator extends JMLPositionValidator {
                      state = ScannerState.DEFAULT;
                      position += 2;
                      break;
-                  // star found, can be ignored because no / was found after
+                     // star found, can be ignored because no / was found after
                   default:
                      position += 1;
                      break;
@@ -116,13 +130,13 @@ public class LoopInvariantValidator extends JMLPositionValidator {
                   break mainloop;
                }
                break;
-            // no special sign found
+               // no special sign found
             default:
                position += 1;
                break;
             }
             break;
-         // in unexpected state
+            // in unexpected state
          default:
             throw new AssertionError("Invalid Enum State");
          }
