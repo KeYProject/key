@@ -1,13 +1,11 @@
-package org.key_project.jmlediting.core.compilation;
+package org.key_project.jmlediting.core.validation;
 
 import java.util.List;
 
-import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 
 public class JMLValidationContext implements IJMLValidationContext {
 
-   private final IASTNode node;
    private final String src;
    private final List<CommentRange> jmlComments;
 
@@ -15,17 +13,10 @@ public class JMLValidationContext implements IJMLValidationContext {
     * @param node
     * @param cu
     */
-   public JMLValidationContext(final IASTNode node, final String src,
+   public JMLValidationContext(final String src,
          final List<CommentRange> jmlComments) {
-      this.node = node;
       this.src = src;
       this.jmlComments = jmlComments;
-   }
-
-   @Override
-   public IASTNode getJMLNode() {
-      // TODO Auto-generated method stub
-      return this.node;
    }
 
    @Override

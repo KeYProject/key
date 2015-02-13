@@ -22,6 +22,8 @@ import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
+import org.key_project.jmlediting.core.validation.IJMLValidationContext;
+import org.key_project.jmlediting.core.validation.JMLValidationContext;
 import org.key_project.util.eclipse.Logger;
 
 /**
@@ -81,7 +83,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                         new String[] { error.getErrorMessage() },
                         new String[] { error.getErrorMessage() },
                         ProblemSeverities.Error, error.getErrorOffset(), error
-                              .getErrorOffset(), -1, -1));
+                        .getErrorOffset(), -1, -1));
                }
 
                // And now put the problems to the context to make them visible
@@ -124,7 +126,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
             try {
                final IASTNode parseResult = parser.parse(source, jmlComment);
                final IJMLValidationContext jmlContext = new JMLValidationContext(
-                     parseResult, source, jmlComments.subList(
+                     source, jmlComments.subList(
                            jmlComments.indexOf(jmlComment) + 1,
                            jmlComments.size()));
                // Throw away the result, here only a parse exception is
