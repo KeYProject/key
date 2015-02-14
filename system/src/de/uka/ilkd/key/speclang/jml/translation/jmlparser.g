@@ -254,6 +254,10 @@ options {
 		return services.getTypeConverter().getHeapLDT().getSavedHeap();
 	}
 
+	private LocationVariable getPermissionHeap() {
+		return services.getTypeConverter().getHeapLDT().getPermissionHeap();
+	}
+
     /**
      * Converts a term so that all of its non-rigid operators refer to the pre-state.
      */
@@ -283,6 +287,16 @@ options {
 	return or.replace(term);
     }
 
+    private Term convertToPermission(Term term) throws SLTranslationException {
+        LocationVariable permissionHeap = getPermissionHeap();
+        if(permissionHeap == null) {
+           raiseError("\\permission expression used in a non-permission context and permissions not enabled.");
+        }
+        if(!term.op().name().toString().endsWith("::select")) {
+           raiseError("\\permission expression used with non store-ref expression.");
+        }
+        return tb.select(services.getTypeConverter().getPermissionLDT().targetSort(), tb.var(getPermissionHeap()), term.sub(1), term.sub(2));
+    }
 
     private String createSignatureString(ImmutableList<SLExpression> signature) {
 	if (signature == null || signature.isEmpty()) {
@@ -1549,6 +1563,11 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	      result = new SLExpression(convertToBackup(result.getTerm()));
 	    }
 	}
+    |
+        PERMISSION LPAREN result=expression RPAREN
+        {
+            result = new SLExpression(convertToPermission(result.getTerm()));
+        }
     |
 	NONNULLELEMENTS LPAREN result=expression RPAREN
 	{
