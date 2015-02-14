@@ -69,7 +69,7 @@ public class ConditionalsAndOther {
 	}
 	
 	/*@
-	  @ ensures \result == x != y;
+	  @ ensures \result == (x != y);
 	  @*/
 	public boolean ifNotEquals() {
 		if (x != y) {
@@ -133,7 +133,7 @@ public class ConditionalsAndOther {
    }
    
    /*@
-     @ ensures \result == x != y;
+     @ ensures \result == (x != y);
      @*/
    public boolean questionNotEquals() {
       return x != y ? true : false;
