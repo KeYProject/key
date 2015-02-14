@@ -3,6 +3,7 @@ package org.key_project.jmlediting.core.validation;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 
 /**
@@ -34,5 +35,12 @@ public interface IJMLValidationContext {
     * @return the JavaAST
     */
    CompilationUnit getJavaAST();
+
+   /**
+    * Returns the JML Parser for this context.
+    * 
+    * @return the JML Parser
+    */
+   IJMLParser getJMLParser();
 
 }

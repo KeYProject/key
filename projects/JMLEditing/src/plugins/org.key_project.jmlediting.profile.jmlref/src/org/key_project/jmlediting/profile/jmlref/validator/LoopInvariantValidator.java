@@ -3,23 +3,43 @@ package org.key_project.jmlediting.profile.jmlref.validator;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.key_project.jmlediting.core.dom.IASTNode;
-import org.key_project.jmlediting.core.utilities.CommentLocator;
+import org.key_project.jmlediting.core.dom.IKeywordNode;
+import org.key_project.jmlediting.core.dom.NodeTypes;
+import org.key_project.jmlediting.core.dom.Nodes;
+import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.utilities.CommentRange;
+import org.key_project.jmlediting.core.utilities.JMLValidationError;
 import org.key_project.jmlediting.core.utilities.LoopNodeVisitor;
 import org.key_project.jmlediting.core.validation.IJMLValidationContext;
 import org.key_project.jmlediting.core.validation.JMLPositionValidator;
+import org.key_project.jmlediting.profile.jmlref.loop.DecreasingKeyword;
+import org.key_project.jmlediting.profile.jmlref.loop.LoopInvariantKeyword;
 
+/**
+ * This Class checks if Loop Invariant specifications in JML are placed valid,
+ * which means that they are immediately followed by a loop in Java Code. It is
+ * allowed to have another invariant between the invariant and the loop, but not
+ * any other java or jml. Comments are allowed too.
+ *
+ * @author David Giessing
+ *
+ */
 public class LoopInvariantValidator extends JMLPositionValidator {
 
-   List<ASTNode> loopNodes = Collections.emptyList();
+   /**
+    * A List of LoopNodes in the JavaAST.
+    */
+   private List<ASTNode> loopNodes = Collections.emptyList();
+   private final List<IKeywordNode> keywords = Collections.emptyList();
+   private CommentRange containingComment;
 
    @Override
-   public List<IMarker> validate(final IJMLValidationContext context,
-         final IASTNode node) {
+   public List<JMLValidationError> validate(
+         final IJMLValidationContext context, final IASTNode node) {
+      final List<JMLValidationError> error = Collections.emptyList();
       final CompilationUnit ast = context.getJavaAST();
       final LoopNodeVisitor visitor = new LoopNodeVisitor();
       ast.accept(visitor);
@@ -27,19 +47,33 @@ public class LoopInvariantValidator extends JMLPositionValidator {
       visitor.visit(ast);
       visitor.visit(ast);
       this.loopNodes = visitor.getLoopNodes();
-      // TODO find Invariant Nodes in JML (node)
-      // TODO call Validate node for each of this
-      return null;
+      final List<IASTNode> keywordNodes = Nodes.getAllNodesOfType(node,
+            NodeTypes.KEYWORD);
+      for (final IASTNode iastNode : keywordNodes) {
+         this.keywords.add((IKeywordNode) iastNode);
+      }
+      // Filter List for Invariant Keywords
+      JMLValidationError keywordError = null;
+      for (final IKeywordNode iKeywordNode : this.keywords) {
+         if ((iKeywordNode.getKeyword() instanceof LoopInvariantKeyword)
+               || (iKeywordNode.getKeyword() instanceof DecreasingKeyword)) {
+            // Validate the Loop Keywords
+            keywordError = this.validateNode(context, iKeywordNode);
+            if (keywordError != null) {
+               error.add(keywordError);
+            }
+         }
+
+      }
+      return error;
    }
 
    @Override
-   protected IMarker validateNode(final IJMLValidationContext context,
-         final IASTNode node) {
-      // TODO check comment for more jml that is not an invariant -> ret false
+   protected JMLValidationError validateNode(
+         final IJMLValidationContext context, final IASTNode node) {
       // find Loop offset that is following the invariant
       ASTNode loopNode = null;
       for (final ASTNode lNode : this.loopNodes) {
-         // Position is not doing its task better get an offset
          if (lNode.getStartPosition() > node.getStartOffset()) {
             // Loop found
             loopNode = lNode;
@@ -48,26 +82,58 @@ public class LoopInvariantValidator extends JMLPositionValidator {
       }
       if (loopNode == null) {
          // Invariant without loop following --> Invalid
-         // TODO: Create IMarker
-         return null;
+         return new JMLValidationError(
+               "org.key_project.jmlediting.core.validationerror",
+               "No Loop found after LoopInvariant or Decreasing Keyword", node);
       }
 
-      // check for JML commments between invariant and loop offset
-      final CommentLocator loc = new CommentLocator(context.getSrc());
+      // check for JML commments between invariant and loop offset and check
+      // comment containing the keyword to check
       for (final CommentRange comment : context.getJMLComments()) {
-         if (comment.getBeginOffset() > node.getStartOffset()
+         if (comment.getEndOffset() > node.getStartOffset()
                && comment.getBeginOffset() < loopNode.getStartPosition()) {
-            ;
-            // TODO: check them for jml that is not an invariant
+            if (comment.getBeginOffset() < node.getStartOffset()
+                  && comment.getEndOffset() > node.getStartOffset()) {
+               this.containingComment = comment;
+            }
+            try {
+               final IASTNode ast = context.getJMLParser().parse(
+                     context.getSrc(), comment);
+               final List<IKeywordNode> keywords = Nodes.getAllKeywords(ast);
+               for (final IKeywordNode iKeywordNode : keywords) {
+                  // Check for Keywords that are no Invariant
+                  // If Keyword is before the Invariant that has to be
+                  // checked
+                  // ignore it
+                  if (iKeywordNode.getStartOffset() > node.getStartOffset()
+                        && (iKeywordNode.getKeyword() instanceof LoopInvariantKeyword || iKeywordNode
+                              .getKeyword() instanceof DecreasingKeyword)) {
+                     continue;
+                  }
+                  else {
+                     // illegal JML Statement after Loop Specification
+                     return new JMLValidationError(
+                           "org.key_project.jmlediting.core.validationerror",
+                           "Non LoopInvariant or Decreasing Keyword found following the Loop Specification",
+                           node);
+                  }
+               }
+            }
+            catch (final ParserException e) {
+               // Comment could not be parsed, ignore it and go on with the
+               // next
+               continue;
+            }
          }
       }
-      // If Java Code final is found between final the Loop invariant final and
-      // the next final Loops
-      // offset, the invariant is invalid
-      if (this.javaFoundBetween(node.getStartOffset(),
+
+      // If Java Code is found between the Loop invariant and
+      // the next Loops offset, the invariant is invalid
+      if (this.javaFoundBetween(this.containingComment.getEndOffset(),
             loopNode.getStartPosition(), context.getSrc())) {
-         // TODO: Create IMarker
-         return null;
+         return new JMLValidationError(
+               "org.key_project.jmlediting.core.validationerror",
+               "Loop Specification not followed by a Loop", node);
       }
       // Valid
       return null;
@@ -79,7 +145,7 @@ public class LoopInvariantValidator extends JMLPositionValidator {
 
    /**
     * Checks whether there is JavaCode between the begin Index and the begin of
-    * the Loop in source
+    * the Loop in source.
     *
     * @param begin
     *           The begin index from where to search

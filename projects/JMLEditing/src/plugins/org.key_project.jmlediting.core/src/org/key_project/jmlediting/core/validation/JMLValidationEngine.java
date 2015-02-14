@@ -4,9 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IMarker;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.utilities.JMLValidationError;
 
 /**
  *
@@ -51,13 +51,13 @@ public class JMLValidationEngine {
     *         emptylist if all specifications are valid (or could not be checked
     *         because there was no validator)
     */
-   public List<IMarker> validateComment(final IASTNode c) {
-      final List<IMarker> markers = Collections.emptyList();
+   public List<JMLValidationError> validateComment(final IASTNode c) {
+      final List<JMLValidationError> errors = Collections.emptyList();
       final Set<IJMLValidator> validator = this.activeProfile.getValidator();
       for (final IJMLValidator jmlValidator : validator) {
-         markers.addAll(jmlValidator.validate(this.context, c));
+         errors.addAll(jmlValidator.validate(this.context, c));
 
       }
-      return markers;
+      return errors;
    }
 }

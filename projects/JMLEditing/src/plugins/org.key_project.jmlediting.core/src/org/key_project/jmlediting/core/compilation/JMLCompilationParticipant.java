@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
@@ -25,6 +24,7 @@ import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
+import org.key_project.jmlediting.core.utilities.JMLValidationError;
 import org.key_project.jmlediting.core.validation.JMLValidationContext;
 import org.key_project.jmlediting.core.validation.JMLValidationEngine;
 import org.key_project.util.eclipse.Logger;
@@ -131,20 +131,20 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          parser.setResolveBindings(true);
          ast = (org.eclipse.jdt.core.dom.CompilationUnit) parser
                .createAST(null);
+         final IJMLParser jmlParser = JMLPreferencesHelper
+               .getProjectActiveJMLProfile(res.getProject()).createParser();
          final JMLValidationContext jmlContext = new JMLValidationContext(
-               source, jmlComments, ast);
+               source, jmlComments, ast, jmlParser);
          final JMLValidationEngine engine = new JMLValidationEngine(
                JMLPreferencesHelper
                      .getProjectActiveJMLProfile(res.getProject()),
                jmlContext);
          // End of Preparation
-         final List<IMarker> markers = Collections.emptyList();
+         final List<JMLValidationError> errors = Collections.emptyList();
          for (final CommentRange jmlComment : jmlComments) {
-            final IJMLParser jmlParser = JMLPreferencesHelper
-                  .getProjectActiveJMLProfile(res.getProject()).createParser();
             try {
                final IASTNode node = jmlParser.parse(source, jmlComment);
-               markers.addAll(engine.validateComment(node));
+               errors.addAll(engine.validateComment(node));
                // Throw away the result, here only a parse exception is
                // interesting
             }
@@ -154,6 +154,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
             }
          }
          // TODO: add Markers to IFile
+         ValidationErrorMarkerUpdater.createErrorMarkers(res, source, errors);
       }
    }
 }

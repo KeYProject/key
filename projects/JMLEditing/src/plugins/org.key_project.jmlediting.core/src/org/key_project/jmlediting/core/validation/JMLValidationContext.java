@@ -3,6 +3,7 @@ package org.key_project.jmlediting.core.validation;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 
 /**
@@ -27,6 +28,11 @@ public class JMLValidationContext implements IJMLValidationContext {
    private final CompilationUnit javaAST;
 
    /**
+    * The JML Parser used for this Validation.
+    */
+   private final IJMLParser jmlParser;
+
+   /**
     * Creates a IJMLValidation context.
     *
     * @param src
@@ -37,12 +43,17 @@ public class JMLValidationContext implements IJMLValidationContext {
     *
     * @param javaAST
     *           The Java AST
+    * 
+    * @param jmlParser
+    *           The jmlParser
     */
    public JMLValidationContext(final String src,
-         final List<CommentRange> jmlComments, final CompilationUnit javaAST) {
+         final List<CommentRange> jmlComments, final CompilationUnit javaAST,
+         final IJMLParser jmlParser) {
       this.src = src;
       this.jmlComments = jmlComments;
       this.javaAST = javaAST;
+      this.jmlParser = jmlParser;
    }
 
    @Override
@@ -60,4 +71,9 @@ public class JMLValidationContext implements IJMLValidationContext {
       return this.javaAST;
    }
 
+   @Override
+   public IJMLParser getJMLParser() {
+      // TODO Auto-generated method stub
+      return this.jmlParser;
+   }
 }

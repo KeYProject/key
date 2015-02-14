@@ -2,8 +2,8 @@ package org.key_project.jmlediting.core.validation;
 
 import java.util.List;
 
-import org.eclipse.core.resources.IMarker;
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.utilities.JMLValidationError;
 
 public interface IJMLValidator {
    /**
@@ -18,5 +18,6 @@ public interface IJMLValidator {
     * @return a List of IMarkers if some Specifications are invalid or an empty
     *         list if they are all valid
     */
-   List<IMarker> validate(IJMLValidationContext context, IASTNode node);
+   List<JMLValidationError> validate(IJMLValidationContext context,
+         IASTNode node);
 }
