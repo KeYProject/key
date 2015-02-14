@@ -254,6 +254,10 @@ options {
 		return services.getTypeConverter().getHeapLDT().getSavedHeap();
 	}
 
+	private LocationVariable getPermissionHeap() {
+		return services.getTypeConverter().getHeapLDT().getPermissionHeap();
+	}
+
     /**
      * Converts a term so that all of its non-rigid operators refer to the pre-state.
      */
@@ -283,6 +287,16 @@ options {
 	return or.replace(term);
     }
 
+    private Term convertToPermission(Term term) throws SLTranslationException {
+        LocationVariable permissionHeap = getPermissionHeap();
+        if(permissionHeap == null) {
+           raiseError("\\permission expression used in a non-permission context and permissions not enabled.");
+        }
+        if(!term.op().name().toString().endsWith("::select")) {
+           raiseError("\\permission expression used with non store-ref expression.");
+        }
+        return tb.select(services.getTypeConverter().getPermissionLDT().targetSort(), tb.var(getPermissionHeap()), term.sub(1), term.sub(2));
+    }
 
     private String createSignatureString(ImmutableList<SLExpression> signature) {
 	if (signature == null || signature.isEmpty()) {
@@ -750,19 +764,13 @@ predicate returns [Term result=null] throws SLTranslationException
 
 expression returns [SLExpression result=null] throws SLTranslationException
 :
-	result=assignmentexpr
+	result=conditionalexpr
 	{
 	    if(!result.isTerm()) {
 	        raiseError("Expected a term: " + result);
 	    }
 	}
     ;
-
-assignmentexpr returns [SLExpression result=null] throws SLTranslationException
-:
-	result=conditionalexpr
-    ;
-
 
 conditionalexpr returns [SLExpression result=null] throws SLTranslationException
 {
@@ -779,18 +787,21 @@ conditionalexpr returns [SLExpression result=null] throws SLTranslationException
     ;
 
 
-equivalenceexpr returns [SLExpression result=null] throws SLTranslationException {
+equivalenceexpr returns [SLExpression result=null] throws SLTranslationException
+{
     SLExpression right = null;
 }
 :
 	result = impliesexpr
-        (   eq:EQV_ANTIV right=equivalenceexpr
+        (   eq:EQV_ANTIV right=impliesexpr
             { result = translator.translate(eq.getText(), SLExpression.class, result, right, services); }
-        )?
+        )*
     ;
 
-
-
+/*
+ * Note: According to JML Manual §12.6.3 forward implication has to be parsed right-associatively
+ * and backward implication left-associatively.
+ */
 impliesexpr returns [SLExpression result=null] throws SLTranslationException
 {
     SLExpression expr;
@@ -798,7 +809,7 @@ impliesexpr returns [SLExpression result=null] throws SLTranslationException
 :
 	result=logicalorexpr
 	(
-	    IMPLIES expr=impliesnonbackwardexpr
+	    IMPLIES expr=impliesforwardexpr
 	    {
 		result = new SLExpression(tb.imp(tb.convertToFormula(result.getTerm()),
 		                                 tb.convertToFormula(expr.getTerm())));
@@ -808,36 +819,21 @@ impliesexpr returns [SLExpression result=null] throws SLTranslationException
 	    (
 		IMPLIESBACKWARD expr=logicalorexpr
 		{
-                    if (expr.isType()) {
-                        raiseError("Cannot negate type " + expr.getType().getName() + ".");
-                    }
-
-                    Term t = expr.getTerm();
-                    assert t != null;
-
-                    if (t.sort() == Sort.FORMULA) {
-                        result = new SLExpression(tb.orSC(tb.convertToFormula(result.getTerm()),
-                                                        tb.convertToFormula(tb.not(t))));
-                    } else if(t.sort() == booleanLDT.targetSort()) {
-                        result = new SLExpression(tb.orSC(tb.convertToFormula(result.getTerm()),
-                                                        tb.convertToFormula(
-                                                                tb.not(tb.equals(t, tb.TRUE())))));
-                    } else {
-                        raiseError("Wrong type in not-expression: " + t);
-                    }
+		result = new SLExpression(tb.imp(tb.convertToFormula(expr.getTerm()),
+		                                 tb.convertToFormula(result.getTerm())));
 		}
 	    )+
 	)?
 ;
 
-impliesnonbackwardexpr returns [SLExpression result=null] throws SLTranslationException
+impliesforwardexpr returns [SLExpression result=null] throws SLTranslationException
 {
     SLExpression expr;
 }
 :
 	result=logicalorexpr
 	(
-	    IMPLIES expr=impliesnonbackwardexpr
+	    IMPLIES expr=impliesforwardexpr
 	    {
 		result = new SLExpression(tb.imp(tb.convertToFormula(result.getTerm()),
 		                                 tb.convertToFormula(expr.getTerm())));
@@ -850,14 +846,14 @@ logicalorexpr returns [SLExpression result=null] throws SLTranslationException
     SLExpression expr;
 }
 :
-	result=inclusiveorexpr
+	result=logicalandexpr
 	(
-	    LOGICALOR expr=logicalorexpr
+	    LOGICALOR expr=logicalandexpr
 	    {
 	        result = new SLExpression(tb.orSC(tb.convertToFormula(result.getTerm()),
                                                   tb.convertToFormula(expr.getTerm())));
 	    }
-	)?
+	)*
 ;
 
 logicalandexpr returns [SLExpression result=null] throws SLTranslationException
@@ -865,14 +861,14 @@ logicalandexpr returns [SLExpression result=null] throws SLTranslationException
     SLExpression expr;
 }
 :
-	result=andexpr
+	result=inclusiveorexpr
 	(
-	    LOGICALAND expr=logicalandexpr
+	    LOGICALAND expr=inclusiveorexpr
 	    {
 		result = new SLExpression(tb.andSC(tb.convertToFormula(result.getTerm()),
                                                    tb.convertToFormula(expr.getTerm())));
 	    }
-	)?
+	)*
 ;
 
 
@@ -883,7 +879,7 @@ inclusiveorexpr returns [SLExpression result=null] throws SLTranslationException
 :
 	result=exclusiveorexpr
 	(
-	    INCLUSIVEOR expr=inclusiveorexpr
+	    INCLUSIVEOR expr=exclusiveorexpr
 	    {
 	       if(intHelper.isIntegerTerm(result)) {
                    result = intHelper.buildPromotedOrExpression(result,expr);
@@ -892,7 +888,7 @@ inclusiveorexpr returns [SLExpression result=null] throws SLTranslationException
                                                    tb.convertToFormula(expr.getTerm())));
                }
 	    }
-	)?
+	)*
 ;
 
 
@@ -901,9 +897,9 @@ exclusiveorexpr returns [SLExpression result=null] throws SLTranslationException
     SLExpression expr;
 }
 :
-	result=logicalandexpr
+	result=andexpr
 	(
-	    XOR expr=exclusiveorexpr
+	    XOR expr=andexpr
 	    {
 	       if(intHelper.isIntegerTerm(result)) {
                    result = intHelper.buildPromotedXorExpression(result,expr);
@@ -914,7 +910,7 @@ exclusiveorexpr returns [SLExpression result=null] throws SLTranslationException
                                                    tb.and(tb.not(resultFormula), exprFormula)));
                }
 	    }
-	)?
+	)*
 ;
 
 
@@ -931,7 +927,7 @@ andexpr returns [SLExpression result=null] throws SLTranslationException
 	    }
 	}
 	(
-	    AND expr=andexpr
+	    AND expr=equalityexpr
 	    {
 	       if(intHelper.isIntegerTerm(result)) {
                    result = intHelper.buildPromotedAndExpression(result, expr);
@@ -940,7 +936,7 @@ andexpr returns [SLExpression result=null] throws SLTranslationException
                                                     tb.convertToFormula(expr.getTerm())));
                }
 	    }
-	)?
+	)*
 ;
 
 equalityexpr returns [SLExpression result=null] throws SLTranslationException
@@ -949,44 +945,10 @@ equalityexpr returns [SLExpression result=null] throws SLTranslationException
 }
 	 :
 	result=relationalexpr
-	(   eq:EQ_NEQ right=equalityexpr
+	(   eq:EQ_NEQ right=relationalexpr
 	        { result = translator.translate(eq.getText(), SLExpression.class, result, right, services); }
-	)?
+	)*
 ;
-
-//equalityexpr returns [SLExpression result=null] throws SLTranslationException
-//{
-//    Deque<Pair<Token,SLExpression>> right = null;
-//}
-//:
-//    result = relationalexpr
-//    right = equalityexprright
-//    {
-//        assert right != null;
-//        for (Pair<Token,SLExpression> pair: right) {
-//            result = translator.translate(pair.first.getText(), SLExpression.class, result, pair.second, services);
-//        }
-//    }
-//;
-///** Helper method to make equality expressions left associative. */
-//equalityexprright returns [Deque<Pair<Token,SLExpression>> result= null] throws SLTranslationException
-//{
-//    SLExpression tmp = null;
-//}
-//:
-//    (EQ | NEQ) =>
-//        eq:EQ_NEQ
-//        tmp = relationalexpr
-//        result = equalityexprright
-//    {
-//        result.push(new Pair<Token,SLExpression>(eq,tmp));
-//    }
-//    |
-//    EMPTY
-//    {
-//        result = new ArrayDeque<Pair<Token,SLExpression>>();
-//    }
-//;
 
 relationalexpr returns [SLExpression result=null] throws SLTranslationException
 {
@@ -1601,6 +1563,11 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	      result = new SLExpression(convertToBackup(result.getTerm()));
 	    }
 	}
+    |
+        PERMISSION LPAREN result=expression RPAREN
+        {
+            result = new SLExpression(convertToPermission(result.getTerm()));
+        }
     |
 	NONNULLELEMENTS LPAREN result=expression RPAREN
 	{

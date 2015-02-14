@@ -113,8 +113,7 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
                System.out.println("Proof loading failed");
                final Object error = info.getResult();
                if (error instanceof Throwable) {
-                   if (verbosity >= HIGH) ((Throwable) error).printStackTrace();
-                   else System.out.println(error);
+                   ((Throwable) error).printStackTrace();
                }
            }
            System.exit(1);

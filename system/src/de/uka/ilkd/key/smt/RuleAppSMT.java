@@ -21,7 +21,9 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.RuleApp;
 
 /**
  * The rule application that is used when a goal is closed by means of an external solver. So far 
@@ -74,7 +76,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
     }
 
     public static class SMTRule implements BuiltInRule {
-	private Name name = new Name("SMTRule");
+	public static final Name name = new Name("SMTRule");
 
 	  public RuleAppSMT createApp( PosInOccurrence pos) {
 	     return createApp(pos, null);
@@ -106,10 +108,11 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
 			});
 		}
 
-		goal.split(1);	
 		RuleAppSMT app = (RuleAppSMT) ruleApp;
-		goal.setBranchLabel(app.getTitle());
-	    return ImmutableSLList.<Goal>nil();
+		//goal.node().getNodeInfo().setBranchLabel(app.getTitle());
+		ImmutableList<Goal> newGoals = goal.split(0);	
+
+		return newGoals;
 	}
 
 	@Override
