@@ -3,9 +3,10 @@ package org.key_project.jmlediting.profile.jmlref.validator;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.key_project.jmlediting.core.dom.IASTNode;
-import org.key_project.jmlediting.core.utilities.ASTNodeIndexComparator;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.LoopNodeVisitor;
@@ -14,22 +15,30 @@ import org.key_project.jmlediting.core.validation.JMLPositionValidator;
 
 public class LoopInvariantValidator extends JMLPositionValidator {
 
+   List<ASTNode> loopNodes = Collections.emptyList();
+
    @Override
-   protected boolean validateForPosition(final IJMLValidationContext context,
+   public List<IMarker> validate(final IJMLValidationContext context,
          final IASTNode node) {
-      final org.eclipse.jdt.core.dom.CompilationUnit ast = context.getJavaAST();
+      final CompilationUnit ast = context.getJavaAST();
       final LoopNodeVisitor visitor = new LoopNodeVisitor();
       ast.accept(visitor);
       visitor.visit(ast);
       visitor.visit(ast);
       visitor.visit(ast);
-      final List<ASTNode> loopNodes = visitor.getLoopNodes();
-      Collections.sort(loopNodes, new ASTNodeIndexComparator());
-      System.out.println(loopNodes.size());
+      this.loopNodes = visitor.getLoopNodes();
+      // TODO find Invariant Nodes in JML (node)
+      // TODO call Validate node for each of this
+      return null;
+   }
+
+   @Override
+   protected IMarker validateNode(final IJMLValidationContext context,
+         final IASTNode node) {
       // TODO check comment for more jml that is not an invariant -> ret false
       // find Loop offset that is following the invariant
       ASTNode loopNode = null;
-      for (final ASTNode lNode : loopNodes) {
+      for (final ASTNode lNode : this.loopNodes) {
          // Position is not doing its task better get an offset
          if (lNode.getStartPosition() > node.getStartOffset()) {
             // Loop found
@@ -39,7 +48,8 @@ public class LoopInvariantValidator extends JMLPositionValidator {
       }
       if (loopNode == null) {
          // Invariant without loop following --> Invalid
-         return false;
+         // TODO: Create IMarker
+         return null;
       }
 
       // check for JML commments between invariant and loop offset
@@ -56,9 +66,11 @@ public class LoopInvariantValidator extends JMLPositionValidator {
       // offset, the invariant is invalid
       if (this.javaFoundBetween(node.getStartOffset(),
             loopNode.getStartPosition(), context.getSrc())) {
-         return false;
+         // TODO: Create IMarker
+         return null;
       }
-      return true;
+      // Valid
+      return null;
    }
 
    private static enum ScannerState {

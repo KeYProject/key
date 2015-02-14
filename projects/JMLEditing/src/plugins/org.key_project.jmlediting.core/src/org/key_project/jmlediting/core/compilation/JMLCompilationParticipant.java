@@ -1,9 +1,11 @@
 package org.key_project.jmlediting.core.compilation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
@@ -12,15 +14,18 @@ import org.eclipse.jdt.core.compiler.CategorizedProblem;
 import org.eclipse.jdt.core.compiler.CompilationParticipant;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.compiler.ReconcileContext;
+import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 import org.eclipse.jdt.internal.compiler.problem.ProblemSeverities;
 import org.key_project.jmlediting.core.Activator;
+import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserError;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
+import org.key_project.jmlediting.core.validation.JMLValidationContext;
 import org.key_project.jmlediting.core.validation.JMLValidationEngine;
 import org.key_project.util.eclipse.Logger;
 
@@ -80,7 +85,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                         new String[] { error.getErrorMessage() },
                         new String[] { error.getErrorMessage() },
                         ProblemSeverities.Error, error.getErrorOffset(), error
-                        .getErrorOffset(), -1, -1));
+                              .getErrorOffset(), -1, -1));
                }
 
                // And now put the problems to the context to make them visible
@@ -117,12 +122,29 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          // Detect all comments in the file and then parse it
          final CommentLocator locator = new CommentLocator(source);
          final List<CommentRange> jmlComments = locator.findJMLCommentRanges();
-         JMLValidationEngine.validateAll(res, source, jmlComments);
+         // Start Preparation for Validation
+         final org.eclipse.jdt.core.dom.CompilationUnit ast;
+         final ASTParser parser = ASTParser
+               .newParser(ASTParser.K_COMPILATION_UNIT);
+         parser.setKind(ASTParser.K_COMPILATION_UNIT);
+         parser.setSource(source.toCharArray());
+         parser.setResolveBindings(true);
+         ast = (org.eclipse.jdt.core.dom.CompilationUnit) parser
+               .createAST(null);
+         final JMLValidationContext jmlContext = new JMLValidationContext(
+               source, jmlComments, ast);
+         final JMLValidationEngine engine = new JMLValidationEngine(
+               JMLPreferencesHelper
+                     .getProjectActiveJMLProfile(res.getProject()),
+               jmlContext);
+         // End of Preparation
+         final List<IMarker> markers = Collections.emptyList();
          for (final CommentRange jmlComment : jmlComments) {
-            final IJMLParser parser = JMLPreferencesHelper
+            final IJMLParser jmlParser = JMLPreferencesHelper
                   .getProjectActiveJMLProfile(res.getProject()).createParser();
             try {
-               parser.parse(source, jmlComment);
+               final IASTNode node = jmlParser.parse(source, jmlComment);
+               markers.addAll(engine.validateComment(node));
                // Throw away the result, here only a parse exception is
                // interesting
             }
@@ -131,6 +153,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                ParseErrorMarkerUpdater.createErrorMarkers(res, source, e);
             }
          }
+         // TODO: add Markers to IFile
       }
    }
 }

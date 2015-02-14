@@ -1,57 +1,63 @@
 package org.key_project.jmlediting.core.validation;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.core.resources.IMarker;
 import org.key_project.jmlediting.core.dom.IASTNode;
-import org.key_project.jmlediting.core.parser.IJMLParser;
-import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
-import org.key_project.jmlediting.core.utilities.CommentRange;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
 
+/**
+ *
+ * @author David Giessing
+ *
+ */
 public class JMLValidationEngine {
 
    /**
-    * validates all JMLSpecifications that can be validated via the Profile
-    * specific Validators. If a Specification is not Valid ErrorMarkers are
-    * added to the IFile res
-    *
-    * @param res
-    *           The IFile to add the Markers to
-    * @param src
-    *           The Source on which to operate.
+    * The project activeProfile.
     */
-   public static void validateAll(final IFile res, final String src,
-         final List<CommentRange> jmlComments) {
-      final org.eclipse.jdt.core.dom.CompilationUnit ast;
-      final ASTParser parser = ASTParser
-            .newParser(ASTParser.K_COMPILATION_UNIT);
-      parser.setKind(ASTParser.K_COMPILATION_UNIT);
-      parser.setSource(src.toCharArray());
-      parser.setResolveBindings(true);
-      ast = (org.eclipse.jdt.core.dom.CompilationUnit) parser.createAST(null);
+   private final IJMLProfile activeProfile;
 
-      final Set<IJMLValidator> validator = JMLPreferencesHelper
-            .getProjectActiveJMLProfile(res.getProject()).getValidator();
-      final IJMLParser jmlParser = JMLPreferencesHelper
-            .getProjectActiveJMLProfile(res.getProject()).createParser();
+   /**
+    * the Validation Context used for the Validation.
+    */
+   private final IJMLValidationContext context;
 
-      final IJMLValidationContext context = new JMLValidationContext(src,
-            jmlComments, ast);
+   /**
+    * creates a new JMLValidationEngine.
+    *
+    * @param activeProfile
+    *           the project ActiveProfile
+    * @param context
+    *           the Validation context that is used for validation
+    */
+   public JMLValidationEngine(final IJMLProfile activeProfile,
+         final IJMLValidationContext context) {
+      this.activeProfile = activeProfile;
+      this.context = context;
+   }
+
+   /**
+    * validates all JMLSpecifications in a comment that can be validated via the
+    * Profile specific Validators. If a Specification is not valid ErrorMarkers
+    * are added to the List
+    *
+    * @param c
+    *           the JMLComment that has to be validated represented by its Top
+    *           Node
+    * @return a List of IMarkers that represent invalid specifications,
+    *         emptylist if all specifications are valid (or could not be checked
+    *         because there was no validator)
+    */
+   public List<IMarker> validateComment(final IASTNode c) {
+      final List<IMarker> markers = Collections.emptyList();
+      final Set<IJMLValidator> validator = this.activeProfile.getValidator();
       for (final IJMLValidator jmlValidator : validator) {
-         for (final CommentRange commentRange : jmlComments) {
-            IASTNode parseResult;
-            try {
-               parseResult = jmlParser.parse(src, commentRange);
-            }
-            catch (final ParserException e) {
-               // could not Parse therefore no Verification possible
-               continue;
-            }
-            jmlValidator.validate(context, parseResult);
-         }
+         markers.addAll(jmlValidator.validate(this.context, c));
+
       }
+      return markers;
    }
 }
