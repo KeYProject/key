@@ -24,7 +24,8 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 
 public class BatchMode {
 
-   public static boolean saveProof (Object result, Proof proof, String fileName) {
+   public static boolean saveProof (Object result, Proof proof, File keyProblemFile) {
+       String fileName = keyProblemFile.getAbsolutePath();
 
         if ( Main.getStatisticsFile() != null )
             saveStatistics ( Main.getStatisticsFile(), result.toString(),

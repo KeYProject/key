@@ -42,7 +42,7 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
     /**
      * Name of current key problem file that is attempted to be proven.
      */
-    private String keyProblemFile = null;
+    private File keyProblemFile = null;
     
     /**
      * We want to record whether there was a proof that could not be proven.
@@ -169,7 +169,7 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
          * It will be used in method printResults() to determine file names,
          * in which proofs will be written.
          */
-        keyProblemFile = file.getName();
+        keyProblemFile = file;
         super.loadProblem(file);
     }
 
