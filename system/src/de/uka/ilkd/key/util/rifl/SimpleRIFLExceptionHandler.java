@@ -15,15 +15,15 @@ package de.uka.ilkd.key.util.rifl;
 
 import java.util.ArrayList;
 import java.util.List;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
-import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 /**
  * Simple exception handler which just writes to standard output.
  *
  * @author bruns
  */
-public class SimpleRIFLExceptionHandler implements KeYExceptionHandler {
+public class SimpleRIFLExceptionHandler extends KeYRecoderExcHandler {
 
     static final SimpleRIFLExceptionHandler INSTANCE = new SimpleRIFLExceptionHandler();
 
@@ -44,5 +44,6 @@ public class SimpleRIFLExceptionHandler implements KeYExceptionHandler {
             reportException(e.getCause());
         }
     }
+
 
 }

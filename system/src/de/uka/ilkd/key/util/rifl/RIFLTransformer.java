@@ -19,20 +19,16 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
-
 import javax.xml.parsers.*;
-
 import org.xml.sax.*;
-
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.java.CompilationUnit;
 import recoder.java.JavaProgramFactory;
-
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.FileCollection.Walker;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
 
@@ -85,7 +81,7 @@ public class RIFLTransformer {
      * @param kexh
      */
     public static void transform(String riflFilename, String javaSource,
-            String savePath, KeYExceptionHandler kexh) {
+            String savePath, KeYRecoderExcHandler kexh) {
         assert riflFilename != null;
         assert javaSource != null;
         assert savePath != null;
@@ -107,7 +103,7 @@ public class RIFLTransformer {
         }
     }
 
-    public static void transform(String riflFilename, String javaSource, KeYExceptionHandler kexh) {
+    public static void transform(String riflFilename, String javaSource, KeYRecoderExcHandler kexh) {
         transform(riflFilename, javaSource, getDefaultSavePath(javaSource), kexh);
     }
 

@@ -38,7 +38,6 @@ import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExperimentalFeature;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.UnicodeHelper;
 import de.uka.ilkd.key.util.rifl.RIFLTransformer;
@@ -561,8 +560,8 @@ public final class Main {
                 System.out.println("[RIFL] No Java file to load from.");
                 System.exit (-130826);
             }
-            final KeYExceptionHandler kexh = ui.getMediator().getExceptionHandler();
-            RIFLTransformer.transform(riflFileName, fileNameOnStartUp, kexh);
+//            final KeYRecoderExceptionHandler kexh = ui.getMediator().getExceptionHandler();
+            RIFLTransformer.transform(riflFileName, fileNameOnStartUp);
             fileNameOnStartUp = RIFLTransformer.getDefaultSavePath(fileNameOnStartUp);
             if (verbosity > Verbosity.SILENT)
                 System.out.println("[RIFL] Writing transformed Java files to "+fileNameOnStartUp+" ...");
