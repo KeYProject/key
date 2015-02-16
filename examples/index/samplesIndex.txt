@@ -44,13 +44,13 @@ heap/vacid0_05_RedBlackTrees/README.txt
 heap/WeideEtAl_01_AddAndMultiply/README.txt
 heap/WeideEtAl_02_BinarySearch/README.txt
 
-firstTouch/000InformationFlow--MiniExamples/README.txt
-firstTouch/001InformationFlow--Sum/README.txt
-firstTouch/002InformationFlow--MethodContracts/README.txt
-firstTouch/003InformationFlow--ToyVoting/README.txt
-firstTouch/004InformationFlow--SimpleEvoting/README.txt
-firstTouch/005InformationFlow--ToyBanking/README.txt
-firstTouch/006InformationFlow--NewObjects/README.txt
-firstTouch/007InformationFlow--LoopInvariants/README.txt
-firstTouch/008InformationFlow--BlockContracts/README.txt
+InformationFlow/MiniExamples/README.txt
+InformationFlow/Sum/README.txt
+InformationFlow/MethodContracts/README.txt
+InformationFlow/ToyVoting/README.txt
+InformationFlow/SimpleEvoting/README.txt
+InformationFlow/ToyBanking/README.txt
+InformationFlow/NewObjects/README.txt
+InformationFlow/LoopInvariants/README.txt
+InformationFlow/BlockContracts/README.txt
 

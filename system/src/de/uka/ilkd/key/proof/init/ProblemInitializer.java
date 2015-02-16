@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -271,7 +272,15 @@ public final class ProblemInitializer {
         envInput.setInitConfig(initConfig);
         final String javaPath = envInput.readJavaPath();
         final List<File> classPath = envInput.readClassPath();
-        final File bootClassPath = envInput.readBootClassPath();
+        
+        final File bootClassPath;
+        try {
+         bootClassPath = envInput.readBootClassPath();
+        } catch (IOException ioe) {
+            throw new ProofInputException(ioe);
+        }
+
+        final Includes includes = envInput.readIncludes();
 
         //create Recoder2KeY, set classpath
         final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(),
