@@ -33,25 +33,19 @@ import de.uka.ilkd.key.rule.metaconstruct.MemberPVToField;
 import de.uka.ilkd.key.rule.metaconstruct.arith.DivideLCRMonomials;
 import de.uka.ilkd.key.rule.metaconstruct.arith.DivideMonomials;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaAdd;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaBinaryAnd;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaBinaryOr;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaBinaryXOr;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaDiv;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaEqual;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaGeq;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaGreater;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaIntAnd;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaIntOr;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaIntShiftLeft;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaIntShiftRight;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaIntUnsignedShiftRight;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaIntXor;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaLongAnd;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaLongOr;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaLongShiftLeft;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaLongShiftRight;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaLongUnsignedShiftRight;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaJavaLongXor;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaLeq;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaLess;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaMul;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaPow;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaShiftLeft;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaShiftRight;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaSub;
 import de.uka.ilkd.key.util.Debug;
 
@@ -69,14 +63,29 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     //must be first
     public static final Sort METASORT = new SortImpl(new Name("Meta"));    
     
+    public static final AbstractTermTransformer META_SHIFTRIGHT = new MetaShiftRight();
+
+    public static final AbstractTermTransformer META_SHIFTLEFT = new MetaShiftLeft();
+
+    public static final AbstractTermTransformer META_AND = new MetaBinaryAnd();
+
+    public static final AbstractTermTransformer META_OR = new MetaBinaryOr();
+
+    public static final AbstractTermTransformer META_XOR = new MetaBinaryXOr();
+
+    
+    
+    
     public static final AbstractTermTransformer META_ADD = new MetaAdd();
 
     public static final AbstractTermTransformer META_SUB = new MetaSub();
 
     public static final AbstractTermTransformer META_MUL = new MetaMul();
-
+    
     public static final AbstractTermTransformer META_DIV = new MetaDiv();
 
+    public static final AbstractTermTransformer META_POW = new MetaPow();
+    
     public static final AbstractTermTransformer META_LESS = new MetaLess();
 
     public static final AbstractTermTransformer META_GREATER = new MetaGreater();
@@ -86,30 +95,6 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer META_GEQ = new MetaGeq();
 
     public static final AbstractTermTransformer META_EQ = new MetaEqual();
-
-    public static final AbstractTermTransformer META_INT_AND = new MetaJavaIntAnd();
-
-    public static final AbstractTermTransformer META_INT_OR = new MetaJavaIntOr();
-
-    public static final AbstractTermTransformer META_INT_XOR = new MetaJavaIntXor();
-
-    public static final AbstractTermTransformer META_INT_SHIFTRIGHT = new MetaJavaIntShiftRight();
-
-    public static final AbstractTermTransformer META_INT_SHIFTLEFT = new MetaJavaIntShiftLeft();
-
-    public static final AbstractTermTransformer META_INT_UNSIGNEDSHIFTRIGHT = new MetaJavaIntUnsignedShiftRight();
-
-    public static final AbstractTermTransformer META_LONG_AND = new MetaJavaLongAnd();
-
-    public static final AbstractTermTransformer META_LONG_OR = new MetaJavaLongOr();
-
-    public static final AbstractTermTransformer META_LONG_XOR = new MetaJavaLongXor();
-
-    public static final AbstractTermTransformer META_LONG_SHIFTRIGHT = new MetaJavaLongShiftRight();
-
-    public static final AbstractTermTransformer META_LONG_SHIFTLEFT = new MetaJavaLongShiftLeft();
-
-    public static final AbstractTermTransformer META_LONG_UNSIGNEDSHIFTRIGHT = new MetaJavaLongUnsignedShiftRight();
 
     public static final AbstractTermTransformer ARRAY_BASE_INSTANCE_OF = new ArrayBaseInstanceOf();
 

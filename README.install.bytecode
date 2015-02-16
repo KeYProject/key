@@ -1,6 +1,6 @@
 		********************************
 		* KeY Byte Code Installation   * 
-		*        Version 2.2.0         *
+		*        Version 2.4.0         *
 		********************************
 
 
@@ -11,7 +11,7 @@ Hardware:	2 GB RAM
 
 Operating Systems: Linux/Unix 
                    Mac OS X
-                   Windows NT or newer
+                   Windows 7 or newer (older versions not tested)
 
 Java SE 6 or newer (already installed)
 
