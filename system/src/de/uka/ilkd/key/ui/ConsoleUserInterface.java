@@ -40,7 +40,7 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
     
     
     /**
-     * Name of current key problem file that is attempted to be proven.
+     * Current key problem file that is attempted to be proven.
      */
     private File keyProblemFile = null;
     
@@ -165,7 +165,7 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
     @Override
     public void loadProblem(File file) {
         /*
-         * We store the file name in a private field here.
+         * Current file is stored in a private field.
          * It will be used in method printResults() to determine file names,
          * in which proofs will be written.
          */
