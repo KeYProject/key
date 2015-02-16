@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Tue Oct 14 09:34:21 CEST 2014
+#Sat Feb 14 11:56:00 CET 2015
 [StrategyProperty]VBT_PHASE=VBT_SYM_EX
 [SMTSettings]useUninterpretedMultiplication=true
 [SMTSettings]SelectedTaclets=
@@ -24,7 +24,7 @@
 [Strategy]Timeout=-1
 [Strategy]MaximumNumberOfAutomaticApplications=10000
 [SMTSettings]integersMaximum=2147483645
-[Choice]DefaultChoices=assertions-assertions\\:on , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:allow , JavaCard-JavaCard\\:on , Strings-Strings\\:on , modelFields-modelFields\\:treatAsAxiom , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , moreSeqRules-moreSeqRules\\:on
+[Choice]DefaultChoices=initialisation-initialisation\\:disableStaticInitialisation , wdChecks-wdChecks\\:off , reach-reach\\:on , moreSeqRules-moreSeqRules\\:on , sequences-sequences\\:on , runtimeExceptions-runtimeExceptions\\:allow , wdOperator-wdOperator\\:L , JavaCard-JavaCard\\:on , integerSimplificationRules-integerSimplificationRules\\:full , modelFields-modelFields\\:treatAsAxiom , assertions-assertions\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , bigint-bigint\\:on , programRules-programRules\\:Java , Strings-Strings\\:on , permissions-permissions\\:off
 [SMTSettings]useConstantsForBigOrSmallIntegers=true
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
@@ -40,7 +40,7 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Tue Oct 14 09:34:21 CEST 2014
+#Sat Feb 14 11:56:00 CET 2015
 name=seqNPermRight
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
@@ -52,14 +52,15 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 (keyLog "3" (keyUser "Stijn" ) (keyVersion "5570769721c52ee00aff0bbfe18f32d3baba33db"))
 (keyLog "4" (keyUser "daniel" ) (keyVersion "7b6a4d606b29c3810d7091c61ced95b1eb3cd625"))
 (keyLog "5" (keyUser "daniel" ) (keyVersion "7b6a4d606b29c3810d7091c61ced95b1eb3cd625"))
+(keyLog "6" (keyUser "bubel" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "148415")
+(autoModeTime "148848")
 
 (branch "dummy ID"
 (rule "impRight" (formula "1") (newnames "v_iv,v_jv,f_s") (userinteraction))
 (rule "andLeft" (formula "1") (userinteraction))
 (rule "andLeft" (formula "1") (userinteraction))
-(rule "seqNPermDefReplace" (formula "4") (inst "jv=jv") (inst "iv=iv") (userinteraction))
+(rule "seqNPermDefReplace" (formula "4") (inst "iv=iv") (inst "jv=jv") (userinteraction))
 (rule "cut" (inst "cutFormula=\\forall int N;
   \\forall Seq s;
     (   seqLen(s) = N
@@ -86,7 +87,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
                 (  leq(Z(0(#)), jv)
                  & lt(jv, seqLen(s))
                  & int::seqGet(s, jv) = iv)))") (userinteraction))
-(branch "CUT: forall int N; forall Seq s; ( s.length = N -> forall int v_iv; forall int v_jv; ( 0 <= v_iv & v_iv < v_jv & v_jv < s.length -> ! int::seqGet(s, v_iv) = int::seqGet(s, v_jv)) & forall int v_iv; ( 0 <= v_iv & v_iv < s.length -> 0 <= int::seqGet(s, v_iv) & int::seqGet(s, v_iv) < s.length) & forall int v_iv; ( 0 <= v_iv & v_iv < s.length -> int::instance(any::seqGet(s, v_iv)) = TRUE) -> forall int iv; ( 0 <= iv & iv < s.length -> exists int jv; ( 0 <= jv & jv < s.length & int::seqGet(s, jv) = iv))) TRUE"
+(branch "CUT: forall int N; forall Seq s; ( s.length = N -> forall int v_iv; forall int v_jv; ( 0 <= v_iv & v_iv < v_jv & v_jv < s.length -> !(int)s[v_iv] = (int)s[v_jv]) & forall int v_iv; ( 0 <= v_iv & v_iv < s.length -> 0 <= (int)s[v_iv] & (int)s[v_iv] < s.length) & forall int v_iv; ( 0 <= v_iv & v_iv < s.length -> int::instance(s[v_iv]) = TRUE) -> forall int iv; ( 0 <= iv & iv < s.length -> exists int jv; ( 0 <= jv & jv < s.length & (int)s[jv] = iv))) TRUE"
    (rule "allLeftHide" (formula "1") (inst "t=seqLen(f_s)") (userinteraction))
    (rule "allLeftHide" (formula "1") (inst "t=f_s") (userinteraction))
    (rule "impLeft" (formula "1") (userinteraction))
@@ -485,7 +486,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
       )
    )
 )
-(branch "CUT: forall int N; forall Seq s; ( s.length = N -> forall int v_iv; forall int v_jv; ( 0 <= v_iv & v_iv < v_jv & v_jv < s.length -> ! int::seqGet(s, v_iv) = int::seqGet(s, v_jv)) & forall int v_iv; ( 0 <= v_iv & v_iv < s.length -> 0 <= int::seqGet(s, v_iv) & int::seqGet(s, v_iv) < s.length) & forall int v_iv; ( 0 <= v_iv & v_iv < s.length -> int::instance(any::seqGet(s, v_iv)) = TRUE) -> forall int iv; ( 0 <= iv & iv < s.length -> exists int jv; ( 0 <= jv & jv < s.length & int::seqGet(s, jv) = iv))) FALSE"
+(branch "CUT: forall int N; forall Seq s; ( s.length = N -> forall int v_iv; forall int v_jv; ( 0 <= v_iv & v_iv < v_jv & v_jv < s.length -> !(int)s[v_iv] = (int)s[v_jv]) & forall int v_iv; ( 0 <= v_iv & v_iv < s.length -> 0 <= (int)s[v_iv] & (int)s[v_iv] < s.length) & forall int v_iv; ( 0 <= v_iv & v_iv < s.length -> int::instance(s[v_iv]) = TRUE) -> forall int iv; ( 0 <= iv & iv < s.length -> exists int jv; ( 0 <= jv & jv < s.length & (int)s[jv] = iv))) FALSE"
    (rule "hide_right" (formula "5") (userinteraction))
    (rule "hide_left" (formula "2") (userinteraction))
    (rule "hide_left" (formula "2") (userinteraction))
@@ -561,7 +562,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
       (rule "concrete_and_2" (formula "1"))
       (rule "closeFalse" (formula "1"))
    )
-   (branch "Step Case"
+   (branch "Step Case (positive)"
       (rule "impRight" (formula "1") (userinteraction))
       (rule "andLeft" (formula "1") (userinteraction))
       (rule "allRight" (formula "3") (inst "sk=s_1") (userinteraction))
@@ -573,12 +574,12 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
   (  leq(Z(0(#)), j)
    & lt(j, seqLen(s_1))
    & int::seqGet(s_1, j) = N_0)") (userinteraction))
-      (branch "CUT: exists int j; (0 <= j & j < s_1.length & int::seqGet(s_1, j) = N_0) TRUE"
+      (branch "CUT: exists int j; (0 <= j & j < s_1.length & (int)s_1[j] = N_0) TRUE"
          (rule "exLeft" (formula "1") (inst "sk=j_0") (userinteraction))
          (rule "cut" (inst "cutFormula=\\forall int j;
   (   leq(Z(0(#)), j) & lt(j, seqLen(s_1)) & !j = j_0
    -> !int::seqGet(s_1, j) = N_0)") (userinteraction))
-         (branch "CUT: forall int j; ( 0 <= j & j < s_1.length & !j = j_0 -> !int::seqGet(s_1, j) = N_0) TRUE"
+         (branch "CUT: forall int j; ( 0 <= j & j < s_1.length & !j = j_0 -> !(int)s_1[j] = N_0) TRUE"
             (rule "allLeftHide" (formula "8") (inst "t=seqDef{int i;}(Z(0(#)),
                N_0,
                \\if (i = j_0)
@@ -2561,7 +2562,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
                               (rule "concrete_and_2" (formula "13") (term "0"))
                               (rule "concrete_or_2" (formula "13"))
                               (rule "cut_direct" (formula "18") (term "0"))
-                              (branch "CUT: int::seqGet(s_1, v_iv_5) >= 0 TRUE"
+                              (branch "CUT: (int)s_1[v_iv_5] >= 0 TRUE"
                                  (rule "concrete_and_1" (formula "19"))
                                  (rule "inEqSimp_leqRight" (formula "19"))
                                  (rule "polySimp_rightDist" (formula "1") (term "1,0,0"))
@@ -2643,7 +2644,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
                                  (rule "concrete_and_2" (formula "3"))
                                  (rule "closeFalse" (formula "3"))
                               )
-                              (branch "CUT: int::seqGet(s_1, v_iv_5) >= 0 FALSE"
+                              (branch "CUT: (int)s_1[v_iv_5] >= 0 FALSE"
                                  (rule "concrete_and_2" (formula "19"))
                                  (rule "false_right" (formula "19"))
                                  (rule "inEqSimp_geqRight" (formula "18"))
@@ -3856,7 +3857,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
                )
             )
          )
-         (branch "CUT: forall int j; ( 0 <= j & j < s_1.length & !j = j_0 -> !int::seqGet(s_1, j) = N_0) FALSE"
+         (branch "CUT: forall int j; ( 0 <= j & j < s_1.length & !j = j_0 -> !(int)s_1[j] = N_0) FALSE"
             (rule "andLeft" (formula "1"))
             (rule "andLeft" (formula "1"))
             (rule "allRight" (formula "10") (inst "sk=j_1"))
@@ -4449,7 +4450,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
             (rule "closeFalse" (formula "7"))
          )
       )
-      (branch "CUT: exists int j; (0 <= j & j < s_1.length & int::seqGet(s_1, j) = N_0) FALSE"
+      (branch "CUT: exists int j; (0 <= j & j < s_1.length & (int)s_1[j] = N_0) FALSE"
          (rule "hide_right" (formula "8") (userinteraction))
          (rule "allLeftHide" (formula "6") (inst "t=seqDef{int i;}(Z(0(#)), N_0, int::seqGet(s_1, i))") (userinteraction))
          (rule "impLeft" (formula "6") (userinteraction))
@@ -5199,7 +5200,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
                         (rule "inEqSimp_sepPosMonomial1" (formula "3"))
                         (rule "mul_literals" (formula "3") (term "1"))
                         (rule "cut_direct" (formula "10") (term "0"))
-                        (branch "CUT: int::seqGet(s_1, v_iv_2) >= 0 TRUE"
+                        (branch "CUT: (int)s_1[v_iv_2] >= 0 TRUE"
                            (rule "concrete_and_1" (formula "11"))
                            (rule "inEqSimp_leqRight" (formula "11"))
                            (rule "polySimp_rightDist" (formula "1") (term "1,0,0"))
@@ -5274,7 +5275,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
                            (rule "leq_literals" (formula "3"))
                            (rule "closeFalse" (formula "3"))
                         )
-                        (branch "CUT: int::seqGet(s_1, v_iv_2) >= 0 FALSE"
+                        (branch "CUT: (int)s_1[v_iv_2] >= 0 FALSE"
                            (rule "concrete_and_2" (formula "11"))
                            (rule "false_right" (formula "11"))
                            (rule "inEqSimp_geqRight" (formula "10"))
@@ -5598,7 +5599,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
                   (rule "commute_or" (formula "4") (term "0"))
                   (rule "commute_or_2" (formula "2") (term "0,0,0"))
                   (rule "cut_direct" (formula "8") (term "0"))
-                  (branch "CUT: int::seqGet(s_1, N_0) >= 0 TRUE"
+                  (branch "CUT: (int)s_1[N_0] >= 0 TRUE"
                      (rule "concrete_and_1" (formula "9"))
                      (rule "inEqSimp_geqRight" (formula "9"))
                      (rule "polySimp_rightDist" (formula "1") (term "1,0,0"))
@@ -5743,7 +5744,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
                         (rule "close" (formula "6") (ifseqformula "1"))
                      )
                   )
-                  (branch "CUT: int::seqGet(s_1, N_0) >= 0 FALSE"
+                  (branch "CUT: (int)s_1[N_0] >= 0 FALSE"
                      (rule "concrete_and_2" (formula "9"))
                      (rule "false_right" (formula "9"))
                      (rule "inEqSimp_geqRight" (formula "8"))
@@ -6201,6 +6202,180 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
             )
          )
       )
+   )
+   (branch "Step Case (negative)"
+      (rule "impRight" (formula "1"))
+      (rule "andLeft" (formula "1"))
+      (rule "allRight" (formula "3") (inst "sk=s_2"))
+      (rule "impRight" (formula "3"))
+      (rule "impRight" (formula "4"))
+      (rule "andLeft" (formula "1"))
+      (rule "andLeft" (formula "1"))
+      (rule "allRight" (formula "7") (inst "sk=iv_4"))
+      (rule "impRight" (formula "7"))
+      (rule "andLeft" (formula "1"))
+      (rule "eqSymm" (formula "8") (term "0,1,0,0,0,0,0,1,0"))
+      (rule "eqSymm" (formula "3") (term "0,1,0,0"))
+      (rule "polySimp_elimSub" (formula "6") (term "1"))
+      (rule "mul_literals" (formula "6") (term "1,1"))
+      (rule "polySimp_addComm0" (formula "6") (term "1"))
+      (rule "inEqSimp_ltToLeq" (formula "8") (term "1,0,0,1,0,1,0"))
+      (rule "polySimp_mulComm0" (formula "8") (term "1,0,0,1,0,0,1,0,1,0"))
+      (rule "polySimp_addComm1" (formula "8") (term "0,1,0,0,1,0,1,0"))
+      (rule "inEqSimp_ltToLeq" (formula "8") (term "1,0,0,1,0,0,1,0"))
+      (rule "polySimp_mulComm0" (formula "8") (term "1,0,0,1,0,0,1,0,0,1,0"))
+      (rule "polySimp_addComm1" (formula "8") (term "0,1,0,0,1,0,0,1,0"))
+      (rule "inEqSimp_ltToLeq" (formula "8") (term "1,0,0,1,1,0"))
+      (rule "polySimp_mulComm0" (formula "8") (term "1,0,0,1,0,0,1,1,0"))
+      (rule "polySimp_addComm1" (formula "8") (term "0,1,0,0,1,1,0"))
+      (rule "inEqSimp_ltToLeq" (formula "8") (term "1,0,0,0,0,0,0,1,0"))
+      (rule "polySimp_mulComm0" (formula "8") (term "1,0,0,1,0,0,0,0,0,0,1,0"))
+      (rule "polySimp_addComm1" (formula "8") (term "0,1,0,0,0,0,0,0,1,0"))
+      (rule "inEqSimp_ltToLeq" (formula "8") (term "1,0,0,1,0,1,1,0"))
+      (rule "polySimp_mulComm0" (formula "8") (term "1,0,0,1,0,0,1,0,1,1,0"))
+      (rule "polySimp_addComm1" (formula "8") (term "0,1,0,0,1,0,1,1,0"))
+      (rule "inEqSimp_ltToLeq" (formula "8") (term "1,1,0,1,0,0,1,0"))
+      (rule "polySimp_mulComm0" (formula "8") (term "1,0,0,1,1,0,1,0,0,1,0"))
+      (rule "inEqSimp_ltToLeq" (formula "8") (term "1,0,0,0,0,0,0,0,1,0"))
+      (rule "polySimp_mulComm0" (formula "8") (term "1,0,0,1,0,0,0,0,0,0,0,1,0"))
+      (rule "polySimp_addComm1" (formula "8") (term "0,1,0,0,0,0,0,0,0,1,0"))
+      (rule "inEqSimp_ltToLeq" (formula "5") (term "1,0,0"))
+      (rule "polySimp_mulComm0" (formula "5") (term "1,0,0,1,0,0"))
+      (rule "inEqSimp_ltToLeq" (formula "4") (term "1,0,0"))
+      (rule "polySimp_mulComm0" (formula "4") (term "1,0,0,1,0,0"))
+      (rule "inEqSimp_ltToLeq" (formula "4") (term "1,1,0"))
+      (rule "polySimp_mulComm0" (formula "4") (term "1,0,0,1,1,0"))
+      (rule "inEqSimp_ltToLeq" (formula "3") (term "1,0,0,0,0"))
+      (rule "polySimp_mulComm0" (formula "3") (term "1,0,0,1,0,0,0,0"))
+      (rule "polySimp_addComm1" (formula "3") (term "0,1,0,0,0,0"))
+      (rule "inEqSimp_ltToLeq" (formula "3") (term "1,0,0,0"))
+      (rule "polySimp_mulComm0" (formula "3") (term "1,0,0,1,0,0,0"))
+      (rule "inEqSimp_ltToLeq" (formula "9") (term "1,0,0"))
+      (rule "polySimp_mulComm0" (formula "9") (term "1,0,0,1,0,0"))
+      (rule "inEqSimp_ltToLeq" (formula "2"))
+      (rule "polySimp_mulComm0" (formula "2") (term "1,0,0"))
+      (rule "polySimp_addComm1" (formula "2") (term "0"))
+      (rule "inEqSimp_commuteLeq" (formula "8") (term "0,1,0,1,0,0,1,0"))
+      (rule "inEqSimp_commuteLeq" (formula "8") (term "0,0,0,1,0,1,1,0"))
+      (rule "inEqSimp_commuteLeq" (formula "8") (term "0,0,0,1,0,0,1,0"))
+      (rule "inEqSimp_commuteLeq" (formula "8") (term "0,0,0,1,0,1,0"))
+      (rule "inEqSimp_commuteLeq" (formula "8") (term "0,0,0,1,1,0"))
+      (rule "inEqSimp_commuteLeq" (formula "8") (term "0,0,0,0,0,0,0,0,1,0"))
+      (rule "inEqSimp_commuteLeq" (formula "5") (term "0,0,0"))
+      (rule "inEqSimp_commuteLeq" (formula "3") (term "0,0,0,0,0"))
+      (rule "inEqSimp_commuteLeq" (formula "4") (term "0,1,0"))
+      (rule "inEqSimp_commuteLeq" (formula "4") (term "0,0,0"))
+      (rule "inEqSimp_commuteLeq" (formula "9") (term "0,0,0"))
+      (rule "inEqSimp_commuteLeq" (formula "1"))
+      (rule "applyEqRigid" (formula "2") (term "0,1,0") (ifseqformula "6"))
+      (rule "polySimp_mulComm0" (formula "2") (term "1,0"))
+      (rule "polySimp_rightDist" (formula "2") (term "1,0"))
+      (rule "mul_literals" (formula "2") (term "0,1,0"))
+      (rule "polySimp_addComm1" (formula "2") (term "0"))
+      (rule "polySimp_addAssoc" (formula "2") (term "0,0"))
+      (rule "add_literals" (formula "2") (term "0,0,0"))
+      (rule "applyEq" (formula "4") (term "0,1,0,0,1,1,0") (ifseqformula "6"))
+      (rule "polySimp_mulComm0" (formula "4") (term "1,0,0,1,1,0"))
+      (rule "polySimp_rightDist" (formula "4") (term "1,0,0,1,1,0"))
+      (rule "mul_literals" (formula "4") (term "0,1,0,0,1,1,0"))
+      (rule "polySimp_addAssoc" (formula "4") (term "0,0,1,1,0"))
+      (rule "add_literals" (formula "4") (term "0,0,0,1,1,0"))
+      (rule "applyEq" (formula "5") (term "0,1,0,0,1,0,0") (ifseqformula "6"))
+      (rule "polySimp_mulComm0" (formula "5") (term "1,0,0,1,0,0"))
+      (rule "polySimp_rightDist" (formula "5") (term "1,0,0,1,0,0"))
+      (rule "mul_literals" (formula "5") (term "0,1,0,0,1,0,0"))
+      (rule "polySimp_addAssoc" (formula "5") (term "0,0,1,0,0"))
+      (rule "add_literals" (formula "5") (term "0,0,0,1,0,0"))
+      (rule "applyEq" (formula "4") (term "0,1,0,0,1,0,0") (ifseqformula "6"))
+      (rule "polySimp_mulComm0" (formula "4") (term "1,0,0,1,0,0"))
+      (rule "polySimp_rightDist" (formula "4") (term "1,0,0,1,0,0"))
+      (rule "mul_literals" (formula "4") (term "0,1,0,0,1,0,0"))
+      (rule "polySimp_addAssoc" (formula "4") (term "0,0,1,0,0"))
+      (rule "add_literals" (formula "4") (term "0,0,0,1,0,0"))
+      (rule "applyEqRigid" (formula "9") (term "0,1,0,0,1,0,0") (ifseqformula "6"))
+      (rule "polySimp_mulComm0" (formula "9") (term "1,0,0,1,0,0"))
+      (rule "polySimp_rightDist" (formula "9") (term "1,0,0,1,0,0"))
+      (rule "mul_literals" (formula "9") (term "0,1,0,0,1,0,0"))
+      (rule "polySimp_addAssoc" (formula "9") (term "0,0,1,0,0"))
+      (rule "add_literals" (formula "9") (term "0,0,0,1,0,0"))
+      (rule "applyEq" (formula "3") (term "0,1,0,0,1,0,0,0") (ifseqformula "6"))
+      (rule "polySimp_mulComm0" (formula "3") (term "1,0,0,1,0,0,0"))
+      (rule "polySimp_rightDist" (formula "3") (term "1,0,0,1,0,0,0"))
+      (rule "mul_literals" (formula "3") (term "0,1,0,0,1,0,0,0"))
+      (rule "polySimp_addAssoc" (formula "3") (term "0,0,1,0,0,0"))
+      (rule "add_literals" (formula "3") (term "0,0,0,1,0,0,0"))
+      (rule "inEqSimp_sepNegMonomial0" (formula "8") (term "1,0,0,1,0,1,0"))
+      (rule "polySimp_mulLiterals" (formula "8") (term "0,1,0,0,1,0,1,0"))
+      (rule "polySimp_elimOne" (formula "8") (term "0,1,0,0,1,0,1,0"))
+      (rule "inEqSimp_sepNegMonomial0" (formula "8") (term "1,0,0,1,0,0,1,0"))
+      (rule "polySimp_mulLiterals" (formula "8") (term "0,1,0,0,1,0,0,1,0"))
+      (rule "polySimp_elimOne" (formula "8") (term "0,1,0,0,1,0,0,1,0"))
+      (rule "inEqSimp_sepNegMonomial0" (formula "8") (term "1,0,0,1,1,0"))
+      (rule "polySimp_mulLiterals" (formula "8") (term "0,1,0,0,1,1,0"))
+      (rule "polySimp_elimOne" (formula "8") (term "0,1,0,0,1,1,0"))
+      (rule "inEqSimp_sepNegMonomial0" (formula "8") (term "1,0,0,0,0,0,0,1,0"))
+      (rule "polySimp_mulLiterals" (formula "8") (term "0,1,0,0,0,0,0,0,1,0"))
+      (rule "polySimp_elimOne" (formula "8") (term "0,1,0,0,0,0,0,0,1,0"))
+      (rule "inEqSimp_sepNegMonomial0" (formula "8") (term "1,0,0,1,0,1,1,0"))
+      (rule "polySimp_mulLiterals" (formula "8") (term "0,1,0,0,1,0,1,1,0"))
+      (rule "polySimp_elimOne" (formula "8") (term "0,1,0,0,1,0,1,1,0"))
+      (rule "inEqSimp_sepPosMonomial0" (formula "8") (term "1,1,0,1,0,0,1,0"))
+      (rule "polySimp_mulComm0" (formula "8") (term "1,1,1,0,1,0,0,1,0"))
+      (rule "polySimp_rightDist" (formula "8") (term "1,1,1,0,1,0,0,1,0"))
+      (rule "mul_literals" (formula "8") (term "0,1,1,1,0,1,0,0,1,0"))
+      (rule "polySimp_mulLiterals" (formula "8") (term "1,1,1,1,0,1,0,0,1,0"))
+      (rule "polySimp_elimOne" (formula "8") (term "1,1,1,1,0,1,0,0,1,0"))
+      (rule "inEqSimp_sepNegMonomial0" (formula "8") (term "1,0,0,0,0,0,0,0,1,0"))
+      (rule "polySimp_mulLiterals" (formula "8") (term "0,1,0,0,0,0,0,0,0,1,0"))
+      (rule "polySimp_elimOne" (formula "8") (term "0,1,0,0,0,0,0,0,0,1,0"))
+      (rule "inEqSimp_sepNegMonomial0" (formula "3") (term "1,0,0,0,0"))
+      (rule "polySimp_mulLiterals" (formula "3") (term "0,1,0,0,0,0"))
+      (rule "polySimp_elimOne" (formula "3") (term "0,1,0,0,0,0"))
+      (rule "inEqSimp_sepPosMonomial0" (formula "2"))
+      (rule "polySimp_mulComm0" (formula "2") (term "1"))
+      (rule "polySimp_rightDist" (formula "2") (term "1"))
+      (rule "polySimp_mulLiterals" (formula "2") (term "1,1"))
+      (rule "mul_literals" (formula "2") (term "0,1"))
+      (rule "polySimp_elimOne" (formula "2") (term "1,1"))
+      (rule "inEqSimp_sepPosMonomial0" (formula "4") (term "1,1,0"))
+      (rule "polySimp_mulComm0" (formula "4") (term "1,1,1,0"))
+      (rule "polySimp_rightDist" (formula "4") (term "1,1,1,0"))
+      (rule "mul_literals" (formula "4") (term "0,1,1,1,0"))
+      (rule "polySimp_mulLiterals" (formula "4") (term "1,1,1,1,0"))
+      (rule "polySimp_elimOne" (formula "4") (term "1,1,1,1,0"))
+      (rule "inEqSimp_sepPosMonomial0" (formula "5") (term "1,0,0"))
+      (rule "polySimp_mulComm0" (formula "5") (term "1,1,0,0"))
+      (rule "polySimp_rightDist" (formula "5") (term "1,1,0,0"))
+      (rule "mul_literals" (formula "5") (term "0,1,1,0,0"))
+      (rule "polySimp_mulLiterals" (formula "5") (term "1,1,1,0,0"))
+      (rule "polySimp_elimOne" (formula "5") (term "1,1,1,0,0"))
+      (rule "inEqSimp_sepPosMonomial0" (formula "4") (term "1,0,0"))
+      (rule "polySimp_mulComm0" (formula "4") (term "1,1,0,0"))
+      (rule "polySimp_rightDist" (formula "4") (term "1,1,0,0"))
+      (rule "polySimp_mulLiterals" (formula "4") (term "1,1,1,0,0"))
+      (rule "mul_literals" (formula "4") (term "0,1,1,0,0"))
+      (rule "polySimp_elimOne" (formula "4") (term "1,1,1,0,0"))
+      (rule "inEqSimp_sepPosMonomial0" (formula "9") (term "1,0,0"))
+      (rule "polySimp_mulComm0" (formula "9") (term "1,1,0,0"))
+      (rule "polySimp_rightDist" (formula "9") (term "1,1,0,0"))
+      (rule "polySimp_mulLiterals" (formula "9") (term "1,1,1,0,0"))
+      (rule "mul_literals" (formula "9") (term "0,1,1,0,0"))
+      (rule "polySimp_elimOne" (formula "9") (term "1,1,1,0,0"))
+      (rule "inEqSimp_sepPosMonomial0" (formula "3") (term "1,0,0,0"))
+      (rule "polySimp_mulComm0" (formula "3") (term "1,1,0,0,0"))
+      (rule "polySimp_rightDist" (formula "3") (term "1,1,0,0,0"))
+      (rule "polySimp_mulLiterals" (formula "3") (term "1,1,1,0,0,0"))
+      (rule "mul_literals" (formula "3") (term "0,1,1,0,0,0"))
+      (rule "polySimp_elimOne" (formula "3") (term "1,1,1,0,0,0"))
+      (rule "inEqSimp_exactShadow3" (formula "1") (ifseqformula "2"))
+      (rule "mul_literals" (formula "1") (term "0,0"))
+      (rule "add_zero_left" (formula "1") (term "0"))
+      (rule "inEqSimp_sepPosMonomial1" (formula "1"))
+      (rule "mul_literals" (formula "1") (term "1"))
+      (rule "inEqSimp_contradInEq0" (formula "1") (ifseqformula "8"))
+      (rule "qeq_literals" (formula "1") (term "0"))
+      (builtin "One Step Simplification" (formula "1"))
+      (rule "closeFalse" (formula "1"))
    )
 )
 )

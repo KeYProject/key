@@ -4,7 +4,9 @@ ChangeLog
 Revision 2.4.0:
 ===============
  * Information flow reasoning
+ * Full support for symbolic execution with bitwise operations
  * Improved test case generation
+ * Improved user interface
  * Support for CVC4 SMT solver backend
 
 Revision 2.2.3:
