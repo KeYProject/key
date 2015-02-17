@@ -534,7 +534,7 @@ public final class Main {
      * @return {@link File} object representing working directory.
      */
     public static File getWorkingDir() {
-        if (fileArguments.isEmpty()) {
+        if (!fileArguments.isEmpty()) {
             File f = fileArguments.get(0);
             if (f.isDirectory()) {
                 return f;
