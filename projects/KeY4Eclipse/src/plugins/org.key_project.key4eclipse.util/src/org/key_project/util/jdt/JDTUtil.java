@@ -315,30 +315,6 @@ public class JDTUtil {
    }
    
    /**
-    * Returns the full qualified type name of the given method parameter.
-    * @param declaringType The {@link IType} that contains the {@link IMethod} which has the given parameter as {@link ILocalVariable} instance.
-    * @param parameter The parameter.
-    * @return The full qualified name.
-    * @throws JavaModelException Occurred Exception.
-    */
-   public static String getQualifiedParameterType(IType declaringType, ILocalVariable parameter) throws JavaModelException {
-      try {
-         if (declaringType != null && parameter != null) {
-            StringBuffer sb = new StringBuffer();
-            JavaElementLabelComposerHelper c = new JavaElementLabelComposerHelper(sb, declaringType);
-            c.appendTypeSignatureLabel(parameter, parameter.getTypeSignature(), JavaElementLabels.F_PRE_TYPE_SIGNATURE);
-            return sb.toString();
-         }
-         else {
-            return null;
-         }
-      }
-      catch (JavaModelRuntimeException e) {
-         throw e.getCause();
-      }
-   }
-   
-   /**
     * Utility class to compute the full qualified type of a method parameter.
     * @author Martin Hentschel
     */
