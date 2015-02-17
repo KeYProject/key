@@ -2,9 +2,15 @@ package org.key_project.jmlediting.core.profile.persistence;
 
 import org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence;
 
-public class ProfilePersistenceFactory {
+public final class ProfilePersistenceFactory {
 
-   public IDerivedProfilePersistence createDerivedProfilePersistence() {
+   /**
+    * No instances.
+    */
+   private ProfilePersistenceFactory() {
+   }
+
+   public static IDerivedProfilePersistence createDerivedProfilePersistence() {
       return new DerivedProfilePersistence();
    }
 
