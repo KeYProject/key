@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
@@ -191,34 +190,6 @@ public class JDTUtilTest extends TestCase {
       assertTrue(block.getStartPosition() >= method.getSourceRange().getOffset());
       assertTrue(block.getStartPosition() + block.getLength() <= method.getSourceRange().getOffset() + method.getSourceRange().getLength());
    }
-   
-    /**
-     * Tests {@link JDTUtil#getQualifiedParameterType(IType, org.eclipse.jdt.core.ILocalVariable)}.
-     */
-    @Test
-    public void testGetQualifiedParameterType() throws CoreException, InterruptedException {
-        // Create projects with test content
-        IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testGetQualifiedParameterType");
-        IFolder srcFolder = javaProject.getProject().getFolder("src");
-        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/SignatureLabelTest", srcFolder);
-        // Get type
-        IType type = javaProject.findType("SignatureLabelTest");
-        assertNotNull(type);
-        IMethod[] methods = type.getMethods();
-        IMethod method = JDTUtil.getElementForQualifiedMethodLabel(methods, "ADateBDate(a.Date, b.Date)");
-        assertNotNull(method);
-        ILocalVariable[] parameters = method.getParameters();
-        assertEquals(2, parameters.length);
-        // Test null type
-        assertNull(JDTUtil.getQualifiedParameterType(null, parameters[0]));
-        // Test null parameter
-        assertNull(JDTUtil.getQualifiedParameterType(type, null));
-        // Test both null
-        assertNull(JDTUtil.getQualifiedParameterType(null, null));
-        // Test methods parameter
-        assertEquals("a.Date", JDTUtil.getQualifiedParameterType(type, parameters[0]));
-        assertEquals("b.Date", JDTUtil.getQualifiedParameterType(type, parameters[1]));
-    }
     
     /**
      * Tests {@link JDTUtil#getElementForQualifiedMethodLabel(IMethod[], String)}
