@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.internal.ui.wizards.NewWizardMessages;
 import org.eclipse.jdt.ui.wizards.NewJavaProjectWizardPageOne;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
@@ -31,6 +32,7 @@ import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.sed.key.example.ui.Activator;
+import org.key_project.sed.key.example.ui.util.KeYSEDExampleImages;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
@@ -47,6 +49,14 @@ public class SEDExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
    @Override
    protected String getExampleName() {
       return "SED Examples";
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected ImageDescriptor computeImageDescriptor() {
+      return KeYSEDExampleImages.getImageDescriptor(KeYSEDExampleImages.NEW_KEY_SED_JAVA_PROJECT_WIZARD);
    }
 
    /**

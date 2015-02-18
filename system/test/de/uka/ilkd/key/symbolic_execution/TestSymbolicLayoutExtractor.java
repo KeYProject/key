@@ -68,6 +68,26 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
     */
+   public void testMyInteger() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorMyInteger/test/MyInteger.java",
+             "MyInteger",
+             "examples/_testcase/set/configurationExtractorMyInteger/oracle/",
+             "StaticMember.xml",
+             "testMyInteger_initial",
+             ".xml",
+             "testMyInteger_current",
+             ".xml",
+             null,
+             1,
+             2,
+             false,
+             false);
+   }
+
+   /**
+    * Tests "configurationExtractorInstanceCreationTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
    public void testVariableArrayIndex() throws Exception {
       doTest("examples/_testcase/set/configurationExtractorVariableArrayIndex/test/VariableArrayIndex.java",
              "VariableArrayIndex",

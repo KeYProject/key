@@ -141,21 +141,28 @@ public abstract class AbstractUpdateExtractor {
     * By default the set will contain the exc variable and the backup
     * of arguments and the heap.
     * </p>
+    * @param ignoreExceptionVariable Ignore exception variable?
+    * @param ignoreOldStateVariables Ignore old state variables?
     * @return The objects to ignore.
     */
-   protected Set<Term> computeInitialObjectsToIgnore() {
+   protected Set<Term> computeInitialObjectsToIgnore(boolean ignoreExceptionVariable, 
+                                                     boolean ignoreOldStateVariables) {
       Set<Term> result = new LinkedHashSet<Term>();
-      // Add exception variable to the ignore list because it is not part of the source code.
-      IProgramVariable excVar = SymbolicExecutionUtil.extractExceptionVariable(getProof());
-      if (excVar instanceof ProgramVariable) {
-         result.add(getServices().getTermBuilder().var((ProgramVariable)excVar));
+      if (ignoreExceptionVariable) {
+         // Add exception variable to the ignore list because it is not part of the source code.
+         IProgramVariable excVar = SymbolicExecutionUtil.extractExceptionVariable(getProof());
+         if (excVar instanceof ProgramVariable) {
+            result.add(getServices().getTermBuilder().var((ProgramVariable)excVar));
+         }
       }
-      // Add initial updates which are used as backup of the heap and method arguments. They are not part of the source code and should be ignored.
-      Sequent sequent = getRoot().sequent();
-      for (SequentFormula sf : sequent.succedent()) {
-         Term term = sf.formula();
-         if (Junctor.IMP.equals(term.op())) {
-            fillInitialObjectsToIgnoreRecursively(term.sub(1), result);
+      if (ignoreOldStateVariables) {
+         // Add initial updates which are used as backup of the heap and method arguments. They are not part of the source code and should be ignored.
+         Sequent sequent = getRoot().sequent();
+         for (SequentFormula sf : sequent.succedent()) {
+            Term term = sf.formula();
+            if (Junctor.IMP.equals(term.op())) {
+               fillInitialObjectsToIgnoreRecursively(term.sub(1), result);
+            }
          }
       }
       return result;
@@ -882,29 +889,21 @@ public abstract class AbstractUpdateExtractor {
             originalUpdates = SymbolicExecutionUtil.computeRootElementaryUpdates(node);
          }
          else {
-            Term originalModifiedFormula = modalityPio.constrainedFormula().formula();
+            Term originalModifiedFormula = modalityPio.subTerm();
             originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;            
          }
       }
       // Combine memory layout with original updates
       ImmutableList<Term> additionalUpdates = ImmutableSLList.nil();
-      for (Term originalUpdate : originalUpdates) {
-         if (UpdateJunctor.PARALLEL_UPDATE == originalUpdate.op()) {
-            additionalUpdates = additionalUpdates.append(originalUpdate.subs());
-         }
-         else if (originalUpdate.op() instanceof ElementaryUpdate) {
-            additionalUpdates = additionalUpdates.append(originalUpdate);
-         }
-         else {
-            throw new ProofInputException("Unexpected update operator \"" + originalUpdate.op() + "\".");
-         }
-      }
       for (ExtractLocationParameter evp : locations) {
          additionalUpdates = additionalUpdates.append(evp.createPreUpdate());
       }
-      ImmutableList<Term> newUpdates = ImmutableSLList.<Term>nil().append(getServices().getTermBuilder().parallel(additionalUpdates));
+      // Apply updates
+      TermBuilder tb = getServices().getTermBuilder();
+      Term updateLayoutTerm = tb.applyParallel(originalUpdates, layoutTerm);
+      updateLayoutTerm = tb.applyParallel(additionalUpdates, updateLayoutTerm);
       final ProofEnvironment sideProofEnv = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
-      Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, modalityPio, layoutCondition, layoutTerm, newUpdates, false);
+      Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, modalityPio, layoutCondition, updateLayoutTerm, null, false);
       // Instantiate and run proof
       ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
                                                                           sideProofEnv,

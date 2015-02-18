@@ -79,7 +79,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
       // Extract locations from updates
       Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();
-      objectsToIgnore = computeInitialObjectsToIgnore(); // Contains all objects which should be ignored, like exc of the proof obligation and created objects during symbolic execution
+      objectsToIgnore = computeInitialObjectsToIgnore(false, false); // Contains all objects which should be ignored, like exc of the proof obligation.
       Set<Term> updateCreatedObjects = new LinkedHashSet<Term>(); // Contains all objects which are created during symbolic execution
       Set<Term> updateValueObjects = new LinkedHashSet<Term>(); // Contains all objects which are the value of an update
       collectLocationsFromUpdates(node.sequent(), temporaryCurrentLocations, updateCreatedObjects, updateValueObjects, objectsToIgnore);

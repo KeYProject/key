@@ -258,4 +258,33 @@ public final class StringUtil {
          return null;
       }
    }
+
+   /**
+    * Chops the given text if required.
+    * @param text The text to check.
+    * @param maxLength The maximal length to ensure.
+    * @return The text considering the maximal length.
+    */
+   public static String chop(String text, int maxLength) {
+      if (text != null && text.length() > maxLength) {
+         if (maxLength <= 0) {
+            return EMPTY_STRING;
+         }
+         else if (maxLength == 1) {
+            return ".";
+         }
+         else if (maxLength == 2) {
+            return "..";
+         }
+         else if (maxLength == 3) {
+            return "...";
+         }
+         else {
+            return text.substring(0, maxLength - 3) + "...";
+         }
+      }
+      else {
+         return text;
+      }
+   }
 }

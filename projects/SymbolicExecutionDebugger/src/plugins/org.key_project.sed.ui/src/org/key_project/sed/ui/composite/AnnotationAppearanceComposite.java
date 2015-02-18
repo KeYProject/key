@@ -12,7 +12,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
+import org.key_project.sed.core.annotation.ISEDAnnotationAppearance;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.annotation.impl.AnnotationApperanceDefinition;
 
 /**
  * This {@link Composite} is used to edit the appearance of an {@link ISEDAnnotation}
@@ -135,18 +137,22 @@ public class AnnotationAppearanceComposite extends Composite {
          backgroundSelector.setColorValue(annotationType.getBackgroundColor());
          highlightForegroundButton.setSelection(annotationType.isHighlightForeground());
          foregroundSelector.setColorValue(annotationType.getForegroundColor());
+         updateBackgroundEnabled();
+         updateForegroundEnabled();
       }
    }
 
    /**
     * Updates the shown content.
     */
-   public void showContent(ISEDAnnotation annotation) {
-      if (annotation != null) {
-         highlightBackgroundButton.setSelection(annotation.isHighlightBackground());
-         backgroundSelector.setColorValue(annotation.getBackgroundColor());
-         highlightForegroundButton.setSelection(annotation.isHighlightForeground());
-         foregroundSelector.setColorValue(annotation.getForegroundColor());
+   public void showContent(ISEDAnnotationAppearance appearance) {
+      if (appearance != null) {
+         highlightBackgroundButton.setSelection(appearance.isHighlightBackground());
+         backgroundSelector.setColorValue(appearance.getBackgroundColor());
+         highlightForegroundButton.setSelection(appearance.isHighlightForeground());
+         foregroundSelector.setColorValue(appearance.getForegroundColor());
+         updateBackgroundEnabled();
+         updateForegroundEnabled();
       }
    }
 
@@ -179,36 +185,46 @@ public class AnnotationAppearanceComposite extends Composite {
    }
 
    /**
-    * Applies the changes to the given {@link ISEDAnnotation}.
-    * @param annotation The {@link ISEDAnnotation} to modify.
+    * Applies the changes to the given {@link ISEDAnnotationAppearance}.
+    * @param appearance The {@link ISEDAnnotationAppearance} to modify.
     */
-   public void applyChanges(ISEDAnnotation annotation) {
-      if (annotation != null) {
-         ISEDAnnotationType type = annotation.getType();
+   public void applyChanges(ISEDAnnotationAppearance appearance) {
+      if (appearance != null) {
+         ISEDAnnotationType type = appearance.getType();
          if (highlightBackgroundButton.getSelection() == type.isHighlightBackground()) {
-            annotation.setCustomHighlightBackground(null);
+            appearance.setCustomHighlightBackground(null);
          }
          else {
-            annotation.setCustomHighlightBackground(highlightBackgroundButton.getSelection());
+            appearance.setCustomHighlightBackground(highlightBackgroundButton.getSelection());
          }
          if (backgroundSelector.getColorValue().equals(type.getBackgroundColor())) {
-            annotation.setCustomBackgroundColor(null);
+            appearance.setCustomBackgroundColor(null);
          }
          else {
-            annotation.setCustomBackgroundColor(backgroundSelector.getColorValue());
+            appearance.setCustomBackgroundColor(backgroundSelector.getColorValue());
          }
          if (highlightForegroundButton.getSelection() == type.isHighlightForeground()) {
-            annotation.setCustomHighlightForeground(null);
+            appearance.setCustomHighlightForeground(null);
          }
          else {
-            annotation.setCustomHighlightForeground(highlightForegroundButton.getSelection());
+            appearance.setCustomHighlightForeground(highlightForegroundButton.getSelection());
          }
          if (foregroundSelector.getColorValue().equals(type.getForegroundColor())) {
-            annotation.setCustomForegroundColor(null);
+            appearance.setCustomForegroundColor(null);
          }
          else {
-            annotation.setCustomForegroundColor(foregroundSelector.getColorValue());
+            appearance.setCustomForegroundColor(foregroundSelector.getColorValue());
          }
       }
+   }
+   
+   /**
+    * Returns the specified {@link ISEDAnnotationAppearance}.
+    * @return The specified {@link ISEDAnnotationAppearance}.
+    */
+   public ISEDAnnotationAppearance getAnnotationAppearance() {
+      ISEDAnnotationAppearance appearance = new AnnotationApperanceDefinition(annotationType);
+      applyChanges(appearance);
+      return appearance;
    }
 }

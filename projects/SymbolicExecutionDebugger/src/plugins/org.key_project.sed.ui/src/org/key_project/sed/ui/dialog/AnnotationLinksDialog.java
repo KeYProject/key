@@ -137,6 +137,7 @@ public class AnnotationLinksDialog extends TitleAreaDialog {
      super.create();
      setTitle("Annotation links of " + annotation);
      setMessage("Inspect all available annotation links.");
+     setTitleImage(SEDImages.getImage(SEDImages.ANNOTATION_LINKS_WIZARD));
    }
    
    /**

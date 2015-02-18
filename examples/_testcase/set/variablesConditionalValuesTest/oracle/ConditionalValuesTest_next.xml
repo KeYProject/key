@@ -4,6 +4,10 @@
       <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
+   <variable name="exc" isArrayIndex="false">
+      <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
    <methodCall name="&lt;call ConditionalValuesTest.mainNext(b)&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="b" isArrayIndex="false">
          <value name="b {equals(b,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(b,null)">
@@ -11,11 +15,19 @@
          <value name="b {not(equals(b,null))}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(b,null))">
          </value>
       </variable>
+      <variable name="exc" isArrayIndex="false">
+         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
       <statement name="b.x.value=2;" pathCondition="true" pathConditionChanged="false">
          <variable name="b" isArrayIndex="false">
             <value name="b {equals(b,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(b,null)">
             </value>
             <value name="b {not(equals(b,null))}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(b,null))">
+            </value>
+         </variable>
+         <variable name="exc" isArrayIndex="false">
+            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
          <branchCondition name="not(equals(b,null))" pathCondition="not(equals(b,null))" pathConditionChanged="true" branchCondition="not(equals(b,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -27,6 +39,10 @@
                      <value name="x {not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))">
                      </value>
                   </variable>
+               </value>
+            </variable>
+            <variable name="exc" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <branchCondition name="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))" pathCondition="and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null)))" pathConditionChanged="true" branchCondition="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -42,6 +58,10 @@
                   <value name="c {true}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
                <statement name="b.y.value=3;" pathCondition="and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null)))" pathConditionChanged="false">
                   <variable name="b" isArrayIndex="false">
                      <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -53,6 +73,10 @@
                               </variable>
                            </value>
                         </variable>
+                     </value>
+                  </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <branchCondition name="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),null))" pathCondition="and(and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),null)))" pathConditionChanged="true" branchCondition="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -76,6 +100,10 @@
                      </variable>
                      <variable name="c_1" isArrayIndex="false">
                         <value name="c_1 {true}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="exc" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <statement name="return b.x.value+b.y.value;" pathCondition="and(and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),null)))" pathConditionChanged="false">
@@ -107,6 +135,10 @@
                               </variable>
                            </value>
                         </variable>
+                        <variable name="exc" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
                         <methodReturn name="&lt;return of mainNext&gt;" signature="&lt;return of ConditionalValuesTest.mainNext(b)&gt;" pathCondition="and(and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),null)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),null)))">
                            <variable name="b" isArrayIndex="false">
                               <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -134,6 +166,10 @@
                                        </variable>
                                     </value>
                                  </variable>
+                              </value>
+                           </variable>
+                           <variable name="exc" isArrayIndex="false">
+                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <termination name="&lt;end&gt;" pathCondition="and(and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),null)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -165,6 +201,10 @@
                                     </variable>
                                  </value>
                               </variable>
+                              <variable name="exc" isArrayIndex="false">
+                                 <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
                            </termination>
                            <callStateVariable name="b" isArrayIndex="false">
                               <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -176,6 +216,10 @@
                                     <value name="y {true}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="exc" isArrayIndex="false">
+                              <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
                         </methodReturn>
@@ -202,6 +246,10 @@
                         <value name="c_1 {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
+                     <variable name="exc" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
                      <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call ConditionalValuesTest.mainNext(b)&gt;&gt;" pathCondition="and(and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))),equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),null))" pathConditionChanged="false" methodReturnCondition="and(and(not(equals(b,null)),not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))),equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$y),null))">
                         <variable name="b" isArrayIndex="false">
                            <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -217,6 +265,10 @@
                                  <value name="y {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
+                           </value>
+                        </variable>
+                        <variable name="exc" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <variable name="n_8" isArrayIndex="false">
@@ -248,6 +300,18 @@
                                  </variable>
                               </value>
                            </variable>
+                           <variable name="exc" isArrayIndex="false">
+                              <value name="exc {true}" typeString="java.lang.NullPointerException" valueString="n_11" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 <variable name="message" isArrayIndex="false">
+                                    <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                                 <variable name="cause" isArrayIndex="false">
+                                    <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
                         </termination>
                         <callStateVariable name="b" isArrayIndex="false">
                            <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -259,6 +323,10 @@
                                  <value name="y {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="exc" isArrayIndex="false">
+                           <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </callStateVariable>
                      </exceptionalMethodReturn>
@@ -278,6 +346,10 @@
                   <value name="c {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
                <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call ConditionalValuesTest.mainNext(b)&gt;&gt;" pathCondition="and(not(equals(b,null)),equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))" pathConditionChanged="false" methodReturnCondition="and(not(equals(b,null)),equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),null))">
                   <variable name="b" isArrayIndex="false">
                      <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -285,6 +357,10 @@
                            <value name="x {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
+                     </value>
+                  </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="n_4" isArrayIndex="false">
@@ -308,6 +384,18 @@
                            </variable>
                         </value>
                      </variable>
+                     <variable name="exc" isArrayIndex="false">
+                        <value name="exc {true}" typeString="java.lang.NullPointerException" valueString="n_7" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <variable name="message" isArrayIndex="false">
+                              <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="cause" isArrayIndex="false">
+                              <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
                   </termination>
                   <callStateVariable name="b" isArrayIndex="false">
                      <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -315,6 +403,10 @@
                            <value name="x {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </callStateVariable>
                </exceptionalMethodReturn>
@@ -325,9 +417,17 @@
                <value name="b {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
+            <variable name="exc" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
             <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call ConditionalValuesTest.mainNext(b)&gt;&gt;" pathCondition="equals(b,null)" pathConditionChanged="false" methodReturnCondition="equals(b,null)">
                <variable name="b" isArrayIndex="false">
                   <value name="b {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="n" isArrayIndex="false">
@@ -347,9 +447,25 @@
                      <value name="b {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="java.lang.NullPointerException" valueString="n_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <variable name="message" isArrayIndex="false">
+                           <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="cause" isArrayIndex="false">
+                           <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
                </termination>
                <callStateVariable name="b" isArrayIndex="false">
                   <value name="b {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </callStateVariable>
             </exceptionalMethodReturn>

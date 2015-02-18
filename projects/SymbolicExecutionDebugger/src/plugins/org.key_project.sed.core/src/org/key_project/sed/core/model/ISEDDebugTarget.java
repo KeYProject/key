@@ -21,11 +21,13 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ITerminate;
 import org.eclipse.debug.core.model.IThread;
+import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
 import org.key_project.sed.core.model.event.ISEDAnnotationListener;
 import org.key_project.sed.core.model.impl.AbstractSEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.core.slicing.ISEDSlicer;
 import org.key_project.sed.core.sourcesummary.ISEDSourceModel;
 
 /**
@@ -174,4 +176,23 @@ public interface ISEDDebugTarget extends ISEDDebugElement, IDebugTarget {
     * @return The {@link ISEDSourceModel} or {@code null} if not available.
     */
    public ISEDSourceModel getSourceModel();
+   
+   /**
+    * Returns the available {@link ISEDSlicer} for the seed {@link ISEDDebugNode}
+    * and seed {@link IVariable}.
+    * @param seedNode The seed {@link ISEDDebugNode}.
+    * @param seedVariable The seed {@link IVariable}.
+    * @return The available {@link ISEDSlicer}.
+    */
+   public ISEDSlicer[] getSlicer(ISEDDebugNode seedNode, IVariable seedVariable);
+   
+   /**
+    * Returns the {@link ISEDSlicer} for the seed {@link ISEDDebugNode}
+    * and seed {@link IVariable} with the given name.
+    * @param seedNode The seed {@link ISEDDebugNode}.
+    * @param seedVariable The seed {@link IVariable}.
+    * @param name The name of the {@link ISEDSlicer} to search.
+    * @return The {@link ISEDSlicer} with the given name or {@code null} if not available.
+    */
+   public ISEDSlicer getSlicer(ISEDDebugNode seedNode, IVariable seedVariable, String name);
 }

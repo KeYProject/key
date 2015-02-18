@@ -2661,17 +2661,25 @@ public final class SymbolicExecutionUtil {
                                                               Term newSuccedent,
                                                               ImmutableList<Term> updates,
                                                               boolean addResultLabel) {
+      final TermBuilder tb = node.proof().getServices().getTermBuilder();
       // Combine method frame, formula with value predicate and the updates which provides the values
       Term newSuccedentToProve;
       if (updates != null) {
-         newSuccedentToProve = node.proof().getServices().getTermBuilder().applySequential(updates, newSuccedent);
+         if (newSuccedent != null) {
+            newSuccedentToProve = tb.applySequential(updates, newSuccedent);
+         }
+         else {
+            newSuccedentToProve = newSuccedent;
+         }
       }
       else {
          newSuccedentToProve = newSuccedent;
       }
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       Sequent originalSequentWithoutMethodFrame = SideProofUtil.computeGeneralSequentToProve(node.sequent(), pio != null ? pio.constrainedFormula() : null);
-      Set<Term> skolemTerms = collectSkolemConstants(originalSequentWithoutMethodFrame, newSuccedentToProve);
+      Set<Term> skolemTerms = newSuccedentToProve != null ? 
+                              collectSkolemConstants(originalSequentWithoutMethodFrame, newSuccedentToProve) :
+                              collectSkolemConstants(originalSequentWithoutMethodFrame, tb.parallel(updates));
       originalSequentWithoutMethodFrame = removeAllUnusedSkolemEqualities(originalSequentWithoutMethodFrame, skolemTerms);
       if (addResultLabel) {
          TermFactory factory = node.proof().getServices().getTermFactory();
