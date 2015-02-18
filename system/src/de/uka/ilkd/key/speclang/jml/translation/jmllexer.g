@@ -214,6 +214,7 @@ LT_IMPLICIT_GT_DISPATCH
       LT {$setType(LT);}
     |
       GT {$setType(GT);}
+    
     ;
 
 LPAREN

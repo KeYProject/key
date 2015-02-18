@@ -121,19 +121,29 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
    /**
     * The used {@link ISEDSourceModel}.
     */
-   private final SEDMemorySourceModel sourceModel = new SEDMemorySourceModel();
+   private final SEDMemorySourceModel sourceModel;
 
    /**
     * Constructor.
     * @param launch The {@link ILaunch} in that this {@link IDebugTarget} is used.
     * @param executable {@code true} Support suspend, resume, etc.; {@code false} Do not support suspend, resume, etc.
+    * @param provideSourceModel {@code true} source model is available, {@code false} source model is not available.
     */
-   public AbstractSEDDebugTarget(ILaunch launch, boolean executable) {
+   public AbstractSEDDebugTarget(ILaunch launch, boolean executable, boolean provideSourceModel) {
       super(null);
       this.executable = executable;
       this.launch = launch;
+      this.sourceModel = provideSourceModel ? createSourceModel() : null;
    }
-   
+
+   /**
+    * Creates the {@link SEDMemorySourceModel} to use.
+    * @return The {@link SEDMemorySourceModel} to use.
+    */
+   protected SEDMemorySourceModel createSourceModel() {
+      return new SEDMemorySourceModel(this);
+   }
+
    /**
     * {@inheritDoc}
     */
@@ -291,6 +301,9 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public void suspend() throws DebugException {
+      if (sourceModel != null) {
+         sourceModel.setPossiblyIncomplete();
+      }
       ISEDThread[] threads = getSymbolicThreads();
       for (ISEDThread thread : threads) {
          thread.suspend();
@@ -763,7 +776,8 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     * @throws DebugException Occurred Exception.
     */
    protected void addToSourceModel(ISEDDebugNode node) throws DebugException {
-      if (node instanceof IStackFrame && getLaunch() != null) {
+      if (sourceModel != null && 
+          node instanceof IStackFrame && getLaunch() != null) {
          IStackFrame stackFrame = (IStackFrame)node;
          ISourceLocator locator = getLaunch().getSourceLocator();
          if (locator != null) {

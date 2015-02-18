@@ -175,6 +175,11 @@ public final class KeySEDUtil {
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED = "org.key_project.sed.key.core.launch.sed.key.attribute.truthValueEvaluationEnabled";
 
     /**
+     * The key of the attribute to store if reached source code is highlighted or not.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE = "org.key_project.sed.key.core.launch.sed.key.attribute.highlightReachedSourceCode";
+
+    /**
      * The launch mode supported by the Symbolic Execution Debugger based on KeY.
      */
     public static final String MODE = "debug";
@@ -379,6 +384,16 @@ public final class KeySEDUtil {
      */
     public static boolean isTruthValueEvaluationEnabled(ILaunchConfiguration configuration) throws CoreException {
        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, KeYSEDPreferences.isTruthValueEvaluationEnabled()) : KeYSEDPreferences.isTruthValueEvaluationEnabled();
+    }
+
+    /**
+     * Checks if reached source code is highlighted or not.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} reached source code is highlighted, {@code false} reached source code is not highlighted.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isHighlightReachedSourceCode(ILaunchConfiguration configuration) throws CoreException {
+       return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, KeYSEDPreferences.isHighlightReachedSourceCode()) : KeYSEDPreferences.isHighlightReachedSourceCode();
     }
     
     /**

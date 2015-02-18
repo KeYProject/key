@@ -132,38 +132,33 @@ class Pipe<T>{
 
 		protected void doWork() {
 			queueLock.lock();
-		    OutputStreamWriter writer = new OutputStreamWriter(output);
-			while(!Thread.interrupted()){
-				try {					
-					while(!queue.isEmpty()){
-						String message = queue.pop();
-						if (message == null) {
-							output.close();
-							return;
+			try {
+				OutputStreamWriter writer = new OutputStreamWriter(output);
+				while(!Thread.interrupted()){
+					try {					
+						while(!queue.isEmpty() && queue.peek() != null){
+							String message = queue.pop();
+							writer.write(message+"\n");
+							writer.flush();
 						}
-						writer.write(message+"\n");
-						writer.flush();
-					}
-			   		postMessages.await(); // save against spurious wakeups because it is placed in a loop.
-	    		} catch (InterruptedException e) {
-					// set interruption flag. 
-					Thread.currentThread().interrupt();
-
-				  }
-				  catch (IOException e) {
-					  close();
-					  throw new RuntimeException(e);
+						postMessages.await(); // save against spurious wakeups because it is placed in a loop.
+					} catch (InterruptedException e) {
+						// set interruption flag. 
+						Thread.currentThread().interrupt();
+					} 
 				}
-			}
-	
+				writer.close();
+			} catch (IOException e) {
+				close();
+				throw new RuntimeException(e);
+			} finally {
+				queueLock.unlock();
+			}			
 		}
-
 
 		@Override
 		protected void stopWorking() throws IOException {
 			this.interrupt();
-			output.close();
-			
 		}		
 	}
 	

@@ -148,6 +148,11 @@ public class KeYLaunchSettings {
    private final boolean truthValueEvaluationEnabled;
    
    /**
+    * Is reached source code highlighted?
+    */
+   private final boolean highlightReachedSourceCode;
+   
+   /**
     * Constructor.
     * @param newDebugSession {@code true} new debug session, {@code false} continue existing *.proof file.
     * @param proofFileToContinue The path to the proof file to continue.
@@ -169,6 +174,7 @@ public class KeYLaunchSettings {
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
     * @param truthValueEvaluationEnabled Is truth value evaluation enabled?
+    * @param highlightReachedSourceCode Is reached source code highlighted?
     * @throws JavaModelException Occurred Exception.
     */
    public KeYLaunchSettings(boolean newDebugSession,
@@ -191,7 +197,8 @@ public class KeYLaunchSettings {
                             boolean usePrettyPrinting,
                             boolean showSignatureOnMethodReturnNodes,
                             boolean variablesAreOnlyComputedFromUpdates,
-                            boolean truthValueEvaluationEnabled) throws JavaModelException {
+                            boolean truthValueEvaluationEnabled,
+                            boolean highlightReachedSourceCode) throws JavaModelException {
       this.newDebugSession = newDebugSession;
       this.proofFileToContinue = proofFileToContinue;
       this.method = method;
@@ -214,6 +221,7 @@ public class KeYLaunchSettings {
       this.showSignatureOnMethodReturnNodes = showSignatureOnMethodReturnNodes;
       this.variablesAreOnlyComputedFromUpdates = variablesAreOnlyComputedFromUpdates;
       this.truthValueEvaluationEnabled = truthValueEvaluationEnabled;
+      this.highlightReachedSourceCode = highlightReachedSourceCode;
    }
 
    /**
@@ -390,5 +398,13 @@ public class KeYLaunchSettings {
     */
    public boolean isTruthValueEvaluationEnabled() {
       return truthValueEvaluationEnabled;
+   }
+
+   /**
+    * Checks if reached source code is highlighted.
+    * @return {@code true} reached source code is higlighted, {@code false} reached source code is not highlighted.
+    */
+   public boolean isHighlightReachedSourceCode() {
+      return highlightReachedSourceCode;
    }
 }
