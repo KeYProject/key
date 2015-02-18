@@ -40,7 +40,8 @@ heap/fm12_01_LRS/README.txt
 heap/permutedSum/README.txt
 
 heap/vacid0_01_SparseArray/README.txt
-heap/vacid0_05_RedBlackTrees/README.txt
+# Red-Black-Trees cannot be parsed currently
+# heap/vacid0_05_RedBlackTrees/README.txt
 heap/WeideEtAl_01_AddAndMultiply/README.txt
 heap/WeideEtAl_02_BinarySearch/README.txt
 
