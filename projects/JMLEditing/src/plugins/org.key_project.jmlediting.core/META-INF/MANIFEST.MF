@@ -22,6 +22,7 @@ Export-Package: org.key_project.jmlediting.core.dom,
  org.key_project.jmlediting.core.parser,
  org.key_project.jmlediting.core.parser.util,
  org.key_project.jmlediting.core.profile,
+ org.key_project.jmlediting.core.profile.persistence,
  org.key_project.jmlediting.core.profile.syntax,
  org.key_project.jmlediting.core.refactoring,
  org.key_project.jmlediting.core.utilities

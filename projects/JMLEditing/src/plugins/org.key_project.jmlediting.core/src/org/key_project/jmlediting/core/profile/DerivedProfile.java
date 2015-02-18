@@ -198,24 +198,16 @@ public class DerivedProfile extends AbstractJMLProfile implements
 
    @Override
    public <T> Set<T> getExtensions(final Object key, final Class<T> clazz) {
-      // Lookup extensions in the parent profile and in this one
-      // Usually the extensions are defined in the parent
-      final Set<T> parentExtensions = this.parentProfile.getExtensions(key,
-            clazz);
-      final Set<T> myExtensions = super.getExtensions(key, clazz);
-      // Check for the usual case that myExtensions is empty
-      // Then check for the other case where parentExtensions is empty
-      // In both cases no new set needs to be created
-      if (myExtensions.isEmpty()) {
-         return parentExtensions;
-      }
-      if (parentExtensions.isEmpty()) {
-         return myExtensions;
-      }
-      // Both profiles provides extensions, merge them
-      final HashSet<T> bothExtensions = new HashSet<T>(parentExtensions);
-      bothExtensions.addAll(myExtensions);
-      return Collections.unmodifiableSet(bothExtensions);
+      // Because the derived profile does not define extensions, return the
+      // extensions of the parent
+      return this.parentProfile.getExtensions(key, clazz);
+   }
+
+   @Override
+   protected <T> void putExtension(final Object key, final T newValue,
+         final Class<T> clazz) {
+      throw new UnsupportedOperationException(
+            "A derived profile is not allowed to define extensions");
    }
 
    @Override

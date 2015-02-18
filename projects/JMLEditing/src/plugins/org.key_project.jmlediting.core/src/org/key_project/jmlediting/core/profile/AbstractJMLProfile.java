@@ -146,7 +146,7 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
     * @param <T>
     *           the type of the extension
     */
-   protected final <T> void putExtension(final Object key, final T newValue,
+   protected <T> void putExtension(final Object key, final T newValue,
          final Class<T> clazz) {
       final TypedKey tKey = new TypedKey(key, clazz);
       @SuppressWarnings("unchecked")
