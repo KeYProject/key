@@ -1,6 +1,6 @@
 // README: User-defined abstract data types //
 
-Currently (as of KeY 2.0), it is not entirely possible to define new data types
+Currently (as of KeY 2.4), it is not entirely possible to define new data types
 as a user which are available in JML specifications. Even though functions,
 predicates, and proof rules are defined in .key files, some things need to be
 hard-coded.

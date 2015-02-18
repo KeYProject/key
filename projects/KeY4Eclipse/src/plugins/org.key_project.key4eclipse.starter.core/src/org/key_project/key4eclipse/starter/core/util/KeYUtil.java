@@ -44,12 +44,18 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
@@ -111,6 +117,7 @@ import de.uka.ilkd.key.util.MiscTools;
  * </p>
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public final class KeYUtil {
     /**
      * The file extension for *.key files.
@@ -440,25 +447,144 @@ public final class KeYUtil {
      * @throws JavaModelException Occurred Exception.
      */
     public static ImmutableList<KeYJavaType> getParameterKJTs(IMethod method, JavaInfo javaInfo) throws ProofInputException, JavaModelException {
-        ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
-        IType declaringType         = method.getDeclaringType();
-        ILocalVariable[] parameters = method.getParameters();
-        for (ILocalVariable parameter : parameters) {
-            String javaTypeName = JDTUtil.getQualifiedParameterType(declaringType, parameter);
-            if(javaTypeName == null) {
-                throw new ProofInputException("Error determining signature types: " + 
-                                              "Could not resolve type " + 
-                                              parameter + 
-                                              "! This is probably a syntax problem, " + 
-                                              " check your import statements.");
-            }
-            KeYJavaType kjt = javaInfo.getKeYJavaType(javaTypeName);
-            result = result.append(kjt);
-        }
-        return result;
+        try {
+           ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
+           IMethodBinding methodBinding = getMethodBinding(method);
+           if (methodBinding == null) {
+              throw new ProofInputException("Error determining signature types: " + 
+                                            "Could not resolve method " + 
+                                            method + 
+                                            "! This is probably a syntax problem, " + 
+                                            " check your import statements.");
+           }
+           for (ITypeBinding tb : methodBinding.getParameterTypes()) {
+              String javaTypeName = tb.getQualifiedName();
+              if (javaTypeName == null) {
+                 throw new ProofInputException("Error determining signature types: " + 
+                                               "Could not resolve type " + 
+                                               tb + 
+                                               "! This is probably a syntax problem, " + 
+                                               " check your import statements.");
+              }
+              KeYJavaType kjt = javaInfo.getKeYJavaType(javaTypeName);
+              result = result.append(kjt);
+           }
+           return result;
+      }
+      catch (CoreException e) {
+         throw new JavaModelException(e);
+      }
     }
-    
-    /**
+
+   /**
+    * Returns the {@link IMethodBinding} of the given {@link IMethod}.
+    * @param method The {@link IMethod}.
+    * @return The {@link IMethodBinding} or {@code null} if not available.
+    * @throws CoreException Occurred Exception.
+    */
+   private static IMethodBinding getMethodBinding(IMethod method) throws CoreException {
+      // Get needed information
+      IType declaringType = method.getDeclaringType();
+      IFile file = (IFile) declaringType.getResource();
+      String[] sourcepathEntries = getAllSourcepathEntries(file);
+      // Create parser
+      ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
+      parser.setResolveBindings(true);
+      parser.setBindingsRecovery(true);
+      parser.setSource(ResourceUtil.readFrom(file).toCharArray());
+      parser.setUnitName(method.getCompilationUnit().getElementName());
+      parser.setKind(ASTParser.K_COMPILATION_UNIT);
+      parser.setEnvironment(null, sourcepathEntries, null, true);
+      parser.setIgnoreMethodBodies(true);
+      // Parse source code
+      ASTNode node = parser.createAST(null);
+      // Search IMethodBinding
+      MethodBindingAstVisitor visitor = new MethodBindingAstVisitor(method);
+      node.accept(visitor);
+      return visitor.getResult();
+   }
+   
+   /**
+    * Utility class used by {@link KeYUtil#getMethodBinding(IMethod)}.
+    * @author Martin Hentschel
+    */
+   private static class MethodBindingAstVisitor extends ASTVisitor {
+      /**
+       * The start offset.
+       */
+      private final int methodNameStart;
+      
+      /**
+       * The length.
+       */
+      private final int methodNameLength;
+      
+      /**
+       * The found {@link IMethodBinding}
+       */
+      private IMethodBinding result;
+      
+      /**
+       * Constructor.
+       * @param method The {@link IMethod}
+       * @throws JavaModelException Occurred Exception.
+       */
+      public MethodBindingAstVisitor(IMethod method) throws JavaModelException {
+         this.methodNameStart = method.getNameRange().getOffset();
+         this.methodNameLength = method.getNameRange().getLength();
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean visit(MethodDeclaration node) {
+         int start = node.getStartPosition();
+         int length = node.getLength();
+         if (start <= methodNameStart &&
+             methodNameStart <= start + length &&
+             methodNameStart + methodNameLength <= start + length) {
+            result = node.resolveBinding();
+         }
+         return false;
+      }
+
+      /**
+       * Returns the found {@link IMethodBinding}.
+       * @return The found {@link IMethodBinding} or {@code null} if not available.
+       */
+      public IMethodBinding getResult() {
+         return result;
+      }
+   }
+   
+   /**
+    * Returns all source path entries.
+    * @param resource The {@link IResource}.
+    * @return All source path entries.
+    * @throws CoreException Occurred Exception.
+    */
+   protected static String[] getAllSourcepathEntries(IResource resource) throws CoreException {
+      List<String> result = new LinkedList<String>();
+      IProject project = resource.getProject();
+      File location = KeYResourceProperties.getSourceClassPathLocation(project);
+      if (location != null) {
+         result.add(location.getAbsolutePath());
+      }
+      File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
+      if (bootClassPath != null) {
+         result.add(bootClassPath.getAbsolutePath());
+      }
+      List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
+      if (classPaths != null) {
+         for (File cpfile : classPaths) {
+            result.add(cpfile.getAbsolutePath());
+         }
+      }
+      return result.toArray(new String[result.size()]);
+   }
+
+   /**
      * Shows the exception to the error dialog to the user via Swing.
      * @param t The {@link Throwable} to show.
      */
