@@ -4,14 +4,26 @@
       <value name="self {true}" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
+   <variable name="exc" isArrayIndex="false">
+      <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
    <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="self" isArrayIndex="false">
          <value name="self {true}" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
+      <variable name="exc" isArrayIndex="false">
+         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
       <statement name="classWrite=classRead;" pathCondition="true" pathConditionChanged="false">
          <variable name="self" isArrayIndex="false">
             <value name="self {true}" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <variable name="exc" isArrayIndex="false">
+            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
          <statement name="this.fieldWrite=this.fieldRead;" pathCondition="true" pathConditionChanged="false">
@@ -21,6 +33,10 @@
             </variable>
             <variable name="UpdateVariablesTest::classRead" isArrayIndex="false">
                <value name="UpdateVariablesTest::classRead {true}" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="exc" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <variable name="UpdateVariablesTest::classWrite" isArrayIndex="false">
@@ -44,6 +60,10 @@
                   <value name="UpdateVariablesTest::classRead {true}" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
                <variable name="UpdateVariablesTest::classWrite" isArrayIndex="false">
                   <value name="UpdateVariablesTest::classWrite {true}" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
@@ -63,6 +83,10 @@
                   </variable>
                   <variable name="UpdateVariablesTest::classRead" isArrayIndex="false">
                      <value name="UpdateVariablesTest::classRead {true}" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="UpdateVariablesTest::classWrite" isArrayIndex="false">
@@ -86,6 +110,10 @@
                         <value name="UpdateVariablesTest::classRead {true}" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
+                     <variable name="exc" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
                      <variable name="UpdateVariablesTest::classWrite" isArrayIndex="false">
                         <value name="UpdateVariablesTest::classWrite {true}" typeString="int" valueString="int::select(heap,null,UpdateVariablesTest::$classRead)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
@@ -93,6 +121,10 @@
                   </termination>
                   <callStateVariable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="UpdateVariablesTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </callStateVariable>
                </methodReturn>

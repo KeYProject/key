@@ -34,6 +34,7 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.ISourceLocator;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
+import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentProvider;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
@@ -49,6 +50,7 @@ import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.event.ISEDAnnotationListener;
 import org.key_project.sed.core.model.event.SEDAnnotationEvent;
 import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
+import org.key_project.sed.core.slicing.ISEDSlicer;
 import org.key_project.sed.core.sourcesummary.ISEDSourceModel;
 import org.key_project.sed.core.sourcesummary.impl.SEDMemorySourceModel;
 import org.key_project.sed.core.sourcesummary.impl.SEDMemorySourceRange;
@@ -121,19 +123,29 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
    /**
     * The used {@link ISEDSourceModel}.
     */
-   private final SEDMemorySourceModel sourceModel = new SEDMemorySourceModel();
+   private final SEDMemorySourceModel sourceModel;
 
    /**
     * Constructor.
     * @param launch The {@link ILaunch} in that this {@link IDebugTarget} is used.
     * @param executable {@code true} Support suspend, resume, etc.; {@code false} Do not support suspend, resume, etc.
+    * @param provideSourceModel {@code true} source model is available, {@code false} source model is not available.
     */
-   public AbstractSEDDebugTarget(ILaunch launch, boolean executable) {
+   public AbstractSEDDebugTarget(ILaunch launch, boolean executable, boolean provideSourceModel) {
       super(null);
       this.executable = executable;
       this.launch = launch;
+      this.sourceModel = provideSourceModel ? createSourceModel() : null;
    }
-   
+
+   /**
+    * Creates the {@link SEDMemorySourceModel} to use.
+    * @return The {@link SEDMemorySourceModel} to use.
+    */
+   protected SEDMemorySourceModel createSourceModel() {
+      return new SEDMemorySourceModel(this);
+   }
+
    /**
     * {@inheritDoc}
     */
@@ -291,6 +303,9 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     */
    @Override
    public void suspend() throws DebugException {
+      if (sourceModel != null) {
+         sourceModel.setPossiblyIncomplete();
+      }
       ISEDThread[] threads = getSymbolicThreads();
       for (ISEDThread thread : threads) {
          thread.suspend();
@@ -763,7 +778,8 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
     * @throws DebugException Occurred Exception.
     */
    protected void addToSourceModel(ISEDDebugNode node) throws DebugException {
-      if (node instanceof IStackFrame && getLaunch() != null) {
+      if (sourceModel != null && 
+          node instanceof IStackFrame && getLaunch() != null) {
          IStackFrame stackFrame = (IStackFrame)node;
          ISourceLocator locator = getLaunch().getSourceLocator();
          if (locator != null) {
@@ -786,6 +802,27 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
             }
          }
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDSlicer getSlicer(ISEDDebugNode seedNode, IVariable seedVariable, final String name) {
+      return ArrayUtil.search(getSlicer(seedNode, seedVariable), new IFilter<ISEDSlicer>() {
+         @Override
+         public boolean select(ISEDSlicer element) {
+            return ObjectUtil.equals(name, element.getName());
+         }
+      });
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDSlicer[] getSlicer(ISEDDebugNode seedNode, IVariable seedVariable) {
+      return null; // Slicing is not supported by default.
    }
 
    /**

@@ -29,6 +29,27 @@ import junit.framework.TestCase;
  */
 public class TestJavaUtil extends TestCase {
    /**
+    * Tests {@link JavaUtil#count(String, char)}.
+    */
+   public void testCount_String_char() {
+      assertEquals(0, JavaUtil.count(null, '.'));
+      assertEquals(0, JavaUtil.count("", '.'));
+      assertEquals(0, JavaUtil.count("a", '.'));
+      assertEquals(0, JavaUtil.count("ab", '.'));
+      assertEquals(0, JavaUtil.count("abc", '.'));
+      assertEquals(1, JavaUtil.count(".a", '.'));
+      assertEquals(1, JavaUtil.count("a.", '.'));
+      assertEquals(1, JavaUtil.count(".ab", '.'));
+      assertEquals(1, JavaUtil.count("a.b", '.'));
+      assertEquals(1, JavaUtil.count("ab.", '.'));
+      assertEquals(2, JavaUtil.count(".a.", '.'));
+      assertEquals(2, JavaUtil.count(".ab.", '.'));
+      assertEquals(2, JavaUtil.count(".a.b", '.'));
+      assertEquals(2, JavaUtil.count("a.b.", '.'));
+      assertEquals(3, JavaUtil.count(".a.b.", '.'));
+   }
+   
+   /**
     * Tests {@link JavaUtil#binaryInsert(List, Object, java.util.Comparator)}.
     */
    public void testBinaryInsert() {

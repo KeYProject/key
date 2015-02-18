@@ -4,12 +4,24 @@
       <value name="y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
+   <variable name="exc" isArrayIndex="false">
+      <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
    <methodCall name="&lt;call LocalVariablesTest.main(y)&gt;" pathCondition="true" pathConditionChanged="false">
+      <variable name="exc" isArrayIndex="false">
+         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
       <variable name="y" isArrayIndex="false">
          <value name="y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
       <statement name="int main = y-2;" pathCondition="true" pathConditionChanged="false">
+         <variable name="exc" isArrayIndex="false">
+            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
          <variable name="y" isArrayIndex="false">
             <value name="y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
@@ -17,6 +29,10 @@
          <statement name="int subResult = sub(main);" pathCondition="true" pathConditionChanged="false">
             <variable name="y" isArrayIndex="false">
                <value name="y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="exc" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <variable name="main" isArrayIndex="false">
@@ -28,6 +44,10 @@
                   <value name="y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
                <variable name="x_1" isArrayIndex="false">
                   <value name="x_1 {true}" typeString="int" valueString="add(Z(neglit(2(#))),y)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
@@ -35,6 +55,10 @@
                <statement name="int sub = x_1+2;" pathCondition="true" pathConditionChanged="false">
                   <variable name="y" isArrayIndex="false">
                      <value name="y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="x_1" isArrayIndex="false">
@@ -46,6 +70,10 @@
                         <value name="y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
+                     <variable name="exc" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
                      <variable name="sub_1" isArrayIndex="false">
                         <value name="sub_1 {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
@@ -53,6 +81,10 @@
                      <methodReturn name="&lt;return of sub&gt;" signature="&lt;return of LocalVariablesTest.sub(x_1)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                         <variable name="y" isArrayIndex="false">
                            <value name="y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="exc" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <variable name="x" isArrayIndex="false">
@@ -64,21 +96,37 @@
                               <value name="y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
+                           <variable name="exc" isArrayIndex="false">
+                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
                            <variable name="subResult" isArrayIndex="false">
                               <value name="subResult {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <methodReturn name="&lt;return of main&gt;" signature="&lt;return of LocalVariablesTest.main(y)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                              <variable name="exc" isArrayIndex="false">
+                                 <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
                               <variable name="y" isArrayIndex="false">
                                  <value name="y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                               <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                 <variable name="exc" isArrayIndex="false">
+                                    <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
                                  <variable name="y" isArrayIndex="false">
                                     <value name="y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </termination>
+                              <callStateVariable name="exc" isArrayIndex="false">
+                                 <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </callStateVariable>
                               <callStateVariable name="y" isArrayIndex="false">
                                  <value name="y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
@@ -89,8 +137,12 @@
                            <value name="y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </callStateVariable>
+                        <callStateVariable name="exc" isArrayIndex="false">
+                           <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
                         <callStateVariable name="x_1" isArrayIndex="false">
-                           <value name="x_1 {true}" typeString="int" valueString="add(Z(neglit(2(#))),y)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="x_1 {true}" typeString="int" valueString="x_1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </callStateVariable>
                      </methodReturn>

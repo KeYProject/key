@@ -31,12 +31,4 @@ public class GraphitiGroupEndConditionsPropertySection extends AbstractGraphitiD
    protected ISEDDebugNodeTabContent createContent() {
       return new GroupEndConditionsTabComposite();
    }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean shouldUseExtraSpace() {
-      return true;
-   }
 }

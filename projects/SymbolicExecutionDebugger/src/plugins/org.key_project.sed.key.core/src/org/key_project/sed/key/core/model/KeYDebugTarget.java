@@ -35,6 +35,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IBreakpoint;
+import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.debug.core.IJavaBreakpoint;
@@ -55,9 +56,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.impl.AbstractSEDDebugTarget;
+import org.key_project.sed.core.slicing.ISEDSlicer;
 import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
 import org.key_project.sed.key.core.breakpoints.KeYWatchpoint;
 import org.key_project.sed.key.core.launch.KeYLaunchSettings;
+import org.key_project.sed.key.core.slicing.KeYThinBackwardSlicer;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -67,6 +70,7 @@ import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.TermCreationException;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
@@ -146,7 +150,7 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
    public KeYDebugTarget(ILaunch launch,
                          SymbolicExecutionEnvironment<?> environment,
                          KeYLaunchSettings launchSettings) throws DebugException {
-      super(launch, true);
+      super(launch, true, launchSettings.isHighlightReachedSourceCode());
       DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
       // Update references
       Assert.isNotNull(environment);
@@ -161,7 +165,7 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
       // Update initial model
       setModelIdentifier(MODEL_IDENTIFIER);
       setName(proof.name() != null ? proof.name().toString() : "Unnamed");
-      // Init breakpoints
+      // Initialize breakpoints
       initBreakpoints();
       // Add thread
       KeYThread thread = new KeYThread(this, environment.getBuilder().getStartNode());
@@ -261,6 +265,30 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
          Assert.isTrue(oldNode == null);
          addToSourceModel(node);
       }
+   }
+   
+   /**
+    * Returns the most relevant {@link IExecutionNode} for the given proof {@link Node}.
+    * @param node The proof {@link Node}.
+    * @return The most relevant {@link IExecutionNode} or {@code null} if non exists.
+    */
+   public IExecutionNode<?> getExecutionNode(Node node) {
+      IExecutionNode<?> executionNode = null;
+      while (executionNode == null && node != null) {
+         executionNode = environment.getBuilder().getExecutionNode(node);
+         node = node.parent();
+      }
+      return executionNode;
+   }
+   
+   /**
+    * Returns the child {@link IKeYSEDDebugNode} for the given {@link Node}.
+    * @param node The {@link Node} for that the debug model representation is needed.
+    * @return The found {@link IKeYSEDDebugNode} representation of the given {@link Node} or {@code null} if no one is available.
+    */
+   public IKeYSEDDebugNode<?> getDebugNode(Node node) {
+      IExecutionNode<?> executionNode = getExecutionNode(node);
+      return executionNode != null ? getDebugNode(executionNode) : null;
    }
    
    /**
@@ -641,5 +669,26 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
       public boolean isContainsRelevantJavaFile() {
          return containsRelevantJavaFile;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDSlicer[] getSlicer(ISEDDebugNode seedNode, IVariable seedVariable) {
+      if (!(seedNode instanceof KeYThread) && seedVariable instanceof KeYVariable) {
+         return new ISEDSlicer[] {new KeYThinBackwardSlicer()};
+      }
+      else {
+         return new ISEDSlicer[0];
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isGroupingSupported() {
+      return launchSettings.isGroupingEnabled();
    }
 }

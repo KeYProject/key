@@ -148,6 +148,16 @@ public class KeYLaunchSettings {
    private final boolean truthValueEvaluationEnabled;
    
    /**
+    * Is reached source code highlighted?
+    */
+   private final boolean highlightReachedSourceCode;
+   
+   /**
+    * Is grouping enabled?
+    */
+   private final boolean groupingEnabled;
+   
+   /**
     * Constructor.
     * @param newDebugSession {@code true} new debug session, {@code false} continue existing *.proof file.
     * @param proofFileToContinue The path to the proof file to continue.
@@ -169,6 +179,8 @@ public class KeYLaunchSettings {
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
     * @param truthValueEvaluationEnabled Is truth value evaluation enabled?
+    * @param highlightReachedSourceCode Is reached source code highlighted?
+    * @param groupingEnabled Is grouping enabled?
     * @throws JavaModelException Occurred Exception.
     */
    public KeYLaunchSettings(boolean newDebugSession,
@@ -191,7 +203,9 @@ public class KeYLaunchSettings {
                             boolean usePrettyPrinting,
                             boolean showSignatureOnMethodReturnNodes,
                             boolean variablesAreOnlyComputedFromUpdates,
-                            boolean truthValueEvaluationEnabled) throws JavaModelException {
+                            boolean truthValueEvaluationEnabled,
+                            boolean highlightReachedSourceCode,
+                            boolean groupingEnabled) throws JavaModelException {
       this.newDebugSession = newDebugSession;
       this.proofFileToContinue = proofFileToContinue;
       this.method = method;
@@ -214,6 +228,8 @@ public class KeYLaunchSettings {
       this.showSignatureOnMethodReturnNodes = showSignatureOnMethodReturnNodes;
       this.variablesAreOnlyComputedFromUpdates = variablesAreOnlyComputedFromUpdates;
       this.truthValueEvaluationEnabled = truthValueEvaluationEnabled;
+      this.highlightReachedSourceCode = highlightReachedSourceCode;
+      this.groupingEnabled = groupingEnabled;
    }
 
    /**
@@ -390,5 +406,21 @@ public class KeYLaunchSettings {
     */
    public boolean isTruthValueEvaluationEnabled() {
       return truthValueEvaluationEnabled;
+   }
+
+   /**
+    * Checks if reached source code is highlighted.
+    * @return {@code true} reached source code is higlighted, {@code false} reached source code is not highlighted.
+    */
+   public boolean isHighlightReachedSourceCode() {
+      return highlightReachedSourceCode;
+   }
+
+   /**
+    * Checks if grouping is enabled.
+    * @return Grouping enabled?
+    */
+   public boolean isGroupingEnabled() {
+      return groupingEnabled;
    }
 }

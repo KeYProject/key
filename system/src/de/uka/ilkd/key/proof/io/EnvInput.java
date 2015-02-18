@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.init.Includes;
@@ -62,8 +63,9 @@ public interface EnvInput {
 
     /**
      * gets the boot classpath element, null if none set.
+     * @throws  
      */
-    File readBootClassPath();
+    File readBootClassPath() throws IOException;
     
     /**
      * Reads the input using the given modification strategy, i.e.,

@@ -128,7 +128,7 @@ public class KeYEnvironment<U extends UserInterface> {
    }
 
    public Profile getProfile() {
-      return getMediator().getProfile();
+      return getInitConfig().getProfile();
    }
    
    /**

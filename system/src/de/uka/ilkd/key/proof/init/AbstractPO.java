@@ -296,7 +296,7 @@ public abstract class AbstractPO implements IPersistablePO {
 
         //classpath
         if (classPath != null && !classPath.equals("")) {
-            sb.append("\\classpath \"").append(classPath).append("\";\n\n");
+            sb.append("\\classpath ").append(classPath).append(";\n\n");
         }
 
         //javaSource

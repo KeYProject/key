@@ -49,10 +49,10 @@ public class TestKey extends TestSuite {
 
     static Class<? extends TestCase>[] parserTests = new Class[] {
         de.uka.ilkd.key.parser.TestDeclParser.class,
-        de.uka.ilkd.key.parser.TestParallelParsing.class,
+//        de.uka.ilkd.key.parser.TestParallelParsing.class,
         de.uka.ilkd.key.parser.TestTermParser.class,
         de.uka.ilkd.key.parser.TestTermParserHeap.class,
-        de.uka.ilkd.key.parser.TestTermParserSequence.class,
+        de.uka.ilkd.key.parser.TestTermParserSorts.class,
         de.uka.ilkd.key.parser.TestTacletParser.class,
     };
 
@@ -126,7 +126,8 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.symbolic_execution.util.TestJavaUtil.class,
         de.uka.ilkd.key.symbolic_execution.util.TestProofUserManager.class,
         de.uka.ilkd.key.symbolic_execution.util.TestSideProofStore.class,
-        de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class
+        de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class,
+        de.uka.ilkd.key.symbolic_execution.slicing.TestThinBackwardSlicer.class
         
     };
     

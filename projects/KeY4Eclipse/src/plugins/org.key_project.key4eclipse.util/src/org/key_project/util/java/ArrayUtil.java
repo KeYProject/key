@@ -92,6 +92,50 @@ public final class ArrayUtil {
    
    /**
     * <p>
+    * Adds the given elements to the existing array. The result is a new
+    * array that contains the other elements in the end.
+    * </p>
+    * <p>
+    * <b>Attention: </b> It is not possible to use this method with
+    * two {@code null} parameters. In this case is an {@link IllegalArgumentException}
+    * thrown.
+    * </p>
+    * @param array The array to add to.
+    * @param toAdd The elements to add.
+    * @param newArrayType The type of the new array.
+    * @return The new created array.
+    * @throws IllegalArgumentException Both parameters are {@code null}.
+    */
+   @SuppressWarnings("unchecked")
+   public static <T> T[] addAll(T[] array, T[] toAdd, Class<?> newArrayType) {
+       if (array != null) {
+           if (toAdd != null) {
+               T[] result = (T[])java.lang.reflect.Array.newInstance(newArrayType, array.length + toAdd.length);
+               System.arraycopy(array, 0, result, 0, array.length);
+               System.arraycopy(toAdd, 0, result, array.length, toAdd.length);
+               return result;
+           }
+           else {
+               T[] result = (T[])java.lang.reflect.Array.newInstance(newArrayType, array.length);
+               System.arraycopy(array, 0, result, 0, array.length);
+               return result;
+           }
+       }
+       else {
+           if (toAdd != null) {
+               T[] result = (T[])java.lang.reflect.Array.newInstance(newArrayType, toAdd.length);
+               System.arraycopy(toAdd, 0, result, 0, toAdd.length);
+               return result;
+           }
+           else {
+              T[] result = (T[])java.lang.reflect.Array.newInstance(newArrayType, 0);
+              return result;
+           }
+       }
+   }
+   
+   /**
+    * <p>
     * Adds the given element to the existing array. The result is a new
     * array that contains one more element.
     * </p>
@@ -392,6 +436,35 @@ public final class ArrayUtil {
          return null;
       }
    }
+   
+   /**
+    * Returns the following element if available from the array.
+    * @param array The array to search in.
+    * @param toSearch The element for that the following one is needed.
+    * @return The following element or {@code null} if no element was found.
+    */
+   public static <T> T getFollowing(T[] array, T toSearch) {
+      return getFollowing(array, toSearch, ObjectUtil.<T>createEqualsComparator());
+   }
+
+   /**
+    * Returns the following element if available from the array. The equality is
+    * computed via the comparator. Objects are equal if the comparison result is {@code 0}.
+    * @param array The array to search in.
+    * @param toSearch The element for that the following one is needed.
+    * @param comparator the {@link Comparator} to use.
+    * @return The following element or {@code null} if no element was found.
+    * @throws IllegalArgumentException If the comparator is {@code null}.
+    */
+   public static <T> T getFollowing(T[] array, T toSearch, Comparator<T> comparator) throws IllegalArgumentException {
+      int index = indexOf(array, toSearch, comparator);
+      if (index < array.length - 1) {
+         return array[index + 1];
+      }
+      else {
+         return null;
+      }
+   }
 
    /**
     * Checks if the given element is the last element in the array.
@@ -421,6 +494,41 @@ public final class ArrayUtil {
          }
          else {
             return comparator.compare(array[array.length - 1], toSearch) == 0;
+         }
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * Checks if the given element is the first element in the array.
+    * @param <T> The type of the array.
+    * @param array The array.
+    * @param toSearch The element to search.
+    * @return {@code true} is first element, {@code false} is not first element or even not contained in the array.
+    */
+   public static <T> boolean isFirst(T[] array, T toSearch) {
+      return isFirst(array, toSearch, ObjectUtil.createEqualsComparator());
+   }
+
+   /**
+    * Checks if the given element is the first element in the array.
+    * Objects are equal if the comparison result is {@code 0}.
+    * @param <T> The type of the array.
+    * @param array The array.
+    * @param toSearch The element to search.
+    * @param comparator the {@link Comparator} to use.
+    * @return {@code true} is first element, {@code false} is not first element or even not contained in the array.
+    * @throws IllegalArgumentException If the comparator is {@code null}.
+    */
+   public static <T> boolean isFirst(T[] array, T toSearch, Comparator<T> comparator) {
+      if (array != null && array.length >= 1) {
+         if (comparator == null) {
+            throw new IllegalArgumentException("Comparator is null.");
+         }
+         else {
+            return comparator.compare(array[0], toSearch) == 0;
          }
       }
       else {

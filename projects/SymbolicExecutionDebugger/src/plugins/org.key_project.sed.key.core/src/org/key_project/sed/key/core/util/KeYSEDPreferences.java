@@ -14,6 +14,7 @@
 package org.key_project.sed.key.core.util;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.key_project.sed.core.model.ISEDGroupable;
 import org.key_project.sed.key.core.Activator;
 
 /**
@@ -76,6 +77,16 @@ public class KeYSEDPreferences {
     * Preference key to enable truth value evaluation.
     */
    public static final String TRUTH_VALUE_EVALUATION_ENABLED = "org.key_project.sed.key.core.preference.truthValueEvaluationEnabled";
+
+   /**
+    * Preference key to enable or disable highlighting of reached source code.
+    */
+   public static final String HIGHLIGHT_REACHED_SOURCE_CODE = "org.key_project.sed.key.core.preference.highlightReachedSourceCode";
+
+   /**
+    * Preference key to enable or disable grouping of {@link ISEDGroupable}s.
+    */
+   public static final String GROUPING_ENABLED = "org.key_project.sed.key.core.preference.groupingEnabled";
    
    /**
     * Returns the managed {@link IPreferenceStore}.
@@ -403,5 +414,69 @@ public class KeYSEDPreferences {
     */
    public static void setDefaultTruthValueEvaluationEnabled(boolean defaultValue) {
       getStore().setDefault(TRUTH_VALUE_EVALUATION_ENABLED, defaultValue);
+   }
+   
+   /**
+    * Checks if reached source code is highlighted is enabled.
+    * @return Is reached source code highlighting enabled?
+    */
+   public static boolean isHighlightReachedSourceCode() {
+      return getStore().getBoolean(HIGHLIGHT_REACHED_SOURCE_CODE);
+   }
+   
+   /**
+    * Checks if reached source code is highlighted by default.
+    * @return Is reached source code highlighting enabled by default?
+    */
+   public static boolean isDefaultHighlightReachedSourceCode() {
+      return getStore().getDefaultBoolean(HIGHLIGHT_REACHED_SOURCE_CODE);
+   }
+   
+   /**
+    * Sets if truth value evaluation is enabled.
+    * @param value Enable source code highlighting.
+    */
+   public static void setHighlightReachedSourceCode(boolean value) {
+      getStore().setValue(HIGHLIGHT_REACHED_SOURCE_CODE, value);
+   }
+   
+   /**
+    * Sets if reached source code is highlighted by default.
+    * @param defaultValue Enable source code highlighting.
+    */
+   public static void setDefaultHighlightReachedSourceCode(boolean defaultValue) {
+      getStore().setDefault(HIGHLIGHT_REACHED_SOURCE_CODE, defaultValue);
+   }
+   
+   /**
+    * Checks if grouping is enabled or not.
+    * @return Grouping enabled?
+    */
+   public static boolean isGroupingEnabled() {
+      return getStore().getBoolean(GROUPING_ENABLED);
+   }
+   
+   /**
+    * Checks if grouping is enabled or not by default.
+    * @return Grouping enabled?
+    */
+   public static boolean isDefaultGroupingEnabled() {
+      return getStore().getDefaultBoolean(GROUPING_ENABLED);
+   }
+   
+   /**
+    * Sets if grouping is enabled or not.
+    * @param value Enable grouping?
+    */
+   public static void setGroupingEnabled(boolean value) {
+      getStore().setValue(GROUPING_ENABLED, value);
+   }
+   
+   /**
+    * Sets if grouping is enabled or not by default.
+    * @param defaultValue Enable grouping?
+    */
+   public static void setDefaultGroupingEnabled(boolean defaultValue) {
+      getStore().setDefault(GROUPING_ENABLED, defaultValue);
    }
 }
