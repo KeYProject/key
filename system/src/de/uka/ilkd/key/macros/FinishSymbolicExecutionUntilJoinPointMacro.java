@@ -138,6 +138,12 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
 
    @Override
    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+      // Need to clear the data structures since no new instance of this
+      // macro is created across multiple calls, so sometimes it would have
+      // no effect in a successive call.
+      blockElems.clear();
+      alreadySeen.clear();
+      
       return new FilterSymbexStrategy(proof.getActiveStrategy());
    }
    
