@@ -109,6 +109,7 @@ public abstract class AbstractDebugNodeLayoutFeature extends AbstractLayoutFeatu
       // Update PictogramElement
       int containerWidth = containerGa.getWidth();
       int containerHeight = containerGa.getHeight();
+
       List<Shape> shapes = containerShape.getChildren();
       if (layoutImageShape(shapes.get(0), containerWidth, containerHeight)) {
          anythingChanged = true;

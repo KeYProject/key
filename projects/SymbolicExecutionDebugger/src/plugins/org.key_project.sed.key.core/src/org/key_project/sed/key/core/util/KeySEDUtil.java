@@ -180,6 +180,11 @@ public final class KeySEDUtil {
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE = "org.key_project.sed.key.core.launch.sed.key.attribute.highlightReachedSourceCode";
 
     /**
+     * The key of the attribute to store if grouping is enabled or not.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_GROUPING_ENABLED = "org.key_project.sed.key.core.launch.sed.key.attribute.groupingEnabled";
+    
+    /**
      * The launch mode supported by the Symbolic Execution Debugger based on KeY.
      */
     public static final String MODE = "debug";
@@ -394,6 +399,16 @@ public final class KeySEDUtil {
      */
     public static boolean isHighlightReachedSourceCode(ILaunchConfiguration configuration) throws CoreException {
        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, KeYSEDPreferences.isHighlightReachedSourceCode()) : KeYSEDPreferences.isHighlightReachedSourceCode();
+    }
+
+    /**
+     * Checks if grouping is enabled or not.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} grouping enabled, {@code false} grouping disabled.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isGroupingEnabled(ILaunchConfiguration configuration) throws CoreException {
+       return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_GROUPING_ENABLED, KeYSEDPreferences.isGroupingEnabled()) : KeYSEDPreferences.isGroupingEnabled();
     }
     
     /**

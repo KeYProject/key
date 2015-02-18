@@ -47,6 +47,7 @@ import org.eclipse.graphiti.mm.algorithms.styles.Style;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.notification.INotificationService;
+import org.eclipse.graphiti.tb.IToolBehaviorProvider;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.widgets.Display;
@@ -61,6 +62,7 @@ import org.key_project.sed.core.model.event.ISEDAnnotationListener;
 import org.key_project.sed.core.model.event.SEDAnnotationEvent;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
 import org.key_project.sed.ui.visualization.execution_tree.feature.AbstractDebugNodeUpdateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeToolBehaviorProvider;
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDNotificationService;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeStyleUtil;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
@@ -74,6 +76,7 @@ import org.key_project.sed.ui.visualization.util.VisualizationPreferences;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
 
 /**
  * {@link DiagramEditor} for Symbolic Execution Tree Diagrams.
@@ -620,6 +623,44 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
                }
             });
          }
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void selectBusinessObjects(Object[] businessObjects) {
+      ExecutionTreeToolBehaviorProvider behaviorProvider = getExecutionTreeToolBehaviorProvider();
+      List<PictogramElement> pictogramElements = new LinkedList<PictogramElement>();
+      for (Object bo : businessObjects) {
+         PictogramElement[] referencingPes = getPictogramElements(bo);
+         for (PictogramElement pe : referencingPes) {
+            if (behaviorProvider == null || behaviorProvider.isSelectable(pe)) {
+               pictogramElements.add(pe);
+            }
+         }
+      }
+      selectPictogramElements(pictogramElements.toArray(new PictogramElement[pictogramElements.size()]));
+   }
+
+   /**
+    * Returns the used {@link ExecutionTreeToolBehaviorProvider} if available.
+    * @return The {@link ExecutionTreeToolBehaviorProvider} or {@code null} if not available.
+    */
+   public ExecutionTreeToolBehaviorProvider getExecutionTreeToolBehaviorProvider() {
+      IDiagramTypeProvider diagramProvider = getDiagramTypeProvider();
+      if (diagramProvider != null) {
+         IToolBehaviorProvider result = ArrayUtil.search(diagramProvider.getAvailableToolBehaviorProviders(), new IFilter<IToolBehaviorProvider>() {
+            @Override
+            public boolean select(IToolBehaviorProvider element) {
+               return element instanceof ExecutionTreeToolBehaviorProvider;
+            }
+         });
+         return (ExecutionTreeToolBehaviorProvider) result;
+      }
+      else {
+         return null;
       }
    }
 }
