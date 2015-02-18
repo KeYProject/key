@@ -28,6 +28,29 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     */
    public static final boolean PRINT_SLICE = false;
 
+// TODO: Support anonymizing locations
+//   /** 
+//    * Tests slicing on the example {@code simpleStatiLoopInvariantTest}.
+//    * @throws Exception Occurred Exception.
+//    */
+//   public void testSimpleStatiLoopInvariantTest() throws Exception {
+//      doSlicingTest("examples/_testcase/slicing/simpleStatiLoopInvariantTest/SimpleStatiLoopInvariantTest.proof", 
+//                    new ReturnSelector(224),
+//                    true,
+//                    12);
+//   }
+
+   /**
+    * Tests slicing on the example {@code simpleLoopInvariantTest}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testSimpleLoopInvariantTest() throws Exception {
+      doSlicingTest("examples/_testcase/slicing/simpleLoopInvariantTest/SimpleLoopInvariantTest.proof", 
+                    new ReturnSelector(125),
+                    true,
+                    9);
+   }
+
    /**
     * Tests slicing on the example {@code simpleArrayTest}.
     * @throws Exception Occurred Exception.

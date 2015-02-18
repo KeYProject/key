@@ -34,6 +34,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
       Set<Location> relevantLocations = null;
       List<Node> result = new LinkedList<Node>();
       Map<Location, SortedSet<Location>> oldAliases = null;
+      Node previousChild = null;
       while (seedNode != null && (relevantLocations == null || !relevantLocations.isEmpty())) {
          SequentInfo info = analyzeSequent(seedNode);
          if (info != null) { // Modality of interest
@@ -46,7 +47,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
                relevantLocations.add(normalizeAlias(services, seedLocation, info));
             }
             // Check if current node is part of the slice or not
-            if (accept(seedNode, services, relevantLocations, info, activeStatement)) {
+            if (accept(seedNode, previousChild, services, relevantLocations, info, activeStatement)) {
                result.add(seedNode);
             }
             if (oldAliases != null) {
@@ -60,6 +61,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
             }
             oldAliases = aliases;
          }
+         previousChild = seedNode;
          seedNode = seedNode.parent();
       }
       return new ImmutableArray<Node>(result);
@@ -68,6 +70,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
    /**
     * Decides if the given {@link Node} is part of the slice or not.
     * @param node The {@link Node} to check.
+    * @param previousChild The previously visited child {@link Node} or {@code null} the first time.
     * @param services The {@link Services} to use.
     * @param relevantLocations The relevant locations.
     * @param info The {@link SequentInfo} with the aliases and so on.
@@ -75,6 +78,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
     * @return {@code true} {@link Node} should be part of slice, {@code false} {@link Node} should not be part of slice.
     */
    protected abstract boolean accept(Node node, 
+                                     Node previousChild,
                                      Services services,
                                      Set<Location> relevantLocations, 
                                      SequentInfo info,
