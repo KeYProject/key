@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.ui;
 
+import static de.uka.ilkd.key.core.Main.Verbosity.DEBUG;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.ApplyStrategy;
@@ -21,15 +22,15 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import java.io.File;
 
 /**
  * <p>
- * An extended version of {@link ConsoleUserInterface} which can be used
+ * An extended version of {@link AbstractConsoleUserInterface} which can be used
  * to prove manually instantiated proofs.
  * </p>
  * <p>
@@ -51,7 +52,7 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
  * </p>
  * @author Martin Hentschel
  */
-public class CustomUserInterface extends ConsoleUserInterface {
+public class CustomUserInterface extends AbstractConsoleUserInterface {
    /**
     * An optional {@link IUserInterfaceCustomization}.
     */
@@ -71,16 +72,8 @@ public class CustomUserInterface extends ConsoleUserInterface {
     * @param customiaztion An optional {@link IUserInterfaceCustomization}.
     */
    public CustomUserInterface(boolean verbose, IUserInterfaceCustomization customiaztion) {
-      super(null, verbose);
+      super(verbose);
       this.customiaztion = customiaztion;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate) {
-      // Nothing to do
    }
    
    /**
@@ -171,6 +164,21 @@ public class CustomUserInterface extends ConsoleUserInterface {
       initConfig.getServices().getSpecificationRepository().registerProof(proofOblInput, proofList.getFirstProof());
       return null;
    }
+
+    @Override
+    public File saveProof(Proof proof, String fileExtension) {
+        return null;
+    }
+
+    /**
+     * Checks if the verbose is active or not.
+     *
+     * @return {@code true} verbose is active, {@code false} verbose is
+     * deactivated.
+     */
+    private boolean isVerbose() {
+        return verbosity >= DEBUG;
+    }
 
    /**
     * Instances of this class can be used to customize the behavior of a {@link CustomUserInterface}.

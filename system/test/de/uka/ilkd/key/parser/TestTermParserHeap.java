@@ -1,14 +1,10 @@
 package de.uka.ilkd.key.parser;
 
-import java.io.File;
-
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import static de.uka.ilkd.key.parser.KeYParserF.NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE;
-import de.uka.ilkd.key.util.HelperClassForTests;
 import java.io.IOException;
+import org.antlr.runtime.RecognitionException;
 
 /**
  * Parser tests for heap terms.
@@ -17,30 +13,17 @@ import java.io.IOException;
  */
 public class TestTermParserHeap extends AbstractTestTermParser {
 
-    static final String javaPath = System.getProperty("key.home")
-            + File.separator + "examples"
-            + File.separator + "_testcase"
-            + File.separator + "termParser"
-            + File.separator + "parserTest.key";
-
     public TestTermParserHeap() {
         super(TestTermParserHeap.class.getSimpleName());
     }
 
     @Override
-    public void setUp() {
+    public void setUp() throws RecognitionException {
         parseDecls("\\programVariables {Heap h, h2;}");
         parseDecls("\\programVariables {int i;}");
         parseDecls("\\programVariables {testTermParserHeap.A a;}");
         parseDecls("\\programVariables {testTermParserHeap.A1 a1;}");
         parseDecls("\\programVariables {testTermParserHeap.A[] array;}");
-    }
-
-    @Override
-    protected Services getServices() {
-        JavaInfo javaInfo = new HelperClassForTests().parse(
-                new File(javaPath)).getFirstProof().getJavaInfo();
-        return javaInfo.getServices();
     }
 
     private Term getSelectTerm(String sort, Term heap, Term object, Term field) {
@@ -49,11 +32,11 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         return tf.createTerm(op, params);
     }
 
-    public void testAllFieldsSelector() throws IOException {
+    public void testAllFieldsSelector() throws Exception {
         comparePrettySyntaxAgainstVerboseSyntax("a.*", "allFields(a)");
     }
 
-    public void testLocationSets() throws IOException {
+    public void testLocationSets() throws Exception {
         String pp = "{(a, testTermParserHeap.A::$f)}";
         String verbose = "singleton(a,testTermParserHeap.A::$f)";
         comparePrettySyntaxAgainstVerboseSyntax(pp, verbose);
@@ -65,7 +48,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         verifyParsing(expected, pp);
     }
 
-    public void testParsePrettyPrintedSelect() throws IOException {
+    public void testParsePrettyPrintedSelect() throws Exception {
         String prettySyntax = "a.f";
         String verboseSyntax = "int::select(heap, a, testTermParserHeap.A::$f)";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
@@ -79,7 +62,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
     }
 
-    public void testBracketHeapUpdate() throws IOException {
+    public void testBracketHeapUpdate() throws Exception {
         String complicatedHeapPretty = "heap[a.f := 4][create(a)][memset({}, 1)][anon(allLocs, heap)]";
         String complicatedHeapVerbose = "anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)";
         comparePrettySyntaxAgainstVerboseSyntax(complicatedHeapPretty, complicatedHeapVerbose);
@@ -108,7 +91,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
      * The @-Operator can be used to specify the heap, which belongs to a
      * field access. That operator is tested in the method below.
      */
-    public void testAtOperator() throws IOException {
+    public void testAtOperator() throws Exception {
         Term expectedParseResult;
         String prettySyntax, verboseSyntax;
 
@@ -177,7 +160,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         }
     }
 
-    public void testQuantifiedSelect() throws IOException {
+    public void testQuantifiedSelect() throws Exception {
         String quantification = "\\forall java.lang.Object o; \\forall Field f; o.f = 1";
         String expectedToString = "all{o:java.lang.Object}(all{f:Field}(equals(any::select(heap,o,f),Z(1(#)))))";
         comparePrettyPrintAgainstToString(quantification, expectedToString);
@@ -188,13 +171,13 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     }
 
-    private void comparePrettyPrintAgainstToString(String quantification, String expectedToString) throws IOException {
+    private void comparePrettyPrintAgainstToString(String quantification, String expectedToString) throws Exception {
         Term t = parseTerm(quantification);
         assertEquals(expectedToString, t.toString());
         assertEqualsIgnoreWhitespaces(quantification, printTerm(t));
     }
 
-    public void testGenericObjectProperties() throws IOException {
+    public void testGenericObjectProperties() throws Exception {
         // test pretty syntax
         comparePrettySyntaxAgainstVerboseSyntax("a.<created>", "boolean::select(heap,a,java.lang.Object::<created>)");
         comparePrettySyntaxAgainstVerboseSyntax("a.<initialized>", "boolean::select(heap,a,java.lang.Object::<initialized>)");
@@ -282,7 +265,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     /*
      * Test pretty-printing on static fields and methods.
      */
-    public void testAccessStaticMembers() throws IOException {
+    public void testAccessStaticMembers() throws Exception {
         // static field access
         comparePrettySyntaxAgainstVerboseSyntax("testTermParserHeap.A.staticField",
                 "int::select(heap, null, testTermParserHeap.A::$staticField)");
@@ -301,7 +284,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     /*
      * Test parsing and printing of store-terms.
      */
-    public void testStore() throws IOException {
+    public void testStore() throws Exception {
         String pretty, verbose;
 
         // non-static non-hidden field
@@ -337,7 +320,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
      * @param s Pretty-printed String representation of a term.
      * @throws IOException
      */
-    private void parseAndPrint(String s) throws IOException {
+    private void parseAndPrint(String s) throws Exception {
         Term t = parseTerm(s);
         String printedSyntax = printTerm(t);
         assertEqualsIgnoreWhitespaces(s, printedSyntax);

@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.core.TaskFinishedInfo;
-import de.uka.ilkd.key.ui.BatchMode;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 /**
  * This class is used for loading key proofs only, but not exiting afterwards.
@@ -10,8 +9,8 @@ import de.uka.ilkd.key.ui.ConsoleUserInterface;
  */
 public class TestConsoleUserInterface extends ConsoleUserInterface{
 
-	public TestConsoleUserInterface(BatchMode batchMode, boolean verbose) {
-		super(batchMode, verbose);
+	public TestConsoleUserInterface(boolean verbose, boolean loadOnly) {
+		super(verbose, loadOnly);
 	}
 
 	@Override

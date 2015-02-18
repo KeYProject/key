@@ -24,34 +24,16 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 
 public class BatchMode {
 
-    private String fileName;
-
-    // flag to indicate that a file should merely be loaded not proved. (for
-    // "reload" testing)
-    private final boolean loadOnly;
-
-    public BatchMode(String fileName, boolean loadOnly) {
-        this.fileName = fileName;
-        this.loadOnly = loadOnly;
-    }
-
-//    public void autoRun() {
-//    }
-
-
-   public void finishedBatchMode (Object result,
-                                  Proof proof) {
+   public static boolean saveProof (Object result, Proof proof, File keyProblemFile) {
+       String fileName = keyProblemFile.getAbsolutePath();
 
         if ( Main.getStatisticsFile() != null )
-            printStatistics ( Main.getStatisticsFile(), result.toString(),
-                              proof.statistics(), proof.closed() );
+            saveStatistics ( Main.getStatisticsFile(), result.toString(),
+                              proof.statistics(), proof.closed(), fileName);
 
-        if (result instanceof Throwable) {
-            // Error in batchMode. Terminate with status -1.
-            System.err.println("An error occurred during batch mode:");
-            System.err.println(""+result);
-            System.exit ( -1 );
-        }
+       if (result instanceof Throwable) {
+           throw new Error("Error in batchmode.", (Throwable) result);
+       }
 
         // Save the proof before exit.
 
@@ -76,16 +58,15 @@ public class BatchMode {
             // save current proof under common name as well
             saveProof (proof, baseName + ".auto.proof" );
         } catch (IOException e) {
-            System.exit( 1 );
+            e.printStackTrace();
         }
-
 
         if (proof.openGoals ().size () == 0) {
             // Says that all Proofs have succeeded
-            System.exit ( 0 );
+            return true;
         } else {
             // Says that there is at least one open Proof
-            System.exit ( 1 );
+            return false;
         }
     }
 
@@ -98,9 +79,10 @@ public class BatchMode {
      *        statistics like the number of applied rules and so on.
      * @param proofClosed information whether the proof has been closed.
      */
-    private void printStatistics(String file, Object result,
+    private static void saveStatistics(String file, Object result,
                                  Proof.Statistics statistics,
-                                 boolean proofClosed) {
+                                 boolean proofClosed,
+                                 String fileName) {
         
         // get current memory consumption (after GC) in kB
         Runtime.getRuntime().gc();
@@ -140,15 +122,9 @@ public class BatchMode {
         }
     }
 
-    private void saveProof(Proof proof, String filename) throws IOException {
-        ProofSaver saver =
-        		new ProofSaver(proof, filename, Main.INTERNAL_VERSION);
+    private static void saveProof(Proof proof, String filename) throws IOException {
+        ProofSaver saver = new ProofSaver(proof, filename, Main.INTERNAL_VERSION);
         saver.save();
     }
-
-    public boolean isLoadOnly() {
-        return loadOnly;
-    }
-
 
 }

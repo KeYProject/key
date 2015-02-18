@@ -45,6 +45,7 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
  */
 public class JavaProfile extends AbstractProfile {
     public static final String NAME = "Java Profile";
+    public static final String NAME_WITH_PERMISSIONS = "Java with Permissions Profile";
     
     /**
      * <p>
@@ -56,7 +57,10 @@ public class JavaProfile extends AbstractProfile {
      * use them in different {@link Thread}s (not the UI {@link Thread}).
      * </p>
      */
-    public static JavaProfile defaultInstance; 
+    public static JavaProfile defaultInstance;
+    public static JavaProfile defaultInstancePermissions;
+
+    private boolean permissions = false;
 
     public final static StrategyFactory DEFAULT =
         new JavaCardDLStrategy.Factory();
@@ -75,6 +79,11 @@ public class JavaProfile extends AbstractProfile {
         this("standardRules.key");
     }
 
+    private JavaProfile(boolean perms) {
+    	this();
+    	this.permissions = perms;
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -173,7 +182,7 @@ public class JavaProfile extends AbstractProfile {
      * the name of the profile
      */
     public String name() {
-        return NAME;
+        return permissions ? NAME_WITH_PERMISSIONS : NAME;
     }
 
     /**
@@ -194,10 +203,25 @@ public class JavaProfile extends AbstractProfile {
      * </p>
      * @return The default instance for usage in the {@link Thread} of the user interface.
      */
-    public static synchronized JavaProfile getDefaultInstance() {
-        if (defaultInstance == null) {
+    public static synchronized JavaProfile getDefaultInstance(boolean perms) {
+        if(!perms) {
+          if (defaultInstance == null) {
             defaultInstance = new JavaProfile();
+          }
+          return defaultInstance;
+        }else{
+          if (defaultInstancePermissions == null) {
+            defaultInstancePermissions = new JavaProfile(true);
+          }
+          return defaultInstancePermissions;
         }
-       return defaultInstance;
     }
+
+    public static synchronized JavaProfile getDefaultInstance() {
+       return getDefaultInstance(false);
+    }
+
+	public boolean withPermissions() {
+		return permissions;
+	}
 }
