@@ -16,6 +16,7 @@ package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
@@ -112,7 +113,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
       else {
          sb.append(getProgramVariableString());
       }
-      if (condition != null) {
+      if (condition != null && condition.op() != Junctor.TRUE) {
          sb.append(" {");
          sb.append(getConditionString());
          sb.append("}");
