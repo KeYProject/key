@@ -139,7 +139,7 @@ public class KeYInstallerCmdLine extends KeYInstallerUI {
 	String welcome = 
 	    "Dear User,\n"+
 	    "   thank you for choosing KeY. In case of any questions, problems " +
-	    "or suggestions please contact us: mailto:key@ira.uka.de\n" +  
+	    "or suggestions please contact us: mailto:support@key-project.org\n" +  
 	    "We would also be interested to know for which purpose you will use "+
 	    " KeY, e.g. research, industry or teaching.\n" + 
 	    "\t Best regards,\n"+
@@ -393,7 +393,7 @@ public class KeYInstallerCmdLine extends KeYInstallerUI {
        System.err.println ( trim ( "Error Description:" + msg, 72 ) );
        System.err.println 
 	   ( "A critical error has occured. Please send a bug "+
-	     "report to: key@ira.uka.de\n" +  
+	     "report to: support@key-project.org\n" +  
 	     "The bug report should include:\n" + 
 	     "\t Error Classification " /*+ ": Developer Heart Attack"*/ + "\n" +
 	     "\t Operating system \n" + 
