@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.Node;
@@ -86,8 +87,8 @@ public abstract class AbstractSlicer {
          throw new IllegalStateException("No rule applied on seed Node '" + seedNode.serialNr() + "'.");
       }
       PosInOccurrence pio = seedNode.getAppliedRuleApp().posInOccurrence();
-      Term topLevel = pio.constrainedFormula().formula();
-      Pair<ImmutableList<Term>,Term> pair = TermBuilder.goBelowUpdates2(topLevel);
+      Term applicationTerm = pio.subTerm();
+      Pair<ImmutableList<Term>,Term> pair = TermBuilder.goBelowUpdates2(applicationTerm);
       Term modalityTerm = pair.second;
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(modalityTerm);
       if (label == null) {
@@ -181,8 +182,7 @@ public abstract class AbstractSlicer {
       HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
       if (label != null) {
          // Solve this reference
-         IExecutionContext ec = JavaTools.getInnermostExecutionContext(modalityTerm.javaBlock(), services);
-         ReferencePrefix thisReference = ec != null ? ec.getRuntimeInstance() : null;
+         ReferencePrefix thisReference = computeThisReference(modalityTerm, services);
          // Compute aliases
          Map<Location, SortedSet<Location>> aliases = new HashMap<Location, SortedSet<Location>>();
          Map<ProgramVariable, Term> localValues = new HashMap<ProgramVariable, Term>();
@@ -192,6 +192,29 @@ public abstract class AbstractSlicer {
       else {
          return null; // Not the modality of interest.
       }
+   }
+
+   /**
+    * Computes the this reference.
+    * @param pio The {@link PosInOccurrence} with the modality.
+    * @param services The {@link Services} to use.
+    * @return The this reference or {@code null} if not available.
+    */
+   protected ReferencePrefix computeThisReference(PosInOccurrence pio, Services services) {
+      Term modalityTerm = TermBuilder.goBelowUpdates(pio.subTerm());
+      return computeThisReference(modalityTerm, services);
+   }
+
+   /**
+    * Computes the this reference.
+    * @param modalityTerm The {@link Term} with the modality.
+    * @param services The {@link Services} to use.
+    * @return The this reference or {@code null} if not available.
+    */
+   protected ReferencePrefix computeThisReference(Term modalityTerm, Services services) {
+      IExecutionContext ec = JavaTools.getInnermostExecutionContext(modalityTerm.javaBlock(), services);
+      ReferencePrefix thisReference = ec != null ? ec.getRuntimeInstance() : null;
+      return thisReference;
    }
    
    /**
@@ -229,7 +252,8 @@ public abstract class AbstractSlicer {
                                 Map<Location, SortedSet<Location>> aliases, 
                                 Map<ProgramVariable, Term> localValues,
                                 ReferencePrefix thisReference) {
-      if (term.op() == UpdateJunctor.PARALLEL_UPDATE) {
+      if (term.op() == UpdateJunctor.PARALLEL_UPDATE || 
+          term.op() == UpdateApplication.UPDATE_APPLICATION) {
          for (int i = 0 ; i < term.arity(); i++) {
             analyzeUpdate(term.sub(i), services, heapLDT, aliases, localValues, thisReference);
          }
@@ -286,6 +310,85 @@ public abstract class AbstractSlicer {
       else if (term.op() == create) {
          // Analyze parent heap
          analyzeHeapUpdate(term.sub(0), services, heapLDT, aliases, thisReference);
+      }
+      else if (term.op() instanceof IProgramVariable) {
+         // Nothing to do, root of heap reached.
+      }
+      else if (SymbolicExecutionUtil.isHeap(term.op(), heapLDT)) {
+         // Nothing to do, just another heap
+      }
+      else {
+         throw new IllegalStateException("Can not analyze heap update '" + term + "'.");
+      }
+   }
+   
+   /**
+    * Recursive method to list all modified {@link Location}s in the given {@link Term}.
+    * @param term The update {@link Term} to analyze.
+    * @param services The {@link Services} to use.
+    * @param heapLDT The {@link HeapLDT} of the {@link Services}.
+    * @param listToFill The result {@link List} with {@link Location}s to fill.
+    * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
+    */
+   protected void listModifiedLocations(Term term, 
+                                        Services services, 
+                                        HeapLDT heapLDT, 
+                                        List<Location> listToFill,
+                                        ReferencePrefix thisReference) {
+      if (term.op() == UpdateJunctor.PARALLEL_UPDATE || 
+          term.op() == UpdateApplication.UPDATE_APPLICATION) {
+         for (int i = 0 ; i < term.arity(); i++) {
+            listModifiedLocations(term.sub(i), services, heapLDT, listToFill, thisReference);
+         }
+      }
+      else if (term.op() instanceof ElementaryUpdate) {
+         UpdateableOperator target = ((ElementaryUpdate) term.op()).lhs();
+         if (SymbolicExecutionUtil.isHeap(target, heapLDT)) {
+            listModifiedHeapLocations(term.sub(0), services, heapLDT, listToFill, thisReference);
+         }
+         else {
+            if (target instanceof ProgramVariable) {
+               listToFill.add(toLocation(services, (ProgramVariable) target, thisReference));
+            }
+         }
+      }
+      else {
+         throw new IllegalArgumentException("Can not analyze update '" + term + "'.");
+      }
+   }
+
+   /**
+    * Recursive utility method used by {@link #listModifiedLocations(Term, Services, HeapLDT, List, ReferencePrefix)} to analyze a given update.
+    * @param term The heap update {@link Term} to analyze.
+    * @param services The {@link Services} to use.
+    * @param heapLDT The {@link HeapLDT} of the {@link Services}.
+    * @param listToFill The result {@link List} with {@link Location}s to fill.
+    * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
+    */
+   protected void listModifiedHeapLocations(Term term, 
+                                            Services services, 
+                                            HeapLDT heapLDT, 
+                                            List<Location> listToFill,
+                                            ReferencePrefix thisReference) {
+      if (term.op() == heapLDT.getStore()) {
+         // Analyze parent heap
+         listModifiedHeapLocations(term.sub(0), services, heapLDT, listToFill, thisReference);
+         // Check for alias in current store
+         if (SymbolicExecutionUtil.hasReferenceSort(services, term.sub(3))) {
+            Location source = toLocation(services, term.sub(3));
+            if (source != null) {
+               Location targetPrefix = toLocation(services, term.sub(1));
+               listToFill.add(targetPrefix);
+            }
+         }
+      }
+      else if (term.op() == heapLDT.getCreate()) {
+         // Analyze parent heap
+         listModifiedHeapLocations(term.sub(0), services, heapLDT, listToFill, thisReference);
+      }
+      else if (term.op() == heapLDT.getAnon()) {
+         // Analyze anonymized locations
+         listModifiedHeapLocations(term.sub(1), services, heapLDT, listToFill, thisReference);
       }
       else if (term.op() instanceof IProgramVariable) {
          // Nothing to do, root of heap reached.
@@ -485,6 +588,41 @@ public abstract class AbstractSlicer {
                                     Set<Location> relevantLocations, 
                                     SequentInfo info) {
       Location normalized = normalizeAlias(services, sourceElement, info);
+      return performRemoveRelevant(services, normalized, relevantLocations, info);
+   }
+
+   /**
+    * Checks if the given {@link Location} is directly or indirectly
+    * contained (aliased) in the {@link Set} of relevant locations.
+    * If it is contained, the element will be removed.
+    * @param services The {@link Services} to use.
+    * @param location The {@link Location} to check.
+    * @param relevantLocations The {@link Set} with locations of interest.
+    * @param info The {@link SequentInfo} with the aliases and so on.
+    * @return {@code true} is relevant and was removed, {@code false} is not relevant and nothing has changed.
+    */
+   protected boolean removeRelevant(Services services,
+                                    Location location, 
+                                    Set<Location> relevantLocations, 
+                                    SequentInfo info) {
+      Location normalized = normalizeAlias(services, location, info);
+      return performRemoveRelevant(services, normalized, relevantLocations, info);
+   }
+
+   /**
+    * Checks if the given {@link Location} is directly or indirectly
+    * contained (aliased) in the {@link Set} of relevant locations.
+    * If it is contained, the element will be removed.
+    * @param services The {@link Services} to use.
+    * @param normalized The {@link Location} to check.
+    * @param relevantLocations The {@link Set} with locations of interest.
+    * @param info The {@link SequentInfo} with the aliases and so on.
+    * @return {@code true} is relevant and was removed, {@code false} is not relevant and nothing has changed.
+    */
+   protected boolean performRemoveRelevant(Services services,
+                                           Location normalized, 
+                                           Set<Location> relevantLocations, 
+                                           SequentInfo info) {
       boolean relevant = false;
       Iterator<Location> iterator = relevantLocations.iterator();
       while (!relevant && iterator.hasNext()) {
