@@ -683,4 +683,12 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
          return new ISEDSlicer[0];
       }
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isGroupingSupported() {
+      return launchSettings.isGroupingEnabled();
+   }
 }
