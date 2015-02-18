@@ -63,7 +63,9 @@ public final class TipOfTheDay {
     }
     
     private static String[] getTipsOnline() throws IOException {
-        return new String[]{checkLatestVersion()};
+        return new String[0];
+        // KeY should not phone home without asking the user
+        // return new String[]{checkLatestVersion()};
     }
     
     private static String checkLatestVersion() {
