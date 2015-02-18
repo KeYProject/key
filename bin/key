@@ -250,5 +250,5 @@ $JAVA $JAVA_OPTIONS $keysysprops \
 -ea:de.uka.ilkd.key... $javaOptionXms $javaOptionXmx \
 -Dkey.home="$KEY_HOME" \
 -Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler \
--splash:"$KEY_HOME/system/resources/de/uka/ilkd/key/gui/images/key22.gif" \
+-splash:"$KEY_HOME/system/resources/de/uka/ilkd/key/gui/images/key-splash.png" \
 -classpath "$keyclasspath" de.uka.ilkd.key.core.Main "$@"
