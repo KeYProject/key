@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <equivalenceClass representativeTerm="self">
+      <term term="self"/>
+      <term term="summand"/>
+   </equivalenceClass>
+   <state name="{}">
+      <value name="exc" programVariable="exc" isArrayIndex="false" value="null" type="Null" condition="true"/>
+      <association name="summand" programVariable="summand" isArrayIndex="false" target="o1" condition="true"/>
+      <association name="self" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
+   </state>
+   <object xml:id="o1" name="self" type="MyInteger">
+      <value name="value" programVariable="value" isArrayIndex="false" value="mul(int::select(heap,self,MyInteger::$value),Z(2(#)))" type="int" condition="true"/>
+   </object>
+</model>
