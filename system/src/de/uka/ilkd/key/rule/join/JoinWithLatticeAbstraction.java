@@ -129,6 +129,13 @@ public abstract class JoinWithLatticeAbstraction extends JoinRule {
                   getNewScolemConstantForPrefix(joinElem.toString(), v.sort(), services);
             
             newConstraints = tb.and(newConstraints, joinElem.getDefiningAxiom(tb.func(skolemConstant), services));
+            //NOTE: We also remember the precise values by if-then-else construction. This
+            //      preserves completeness and should also not be harmful to performance in
+            //      cases where completeness is also preserved by the lattice. However, if
+            //      there are lattices where this construction is bad, it may be safely
+            //      removed (no harm to soundness!).
+            newConstraints = tb.and(newConstraints, tb.equals(tb.func(skolemConstant),
+                  JoinIfThenElse.createIfThenElseTerm(state1, state2, rightSide1, rightSide2, services)));
             
             newElementaryUpdates = newElementaryUpdates.prepend(
                   tb.elementary(

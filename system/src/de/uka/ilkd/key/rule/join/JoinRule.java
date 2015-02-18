@@ -277,6 +277,8 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
          if (termAfterUpdate.op() instanceof Modality &&
                !termAfterUpdate.sub(0).javaBlock().equals(JavaBlock.EMPTY_JAVABLOCK)) {
             return false;
+         } else if (termAfterUpdate.op() instanceof UpdateApplication) {
+            return false;
          }
          
          return !doJoinPartnerCheck || findPotentialJoinPartners(goal, pio).size() > 0;
