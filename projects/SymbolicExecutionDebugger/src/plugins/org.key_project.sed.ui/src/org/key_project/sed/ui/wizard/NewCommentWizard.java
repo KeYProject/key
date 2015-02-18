@@ -53,6 +53,7 @@ public class NewCommentWizard extends Wizard {
       Assert.isNotNull(node);
       Assert.isNotNull(annotationType);
       setWindowTitle("New Comment");
+      setHelpAvailable(false);
    }
 
    /**
@@ -97,6 +98,7 @@ public class NewCommentWizard extends Wizard {
     */
    public static int openWizard(Shell parentShell, ISEDDebugNode node) {
       WizardDialog dialog = new WizardDialog(parentShell, new NewCommentWizard(node));
+      dialog.setHelpAvailable(false);
       return dialog.open();
    }
 }

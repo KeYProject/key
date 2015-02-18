@@ -26,7 +26,9 @@ package org.key_project.key4eclipse.resources.ui.wizard;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.Wizard;
+import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.key_project.key4eclipse.common.ui.wizard.AbstractNewJavaProjectWizard;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
@@ -59,6 +61,14 @@ public class KeYProjectWizard extends AbstractNewJavaProjectWizard {
    @Override
    protected String computeTitle() {
       return "Create a KeY Project";
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected ImageDescriptor computeImageDescriptor() {
+      return KeYImages.getImageDescriptor(KeYImages.NEW_KEY_JAVA_PROJECT_WIZARD);
    }
    
    /**

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_3d705014-3fdc-4b32-b1f5-22f7c620b974" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_80d4f959-fb8e-4062-8b23-d19240e52aca" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYThinBackwardSlicerTest_testSimpleLocalVariables\src\SimpleLocalVariables.java">
+         <sedVariable xml:id="_a5f2976b-0fa5-4b1a-ab0b-70ce80dbb815" name="heapAtPre" referenceTypeName="Heap">
+            <sedValue xml:id="_4272a9d6-6af7-4e97-8de3-a96f44ae4c1f" referenceTypeName="Heap" valueString="heap" allocated="true" multiValued="false">
+            </sedValue>
+         </sedVariable>
+         <sedMethodCall xml:id="_43b7081e-dd01-4f0e-8ab6-02d66ada5510" name="&lt;call SimpleLocalVariables.main()&gt;" pathCondition="true" lineNumber="-1" charStart="60" charEnd="64" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYThinBackwardSlicerTest_testSimpleLocalVariables\src\SimpleLocalVariables.java" groupable="true">
+            <sedVariable xml:id="_613fd0d3-9fdb-4cf5-a748-2d62a6f59721" name="exc" referenceTypeName="Null">
+               <sedValue xml:id="_dd60de41-4914-48e1-9bc5-ff66d77ffb91" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+               </sedValue>
+            </sedVariable>
+            <sedStatement xml:id="_892c5847-84e5-41f7-bc15-977fcd46307a" name="int x = 40;" pathCondition="true" lineNumber="-1" charStart="76" charEnd="87" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYThinBackwardSlicerTest_testSimpleLocalVariables\src\SimpleLocalVariables.java">
+               <sedVariable xml:id="_b1dfdefe-d1fe-4508-a8af-4b0599732e2f" name="exc" referenceTypeName="Null">
+                  <sedValue xml:id="_8dd58940-9bd1-4934-80d1-beb170a70380" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                  </sedValue>
+               </sedVariable>
+               <sedStatement xml:id="_1a4f5fba-1240-4af5-b088-dd489759c2aa" name="int y = 2;" pathCondition="true" lineNumber="-1" charStart="95" charEnd="105" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYThinBackwardSlicerTest_testSimpleLocalVariables\src\SimpleLocalVariables.java">
+                  <sedVariable xml:id="_89eb805c-16e7-4ea7-a25e-5a63ed6a3eab" name="exc" referenceTypeName="Null">
+                     <sedValue xml:id="_64190f82-db82-4885-ba9e-12aa3061436c" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                     </sedValue>
+                  </sedVariable>
+                  <sedVariable xml:id="_591b99ca-8bf8-4dfb-8e6e-b5c288ef526c" name="x" referenceTypeName="int">
+                     <sedValue xml:id="_e2005e4e-4935-4804-b1c5-bf6da0120795" referenceTypeName="int" valueString="Z(0(4(#)))" allocated="true" multiValued="false">
+                     </sedValue>
+                  </sedVariable>
+                  <sedStatement xml:id="_71ae511d-a6f7-4fd6-b1b7-9e2479cd09e5" name="int z = -4711;" pathCondition="true" lineNumber="-1" charStart="113" charEnd="127" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYThinBackwardSlicerTest_testSimpleLocalVariables\src\SimpleLocalVariables.java">
+                     <sedVariable xml:id="_97f2e825-d73f-404d-8f02-fe559c4cc4ba" name="exc" referenceTypeName="Null">
+                        <sedValue xml:id="_29bfa9c5-3839-47fc-b22c-c9f0f94b3f51" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                        </sedValue>
+                     </sedVariable>
+                     <sedVariable xml:id="_e6dc235d-80ef-4035-b283-1503af773805" name="x" referenceTypeName="int">
+                        <sedValue xml:id="_3f3876d2-c019-42b8-8f87-48acfdb0f55b" referenceTypeName="int" valueString="Z(0(4(#)))" allocated="true" multiValued="false">
+                        </sedValue>
+                     </sedVariable>
+                     <sedVariable xml:id="_6dde449b-efb9-47cb-8630-e96a6969a4a8" name="y" referenceTypeName="int">
+                        <sedValue xml:id="_fd44008f-2e9d-4a2d-ad24-0a94d7546c90" referenceTypeName="int" valueString="Z(2(#))" allocated="true" multiValued="false">
+                        </sedValue>
+                     </sedVariable>
+                     <sedStatement xml:id="_1edeb58e-ed62-4d79-b9ee-1272ecce6af7" name="int result = x+y;" pathCondition="true" lineNumber="-1" charStart="135" charEnd="154" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYThinBackwardSlicerTest_testSimpleLocalVariables\src\SimpleLocalVariables.java">
+                        <sedVariable xml:id="_9160ce57-ec1e-44cd-a3b7-71c60a086f88" name="exc" referenceTypeName="Null">
+                           <sedValue xml:id="_a5c76849-f538-4480-a09b-615850bc61e0" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                           </sedValue>
+                        </sedVariable>
+                        <sedVariable xml:id="_dc8137cc-bdce-4c96-9b72-32587edf3692" name="x" referenceTypeName="int">
+                           <sedValue xml:id="_a0de0186-ef9f-4482-a27e-974db3a305ab" referenceTypeName="int" valueString="Z(0(4(#)))" allocated="true" multiValued="false">
+                           </sedValue>
+                        </sedVariable>
+                        <sedVariable xml:id="_638ce255-1bde-45ed-8488-bc37e5605831" name="y" referenceTypeName="int">
+                           <sedValue xml:id="_848894ca-84ef-4a0c-859e-4dd67bf67fa5" referenceTypeName="int" valueString="Z(2(#))" allocated="true" multiValued="false">
+                           </sedValue>
+                        </sedVariable>
+                        <sedStatement xml:id="_fb75c223-6ec1-46d5-9b1f-b9881110ca68" name="return result_1;" pathCondition="true" lineNumber="-1" charStart="162" charEnd="176" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYThinBackwardSlicerTest_testSimpleLocalVariables\src\SimpleLocalVariables.java">
+                           <sedVariable xml:id="_e160db13-c4ce-4655-af67-19785883096e" name="exc" referenceTypeName="Null">
+                              <sedValue xml:id="_542097e7-b07a-441c-9850-bb1ff0ab4b72" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                              </sedValue>
+                           </sedVariable>
+                           <sedVariable xml:id="_cb10c3fb-6e10-4768-845c-abca77c75f6f" name="result_1" referenceTypeName="int">
+                              <sedValue xml:id="_59dcdc20-d703-4583-9a3e-971ee0763bf0" referenceTypeName="int" valueString="Z(2(4(#)))" allocated="true" multiValued="false">
+                              </sedValue>
+                           </sedVariable>
+                           <sedMethodReturn xml:id="_be7d4a98-c44f-496b-82b0-a13214c236a0" name="&lt;return of main&gt;" pathCondition="true" lineNumber="-1" charStart="60" charEnd="64" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYThinBackwardSlicerTest_testSimpleLocalVariables\src\SimpleLocalVariables.java" methodReturnConditionRef="_ae88e6ba-1336-4811-9247-5bac55da6c5b">
+                              <sedVariable xml:id="_b056ac09-f9a8-4db6-829e-0bc8551b794b" name="exc" referenceTypeName="Null">
+                                 <sedValue xml:id="_de12ad61-f6c1-475d-beb9-ff012d07ec64" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                 </sedValue>
+                              </sedVariable>
+                              <sedCallStateVariable xml:id="_6a5221fc-6388-4485-9403-b10f76360417" name="exc" referenceTypeName="Null">
+                                 <sedValue xml:id="_64a493b0-9138-468f-948f-795e8d6a4006" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                 </sedValue>
+                              </sedCallStateVariable>
+                              <sedCallStateVariable xml:id="_2b17d0f5-73ae-4911-bd41-e7f5fb6b8223" name="heapBefore_main" referenceTypeName="Heap">
+                                 <sedValue xml:id="_5f55d456-fa14-4401-a815-d11acd812111" referenceTypeName="Heap" valueString="heap" allocated="true" multiValued="false">
+                                 </sedValue>
+                              </sedCallStateVariable>
+                              <sedCallStateVariable xml:id="_844311c5-790b-4b1b-a55e-c3a8bb8f225b" name="savedHeapBefore_main" referenceTypeName="Heap">
+                                 <sedValue xml:id="_3d099e53-413b-4bcd-a16b-679506e4fa50" referenceTypeName="Heap" valueString="savedHeap" allocated="true" multiValued="false">
+                                 </sedValue>
+                              </sedCallStateVariable>
+                              <sedTermination xml:id="_7d6a738b-9384-4247-9ba9-6f7bdf773296" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYThinBackwardSlicerTest_testSimpleLocalVariables\src\SimpleLocalVariables.java" verified="true">
+                                 <sedVariable xml:id="_245c35a9-5304-400d-8e26-b44defc2475e" name="exc" referenceTypeName="Null">
+                                    <sedValue xml:id="_1d9a8d68-fa97-49c0-9f4f-9bdd27ccad74" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                    </sedValue>
+                                 </sedVariable>
+                              </sedTermination>
+                              <sedGroupEndConditionReference nodeIdRef="_ae88e6ba-1336-4811-9247-5bac55da6c5b"/>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedStatement>
+                  </sedStatement>
+               </sedStatement>
+            </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_ae88e6ba-1336-4811-9247-5bac55da6c5b" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYThinBackwardSlicerTest_testSimpleLocalVariables\src\SimpleLocalVariables.java">
+               <sedChildReference nodeIdRef="_be7d4a98-c44f-496b-82b0-a13214c236a0"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_ae88e6ba-1336-4811-9247-5bac55da6c5b" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYThinBackwardSlicerTest_testSimpleLocalVariables\src\SimpleLocalVariables.java">
+               <sedChildReference nodeIdRef="_be7d4a98-c44f-496b-82b0-a13214c236a0"/>
+            </sedGroupEndCondition>
+         </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_7d6a738b-9384-4247-9ba9-6f7bdf773296"/>
+      </sedThread>
+   </sedTarget>
+</launch>

@@ -4,11 +4,19 @@
       <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
+   <variable name="exc" isArrayIndex="false">
+      <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
    <methodCall name="&lt;call VariablesArrayTest.arrayTest(a)&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="a" isArrayIndex="false">
          <value name="a {equals(a,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(a,null)">
          </value>
          <value name="a {not(equals(a,null))}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(a,null))">
+         </value>
+      </variable>
+      <variable name="exc" isArrayIndex="false">
+         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
       <statement name="a[10]=2;" pathCondition="true" pathConditionChanged="false">
@@ -18,6 +26,10 @@
             <value name="a {not(equals(a,null))}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(a,null))">
             </value>
          </variable>
+         <variable name="exc" isArrayIndex="false">
+            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
          <branchCondition name="or(lt(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(1(#))))))" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(1(#))))))" pathConditionChanged="true" branchCondition="or(lt(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(1(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <variable name="a" isArrayIndex="false">
                <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -25,6 +37,10 @@
                      <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
+               </value>
+            </variable>
+            <variable name="exc" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <statement name="a[20]=4;" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(1(#))))))" pathConditionChanged="false">
@@ -40,6 +56,10 @@
                      </variable>
                   </value>
                </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
                <branchCondition name="gt(length(a),Z(0(2(#))))" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))" pathConditionChanged="true" branchCondition="gt(length(a),Z(0(2(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <variable name="a" isArrayIndex="false">
                      <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -51,6 +71,10 @@
                            <value name="[Z(0(1(#)))] {true}" typeString="int" valueString="int::select(heap,a,arr(Z(0(1(#)))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
+                     </value>
+                  </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <statement name="return a[10]+a[20];" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))" pathConditionChanged="false">
@@ -70,6 +94,10 @@
                            </variable>
                         </value>
                      </variable>
+                     <variable name="exc" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
                      <methodReturn name="&lt;return of arrayTest&gt;" signature="&lt;return of VariablesArrayTest.arrayTest(a)&gt;" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))">
                         <variable name="a" isArrayIndex="false">
                            <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -85,6 +113,10 @@
                                  <value name="[Z(0(1(#)))] {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
+                           </value>
+                        </variable>
+                        <variable name="exc" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <termination name="&lt;end&gt;" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -104,6 +136,10 @@
                                  </variable>
                               </value>
                            </variable>
+                           <variable name="exc" isArrayIndex="false">
+                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
                         </termination>
                         <callStateVariable name="a" isArrayIndex="false">
                            <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -111,6 +147,10 @@
                                  <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="exc" isArrayIndex="false">
+                           <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </callStateVariable>
                      </methodReturn>
@@ -129,6 +169,10 @@
                         </variable>
                      </value>
                   </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
                   <exceptionalMethodReturn name="&lt;throw java.lang.ArrayIndexOutOfBoundsException&gt;" signature="&lt;exceptional return of &lt;call VariablesArrayTest.arrayTest(a)&gt;&gt;" pathCondition="imp(geq(length(a),Z(0(#))),and(and(not(equals(a,null)),geq(length(a),Z(1(1(#))))),leq(length(a),Z(0(2(#))))))" pathConditionChanged="false" methodReturnCondition="imp(geq(length(a),Z(0(#))),and(and(not(equals(a,null)),geq(length(a),Z(1(1(#))))),leq(length(a),Z(0(2(#))))))">
                      <variable name="a" isArrayIndex="false">
                         <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -140,6 +184,10 @@
                               <value name="[Z(0(1(#)))] {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
+                        </value>
+                     </variable>
+                     <variable name="exc" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="a_5" isArrayIndex="false">
@@ -167,6 +215,18 @@
                               </variable>
                            </value>
                         </variable>
+                        <variable name="exc" isArrayIndex="false">
+                           <value name="exc {true}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_8" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <variable name="message" isArrayIndex="false">
+                                 <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="cause" isArrayIndex="false">
+                                 <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
                      </termination>
                      <callStateVariable name="a" isArrayIndex="false">
                         <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -174,6 +234,10 @@
                               <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="exc" isArrayIndex="false">
+                        <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </callStateVariable>
                   </exceptionalMethodReturn>
@@ -185,9 +249,17 @@
                <value name="a {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
+            <variable name="exc" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
             <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call VariablesArrayTest.arrayTest(a)&gt;&gt;" pathCondition="equals(a,null)" pathConditionChanged="false" methodReturnCondition="equals(a,null)">
                <variable name="a" isArrayIndex="false">
                   <value name="a {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="n" isArrayIndex="false">
@@ -207,9 +279,25 @@
                      <value name="a {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="java.lang.NullPointerException" valueString="n_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <variable name="message" isArrayIndex="false">
+                           <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="cause" isArrayIndex="false">
+                           <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
                </termination>
                <callStateVariable name="a" isArrayIndex="false">
                   <value name="a {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </callStateVariable>
             </exceptionalMethodReturn>
@@ -223,6 +311,10 @@
                   </variable>
                </value>
             </variable>
+            <variable name="exc" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
             <exceptionalMethodReturn name="&lt;throw java.lang.ArrayIndexOutOfBoundsException&gt;" signature="&lt;exceptional return of &lt;call VariablesArrayTest.arrayTest(a)&gt;&gt;" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),leq(length(a),Z(0(1(#))))))" pathConditionChanged="false" methodReturnCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),leq(length(a),Z(0(1(#))))))">
                <variable name="a" isArrayIndex="false">
                   <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -230,6 +322,10 @@
                         <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
+                  </value>
+               </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="a_1" isArrayIndex="false">
@@ -253,6 +349,18 @@
                         </variable>
                      </value>
                   </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <variable name="message" isArrayIndex="false">
+                           <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="cause" isArrayIndex="false">
+                           <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
                </termination>
                <callStateVariable name="a" isArrayIndex="false">
                   <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -260,6 +368,10 @@
                         <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </callStateVariable>
             </exceptionalMethodReturn>

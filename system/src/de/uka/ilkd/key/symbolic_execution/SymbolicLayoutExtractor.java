@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -221,6 +222,11 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * are created during symbolic execution or part of the proof obligation.
     */
    private Set<Term> objectsToIgnore;
+
+   /**
+    * The updates to consider.
+    */
+   private ImmutableList<Term> updates;
    
    /**
     * Constructor.
@@ -255,7 +261,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
             // Compute all locations used in path conditions and updates. The values of the locations will be later computed in the state computation (and finally shown in a memory layout).
             Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();
-            objectsToIgnore = computeInitialObjectsToIgnore(); // Contains all objects which should be ignored, like exc of the proof obligation and created objects during symbolic execution
+            objectsToIgnore = computeInitialObjectsToIgnore(false, false); // Contains all objects which should be ignored, like exc of the proof obligation.
             Set<Term> updateCreatedObjects = new LinkedHashSet<Term>(); // Contains all objects which are created during symbolic execution
             Set<Term> updateValueObjects = new LinkedHashSet<Term>(); // Contains all objects which are the value of an update
             collectLocationsFromUpdates(node.sequent(), temporaryCurrentLocations, updateCreatedObjects, updateValueObjects, objectsToIgnore);
@@ -270,6 +276,8 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             symbolicObjectsResultingInCurrentState.addAll(collectObjectsFromSequent(node.sequent(), objectsToIgnore));
             symbolicObjectsResultingInCurrentState = sortTerms(symbolicObjectsResultingInCurrentState); // Sort terms alphabetically. This guarantees that in equivalence classes the representative term is for instance self.next and not self.next.next.
             symbolicObjectsResultingInCurrentState.add(getServices().getTermBuilder().NULL()); // Add null because it can happen that a object is null and this option must be included in equivalence class computation
+            // Find updates
+            updates = extractInitialUpdates();
             // Compute a Sequent with the initial conditions of the proof without modality
             final ProofEnvironment sideProofEnv = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
             Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation();
@@ -278,7 +286,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                // Instantiate proof in which equivalent classes of symbolic objects are computed.
                ProofStarter equivalentClassesProofStarter = SideProofUtil.createSideProof(sideProofEnv, initialConditionsSequent, null);
                // Apply cut rules to compute equivalent classes
-               applyCutRules(equivalentClassesProofStarter, symbolicObjectsResultingInCurrentState);
+               applyCutRules(equivalentClassesProofStarter, symbolicObjectsResultingInCurrentState, updates);
                // Finish proof automatically
                info = SideProofUtil.startSideProof(getProof(), 
                                                    equivalentClassesProofStarter, 
@@ -303,6 +311,20 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
       }
    }
    
+   /**
+    * Computes the initial updates to consider.
+    * @return The initial updates to consider.
+    */
+   protected ImmutableList<Term> extractInitialUpdates() {
+      Sequent sequent = getRoot().sequent();
+      assert sequent.antecedent().isEmpty();
+      assert sequent.succedent().size() == 1;
+      Term sf = sequent.succedent().get(0).formula();
+      assert sf.op() == Junctor.IMP;
+      Term modality = sf.sub(1);
+      return TermBuilder.goBelowUpdates2(modality).first;
+   }
+
    /**
     * Sorts the given {@link Term}s alphabetically.
     * @param terms The {@link Term}s to sort.
@@ -354,7 +376,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                                                                         modalityPio, 
                                                                         null,
                                                                         null,
-                                                                        null,
+                                                                        updates,
                                                                         false);
    }
    
@@ -367,14 +389,17 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * </p>
     * @param starter The {@link ProofStarter} which provides the side proof.
     * @param symbolicObjects The symbolic objects to compute equivalence classes for.
+    * @param updates The updates to consider.
     */
-   protected void applyCutRules(ProofStarter starter, Set<Term> symbolicObjects) {
+   protected void applyCutRules(ProofStarter starter, Set<Term> symbolicObjects, ImmutableList<Term> updates) {
+      final TermBuilder tb = getServices().getTermBuilder();
       List<Term> objectsCopy = new ArrayList<Term>(symbolicObjects);
       int maxProofSteps = 8000;
       for (int i = 0; i < objectsCopy.size(); i++) {
          for (int j = i + 1; j < objectsCopy.size(); j++) {
-            Term equalTerm = getServices().getTermBuilder().equals(objectsCopy.get(i), objectsCopy.get(j));
-            applyCut(starter, equalTerm, maxProofSteps);
+            Term equalTerm = tb.equals(objectsCopy.get(i), objectsCopy.get(j));
+            Term updateTerm = tb.applyParallel(updates, equalTerm);
+            applyCut(starter, updateTerm, maxProofSteps);
          }
       }
       starter.setMaxRuleApplications(maxProofSteps);
@@ -453,6 +478,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             NoPosTacletApp npta = (NoPosTacletApp) goalnode.getAppliedRuleApp();
             if ("CUT".equals(npta.taclet().name().toString().toUpperCase())) {
                Term inst = (Term) npta.instantiations().lookupEntryForSV(new Name("cutFormula")).value().getInstantiation();
+               inst = TermBuilder.goBelowUpdates(inst);
                if (goalnode.child(1) == oldNode) {
                   inst = getServices().getTermBuilder().not(inst);
                }
@@ -594,7 +620,12 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                                                String stateName,
                                                boolean currentLayout) throws ProofInputException {
       if (!locations.isEmpty()) {
-         Term layoutCondition = getServices().getTermBuilder().and(layout);
+         final TermBuilder tb = getServices().getTermBuilder();
+         List<Term> updateConditions = new ArrayList<Term>(layout.size());
+         for (Term term : layout) {
+            updateConditions.add(tb.applyParallel(updates, term));
+         }
+         Term layoutCondition = tb.and(updateConditions);
          Set<ExecutionVariableValuePair> pairs = computeVariableValuePairs(layoutCondition, layoutTerm, locations, currentLayout);
          return createLayoutFromExecutionVariableValuePairs(equivalentClasses, pairs, stateName);
       }
