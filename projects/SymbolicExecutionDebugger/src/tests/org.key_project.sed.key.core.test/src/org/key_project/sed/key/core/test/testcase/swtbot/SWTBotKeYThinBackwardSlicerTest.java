@@ -35,7 +35,7 @@ public class SWTBotKeYThinBackwardSlicerTest extends AbstractKeYDebugTargetTestC
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Resume
-            SWTBotTreeItem launchTreeItem = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0);
+            SWTBotTreeItem launchTreeItem = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0);
             resume(bot, launchTreeItem, target);
             assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/simpleLocalVariables/oracle/SimpleLocalVariables.xml", true, false, false);
             // Find seed
