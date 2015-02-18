@@ -13,6 +13,7 @@
 
 package org.key_project.sed.core.model.impl;
 
+import org.eclipse.debug.core.DebugEvent;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDLoopStatement;
@@ -24,6 +25,11 @@ import org.key_project.sed.core.model.ISEDThread;
  * @see ISEDLoopStatement
  */
 public abstract class AbstractSEDLoopStatement extends AbstractSEDGroupableStackFrameCompatibleDebugNode implements ISEDLoopStatement {
+   /**
+    * The collapsed state.
+    */
+   private boolean collapsed;
+   
    /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this loop statement is contained.
@@ -42,5 +48,24 @@ public abstract class AbstractSEDLoopStatement extends AbstractSEDGroupableStack
    @Override
    public String getNodeType() {
       return "Loop Statement";
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCollapsed() {
+      return collapsed;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setCollapsed(boolean collapsed) {
+      if (this.collapsed != collapsed) {
+         this.collapsed = collapsed;
+         fireChangeEvent(DebugEvent.CONTENT);
+      }
    }
 }

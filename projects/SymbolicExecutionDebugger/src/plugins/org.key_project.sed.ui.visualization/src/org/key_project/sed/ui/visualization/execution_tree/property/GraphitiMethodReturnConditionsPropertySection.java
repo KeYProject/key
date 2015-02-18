@@ -31,12 +31,4 @@ public class GraphitiMethodReturnConditionsPropertySection extends AbstractGraph
    protected ISEDDebugNodeTabContent createContent() {
       return new MethodReturnConditionsTabComposite();
    }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean shouldUseExtraSpace() {
-      return true;
-   }
 }

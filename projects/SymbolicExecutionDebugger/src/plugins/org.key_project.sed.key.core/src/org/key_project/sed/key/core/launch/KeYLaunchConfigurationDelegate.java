@@ -99,6 +99,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           Position methodRangeEnd = new KeYUtil.CursorPosition(KeySEDUtil.getMethodRangeEndLine(configuration), KeySEDUtil.getMethodRangeEndColumn(configuration));
           boolean truthValueEvaluationEnabled = KeySEDUtil.isTruthValueEvaluationEnabled(configuration);
           boolean highlightReachedSourceCode = KeySEDUtil.isHighlightReachedSourceCode(configuration);
+          boolean groupingEnabled = KeySEDUtil.isGroupingEnabled(configuration);
           // Determine location and class path entries
           File location = null;
           List<File> classPaths = null;
@@ -148,7 +149,8 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                              showSignatureOnMethodReturnNodes,
                                                              variablesAreOnlyComputedFromUpdates,
                                                              truthValueEvaluationEnabled,
-                                                             highlightReachedSourceCode); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
+                                                             highlightReachedSourceCode,
+                                                             groupingEnabled); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
           // Validate proof settings
           if (newDebugSession) {
              if (method == null) {

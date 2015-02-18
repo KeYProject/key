@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
@@ -135,11 +136,20 @@ public class InnerNodeView extends SequentView {
             out.append("\\variables");
         } else if (schemaVar instanceof SkolemTermSV) {
             out.append("\\skolemTerm");
+        } else if (schemaVar instanceof TermLabelSV) {
+            out.append("\\termlabel");
         } else {
             out.append("?");
         }
         writeSVModifiers(out, schemaVar);
-        if (!(schemaVar instanceof FormulaSV || schemaVar instanceof UpdateSV)) {
+
+        /*
+         * TODO: Add an explanation for the following if-statement.
+         * (Kai Wallisch 01/2015)
+         */
+        if (!(schemaVar instanceof FormulaSV
+                || schemaVar instanceof UpdateSV
+                || schemaVar instanceof TermLabelSV)) {
             out.append(" ").append(schemaVar.sort().declarationString());
         }
         out.append(" ").append(schemaVar.name());
@@ -198,13 +208,13 @@ public class InnerNodeView extends SequentView {
         if (app != null) {
             s += "The following rule was applied on this node: \n\n";
             if (app.rule() instanceof Taclet) {
-                SequentViewLogicPrinter tacPrinter = new SequentViewLogicPrinter(new ProgramPrinter(null),
+                SequentViewLogicPrinter logicPrinter = new SequentViewLogicPrinter(new ProgramPrinter(null),
                         mediator.getNotationInfo(),
                         mediator.getServices(),
                         true,
                         getVisibleTermLabels());
-                tacPrinter.printTaclet((Taclet) (app.rule()));
-                s += tacPrinter;
+                logicPrinter.printTaclet((Taclet) (app.rule()));
+                s += logicPrinter;
             } else {
                 s = s + app.rule();
             }

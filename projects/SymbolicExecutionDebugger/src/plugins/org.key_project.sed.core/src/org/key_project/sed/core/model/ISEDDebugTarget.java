@@ -195,4 +195,10 @@ public interface ISEDDebugTarget extends ISEDDebugElement, IDebugTarget {
     * @return The {@link ISEDSlicer} with the given name or {@code null} if not available.
     */
    public ISEDSlicer getSlicer(ISEDDebugNode seedNode, IVariable seedVariable, String name);
+
+   /**
+    * Checks if {@link ISEDGroupable}s are supported or not.
+    * @return {@code false} {@link ISEDGroupable} are never contained in the symbolic execution tree, {@code true} {@link ISEDGroupable} might be part of the symbolic execution tree.
+    */
+   public boolean isGroupingSupported();
 }
