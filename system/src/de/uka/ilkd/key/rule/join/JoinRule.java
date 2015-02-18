@@ -270,20 +270,16 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
             } else {
                return false;
             }
-         } else {
-            // We do not merge states without updates
-            // by weakening. Should also not happen
-            // in practice.
-//            return false;
          }
          
-         // Check for form "\<{...}\> phi", where phi must not contain a Java block.
+         // Term after update must have the form "phi" or "\<{...}\> phi" or
+         // "\[{...}\]", where phi must not contain a Java block.
          if (termAfterUpdate.op() instanceof Modality &&
-               termAfterUpdate.sub(0).javaBlock().equals(JavaBlock.EMPTY_JAVABLOCK)) {
-            return !doJoinPartnerCheck || findPotentialJoinPartners(goal, pio).size() > 0;
-         } else {
+               !termAfterUpdate.sub(0).javaBlock().equals(JavaBlock.EMPTY_JAVABLOCK)) {
             return false;
          }
+         
+         return !doJoinPartnerCheck || findPotentialJoinPartners(goal, pio).size() > 0;
          
       } else {
          

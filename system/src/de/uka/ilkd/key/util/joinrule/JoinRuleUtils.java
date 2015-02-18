@@ -894,34 +894,46 @@ public class JoinRuleUtils {
       Term postCondition = null;
       Modality modality = null;
       
+      Term termAfterUpdate = null;
+      
       if (selected.op() instanceof UpdateApplication) {
          updateTerm = selected.sub(0);
-         programCounter = selected.sub(1).javaBlock().program();
-         postCondition = selected.sub(1).sub(0);
-         modality = (Modality) selected.sub(1).op();
+         termAfterUpdate = selected.sub(1);
       } else {
-         programCounter = selected.javaBlock().program();
-         postCondition = selected.sub(0);
-         modality = (Modality) selected.op();
+         termAfterUpdate = selected;
+      }
+      
+      if (termAfterUpdate.op() instanceof Modality) {
+         programCounter = termAfterUpdate.javaBlock().program();
+         postCondition = termAfterUpdate.sub(0);
+         modality = (Modality) termAfterUpdate.op();
+      } else {
+         postCondition = termAfterUpdate;
       }
       
       // Note: We may not rename variables in the program counter that also
       //       occur in the post condition. Otherwise, we may render the goal
       //       unprovable.
       
-      // Replace location variables in program counter by their
-      // branch-unique versions
       LocVarReplBranchUniqueMap replMap = new LocVarReplBranchUniqueMap(
             goal.node(), getLocationVariables(postCondition));
       
-      ProgVarReplaceVisitor replVisitor =
-            new ProgVarReplaceVisitor(programCounter, replMap, services);
-      replVisitor.start();
-      programCounter = replVisitor.result();
-      Term progCntAndPostCond = services.getTermBuilder().prog(
-            modality,
-            JavaBlock.createJavaBlock((StatementBlock) programCounter),
-            postCondition);
+      // Replace location variables in program counter by their
+      // branch-unique versions
+      Term progCntAndPostCond = null;      
+      if (programCounter != null) {
+         
+         ProgVarReplaceVisitor replVisitor =
+               new ProgVarReplaceVisitor(programCounter, replMap, services);
+         replVisitor.start();
+         programCounter = replVisitor.result();
+         progCntAndPostCond = services.getTermBuilder().prog(
+               modality,
+               JavaBlock.createJavaBlock((StatementBlock) programCounter),
+               postCondition);
+      } else {
+         progCntAndPostCond = postCondition;
+      }
       
       // Replace location variables in update by branch-unique versions
       ImmutableList<Term> newElementaries = ImmutableSLList.nil();
