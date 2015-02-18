@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jdt.core.IMethod;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDGroupable;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDThread;
@@ -45,6 +46,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicExecutionCompletions;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
@@ -314,7 +317,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     */
    protected void handleCompletions(SymbolicExecutionCompletions completions) throws DebugException {
 // TODO: This methods does currently nothing until collapsing is supported by the SED.
-//      // Collapse all completed blocks
+      // Collapse all completed blocks
 //      for (IExecutionNode<?> blockCompletion : completions.getBlockCompletions()) {
 //         for (IExecutionNode<?> completedBlock : blockCompletion.getCompletedBlocks()) {
 //            IKeYSEDDebugNode<?> keyNode = getDebugTarget().ensureDebugNodeIsCreated(completedBlock);
@@ -323,7 +326,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
 //            }
 //         }
 //      }
-//      // Collapse all returned methods
+////       Collapse all returned methods
 //      for (IExecutionBaseMethodReturn<?> methodReturn : completions.getMethodReturns()) {
 //         IExecutionMethodCall methodCall = methodReturn.getMethodCall();
 //         IKeYSEDDebugNode<?> keyNode = getDebugTarget().ensureDebugNodeIsCreated(methodCall);

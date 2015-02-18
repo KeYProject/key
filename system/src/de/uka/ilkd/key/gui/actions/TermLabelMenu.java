@@ -57,11 +57,10 @@ public class TermLabelMenu extends JMenu {
             @Override
             public boolean contains(Name name) {
                 if (displayLabelsCheckBox.isSelected()) {
-                   TermLabelCheckBox checkedName = checkBoxMap.get(name);
-                   return checkedName != null && checkedName.isSelected();
-                }
-                else {
-                   return false;
+                    TermLabelCheckBox checkedName = checkBoxMap.get(name);
+                    return checkedName == null || checkedName.isSelected();
+                } else {
+                    return false;
                 }
             }
         };

@@ -1,6 +1,7 @@
 package org.key_project.sed.core.model.impl;
 
 import org.eclipse.debug.core.DebugEvent;
+import org.eclipse.debug.core.model.DebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDGroupable;
@@ -44,7 +45,7 @@ public abstract class AbstractSEDGroupableStackFrameCompatibleDebugNode extends 
    public void setCollapsed(boolean collapsed) {
       if (this.collapsed != collapsed) {
          this.collapsed = collapsed;
-         fireChangeEvent(DebugEvent.CONTENT);
+         ((DebugElement) getThread()).fireChangeEvent(DebugEvent.CONTENT);
       }
    }
 }

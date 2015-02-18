@@ -54,7 +54,8 @@ public class DebugTargetUpdateFeature extends AbstractDebugNodeUpdateFeature {
     * {@inheritDoc}
     */
    @Override
-   protected boolean haveAllBusinessObjectChildrenHaveGraphicalRepresentation(PictogramElement pictogramElement) throws DebugException {
+   protected boolean haveAllBusinessObjectChildrenHaveGraphicalRepresentation(PictogramElement pictogramElement, 
+                                                                              boolean groupingSupported) throws DebugException {
       boolean childrenHavePictogramElement = true;
       Object[] bos = getAllBusinessObjectsForPictogramElement(pictogramElement);
       for (Object bo : bos) {
@@ -62,7 +63,7 @@ public class DebugTargetUpdateFeature extends AbstractDebugNodeUpdateFeature {
             ISEDThread[] threads = ((ISEDDebugTarget)bo).getSymbolicThreads();
             int i = 0;
             while (childrenHavePictogramElement && i < threads.length) {
-               PictogramElement threadPE = getPictogramElementForBusinessObject(threads[i]);
+               PictogramElement threadPE = getPictogramElementForBusinessObject(threads[i], groupingSupported);
                childrenHavePictogramElement = threadPE != null;
                i++;
             }
