@@ -274,7 +274,7 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
             // We do not merge states without updates
             // by weakening. Should also not happen
             // in practice.
-            return false;
+//            return false;
          }
          
          // Check for form "\<{...}\> phi", where phi must not contain a Java block.

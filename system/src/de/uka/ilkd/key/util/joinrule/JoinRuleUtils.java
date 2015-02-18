@@ -51,6 +51,7 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -888,8 +889,21 @@ public class JoinRuleUtils {
          }
       }
 
-      ProgramElement programCounter = selected.sub(1).javaBlock().program();
-      Term postCondition = selected.sub(1).sub(0);
+      Term updateTerm = null;
+      ProgramElement programCounter = null;
+      Term postCondition = null;
+      Modality modality = null;
+      
+      if (selected.op() instanceof UpdateApplication) {
+         updateTerm = selected.sub(0);
+         programCounter = selected.sub(1).javaBlock().program();
+         postCondition = selected.sub(1).sub(0);
+         modality = (Modality) selected.sub(1).op();
+      } else {
+         programCounter = selected.javaBlock().program();
+         postCondition = selected.sub(0);
+         modality = (Modality) selected.op();
+      }
       
       // Note: We may not rename variables in the program counter that also
       //       occur in the post condition. Otherwise, we may render the goal
@@ -905,21 +919,24 @@ public class JoinRuleUtils {
       replVisitor.start();
       programCounter = replVisitor.result();
       Term progCntAndPostCond = services.getTermBuilder().prog(
-            Modality.DIA,
+            modality,
             JavaBlock.createJavaBlock((StatementBlock) programCounter),
             postCondition);
       
       // Replace location variables in update by branch-unique versions
-      LinkedList<Term> elementaries = getElementaryUpdates(selected.sub(0));
       ImmutableList<Term> newElementaries = ImmutableSLList.nil();
-      for (Term elementary : elementaries) {
-         ElementaryUpdate upd = (ElementaryUpdate) elementary.op();
-         LocationVariable lhs = (LocationVariable) upd.lhs();
-               
-         newElementaries = newElementaries.prepend(
-               tb.elementary(
-                     (LocationVariable) (replMap.get(lhs)),
-                     elementary.sub(0)));
+      
+      if (updateTerm != null) {
+         LinkedList<Term> elementaries = getElementaryUpdates(selected.sub(0));
+         for (Term elementary : elementaries) {
+            ElementaryUpdate upd = (ElementaryUpdate) elementary.op();
+            LocationVariable lhs = (LocationVariable) upd.lhs();
+                  
+            newElementaries = newElementaries.prepend(
+                  tb.elementary(
+                        (LocationVariable) (replMap.get(lhs)),
+                        elementary.sub(0)));
+         }
       }
       
       return new SymbolicExecutionStateWithProgCnt(
