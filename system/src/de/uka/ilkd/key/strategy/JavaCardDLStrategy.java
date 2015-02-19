@@ -1157,7 +1157,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                         .create ( right, left, numbers ) ),
                                   TermSmallerThanFeature.create ( right, left ) )
                             ) ) ) ) ) ),
-                 longConst ( -4000 ) } ) );
+                 longConst ( -4000 ),
+                 EqNonDuplicateAppFeature.INSTANCE} ) ); // Without EqNonDuplicateAppFeature.INSTANCE rule 'applyEq' might be applied on the same term without changing the sequent for a really long time. This is tested by TestSymbolicExecutionTreeBuilder#testInstanceOfNotInEndlessLoop()
     }
 
     
