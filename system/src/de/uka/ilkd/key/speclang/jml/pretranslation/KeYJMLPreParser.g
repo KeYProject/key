@@ -1063,11 +1063,14 @@ method_declaration[ImmutableList<String> mods, PositionedString type, Token name
           assert bodyString.charAt(0) == '{' && bodyString.charAt(bodyString.length()-1) == '}';
           bodyString = bodyString.substring(1, bodyString.length()-1).trim();
           assert bodyString.startsWith("return ") : "return expected, instead: " + bodyString;
-          bodyString = bodyString.substring(bodyString.indexOf(" ") + 1);
+          int beginIndex = bodyString.indexOf(" ") + 1;
+          int endIndex = bodyString.lastIndexOf(";");
+          bodyString = bodyString.substring(beginIndex, endIndex);
+
           // TODO Other heaps? There is only one return statement.....
+          // TODO Better not encoded as a string but create equality directly.
           psDefinition = createPositionedString("<heap> "+name.getText() +
-               paramsString + " == "+bodyString, type.pos);
-               
+                paramsString + " == ("+bodyString+");", type.pos);
         }
 
 	TextualJMLMethodDecl md
