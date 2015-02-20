@@ -81,9 +81,21 @@ public class DerivedProfilePersistenceTest {
    }
 
    public static class TestKeyword extends AbstractEmptyKeyword {
-
       public TestKeyword() {
          super("testkeyword");
+      }
+
+      @Override
+      public String getDescription() {
+         return null;
+      }
+   }
+
+   // Illegal for persistence because the keyword has a non nullary constructor
+   public static class IllegalTestKeyword extends AbstractEmptyKeyword {
+
+      public IllegalTestKeyword(final String keyword) {
+         super(keyword);
       }
 
       @Override
@@ -107,6 +119,17 @@ public class DerivedProfilePersistenceTest {
             .getAdditionalKeywords().size());
       assertEquals("Class of new keyword is wrong", TestKeyword.class,
             readProfile.getAdditionalKeywords().iterator().next().getClass());
+   }
+
+   @Test(expected = ProfilePersistenceException.class)
+   public void testPersitKeywordWithNonNullaryConstructor()
+         throws ProfilePersistenceException {
+      final IEditableDerivedProfile profile = new DerivedProfile("IllegalTest",
+            "org.test.illegal", this.availableProfile);
+      profile.addKeyword(new IllegalTestKeyword("illegal_keyword"));
+
+      // Should throw an exception
+      this.persistence.persist(profile);
    }
 
 }

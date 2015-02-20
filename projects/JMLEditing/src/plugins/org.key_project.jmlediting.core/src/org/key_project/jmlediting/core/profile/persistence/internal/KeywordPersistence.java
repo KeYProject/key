@@ -7,7 +7,7 @@ import static org.key_project.jmlediting.core.profile.persistence.internal.Deriv
 
 import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceException;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.core.profile.syntax.UserDefinedKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IUserDefinedKeyword;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.w3c.dom.Document;
@@ -17,7 +17,7 @@ public abstract class KeywordPersistence {
 
    public Element persist(final IKeyword keyword, final Document doc)
          throws ProfilePersistenceException {
-      if (keyword instanceof UserDefinedKeyword) {
+      if (keyword instanceof IUserDefinedKeyword) {
          throw new AssertionError("Cannot be persisted yet.");
       }
       else {
