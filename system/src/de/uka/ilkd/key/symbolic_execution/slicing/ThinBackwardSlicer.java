@@ -61,7 +61,6 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
          else if (SymbolicExecutionUtil.isLoopInvariant(node, node.getAppliedRuleApp())) {
             // Compute this reference
             PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
-            ReferencePrefix thisReference = computeThisReference(pio, services);
             // Compute modified locations
             List<Location> modifiedLocations = new LinkedList<Location>();
             Term loopConditionModalityTerm = SymbolicExecutionUtil.posInOccurrenceInOtherNode(node, pio, previousChild);
@@ -70,7 +69,7 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
             }
             Term updateTerm = UpdateApplication.getTarget(loopConditionModalityTerm);
             while (updateTerm.op() == UpdateApplication.UPDATE_APPLICATION) {
-               listModifiedLocations(UpdateApplication.getUpdate(updateTerm), services, services.getTypeConverter().getHeapLDT(), modifiedLocations, thisReference);
+               listModifiedLocations(UpdateApplication.getUpdate(updateTerm), services, services.getTypeConverter().getHeapLDT(), modifiedLocations, info.getExecutionContext(), info.getThisReference());
                updateTerm = UpdateApplication.getTarget(updateTerm);
             }
             // Check modified locations

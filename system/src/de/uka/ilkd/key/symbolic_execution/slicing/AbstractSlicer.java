@@ -18,8 +18,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.reference.ArrayReference;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -68,10 +68,10 @@ public abstract class AbstractSlicer {
       Term topLevel = pio.constrainedFormula().formula();
       Term modalityTerm = TermBuilder.goBelowUpdates(topLevel);
       Services services = seedNode.proof().getServices();
-      IExecutionContext ec = JavaTools.getInnermostExecutionContext(modalityTerm.javaBlock(), services);
+      ExecutionContext ec = JavaTools.getInnermostExecutionContext(modalityTerm.javaBlock(), services);
       ReferencePrefix thisReference = ec != null ? ec.getRuntimeInstance() : null;
       // Perform slicing
-      return slice(seedNode, toLocation(services, seedLocation, thisReference));
+      return slice(seedNode, toLocation(services, seedLocation, ec, thisReference));
    }
 
    /**
@@ -119,6 +119,11 @@ public abstract class AbstractSlicer {
        * The local values.
        */
       private final Map<ProgramVariable, Term> localValues;
+
+      /**
+       * The current {@link ExecutionContext}.
+       */
+      private final ExecutionContext executionContext;
       
       /**
        * The this reference if available.
@@ -132,11 +137,13 @@ public abstract class AbstractSlicer {
        */
       public SequentInfo(Map<Location, SortedSet<Location>> aliases, 
                          Map<ProgramVariable, Term> localValues, 
+                         ExecutionContext executionContext,
                          ReferencePrefix thisReference) {
          assert aliases != null;
          assert localValues != null;
          this.aliases = aliases;
          this.localValues = localValues;
+         this.executionContext = executionContext;
          this.thisReference = thisReference;
       }
 
@@ -154,6 +161,14 @@ public abstract class AbstractSlicer {
        */
       public Map<ProgramVariable, Term> getLocalValues() {
          return localValues;
+      }
+
+      /**
+       * Returns the current {@link ExecutionContext}.
+       * @return The current {@link ExecutionContext}.
+       */
+      public ExecutionContext getExecutionContext() {
+         return executionContext;
       }
 
       /**
@@ -181,39 +196,17 @@ public abstract class AbstractSlicer {
       HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
       if (label != null) {
          // Solve this reference
-         ReferencePrefix thisReference = computeThisReference(modalityTerm, services);
+         ExecutionContext ec = JavaTools.getInnermostExecutionContext(modalityTerm.javaBlock(), services);
+         ReferencePrefix thisReference = ec != null ? ec.getRuntimeInstance() : null;
          // Compute aliases
          Map<Location, SortedSet<Location>> aliases = new HashMap<Location, SortedSet<Location>>();
          Map<ProgramVariable, Term> localValues = new HashMap<ProgramVariable, Term>();
-         analyzeUpdates(pair.first, services, heapLDT, aliases, localValues, thisReference);
-         return new SequentInfo(aliases, localValues, thisReference);
+         analyzeUpdates(pair.first, services, heapLDT, aliases, localValues, ec, thisReference);
+         return new SequentInfo(aliases, localValues, ec, thisReference);
       }
       else {
          return null; // Not the modality of interest.
       }
-   }
-
-   /**
-    * Computes the this reference.
-    * @param pio The {@link PosInOccurrence} with the modality.
-    * @param services The {@link Services} to use.
-    * @return The this reference or {@code null} if not available.
-    */
-   protected ReferencePrefix computeThisReference(PosInOccurrence pio, Services services) {
-      Term modalityTerm = TermBuilder.goBelowUpdates(pio.subTerm());
-      return computeThisReference(modalityTerm, services);
-   }
-
-   /**
-    * Computes the this reference.
-    * @param modalityTerm The {@link Term} with the modality.
-    * @param services The {@link Services} to use.
-    * @return The this reference or {@code null} if not available.
-    */
-   protected ReferencePrefix computeThisReference(Term modalityTerm, Services services) {
-      IExecutionContext ec = JavaTools.getInnermostExecutionContext(modalityTerm.javaBlock(), services);
-      ReferencePrefix thisReference = ec != null ? ec.getRuntimeInstance() : null;
-      return thisReference;
    }
    
    /**
@@ -223,6 +216,7 @@ public abstract class AbstractSlicer {
     * @param heapLDT The {@link HeapLDT} of the {@link Services}.
     * @param aliases The alias {@link Map} to fill.
     * @param localValues The local values to fill.
+    * @param ec The current {@link ExecutionContext}.
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
     */
    protected void analyzeUpdates(ImmutableList<Term> updates, 
@@ -230,9 +224,10 @@ public abstract class AbstractSlicer {
                                  HeapLDT heapLDT, 
                                  Map<Location, SortedSet<Location>> aliases,
                                  Map<ProgramVariable, Term> localValues,
+                                 ExecutionContext ec,
                                  ReferencePrefix thisReference) {
       for (Term update : updates) {
-         analyzeUpdate(update, services, heapLDT, aliases, localValues, thisReference);
+         analyzeUpdate(update, services, heapLDT, aliases, localValues, ec, thisReference);
       }
    }
    
@@ -243,6 +238,7 @@ public abstract class AbstractSlicer {
     * @param heapLDT The {@link HeapLDT} of the {@link Services}.
     * @param aliases The alias {@link Map} to fill.
     * @param localValues The local values to fill.
+    * @param ec The current {@link ExecutionContext}.
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
     */
    protected void analyzeUpdate(Term term, 
@@ -250,11 +246,12 @@ public abstract class AbstractSlicer {
                                 HeapLDT heapLDT, 
                                 Map<Location, SortedSet<Location>> aliases, 
                                 Map<ProgramVariable, Term> localValues,
+                                ExecutionContext ec,
                                 ReferencePrefix thisReference) {
       if (term.op() == UpdateJunctor.PARALLEL_UPDATE || 
           term.op() == UpdateApplication.UPDATE_APPLICATION) {
          for (int i = 0 ; i < term.arity(); i++) {
-            analyzeUpdate(term.sub(i), services, heapLDT, aliases, localValues, thisReference);
+            analyzeUpdate(term.sub(i), services, heapLDT, aliases, localValues, ec, thisReference);
          }
       }
       else if (term.op() instanceof ElementaryUpdate) {
@@ -268,7 +265,7 @@ public abstract class AbstractSlicer {
             }
             Location sourceLocation = toLocation(services, term.sub(0));
             if (target instanceof ReferencePrefix && sourceLocation != null) {
-               Location targetLocation = toLocation(services, (ReferencePrefix) target, thisReference);
+               Location targetLocation = toLocation(services, (ReferencePrefix) target, ec, thisReference);
                updateAliases(services, targetLocation, sourceLocation, aliases, thisReference);
             }
          }
@@ -327,17 +324,19 @@ public abstract class AbstractSlicer {
     * @param services The {@link Services} to use.
     * @param heapLDT The {@link HeapLDT} of the {@link Services}.
     * @param listToFill The result {@link List} with {@link Location}s to fill.
+    * @param ec The currrent {@link ExecutionContext}.
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
     */
    protected void listModifiedLocations(Term term, 
                                         Services services, 
                                         HeapLDT heapLDT, 
                                         List<Location> listToFill,
+                                        ExecutionContext ec,
                                         ReferencePrefix thisReference) {
       if (term.op() == UpdateJunctor.PARALLEL_UPDATE || 
           term.op() == UpdateApplication.UPDATE_APPLICATION) {
          for (int i = 0 ; i < term.arity(); i++) {
-            listModifiedLocations(term.sub(i), services, heapLDT, listToFill, thisReference);
+            listModifiedLocations(term.sub(i), services, heapLDT, listToFill, ec, thisReference);
          }
       }
       else if (term.op() instanceof ElementaryUpdate) {
@@ -347,7 +346,7 @@ public abstract class AbstractSlicer {
          }
          else {
             if (target instanceof ProgramVariable) {
-               listToFill.add(toLocation(services, (ProgramVariable) target, thisReference));
+               listToFill.add(toLocation(services, (ProgramVariable) target, ec, thisReference));
             }
          }
       }
@@ -481,7 +480,7 @@ public abstract class AbstractSlicer {
    protected Location normalizeAlias(Services services,
                                      ReferencePrefix referencePrefix, 
                                      SequentInfo info) {
-      Location location = toLocation(services, referencePrefix, info.getThisReference());
+      Location location = toLocation(services, referencePrefix, info.getExecutionContext(), info.getThisReference());
       return normalizeAlias(services, location, info);
    }
    
@@ -642,13 +641,15 @@ public abstract class AbstractSlicer {
     * Converts the given {@link ReferencePrefix} into a {@link Location}.
     * @param services The {@link Services} to use.
     * @param prefix The {@link ReferencePrefix} to convert.
+    * @param ec The current {@link ExecutionContext}.
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
     * @return The {@link Location} representing the given {@link ReferencePrefix}.
     */
    protected Location toLocation(Services services,
                                  ReferencePrefix prefix, 
+                                 ExecutionContext ec,
                                  ReferencePrefix thisReference) {
-      ImmutableList<Access> accesses = toLocationRecursive(services, prefix, thisReference, ImmutableSLList.<Access>nil());
+      ImmutableList<Access> accesses = toLocationRecursive(services, prefix, ec, thisReference, ImmutableSLList.<Access>nil());
       return new Location(accesses);
    }
    
@@ -657,12 +658,14 @@ public abstract class AbstractSlicer {
     * to recursively extract the {@link Access} instances.
     * @param services The {@link Services} to use.
     * @param prefix The {@link ReferencePrefix} to work with.
+    * @param ec The current {@link ExecutionContext}.
     * @param thisReference The {@link ReferencePrefix} which is represented by {@code this} ({@link ThisReference}).
     * @param children The already known child {@link Access}s.
     * @return An {@link ImmutableList} containing all {@link Access}s of the {@link ReferencePrefix} in the order of access.
     */
    protected ImmutableList<Access> toLocationRecursive(Services services,
                                                        ReferencePrefix prefix, 
+                                                       ExecutionContext ec,
                                                        ReferencePrefix thisReference, 
                                                        ImmutableList<Access> children) {
       if (prefix instanceof ProgramVariable) {
@@ -673,7 +676,7 @@ public abstract class AbstractSlicer {
          ReferencePrefix parent = fr.getReferencePrefix();
          children = children.prepend(new Access(fr.getProgramVariable()));
          if (parent != null) {
-            return toLocationRecursive(services, parent, thisReference, children);
+            return toLocationRecursive(services, parent, ec, thisReference, children);
          }
          else {
             return children;
@@ -684,7 +687,7 @@ public abstract class AbstractSlicer {
             return children.prepend(new Access((ProgramVariable) thisReference));
          }
          else if (thisReference instanceof FieldReference) {
-            return toLocationRecursive(services, thisReference, thisReference, children);
+            return toLocationRecursive(services, thisReference, ec, thisReference, children);
          }
          else {
             throw new IllegalStateException("Unsupported this reference '" + thisReference + "'.");
@@ -692,8 +695,8 @@ public abstract class AbstractSlicer {
       }
       else if (prefix instanceof ArrayReference) {
          ArrayReference ar = (ArrayReference) prefix;
-         children = children.prepend(new Access(toTerm(services, ar.getDimensionExpressions())));
-         return toLocationRecursive(services, ar.getReferencePrefix(), thisReference, children);
+         children = children.prepend(new Access(toTerm(services, ar.getDimensionExpressions(), ec)));
+         return toLocationRecursive(services, ar.getReferencePrefix(), ec, thisReference, children);
       }
       else {
          throw new IllegalStateException("Unsupported prefix '" + prefix + "'.");
@@ -704,14 +707,16 @@ public abstract class AbstractSlicer {
     * Converts the given {@link Expression}s into {@link Term}s.
     * @param services The {@link Services} to use.
     * @param expressions The {@link Expression}s to convert.
+    * @param ec The current {@link ExecutionContext}.
     * @return The created {@link Term}s.
     */
    public static ImmutableArray<Term> toTerm(Services services, 
-                                             ImmutableArray<Expression> expressions) {
+                                             ImmutableArray<Expression> expressions,
+                                             ExecutionContext ec) {
       Term[] terms = new Term[expressions.size()];
       int i = 0;
       for (Expression expression : expressions) {
-         terms[i] = AbstractSlicer.toTerm(services, expression);
+         terms[i] = AbstractSlicer.toTerm(services, expression, ec);
          i++;
       }
       return new ImmutableArray<Term>(terms);
@@ -721,10 +726,13 @@ public abstract class AbstractSlicer {
     * Converts the given {@link Expression} into a {@link Term}.
     * @param services The {@link Services} to use.
     * @param expression The {@link Expression} to convert.
+    * @param ec The current {@link ExecutionContext}.
     * @return The created {@link Term}.
     */
-   public static Term toTerm(Services services, Expression expression) {
-      return services.getTypeConverter().convertToLogicElement(expression);
+   public static Term toTerm(Services services, 
+                             Expression expression, 
+                             ExecutionContext ec) {
+      return services.getTypeConverter().convertToLogicElement(expression, ec);
    }
 
    /**
