@@ -26,7 +26,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
    /**
     * Flag to print found slices in the console.
     */
-   public static final boolean PRINT_SLICE = false;
+   public static final boolean PRINT_SLICE = true;
 
 // TODO: Support anonymizing locations
 //   /** 
@@ -49,6 +49,17 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
                     new ReturnSelector(125),
                     true,
                     9);
+   }
+
+   /**
+    * Tests slicing on the example {@code simpleMultidimensionArrayTest}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testSimpleMultidimensionArrayTest() throws Exception {
+      doSlicingTest("examples/_testcase/slicing/simpleMultidimensionArrayTest/SimpleMultidimensionArrayTest.proof", 
+                    new ReturnSelector(461),
+                    false,
+                    445, 441, 416, 353, 172, 133);
    }
 
    /**
