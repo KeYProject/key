@@ -10,7 +10,7 @@ public abstract class AllKeywordsHighlightingTest {
    private /*@ spec_public */ int numCalls;
    private /*@ spec_protected*/ int handledCalls;
    private boolean needsRefresh;
-   private Object[] obs;
+   private /*@ nullable */ Object[] obs;
    
    //@ private model int i ;
    //@ private model int j;
@@ -104,7 +104,7 @@ public abstract class AllKeywordsHighlightingTest {
      @   requires \not_specified;   
      @   requires \same;
      @*/
-   protected /*@helper*/ void tryBreakEverything() {
+   protected /*@helper*/ void tryBreakEverything(/*@ non_null */ String s) {
       
    }
 

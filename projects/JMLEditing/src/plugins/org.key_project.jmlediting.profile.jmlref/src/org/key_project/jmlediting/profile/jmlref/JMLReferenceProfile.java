@@ -8,8 +8,8 @@ import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
 import org.key_project.jmlediting.profile.jmlref.behavior.BehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.ExceptionalBehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.NormalBehaviorKeyword;
-import org.key_project.jmlediting.profile.jmlref.bound_mod.NonNullKeyword;
-import org.key_project.jmlediting.profile.jmlref.bound_mod.NullableKeyword;
+import org.key_project.jmlediting.profile.jmlref.bound_mod.NonNullBoundModKeyword;
+import org.key_project.jmlediting.profile.jmlref.bound_mod.NullableBoundModKeyword;
 import org.key_project.jmlediting.profile.jmlref.loop.DecreasingKeyword;
 import org.key_project.jmlediting.profile.jmlref.loop.LoopInvariantKeyword;
 import org.key_project.jmlediting.profile.jmlref.model.GhostKeyword;
@@ -20,6 +20,8 @@ import org.key_project.jmlediting.profile.jmlref.model.SuchThatKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.AlsoKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.HelperKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.InvariantKeyword;
+import org.key_project.jmlediting.profile.jmlref.other.NonNullKeyword;
+import org.key_project.jmlediting.profile.jmlref.other.NullableKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.PureKeyword;
 import org.key_project.jmlediting.profile.jmlref.primary.InvariantForKeyword;
 import org.key_project.jmlediting.profile.jmlref.primary.KeywordJMLPrimary;
@@ -79,12 +81,13 @@ public class JMLReferenceProfile extends AbstractJMLProfile {
                   new ExistentialQuantifierKeyword(),
                   new MinQuantifierKeyword(), new MaxQuantifierKeyword(),
                   new ProductQuantifierKeyword(), new SumQuantifierKeyword(),
-                  new NumOfQuantifierKeyword(), new NonNullKeyword(),
-                  new NullableKeyword(), new InvariantKeyword(),
+                  new NumOfQuantifierKeyword(), new NonNullBoundModKeyword(),
+                  new NullableBoundModKeyword(), new InvariantKeyword(),
                   new LoopInvariantKeyword(), new DecreasingKeyword(),
                   new InvariantForKeyword(), new SuchThatKeyword(),
                   new SetKeyword(), new ModelKeyword(), new GhostKeyword(),
-                  new RepresentsKeyword()));
+                  new RepresentsKeyword(), new NonNullKeyword(),
+                  new NullableKeyword()));
 
       this.getSupportedPrimariesInternal().addAll(
             Arrays.asList(new KeywordJMLPrimary(), new QuantifierPrimary()));

@@ -3,18 +3,18 @@ package org.key_project.jmlediting.profile.jmlref.bound_mod;
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 
 /**
- * Implementation of the non_null keyword, which is not reserved.
+ * Non null as bound modifier.
  *
  * @author Moritz Lichter
  *
  */
-public class NonNullKeyword extends AbstractEmptyKeyword implements
+public class NonNullBoundModKeyword extends AbstractEmptyKeyword implements
       IBoundVarModifierKeyword {
 
    /**
     * Creates a new instance.
     */
-   public NonNullKeyword() {
+   public NonNullBoundModKeyword() {
       super("non_null");
    }
 
