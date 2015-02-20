@@ -1,6 +1,6 @@
 package org.key_project.jmlediting.core.utilities;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -10,7 +10,7 @@ import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 public class LoopNodeVisitor extends ASTVisitor {
-   List<ASTNode> loopNodes = Collections.emptyList();
+   List<ASTNode> loopNodes = new ArrayList<ASTNode>();
 
    public List<ASTNode> getLoopNodes() {
       return this.loopNodes;

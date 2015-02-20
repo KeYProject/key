@@ -1,6 +1,6 @@
 package org.key_project.jmlediting.core.validation;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -52,7 +52,7 @@ public class JMLValidationEngine {
     *         because there was no validator)
     */
    public List<JMLValidationError> validateComment(final IASTNode c) {
-      final List<JMLValidationError> errors = Collections.emptyList();
+      final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
       final Set<IJMLValidator> validator = this.activeProfile.getValidators();
       for (final IJMLValidator jmlValidator : validator) {
          errors.addAll(jmlValidator.validate(this.context, c));

@@ -49,7 +49,6 @@ public class ValidationErrorMarkerUpdater {
          for (final IMarker m : problems) {
             if (m.getType().equals(
                   "org.key_project.jmlediting.core.validationerror")) {
-
                m.delete();
             }
          }
@@ -63,6 +62,7 @@ public class ValidationErrorMarkerUpdater {
    public static void createErrorMarkers(final IResource res,
          final String text, final List<JMLValidationError> errors) {
       for (final JMLValidationError error : errors) {
+         System.out.println("Updater: " + error.getErrorMessage());
          try {
             final IMarker marker = res.createMarker(error.getErrorType());
             final Position pos = getPositionForOffset(text, error

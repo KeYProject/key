@@ -1,6 +1,6 @@
 package org.key_project.jmlediting.profile.jmlref.validator;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -32,14 +32,14 @@ public class LoopInvariantValidator extends JMLKeywordValidator {
    /**
     * A List of LoopNodes in the JavaAST.
     */
-   private List<ASTNode> loopNodes = Collections.emptyList();
-   private final List<IKeywordNode> keywords = Collections.emptyList();
+   private List<ASTNode> loopNodes = new ArrayList<ASTNode>();
+   private final List<IKeywordNode> keywords = new ArrayList<IKeywordNode>();
    private CommentRange containingComment;
 
    @Override
    public List<JMLValidationError> validate(
          final IJMLValidationContext context, final IASTNode node) {
-      final List<JMLValidationError> error = Collections.emptyList();
+      final List<JMLValidationError> error = new ArrayList<JMLValidationError>();
       final CompilationUnit ast = context.getJavaAST();
       final LoopNodeVisitor visitor = new LoopNodeVisitor();
       ast.accept(visitor);
@@ -88,6 +88,8 @@ public class LoopInvariantValidator extends JMLKeywordValidator {
       }
       if (loopNode == null) {
          // Invariant without loop following --> Invalid
+         System.out
+               .println("No Loop found after LoopInvariant or Decreasing Keyword");
          return new JMLValidationError(
                "org.key_project.jmlediting.core.validationerror",
                "No Loop found after LoopInvariant or Decreasing Keyword", node);
@@ -118,6 +120,8 @@ public class LoopInvariantValidator extends JMLKeywordValidator {
                   }
                   else {
                      // illegal JML Statement after Loop Specification
+                     System.out
+                     .println("Non LoopInvariant or Decreasing Keyword found following the Loop Specification");
                      return new JMLValidationError(
                            "org.key_project.jmlediting.core.validationerror",
                            "Non LoopInvariant or Decreasing Keyword found following the Loop Specification",
@@ -137,6 +141,7 @@ public class LoopInvariantValidator extends JMLKeywordValidator {
       // the next Loops offset, the invariant is invalid
       if (this.javaFoundBetween(this.containingComment.getEndOffset(),
             loopNode.getStartPosition(), context.getSrc())) {
+         System.out.println("Loop Specification not followed by a Loop");
          return new JMLValidationError(
                "org.key_project.jmlediting.core.validationerror",
                "Loop Specification not followed by a Loop", node);
@@ -184,13 +189,13 @@ public class LoopInvariantValidator extends JMLKeywordValidator {
                      final int end = source.indexOf('\n', position);
                      position = end + 1;
                      break;
-                  // Multiline Comment Opener found
+                     // Multiline Comment Opener found
                   case '*':
                      position += 2;
                      state = ScannerState.IN_COMMENT;
                      break;
-                  // wrong combination of signs, ignore because there will be
-                  // compile errors
+                     // wrong combination of signs, ignore because there will be
+                     // compile errors
                   default:
                      position += 1;
                      state = ScannerState.DEFAULT;
@@ -201,7 +206,7 @@ public class LoopInvariantValidator extends JMLKeywordValidator {
                   break mainloop;
                }
                break;
-            // no special sign found
+               // no special sign found
             default:
                if (Character.isJavaIdentifierStart(c)) {
                   return true;
@@ -222,7 +227,7 @@ public class LoopInvariantValidator extends JMLKeywordValidator {
                      state = ScannerState.DEFAULT;
                      position += 2;
                      break;
-                  // star found, can be ignored because no / was found after
+                     // star found, can be ignored because no / was found after
                   default:
                      position += 1;
                      break;
@@ -232,13 +237,13 @@ public class LoopInvariantValidator extends JMLKeywordValidator {
                   break mainloop;
                }
                break;
-            // no special sign found
+               // no special sign found
             default:
                position += 1;
                break;
             }
             break;
-         // in unexpected state
+            // in unexpected state
          default:
             throw new AssertionError("Invalid Enum State");
          }

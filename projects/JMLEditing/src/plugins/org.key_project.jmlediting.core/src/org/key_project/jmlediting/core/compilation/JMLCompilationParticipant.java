@@ -1,7 +1,6 @@
 package org.key_project.jmlediting.core.compilation;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -85,7 +84,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                         new String[] { error.getErrorMessage() },
                         new String[] { error.getErrorMessage() },
                         ProblemSeverities.Error, error.getErrorOffset(), error
-                              .getErrorOffset(), -1, -1));
+                        .getErrorOffset(), -1, -1));
                }
 
                // And now put the problems to the context to make them visible
@@ -119,6 +118,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          final String source = new String(context.getContents());
          // Remove all JML Error markers from the file
          ParseErrorMarkerUpdater.removeErrorMarkers(res);
+         ValidationErrorMarkerUpdater.removeErrorMarkers(res);
          // Detect all comments in the file and then parse it
          final CommentLocator locator = new CommentLocator(source);
          final List<CommentRange> jmlComments = locator.findJMLCommentRanges();
@@ -137,10 +137,10 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                source, jmlComments, ast, jmlParser);
          final JMLValidationEngine engine = new JMLValidationEngine(
                JMLPreferencesHelper
-                     .getProjectActiveJMLProfile(res.getProject()),
+               .getProjectActiveJMLProfile(res.getProject()),
                jmlContext);
          // End of Preparation
-         final List<JMLValidationError> errors = Collections.emptyList();
+         final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
          for (final CommentRange jmlComment : jmlComments) {
             try {
                final IASTNode node = jmlParser.parse(source, jmlComment);
@@ -153,7 +153,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                ParseErrorMarkerUpdater.createErrorMarkers(res, source, e);
             }
          }
-         // TODO: add Markers to IFile
+         // TODO: Unify ErrorMarkerUpdater
          ValidationErrorMarkerUpdater.createErrorMarkers(res, source, errors);
       }
    }
