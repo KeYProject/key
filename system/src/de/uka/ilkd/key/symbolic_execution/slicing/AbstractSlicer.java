@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
@@ -725,16 +724,7 @@ public abstract class AbstractSlicer {
     * @return The created {@link Term}.
     */
    public static Term toTerm(Services services, Expression expression) {
-      if (expression instanceof IntLiteral) {
-         IntLiteral literal = (IntLiteral) expression;
-         return services.getTermBuilder().zTerm(literal.getValue());
-      }
-      else if (expression instanceof ProgramVariable) {
-         return services.getTermBuilder().var((ProgramVariable) expression);
-      }
-      else {
-         throw new IllegalStateException("Unsupported expression '" + expression + "'.");
-      }
+      return services.getTypeConverter().convertToLogicElement(expression);
    }
 
    /**

@@ -51,12 +51,17 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
                result.add(seedNode);
             }
             if (oldAliases != null) {
-               // Update relevant locations if required
-               if (activeStatement instanceof CopyAssignment) {
-                  SourceElement originalTarget = ((CopyAssignment) activeStatement).getArguments().get(0);
-                  ReferencePrefix relevantTarget = toReferencePrefix(originalTarget);
-                  Location normalizedPrefix = normalizeAlias(services, relevantTarget, info);
-                  relevantLocations = updateOutdatedLocations(services, relevantLocations, aliases, oldAliases, normalizedPrefix, thisReference);
+               try {
+                  // Update relevant locations if required
+                  if (activeStatement instanceof CopyAssignment) {
+                     SourceElement originalTarget = ((CopyAssignment) activeStatement).getArguments().get(0);
+                     ReferencePrefix relevantTarget = toReferencePrefix(originalTarget);
+                     Location normalizedPrefix = normalizeAlias(services, relevantTarget, info);
+                     relevantLocations = updateOutdatedLocations(services, relevantLocations, aliases, oldAliases, normalizedPrefix, thisReference);
+                  }
+               }
+               catch (IllegalArgumentException e) {
+                  // Nothing to do, expression with side effects is evaluated
                }
             }
             oldAliases = aliases;
