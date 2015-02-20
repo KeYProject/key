@@ -393,6 +393,9 @@ public abstract class AbstractSlicer {
       else if (term.op() instanceof IProgramVariable) {
          // Nothing to do, root of heap reached.
       }
+      else if (term.op() == services.getTypeConverter().getLocSetLDT().getEmpty()) {
+         // Nothing to do, root of heap reached.
+      }
       else {
          throw new IllegalStateException("Can not analyze heap update '" + term + "'.");
       }
