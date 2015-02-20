@@ -19,5 +19,6 @@
       <association name="[Z(0(#))]" isArrayIndex="true" arrayIndex="Z(0(#))" target="o5" condition="true"/>
    </object>
    <object xml:id="o5" name="SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next),arr(Z(0(#)))),SimpleLinkedArrays::$next),arr(Z(0(#))))" type="SimpleLinkedArrays">
+      <value name="value" programVariable="value" isArrayIndex="false" value="int::select(heap,SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next),arr(Z(0(#)))),SimpleLinkedArrays::$next),arr(Z(0(#)))),SimpleLinkedArrays::$value)" type="int" condition="true"/>
    </object>
 </model>

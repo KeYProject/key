@@ -13,7 +13,6 @@
       <value name="l" programVariable="l" isArrayIndex="false" value="add(int::select(heap,null,NextLevel::$m),int::select(heap,Refer::select(heap,null,StaticMember::$r),Refer::$x))" type="int" condition="true"/>
    </object>
    <object xml:id="o2" name="Refer::select(heap,null,StaticMember::$r)" type="Refer">
-      <value name="x" programVariable="x" isArrayIndex="false" value="int::select(heap,Refer::select(heap,null,StaticMember::$r),Refer::$x)" type="int" condition="true"/>
       <association name="nl" programVariable="nl" isArrayIndex="false" target="o3" condition="true"/>
    </object>
    <object xml:id="o3" name="NextLevel::select(heap,Refer::select(heap,null,StaticMember::$r),Refer::$nl)" type="NextLevel">
