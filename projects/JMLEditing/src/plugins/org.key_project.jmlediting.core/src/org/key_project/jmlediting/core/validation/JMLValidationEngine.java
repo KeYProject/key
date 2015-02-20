@@ -53,7 +53,7 @@ public class JMLValidationEngine {
     */
    public List<JMLValidationError> validateComment(final IASTNode c) {
       final List<JMLValidationError> errors = Collections.emptyList();
-      final Set<IJMLValidator> validator = this.activeProfile.getValidator();
+      final Set<IJMLValidator> validator = this.activeProfile.getValidators();
       for (final IJMLValidator jmlValidator : validator) {
          errors.addAll(jmlValidator.validate(this.context, c));
 

@@ -153,7 +153,7 @@ public class JMLReferenceProfile extends AbstractJMLProfile {
    }
 
    @Override
-   public Set<IJMLValidator> getValidator() {
+   public Set<IJMLValidator> getValidators() {
       final Set<IJMLValidator> validator = Collections.emptySet();
       validator.add(new LoopInvariantValidator());
       return validator;

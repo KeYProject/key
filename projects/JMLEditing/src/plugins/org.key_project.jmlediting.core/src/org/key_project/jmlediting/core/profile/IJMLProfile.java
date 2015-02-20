@@ -75,6 +75,6 @@ public interface IJMLProfile {
     * @return a Set of Validators the Profile provides or an Empty Set if there
     *         are no Validators.
     */
-   Set<IJMLValidator> getValidator();
+   Set<IJMLValidator> getValidators();
 
 }

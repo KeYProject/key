@@ -119,7 +119,7 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
    }
 
    @Override
-   public Set<IJMLValidator> getValidator() {
+   public Set<IJMLValidator> getValidators() {
       return Collections.emptySet();
    }
 

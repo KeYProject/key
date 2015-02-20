@@ -58,7 +58,7 @@ public class JMLProfileManagementTest {
       }
 
       @Override
-      public Set<IJMLValidator> getValidator() {
+      public Set<IJMLValidator> getValidators() {
          // TODO Auto-generated method stub
          return Collections.emptySet();
       }

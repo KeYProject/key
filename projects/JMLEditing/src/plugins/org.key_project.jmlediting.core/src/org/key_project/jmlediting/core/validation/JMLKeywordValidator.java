@@ -11,7 +11,7 @@ import org.key_project.jmlediting.core.utilities.JMLValidationError;
  * @author David Giessing
  *
  */
-public abstract class JMLPositionValidator implements IJMLValidator {
+public abstract class JMLKeywordValidator implements IJMLValidator {
 
    /*
     * (non-Javadoc)
@@ -23,18 +23,4 @@ public abstract class JMLPositionValidator implements IJMLValidator {
    @Override
    public abstract List<JMLValidationError> validate(
          final IJMLValidationContext context, final IASTNode node);
-
-   /**
-    * Method for checking if a given JML Specification represented by node is
-    * valid.
-    *
-    * @param context
-    *           the Validation Context
-    * @param node
-    *           the Specification to validate
-    * @return an IMarker if the Specification is invalid, null if it is valid
-    */
-   protected abstract JMLValidationError validateNode(
-         final IJMLValidationContext context, IASTNode node);
-
 }

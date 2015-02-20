@@ -14,7 +14,7 @@ import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLValidationError;
 import org.key_project.jmlediting.core.utilities.LoopNodeVisitor;
 import org.key_project.jmlediting.core.validation.IJMLValidationContext;
-import org.key_project.jmlediting.core.validation.JMLPositionValidator;
+import org.key_project.jmlediting.core.validation.JMLKeywordValidator;
 import org.key_project.jmlediting.profile.jmlref.loop.DecreasingKeyword;
 import org.key_project.jmlediting.profile.jmlref.loop.LoopInvariantKeyword;
 
@@ -27,7 +27,7 @@ import org.key_project.jmlediting.profile.jmlref.loop.LoopInvariantKeyword;
  * @author David Giessing
  *
  */
-public class LoopInvariantValidator extends JMLPositionValidator {
+public class LoopInvariantValidator extends JMLKeywordValidator {
 
    /**
     * A List of LoopNodes in the JavaAST.
@@ -43,9 +43,6 @@ public class LoopInvariantValidator extends JMLPositionValidator {
       final CompilationUnit ast = context.getJavaAST();
       final LoopNodeVisitor visitor = new LoopNodeVisitor();
       ast.accept(visitor);
-      visitor.visit(ast);
-      visitor.visit(ast);
-      visitor.visit(ast);
       this.loopNodes = visitor.getLoopNodes();
       final List<IASTNode> keywordNodes = Nodes.getAllNodesOfType(node,
             NodeTypes.KEYWORD);
@@ -68,7 +65,16 @@ public class LoopInvariantValidator extends JMLPositionValidator {
       return error;
    }
 
-   @Override
+   /**
+    * Method for checking if a given JML Specification represented by node is
+    * valid.
+    *
+    * @param context
+    *           the Validation Context
+    * @param node
+    *           the Specification to validate
+    * @return an IMarker if the Specification is invalid, null if it is valid
+    */
    protected JMLValidationError validateNode(
          final IJMLValidationContext context, final IASTNode node) {
       // find Loop offset that is following the invariant
