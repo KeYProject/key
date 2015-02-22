@@ -91,6 +91,7 @@ public abstract class KeywordPersistence {
          final IUserDefinedKeyword userKeyword, final Document doc) {
       final Element userDefinedKeywordElem = doc
             .createElement(USER_DEFINED_KEYWORD);
+
       userDefinedKeywordElem.setAttribute(CONTENT_DESCRIPTION_ID, userKeyword
             .getContentDescription().getId());
       if (userKeyword.getClosingCharacter() != null) {
@@ -98,11 +99,13 @@ public abstract class KeywordPersistence {
                .getClosingCharacter().toString());
       }
       final Element descriptionElement = doc.createElement(DESCRIPTION);
-      descriptionElement.setNodeValue(userKeyword.getDescription());
+      descriptionElement.appendChild(doc.createTextNode(userKeyword
+            .getDescription()));
       userDefinedKeywordElem.appendChild(descriptionElement);
+
       for (final String keywordString : userKeyword.getKeywords()) {
          final Element keywordElement = doc.createElement(KEYWORD);
-         keywordElement.setNodeValue(keywordString);
+         keywordElement.appendChild(doc.createTextNode(keywordString));
          userDefinedKeywordElem.appendChild(keywordElement);
       }
       return userDefinedKeywordElem;
@@ -113,22 +116,25 @@ public abstract class KeywordPersistence {
       final String descriptionID = elem.getAttribute(CONTENT_DESCRIPTION_ID);
       if ("".equals(descriptionID)) {
          throw new ProfilePersistenceException(
-               "No description of for user defined keyword");
+               "No content description of for user defined keyword");
       }
 
       String description = null;
       final Set<String> keywords = new HashSet<String>();
 
       final NodeList children = elem.getChildNodes();
+      System.err.println("Num children: " + children.getLength());
       for (int i = 0; i < children.getLength(); i++) {
          if (!(children.item(i) instanceof Element)) {
             throw new ProfilePersistenceException("Unexpected content "
                   + children.item(i).getNodeName());
          }
          final Element cElem = (Element) children.item(i);
+
+         System.err.println(elem.getTagName());
          if (cElem.getNodeName().equals(DESCRIPTION)) {
             if (description == null) {
-               description = cElem.getNodeValue();
+               description = cElem.getFirstChild().getTextContent();// .getNodeValue();
             }
             else {
                throw new ProfilePersistenceException(
@@ -136,7 +142,7 @@ public abstract class KeywordPersistence {
             }
          }
          else if (cElem.getNodeName().equals(KEYWORD)) {
-            keywords.add(cElem.getNodeValue());
+            keywords.add(cElem.getFirstChild().getTextContent());
          }
          else {
             throw new ProfilePersistenceException("Unsupported element: "

@@ -43,6 +43,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Re
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.EverythingKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.NotSpecifiedKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.NothingKeyword;
+import org.key_project.jmlediting.profile.jmlref.usercontent.SpecExpressionContentDescription;
 import org.key_project.jmlediting.profile.jmlref.visibility.PrivateKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.ProtectedKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.PublicKeyword;
@@ -91,6 +92,9 @@ public class JMLReferenceProfile extends AbstractJMLProfile {
 
       this.getSupportedPrimariesInternal().addAll(
             Arrays.asList(new KeywordJMLPrimary(), new QuantifierPrimary()));
+
+      this.getSupportedContentDescriptionsInternal().addAll(
+            Arrays.asList(new SpecExpressionContentDescription()));
 
    }
 

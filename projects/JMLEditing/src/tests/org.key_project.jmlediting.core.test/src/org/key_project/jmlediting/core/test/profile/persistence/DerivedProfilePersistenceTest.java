@@ -3,6 +3,7 @@ package org.key_project.jmlediting.core.test.profile.persistence;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +18,10 @@ import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceExc
 import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceFactory;
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeyword;
+import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
+import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription.ClosingCharacterLaw;
+import org.key_project.jmlediting.core.profile.syntax.user.UserDefinedKeyword;
 import org.key_project.jmlediting.core.test.parser.ProfileWrapper;
 import org.w3c.dom.Document;
 
@@ -130,6 +135,48 @@ public class DerivedProfilePersistenceTest {
 
       // Should throw an exception
       this.persistence.persist(profile);
+   }
+
+   @Test
+   public void testPersistUserDefinedKeyword()
+         throws ProfilePersistenceException {
+      final IEditableDerivedProfile profile = new DerivedProfile("IllegalTest",
+            "org.test.userdef", this.availableProfile);
+      final IUserDefinedKeywordContentDescription contentDescription = this.availableProfile
+            .getSupportedContentDescriptions().iterator().next();
+      Character closingChar;
+      if (contentDescription.getClosingCharacterLaw() == ClosingCharacterLaw.NOT_ALLOWED) {
+         closingChar = null;
+      }
+      else {
+         closingChar = ';';
+      }
+      final String keyword = "mykeyword";
+      final String keywrodDescription = "My own keyword.";
+      profile.addKeyword(new UserDefinedKeyword(Collections.singleton(keyword),
+            contentDescription, keywrodDescription, closingChar));
+
+      final Document doc = this.persistence.persist(profile);
+      final IDerivedProfile readProfile = this.persistence.read(doc);
+
+      assertEquals("User defined keyword not loaded", 1, readProfile
+            .getAdditionalKeywords().size());
+      final IKeyword newKeyword = readProfile.getAdditionalKeywords()
+            .iterator().next();
+      assertTrue("Keyword loaded does not implement IUserDefinedKeyword",
+            newKeyword instanceof IUserDefinedKeyword);
+      final IUserDefinedKeyword newUserKeyword = (IUserDefinedKeyword) newKeyword;
+      assertEquals("Wrong number of keywords", 1, newKeyword.getKeywords()
+            .size());
+      assertEquals("Wrong keyword", keyword, newKeyword.getKeywords()
+            .iterator().next());
+      assertEquals("Wrong description", keywrodDescription,
+            newKeyword.getDescription());
+      assertEquals("Wrong content description", contentDescription,
+            newUserKeyword.getContentDescription());
+      assertEquals("Wrong closing character", closingChar,
+            newUserKeyword.getClosingCharacter());
+
    }
 
 }
