@@ -6,7 +6,6 @@ import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordAutoProposer;
-import org.key_project.jmlediting.core.profile.syntax.IKeywordContentRefactorer;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.ParseFunctionKeywordParser;
 
@@ -74,11 +73,6 @@ public class UserDefinedKeyword extends AbstractKeyword implements
 
    @Override
    public IKeywordAutoProposer createAutoProposer() {
-      return null;
-   }
-
-   @Override
-   public IKeywordContentRefactorer createRefactorer() {
       return null;
    }
 

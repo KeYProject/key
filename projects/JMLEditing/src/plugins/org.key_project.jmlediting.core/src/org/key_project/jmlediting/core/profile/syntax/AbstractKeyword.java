@@ -93,9 +93,4 @@ public abstract class AbstractKeyword implements IKeyword {
       return null;
    }
 
-   @Override
-   public IKeywordContentRefactorer createRefactorer() {
-      return null;
-   }
-
 }
