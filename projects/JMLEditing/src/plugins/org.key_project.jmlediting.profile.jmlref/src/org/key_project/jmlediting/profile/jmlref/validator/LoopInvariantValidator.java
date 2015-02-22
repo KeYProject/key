@@ -15,6 +15,7 @@ import org.key_project.jmlediting.core.utilities.JMLValidationError;
 import org.key_project.jmlediting.core.utilities.LoopNodeVisitor;
 import org.key_project.jmlediting.core.validation.IJMLValidationContext;
 import org.key_project.jmlediting.core.validation.JMLKeywordValidator;
+import org.key_project.jmlediting.core.validation.JavaCodeVisitor;
 import org.key_project.jmlediting.profile.jmlref.loop.DecreasingKeyword;
 import org.key_project.jmlediting.profile.jmlref.loop.LoopInvariantKeyword;
 
@@ -89,7 +90,7 @@ public class LoopInvariantValidator extends JMLKeywordValidator {
       if (loopNode == null) {
          // Invariant without loop following --> Invalid
          System.out
-               .println("No Loop found after LoopInvariant or Decreasing Keyword");
+         .println("No Loop found after LoopInvariant or Decreasing Keyword");
          return new JMLValidationError(
                "org.key_project.jmlediting.core.validationerror",
                "No Loop found after LoopInvariant or Decreasing Keyword", node);
@@ -113,19 +114,23 @@ public class LoopInvariantValidator extends JMLKeywordValidator {
                   // If Keyword is before the Invariant that has to be
                   // checked
                   // ignore it
-                  if (iKeywordNode.getStartOffset() > node.getStartOffset()
-                        && (iKeywordNode.getKeyword() instanceof LoopInvariantKeyword || iKeywordNode
-                              .getKeyword() instanceof DecreasingKeyword)) {
-                     continue;
+                  if (iKeywordNode.getStartOffset() > node.getStartOffset()) {
+                     if (iKeywordNode.getKeyword() instanceof LoopInvariantKeyword
+                           || iKeywordNode.getKeyword() instanceof DecreasingKeyword) {
+                        continue;
+                     }
+                     else {
+                        // illegal JML Statement after Loop Specification
+                        System.out
+                        .println("Non LoopInvariant or Decreasing Keyword found following the Loop Specification");
+                        return new JMLValidationError(
+                              "org.key_project.jmlediting.core.validationerror",
+                              "Non LoopInvariant or Decreasing Keyword found following the Loop Specification",
+                              node);
+                     }
                   }
                   else {
-                     // illegal JML Statement after Loop Specification
-                     System.out
-                     .println("Non LoopInvariant or Decreasing Keyword found following the Loop Specification");
-                     return new JMLValidationError(
-                           "org.key_project.jmlediting.core.validationerror",
-                           "Non LoopInvariant or Decreasing Keyword found following the Loop Specification",
-                           node);
+                     continue;
                   }
                }
             }
@@ -139,8 +144,8 @@ public class LoopInvariantValidator extends JMLKeywordValidator {
 
       // If Java Code is found between the Loop invariant and
       // the next Loops offset, the invariant is invalid
-      if (this.javaFoundBetween(this.containingComment.getEndOffset(),
-            loopNode.getStartPosition(), context.getSrc())) {
+      if (this.javaFoundBetweenAST(this.containingComment.getEndOffset(),
+            loopNode.getStartPosition(), context.getJavaAST())) {
          System.out.println("Loop Specification not followed by a Loop");
          return new JMLValidationError(
                "org.key_project.jmlediting.core.validationerror",
@@ -249,5 +254,12 @@ public class LoopInvariantValidator extends JMLKeywordValidator {
          }
       }
       return javaFound;
+   }
+
+   private boolean javaFoundBetweenAST(final int offset,
+         final int loopNodeStart, final ASTNode javaAST) {
+      final JavaCodeVisitor visitor = new JavaCodeVisitor(offset, loopNodeStart);
+      javaAST.accept(visitor);
+      return visitor.getNodeAfterComment() != null;
    }
 }
