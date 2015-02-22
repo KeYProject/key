@@ -12,6 +12,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 
 public class JMLProfileManagementTest {
 
@@ -43,6 +44,11 @@ public class JMLProfileManagementTest {
 
       @Override
       public Set<IJMLPrimary> getSupportedPrimaries() {
+         return Collections.emptySet();
+      }
+
+      @Override
+      public Set<IUserDefinedKeywordContentDescription> getSupportedContentDescriptions() {
          return Collections.emptySet();
       }
 

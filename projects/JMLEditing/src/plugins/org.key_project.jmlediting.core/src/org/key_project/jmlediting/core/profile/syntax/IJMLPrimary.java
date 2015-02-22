@@ -3,6 +3,15 @@ package org.key_project.jmlediting.core.profile.syntax;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 
+/**
+ * A {@link IJMLProfile} is a special parse function which is injected into JML
+ * expressions as a new primary. See the section to primaries in the <a href=
+ * "http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_12.html#SEC129"
+ * >Reference Manual</a>.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public interface IJMLPrimary extends ParseFunction {
 
    /**

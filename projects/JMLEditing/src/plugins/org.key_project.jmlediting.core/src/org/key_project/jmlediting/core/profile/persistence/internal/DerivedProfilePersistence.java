@@ -26,6 +26,9 @@ public class DerivedProfilePersistence implements IDerivedProfilePersistence {
    protected static final String NAME = "name";
    protected static final String IDENTIFIER = "identifier";
    protected static final String DERIVED_PROFILE = "derivedprofile";
+   protected static final String KEYWORD = "keywords";
+   protected static final String CONTENT_DESCRIPTION_ID = "contentdescriptionid";
+   protected static final String DESCRIPTION = "description";
 
    @Override
    public Document persist(final IDerivedProfile profile)
@@ -107,7 +110,8 @@ public class DerivedProfilePersistence implements IDerivedProfilePersistence {
 
    private void readAdditonalKeywords(final Element profileNode,
          final DerivedProfile profile) throws ProfilePersistenceException {
-      final InstantiateKeywordsPersistence keywordPersistence = new InstantiateKeywordsPersistence();
+      final InstantiateKeywordsPersistence keywordPersistence = new InstantiateKeywordsPersistence(
+            profile);
       final NodeList additonalKeywords = profileNode
             .getElementsByTagName(ADDITONAL_KEYWORDS);
       for (int i = 0; i < additonalKeywords.getLength(); i++) {
@@ -124,7 +128,8 @@ public class DerivedProfilePersistence implements IDerivedProfilePersistence {
 
    private Element persistAdditionalKeywords(final IDerivedProfile profile,
          final Document doc) throws ProfilePersistenceException {
-      final InstantiateKeywordsPersistence keywordPersistence = new InstantiateKeywordsPersistence();
+      final InstantiateKeywordsPersistence keywordPersistence = new InstantiateKeywordsPersistence(
+            profile);
       if (!profile.getAdditionalKeywords().isEmpty()) {
          final Element additionalKeywordElement = doc
                .createElement(ADDITONAL_KEYWORDS);
@@ -142,7 +147,7 @@ public class DerivedProfilePersistence implements IDerivedProfilePersistence {
    private Element persistDisabledKeywords(final IDerivedProfile profile,
          final Document doc) throws ProfilePersistenceException {
       final LoadFromProfileKeywordPersistence keywordPersistence = new LoadFromProfileKeywordPersistence(
-            profile.getParentProfile());
+            profile);
       final Element disabledKeywordElem = doc
             .createElement(DISABLED_PARENT_KEYWORDS);
       for (final IKeyword disabledKeyword : profile.getParentProfile()
@@ -163,7 +168,7 @@ public class DerivedProfilePersistence implements IDerivedProfilePersistence {
    private void readDisabledKeywords(final Element profileNode,
          final DerivedProfile profile) throws ProfilePersistenceException {
       final LoadFromProfileKeywordPersistence keywordPersistence = new LoadFromProfileKeywordPersistence(
-            profile.getParentProfile());
+            profile);
       final NodeList parentDisabledKeywords = profileNode
             .getElementsByTagName(DISABLED_PARENT_KEYWORDS);
       for (int i = 0; i < parentDisabledKeywords.getLength(); i++) {

@@ -5,6 +5,7 @@ import java.util.Set;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 
 /**
  * Defines a profile for a JML variant.
@@ -42,6 +43,15 @@ public interface IJMLProfile {
     * @return the set of all supported primaries
     */
    Set<IJMLPrimary> getSupportedPrimaries();
+
+   /**
+    * Returns a set of supported content descriptions which the user may use to
+    * create other keywords dynamically.
+    *
+    * @return a set of all supported content descriptions, which is not
+    *         modifiable
+    */
+   Set<IUserDefinedKeywordContentDescription> getSupportedContentDescriptions();
 
    /**
     * Returns an extension to the project for the given key and type. This can

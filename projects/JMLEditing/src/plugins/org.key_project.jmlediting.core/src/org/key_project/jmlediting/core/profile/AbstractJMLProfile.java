@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 
 /**
  * This class implements some methods of the {@link IJMLProfile} in a generic
@@ -86,6 +87,10 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
     * The set containing all supported keywords.
     */
    private final Set<IJMLPrimary> supportedPrimaries = new HashSet<IJMLPrimary>();
+   /**
+    * The set containing all keyword content descriptions.
+    */
+   private final Set<IUserDefinedKeywordContentDescription> supportedContentDescriptions = new HashSet<IUserDefinedKeywordContentDescription>();
 
    /**
     * A map which stores the extensions registered to this profile.
@@ -114,6 +119,11 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
       return Collections.unmodifiableSet(this.supportedPrimaries);
    }
 
+   @Override
+   public Set<IUserDefinedKeywordContentDescription> getSupportedContentDescriptions() {
+      return Collections.unmodifiableSet(this.supportedContentDescriptions);
+   }
+
    /**
     * Returns the modifiable version of the keywords set to allow subclasses to
     * access them.
@@ -132,6 +142,16 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
     */
    protected final Set<IJMLPrimary> getSupportedPrimariesInternal() {
       return this.supportedPrimaries;
+   }
+
+   /**
+    * Returns the modifiable version of the supported content descriptions set
+    * to allow subclasses to access them.
+    *
+    * @return the modifiable content description set
+    */
+   protected final Set<IUserDefinedKeywordContentDescription> getSupportedContentDescriptionsInternal() {
+      return this.supportedContentDescriptions;
    }
 
    /**

@@ -42,6 +42,45 @@ public abstract class AbstractKeyword implements IKeyword {
          k.add(keyword);
          this.keywords = Collections.unmodifiableSet(k);
       }
+      // Validate keywords
+      for (final String k : this.keywords) {
+         validateKeyword(k);
+      }
+   }
+
+   /**
+    * Creates a new {@link AbstractKeyword}. The set of supported keywords is
+    * not allowed to be empty.
+    *
+    * @param keywords
+    *           all supported keywords
+    */
+   public AbstractKeyword(final Set<String> keywords) {
+      if (keywords.isEmpty()) {
+         throw new IllegalArgumentException(
+               "Need to provide at least one keyword");
+      }
+      // Validate keywords
+      for (final String keyword : keywords) {
+         validateKeyword(keyword);
+      }
+      this.keywords = Collections.unmodifiableSet(keywords);
+   }
+
+   /**
+    * Ensures that the keyword does not contains white spaces. Otherwise it
+    * throws an exception.
+    *
+    * @param keyword
+    *           the keyword to validate
+    */
+   private static void validateKeyword(final String keyword) {
+      for (final char c : keyword.toCharArray()) {
+         if (Character.isWhitespace(c)) {
+            throw new IllegalArgumentException(
+                  "The keyword is not allowed to contain whitespaces.");
+         }
+      }
    }
 
    @Override
