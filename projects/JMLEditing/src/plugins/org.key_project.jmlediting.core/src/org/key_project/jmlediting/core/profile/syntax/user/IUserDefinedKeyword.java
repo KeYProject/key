@@ -19,4 +19,12 @@ public interface IUserDefinedKeyword extends IKeyword {
     */
    IUserDefinedKeywordContentDescription getContentDescription();
 
+   /**
+    * Returns the closing character for the keyword, e.g. a semicolon. If no
+    * character is allowed, this method returns null.
+    * 
+    * @return the closing character or null
+    */
+   Character getClosingCharacter();
+
 }

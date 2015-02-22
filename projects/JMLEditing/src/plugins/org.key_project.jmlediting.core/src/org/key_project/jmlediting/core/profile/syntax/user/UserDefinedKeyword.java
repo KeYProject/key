@@ -26,6 +26,10 @@ public class UserDefinedKeyword extends AbstractKeyword implements
     * The description of the keyword.
     */
    private final String description;
+   /**
+    * The closing character.
+    */
+   private final char closingCharacter;
 
    /**
     * Creates a new {@link UserDefinedKeyword}.
@@ -36,10 +40,12 @@ public class UserDefinedKeyword extends AbstractKeyword implements
     *           the description of the content, not allowed to be null
     * @param description
     *           the description of the keyword, not allowed to be null
+    * @param closingCharacter
+    *           the closing character for this keyword, may be null
     */
    public UserDefinedKeyword(final Set<String> keywords,
          final IUserDefinedKeywordContentDescription contentDescription,
-         final String description) {
+         final String description, final Character closingCharacter) {
       super(keywords);
       if (contentDescription == null) {
          throw new IllegalArgumentException(
@@ -51,6 +57,7 @@ public class UserDefinedKeyword extends AbstractKeyword implements
       }
       this.contentDescription = contentDescription;
       this.description = description;
+      this.closingCharacter = closingCharacter;
    }
 
    @Override
@@ -66,7 +73,8 @@ public class UserDefinedKeyword extends AbstractKeyword implements
          @Override
          protected ParseFunction createParseFunction(final IJMLProfile profile) {
             return UserDefinedKeyword.this.contentDescription
-                  .getContentParseFunction(profile);
+                  .getContentParseFunction(profile,
+                        UserDefinedKeyword.this.closingCharacter);
          }
       };
    }
@@ -79,6 +87,11 @@ public class UserDefinedKeyword extends AbstractKeyword implements
    @Override
    public String getDescription() {
       return this.description;
+   }
+
+   @Override
+   public Character getClosingCharacter() {
+      return this.closingCharacter;
    }
 
 }

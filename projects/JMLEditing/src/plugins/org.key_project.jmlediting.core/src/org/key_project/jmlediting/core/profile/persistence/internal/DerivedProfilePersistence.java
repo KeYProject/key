@@ -29,6 +29,7 @@ public class DerivedProfilePersistence implements IDerivedProfilePersistence {
    protected static final String KEYWORD = "keywords";
    protected static final String CONTENT_DESCRIPTION_ID = "contentdescriptionid";
    protected static final String DESCRIPTION = "description";
+   protected static final String CLOSING_CHARACTER = "closingcharacter";
 
    @Override
    public Document persist(final IDerivedProfile profile)

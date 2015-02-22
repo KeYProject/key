@@ -2,6 +2,7 @@ package org.key_project.jmlediting.core.profile.persistence.internal;
 
 import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.BUNDLE;
 import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.CLASS;
+import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.CLOSING_CHARACTER;
 import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.CODED_KEYWORD;
 import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.CONTENT_DESCRIPTION_ID;
 import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.DESCRIPTION;
@@ -92,6 +93,10 @@ public abstract class KeywordPersistence {
             .createElement(USER_DEFINED_KEYWORD);
       userDefinedKeywordElem.setAttribute(CONTENT_DESCRIPTION_ID, userKeyword
             .getContentDescription().getId());
+      if (userKeyword.getClosingCharacter() != null) {
+         userDefinedKeywordElem.setAttribute(CLOSING_CHARACTER, userKeyword
+               .getClosingCharacter().toString());
+      }
       final Element descriptionElement = doc.createElement(DESCRIPTION);
       descriptionElement.setNodeValue(userKeyword.getDescription());
       userDefinedKeywordElem.appendChild(descriptionElement);
@@ -148,6 +153,17 @@ public abstract class KeywordPersistence {
                "No description found for UserDefinedKeyword");
       }
 
+      Character closingCharacter = null;
+      if (elem.hasAttribute(CLOSING_CHARACTER)) {
+         final String closingCharacterString = elem
+               .getAttribute(CLOSING_CHARACTER);
+         if (closingCharacterString.length() != 1) {
+            throw new ProfilePersistenceException(
+                  "Closing character attribute is not excatly one char long");
+         }
+         closingCharacter = closingCharacterString.charAt(0);
+      }
+
       final IUserDefinedKeywordContentDescription descr = JMLProfileHelper
             .getDescriptionById(descriptionID, this.profile);
       if (descr == null) {
@@ -155,7 +171,8 @@ public abstract class KeywordPersistence {
                "Content for UserDefinedKeyword with id \"" + descriptionID
                      + "\" was not found.");
       }
-      return new UserDefinedKeyword(keywords, descr, description);
+      return new UserDefinedKeyword(keywords, descr, description,
+            closingCharacter);
    }
 
 }
