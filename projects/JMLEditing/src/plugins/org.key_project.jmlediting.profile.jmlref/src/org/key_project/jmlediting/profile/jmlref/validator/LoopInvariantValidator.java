@@ -9,7 +9,6 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IKeywordNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
-import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLValidationError;
 import org.key_project.jmlediting.core.utilities.LoopNodeVisitor;
@@ -93,51 +92,6 @@ public class LoopInvariantValidator extends JMLKeywordValidator {
                "org.key_project.jmlediting.core.validationerror",
                "No Loop found after LoopInvariant or Decreasing Keyword", node);
       }
-
-      // check for JML commments between invariant and loop offset and check
-      // comment containing the keyword to check
-      for (final CommentRange comment : context.getJMLComments()) {
-         if (comment.getEndOffset() > node.getStartOffset()
-               && comment.getBeginOffset() < loopNode.getStartPosition()) {
-            if (comment.getBeginOffset() < node.getStartOffset()
-                  && comment.getEndOffset() > node.getStartOffset()) {
-               this.containingComment = comment;
-            }
-            try {
-               final IASTNode ast = context.getJMLParser().parse(
-                     context.getSrc(), comment);
-               final List<IKeywordNode> keywords = Nodes.getAllKeywords(ast);
-               for (final IKeywordNode iKeywordNode : keywords) {
-                  // Check for Keywords that are no Invariant
-                  // If Keyword is before the Invariant that has to be
-                  // checked
-                  // ignore it
-                  if (iKeywordNode.getStartOffset() > node.getStartOffset()) {
-                     if (iKeywordNode.getKeyword() instanceof LoopInvariantKeyword
-                           || iKeywordNode.getKeyword() instanceof DecreasingKeyword) {
-                        continue;
-                     }
-                     else {
-                        // illegal JML Statement after Loop Specification
-                        return new JMLValidationError(
-                              "org.key_project.jmlediting.core.validationerror",
-                              "Non LoopInvariant or Decreasing Keyword found following the Loop Specification",
-                              node);
-                     }
-                  }
-                  else {
-                     continue;
-                  }
-               }
-            }
-            catch (final ParserException e) {
-               // Comment could not be parsed, ignore it and go on with the
-               // next
-               continue;
-            }
-         }
-      }
-
       // If Java Code is found between the Loop invariant and
       // the next Loops offset, the invariant is invalid
       if (this.javaFoundBetweenAST(this.containingComment.getEndOffset(),
