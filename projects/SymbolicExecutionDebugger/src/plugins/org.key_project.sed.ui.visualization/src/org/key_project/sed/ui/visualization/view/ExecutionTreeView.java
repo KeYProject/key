@@ -30,8 +30,6 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdate;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdateListener;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
@@ -41,14 +39,15 @@ import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
-import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.ui.util.SEDUIUtil;
@@ -58,10 +57,11 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.DebugTargetCo
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugTargetConnectFeature.IProgressHandler;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
-import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
+import org.key_project.sed.ui.visualization.util.EmptyDiagramPersistencyBehavior;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.eclipse.swt.view.ParentBasedTabbedPropertySheetPage;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
@@ -107,6 +107,11 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     * </p>
     */
    private boolean internalSelectionUpdate = false;
+   
+   /**
+    * The {@link ISelectionProvider} of the active {@link IWorkbenchPart} observed via {@link #editorSelectionListener}.
+    */
+   private ISelectionProvider observedSelectionProvider = null;
    
    /**
     * Listens for selection changes on {@link #getEditorPart()}.
@@ -178,16 +183,28 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
       setMessage(MESSAGE_DEBUG_VIEW_NOT_OPENED);
       Job.getJobManager().addJobChangeListener(jobChangeListener);
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @SuppressWarnings("rawtypes")
+   @Override
+   public Object getAdapter(Class type) {
+      if (type.equals(IPropertySheetPage.class)) {
+         return new ParentBasedTabbedPropertySheetPage(this, getEditorPart());
+      }
+      else {
+         return super.getAdapter(type);
+      }
+   }
 
    /**
     * {@inheritDoc}
     */
    @Override
    protected ExecutionTreeDiagramEditor createEditorPart() {
-      ExecutionTreeDiagramEditor editorPart = new ExecutionTreeDiagramEditor();
+      ExecutionTreeDiagramEditor editorPart = new ExecutionTreeDiagramEditor(true);
       editorPart.setDefaultSelectionSynchronizationEnabled(false);
-      editorPart.setReadOnly(true);
-      editorPart.setPaletteHidden(true);
       return editorPart;
    }
 
@@ -212,7 +229,10 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     */
    @Override
    protected void editorPartControlCreated(ExecutionTreeDiagramEditor editorPart, ReadonlyDiagramEditorActionBarContributor contributor) {
-      editorPart.getSite().getSelectionProvider().addSelectionChangedListener(editorSelectionListener);
+      observedSelectionProvider = editorPart.getSite().getSelectionProvider();
+      if (observedSelectionProvider != null) { // TODO: Why is it null?
+         observedSelectionProvider.addSelectionChangedListener(editorSelectionListener);
+      }
       editorPart.setGridVisible(false);
       ZoomManager zoomManager = (ZoomManager)editorPart.getAdapter(ZoomManager.class);
       contributor.setZoomManager(zoomManager);
@@ -231,15 +251,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     */
    @Override
    protected DiagramEditorInput createEditorInput() {
-      // Create empty diagram
-      Diagram diagram = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, 
-                                                                    "Empty Diagram", 
-                                                                    true);
-      URI domainURI = URI.createURI("INVALID" + ExecutionTreeUtil.DOMAIN_FILE_EXTENSION_WITH_DOT);
-      GraphitiUi.getPeService().setPropertyValue(diagram, ExecutionTreeUtil.USER_PROPERTY_DOMAIN_MODEL_FILE, domainURI.toString());
-      // Create editing domain and resource that contains the diagram
-      TransactionalEditingDomain domain = ExecutionTreeUtil.createDomainAndResource(diagram);
-      return DiagramEditorInput.createEditorInput(diagram, domain, ExecutionTreeDiagramTypeProvider.PROVIDER_ID, true);
+      return new DiagramEditorInput(EmptyDiagramPersistencyBehavior.EMPTY_DIAGRAM_URI, ExecutionTreeDiagramTypeProvider.PROVIDER_ID);
    }
 
    /**
@@ -471,6 +483,9 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     */
    @Override
    public void dispose() {
+      if (observedSelectionProvider != null) {
+         observedSelectionProvider.removeSelectionChangedListener(editorSelectionListener);
+      }
       Job.getJobManager().removeJobChangeListener(jobChangeListener);
       getEditorPart().getSite().getSelectionProvider().removeSelectionChangedListener(editorSelectionListener);
       IDebugView debugView = getDebugView();

@@ -25,7 +25,6 @@ import org.eclipse.ui.IKeyBindingService;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.PartSite;
@@ -49,19 +48,19 @@ public class EditorInViewEditorSite extends PartSite implements IEditorSite, IDi
    /**
     * The {@link IViewSite} of an {@link IViewPart} which contains an {@link IEditorPart}.
     */
-   private IViewSite wrapperViewSite;
+   private final IViewSite wrapperViewSite;
    
    /**
     * The {@link IEditorActionBarContributor} of the {@link IEditorPart} which 
     * is shown in the {@link IViewSite} of {@link #wrapperViewSite}.
     */
-   private IEditorActionBarContributor wrappedEditorContributor;
+   private final IEditorActionBarContributor wrappedEditorContributor;
    
    /**
     * The used {@link IWorkbenchPage} used to let the {@link IEditorPart} believe
     * that he is a normal {@link IEditorPart}.
     */
-   private EditorInViewWorkbenchPage page;
+   private final EditorInViewWorkbenchPage page;
    
    /**
     * Indicates that this {@link IEditorSite} is disposed or not.
@@ -77,7 +76,7 @@ public class EditorInViewEditorSite extends PartSite implements IEditorSite, IDi
    public EditorInViewEditorSite(IViewSite wrapperViewSite, 
                                  EditorInViewWorkbenchPage page, 
                                  IEditorActionBarContributor wrappedEditorContributor) {
-      super(null, null, page);
+      super(((PartSite)wrapperViewSite).getModel(), wrapperViewSite.getPart(), null, null);
       Assert.isNotNull(page);
       Assert.isNotNull(wrapperViewSite);
       this.page = page;
@@ -251,19 +250,6 @@ public class EditorInViewEditorSite extends PartSite implements IEditorSite, IDi
     * </p>
     */
    @Override
-   public IWorkbenchPart getPart() {
-      return wrapperViewSite.getPart();
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * The call is delegated to the {@link IViewSite}.
-    * </p>
-    */
-   @Override
    public ISelectionProvider getSelectionProvider() {
       return wrapperViewSite.getSelectionProvider();
    }
@@ -309,7 +295,6 @@ public class EditorInViewEditorSite extends PartSite implements IEditorSite, IDi
    public void dispose() {
       if (!isDisposed()) {
          disposed = true;
-         super.dispose();
       }
    }
 }

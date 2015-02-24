@@ -14,6 +14,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
@@ -46,7 +47,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
     * has changed so that they are outdated.
     * </p>
     */
-   public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = false;
+   public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = true;
    
    /**
     * The used temporary oracle directory.
@@ -118,7 +119,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
                try {
                   testSteps.init(bot, project, setFile, debugView, debugTree, launch, target);
                   // Select debug target
-                  TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0);
+                  TestSedCoreUtil.selectInDebugTree(debugView, 0, 0);
                   // Wait until diagram is completely constructed
                   TestUtilsUtil.openView(ExecutionTreeView.VIEW_ID);
                   TestUtilsUtil.waitForJobs();
@@ -215,7 +216,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
       // Open Save diagram wizard
       SWTBotView executionTreeView = bot.viewById(ExecutionTreeView.VIEW_ID);
       executionTreeView.setFocus();
-      executionTreeView.toolbarButton("Save As").click();
+      TestUtilsUtil.getToolbarButtonWithId(executionTreeView, "saveAs").click();
       // Finish wizard
       SWTBotShell wizardShell = bot.shell("Save Symbolic Execution Tree Diagram");
       wizardShell.bot().tree().select(project.getName());

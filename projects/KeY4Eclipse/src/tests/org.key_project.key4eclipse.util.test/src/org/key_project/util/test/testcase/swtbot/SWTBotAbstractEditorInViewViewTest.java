@@ -26,6 +26,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.navigator.resources.ProjectExplorer;
 import org.junit.Test;
@@ -301,10 +302,14 @@ public class SWTBotAbstractEditorInViewViewTest extends TestCase {
    @Test
    public void testGraphitiEditorInView() throws Exception {
       SWTBotView view = null;
+      IPerspectiveDescriptor originalPerspective = null;
       try {
          // Close welcome view
          SWTWorkbenchBot bot = new SWTWorkbenchBot();
          TestUtilsUtil.closeWelcomeView(bot);
+         // Open resource perspective
+         originalPerspective = TestUtilsUtil.getActivePerspective();
+         TestUtilsUtil.openResourcePerspective();
          // Open view
          final IViewPart part = TestUtilsUtil.openView(GraphitiEditorInViewView.VIEW_ID);
          view = bot.viewById(GraphitiEditorInViewView.VIEW_ID);
@@ -346,6 +351,9 @@ public class SWTBotAbstractEditorInViewViewTest extends TestCase {
       finally {
          if (view != null) {
             view.close();
+         }
+         if (originalPerspective != null) {
+            TestUtilsUtil.openPerspective(originalPerspective);
          }
       }
    }

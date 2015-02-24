@@ -30,12 +30,4 @@ public class GraphitiCallStackPropertySection extends AbstractGraphitiDebugNodeP
    protected ISEDDebugNodeTabContent createContent() {
       return new CallStackTabComposite();
    }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean shouldUseExtraSpace() {
-      return true;
-   }
 }

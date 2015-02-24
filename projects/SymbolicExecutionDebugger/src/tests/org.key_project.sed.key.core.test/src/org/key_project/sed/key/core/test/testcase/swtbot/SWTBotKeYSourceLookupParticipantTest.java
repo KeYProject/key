@@ -114,7 +114,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             SWTBotView symbolicSettingsView = bot.viewById(SymbolicExecutionSettingsView.VIEW_ID);
             TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.METHOD_TREATMENT_CONTRACT));
             // Get debug target TreeItem
-            SWTBotTreeItem launchTreeItem = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select first thread
+            SWTBotTreeItem launchTreeItem = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select first thread
             // Resume execution
             resume(bot, launchTreeItem, target);
             // Make sure that correct source resources are computed for each IStackFrame

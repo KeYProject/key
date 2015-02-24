@@ -95,11 +95,12 @@ public class WorkbenchUtilTest extends TestCase {
      */
     @Test
     public void testViewManagement() throws PartInitException {
+       TestUtilsUtil.closeWelcomeView();
        // Make sure that view is not open
        String viewId = GraphitiEditorInViewView.VIEW_ID;
        IViewPart view = WorkbenchUtil.findView(viewId);
        assertNull(view);
-       IViewPart explorer = WorkbenchUtil.findView(ProjectExplorer.VIEW_ID);
+       IViewPart explorer = WorkbenchUtil.openView(ProjectExplorer.VIEW_ID);
        assertNotNull(explorer);
        // Open view
        view = WorkbenchUtil.openView(viewId);

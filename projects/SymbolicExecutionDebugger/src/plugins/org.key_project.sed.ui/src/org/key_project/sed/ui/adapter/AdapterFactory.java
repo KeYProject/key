@@ -16,9 +16,11 @@ package org.key_project.sed.ui.adapter;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.debug.internal.ui.views.launch.LaunchView;
 import org.eclipse.debug.internal.ui.views.variables.VariablesView;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
+import org.key_project.util.eclipse.swt.view.ParentBasedTabbedPropertySheetPage;
 
 /**
  * Provides a {@link TabbedPropertySheetPage} for given {@link LaunchView}s.
@@ -46,7 +48,7 @@ public class AdapterFactory implements IAdapterFactory {
                   return LAUNCH_VIEW_CONTRIBUTOR_ID;
                }
             };
-            return new TabbedPropertySheetPage(contributor, true);
+            return new ParentBasedTabbedPropertySheetPage((IWorkbenchPart) adaptableObject, contributor, true);
          }
       }
       return null;

@@ -30,7 +30,6 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewPart;
@@ -90,8 +89,9 @@ public abstract class AbstractSWTBotSetFileTest extends TestCase {
          SWTWorkbenchBot bot = new SWTWorkbenchBot();
          TestUtilsUtil.closeWelcomeView(bot);
          propertiesView = TestUtilsUtil.openView(IPageLayout.ID_PROP_SHEET); // Has to be opened to avoid exceptions.
-         SWTBotTreeItem setFileItem = TestUtilsUtil.selectInProjectExplorer(bot, uiPath.toArray(new String[uiPath.size()]));
-         setFileItem.contextMenu("Debug As").menu("&1 Symbolic Execution Tree File").click();
+         TestUtilsUtil.selectInProjectExplorer(bot, uiPath.toArray(new String[uiPath.size()]));
+         SWTBotView viewBot = TestUtilsUtil.getProjectExplorer(bot);
+         TestUtilsUtil.clickContextMenu(viewBot.bot().tree(), "Debug As", "&1 Symbolic Execution Tree File");
          // Switch into symbolic debug perspective
          TestUtilsUtil.confirmPerspectiveSwitch(bot, SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID);
          // Find the launched ILaunch in the debug view

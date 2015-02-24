@@ -21,6 +21,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.INavigationHistory;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPartListener2;
@@ -39,7 +40,9 @@ import org.eclipse.ui.MultiPartInitException;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.internal.PartListenerList;
 import org.eclipse.ui.internal.PartListenerList2;
+import org.eclipse.ui.internal.PartSite;
 import org.eclipse.ui.services.IDisposable;
+import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ObjectUtil;
 
 /**
@@ -55,7 +58,7 @@ import org.key_project.util.java.ObjectUtil;
  * @see EditorInViewEditorSite
  */
 @SuppressWarnings("restriction")
-public class EditorInViewWorkbenchPage implements IWorkbenchPage, IDisposable {
+public class EditorInViewWorkbenchPage extends PartSite implements IWorkbenchPage, IDisposable {
    /**
     * The {@link IViewSite} of an {@link IViewPart} which contains an {@link IEditorPart}.
     */
@@ -160,7 +163,7 @@ public class EditorInViewWorkbenchPage implements IWorkbenchPage, IDisposable {
     */
    public EditorInViewWorkbenchPage(IViewSite wrapperViewSite,
                                     IEditorPart wrappedEditorPart) {
-      super();
+      super(((PartSite)wrapperViewSite).getModel(), wrapperViewSite.getPart(), null, null);
       Assert.isNotNull(wrapperViewSite);
       Assert.isNotNull(wrappedEditorPart);
       this.wrapperViewSite = wrapperViewSite;
@@ -895,7 +898,12 @@ public class EditorInViewWorkbenchPage implements IWorkbenchPage, IDisposable {
     */
    @Override
    public IWorkbenchWindow getWorkbenchWindow() {
-      return wrapperViewSite.getPage().getWorkbenchWindow();
+      if (wrapperViewSite != null) {
+         return wrapperViewSite.getPage().getWorkbenchWindow();
+      }
+      else {
+         return WorkbenchUtil.getActiveWorkbenchWindow();
+      }
    }
 
    /**
@@ -1484,5 +1492,31 @@ public class EditorInViewWorkbenchPage implements IWorkbenchPage, IDisposable {
    @Override
    public IEditorReference[] openEditors(IEditorInput[] inputs, String[] editorIDs, int matchFlags) throws MultiPartInitException {
       return wrapperViewSite.getPage().openEditors(inputs, editorIDs, matchFlags);
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * The call is delegated to the {@link IViewSite}.
+    * </p>
+    */
+   @Override
+   public IEditorReference[] openEditors(IEditorInput[] inputs, String[] editorIDs, IMemento[] mementos, int matchFlags, int activateIndex) throws MultiPartInitException {
+      return wrapperViewSite.getPage().openEditors(inputs, editorIDs, mementos, matchFlags, activateIndex);
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * The call is delegated to the {@link IViewSite}.
+    * </p>
+    */
+   @Override
+   public IMemento[] getEditorState(IEditorReference[] editorRefs, boolean includeInputState) {
+      return wrapperViewSite.getPage().getEditorState(editorRefs, includeInputState);
    }
 }

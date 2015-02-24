@@ -38,6 +38,7 @@ import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotKeYDebugTargetTes
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotKeYLaunchConfigurationDelegateTest;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotKeYModelThreadSaveChildAccessTest;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotKeYSourceLookupParticipantTest;
+import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotKeYThinBackwardSlicerTest;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotLaunchDefaultPreferencesTest;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotRemoveExceptionBreakpoint;
@@ -60,6 +61,7 @@ import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotStepReturnTest;
    SWTBotKeYLaunchConfigurationDelegateTest.class,
    SWTBotKeYModelThreadSaveChildAccessTest.class,
    SWTBotKeYSourceLookupParticipantTest.class,
+   SWTBotKeYThinBackwardSlicerTest.class,
    SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest.class,
    SWTBotStepOverTest.class,
    SWTBotStepReturnTest.class,

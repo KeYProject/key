@@ -14,6 +14,7 @@
 package org.key_project.sed.ui.visualization.execution_tree.provider;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,13 +23,17 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.palette.IPaletteCompartmentEntry;
+import org.eclipse.graphiti.platform.IPlatformImageConstants;
 import org.eclipse.graphiti.tb.ContextButtonEntry;
 import org.eclipse.graphiti.tb.ContextMenuEntry;
 import org.eclipse.graphiti.tb.DefaultToolBehaviorProvider;
@@ -36,9 +41,13 @@ import org.eclipse.graphiti.tb.IContextButtonEntry;
 import org.eclipse.graphiti.tb.IContextButtonPadData;
 import org.eclipse.graphiti.tb.IContextMenuEntry;
 import org.eclipse.graphiti.tb.IToolBehaviorProvider;
-import org.eclipse.graphiti.ui.internal.GraphitiUIPlugin;
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.graphiti.ui.internal.platform.ExtensionManager;
+import org.eclipse.graphiti.ui.platform.IImageProvider;
 import org.eclipse.swt.graphics.Image;
+import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDGroupable;
+import org.key_project.sed.core.util.NodeUtil;
+import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeCollapseFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeResumeFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStepIntoFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStepOverFeature;
@@ -46,6 +55,7 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStep
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeSuspendFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeTerminateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeVisualizeStateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.ICustomFeatureFactory;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -62,6 +72,11 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
     * ID of the used extension point.
     */
    public static final String CONTEXT_ITEM_EXTENSION_POINT = "org.key_project.sed.ui.visualization.executionTree.contextMenuEntries";
+
+   /**
+    * The contributor id used in the tab view.
+    */
+   public static final String CONTRIBUTOR_ID = "symbolicExecutionTreeDiagram.PropertyContributor";
    
    /**
     * Indicates that the diagram is read-only or editable.
@@ -90,10 +105,37 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
    @Override
    public IContextButtonPadData getContextButtonPad(IPictogramElementContext context) {
       IContextButtonPadData data = super.getContextButtonPad(context);
+      
+      if(context.getPictogramElement().getGraphicsAlgorithm() instanceof Rectangle) {
+         data.getGenericContextButtons().clear();
+         return data;
+      }
+      
       if (isReadOnly()) {
          data.getGenericContextButtons().clear();
+         
+         ISEDDebugNode node = (ISEDDebugNode) getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElement());
+         if(ExecutionTreeUtil.isGroupingSupported(node) && node instanceof ISEDGroupable) {
+            ISEDGroupable groupStart = (ISEDGroupable) node;
+            if(groupStart.isCollapsed()) {
+               data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeCollapseFeature(getFeatureProvider()), context, "Expand", null, IPlatformImageConstants.IMG_EDIT_EXPAND));
+            }
+            else {
+               try {
+                  ISEDDebugNode[] children = NodeUtil.getChildren((ISEDDebugNode) groupStart);
+                  if(groupStart.getGroupEndConditions().length > 0 && !(children.length == 1 && children[0].getGroupStartCondition((ISEDDebugNode) groupStart) != null)){
+                     data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeCollapseFeature(getFeatureProvider()), context, "Collapse", null, IPlatformImageConstants.IMG_EDIT_COLLAPSE));
+                  }
+               }
+               catch (DebugException e) {
+                  LogUtil.getLogger().logError(e);
+               }
+            }
+         }
+         
          List<IContextButtonEntry> epEntries = collectContextButtonEntriesFromExtensionPoint(isReadOnly(), context);
          data.getGenericContextButtons().addAll(epEntries);
+
          data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeVisualizeStateFeature(getFeatureProvider()), context, "Visualize State", null, IExecutionTreeImageConstants.IMG_VISUALIZE_STATE));
 
          data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeStepReturnFeature(getFeatureProvider()), context, "Step Return", null, IExecutionTreeImageConstants.IMG_STEP_RETURN));
@@ -137,6 +179,27 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
       List<IContextMenuEntry> result = new LinkedList<IContextMenuEntry>();
       CollectionUtil.addAll(result, menuEntries);
       if (isReadOnly()) {
+         Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElements()[0]);
+         if(bo instanceof ISEDDebugNode) {
+            ISEDDebugNode node = (ISEDDebugNode) bo;
+            if(ExecutionTreeUtil.isGroupingSupported(node) && node instanceof ISEDGroupable) {
+               ISEDGroupable groupStart = (ISEDGroupable) node;
+               if(groupStart.isCollapsed()) {
+                  result.add(createCustomContextMenuEntry(new DebugNodeCollapseFeature(getFeatureProvider()), context, "Expand", null, IPlatformImageConstants.IMG_EDIT_EXPAND));
+               }
+               else {
+                  try {
+                     if(groupStart.getGroupEndConditions().length > 0){
+                        result.add(createCustomContextMenuEntry(new DebugNodeCollapseFeature(getFeatureProvider()), context, "Collapse", null, IPlatformImageConstants.IMG_EDIT_COLLAPSE));
+                     }
+                  }
+                  catch (DebugException e) {
+                     LogUtil.getLogger().logError(e);
+                  }
+               }
+            }
+         }
+
          result.add(createCustomContextMenuEntry(new DebugNodeResumeFeature(getFeatureProvider()), context, "Resume", null, IExecutionTreeImageConstants.IMG_RESUME));
          result.add(createCustomContextMenuEntry(new DebugNodeSuspendFeature(getFeatureProvider()), context, "Suspend", null, IExecutionTreeImageConstants.IMG_SUSPEND));
          result.add(createCustomContextMenuEntry(new DebugNodeTerminateFeature(getFeatureProvider()), context, "Terminate", null, IExecutionTreeImageConstants.IMG_TERMINATE));
@@ -236,10 +299,15 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
     */
    protected void makeSureThatImageIdExist(IConfigurationElement configElement) {
       String imageKey = configElement.getAttribute("iconId");
-      if (GraphitiUIPlugin.getDefault().getImageRegistry().getDescriptor(imageKey) == null) {
-         Bundle bundle = Platform.getBundle(configElement.getContributor().getName());
-         URL url = bundle.getResource(configElement.getAttribute("icon"));
-         GraphitiUIPlugin.getDefault().getImageRegistry().put(imageKey, ImageDescriptor.createFromURL(url));
+      Collection<IImageProvider> imageProviders = ExtensionManager.getSingleton().getImageProvidersForDiagramTypeProviderId(ExecutionTreeDiagramTypeProvider.PROVIDER_ID);
+      for (IImageProvider imageProvider : imageProviders) {
+         if (imageProvider instanceof ExecutionTreeImageProvider) {
+            Bundle bundle = Platform.getBundle(configElement.getContributor().getName());
+            URL url = bundle.getResource(configElement.getAttribute("icon"));
+            if (url != null) {
+               ((ExecutionTreeImageProvider)imageProvider).addImageFilePathIfNotAvailable(imageKey, url.toString());
+            }
+         }
       }
    }
 
@@ -274,6 +342,28 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
       }
       return result.toArray(new IPaletteCompartmentEntry[result.size()]);
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public GraphicsAlgorithm[] getClickArea(PictogramElement pe) {
+      if (isSelectable(pe)) {
+         return super.getClickArea(pe);
+      }
+      else {
+         return new GraphicsAlgorithm[0];
+      }
+   }
+   
+   /**
+    * Checks if the given {@link PictogramElement} is selectable.
+    * @param pe The {@link PictogramElement} to check.
+    * @return {@code true} {@link PictogramElement} is selectable, {@code false} {@link PictogramElement} can be selected.
+    */
+   public boolean isSelectable(PictogramElement pe) {
+      return !(pe.getGraphicsAlgorithm() instanceof Rectangle);
+   }
 
    /**
     * Checks if the diagram is read-only or editable.
@@ -289,5 +379,23 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
     */
    public void setReadOnly(boolean readOnly) {
       this.readOnly = readOnly;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isShowFlyoutPalette() {
+      return !isReadOnly();
+   }
+   
+   /**
+    * Made sure that always the correct contributor ID is returned
+    * and that it is not computed by the active diagram which fails
+    * for object diagrams opened from the symbolic execution tree view.
+    */
+   @Override
+   public String getContributorId() {
+      return CONTRIBUTOR_ID;
    }
 }

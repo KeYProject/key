@@ -41,5 +41,6 @@ public class KeYSEDPreferencesInitializer extends AbstractPreferenceInitializer 
       KeYSEDPreferences.setDefaultVariablesAreOnlyComputedFromUpdates(false);
       KeYSEDPreferences.setDefaultTruthValueEvaluationEnabled(false);
       KeYSEDPreferences.setDefaultHighlightReachedSourceCode(true);
+      KeYSEDPreferences.setDefaultGroupingEnabled(true);
    }
 }

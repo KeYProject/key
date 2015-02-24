@@ -31,12 +31,4 @@ public class GraphitiGroupStartConditionsPropertySection extends AbstractGraphit
    protected ISEDDebugNodeTabContent createContent() {
       return new GroupStartConditionsTabComposite();
    }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean shouldUseExtraSpace() {
-      return true;
-   }
 }
