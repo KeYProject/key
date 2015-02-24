@@ -558,6 +558,12 @@ public class ContractFactory {
              }
         }
 
+        /* (*) free preconditions are not joined because no sensible joining operator
+         * suggests itself. This is no problem, however, since combined contracts are only used
+         * for contract application and free preconditions are not used there.
+         * 2015, mu
+         */
+
         return new FunctionalOperationContractImpl(INVALID_ID,
                                                    nameSB.toString(),
                                                    t.kjt,
@@ -565,7 +571,7 @@ public class ContractFactory {
                                                    t.specifiedIn,
                                                    moda,
                                                    pres,
-                                                   new LinkedHashMap<LocationVariable, Term>(),
+                                                   new LinkedHashMap<LocationVariable, Term>(), // (*)
                                                    mby,
                                                    posts,
                                                    freePosts,
