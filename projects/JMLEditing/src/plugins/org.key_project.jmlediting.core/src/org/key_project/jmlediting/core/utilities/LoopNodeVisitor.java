@@ -19,18 +19,18 @@ public class LoopNodeVisitor extends ASTVisitor {
    @Override
    public boolean visit(final DoStatement node) {
       this.loopNodes.add(node);
-      return super.visit(node);
+      return true;
    }
 
    @Override
    public boolean visit(final WhileStatement node) {
       this.loopNodes.add(node);
-      return super.visit(node);
+      return true;
    }
 
    @Override
    public boolean visit(final ForStatement node) {
       this.loopNodes.add(node);
-      return super.visit(node);
+      return true;
    }
 }

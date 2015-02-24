@@ -11,7 +11,7 @@ public class JavaCodeVisitor extends GenericVisitor {
 
    public JavaCodeVisitor(final int commentEndOffset, final int loopOffset) {
       this.endOffsetOfComment = commentEndOffset;
-      this.loopOffset = this.loopOffset;
+      this.loopOffset = loopOffset;
       this.nodeAfterComment = null;
    }
 
@@ -22,7 +22,7 @@ public class JavaCodeVisitor extends GenericVisitor {
    @Override
    protected boolean visitNode(final ASTNode node) {
       if (node instanceof Comment) {
-         return super.visitNode(node);
+         return false;
       }
       if (node != null) {
          if (node.getStartPosition() > this.endOffsetOfComment
@@ -31,15 +31,15 @@ public class JavaCodeVisitor extends GenericVisitor {
                if (node.getStartPosition() < this.nodeAfterComment
                      .getStartPosition()) {
                   this.nodeAfterComment = node;
-                  return super.visitNode(node);
+                  return true;
                }
             }
             else {
                this.nodeAfterComment = node;
-               return super.visitNode(node);
+               return true;
             }
          }
       }
-      return super.visitNode(node);
+      return true;
    }
 }
