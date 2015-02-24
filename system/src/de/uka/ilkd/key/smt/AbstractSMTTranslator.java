@@ -1530,7 +1530,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 "Integer less or equal is not supported by this translator.");
 
         }
-
+        
+        
         /**
          * Translate the NULL element
          * 
@@ -2250,7 +2251,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                     subterms.add(arg2);
                                     
                                     return translateBprodFunction(term, subterms);
-                                } else {
+                                }  else {
                                     boolean bindsVars = false;
                                     for (int i = 0; i < fun.arity(); i++) {
                                         bindsVars = bindsVars || fun.bindVarsAt(i);

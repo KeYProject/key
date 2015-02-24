@@ -845,6 +845,15 @@ public final class WhileInvariantRule implements BuiltInRule {
             heapToBeforeLoop.get(heap).put(tb.var(heap), tb.var(lv));
         }
 
+        // This is needed because of the shallow access of \permission,
+        // heap references that are deeper than top-level have to be replaced to, but with heapBefore_....
+        final LocationVariable permissionHeap = services.getTypeConverter().getHeapLDT().getPermissionHeap();
+        if(permissionHeap != null && heapContext.contains(permissionHeap)) {
+            final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+            final Term baseHeapVar = services.getTermBuilder().var(baseHeap);
+            heapToBeforeLoop.get(permissionHeap).put(baseHeapVar, heapToBeforeLoop.get(baseHeap).get(baseHeapVar));
+        }
+
         for (ProgramVariable pv : localOuts) {
             final String pvBeforeLoopName
             = tb.newName(pv.name().toString() + "Before_LOOP");

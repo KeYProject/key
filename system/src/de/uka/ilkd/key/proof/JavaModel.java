@@ -17,6 +17,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
+import de.uka.ilkd.key.proof.init.Includes;
 
 public final class JavaModel {
 
@@ -26,6 +27,7 @@ public final class JavaModel {
     private final String classPath;
     private final List<File> classPathEntries;
     private final String bootClassPath;
+    private final String includedFiles;
     private final File initialFile;
    
     public static final JavaModel NO_MODEL = new JavaModel();
@@ -38,6 +40,7 @@ public final class JavaModel {
     public static JavaModel createJavaModel(String javaPath,
                                       List<File> classPath,
                                       File bootClassPath,
+                                      Includes includes,
                                       File initialFile) {
         JavaModel result;
         if(javaPath == null) {
@@ -46,6 +49,7 @@ public final class JavaModel {
             result = new JavaModel(javaPath,
                                    classPath,
                                    bootClassPath,
+                                   includes,
                                    initialFile);
         }
         return result;
@@ -59,12 +63,14 @@ public final class JavaModel {
 	classPath = null;
    classPathEntries = null;
 	bootClassPath = null;
+	includedFiles = null;
 	initialFile = null;
     }
 
     private JavaModel(String modelDir, 
 	    	     List<File> classPathEntries,
 	    	     File bootClassPath,
+	    	     Includes includes,
 	     	     File initialFile) {
 	this.modelDir = (new File(modelDir)).getAbsolutePath();
 	this.modelTag = "KeY_" + Long.valueOf((new java.util.Date()).getTime());
@@ -73,7 +79,7 @@ public final class JavaModel {
 	StringBuffer sb = new StringBuffer();
 	if(classPathEntries != null && !classPathEntries.isEmpty()) {
 	    for(File f : classPathEntries) {
-		sb.append(f.getAbsolutePath() + ", ");
+		sb.append("\"" + f.getAbsolutePath() + "\", ");
 	    }
 	    sb.setLength(sb.length() - 2);
 	}
@@ -82,6 +88,17 @@ public final class JavaModel {
 	this.bootClassPath = bootClassPath == null 
 	                     ? null 
 	                     : bootClassPath.getAbsolutePath();
+	StringBuffer sb2 = new StringBuffer();
+	if(includes != null) {
+		List<File> includeList = includes.getFiles();
+		if(!includeList.isEmpty()) {
+		    for(File f : includeList) {
+				sb2.append("\"" + f.getAbsolutePath() + "\", ");
+			    }
+			    sb2.setLength(sb2.length() - 2);
+	    }
+	}
+	includedFiles = sb2.toString();
 	this.initialFile = initialFile;
     }
    
@@ -103,6 +120,10 @@ public final class JavaModel {
 
    public String getBootClassPath() {
 	return bootClassPath;
+    }
+
+   public String getIncludedFiles() {
+	return includedFiles;
     }
    
     public File getInitialFile() {

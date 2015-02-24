@@ -48,8 +48,8 @@ public class KeYFileChooser {
 
     private File resetFile = null;
 
-    private KeYFileChooser(String initDir) {
-        fileChooser = new JFileChooser(new File(initDir)) {
+    private KeYFileChooser(File initDir) {
+        fileChooser = new JFileChooser(initDir) {
             private static final long serialVersionUID = -7598570660247063980L;
 
             public void approveSelection() {
@@ -207,10 +207,7 @@ public class KeYFileChooser {
      */
     public static KeYFileChooser getFileChooser(String title) {
         if (INSTANCE == null) {
-            String initDir = Main.getFileNameOnStartUp() == null 
-                             ? System.getProperty("user.dir")
-                             : Main.getFileNameOnStartUp();
-                             
+            File initDir = Main.getWorkingDir();
             INSTANCE = new KeYFileChooser(initDir);
         }
         
