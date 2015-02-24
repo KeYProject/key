@@ -5,9 +5,10 @@
       <term term="InstanceCreationTest::select(heap,self,InstanceCreationTest::$next)"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in {}">
-      <association name="self {true}" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
+      <value name="exc" programVariable="exc" isArrayIndex="false" value="exc" type="java.lang.Throwable" condition="true"/>
+      <association name="self" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="self" type="InstanceCreationTest">
-      <association name="next {true}" programVariable="next" isArrayIndex="false" target="o1" condition="true"/>
+      <association name="next" programVariable="next" isArrayIndex="false" target="o1" condition="true"/>
    </object>
 </model>

@@ -18,6 +18,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
@@ -712,6 +713,12 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             }
             assertEquals(expectedProofClosed, node.isClosed());
             // Make sure that start stop auto mode buttons are as expected
+            if (expectedProofClosed) {
+               bot.waitWhile(Conditions.widgetIsEnabled(bot.toolbarButtonWithTooltip("Start Auto Mode")));
+            }
+            else {
+               bot.waitUntil(Conditions.widgetIsEnabled(bot.toolbarButtonWithTooltip("Start Auto Mode")));
+            }
             assertEquals(!expectedProofClosed, bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
             assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
          }

@@ -58,29 +58,29 @@ public class AbstractSWTBotVariablesPropertyTabTest extends AbstractSetupTestCas
          SWTBotView propertiesView = TestUtilsUtil.getPropertiesView(bot);
          steps.initializeLaunch(TestSedCoreUtil.getFirstLaunch(debugTree));
          // Make sure that all nodes to test are loaded and that the automatic selection set to the debug target by the Debug API is done.
-         selectStatement(debugTree);
+         selectStatement(debugView);
          Thread.sleep(1000); // Some extra time for the Debug API to set the selection
          TestUtilsUtil.waitForJobs();
          // Get variables view
-         selectStatement(debugTree); // Because selection might have changed in between
+         selectStatement(debugView); // Because selection might have changed in between
          SWTBotView variablesView = TestSedCoreUtil.getVariablesView(bot);
          variablesView.show();
          SWTBotTree variablesTree = variablesView.bot().tree();
          variablesView.bot().waitUntil(Conditions.treeHasRows(variablesTree, 2));
          // Select and test first variable
-         IVariable firstVariable = selectFirstVariable(variablesTree);
+         IVariable firstVariable = selectFirstVariable(variablesView);
          steps.assertFirstVariable(variablesTree, propertiesView, getPropertiesTabs(propertiesView), firstVariable);
          // Select and test second variable
-         IVariable secondVariable = selectSecondVariable(variablesTree);
+         IVariable secondVariable = selectSecondVariable(variablesView);
          steps.assertSecondVariable(variablesTree, propertiesView, getPropertiesTabs(propertiesView), secondVariable);
          // Select and test first variable again
-         IVariable firstVariableAgain = selectFirstVariable(variablesTree);
+         IVariable firstVariableAgain = selectFirstVariable(variablesView);
          steps.assertFirstVariable(variablesTree, propertiesView, getPropertiesTabs(propertiesView), firstVariableAgain);
          // Deselect variable
          variablesTree.select(new int[] {});
          steps.assertNoVariable(variablesTree, propertiesView, getPropertiesTabs(propertiesView));
          // Select and test second variable again
-         IVariable secondVariableAgain = selectSecondVariable(variablesTree);
+         IVariable secondVariableAgain = selectSecondVariable(variablesView);
          steps.assertSecondVariable(variablesTree, propertiesView, getPropertiesTabs(propertiesView), secondVariableAgain);
          
       }
@@ -93,24 +93,24 @@ public class AbstractSWTBotVariablesPropertyTabTest extends AbstractSetupTestCas
 
    /**
     * Selects the first {@link IVariable}.
-    * @param variablesTree The {@link SWTBotTree} to select in.
+    * @param variablesView The {@link SWTBotView} to select in.
     * @return The selected {@link IVariable}.
     * @throws Exception Occurred Exception.
     */
-   protected IVariable selectFirstVariable(SWTBotTree variablesTree) throws Exception {
-      Object data = selectInDebugTree(variablesTree, 0);
+   protected IVariable selectFirstVariable(SWTBotView variablesView) throws Exception {
+      Object data = selectInDebugTree(variablesView, 0);
       assertTrue(data instanceof IVariable);
       return (IVariable)data;
    }
 
    /**
     * Selects the second {@link IVariable}.
-    * @param variablesTree The {@link SWTBotTree} to select in.
+    * @param variablesView The {@link SWTBotView} to select in.
     * @return The selected {@link IVariable}.
     * @throws Exception Occurred Exception.
     */
-   protected IVariable selectSecondVariable(SWTBotTree variablesTree) throws Exception {
-      Object data = selectInDebugTree(variablesTree, 1);
+   protected IVariable selectSecondVariable(SWTBotView variablesView) throws Exception {
+      Object data = selectInDebugTree(variablesView, 1);
       assertTrue(data instanceof IVariable);
       return (IVariable)data;
    }
@@ -128,24 +128,25 @@ public class AbstractSWTBotVariablesPropertyTabTest extends AbstractSetupTestCas
 
    /**
     * Selects an {@link ISEDStatement}.
-    * @param debugTree The {@link SWTBotTree} to select in.
+    * @param debugView The {@link SWTBotView} to select in.
     * @return The selected {@link ISEDStatement}.
     * @throws Exception Occurred Exception.
     */
-   protected ISEDStatement selectStatement(SWTBotTree debugTree) throws Exception {
-      Object data = selectInDebugTree(debugTree, 0, 0, 0, 0);
+   protected ISEDStatement selectStatement(SWTBotView debugView) throws Exception {
+      Object data = selectInDebugTree(debugView, 0, 0, 0, 0);
       assertTrue(data instanceof ISEDStatement);
       return (ISEDStatement)data;
    }
    
    /**
     * Selects the element at the given index. 
-    * @param debugTree The {@link SWTBotTree} to select in.
+    * @param debugView The {@link SWTBotView} to select in.
     * @param indexPathToItem The path to the item to select.
     * @return The selected object.
+    * @throws Exception Occurred Exception.
     */
-   protected Object selectInDebugTree(SWTBotTree debugTree, int... indexPathToItem) {
-      SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, indexPathToItem);
+   protected Object selectInDebugTree(SWTBotView debugView, int... indexPathToItem) throws Exception {
+      SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, indexPathToItem);
       return TestUtilsUtil.getTreeItemData(item);
    }
 

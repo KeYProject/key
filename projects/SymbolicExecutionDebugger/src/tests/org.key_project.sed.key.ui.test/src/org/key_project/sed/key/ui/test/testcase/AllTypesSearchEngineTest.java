@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.key_project.sed.key.ui.jdt.AllTypesSearchEngine;
@@ -166,12 +167,18 @@ public class AllTypesSearchEngineTest extends AbstractSetupTestCase {
      * Compares the found types with the expected one.
      * @param result The found {@link IType}.
      * @param expectedTypes The expected type full qualified names.
+     * @throws JavaModelException Occurred Exception
      */
-    public void doCompareTestResult(IType[] result, String... expectedTypes) {
+    public void doCompareTestResult(IType[] result, String... expectedTypes) throws JavaModelException {
         assertNotNull(result);
         assertEquals(expectedTypes.length, result.length);
         for (int i = 0; i < result.length; i++) {
-            assertEquals(expectedTypes[i], result[i].getFullyQualifiedName());
+            String name = result[i].getFullyQualifiedName();
+            // Since Eclipse 4.2 result[i].getFullyQualifiedName() returns wrong getOccurrenceCount() of anonymous types
+            if (result[i].isAnonymous()) {
+               name = name.substring(0, name.lastIndexOf("$") + 1) + result[i].getOccurrenceCount();
+            }
+            assertEquals(expectedTypes[i], name);
         }
     }
 }

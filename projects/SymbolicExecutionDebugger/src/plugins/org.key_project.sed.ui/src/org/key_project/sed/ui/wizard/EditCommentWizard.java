@@ -58,6 +58,7 @@ public class EditCommentWizard extends Wizard {
     */
    public static int openWizard(Shell parentShell, CommentAnnotationLink link) {
       WizardDialog dialog = new WizardDialog(parentShell, new EditCommentWizard(link));
+      dialog.setHelpAvailable(false);
       return dialog.open();
    }
 }

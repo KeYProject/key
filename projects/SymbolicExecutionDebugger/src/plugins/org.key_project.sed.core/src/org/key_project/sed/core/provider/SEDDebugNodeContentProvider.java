@@ -206,8 +206,15 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
             }
          }
          else {
-            Object[] children = ((ISEDDebugNode)parent).getChildren();
-            return children != null ? children : EMPTY;
+            if (parent instanceof ISEDGroupable &&
+                ((ISEDGroupable) parent).isCollapsed()) {
+               ISEDBranchCondition[] endConditions = ((ISEDGroupable) parent).getGroupEndConditions();
+               return endConditions != null ? endConditions : EMPTY;
+            }
+            else {
+               Object[] children = ((ISEDDebugNode)parent).getChildren();
+               return children != null ? children : EMPTY;
+            }
          }
       }
       else {
@@ -227,7 +234,12 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
       if (node != null) {
          ISEDDebugNode parent = node.getParent();
          if (parent != null) {
-            if (parent.getChildren().length >= 2) {
+            if (parent instanceof ISEDGroupable &&
+                ((ISEDGroupable) parent).isCollapsed() &&
+                ((ISEDGroupable) parent).getGroupEndConditions().length >= 2) {
+               return false;
+            }
+            else if (parent.getChildren().length >= 2) {
                return false;
             }
             else {
@@ -255,9 +267,13 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
     */
    protected Object[] getCompactChildren(ISEDDebugNode node) throws DebugException {
       if (node != null) {
-         ISEDDebugNode[] children = node.getChildren();
+         ISEDDebugNode[] children = node instanceof ISEDGroupable && ((ISEDGroupable) node).isCollapsed() ?
+                                    ((ISEDGroupable) node).getGroupEndConditions() :
+                                    node.getChildren();
          if (children != null && children.length == 1) {
-            ISEDDebugNode[] childChildren = children[0].getChildren();
+            ISEDDebugNode[] childChildren = children[0] instanceof ISEDGroupable && ((ISEDGroupable) children[0]).isCollapsed() ?
+                                            ((ISEDGroupable) children[0]).getGroupEndConditions() :
+                                            children[0].getChildren();
             if (childChildren != null && childChildren.length == 1) {
                return ArrayUtil.addAll(children, getCompactChildren(children[0]), ISEDDebugNode.class);
             }
@@ -286,10 +302,10 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
          return ((ISEDThread)element).getDebugTarget();
       }
       else if (element instanceof ISEDDebugNode) {
-         ISEDDebugNode parent = ((ISEDDebugNode)element).getParent();
+         ISEDDebugNode parent = getShownParent((ISEDDebugNode) element);
          if (SEDPreferenceUtil.isShowCompactExecutionTree()) {
             while (isCompactNode(parent)) {
-               parent = parent.getParent();
+               parent = getShownParent(parent);
             }
          }
          return parent;
@@ -297,6 +313,31 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
       else {
          return null;
       }
+   }
+   
+   /**
+    * Returns the shown parent of the given {@link ISEDDebugNode} which
+    * is {@link ISEDDebugNode#getParent()} in case that the start node is not
+    * collapsed or the outer most visible parent.
+    * @param node The {@link ISEDDebugNode} to compute its parent.
+    * @return The computed parent or {@code null} if the node has no parent.
+    * @throws DebugException Occurred Exception.
+    */
+   protected ISEDDebugNode getShownParent(ISEDDebugNode node) throws DebugException {
+      ISEDBranchCondition[] startConditions = node.getGroupStartConditions();
+      ISEDDebugNode parent = null;
+      if (startConditions != null) {
+         int i = 0;
+         while (parent == null && i < startConditions.length) {
+            ISEDDebugNode startNode = startConditions[i].getParent();
+            if (startNode instanceof ISEDGroupable &&
+                ((ISEDGroupable) startNode).isCollapsed()) {
+               parent = startConditions[i];
+            }
+            i++;
+         }
+      }
+      return parent != null ? parent : node.getParent();
    }
 
    /**

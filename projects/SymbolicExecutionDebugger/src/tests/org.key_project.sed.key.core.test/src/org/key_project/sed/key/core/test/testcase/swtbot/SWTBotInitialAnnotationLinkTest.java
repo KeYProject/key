@@ -51,7 +51,7 @@ public class SWTBotInitialAnnotationLinkTest extends AbstractKeYDebugTargetTestC
             annotation.setSearch("=");
             target.registerAnnotation(annotation);
             // Get debug target TreeItem
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
             resume(bot, item, target);
             // Test annotation
             ISEDAnnotationLink[] links = annotation.getLinks();

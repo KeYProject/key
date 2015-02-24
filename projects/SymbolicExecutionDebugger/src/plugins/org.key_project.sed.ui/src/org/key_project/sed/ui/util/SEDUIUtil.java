@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -65,14 +66,11 @@ import org.key_project.sed.ui.action.ISEDAnnotationAction;
 import org.key_project.sed.ui.action.ISEDAnnotationLinkAction;
 import org.key_project.sed.ui.action.ISEDAnnotationLinkEditAction;
 import org.key_project.sed.ui.edit.ISEDAnnotationEditor;
-import org.key_project.util.eclipse.JobUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
-import org.key_project.util.eclipse.job.ScheduledJobCollector;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
@@ -176,7 +174,7 @@ public final class SEDUIUtil {
                         try {
                            monitor.beginTask(getName(), IProgressMonitor.UNKNOWN);
                            monitor.subTask("Collecting unknown elements");
-                           Deque<Object> expandQue = collectUnknownElementsInParentHierarchy(treeViewer, element, monitor);
+                           Deque<Object> expandQue = collectUnknownElementsInParentHierarchy(treeViewer, element);
                            monitor.beginTask(getName(), expandQue.size() + 1);
                            monitor.subTask("Expanding unknown elements");
                            injectElements(treeViewer, expandQue, monitor);
@@ -187,7 +185,7 @@ public final class SEDUIUtil {
                      }
                   }
                   // Select new elements
-                  monitor.subTask("Select element");
+                  monitor.beginTask("Select element", 1);
                   ISelection newSelection = SWTUtil.createSelection(selection);
                   SWTUtil.select(debugViewer, newSelection, true);
                   monitor.worked(1);
@@ -248,9 +246,9 @@ public final class SEDUIUtil {
                      try {
                         SWTUtil.checkCanceled(monitor);
                         monitor.subTask("Collecting unknown elements");
-                        Deque<Object> expandQue = collectUnknownElementsInParentHierarchy(treeViewer, element, monitor);
+                        Deque<Object> expandQue = collectUnknownElementsInParentHierarchy(treeViewer, element);
                         monitor.subTask("Injecting unknown elements");
-                        injectElements(treeViewer, expandQue, monitor);
+                        injectElements(treeViewer, expandQue, new NullProgressMonitor());
                         monitor.worked(1);
                      }
                      catch (DebugException e) {
@@ -308,14 +306,12 @@ public final class SEDUIUtil {
     * </p>
     * @param treeViewer The {@link TreeViewer} to search in.
     * @param element The element to start search for unknown elements.
-    * @param monitor The {@link IProgressMonitor} to use.
     * @return A {@link Deque} which contains all unknown elements in order from root to given element.
     * @throws DebugException Occurred Exception.
     */
-   protected static Deque<Object> collectUnknownElementsInParentHierarchy(final TreeViewer treeViewer, Object element, IProgressMonitor monitor) throws DebugException {
+   protected static Deque<Object> collectUnknownElementsInParentHierarchy(final TreeViewer treeViewer, Object element) throws DebugException {
       Deque<Object> expandQue = new LinkedList<Object>();
       while (element != null) {
-         SWTUtil.checkCanceled(monitor);
          // Check if the element is unknown in tree
          if (isUnknownInTreeViewer(treeViewer, element)) {
             // Element is not known, add to deque and continue with parent.
@@ -338,20 +334,15 @@ public final class SEDUIUtil {
     * @return {@code true} is unknown, {@code false} is known.
     */
    protected static boolean isUnknownInTreeViewer(final TreeViewer treeViewer, final Object toTest) {
-      if (!treeViewer.getControl().isDisposed()) {
-         IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
-            @Override
-            public void run() {
-               Widget item = treeViewer.testFindItem(toTest);
-               setResult(item == null);
-            }
-         };
-         treeViewer.getControl().getDisplay().syncExec(run);
-         return run.getResult() != null && run.getResult().booleanValue();
-      }
-      else {
-         return false;
-      }
+      IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+         @Override
+         public void run() {
+            Widget item = treeViewer.testFindItem(toTest);
+            setResult(item == null);
+         }
+      };
+      treeViewer.getControl().getDisplay().syncExec(run);
+      return run.getResult() != null && run.getResult().booleanValue();
    }
    
    /**
@@ -402,10 +393,9 @@ public final class SEDUIUtil {
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception
     */
-   protected static void injectElements(final TreeViewer treeViewer, 
+   protected static void injectElements(TreeViewer treeViewer, 
                                         Deque<Object> injectQue,
-                                        final IProgressMonitor monitor) throws DebugException {
-      SWTUtil.checkCanceled(monitor);
+                                        IProgressMonitor monitor) throws DebugException {
       // Check if something must be done
       if (!CollectionUtil.isEmpty(injectQue)) {
          // Check if the provider is of the expected form.
@@ -429,72 +419,33 @@ public final class SEDUIUtil {
                if (viewIndex >= 0) {
                   // Create tree path to current element
                   final TreePath tp = new TreePath(tpElements.toArray());
-                  // Create job collector to collect update jobs started by the Debug API
-                  IFilter<Job> jobFilter = new IFilter<Job>() {
+                  // Inject the element into the TreeViewer
+                  runInViewerThread(treeViewer, lazyContentProvider, new AbstractRunnableWithException() {
                      @Override
-                     public boolean select(Job element) {
-                        String className = element.getClass().getName();
-                        return className.startsWith("org.eclipse.debug") ||
-                               className.startsWith("org.eclipse.ui.internal.progress");
-                     }
-                  };
-                  ScheduledJobCollector collector = new ScheduledJobCollector(jobFilter);
-                  try {
-                     // Start collecting update jobs started by the debug view
-                     collector.start();
-                     IRunnableWithException run = new AbstractRunnableWithException() {
-                        @Override
-                        public void run() {
-                           try {
-                              // Inject the element into the TreeViewer
-                              lazyContentProvider.updateChildCount(tp, 0);
-                              lazyContentProvider.updateElement(tp, viewIndex);
-                           }
-                           catch (Exception e) {
-                              setException(e);
-                           }
+                     public void run() {
+                        try {
+                           lazyContentProvider.updateChildCount(tp, 0);
                         }
-                     };
-                     if (!treeViewer.getControl().isDisposed()) {
-                        treeViewer.getControl().getDisplay().syncExec(run);
-                        if (run.getException() != null) {
-                           throw new DebugException(LogUtil.getLogger().createErrorStatus(run.getException().getMessage(), run.getException()));
+                        catch (Exception e) {
+                           setException(e);
                         }
                      }
-                     else {
-                        monitor.setCanceled(true);
+                  });
+                  runInViewerThread(treeViewer, lazyContentProvider, new AbstractRunnableWithException() {
+                     @Override
+                     public void run() {
+                        try {
+                           lazyContentProvider.updateElement(tp, viewIndex);
+                        }
+                        catch (Exception e) {
+                           setException(e);
+                        }
                      }
-                  }
-                  finally {
-                     // Stop collecting update jobs
-                     collector.stop();
-                  }
-                  // Wait until all update jobs have finished before
-                  Job[] jobs = collector.getJobs();
-                  for (Job job : jobs) {
-                     SWTUtil.checkCanceled(monitor);
-                     JobUtil.waitFor(job, 10);
-                  }
-                  // Wait until the element is known by the viewer since sometimes waiting for jobs is not enough.
-                  int numOfTries = 0;
-                  while (!treeViewer.getControl().isDisposed() &&
-                         SWTUtil.testFindItem(treeViewer, toInject) == null &&
-                         numOfTries < 200) { // Try at most for two seconds
-                     SWTUtil.checkCanceled(monitor);
-                     try {
-                        Thread.sleep(10);
-                     }
-                     catch (InterruptedException e) {
-                        // Nothing to do.
-                     }
-                     finally {
-                        numOfTries++;
-                     }
-                  }
+                  });
                   // Update tree path for next loop iteration
                   tpElements.add(toInject);
                   // Update monitor
-                  monitor.worked(1);                  
+                  monitor.worked(1);                
                }
                else {
                   // Something has changed in between and injection is not possible.
@@ -504,7 +455,79 @@ public final class SEDUIUtil {
          }
       }
    }
+   
+   /**
+    * Executes the given {@link IRunnableWithResult} and waits until
+    * the {@link ILazyTreeContentProvider} has done his work. 
+    * @param treeViewer The {@link TreeViewer} to use.
+    * @param lazyContentProvider The {@link ILazyTreePathContentProvider} to use.
+    * @param run The {@link IRunnableWithException} to execute.
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void runInViewerThread(TreeViewer treeViewer, 
+                                           ILazyTreePathContentProvider lazyContentProvider, 
+                                           IRunnableWithException run) throws DebugException {
+      treeViewer.getControl().getDisplay().syncExec(run);
+      if (run.getException() != null) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(run.getException().getMessage(), run.getException()));
+      }
+      // Wait until all pending requests in content provider are done
+      waitForPendingRequests(treeViewer, lazyContentProvider);
+   }
 
+   /**
+    * Blocks the current thread until the given {@link ILazyTreeContentProvider}
+    * has no pending requests.
+    * @param treeViewer The {@link TreeViewer} to use.
+    * @param lazyContentProvider The {@link ILazyTreeContentProvider} to wait for.
+    * @throws DebugException Occurred Exception.
+    */
+   public static void waitForPendingRequests(TreeViewer treeViewer, 
+                                             ILazyTreePathContentProvider lazyContentProvider) throws DebugException {
+      while (hasPendingRequests(treeViewer, lazyContentProvider)) {
+         try {
+            Thread.sleep(10);
+         }
+         catch (InterruptedException e) {
+         }
+      }
+   }
+
+   /**
+    * Checks if the given {@link ILazyTreeContentProvider} has pending requests.
+    * @param treeViewer The {@link TreeViewer} to use.
+    * @param lazyContentProvider The {@link ILazyTreeContentProvider} to check.
+    * @return {@code true} has pending requests, {@code false} no pending requests.
+    * @throws DebugException Occurred Exception.
+    */
+   protected static boolean hasPendingRequests(TreeViewer treeViewer, 
+                                               final ILazyTreePathContentProvider lazyContentProvider) throws DebugException {
+      if (lazyContentProvider instanceof TreeModelContentProvider){
+         IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+            @Override
+            public void run() {
+               try {
+                  synchronized (lazyContentProvider) {
+                     Boolean result = ObjectUtil.invoke(lazyContentProvider, "areRequestsPending"); // Run in viewer thread in which all requests are scheduled.
+                     setResult(result);
+                  }
+               }
+               catch (Exception e) {
+                  setException(e);
+               }
+            }
+         };
+         treeViewer.getControl().getDisplay().syncExec(run);
+         if (run.getException() != null) {
+            throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't check if content provider \"" + lazyContentProvider + "\" has pending requests.", run.getException()));
+         }
+         return run.getResult() != null && run.getResult().booleanValue();
+      }
+      else {
+         return false;
+      }
+   }
+   
    /**
     * Returns all available annotation action descriptions.
     * @return All available annotation action descriptions.

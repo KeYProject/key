@@ -62,7 +62,8 @@ public abstract class AbstractProofEditorInput extends PlatformObject implements
                                    String name) {
       this.environment = environment;
       this.method = method;
-      this.storage = new TextStorage(StringUtil.EMPTY_STRING, name);
+      this.storage = new TextStorage(StringUtil.EMPTY_STRING, 
+                                     StringUtil.chop(name, 30)); // The name can't be longer than roughly 30 characters because otherwise the rendering of an IEditorPart will be really slow.
    }
 
    /** 

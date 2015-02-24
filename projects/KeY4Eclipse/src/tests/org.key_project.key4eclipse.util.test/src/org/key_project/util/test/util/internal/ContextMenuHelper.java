@@ -14,8 +14,6 @@
 package org.key_project.util.test.util.internal;
 
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withMnemonic;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.instanceOf;
 
 import java.util.Arrays;
 
@@ -33,6 +31,8 @@ import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.results.WidgetResult;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
 import org.hamcrest.Matcher;
+import org.hamcrest.core.AllOf;
+import org.hamcrest.core.IsInstanceOf;
 
 // see http://www.eclipse.org/forums/index.php/t/11863/
 public class ContextMenuHelper {
@@ -65,9 +65,8 @@ public class ContextMenuHelper {
                   
                   Menu menu = control.getMenu();
                   for (String text : texts) {
-                     @SuppressWarnings("unchecked")
-                     Matcher<?> matcher = allOf(
-                           instanceOf(MenuItem.class),
+                     Matcher<?> matcher = AllOf.allOf(
+                           IsInstanceOf.instanceOf(MenuItem.class),
                            withMnemonic(text));
                      menuItem = show(menu, x, y, matcher);
                      if (menuItem != null) {

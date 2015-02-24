@@ -21,10 +21,13 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
+import org.junit.Before;
 import org.junit.Test;
 import org.key_project.sed.key.core.test.util.TestBreakpointsUtil;
 import org.key_project.sed.key.ui.test.Activator;
@@ -32,9 +35,15 @@ import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 public class SWTBotAddKeYWatchpointTest extends TestCase {
-   public static final String ADD_WATCHPOINT_TOOLTIP = "Add a KeY Watchpoint.";
+   public static final String ADD_WATCHPOINT_ID = "org.key_project.sed.key.ui.addWatchpointCommand";
 
    private static boolean projectExists = false;
+
+   @Before
+   @Override
+   public void setUp() throws Exception {
+      TestUtilsUtil.closeWelcomeView();
+   }
 
    @Test
    public void testOpensDialog() throws Exception {
@@ -42,8 +51,9 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       if (!projectExists) {
          initializeProject();
       }
-      TestBreakpointsUtil.openBreakpointView(bot);
-      TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip(ADD_WATCHPOINT_TOOLTIP));
+      SWTBotView view = TestBreakpointsUtil.openBreakpointView(bot);
+      SWTBotToolbarButton addButton = TestUtilsUtil.getToolbarButtonWithId(view, ADD_WATCHPOINT_ID);
+      TestUtilsUtil.clickDirectly(addButton);
       SWTBotShell addWatchpointShell = bot.activeShell();
       assertEquals("Add KeY Watchpoint", addWatchpointShell.getText());
       TestUtilsUtil.clickDirectly(bot, "Cancel");
@@ -59,9 +69,9 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       if (!projectExists) {
          initializeProject();
       }
-      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-      TestUtilsUtil.clickDirectly(bot
-            .toolbarButtonWithTooltip(ADD_WATCHPOINT_TOOLTIP));
+      SWTBotView view = TestBreakpointsUtil.openBreakpointView(bot);
+      SWTBotToolbarButton addButton = TestUtilsUtil.getToolbarButtonWithId(view, ADD_WATCHPOINT_ID);
+      TestUtilsUtil.clickDirectly(addButton);
       bot.text(0).setText("invalidType");
       assertFalse(bot.button("OK").isEnabled());
       assertFalse(bot.styledText().isEnabled());
@@ -78,9 +88,9 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       if (!projectExists) {
          initializeProject();
       }
-      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-      TestUtilsUtil.clickDirectly(bot
-            .toolbarButtonWithTooltip(ADD_WATCHPOINT_TOOLTIP));
+      SWTBotView view = TestBreakpointsUtil.openBreakpointView(bot);
+      SWTBotToolbarButton addButton = TestUtilsUtil.getToolbarButtonWithId(view, ADD_WATCHPOINT_ID);
+      TestUtilsUtil.clickDirectly(addButton);
       bot.text(0).setText("EmptyTestClass");
       assertFalse(bot.button("OK").isEnabled());
       assertTrue(bot.styledText().isEnabled());
@@ -97,9 +107,9 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       if (!projectExists) {
          initializeProject();
       }
-      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-      TestUtilsUtil.clickDirectly(bot
-            .toolbarButtonWithTooltip(ADD_WATCHPOINT_TOOLTIP));
+      SWTBotView view = TestBreakpointsUtil.openBreakpointView(bot);
+      SWTBotToolbarButton addButton = TestUtilsUtil.getToolbarButtonWithId(view, ADD_WATCHPOINT_ID);
+      TestUtilsUtil.clickDirectly(addButton);
       bot.text(0).setText("EmptyTestClass");
       SWTBotStyledText styledText = bot.styledText(0);
       styledText.setText("     ");
@@ -117,8 +127,9 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       if (!projectExists) {
          initializeProject();
       }
-      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-      TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip(ADD_WATCHPOINT_TOOLTIP));
+      SWTBotView view = TestBreakpointsUtil.openBreakpointView(bot);
+      SWTBotToolbarButton addButton = TestUtilsUtil.getToolbarButtonWithId(view, ADD_WATCHPOINT_ID);
+      TestUtilsUtil.clickDirectly(addButton);
       bot.text(0).setText("EmptyTestClass");
       SWTBotStyledText styledText = bot.styledText(0);
       styledText.setText("anyNonEmptyCondition");
@@ -139,8 +150,9 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       IPath classPath = new Path(ResourcesPlugin.getWorkspace().getRoot().getRawLocation().toString() + "/SWTBotAddKeYWatchpointTest/src/EmptyTestClass.java");
       IFile classFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(classPath);
       TestUtilsUtil.openEditor(classFile);
-      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-      TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip(ADD_WATCHPOINT_TOOLTIP));
+      SWTBotView view = TestBreakpointsUtil.openBreakpointView(bot);
+      SWTBotToolbarButton addButton = TestUtilsUtil.getToolbarButtonWithId(view, ADD_WATCHPOINT_ID);
+      TestUtilsUtil.clickDirectly(addButton);
       SWTBotShell addWatchpointShell = bot.activeShell();
       assertEquals("EmptyTestClass", bot.text().getText());
       SWTBotStyledText styledText = bot.styledText();
@@ -164,8 +176,9 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       if (!projectExists) {
          initializeProject();
       }
-      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-      TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip(ADD_WATCHPOINT_TOOLTIP));
+      SWTBotView view = TestBreakpointsUtil.openBreakpointView(bot);
+      SWTBotToolbarButton addButton = TestUtilsUtil.getToolbarButtonWithId(view, ADD_WATCHPOINT_ID);
+      TestUtilsUtil.clickDirectly(addButton);
       SWTBotShell addWatchpointShell = bot.activeShell();
       TestUtilsUtil.clickDirectly(bot, "Browse");
       SWTBotShell dialogShell = bot.activeShell();
@@ -197,14 +210,15 @@ public class SWTBotAddKeYWatchpointTest extends TestCase {
       if (!projectExists) {
          initializeProject();
       }
-      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
-      assertFalse(bot.tree().hasItems());
-      TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip(ADD_WATCHPOINT_TOOLTIP));
+      SWTBotView view = TestBreakpointsUtil.openBreakpointView(bot);
+      assertFalse(view.bot().tree().hasItems());
+      SWTBotToolbarButton addButton = TestUtilsUtil.getToolbarButtonWithId(view, ADD_WATCHPOINT_ID);
+      TestUtilsUtil.clickDirectly(addButton);
       bot.text().setText("EmptyTestClass");
       SWTBotStyledText styledText = bot.styledText(0);
       styledText.setText("anyNonEmptyCondition");
       TestUtilsUtil.clickDirectly(bot, "OK");
-      TestUtilsUtil.openView("org.eclipse.debug.ui.BreakpointView");
+      TestBreakpointsUtil.openBreakpointView(bot);
       assertTrue(bot.tree().hasItems());
       assertEquals(1, bot.tree().getAllItems().length);
       // close all shells

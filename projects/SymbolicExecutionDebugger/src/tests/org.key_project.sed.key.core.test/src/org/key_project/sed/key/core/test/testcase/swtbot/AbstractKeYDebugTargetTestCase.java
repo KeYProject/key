@@ -836,7 +836,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.ALIAS_CHECK_NEVER));
             }
             // Get debug target TreeItem
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0); // Select first debug target
+            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0); // Select first debug target
             // Create tree
             if (stepIntoInsteadOfRun) {
                // Step into on each SET node

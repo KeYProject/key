@@ -38,7 +38,7 @@ public class SWTBotChangeAccessModification extends AbstractKeYDebugTargetTestCa
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {            
             // Get debug target TreeItem
             TestBreakpointsUtil.addSomeBreakpoints(CALLER_PATH, bot, 5, 3);
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0);
+            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
             resume(bot, item, target);
             assertTrue(TestBreakpointsUtil.checkTargetAccessAndModificationofAllBreakpoints(target, 2,2));
             assertTrue(TestBreakpointsUtil.checkProofAccessAndModificationofAllBreakpoints(target,  2,2));

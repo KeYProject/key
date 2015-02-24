@@ -145,6 +145,16 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
    }
    
    /**
+    * Ensures that all top level elements are shown which is required in Eclipse 4.4... :-(
+    */
+   public void injectTopLevelElements() {
+      int childCount = doUpdateChildCount(proof, -1);
+      for (int i = 0; i < childCount; i++) {
+         updateElement(proof, i);
+      }
+   }
+   
+   /**
     * {@inheritDoc}
     */
    @Override

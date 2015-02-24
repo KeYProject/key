@@ -11,7 +11,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.waits.Conditions;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorReference;
-import org.hamcrest.Matchers;
+import org.hamcrest.core.IsAnything;
 import org.key_project.key4eclipse.common.ui.testGeneration.EclipseTestGenerator;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.IOUtil;
@@ -37,7 +37,7 @@ public class AbstractGenerateTestsJobTest extends TestCase {
       // Test generated stuff
       IProject testProject = ResourcesPlugin.getWorkspace().getRoot().getProject(sourceProject.getProject().getName() + EclipseTestGenerator.TEST_PROJECT_SUFFIX);
       TestUtilsUtil.waitForProject(bot, testProject);
-      bot.waitUntil(Conditions.waitForEditor(Matchers.<IEditorReference>anything()));
+      bot.waitUntil(Conditions.waitForEditor(new IsAnything<IEditorReference>()));
       assertTrue(testProject.exists());
       assertTrue(testProject.isOpen());
       // Test library folder

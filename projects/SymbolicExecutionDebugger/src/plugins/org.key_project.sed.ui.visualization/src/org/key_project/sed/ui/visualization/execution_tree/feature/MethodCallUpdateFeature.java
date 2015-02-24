@@ -29,7 +29,7 @@ public class MethodCallUpdateFeature extends AbstractDebugNodeUpdateFeature {
    public MethodCallUpdateFeature(IFeatureProvider fp) {
       super(fp);
    }
-
+   
    /**
     * {@inheritDoc}
     */

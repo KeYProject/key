@@ -87,6 +87,11 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
    private Button highlightReachedSourceCodeButton;
    
    /**
+    * Defines if grouping is enabled or not.
+    */
+   private Button groupingEnabledButton;
+   
+   /**
     * Constructor.
     * @param parent The parent {@link Composite}.
     * @param style The style.
@@ -153,6 +158,14 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       truthValueEvaluationEnabledButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)", SWT.CHECK);
       truthValueEvaluationEnabledButton.setEnabled(isEditable());
       truthValueEvaluationEnabledButton.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateLaunchConfigurationDialog();
+         }
+      });
+      groupingEnabledButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "Group nodes", SWT.CHECK);
+      groupingEnabledButton.setEnabled(isEditable());
+      groupingEnabledButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
             updateLaunchConfigurationDialog();
@@ -250,6 +263,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
          variablesAreOnlyComputedFromUpdatesCombo.setText(KeySEDUtil.isVariablesAreOnlyComputedFromUpdates(configuration) ? "Based on sequent" : "Based on visible type structure");
          truthValueEvaluationEnabledButton.setSelection(KeySEDUtil.isTruthValueEvaluationEnabled(configuration));
          highlightReachedSourceCodeButton.setSelection(KeySEDUtil.isHighlightReachedSourceCode(configuration));
+         groupingEnabledButton.setSelection(KeySEDUtil.isGroupingEnabled(configuration));
          updatePrettyPrintingDependingEnabledStates();
          updateShowVariablesEnabledState();
       } 
@@ -273,6 +287,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       variablesAreOnlyComputedFromUpdatesCombo.setText(launchSettings.isVariablesAreOnlyComputedFromUpdates() ? "Based on sequent" : "Based on visible type structure");
       truthValueEvaluationEnabledButton.setSelection(launchSettings.isTruthValueEvaluationEnabled());
       highlightReachedSourceCodeButton.setSelection(launchSettings.isHighlightReachedSourceCode());
+      groupingEnabledButton.setSelection(launchSettings.isGroupingEnabled());
       updatePrettyPrintingDependingEnabledStates();
       updateShowVariablesEnabledState();
    }
@@ -292,5 +307,6 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_VARIABLES_ARE_COMPUTED_FROM_UPDATES, "Based on sequent".equals(variablesAreOnlyComputedFromUpdatesCombo.getText()));
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, truthValueEvaluationEnabledButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, highlightReachedSourceCodeButton.getSelection());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_GROUPING_ENABLED, groupingEnabledButton.getSelection());
    }
 }

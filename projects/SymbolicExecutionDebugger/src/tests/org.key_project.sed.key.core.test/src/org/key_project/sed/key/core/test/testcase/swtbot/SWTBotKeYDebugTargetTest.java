@@ -1187,7 +1187,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             // Make sure that the debug target is in the initial state.
             TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.computeTargetName(method));
             // Resume launch
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0); // Select first debug target
+            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0); // Select first debug target
             item.contextMenu("Resume").click();
             SuspendingStopCondition sc = new SuspendingStopCondition(true, 1, 1000);
             ((KeYDebugTarget)target).getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(sc);
@@ -1509,7 +1509,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             }
             else {
                // Disconnect
-               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, pathToElementInDebugTreeWhichProvidesDisconnectMenuItem); // Select first debug target
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, pathToElementInDebugTreeWhichProvidesDisconnectMenuItem); // Select first debug target
                item.contextMenu("Disconnect").click();
             }
             assertTrue(launch instanceof IDisconnect);
@@ -1623,7 +1623,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
             }
             // Terminate launch
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, pathToElementInDebugTreeWhichProvidesTerminateMenuItem); // Select first launch
+            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, pathToElementInDebugTreeWhichProvidesTerminateMenuItem); // Select first launch
             item.contextMenu("Terminate").click();
             TestSedCoreUtil.waitUntilLaunchIsTerminated(bot, launch);
             assertFalse(launch.canTerminate());

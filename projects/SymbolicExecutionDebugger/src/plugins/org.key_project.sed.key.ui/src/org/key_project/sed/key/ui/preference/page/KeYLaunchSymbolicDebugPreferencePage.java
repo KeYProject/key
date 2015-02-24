@@ -75,6 +75,8 @@ public class KeYLaunchSymbolicDebugPreferencePage extends FieldEditorPreferenceP
       addField(sigEdit);
       BooleanFieldEditor truthEvaluationEdit = new BooleanFieldEditor(KeYSEDPreferences.TRUTH_VALUE_EVALUATION_ENABLED, "Truth value evaluation enabled (EXPERIMENTAL, not all rules are correctly supported)", SWT.NONE, spacer);
       addField(truthEvaluationEdit);
+      BooleanFieldEditor groupingEdit = new BooleanFieldEditor(KeYSEDPreferences.GROUPING_ENABLED, "Group nodes", SWT.NONE, spacer);
+      addField(groupingEdit);
 
       group = SWTFactory.createGroup(getFieldEditorParent(), "Variables", 1, 1, GridData.FILL_HORIZONTAL);
       final Composite variablesSpacer = SWTFactory.createComposite(group, 2, 1, GridData.FILL_HORIZONTAL);
