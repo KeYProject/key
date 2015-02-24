@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.speclang;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -407,6 +408,16 @@ public class ContractFactory {
            }
         }
 
+        Map<LocationVariable,Term> freePosts =
+                new LinkedHashMap<LocationVariable, Term>(t.originalFreePosts.size());
+        for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+           Term oriPost = t.originalFreePosts.get(h);
+           if(oriPost != null) {
+               freePosts.put(h,tb.imp(atPreify(t.originalPres.get(h),
+                        t.originalAtPreVars), oriPost));
+           }
+        }
+
         Map<LocationVariable,Term> axioms = new LinkedHashMap<LocationVariable,Term>();
         if(t.originalAxioms != null) { // TODO: what about the others?
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
@@ -449,6 +460,12 @@ public class ContractFactory {
                         t.originalExcVar,
                         t.originalAtPreVars,
                         services);
+                Term otherFreePost = other.getFreePost(h, t.originalSelfVar,
+                        t.originalParamVars,
+                        t.originalResultVar,
+                        t.originalExcVar,
+                        t.originalAtPreVars,
+                        services);
                 Term otherAxiom = other.getRepresentsAxiom(h, t.originalSelfVar,
                         t.originalParamVars,
                         t.originalResultVar,
@@ -471,6 +488,10 @@ public class ContractFactory {
                 if(otherPost != null) {
                     final Term oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
                     posts.put(h, posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost));
+                }
+                if(otherFreePost != null) {
+                    final Term oFreePost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
+                    posts.put(h, posts.get(h) == null ? oFreePost : tb.and(freePosts.get(h), oFreePost));
                 }
                 if(otherAxiom != null) {
                     final Term oAxiom = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherAxiom);
@@ -541,6 +562,12 @@ public class ContractFactory {
              }
         }
 
+        /* (*) free preconditions are not joined because no sensible joining operator
+         * suggests itself. This is no problem, however, since combined contracts are only used
+         * for contract application and free preconditions are not used there.
+         * 2015, mu
+         */
+
         return new FunctionalOperationContractImpl(INVALID_ID,
                                                    nameSB.toString(),
                                                    t.kjt,
@@ -548,8 +575,10 @@ public class ContractFactory {
                                                    t.specifiedIn,
                                                    moda,
                                                    pres,
+                                                   Collections.<LocationVariable,Term>emptyMap(), // (*)
                                                    mby,
                                                    posts,
+                                                   freePosts,
                                                    axioms,
                                                    mods,
                                                    deps,
