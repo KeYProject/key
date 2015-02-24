@@ -56,3 +56,4 @@ smt-solvers
 *.snm
 
 /projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.pdf
+/key/key.core/genSrc
