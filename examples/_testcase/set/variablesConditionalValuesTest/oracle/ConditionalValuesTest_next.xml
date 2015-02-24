@@ -84,6 +84,10 @@
                         <value name="b {true}" typeString="ConditionalValuesTest.Both" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="x" isArrayIndex="false">
                               <value name="x {equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),c_1)}" typeString="ConditionalValuesTest" valueString="c_1" isValueAnObject="true" isValueUnknown="false" conditionString="equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),c_1)">
+                                 <variable name="value" isArrayIndex="false">
+                                    <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
                               </value>
                               <value name="x {not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),c_1))}" typeString="ConditionalValuesTest" valueString="ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x)" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(ConditionalValuesTest::select(heap,b,ConditionalValuesTest.Both::$x),c_1))">
                                  <variable name="value" isArrayIndex="false">

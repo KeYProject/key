@@ -311,6 +311,7 @@ public final class ProblemInitializer {
         initConfig.getServices().setJavaModel(JavaModel.createJavaModel(javaPath,
                                                                         classPath,
                                                                         bootClassPath,
+                                                                        includes,
                                                                         initialFile));
     }
     
@@ -491,7 +492,7 @@ public final class ProblemInitializer {
        }
     }
     
-    public InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)throws ProofInputException{
+    private InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)throws ProofInputException{
         //create initConfig
     	InitConfig initConfig = referenceConfig.copy();
         

@@ -10,6 +10,7 @@
       <association name="self" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="self" type="SimpleLinkedOjbectsInstanceVariable">
+      <value name="value" programVariable="value" isArrayIndex="false" value="int::select(heap,self,SimpleLinkedOjbectsInstanceVariable::$value)" type="int" condition="true"/>
       <association name="next" programVariable="next" isArrayIndex="false" target="o1" condition="true"/>
    </object>
 </model>
