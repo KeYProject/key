@@ -112,6 +112,7 @@ public class UITestUtils {
       bot.sleep(100);
 
       bot.tree().getTreeItem("JML").select();
+      bot.sleep(100);
       bot.tree().getTreeItem("JML").expand().getNode("Profile").select();
    }
 

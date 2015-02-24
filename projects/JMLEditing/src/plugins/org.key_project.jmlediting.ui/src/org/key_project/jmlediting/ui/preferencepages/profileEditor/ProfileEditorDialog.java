@@ -36,18 +36,17 @@ public class ProfileEditorDialog extends StatusDialog {
       final Composite composite = (Composite) super.createDialogArea(parent);
 
       final Composite myComposite = new Composite(composite, SWT.NONE);
-      myComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+      myComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
       myComposite.setLayout(new GridLayout(1, false));
 
       final Label label = new Label(myComposite, SWT.NONE);
-      label.setText("Supported generic specifications");
+      label.setText("Supported Keywords");
       label.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
 
-      GridData data = new GridData(SWT.LEFT, SWT.TOP, true, false, 1, 1);
-      data.horizontalAlignment = SWT.FILL;
+      GridData data = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
 
-      this.supportedGenericSpecifications = new Table(myComposite, SWT.SINGLE
-            | SWT.FULL_SELECTION | SWT.BORDER);
+      this.supportedGenericSpecifications = new Table(myComposite, SWT.V_SCROLL
+            | SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION);
       this.supportedGenericSpecifications.setLayoutData(data);
       this.supportedGenericSpecifications.setHeaderVisible(true);
       this.supportedGenericSpecifications.setLinesVisible(true);

@@ -17,6 +17,8 @@ public abstract class AllKeywordsHighlightingTest {
    //@ represents i = numCalls + handledCalls;
    //@ represents j \such_that j==0;
    //@ private ghost java.lang.Double d1,d2,d3;
+   //@ protected ghost \real myReal;
+   //@ protected ghost \bigint myBigInt;
    
    /*@
      @ public normal_behavior

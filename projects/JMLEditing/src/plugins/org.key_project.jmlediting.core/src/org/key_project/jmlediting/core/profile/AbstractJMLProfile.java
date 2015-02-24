@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
+import org.key_project.jmlediting.core.validation.IJMLValidator;
 import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
@@ -176,6 +176,11 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
       }
       extensionSet.add(newValue);
       this.extensions.put(tKey, extensionSet);
+   }
+
+   @Override
+   public Set<IJMLValidator> getValidators() {
+      return Collections.emptySet();
    }
 
 }
