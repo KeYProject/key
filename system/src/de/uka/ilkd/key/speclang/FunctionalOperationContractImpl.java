@@ -76,8 +76,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     final KeYJavaType specifiedIn;
     final Modality modality;
     final Map<LocationVariable,Term> originalPres;
+    final Map<LocationVariable,Term> originalFreePres;
     final Term originalMby;
     final Map<LocationVariable,Term> originalPosts;
+    final Map<LocationVariable,Term> originalFreePosts;
     final Map<LocationVariable,Term> originalAxioms;
     final Map<LocationVariable,Term> originalMods;
     final Map<ProgramVariable, Term> originalDeps;
@@ -130,8 +132,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                     KeYJavaType specifiedIn,
                                     Modality modality,
                                     Map<LocationVariable,Term> pres,
+                                    Map<LocationVariable,Term> freePres,
                                     Term mby,
                                     Map<LocationVariable,Term> posts,
+                                    Map<LocationVariable,Term> freePosts,
                                     Map<LocationVariable,Term> axioms,
                                     Map<LocationVariable,Term> mods,
                                     Map<ProgramVariable, Term> accessibles,
@@ -150,6 +154,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert pm != null;
         assert pres != null;
         assert posts != null;
+        assert freePres != null;
+        assert freePosts != null;
         assert modality != null;
         assert (selfVar == null) == pm.isStatic();
         assert globalDefs == null || globalDefs.sort() == Sort.UPDATE;
@@ -175,8 +181,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         this.specifiedIn            = specifiedIn;
         this.modality               = modality;
         this.originalPres           = pres;
+        this.originalFreePres       = freePres;
         this.originalMby            = mby;
         this.originalPosts          = posts;
+        this.originalFreePosts      = freePosts;
         this.originalAxioms         = axioms;
         this.originalMods           = mods;
         this.originalDeps           = accessibles;
@@ -1311,8 +1319,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    specifiedIn,
                                                    modality,
                                                    originalPres,
+                                                   originalFreePres,
                                                    originalMby,
                                                    originalPosts,
+                                                   originalFreePosts,
                                                    originalAxioms,
                                                    originalMods,
                                                    originalDeps,
@@ -1341,8 +1351,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    specifiedIn,
                                                    modality,
                                                    originalPres,
+                                                   originalFreePres,
                                                    originalMby,
                                                    originalPosts,
+                                                   originalFreePosts,
                                                    originalAxioms,
                                                    originalMods,
                                                    originalDeps,

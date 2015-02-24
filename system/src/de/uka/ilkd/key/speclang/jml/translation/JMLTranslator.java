@@ -121,9 +121,11 @@ public final class JMLTranslator {
         ASSIGNABLE ("assignable"),
         DEPENDS ("depends"),
         ENSURES ("ensures"),
+        ENSURES_FREE ("ensures_free"),
         MODEL_METHOD_AXIOM ("model_method_axiom"),
         REPRESENTS ("represents"),
         REQUIRES ("requires"),
+        REQUIRES_FREE ("requires_free"),
         SIGNALS ("signals"),
         SIGNALS_ONLY ("signals_only"),
 
@@ -306,29 +308,21 @@ public final class JMLTranslator {
                         mby == null ? null : mby.getTerm());
             }
         });
-        translationMethods.put(JMLKeyWord.ENSURES, new JMLTranslationMethod() {
+        JMLTranslationMethod termTranslationMethod = new JMLTranslationMethod() {
 
             @Override
             public Term translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
                 checkParameters(params, Term.class, Services.class);
-                Term ensuresTerm = (Term) params[0];
-                TermServices services = (TermServices) params[1];
-                return tb.convertToFormula(ensuresTerm);
-            }
-        });
-        translationMethods.put(JMLKeyWord.MODEL_METHOD_AXIOM, new JMLTranslationMethod() {
-
-        	@Override
-        	public Term translate(SLTranslationExceptionManager excManager, Object... params)
-        	              throws SLTranslationException {
-        	    checkParameters(params, Term.class, Services.class);
-        	    Term axiomsTerm = (Term) params[0];
+                Term term = (Term) params[0];
         	    TermServices services = (TermServices) params[1];
-        	    return tb.convertToFormula(axiomsTerm);
+                return tb.convertToFormula(term);
         	}
-       });
+        };
+        translationMethods.put(JMLKeyWord.ENSURES, termTranslationMethod);
+        translationMethods.put(JMLKeyWord.ENSURES_FREE, termTranslationMethod);
+        translationMethods.put(JMLKeyWord.MODEL_METHOD_AXIOM, termTranslationMethod);
        translationMethods.put(JMLKeyWord.REPRESENTS,
                                new JMLTranslationMethod() {
 
@@ -346,18 +340,9 @@ public final class JMLTranslator {
                         t);
             }
         });
-        translationMethods.put(JMLKeyWord.REQUIRES, new JMLTranslationMethod() {
+        translationMethods.put(JMLKeyWord.REQUIRES, termTranslationMethod);
+        translationMethods.put(JMLKeyWord.REQUIRES_FREE, termTranslationMethod);
 
-            @Override
-            public Term translate(SLTranslationExceptionManager excManager,
-                                  Object... params)
-                    throws SLTranslationException {
-                checkParameters(params, Term.class, Services.class);
-                Term requiresTerm = (Term) params[0];
-                TermServices services = (TermServices) params[1];
-                return tb.convertToFormula(requiresTerm);
-            }
-        });
         translationMethods.put(JMLKeyWord.SIGNALS, new JMLTranslationMethod() {
 
             @Override

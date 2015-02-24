@@ -93,6 +93,7 @@ public class ContractFactory {
             foci.specifiedIn,
             foci.modality,
             foci.originalPres,
+
             foci.originalMby,
             newPosts,
             foci.originalAxioms,
@@ -313,14 +314,17 @@ public class ContractFactory {
                                              IProgramMethod pm,
                                              boolean terminates,
                                              Map<LocationVariable, Term> pres,
+                                             Map<LocationVariable, Term> freePres,
                                              Term mby,
                                              Map<LocationVariable, Term> posts,
+                                             Map<LocationVariable, Term> freePosts,
                                              Map<LocationVariable, Term> axioms,
                                              Map<LocationVariable, Term> mods,
                                              Map<ProgramVariable, Term> accessibles,
                                              Map<LocationVariable, Boolean> hasMod,
                                              ProgramVariableCollection pv) {
-        return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres, mby, posts, axioms,
+        return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres,
+                    freePres, mby, posts, freePosts, axioms,
                     mods, accessibles, hasMod, pv, false, mods.get(
                             services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
@@ -330,8 +334,10 @@ public class ContractFactory {
                                              IProgramMethod pm,
                                              Modality modality,
                                              Map<LocationVariable, Term> pres,
+                                             Map<LocationVariable, Term> freePres,
                                              Term mby,
                                              Map<LocationVariable, Term> posts,
+                                             Map<LocationVariable, Term> freePosts,
                                              Map<LocationVariable, Term> axioms,
                                              Map<LocationVariable, Term> mods,
                                              Map<ProgramVariable, Term> accessibles,
@@ -339,8 +345,9 @@ public class ContractFactory {
                                              ProgramVariableCollection progVars,
                                              boolean toBeSaved, boolean transaction) {
         return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm,
-                                                   pm.getContainerType(), modality, pres, mby,
-                                                   posts, axioms, mods, accessibles, hasMod,
+                                                   pm.getContainerType(), modality, pres, freePres,
+                                                   mby, posts, freePosts,
+                                                   axioms, mods, accessibles, hasMod,
                                                    progVars.selfVar, progVars.paramVars,
                                                    progVars.resultVar, progVars.excVar,
                                                    progVars.atPreVars, null,

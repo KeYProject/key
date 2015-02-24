@@ -63,7 +63,13 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
       requires = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
     private Map<String, ImmutableList<PositionedString>>
+      requiresFree = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+
+    private Map<String, ImmutableList<PositionedString>>
       ensures = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+
+    private Map<String, ImmutableList<PositionedString>>
+      ensuresFree = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
     private Map<String, ImmutableList<PositionedString>>
       axioms = new LinkedHashMap<String, ImmutableList<PositionedString>>();
@@ -316,6 +322,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return requires.get(hName);
     }
 
+    public ImmutableList<PositionedString> getRequiresFree(String hName) {
+        return requiresFree.get(hName);
+    }
+
     public ImmutableList<PositionedString> getMeasuredBy() {
         return measuredBy;
     }
@@ -343,6 +353,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public ImmutableList<PositionedString> getEnsures(String hName) {
         return ensures.get(hName);
+    }
+
+    public ImmutableList<PositionedString> getEnsuresFree(String hName) {
+        return ensuresFree.get(hName);
     }
 
     public ImmutableList<PositionedString> getAxioms() {
