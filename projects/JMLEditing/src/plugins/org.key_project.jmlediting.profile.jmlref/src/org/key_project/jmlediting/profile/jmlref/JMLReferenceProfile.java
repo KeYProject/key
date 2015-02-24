@@ -1,12 +1,12 @@
 package org.key_project.jmlediting.profile.jmlref;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
-import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
-import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.validation.IJMLValidator;
 import org.key_project.jmlediting.profile.jmlref.behavior.BehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.ExceptionalBehaviorKeyword;
@@ -76,23 +76,23 @@ public class JMLReferenceProfile extends AbstractJMLProfile {
                   new AccessibleKeyword(), new RequiresKeyword(),
                   new BehaviorKeyword(lang), new ExceptionalBehaviorKeyword(
                         lang), new NormalBehaviorKeyword(lang),
-                  new AlsoKeyword(), new HelperKeyword(), new PureKeyword(),
-                  new PrivateKeyword(), new ProtectedKeyword(),
-                  new PublicKeyword(), new SpecProtectedKeyword(),
-                  new SpecPublicKeyword(), new EverythingKeyword(),
-                  new NothingKeyword(), new NotSpecifiedKeyword(),
-                  new ResultKeyword(), new OldKeyword(), new SameKeyword(),
-                  new ForallQuantifierKeyword(),
-                  new ExistentialQuantifierKeyword(),
-                  new MinQuantifierKeyword(), new MaxQuantifierKeyword(),
-                  new ProductQuantifierKeyword(), new SumQuantifierKeyword(),
-                  new NumOfQuantifierKeyword(), new NonNullBoundModKeyword(),
-                  new NullableBoundModKeyword(), new InvariantKeyword(),
-                  new LoopInvariantKeyword(), new DecreasingKeyword(),
-                  new InvariantForKeyword(), new SuchThatKeyword(),
-                  new SetKeyword(), new ModelKeyword(), new GhostKeyword(),
-                  new RepresentsKeyword(), new NonNullKeyword(),
-                  new NullableKeyword()));
+                        new AlsoKeyword(), new HelperKeyword(), new PureKeyword(),
+                        new PrivateKeyword(), new ProtectedKeyword(),
+                        new PublicKeyword(), new SpecProtectedKeyword(),
+                        new SpecPublicKeyword(), new EverythingKeyword(),
+                        new NothingKeyword(), new NotSpecifiedKeyword(),
+                        new ResultKeyword(), new OldKeyword(), new SameKeyword(),
+                        new ForallQuantifierKeyword(),
+                        new ExistentialQuantifierKeyword(),
+                        new MinQuantifierKeyword(), new MaxQuantifierKeyword(),
+                        new ProductQuantifierKeyword(), new SumQuantifierKeyword(),
+                        new NumOfQuantifierKeyword(), new NonNullBoundModKeyword(),
+                        new NullableBoundModKeyword(), new InvariantKeyword(),
+                        new LoopInvariantKeyword(), new DecreasingKeyword(),
+                        new InvariantForKeyword(), new SuchThatKeyword(),
+                        new SetKeyword(), new ModelKeyword(), new GhostKeyword(),
+                        new RepresentsKeyword(), new NonNullKeyword(),
+                        new NullableKeyword()));
 
       this.getSupportedPrimariesInternal().addAll(
             Arrays.asList(new KeywordJMLPrimary(), new QuantifierPrimary()));
@@ -124,7 +124,8 @@ public class JMLReferenceProfile extends AbstractJMLProfile {
    public IJMLParser createParser() {
       return new DefaultJMLParser(this);
    }
-  @Override
+
+   @Override
    public Set<IJMLValidator> getValidators() {
       final Set<IJMLValidator> validator = new HashSet<IJMLValidator>();
       validator.add(new LoopInvariantValidator());
