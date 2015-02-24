@@ -157,7 +157,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
       
       for (Goal goal : proof.openEnabledGoals()) {
          
-         if (!hashBreakPoint(goal.sequent().succedent())) {
+         if (!hasBreakPoint(goal.sequent().succedent())) {
             continue;
          }
          
@@ -175,10 +175,10 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
             } else {
                break;
             }
-         } while (hashBreakPoint(goal.sequent().succedent()));
+         } while (hasBreakPoint(goal.sequent().succedent()));
          
          // Undo until a break condition is the first active statement again.
-         while (!hashBreakPoint(lastNode.sequent().succedent())) {
+         while (!hasBreakPoint(lastNode.sequent().succedent())) {
             lastNode = lastNode.parent();
             proof.pruneProof(lastNode);
          }
@@ -203,7 +203,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
     * @return true iff the given succedent has one formula with
     *   a break point statement.
     */
-   private boolean hashBreakPoint(Semisequent succedent) {
+   private boolean hasBreakPoint(Semisequent succedent) {
       for (SequentFormula formula : succedent.toList()) {
          if (blockElems.contains(
                JavaTools.getActiveStatement(
