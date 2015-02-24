@@ -78,4 +78,12 @@ public interface IJMLProfile {
     */
    IJMLParser createParser();
 
+   /**
+    * Returns a Set of Validators that this Profile provides.
+    *
+    * @return a Set of Validators the Profile provides or an Empty Set if there
+    *         are no Validators.
+    */
+   Set<IJMLValidator> getValidators();
+
 }

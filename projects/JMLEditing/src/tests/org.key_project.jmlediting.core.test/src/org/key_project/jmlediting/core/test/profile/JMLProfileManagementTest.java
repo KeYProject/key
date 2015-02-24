@@ -13,7 +13,7 @@ import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
-
+import org.key_project.jmlediting.core.validation.IJMLValidator;
 public class JMLProfileManagementTest {
 
    private static class DummyProfile implements IJMLProfile {
@@ -59,6 +59,12 @@ public class JMLProfileManagementTest {
 
       @Override
       public <T> Set<T> getExtensions(final Object key, final Class<T> clazz) {
+         return Collections.emptySet();
+      }
+
+      @Override
+      public Set<IJMLValidator> getValidators() {
+         // TODO Auto-generated method stub
          return Collections.emptySet();
       }
 

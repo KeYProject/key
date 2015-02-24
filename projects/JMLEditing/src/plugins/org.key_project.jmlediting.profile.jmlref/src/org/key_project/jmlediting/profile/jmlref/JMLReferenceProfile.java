@@ -5,6 +5,9 @@ import java.util.Arrays;
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
+import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
+import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.validation.IJMLValidator;
 import org.key_project.jmlediting.profile.jmlref.behavior.BehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.ExceptionalBehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.NormalBehaviorKeyword;
@@ -44,6 +47,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.Everythin
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.NotSpecifiedKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.NothingKeyword;
 import org.key_project.jmlediting.profile.jmlref.usercontent.SpecExpressionContentDescription;
+import org.key_project.jmlediting.profile.jmlref.validator.LoopInvariantValidator;
 import org.key_project.jmlediting.profile.jmlref.visibility.PrivateKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.ProtectedKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.PublicKeyword;
@@ -120,5 +124,10 @@ public class JMLReferenceProfile extends AbstractJMLProfile {
    public IJMLParser createParser() {
       return new DefaultJMLParser(this);
    }
-
+  @Override
+   public Set<IJMLValidator> getValidators() {
+      final Set<IJMLValidator> validator = new HashSet<IJMLValidator>();
+      validator.add(new LoopInvariantValidator());
+      return validator;
+   }
 }
