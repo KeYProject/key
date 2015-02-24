@@ -84,8 +84,10 @@
   </target>
 
   <target name="clean">
-	<delete failonerror="true" includeemptydirs="true"> 
-		<fileset dir="${build.dir}" includes="**/*"/>
+	<delete failonerror="false" includeemptydirs="true"> 
+		<fileset dir="${build.dir}" includes="**/*">
+			<excludesfile name="readme.txt"/>
+		</fileset>
 		<fileset dir="${gen.dir}" includes="**/*"/>
 	</delete>
   </target>
