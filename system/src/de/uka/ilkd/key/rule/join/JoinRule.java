@@ -341,8 +341,8 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
                   JavaProgramElement ownProgramElem     = ownSEState.third.javaBlock().program();
                   JavaProgramElement partnerProgramElem = partnerSEState.third.javaBlock().program();
                   
-                  Term ownPostCond     = ownSEState.third.sub(0);
-                  Term partnerPostCond = partnerSEState.third.sub(0);
+                  Term ownPostCond     = ownSEState.third.op() instanceof Modality ? ownSEState.third.sub(0) : ownSEState.third;
+                  Term partnerPostCond = partnerSEState.third.op() instanceof Modality ? partnerSEState.third.sub(0) : partnerSEState.third;
                   
                   // Requirement: Same post condition, matching program parts
                   if (ownPostCond.equals(partnerPostCond) &&
