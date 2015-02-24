@@ -244,11 +244,23 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
                int end = content.indexOf(JAVA_SOURCE_END, start);
                if (end >= 0) {
                   String currentDir = content.substring(start + JAVA_SOURCE_START.length(), end);
+                  int pathEnd = currentDir.indexOf("/");
+                  String pathSuffix;
+                  String firstFolder;
+                  if (pathEnd >= 0) {
+                     pathSuffix = currentDir.substring(pathEnd + 1);
+                     firstFolder = currentDir.substring(0, pathEnd);
+                  }
+                  else {
+                     firstFolder = currentDir;
+                     pathSuffix = "";
+                  }
                   String newSourceDir = sourceDirectory instanceof IProject ? "." : sourceDirectory.getName();
-                  if (oldNames.contains(currentDir)) {
+                  if (oldNames.contains(firstFolder)) {
                      content = content.substring(0, start) +
                                JAVA_SOURCE_START +
                                newSourceDir +
+                               (!pathSuffix.isEmpty() ? "/" + pathSuffix : "") +
                                content.substring(end);
                   }
                   else {

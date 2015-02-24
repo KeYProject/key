@@ -37,6 +37,10 @@
                      <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
+                  <variable name="[Z(0(1(#)))]" arrayIndex="Z(0(1(#)))" isArrayIndex="true">
+                     <value name="[Z(0(1(#)))] {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
                </value>
             </variable>
             <variable name="exc" isArrayIndex="false">
@@ -69,6 +73,10 @@
                         </variable>
                         <variable name="[Z(0(1(#)))]" arrayIndex="Z(0(1(#)))" isArrayIndex="true">
                            <value name="[Z(0(1(#)))] {true}" typeString="int" valueString="int::select(heap,a,arr(Z(0(1(#)))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="[Z(0(2(#)))]" arrayIndex="Z(0(2(#)))" isArrayIndex="true">
+                           <value name="[Z(0(2(#)))] {true}" typeString="int" valueString="Z(4(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>

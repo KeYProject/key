@@ -31,7 +31,6 @@ import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.ui.BatchMode;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.CommandLine;
@@ -136,8 +135,6 @@ public final class Main {
      */
     private static boolean loadOnly = false;
 
-    private static String fileNameOnStartUp = null;
-    
     /**
      * Object handling the parsing of commandline options
      */
@@ -146,6 +143,8 @@ public final class Main {
      * flag whether recent loaded file should be loaded on startup
      */
     private static boolean loadRecentFile=false;
+    
+    public static List<File> fileArguments;
 
     /** Lists all features currently marked as experimental.
      * Unless invoked with command line option --experimental ,
@@ -190,8 +189,9 @@ public final class Main {
             cl = createCommandLine();
             cl.parse(args);
             evaluateOptions(cl);
-            UserInterface userInterface = createUserInterface();
-            loadCommandLineFile(userInterface);
+            fileArguments = cl.getFileArguments();
+            UserInterface userInterface = createUserInterface(fileArguments);
+            loadCommandLineFiles(userInterface, fileArguments);
         } catch (ExceptionInInitializerError e) {
             System.err.println("D'oh! It seems that KeY was not built properly!");
             System.exit(777);
@@ -205,12 +205,17 @@ public final class Main {
 
     }
 
-    public static void loadCommandLineFile(UserInterface ui) {
-        if (Main.getFileNameOnStartUp() != null) {
-            final File fnos = new File(Main.getFileNameOnStartUp());
+    public static void loadCommandLineFiles(UserInterface ui, List<File> fileArguments) {
+        if (!fileArguments.isEmpty()) {
             ui.setMacro(autoMacro);
             ui.setSaveOnly(saveAllContracts);
-            ui.loadProblem(fnos);
+            for (int i = 0; i < fileArguments.size(); i++) {
+                File f = fileArguments.get(i);
+                ui.loadProblem(f);
+            }
+            if (ui instanceof ConsoleUserInterface) {
+                System.exit(((ConsoleUserInterface) ui).allProofsSuccessful ? 0 : 1);
+            }
         } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
             ui.openExamples();
         }
@@ -376,8 +381,6 @@ public final class Main {
             loadRecentFile=true;
         }
 
-        List<String> fileArguments = cl.getArguments();
-
         if (cl.isSet(JUSTIFY_RULES)) {
             evaluateLemmataOptions(cl);
         }
@@ -412,17 +415,6 @@ public final class Main {
             saveAllContracts = true;
         }
 
-        //arguments not assigned to a command line option may be files
-
-        if(!fileArguments.isEmpty()){
-            String fileArg = fileArguments.get(0);
-            if(new File(fileArg).exists()) {
-                fileNameOnStartUp = fileArg;
-            } else {
-                printUsageAndExit(false, "File not found: " + fileArg, -4);
-            }
-        }
-
     }
 
     /** Deactivate experimental features. */
@@ -448,8 +440,7 @@ public final class Main {
      * @return a <code>UserInterface</code> based on the value of
      *         <code>uiMode</code>
      */
-    private static UserInterface createUserInterface() {
-        UserInterface ui;
+    private static UserInterface createUserInterface(List<File> fileArguments) {
 
         if (uiMode == UiMode.AUTO) {
             // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see bug #1216
@@ -466,11 +457,10 @@ public final class Main {
                     System.exit(-1);
                 }
             });
-            if (fileNameOnStartUp == null)
+            if (fileArguments.isEmpty())
                 printUsageAndExit(true, "Error: No file to load from.", -4);
-            BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
-            ui = new ConsoleUserInterface(batch, verbosity);
+            return new ConsoleUserInterface(verbosity, loadOnly);
         } else {
             updateSplashScreen();
             MainWindow mainWindow = MainWindow.getInstance();
@@ -480,16 +470,16 @@ public final class Main {
                         mainWindow.getRecentFiles().getMostRecent();
 
                 if (mostRecent != null) {
-                    fileNameOnStartUp = mostRecent.getAbsolutePath();
+                    File mostRecentFile = new File(mostRecent.getAbsolutePath());
+                    if (mostRecentFile.exists()) {
+                        fileArguments.add(mostRecentFile);
+                    } else {
+                        System.out.println("File does not exist anymore: " + mostRecentFile.toString());
+                    }
                 }
             }
-
-            ui = mainWindow.getUserInterface();
-	    if (fileNameOnStartUp != null && verbosity > Verbosity.SILENT)
-	        System.out.println("Loading: "+fileNameOnStartUp);
+            return mainWindow.getUserInterface();
         }
-
-        return ui;
 
     }
 
@@ -522,7 +512,7 @@ public final class Main {
 
     }
 
-    private static void printUsageAndExit(boolean printUsage, String offending, int exitValue) {
+    public static void printUsageAndExit(boolean printUsage, String offending, int exitValue) {
         PrintStream ps = exitValue==0 ? System.out : System.err;
         if(offending != null) {
             ps.println(offending);
@@ -531,6 +521,29 @@ public final class Main {
             cl.printUsage(ps);
         }
         System.exit(exitValue);
+    }
+
+    /**
+     * Used by {@link de.uka.ilkd.key.gui.KeYFileChooser} (and potentially
+     * others) to determine working directory. In case there is at least one
+     * location (i.e. a file or directory) specified as command line argument,
+     * working directory is determined based on first location that occured in
+     * the list of arguments. Otherwise, value of System.getProperty("user.dir")
+     * is used to determine working directory.
+     *
+     * @return {@link File} object representing working directory.
+     */
+    public static File getWorkingDir() {
+        if (!fileArguments.isEmpty()) {
+            File f = fileArguments.get(0);
+            if (f.isDirectory()) {
+                return f;
+            } else {
+                return f.getParentFile();
+            }
+        } else {
+            return new File(System.getProperty("user.dir"));
+        }
     }
 
     public static String getExamplesDir() {
@@ -552,13 +565,6 @@ public final class Main {
      */
     public static String getStatisticsFile() {
         return statisticsFile;
-    }
-
-    /**
-     * @return the fileNameOnStartUp
-     */
-    public static String getFileNameOnStartUp() {
-        return fileNameOnStartUp;
     }
 
     /** Returns the time of the program start in millis. */

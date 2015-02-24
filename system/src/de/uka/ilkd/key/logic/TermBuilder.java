@@ -1600,6 +1600,14 @@ public class TermBuilder {
         return wellFormed(var(heap));
     }
 
+    public Term permissionsFor(Term permHeap, Term regularHeap) {
+        return func(services.getTypeConverter().getPermissionLDT().getPermissionsFor(),
+                permHeap, regularHeap);
+    }
+
+    public Term permissionsFor(LocationVariable permHeap, LocationVariable regularHeap) {
+        return permissionsFor(var(permHeap),var(regularHeap));
+    }
 
     public Term inv(Term[] h, Term o) {
         Term[] p = new Term[h.length + 1];
@@ -1951,17 +1959,21 @@ public class TermBuilder {
                 ImmutableSLList.<QuantifiableVariable>nil();
         quantVars = quantVars.append(objVar);
         quantVars = quantVars.append(fieldVar);
+        // selects on permission heaps have to be explicitly typed as field type narrowing
+        // does not follow Java typing for the permission heap
+        boolean permissionHeap =
+            heapTerm.op() == services.getTypeConverter().getHeapLDT().getPermissionHeap();
         return all(quantVars,
                 or(elementOf(objVarTerm,
                         fieldVarTerm,
                         modAtPre),
                         and(not(equals(objVarTerm, NULL())),
                                 not(createdAtPre)),
-                                equals(select(Sort.ANY,
+                                equals(select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : Sort.ANY,
                                         heapTerm,
                                         objVarTerm,
                                         fieldVarTerm),
-                                        select(Sort.ANY,
+                                        select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : Sort.ANY,
                                                 or.replace(heapTerm),
                                                 objVarTerm,
                                                 fieldVarTerm))));
@@ -1993,12 +2005,15 @@ public class TermBuilder {
         quantVars = quantVars.append(objVar);
         quantVars = quantVars.append(fieldVar);
 
+        // see above
+        boolean permissionHeap = heapTerm.op() == services.getTypeConverter().getHeapLDT().getPermissionHeap();
+
         return all(quantVars,
-                equals(select(Sort.ANY,
+                equals(select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : Sort.ANY,
                         heapTerm,
                         objVarTerm,
                         fieldVarTerm),
-                        select(Sort.ANY,
+                        select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort() : Sort.ANY,
                                 or.replace(heapTerm),
                                 objVarTerm,
                                 fieldVarTerm)));

@@ -52,6 +52,61 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
    }
 
    /**
+    * Tests slicing on the example {@code arrayIndexAsVariableFieldTest}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testArrayIndexAsVariableFieldTest() throws Exception {
+      doSlicingTest("examples/_testcase/slicing/arrayIndexAsVariableFieldTest/ArrayIndexAsVariableFieldTest.proof", 
+                    new ReturnSelector(412),
+                    true,
+                    408, 397, 315, 256, 148);
+   }
+
+   /**
+    * Tests slicing on the example {@code arrayIndexVariableTest}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testArrayIndexVariableTest() throws Exception {
+      doSlicingTest("examples/_testcase/slicing/arrayIndexVariableTest/ArrayIndexVariableTest.proof", 
+                    new ReturnSelector(347),
+                    true,
+                    343, 332, 258, 211, 118);
+   }
+
+   /**
+    * Tests slicing on the example {@code arrayIndexSideeffectsBevore}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testArrayIndexSideeffectsBevore() throws Exception {
+      doSlicingTest("examples/_testcase/slicing/arrayIndexSideeffectsBevore/ArrayIndexSideeffectsBevore.proof", 
+                    new ReturnSelector(211),
+                    true,
+                    148, 55);
+   }
+
+   /**
+    * Tests slicing on the example {@code arrayIndexSideeffectsAfter}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testArrayIndexSideeffectsAfter() throws Exception {
+      doSlicingTest("examples/_testcase/slicing/arrayIndexSideeffectsAfter/ArrayIndexSideeffectsAfter.proof", 
+                    new ReturnSelector(216),
+                    true,
+                    163, 59);
+   }
+
+   /**
+    * Tests slicing on the example {@code simpleMultidimensionArrayTest}.
+    * @throws Exception Occurred Exception.
+    */
+   public void testSimpleMultidimensionArrayTest() throws Exception {
+      doSlicingTest("examples/_testcase/slicing/simpleMultidimensionArrayTest/SimpleMultidimensionArrayTest.proof", 
+                    new ReturnSelector(461),
+                    true,
+                    445, 441, 416, 353, 172, 133);
+   }
+
+   /**
     * Tests slicing on the example {@code simpleArrayTest}.
     * @throws Exception Occurred Exception.
     */

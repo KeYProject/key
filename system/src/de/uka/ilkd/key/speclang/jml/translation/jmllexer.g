@@ -118,6 +118,7 @@ tokens {
     NOT_SPECIFIED        = "\\not_specified";
     NUM_OF               = "\\num_of";
     OLD                  = "\\old";
+    PERMISSION           = "\\permission";
     PRE                  = "\\pre";
     PRODUCT              = "\\product";
     REACH                = "\\reach";
