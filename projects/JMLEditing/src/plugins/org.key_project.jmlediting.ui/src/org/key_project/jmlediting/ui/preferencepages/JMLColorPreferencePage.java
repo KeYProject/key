@@ -6,8 +6,6 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jdt.internal.ui.preferences.PropertyAndPreferencePage;
 import org.eclipse.jface.preference.ColorSelector;
@@ -41,13 +39,6 @@ public class JMLColorPreferencePage extends PropertyAndPreferencePage {
     */
    public static final String TEST_KEY = "CommentColor";
 
-   /**
-    * The {@link IPreferenceChangeListener} which listens to changes of the
-    * profile property for properties. This is used to change the selection in
-    * the properies page when global settings are used and they change.
-    */
-   private final IPreferenceChangeListener currentPreferenceListener;
-
    private final Map<ColorProperty, ColorSelector> colorSelectorMap;
 
    /**
@@ -59,30 +50,7 @@ public class JMLColorPreferencePage extends PropertyAndPreferencePage {
     * Creates a new {@link JMLProfilePropertiesPage}.
     */
    public JMLColorPreferencePage() {
-      this.currentPreferenceListener = new IPreferenceChangeListener() {
-
-         @Override
-         public void preferenceChange(final PreferenceChangeEvent event) {
-            JMLColorPreferencePage.this.updateValues();
-
-         }
-
-      };
       this.colorSelectorMap = new HashMap<JMLUiPreferencesHelper.ColorProperty, ColorSelector>();
-   }
-
-   @Override
-   public void setVisible(final boolean visible) {
-      // Register the preference listener if the dialog is visible
-      // do not generate memory leaks, listener are removed in
-      // performOK and performCancel, here is too late
-      if (visible) {
-         final IEclipsePreferences preferences = InstanceScope.INSTANCE
-               .getNode(Activator.PLUGIN_ID);
-         preferences
-               .addPreferenceChangeListener(this.currentPreferenceListener);
-      }
-      super.setVisible(visible);
    }
 
    @Override
@@ -165,26 +133,13 @@ public class JMLColorPreferencePage extends PropertyAndPreferencePage {
    }
 
    @Override
-   public boolean performCancel() {
-      // Remove preferences listener
-      final IEclipsePreferences preferences = InstanceScope.INSTANCE
-            .getNode(Activator.PLUGIN_ID);
-      preferences
-            .removePreferenceChangeListener(this.currentPreferenceListener);
-      return super.performCancel();
-   }
-
-   @Override
    public boolean performOk() {
-      // Remove preference listener
+      // Update values
       for (final Entry<ColorProperty, ColorSelector> propertyEntry : this.colorSelectorMap
             .entrySet()) {
          JMLUiPreferencesHelper.setDefaultJMLColor(propertyEntry.getValue()
                .getColorValue(), propertyEntry.getKey());
       }
-
-      InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID)
-            .removePreferenceChangeListener(this.currentPreferenceListener);
       return super.performOk();
    }
 

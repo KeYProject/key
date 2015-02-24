@@ -336,7 +336,8 @@ public final class ExpressionParserUtils {
    }
 
    public static ParseFunction[] appendFirsts(
-         final Collection<ParseFunction> moreAlts, final ParseFunction... alts) {
+         final Collection<? extends ParseFunction> moreAlts,
+         final ParseFunction... alts) {
       final ArrayList<ParseFunction> allFunctions = new ArrayList<ParseFunction>(
             moreAlts.size() + alts.length);
       allFunctions.addAll(Arrays.asList(alts));

@@ -8,8 +8,11 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChang
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jdt.internal.ui.preferences.PropertyAndPreferencePage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -21,6 +24,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
+import org.key_project.jmlediting.ui.preferencepages.profileEditor.ProfileEditorDialog;
 
 /**
  * The {@link JMLProfilePropertiesPage} implements a properties and preferences
@@ -117,9 +121,45 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       data.horizontalSpan = 1;
       data.verticalAlignment = SWT.TOP;
       data.horizontalAlignment = SWT.FILL;
-
       this.initUI();
+
+      final Button copyButton = this.createTableSideButton(myComposite, "Copy");
+      final Button editButton = this.createTableSideButton(myComposite, "Edit");
+
+      copyButton.addSelectionListener(new SelectionListener() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            System.out.println("click Copy");
+         }
+
+         @Override
+         public void widgetDefaultSelected(final SelectionEvent e) {
+         }
+      });
+      editButton.addSelectionListener(new SelectionListener() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            final ProfileEditorDialog d = new ProfileEditorDialog(
+                  JMLProfilePropertiesPage.this.getShell());
+            d.setProfile(JMLProfilePropertiesPage.this.getSelectedProfile());
+            d.open();
+         }
+
+         @Override
+         public void widgetDefaultSelected(final SelectionEvent e) {
+         }
+      });
+
       return myComposite;
+   }
+
+   private Button createTableSideButton(final Composite myComposite,
+         final String name) {
+      final Button button = new Button(myComposite, SWT.PUSH);
+      button.setText(name);
+      button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1));
+
+      return button;
    }
 
    /**
@@ -167,7 +207,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
                   }
                   if (nothingChecked) {
                      JMLProfilePropertiesPage.this
-                     .setErrorMessage("Please select an active profile");
+                           .setErrorMessage("Please select an active profile");
                   }
                }
             }
@@ -274,7 +314,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
    private void removePreferencesListener() {
       JMLPreferencesHelper
-      .removeDefaultProfilePreferencesListener(this.currentPreferenceListener);
+            .removeDefaultProfilePreferencesListener(this.currentPreferenceListener);
    }
 
    @Override
@@ -287,18 +327,20 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       return cancel;
    }
 
+   private IJMLProfile getSelectedProfile() {
+      for (int i = 0; i < this.profilesList.getItemCount(); i++) {
+         // Can only have one selection
+         if (this.profilesList.getItem(i).getChecked()) {
+            return this.allProfiles.get(i);
+         }
+      }
+      return null;
+   }
+
    @Override
    public boolean performOk() {
 
-      IJMLProfile selectedProfile = null;
-      for (int i = 0; i < this.profilesList.getItemCount(); i++) {
-
-         // Can only have one selection
-         if (this.profilesList.getItem(i).getChecked()) {
-            selectedProfile = this.allProfiles.get(i);
-            break;
-         }
-      }
+      final IJMLProfile selectedProfile = this.getSelectedProfile();
 
       // Only write into properties if a selection is available (user is forced
       // to),

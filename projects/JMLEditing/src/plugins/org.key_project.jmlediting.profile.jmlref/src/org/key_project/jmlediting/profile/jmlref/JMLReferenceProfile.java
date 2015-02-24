@@ -46,6 +46,8 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Re
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.EverythingKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.NotSpecifiedKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.NothingKeyword;
+import org.key_project.jmlediting.profile.jmlref.type.BigIntKeyword;
+import org.key_project.jmlediting.profile.jmlref.type.RealKeyword;
 import org.key_project.jmlediting.profile.jmlref.usercontent.SpecExpressionContentDescription;
 import org.key_project.jmlediting.profile.jmlref.validator.LoopInvariantValidator;
 import org.key_project.jmlediting.profile.jmlref.visibility.PrivateKeyword;
@@ -71,28 +73,33 @@ public class JMLReferenceProfile extends AbstractJMLProfile {
     *           the keyword locale for AE/BE
     */
    public JMLReferenceProfile(final KeywordLocale lang) {
-      this.getSupportedKeywordsInternal().addAll(
-            Arrays.asList(new EnsuresKeyword(), new AssignableKeyword(),
-                  new AccessibleKeyword(), new RequiresKeyword(),
-                  new BehaviorKeyword(lang), new ExceptionalBehaviorKeyword(
-                        lang), new NormalBehaviorKeyword(lang),
-                        new AlsoKeyword(), new HelperKeyword(), new PureKeyword(),
+      this.getSupportedKeywordsInternal()
+            .addAll(
+                  Arrays.asList(new EnsuresKeyword(), new AssignableKeyword(),
+                        new AccessibleKeyword(), new RequiresKeyword(),
+                        new BehaviorKeyword(lang),
+                        new ExceptionalBehaviorKeyword(lang),
+                        new NormalBehaviorKeyword(lang), new AlsoKeyword(),
+                        new HelperKeyword(), new PureKeyword(),
                         new PrivateKeyword(), new ProtectedKeyword(),
                         new PublicKeyword(), new SpecProtectedKeyword(),
                         new SpecPublicKeyword(), new EverythingKeyword(),
                         new NothingKeyword(), new NotSpecifiedKeyword(),
-                        new ResultKeyword(), new OldKeyword(), new SameKeyword(),
-                        new ForallQuantifierKeyword(),
+                        new ResultKeyword(), new OldKeyword(),
+                        new SameKeyword(), new ForallQuantifierKeyword(),
                         new ExistentialQuantifierKeyword(),
                         new MinQuantifierKeyword(), new MaxQuantifierKeyword(),
-                        new ProductQuantifierKeyword(), new SumQuantifierKeyword(),
-                        new NumOfQuantifierKeyword(), new NonNullBoundModKeyword(),
+                        new ProductQuantifierKeyword(),
+                        new SumQuantifierKeyword(),
+                        new NumOfQuantifierKeyword(),
+                        new NonNullBoundModKeyword(),
                         new NullableBoundModKeyword(), new InvariantKeyword(),
                         new LoopInvariantKeyword(), new DecreasingKeyword(),
                         new InvariantForKeyword(), new SuchThatKeyword(),
-                        new SetKeyword(), new ModelKeyword(), new GhostKeyword(),
-                        new RepresentsKeyword(), new NonNullKeyword(),
-                        new NullableKeyword()));
+                        new SetKeyword(), new ModelKeyword(),
+                        new GhostKeyword(), new RepresentsKeyword(),
+                        new NonNullKeyword(), new NullableKeyword(),
+                        new RealKeyword(), new BigIntKeyword()));
 
       this.getSupportedPrimariesInternal().addAll(
             Arrays.asList(new KeywordJMLPrimary(), new QuantifierPrimary()));

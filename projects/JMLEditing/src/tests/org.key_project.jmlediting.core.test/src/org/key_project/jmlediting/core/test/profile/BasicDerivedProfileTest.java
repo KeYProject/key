@@ -224,19 +224,9 @@ public class BasicDerivedProfileTest {
             this.derivedProfile.getExtensions(key, Object.class));
    }
 
-   @Test
-   public void testOnlyDerivedExtensions() {
+   @Test(expected = UnsupportedOperationException.class)
+   public void testDerivedProfileNoExtensions() {
       this.derivedProfile.putExtension();
-      assertEquals("No extension of derived", set(derivedValue),
-            this.derivedProfile.getExtensions(key, Object.class));
-   }
-
-   @Test
-   public void testBothExtensions() {
-      this.parentProfile.putExtension();
-      this.derivedProfile.putExtension();
-      assertEquals("Wrong extension of both", set(derivedValue, baseValue),
-            this.derivedProfile.getExtensions(key, Object.class));
    }
 
    @Test(expected = IllegalArgumentException.class)

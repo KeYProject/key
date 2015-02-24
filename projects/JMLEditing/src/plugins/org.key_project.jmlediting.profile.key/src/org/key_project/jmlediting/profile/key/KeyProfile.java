@@ -68,22 +68,18 @@ public class KeyProfile extends JMLReferenceProfile {
       supportedKeywords.addAll(Arrays.asList(new EmptyKeywod(),
             new InfiniteUnionKeyword(), new IntersetOperatorKeyword(),
             new ReachLocsParser(), new SetMinusOperatorKeyword(),
-            new SetUnionOperatorKeyword()));
+            new SetUnionOperatorKeyword(), new LocSetKeyword()));
 
       // Allows \inv as access on a not toplevel object just as for x[3].\inv
       this.putExtension(ExpressionParser.ADDITIONAL_PRIMARY_SUFFIXES,
             separateBy('.', keywords(InvKeyword.class, this)),
             ParseFunction.class);
-      this.putExtension(ExpressionParser.ADDITIONAL_PRIMITIVE_TYPES,
-            keywords(LocSetKeyword.class, this), ParseFunction.class);
 
       // Support for seq expression
       supportedKeywords.addAll(Arrays.asList(new SeqKeyword(),
             new SeqConcatKeyword(), new SeqDefKeyword(), new SeqEmptyKeyword(),
             new SeqSingletonKeyword(), new ValuesKeyword()));
       supportedPrimaries.add(new SeqPrimary());
-      this.putExtension(ExpressionParser.ADDITIONAL_PRIMITIVE_TYPES,
-            keywords(SeqKeyword.class, this), ParseFunction.class);
       this.putExtension(ExpressionParser.CONDITONAL_EXPR_SUFFIXES,
             SeqExpressionParser.seqExpressionSuffix(this), ParseFunction.class);
    }

@@ -12,6 +12,7 @@ import org.key_project.jmlediting.core.parser.IRecursiveParseFunction;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.profile.jmlref.type.ITypeKeyword;
 
 /**
  * The Expression Parser parses expressions as defined in the JML Reference
@@ -27,7 +28,6 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 public class ExpressionParser implements ParseFunction {
 
    public static final Object ADDITIONAL_PRIMARY_SUFFIXES = new Object();
-   public static final Object ADDITIONAL_PRIMITIVE_TYPES = new Object();
    public static final Object CONDITONAL_EXPR_SUFFIXES = new Object();
 
    /**
@@ -164,13 +164,11 @@ public class ExpressionParser implements ParseFunction {
       referenceType.defineAs(seq(REFERENCE_TYPE, name(),
             opt(typed(TYPE_ARGUMENT, brackets("<", referenceType, ">")))));
 
-      final Set<ParseFunction> pluginTypes = profile.getExtensions(
-            ADDITIONAL_PRIMITIVE_TYPES, ParseFunction.class);
       /**
        * type ::= reference-type | built-in-type
        */
-      final ParseFunction type = alt(appendFirsts(pluginTypes, referenceType,
-            builtInType));
+      final ParseFunction type = alt(keywords(ITypeKeyword.class, profile),
+            referenceType, builtInType);
       /**
        * type-spec ::= [ ownership-modifiers ] type [ dims ]<br>
        * | \TYPE [ dims ]
