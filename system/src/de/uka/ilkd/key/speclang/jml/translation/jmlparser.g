@@ -429,7 +429,7 @@ requiresclause returns [Term result = null] throws SLTranslationException
 
 requiresfreeclause returns [Term result = null] throws SLTranslationException
 :
-    req:REQUIRES result=predornot
+    req:REQUIRES_FREE result=predornot
             { result = translator.translate(req.getText(), Term.class, result, services); }
     ;
 

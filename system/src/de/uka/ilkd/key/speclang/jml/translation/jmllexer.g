@@ -61,6 +61,7 @@ tokens {
     NULLABLE        = "nullable";
     REPRESENTS      = "represents";
     REQUIRES        = "requires";
+    REQUIRES_FREE   = "requires_free";
     RETURNS         = "returns";  //KeY extension, not official JML
     SEPARATES       = "separates";  //KeY extension, not official JML
     SIGNALS         = "signals";

@@ -397,14 +397,21 @@ public class ContractFactory {
         Map<LocationVariable,Boolean> hasMod = new LinkedHashMap<LocationVariable,Boolean>();
         Map<LocationVariable,Term> posts =
                 new LinkedHashMap<LocationVariable, Term>(t.originalPosts.size());
+        Map<LocationVariable,Term> freePosts =
+                new LinkedHashMap<LocationVariable, Term>(t.originalFreePosts.size());
         for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
            hasMod.put(h, false);
            Term oriPost = t.originalPosts.get(h);
+           Term oriFreePost = t.originalFreePosts.get(h);
            if(oriPost != null) {
               posts.put(h,tb.imp(atPreify(t.originalPres.get(h),
                         t.originalAtPreVars),
                    oriPost));
            }
+           if(oriFreePost != null) {
+               freePosts.put(h, tb.imp(atPreify(t.originalFreePres.get(h), t.originalAtPreVars),
+                                       oriFreePost));
+            }
         }
 
         Map<LocationVariable,Term> axioms = new LinkedHashMap<LocationVariable,Term>();
@@ -449,6 +456,12 @@ public class ContractFactory {
                         t.originalExcVar,
                         t.originalAtPreVars,
                         services);
+                Term otherFreePost = other.getFreePost(h, t.originalSelfVar,
+                                                       t.originalParamVars,
+                                                       t.originalResultVar,
+                                                       t.originalExcVar,
+                                                       t.originalAtPreVars,
+                                                       services);
                 Term otherAxiom = other.getRepresentsAxiom(h, t.originalSelfVar,
                         t.originalParamVars,
                         t.originalResultVar,
@@ -471,6 +484,10 @@ public class ContractFactory {
                 if(otherPost != null) {
                     final Term oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
                     posts.put(h, posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost));
+                }
+                if(otherFreePost != null) {
+                    final Term oFreePost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherFreePost);
+                    freePosts.put(h, freePosts.get(h) == null ? oFreePost : tb.and(freePosts.get(h), oFreePost));
                 }
                 if(otherAxiom != null) {
                     final Term oAxiom = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherAxiom);
@@ -548,8 +565,10 @@ public class ContractFactory {
                                                    t.specifiedIn,
                                                    moda,
                                                    pres,
+                                                   new LinkedHashMap<LocationVariable, Term>(),
                                                    mby,
                                                    posts,
+                                                   freePosts,
                                                    axioms,
                                                    mods,
                                                    deps,

@@ -348,12 +348,14 @@ public final class UseOperationContractRule implements BuiltInRule {
      * meaning created or null for reference types, inInt(), etc., for integer types,
      * and for location sets containing only locations that belong to created objects.
      */
-    private static Term getFreePost(List<LocationVariable> heapContext, IProgramMethod pm,
-	    		     	    KeYJavaType kjt,
-	    		     	    Term resultTerm,
-	    		     	    Term selfTerm,
-	    		     	    Map<LocationVariable, Term> heapAtPres,
-	    		     	    Services services) {
+    private static Term getFreePost(List<LocationVariable> heapContext,
+                                    IProgramMethod pm,
+                                    KeYJavaType kjt,
+                                    Term resultTerm,
+                                    Term selfTerm,
+                                    Map<LocationVariable, Term> heapAtPres,
+                                    Term freeSpecPost,
+                                    Services services) {
         final TermBuilder TB = services.getTermBuilder();
         final Term result;
         if(pm.isConstructor()) {
@@ -384,7 +386,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         } else {
             result = TB.tt();
         }
-        return result;
+        return TB.and(result, freeSpecPost);
     }
 
 
@@ -723,13 +725,22 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term pre = globalDefs==null? originalPre: tb.apply(globalDefs, originalPre);
         final Term originalPost = contract.getPost(heapContext,
                                            heapTerms,
-        	                               contractSelf,
-        				                   contractParams,
+                                           contractSelf,
+                                           contractParams,
                                            contractResult,
                                            tb.var(excVar),
                                            atPres,
                                            services);
+        final Term originalFreePost = contract.getFreePost(heapContext,
+                                                           heapTerms,
+                                                           contractSelf,
+                                                           contractParams,
+                                                           contractResult,
+                                                           tb.var(excVar),
+                                                           atPres,
+                                                           services);
         final Term post = globalDefs==null? originalPost: tb.apply(globalDefs, originalPost);
+        final Term freeSpecPost = globalDefs==null? originalFreePost: tb.apply(globalDefs, originalFreePost);
         final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
 
         for(LocationVariable heap : heapContext) {
@@ -822,21 +833,22 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term excNull = tb.equals(tb.var(excVar), tb.NULL());
         final Term excCreated = tb.created(tb.var(excVar));
         final Term freePost = getFreePost(heapContext,
-                              inst.pm,
-	    		     		  inst.staticType,
-	    		     		  contractResult,
-	    		     		  contractSelf,
-	    		     		  atPres,
-	    		     		  services);
+                                          inst.pm,
+                                          inst.staticType,
+                                          contractResult,
+                                          contractSelf,
+                                          atPres,
+                                          freeSpecPost,
+                                          services);
         final Term freeExcPost = inst.pm.isConstructor()
                                  ? freePost
                                  : tb.tt();
         final Term postAssumption
-        	= tb.applySequential(new Term[]{inst.u, atPreUpdates},
-        		   	     tb.and(anonAssumption,
-        		   		    tb.apply(anonUpdate, tb.and(excNull,
-                                    freePost,
-                                    post), null)));
+                = tb.applySequential(new Term[]{inst.u, atPreUpdates},
+                                     tb.and(anonAssumption,
+                                            tb.apply(anonUpdate,
+                                                     tb.and(excNull, freePost, post),
+                                                     null)));
         final Term excPostAssumption
         	= tb.applySequential(new Term[]{inst.u, atPreUpdates},
         		   tb.and(anonAssumption,

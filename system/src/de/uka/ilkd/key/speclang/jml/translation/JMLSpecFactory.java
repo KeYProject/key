@@ -384,7 +384,7 @@ public class JMLSpecFactory {
                         translateAndClauses(pm, progVars.selfVar,
                                 progVars.paramVars, null, null,
                                 progVars.atPres, textualSpecCase
-                                        .getRequires(heap.name().toString())));
+                                        .getRequiresFree(heap.name().toString())));
             }
 
            if(heap == savedHeap && textualSpecCase.getEnsures(heap.name().toString()).isEmpty()) {
@@ -408,7 +408,7 @@ public class JMLSpecFactory {
                                 progVars.paramVars, progVars.resultVar,
                                 progVars.excVar, progVars.atPres,
                                 originalBehavior, textualSpecCase
-                                        .getEnsures(heap.name().toString())));
+                                        .getEnsuresFree(heap.name().toString())));
             }
 
 
