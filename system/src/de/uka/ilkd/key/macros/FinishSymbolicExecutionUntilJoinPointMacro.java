@@ -198,6 +198,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
       public void taskFinished(TaskFinishedInfo info) {}
    };
    
+   
    /**
     * @param succedent Succedent of a sequent.
     * @return true iff the given succedent has one formula with
@@ -263,6 +264,10 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
             return false;
          }
          
+         if (hasBreakPoint(goal.sequent().succedent())) {
+            return false;
+         }
+         
          if (pio != null) {
             JavaBlock theJavaBlock = getJavaBlockRecursive(pio.subTerm());
             SourceElement activeStmt = JavaTools.getActiveStatement(theJavaBlock);
@@ -274,7 +279,7 @@ public class FinishSymbolicExecutionUntilJoinPointMacro extends StrategyProofMac
                // statement block multiple times. However, we have
                // to consider it if it is a break point, of course.
                return super.isApprovedApp(app, pio, goal);
-            } else {
+            } else if (!theJavaBlock.equals(JavaBlock.EMPTY_JAVABLOCK)) {
                alreadySeen.add(theJavaBlock);
             }
             
