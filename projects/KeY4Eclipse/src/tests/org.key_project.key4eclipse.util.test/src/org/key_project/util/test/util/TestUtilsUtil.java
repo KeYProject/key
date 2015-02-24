@@ -1957,4 +1957,22 @@ public class TestUtilsUtil {
          }
       });
    }
+
+   /**
+    * Opens the perspective 'Resource'.
+    * @return The {@link IPerspectiveDescriptor} of the perspective 'Resource'.
+    */
+   public static IPerspectiveDescriptor openResourcePerspective() {
+      IPerspectiveDescriptor resourcePerspective = getResourcePerspective();
+      openPerspective(resourcePerspective);
+      return resourcePerspective;
+   }
+
+   /**
+    * Returns the {@link IPerspectiveDescriptor} of the perspective 'Resource'.
+    * @return The {@link IPerspectiveDescriptor} of the perspective 'Resource'.
+    */
+   public static IPerspectiveDescriptor getResourcePerspective() {
+      return TestUtilsUtil.getPerspective("org.eclipse.ui.resourcePerspective");
+   }
 }
