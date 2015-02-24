@@ -460,7 +460,9 @@ public abstract class AbstractUpdateExtractor {
     * @param objectsToIgnore The objects to ignore.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void collectLocationsFromTerm(Set<ExtractLocationParameter> toFill, Term term, Set<Term> objectsToIgnore) throws ProofInputException {
+   protected void collectLocationsFromTerm(Set<ExtractLocationParameter> toFill, 
+                                           Term term, 
+                                           Set<Term> objectsToIgnore) throws ProofInputException {
       final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
       if (term.op() instanceof ProgramVariable) {
          ProgramVariable var = (ProgramVariable)term.op();
@@ -474,37 +476,10 @@ public abstract class AbstractUpdateExtractor {
       else {
          Sort sort = heapLDT.getSortOfSelect(term.op());
          if (sort != null) {
-            Term selectTerm = term.sub(1);
-            if (!objectsToIgnore.contains(selectTerm) &&
-                !SymbolicExecutionUtil.isSkolemConstant(selectTerm)) {
-               ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, term.sub(2));
-               if (var != null) {
-                  if (!isImplicitProgramVariable(var) &&
-                      !hasFreeVariables(term.sub(2))) {
-                     if (var.isStatic()) {
-                        toFill.add(new ExtractLocationParameter(var, true));
-                     }
-                     else {
-                        if (selectTerm.op() instanceof ProgramVariable) {
-                           toFill.add(new ExtractLocationParameter((ProgramVariable)selectTerm.op(), true));
-                        }
-                        toFill.add(new ExtractLocationParameter(var, selectTerm));
-                     }
-                  }
-               }
-               else {
-                  Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
-                  if (arrayIndex != null && !hasFreeVariables(arrayIndex)) {
-                     if (selectTerm.op() instanceof ProgramVariable) {
-                        toFill.add(new ExtractLocationParameter((ProgramVariable)selectTerm.op(), true));
-                     }
-                     toFill.add(new ExtractLocationParameter(arrayIndex, selectTerm));
-                  }
-                  else {
-                     // Nothing to do, since program variable and array index is undefined.
-                  }
-               }
-            }
+            collectLocationsFromHeapTerms(term.sub(1), term.sub(2), heapLDT, toFill, objectsToIgnore);
+         }
+         else if (heapLDT.getStore() == term.op()) {
+            collectLocationsFromHeapTerms(term.sub(1), term.sub(2), heapLDT, toFill, objectsToIgnore);
          }
          else if (heapLDT.getLength() == term.op()) {
             if (!objectsToIgnore.contains(term.sub(0)) &&
@@ -519,6 +494,52 @@ public abstract class AbstractUpdateExtractor {
             }
          }
       }
+   }
+   
+   /**
+    * Collects the {@link ExtractLocationParameter} location from the heap {@link Term}s.
+    * @param selectTerm The parent {@link Term}.
+    * @param variableTerm The {@link Term} with the {@link ProgramVariable}.
+    * @param heapLDT The {@link HeapLDT} to use.
+    * @param toFill The result {@link Set} to fill.
+    * @param objectsToIgnore The objects to ignore.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void collectLocationsFromHeapTerms(Term selectTerm, 
+                                                Term variableTerm,
+                                                HeapLDT heapLDT,
+                                                Set<ExtractLocationParameter> toFill, 
+                                                Set<Term> objectsToIgnore) throws ProofInputException {
+      if (!objectsToIgnore.contains(selectTerm) &&
+            !SymbolicExecutionUtil.isSkolemConstant(selectTerm)) {
+           ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, variableTerm);
+           if (var != null) {
+              if (!isImplicitProgramVariable(var) &&
+                  !hasFreeVariables(variableTerm)) {
+                 if (var.isStatic()) {
+                    toFill.add(new ExtractLocationParameter(var, true));
+                 }
+                 else {
+                    if (selectTerm.op() instanceof ProgramVariable) {
+                       toFill.add(new ExtractLocationParameter((ProgramVariable)selectTerm.op(), true));
+                    }
+                    toFill.add(new ExtractLocationParameter(var, selectTerm));
+                 }
+              }
+           }
+           else {
+              Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, variableTerm);
+              if (arrayIndex != null && !hasFreeVariables(arrayIndex)) {
+                 if (selectTerm.op() instanceof ProgramVariable) {
+                    toFill.add(new ExtractLocationParameter((ProgramVariable)selectTerm.op(), true));
+                 }
+                 toFill.add(new ExtractLocationParameter(arrayIndex, selectTerm));
+              }
+              else {
+                 // Nothing to do, since program variable and array index is undefined.
+              }
+           }
+        }
    }
 
    /**

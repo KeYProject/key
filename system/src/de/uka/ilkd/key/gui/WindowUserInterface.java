@@ -61,10 +61,10 @@ import de.uka.ilkd.key.util.Pair;
 
 public class WindowUserInterface extends AbstractUserInterface {
 
-    private MainWindow mainWindow;
+    private final MainWindow mainWindow;
     private int numOfInvokedMacros;
 
-    private LinkedList<InteractiveRuleApplicationCompletion> completions =
+    private final LinkedList<InteractiveRuleApplicationCompletion> completions =
             new LinkedList<InteractiveRuleApplicationCompletion>();
 
     public WindowUserInterface(MainWindow mainWindow) {
@@ -76,10 +76,17 @@ public class WindowUserInterface extends AbstractUserInterface {
         this.numOfInvokedMacros = 0;
     }
 
+    /**
+     * loads the problem or proof from the given file
+     *
+     * @param file the File with the problem description or the proof
+     * @param classPath the class path entries to use.
+     * @param bootClassPath the boot class path to use.
+     */
     public void loadProblem(File file, List<File> classPath,
                             File bootClassPath) {
         mainWindow.addRecentFile(file.getAbsolutePath());
-        super.getProblemLoader(file, classPath, bootClassPath,
+        getProblemLoader(file, classPath, bootClassPath,
                                mainWindow.getMediator()).runAsynchronously();
     }
 
