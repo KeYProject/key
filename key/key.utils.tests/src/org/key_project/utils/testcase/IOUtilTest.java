@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -276,6 +277,7 @@ public class IOUtilTest extends TestCase {
          assertEquals(0, visitor.getVisitedFiles().size());
          // Test visiting
          IOUtil.visit(tempDir, visitor);
+         Collections.sort(visitor.getVisitedFiles()); // Ensure same order in all operating systems
          assertEquals(8, visitor.getVisitedFiles().size());
          assertEquals(tempDir, visitor.getVisitedFiles().get(0));
          assertEquals(emptyFolder, visitor.getVisitedFiles().get(1));
@@ -352,6 +354,7 @@ public class IOUtilTest extends TestCase {
          assertEquals(0, result.size());
          // Test no filter
          result = IOUtil.search(tempDir, null);
+         Collections.sort(result); // Ensure same order in all operating systems
          assertEquals(8, result.size());
          assertEquals(tempDir, result.get(0));
          assertEquals(emptyFolder, result.get(1));
@@ -363,6 +366,7 @@ public class IOUtilTest extends TestCase {
          assertEquals(text, result.get(7));
          // Test with filter
          result = IOUtil.search(tempDir, filter);
+         Collections.sort(result); // Ensure same order in all operating systems
          assertEquals(4, result.size());
          assertEquals(subFile, result.get(0));
          assertEquals(subSubDir, result.get(1));
