@@ -36,19 +36,19 @@ public class TestExceptionBreakpointStopConditionWithHitCount extends AbstractSy
       SymbolicExecutionEnvironment<CustomUserInterface> env = null;
       try {
          // Define test settings
-         String javaPathInkeyRepDirectory = "examples/_testcase/set/exceptionBreakpointsWithHitCountTest/test/ClassCastAndNullpointerExceptions.java";
+         String javaPathInkeyRepDirectory = "/set/exceptionBreakpointsWithHitCountTest/test/ClassCastAndNullpointerExceptions.java";
          String containerTypeName = "ClassCastAndNullpointerExceptions";
          final String methodFullName = "main";
-         String oraclePathInkeyRepDirectoryFile = "examples/_testcase/set/exceptionBreakpointsWithHitCountTest/oracle/ClassCastAndNullpointerExceptions";
+         String oraclePathInkeyRepDirectoryFile = "/set/exceptionBreakpointsWithHitCountTest/oracle/ClassCastAndNullpointerExceptions";
          String oracleFileExtension = ".xml";
          // Store original settings of KeY
-         originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
+         originalTacletOptions = setDefaultTacletOptions(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
          setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false);
+         env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false);
          // Make sure that initial tree is valid
          int oracleIndex = 0;
-         assertSetTreeAfterStep(env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);
+         assertSetTreeAfterStep(env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory);
          CompoundStopCondition allBreakpoints = new CompoundStopCondition();
          
          Proof proof = env.getBuilder().getProof();
@@ -62,9 +62,9 @@ public class TestExceptionBreakpointStopConditionWithHitCount extends AbstractSy
          allBreakpoints.addChildren(bc);
          env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          // Do steps
-         stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
-         stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
-         stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
+         stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);
+         stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);
+         stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);
       }
       finally {
          setOneStepSimplificationEnabled(null, originalOneStepSimplification);

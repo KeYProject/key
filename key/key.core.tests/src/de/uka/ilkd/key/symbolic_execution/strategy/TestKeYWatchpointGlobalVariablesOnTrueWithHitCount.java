@@ -36,19 +36,19 @@ public class TestKeYWatchpointGlobalVariablesOnTrueWithHitCount extends Abstract
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try{
          // Define test settings
-         String javaPathInkeyRepDirectory = "examples/_testcase/set/keyWatchpointGlobalVariablesOnTrueWithHitCount/test/GlobalVariablesOnTrue.java";
+         String javaPathInkeyRepDirectory = "/set/keyWatchpointGlobalVariablesOnTrueWithHitCount/test/GlobalVariablesOnTrue.java";
          String containerTypeName = "GlobalVariablesOnTrue";
          final String methodFullName = "doSomething";
-         String oraclePathInkeyRepDirectoryFile = "examples/_testcase/set/keyWatchpointGlobalVariablesOnTrueWithHitCount/oracle/GlobalVariablesOnTrue";
+         String oraclePathInkeyRepDirectoryFile = "/set/keyWatchpointGlobalVariablesOnTrueWithHitCount/oracle/GlobalVariablesOnTrue";
          String oracleFileExtension = ".xml";
          // Store original settings of KeY
-         originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
+         originalTacletOptions = setDefaultTacletOptions(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
          setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false);
+         env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false);
          // Make sure that initial tree is valid
          int oracleIndex = 0;
-         assertSetTreeAfterStep(env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);
+         assertSetTreeAfterStep(env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory);
          CompoundStopCondition allBreakpoints = new CompoundStopCondition();
          JavaInfo javaInfo = env.getServices().getJavaInfo();
          KeYJavaType containerType = javaInfo.getTypeByClassName(containerTypeName);
@@ -59,9 +59,9 @@ public class TestKeYWatchpointGlobalVariablesOnTrueWithHitCount extends Abstract
          allBreakpoints.addChildren(bc);
          env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          // Do steps
-         stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
-         stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
-         stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
+         stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);
+         stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);
+         stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, testCaseDirectory, allBreakpoints);
       }
       finally{
          setOneStepSimplificationEnabled(null, originalOneStepSimplification);

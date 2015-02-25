@@ -29,7 +29,7 @@ public class TestKeYTypeUtil extends AbstractSymbolicExecutionTestCase {
     * Tests {@link KeYTypeUtil#isInnerType(Services, KeYJavaType)}.
     */
    public void testIsInnerType() throws Exception {
-      KeYEnvironment<?> environment = KeYEnvironment.load(new File(keyRepDirectory, "examples/_testcase/proofReferences/InnerAndAnonymousTypeTest"), null, null);
+      KeYEnvironment<?> environment = KeYEnvironment.load(new File(testCaseDirectory, "/proofReferences/InnerAndAnonymousTypeTest"), null, null);
       try {
          Services services = environment.getServices();
          assertNotNull(services);
@@ -64,7 +64,7 @@ public class TestKeYTypeUtil extends AbstractSymbolicExecutionTestCase {
     * Tests {@link KeYTypeUtil#getParentName(Services, KeYJavaType)}.
     */
    public void testGetParentName() throws Exception {
-      KeYEnvironment<?> environment = KeYEnvironment.load(new File(keyRepDirectory, "examples/_testcase/proofReferences/InnerAndAnonymousTypeTest"), null, null);
+      KeYEnvironment<?> environment = KeYEnvironment.load(new File(testCaseDirectory, "/proofReferences/InnerAndAnonymousTypeTest"), null, null);
       try {
          Services services = environment.getServices();
          assertNotNull(services);
@@ -99,7 +99,7 @@ public class TestKeYTypeUtil extends AbstractSymbolicExecutionTestCase {
     * Tests {@link KeYTypeUtil#isType(Services, String)}.
     */
    public void testIsType() throws Exception {
-      KeYEnvironment<?> environment = KeYEnvironment.load(new File(keyRepDirectory, "examples/_testcase/proofReferences/InnerAndAnonymousTypeTest"), null, null);
+      KeYEnvironment<?> environment = KeYEnvironment.load(new File(testCaseDirectory, "/proofReferences/InnerAndAnonymousTypeTest"), null, null);
       try {
          Services services = environment.getServices();
          assertNotNull(services);
@@ -131,7 +131,7 @@ public class TestKeYTypeUtil extends AbstractSymbolicExecutionTestCase {
     * Tests {@link KeYTypeUtil#getType(de.uka.ilkd.key.java.Services, String)}.
     */
    public void testGetType() throws Exception {
-      KeYEnvironment<?> environment = KeYEnvironment.load(new File(keyRepDirectory, "examples/_testcase/proofReferences/InnerAndAnonymousTypeTest"), null, null);
+      KeYEnvironment<?> environment = KeYEnvironment.load(new File(testCaseDirectory, "/proofReferences/InnerAndAnonymousTypeTest"), null, null);
       try {
          Services services = environment.getServices();
          assertNotNull(services);

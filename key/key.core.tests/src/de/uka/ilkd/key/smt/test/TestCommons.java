@@ -36,6 +36,7 @@ import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.SMTTestSettings;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.util.HelperClassForTests;
 
 /**
  * Use this class for testing SMT: It provides a mechanism to load proofs and
@@ -45,8 +46,7 @@ import de.uka.ilkd.key.smt.SolverType;
  */
 public abstract class TestCommons extends TestCase {
 	private static HashMap<String, ProofAggregate> proofs = new HashMap<String, ProofAggregate>();
-	protected static String folder = System.getProperty("key.home")
-	        + File.separator + "examples" + File.separator + "_testcase"
+	protected static String folder = HelperClassForTests.TESTCASE_DIRECTORY
 	        + File.separator + "smt" + File.separator + "tacletTranslation"
 	        + File.separator;
 	/** The set of taclets */

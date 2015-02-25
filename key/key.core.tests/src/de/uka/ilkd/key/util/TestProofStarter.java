@@ -18,8 +18,9 @@ public class TestProofStarter extends AbstractSymbolicExecutionTestCase {
     * Loads key-file {@code examples/_testcase/proofStarter/CC/project.key}
     * and runs the auto mode via {@link ProofStarter} 
     * while one step simplification is disabled.
+    * @throws ProblemLoaderException Occurred Exception
     */
-   public void testDirectProof() {
+   public void testDirectProof() throws ProblemLoaderException {
       doProofStarter(false);
    }
    
@@ -27,21 +28,23 @@ public class TestProofStarter extends AbstractSymbolicExecutionTestCase {
     * Loads key-file {@code examples/_testcase/proofStarter/CC/project.key}
     * and runs the auto mode via {@link ProofStarter} 
     * while one step simplification is enabled.
+    * @throws ProblemLoaderException Occurred Exception
     */
-   public void testDirectProofWithOneStepSimplification() {
+   public void testDirectProofWithOneStepSimplification() throws ProblemLoaderException {
       doProofStarter(true);
    }
    
    /**
     * Executes the test steps of {@link #testDirectProof()}
     * and {@link #testDirectProofWithOneStepSimplification()}.
-    * @param oneStepSimplification
+    * @param oneStepSimplification Use one step simplification?
+    * @throws ProblemLoaderException Occurred Exception
     */
-   protected void doProofStarter(boolean oneStepSimplification) {
+   protected void doProofStarter(boolean oneStepSimplification) throws ProblemLoaderException {
       KeYEnvironment<CustomUserInterface> env = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
-         File file = new File(keyRepDirectory, "examples/_testcase/proofStarter/CC/project.key");
+         File file = new File(testCaseDirectory, "proofStarter/CC/project.key");
          env = KeYEnvironment.load(file, null, null);
          Proof proof = env.getLoadedProof();
          assertNotNull(proof);
@@ -51,9 +54,6 @@ public class TestProofStarter extends AbstractSymbolicExecutionTestCase {
          ApplyStrategyInfo info = ps.start();
          assertNotNull(info);
          assertTrue(proof.closed());
-      } catch (ProblemLoaderException e) {
-          // TODO: this exception was unhandled before -- expected???
-          fail();
       }
       finally {
          setOneStepSimplificationEnabled(null, originalOneStepSimplification);

@@ -26,8 +26,8 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
     * Tests "InvariantInOperationContractOfArgument".
     */
    public void testInvariantInOperationContractOfArgument() throws Exception {
-      doReferenceMethodTest(keyRepDirectory, 
-                            "examples/_testcase/proofReferences/InvariantInOperationContractOfArgument/InvariantInOperationContractOfArgument.java", 
+      doReferenceMethodTest(testCaseDirectory, 
+                            "/proofReferences/InvariantInOperationContractOfArgument/InvariantInOperationContractOfArgument.java", 
                             "InvariantInOperationContractOfArgument",
                             "main", 
                             false,
@@ -45,8 +45,8 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
     * Tests "InvariantInOperationContract".
     */
    public void testInvariantInOperationContract() throws Exception {
-      doReferenceMethodTest(keyRepDirectory, 
-                            "examples/_testcase/proofReferences/InvariantInOperationContract/InvariantInOperationContract.java", 
+      doReferenceMethodTest(testCaseDirectory, 
+                            "/proofReferences/InvariantInOperationContract/InvariantInOperationContract.java", 
                             "InvariantInOperationContract",
                             "main", 
                             false,
@@ -64,8 +64,8 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
     * Tests "NestedInvariantInOperationContract".
     */
    public void testNestedInvariantInOperationContract() throws Exception {
-      doReferenceMethodTest(keyRepDirectory, 
-                            "examples/_testcase/proofReferences/NestedInvariantInOperationContract/NestedInvariantInOperationContract.java", 
+      doReferenceMethodTest(testCaseDirectory, 
+                            "/proofReferences/NestedInvariantInOperationContract/NestedInvariantInOperationContract.java", 
                             "NestedInvariantInOperationContract",
                             "main", 
                             false,
@@ -83,8 +83,8 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
     * Tests "ModelFieldTest#doubleX".
     */
    public void testModelFieldTest_doubleX() throws Exception {
-      doReferenceMethodTest(keyRepDirectory, 
-                            "examples/_testcase/proofReferences/ModelFieldTest/ModelFieldTest.java", 
+      doReferenceMethodTest(testCaseDirectory, 
+                            "/proofReferences/ModelFieldTest/ModelFieldTest.java", 
                             "test.ModelFieldTest",
                             "doubleX", 
                             false,
@@ -97,8 +97,8 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
     * Tests "ModelFieldTest#test.ModelFieldTest::$f".
     */
    public void testModelFieldTest_f() throws Exception {
-      doReferenceFunctionTest(keyRepDirectory, 
-                              "examples/_testcase/proofReferences/ModelFieldTest/ModelFieldTest.java", 
+      doReferenceFunctionTest(testCaseDirectory, 
+                              "/proofReferences/ModelFieldTest/ModelFieldTest.java", 
                               "test.ModelFieldTest",
                               "test.ModelFieldTest::$f", 
                               false,
@@ -111,8 +111,8 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
     * Tests "AccessibleTest".
     */
    public void testAccessibleTest() throws Exception {
-      doReferenceFunctionTest(keyRepDirectory, 
-                              "examples/_testcase/proofReferences/AccessibleTest/AccessibleTest.java", 
+      doReferenceFunctionTest(testCaseDirectory, 
+                              "/proofReferences/AccessibleTest/AccessibleTest.java", 
                               "test.B",
                               "java.lang.Object::<inv>", 
                               false,

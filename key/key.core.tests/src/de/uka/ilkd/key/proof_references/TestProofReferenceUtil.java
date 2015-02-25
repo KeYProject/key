@@ -37,8 +37,8 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
     */
    public void testReferenceComputation_ExpandAndContract() throws Exception {
-      doAPITest(keyRepDirectory, 
-                "examples/_testcase/proofReferences/UseOperationContractTest/UseOperationContractTest.java", 
+      doAPITest(testCaseDirectory, 
+                "/proofReferences/UseOperationContractTest/UseOperationContractTest.java", 
                 "UseOperationContractTest", 
                 "main", 
                 true,
@@ -52,8 +52,8 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
     */
    public void testReferenceComputation_NoAnalysts() throws Exception {
-      doAPITest(keyRepDirectory, 
-                "examples/_testcase/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
+      doAPITest(testCaseDirectory, 
+                "/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
                 "MethodBodyExpand", 
                 "main", 
                 false,
@@ -65,8 +65,8 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
     */
    public void testReferenceComputation_ContractOnly() throws Exception {
-      doAPITest(keyRepDirectory, 
-                "examples/_testcase/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
+      doAPITest(testCaseDirectory, 
+                "/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
                 "MethodBodyExpand", 
                 "main", 
                 false,
@@ -78,8 +78,8 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
     */
    public void testReferenceComputation_ExpandOnly() throws Exception {
-      doAPITest(keyRepDirectory, 
-                "examples/_testcase/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
+      doAPITest(testCaseDirectory, 
+                "/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
                 "MethodBodyExpand", 
                 "main", 
                 false,
@@ -93,8 +93,8 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     * {@link ProofReferenceUtil#computeProofReferences(Node)}.
     */
    public void testReferenceComputation_DefaultAnalysts() throws Exception {
-      doAPITest(keyRepDirectory, 
-                "examples/_testcase/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
+      doAPITest(testCaseDirectory, 
+                "/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
                 "MethodBodyExpand", 
                 "main",
                 false,

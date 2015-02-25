@@ -23,10 +23,8 @@ public class TestJavaCardDLJavaExtensions extends TestCase {
 
     private HelperClassForTests helper = new HelperClassForTests();
     
-    public static final String testpath = System.getProperty("key.home")
-    + File.separator + "examples"
-    + File.separator + "_testcase" + File.separator
-    + "javacardDLExtensions" + File.separator;
+    public static final String testpath = HelperClassForTests.TESTCASE_DIRECTORY + 
+                                          File.separator + "javacardDLExtensions" + File.separator;
 
     
     public TestJavaCardDLJavaExtensions() {

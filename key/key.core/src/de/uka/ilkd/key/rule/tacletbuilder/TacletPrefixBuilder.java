@@ -15,7 +15,12 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.collection.DefaultImmutableMap;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableMap;
+import de.uka.ilkd.key.collection.ImmutableMapEntry;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -25,6 +30,7 @@ import de.uka.ilkd.key.rule.NotFreeIn;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletPrefix;
 import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
+import de.uka.ilkd.key.utils.*;
 
 public class TacletPrefixBuilder {
 

@@ -49,6 +49,8 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.utils.IOUtils;
 
 
 public class TestMatchTaclet extends TestCase {
@@ -77,9 +79,7 @@ public class TestMatchTaclet extends TestCase {
     }
 
     public void setUp() {
-        TacletForTests.setStandardFile(System.getProperty("key.home")
-                + java.io.File.separator + "system" + java.io.File.separator
-                + "test/de/uka/ilkd/key/logic/testRuleMatch.txt");
+        TacletForTests.setStandardFile(IOUtils.toFileString(KeYResourceManager.getManager().getResourceFile(getClass(), "testRuleMatch.txt")));
         TacletForTests.parse();
     
         services = TacletForTests.services();

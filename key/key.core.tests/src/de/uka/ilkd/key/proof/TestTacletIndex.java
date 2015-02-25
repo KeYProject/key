@@ -34,6 +34,8 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.utils.IOUtils;
 
 
 public class TestTacletIndex extends TestCase{   
@@ -61,9 +63,7 @@ public class TestTacletIndex extends TestCase{
     }
     
     public void setUp() {
-	TacletForTests.parse(System.getProperty("key.home")+
-           java.io.File.separator+"system"+java.io.File.separator+
-           "test/de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
+	TacletForTests.parse(IOUtils.toFile(KeYResourceManager.getManager().getResourceFile(getClass(), "ruleForTestTacletIndex.taclet")));
 
 	h1 = (RuleSet)TacletForTests.getHeuristics().lookup(new Name("h1"));
 	h2 = (RuleSet)TacletForTests.getHeuristics().lookup(new Name("h2"));

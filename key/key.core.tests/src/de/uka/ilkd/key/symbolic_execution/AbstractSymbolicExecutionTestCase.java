@@ -14,9 +14,7 @@
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
@@ -26,7 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -106,6 +103,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -159,7 +157,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    /**
     * The directory which contains the KeY repository.
     */
-   public static final File keyRepDirectory;
+   public static final File testCaseDirectory = new File(HelperClassForTests.TESTCASE_DIRECTORY);
    
    /**
     * Creates the temporary oracle directory if required.
@@ -184,38 +182,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       catch (IOException e) {
       }
       tempNewOracleDirectory = directory;
-      // Detect the KeY repository.
-      // By default the repository should be the current path.
-      // But in Eclipse development like for the symbolic execution debugger it is the eclipse plug-in.
-      File currentDirectory = null;
-      try {
-         // Try to get key home directory from system property
-         String keyProp = System.getProperty("key.home");
-         if (keyProp != null)  {
-            currentDirectory = new File(keyProp);
-         }
-         // Try to get it from customTargets.properties if plug-in org.key_project.key4eclipse is used.
-         if (currentDirectory == null || !currentDirectory.isDirectory()) {
-            File customTargets = new File(currentDirectory, "customTargets.properties"); 
-            if (customTargets.isFile()) {
-               // Extract repository directory from properties.
-               Properties properties = new Properties();
-               Reader reader = new FileReader(customTargets);
-               try {
-                  properties.load(reader);
-               }
-               finally {
-                  reader.close();
-               }
-               final String KEY_REP_KEY = "key.rep";
-               assertTrue("Value \"" + KEY_REP_KEY + "\" is not defined in \"" + customTargets.getAbsolutePath() + "\".", properties.containsKey(KEY_REP_KEY));
-               currentDirectory = new File(properties.getProperty(KEY_REP_KEY));
-            }
-         }
-      }
-      catch (IOException e) {
-      }
-      keyRepDirectory = currentDirectory;  
    }
    
    /**
@@ -2001,7 +1967,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                  String javaPathInBaseDir,
                                                                  String baseContractName) throws ProblemLoaderException, ProofInputException {
       if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-         SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInBaseDir, baseContractName, false, false, false, false, false, false, false, false, false);
+         SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInBaseDir, baseContractName, false, false, false, false, false, false, false, false, false);
          env.dispose();
       }
       return setDefaultTacletOptions();

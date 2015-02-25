@@ -16,6 +16,8 @@
  */
 package de.uka.ilkd.key.util;
 
+import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
+
 import java.io.File;
 
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -29,8 +31,8 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.RuleCollection;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
-import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.utils.IOUtils;
 
 /**
  * @author bubel
@@ -39,6 +41,10 @@ import de.uka.ilkd.key.rule.BuiltInRule;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class HelperClassForTests {
+   public static final String TESTCASE_DIRECTORY = IOUtils.getProjectRoot(HelperClassForTests.class) + 
+                                                   File.separator + "resources"+ 
+                                                   File.separator + "testcase";
+
     
     private static final Profile profile = new JavaProfile() {
             //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)

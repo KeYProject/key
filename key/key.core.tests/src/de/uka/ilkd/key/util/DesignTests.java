@@ -20,6 +20,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.utils.IOUtils;
 import junit.framework.TestCase;
 
 
@@ -29,9 +32,8 @@ import junit.framework.TestCase;
  */
 public class DesignTests extends TestCase {
 
-    private static final File binaryPath = 
-	new File(System.getProperty("key.home")+File.separator+"system"+
-	                File.separator+"binary"+File.separator+"de"+File.separator+"uka"+File.separator+"ilkd"+File.separator+"key");
+    private static final File binaryPath = new File(IOUtils.getClassLocation(Term.class), "de"+File.separator+"uka"+File.separator+"ilkd"+File.separator+"key");
+          
     private static final FileFilter FILTER = new FileFilter() {
         public boolean accept(File fileName) {
             final String absolutePath = fileName.getAbsolutePath();
@@ -261,7 +263,6 @@ public class DesignTests extends TestCase {
 
 
     public void runTests() {
-        assertNotNull("Environment variable \"key.home\" not set", binaryPath);
         Method[] meth = getClass().getMethods();
         System.out.println("[Design Conformance Tests]");	
         System.out.println("[Collecting classes. Please wait...]");

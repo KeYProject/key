@@ -19,12 +19,12 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
     * @throws Exception Occurred Exception.
     */
    public void testVariablesUnderMethodReturnCondition() throws Exception {
-      SymbolicExecutionEnvironment<CustomUserInterface> env = doSETTest(keyRepDirectory, 
-                                                                        "examples/_testcase/set/conditionalVariables/test/Number.java", 
+      SymbolicExecutionEnvironment<CustomUserInterface> env = doSETTest(testCaseDirectory, 
+                                                                        "/set/conditionalVariables/test/Number.java", 
                                                                         "Number", 
                                                                         "equals", 
                                                                         null, 
-                                                                        "examples/_testcase/set/conditionalVariables/oracle/Number.xml", 
+                                                                        "/set/conditionalVariables/oracle/Number.xml", 
                                                                         false, 
                                                                         false, 
                                                                         false, 

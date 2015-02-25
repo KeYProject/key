@@ -42,15 +42,15 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
    //Commented out for the moment as Hudson throws an OOM Exception
    public void xxxtestNewProof() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       // Define test settings
-      String javaPathInkeyRepDirectory = "examples/_testcase/set/magic42/test/Magic42.java";
+      String javaPathInkeyRepDirectory = "/set/magic42/test/Magic42.java";
       String containerTypeName = "Magic42";
       final String methodFullName = "compute";
-      String oraclePathInBaseDirFile = "examples/_testcase/set/magic42/oracle/Magic42.xml";
+      String oraclePathInBaseDirFile = "/set/magic42/oracle/Magic42.xml";
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false);
+      SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false);
       try {
          // Resume
-         resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, keyRepDirectory);
+         resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, testCaseDirectory);
          // Do test steps
          doParallelSiteProofTest(env);
       }
@@ -64,9 +64,9 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
     */
    public void testProofFile() throws ProofInputException, IOException, ProblemLoaderException {
       // Define test settings
-      String javaPathInkeyRepDirectory = "examples/_testcase/set/magic42/test/Magic42.proof";
+      String javaPathInkeyRepDirectory = "/set/magic42/test/Magic42.proof";
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, false, false, false, false, false, false, false, false, false);
+      SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, false, false, false, false, false, false, false, false, false);
       try {
          // Do test steps
          doParallelSiteProofTest(env);

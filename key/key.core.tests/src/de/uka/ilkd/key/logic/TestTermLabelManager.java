@@ -359,15 +359,11 @@ public class TestTermLabelManager extends TestCase {
 
    /**
     * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, JavaBlock)}.
+    * @throws ProblemLoaderException Occurred Exception
     */
-   public void testInstantiateLabels_directChildPolicies_allRules() {
+   public void testInstantiateLabels_directChildPolicies_allRules() throws ProblemLoaderException {
       LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy();
-      Services services = null;
-    try {
-        services = createTestServices(null, null, policy, null, null, null).getServices();
-    } catch (ProblemLoaderException e) {
-        fail();
-    }
+      Services services = createTestServices(null, null, policy, null, null, null).getServices();
       PosInOccurrence pos = createTestPosInOccurrence(services);
       Rule rule = new DummyRule("rule");
       Term taclet = services.getTermBuilder().tt();
@@ -612,7 +608,7 @@ public class TestTermLabelManager extends TestCase {
    throws ProblemLoaderException {
       KeYEnvironment<?> env = null;
       try {
-         env = KeYEnvironment.load(new File(AbstractSymbolicExecutionTestCase.keyRepDirectory, "examples/_testcase/set/statements/test/FlatSteps.java"), null, null);
+         env = KeYEnvironment.load(new File(AbstractSymbolicExecutionTestCase.testCaseDirectory, "set/statements/test/FlatSteps.java"), null, null);
          Profile profile = new JavaProfile() {
             @Override
             protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {

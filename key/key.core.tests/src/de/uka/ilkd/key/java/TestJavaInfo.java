@@ -28,10 +28,9 @@ import de.uka.ilkd.key.util.HelperClassForTests;
  */
 public class TestJavaInfo extends TestCase {       
     
-    public static final String testfile = System.getProperty("key.home")
-    + File.separator + "examples"
-    + File.separator + "_testcase" + File.separator
-    + "javainfo" + File.separator + "testJavaInfo.key";
+    public static final String testfile = HelperClassForTests.TESTCASE_DIRECTORY + 
+                                          File.separator + "javainfo" + 
+                                          File.separator + "testJavaInfo.key";
 
     private static Services services;
     private static JavaInfo javaInfo;

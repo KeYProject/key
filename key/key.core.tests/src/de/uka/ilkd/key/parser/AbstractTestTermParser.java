@@ -37,11 +37,9 @@ public abstract class AbstractTestTermParser extends TestCase {
     protected final NamespaceSet nss;
     protected final Services services;
     
-    static final String javaPath = System.getProperty("key.home")
-            + File.separator + "examples"
-            + File.separator + "_testcase"
-            + File.separator + "termParser"
-            + File.separator + "parserTest.key";
+    static final String javaPath = HelperClassForTests.TESTCASE_DIRECTORY + 
+                                   File.separator + "termParser" + 
+                                   File.separator + "parserTest.key";
 
     AbstractTestTermParser(String name) {
         super(name);

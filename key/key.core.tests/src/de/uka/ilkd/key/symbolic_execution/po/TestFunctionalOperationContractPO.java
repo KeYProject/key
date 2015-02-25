@@ -37,9 +37,9 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
     * Tests the contract of method {@code doubleValue}.
     */
    public void testDoubleValue() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      doTest("examples/_testcase/set/existingContractTest/test/ExistingContractTest.java",
+      doTest("/set/existingContractTest/test/ExistingContractTest.java",
              "ExistingContractTest[ExistingContractTest::doubleValue(int)].JML operation contract.0",
-             "examples/_testcase/set/existingContractTest/oracle/ExistingContractTest.xml",
+             "/set/existingContractTest/oracle/ExistingContractTest.xml",
              "{result=self.doubleValue(_value)@ExistingContractTest; }");
    }
    
@@ -54,16 +54,16 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
       SymbolicExecutionEnvironment<CustomUserInterface> env = null;
       try {
          // Make sure that the correct taclet options are defined.
-         originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, baseContractName);
+         originalTacletOptions = setDefaultTacletOptions(testCaseDirectory, javaPathInkeyRepDirectory, baseContractName);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, baseContractName, false, false, false, false, false, false, false, false, false);
+         env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, baseContractName, false, false, false, false, false, false, false, false, false);
          // Extract and test try content
          String tryContent = getTryContent(env.getProof());
          assertTrue("Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".", JavaUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent));
          // Resume
-         resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, keyRepDirectory);
+         resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, testCaseDirectory);
          // Test save and reload of the proof
-         assertSaveAndReload(keyRepDirectory, javaPathInkeyRepDirectory, oraclePathInBaseDirFile, env);
+         assertSaveAndReload(testCaseDirectory, javaPathInkeyRepDirectory, oraclePathInBaseDirFile, env);
       }
       finally {
          // Restore taclet options

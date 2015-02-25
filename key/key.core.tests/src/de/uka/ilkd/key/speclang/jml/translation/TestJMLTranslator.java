@@ -51,9 +51,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 
 public class TestJMLTranslator extends TestCase {
 
-    public static final String testFile = System.getProperty("key.home")
-                                          + File.separator + "examples"
-                                          + File.separator + "_testcase"
+    public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY
                                           + File.separator + "speclang"
                                           + File.separator + "testFile.key";
     private static TermBuilder TB;

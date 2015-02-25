@@ -37,7 +37,7 @@ public class TestParallelParsing extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testLoadingOfTwoDifferentProofFiles() throws Exception {
-      doParallelTest(keyRepDirectory,
+      doParallelTest(testCaseDirectory,
                      2,
                      "examples/_testcase/parser/MultipleRecursion/MultipleRecursion[MultipleRecursion__a()]_JML_normal_behavior_operation_contract_0.proof",
                      "examples/_testcase/parser/MultipleRecursion/MultipleRecursion[MultipleRecursion__b()]_JML_normal_behavior_operation_contract_0.proof");

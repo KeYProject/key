@@ -25,8 +25,8 @@ public class TestMethodBodyExpandProofReferencesAnalyst extends AbstractProofRef
     * Tests "MethodBodyExpand".
     */
    public void testMethodBodyExpand() throws Exception {
-      doReferenceMethodTest(keyRepDirectory, 
-                            "examples/_testcase/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
+      doReferenceMethodTest(testCaseDirectory, 
+                            "/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
                             "MethodBodyExpand", 
                             "main", 
                             false,

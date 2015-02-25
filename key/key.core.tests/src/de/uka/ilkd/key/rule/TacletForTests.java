@@ -41,16 +41,16 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.RuleCollection;
 import de.uka.ilkd.key.proof.io.*;
+import de.uka.ilkd.key.util.HelperClassForTests;
+import de.uka.ilkd.key.utils.IOUtils;
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
 public class TacletForTests {
 
     private TacletForTests() {}
 
-    public static final String testRules = System.getProperty("key.home")+
-        File.separator+"examples"+
-        File.separator+"_testcase"+
-        File.separator+"testrules.key";
+    public static final String testRules = HelperClassForTests.TESTCASE_DIRECTORY +
+                                           File.separator + "testrules.key";
     public static String standardFile = testRules;
 
     public static AbbrevMap scm = new AbbrevMap();

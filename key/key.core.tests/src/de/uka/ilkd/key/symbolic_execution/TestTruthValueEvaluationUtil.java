@@ -26,7 +26,7 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  */
 public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestCase {
    /**
-    * Tests example: examples/_testcase/set/truthValueEquivExample
+    * Tests example: /set/truthValueEquivExample
     */
    public void testEquivExample_NoOneStepSimplification() throws Exception {
       // Create expected results
@@ -36,15 +36,15 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       ExpectedBranchResult goal97 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.FALSE)); // SETAccumulate is false
       ExpectedTruthValueEvaluationResult result = new ExpectedTruthValueEvaluationResult(goal79, goal91, goal95, goal97);
       // Perform test
-      doTruthValueEvaluationTest("examples/_testcase/set/truthValueEquivExample/test/EquivExampleNoOneStepSimplification.proof", 
-                                 "examples/_testcase/set/truthValueEquivExample/oracle/EquivExample.xml",
+      doTruthValueEvaluationTest("/set/truthValueEquivExample/test/EquivExampleNoOneStepSimplification.proof", 
+                                 "/set/truthValueEquivExample/oracle/EquivExample.xml",
                                  false,
                                  true,
                                  result);
    }
    
    /**
-    * Tests example: examples/_testcase/set/truthValueEquivExample
+    * Tests example: /set/truthValueEquivExample
     */
    public void testEquivExample() throws Exception {
       // Create expected results
@@ -54,24 +54,24 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.FALSE)); // SETAccumulate is false
       ExpectedTruthValueEvaluationResult result = new ExpectedTruthValueEvaluationResult(goal39, goal50, goal53, goal55);
       // Perform test
-      doTruthValueEvaluationTest("examples/_testcase/set/truthValueEquivExample/test/EquivExample.proof", 
-                                 "examples/_testcase/set/truthValueEquivExample/oracle/EquivExample.xml",
+      doTruthValueEvaluationTest("/set/truthValueEquivExample/test/EquivExample.proof", 
+                                 "/set/truthValueEquivExample/oracle/EquivExample.xml",
                                  false,
                                  false,
                                  result);
    }
    
    /**
-    * Tests example: examples/_testcase/set/truthValueIfThenElseIntegerTest
+    * Tests example: /set/truthValueIfThenElseIntegerTest
     */
    public void testIfThenElseInteger() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult thenResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult elseResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
       // Perform test
-      doTruthValueEvaluationTest("examples/_testcase/set/truthValueIfThenElseIntegerTest/test/IfThenElseIntegerTest.java", 
+      doTruthValueEvaluationTest("/set/truthValueIfThenElseIntegerTest/test/IfThenElseIntegerTest.java", 
                                  "IfThenElseIntegerTest[IfThenElseIntegerTest::magic(int,int)].JML normal_behavior operation contract.0", 
-                                 "examples/_testcase/set/truthValueIfThenElseIntegerTest/oracle/IfThenElseIntegerTest.xml",
+                                 "/set/truthValueIfThenElseIntegerTest/oracle/IfThenElseIntegerTest.xml",
                                  false,
                                  false,
                                  thenResult,
@@ -79,16 +79,16 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
    
    /**
-    * Tests example: examples/_testcase/set/truthValueIfThenElseNotFormulaTest
+    * Tests example: /set/truthValueIfThenElseNotFormulaTest
     */
    public void testIfThenElseNotFormula() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult thenResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult elseResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
       // Perform test
-      doTruthValueEvaluationTest("examples/_testcase/set/truthValueIfThenElseNotFormulaTest/test/IfThenElseNotFormulaTest.java", 
+      doTruthValueEvaluationTest("/set/truthValueIfThenElseNotFormulaTest/test/IfThenElseNotFormulaTest.java", 
                                  "IfThenElseNotFormulaTest[IfThenElseNotFormulaTest::magic(int,int)].JML normal_behavior operation contract.0", 
-                                 "examples/_testcase/set/truthValueIfThenElseNotFormulaTest/oracle/IfThenElseNotFormulaTest.xml",
+                                 "/set/truthValueIfThenElseNotFormulaTest/oracle/IfThenElseNotFormulaTest.xml",
                                  false,
                                  false,
                                  thenResult,
@@ -96,16 +96,16 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
    
    /**
-    * Tests example: examples/_testcase/set/truthValueIfThenElseFormulaTest
+    * Tests example: /set/truthValueIfThenElseFormulaTest
     */
    public void testIfThenElseFormula() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult thenResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("4.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult elseResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("4.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.FALSE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE)));
       // Perform test
-      doTruthValueEvaluationTest("examples/_testcase/set/truthValueIfThenElseFormulaTest/test/IfThenElseFormulaTest.java", 
+      doTruthValueEvaluationTest("/set/truthValueIfThenElseFormulaTest/test/IfThenElseFormulaTest.java", 
                                  "IfThenElseFormulaTest[IfThenElseFormulaTest::magic(int,int)].JML normal_behavior operation contract.0", 
-                                 "examples/_testcase/set/truthValueIfThenElseFormulaTest/oracle/IfThenElseFormulaTest.xml",
+                                 "/set/truthValueIfThenElseFormulaTest/oracle/IfThenElseFormulaTest.xml",
                                  false,
                                  false,
                                  thenResult,
@@ -113,7 +113,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
    
    /**
-    * Tests example: examples/_testcase/set/truthValueNotLastEvaluationGivesTruthValue
+    * Tests example: /set/truthValueNotLastEvaluationGivesTruthValue
     */
    public void testNotLastEvaluationGivesTruthValue() throws Exception {
       // Create expected results
@@ -123,15 +123,15 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.11", TruthValue.TRUE));
       ExpectedTruthValueEvaluationResult result = new ExpectedTruthValueEvaluationResult(goal53, goal41, goal39, goal55);
       // Perform test
-      doTruthValueEvaluationTest("examples/_testcase/set/truthValueNotLastEvaluationGivesTruthValue/test/NotLastEvaluationGivesTruthValue.proof", 
-                                 "examples/_testcase/set/truthValueNotLastEvaluationGivesTruthValue/oracle/NotLastEvaluationGivesTruthValue.xml",
+      doTruthValueEvaluationTest("/set/truthValueNotLastEvaluationGivesTruthValue/test/NotLastEvaluationGivesTruthValue.proof", 
+                                 "/set/truthValueNotLastEvaluationGivesTruthValue/oracle/NotLastEvaluationGivesTruthValue.xml",
                                  false,
                                  true,
                                  result);
    }
    
    /**
-    * Tests example: examples/_testcase/set/truthValueArraySumWhile
+    * Tests example: /set/truthValueArraySumWhile
     */
    public void testArraySumWhile_NoOneStepSimplification() throws Exception {
       // Create expected results
@@ -139,8 +139,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       ExpectedTruthValueEvaluationResult preservesResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("18.0", TruthValue.TRUE), new ExpectedTruthValueResult("19.0", TruthValue.TRUE), new ExpectedTruthValueResult("20.0", TruthValue.TRUE), new ExpectedTruthValueResult("21.0", TruthValue.TRUE), new ExpectedTruthValueResult("22.0", TruthValue.TRUE), new ExpectedTruthValueResult("23.0", TruthValue.TRUE), new ExpectedTruthValueResult("24.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.FALSE), new ExpectedTruthValueResult("8.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE)));
       // Perform test
-      doTruthValueEvaluationTest("examples/_testcase/set/truthValueArraySumWhile/test/ArraySumWhileNoOneStepSimplification.proof", 
-                                 "examples/_testcase/set/truthValueArraySumWhile/oracle/ArraySumWhile.xml",
+      doTruthValueEvaluationTest("/set/truthValueArraySumWhile/test/ArraySumWhileNoOneStepSimplification.proof", 
+                                 "/set/truthValueArraySumWhile/oracle/ArraySumWhile.xml",
                                  false,
                                  true,
                                  initialResult,
@@ -149,7 +149,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
    
    /**
-    * Tests example: examples/_testcase/set/truthValueArraySumWhile
+    * Tests example: /set/truthValueArraySumWhile
     */
    public void testArraySumWhile() throws Exception {
       // Create expected results
@@ -157,8 +157,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       ExpectedTruthValueEvaluationResult preservesResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("18.0", TruthValue.TRUE), new ExpectedTruthValueResult("19.0", TruthValue.TRUE), new ExpectedTruthValueResult("20.0", TruthValue.TRUE), new ExpectedTruthValueResult("21.0", TruthValue.TRUE), new ExpectedTruthValueResult("22.0", TruthValue.TRUE), new ExpectedTruthValueResult("23.0", TruthValue.TRUE), new ExpectedTruthValueResult("24.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE), new ExpectedTruthValueResult("4.0", TruthValue.FALSE), new ExpectedTruthValueResult("8.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE)));
       // Perform test
-      doTruthValueEvaluationTest("examples/_testcase/set/truthValueArraySumWhile/test/ArraySumWhile.proof", 
-                                 "examples/_testcase/set/truthValueArraySumWhile/oracle/ArraySumWhile.xml",
+      doTruthValueEvaluationTest("/set/truthValueArraySumWhile/test/ArraySumWhile.proof", 
+                                 "/set/truthValueArraySumWhile/oracle/ArraySumWhile.xml",
                                  false,
                                  true,
                                  initialResult,
@@ -167,7 +167,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
    
    /**
-    * Tests example: examples/_testcase/set/truthValueArrayUtil
+    * Tests example: /set/truthValueArrayUtil
     */
    public void testArrayUtil_NoOneStepSimplification() throws Exception {
       // Create expected results
@@ -178,8 +178,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       ExpectedTruthValueEvaluationResult goal1024 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult goal1161 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE)));
       // Perform test
-      doTruthValueEvaluationTest("examples/_testcase/set/truthValueArrayUtil/test/ArrayUtilNoOneStepSimplification.proof", 
-                                 "examples/_testcase/set/truthValueArrayUtil/oracle/ArrayUtil.xml",
+      doTruthValueEvaluationTest("/set/truthValueArrayUtil/test/ArrayUtilNoOneStepSimplification.proof", 
+                                 "/set/truthValueArrayUtil/oracle/ArrayUtil.xml",
                                  true,
                                  true,
                                  goal97,
@@ -191,7 +191,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
    
    /**
-    * Tests example: examples/_testcase/set/truthValueArrayUtil
+    * Tests example: /set/truthValueArrayUtil
     */
    public void testArrayUtil() throws Exception {
       // Create expected results
@@ -202,8 +202,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       ExpectedTruthValueEvaluationResult goal1024 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult goal1161 = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("3.0", TruthValue.TRUE)));
       // Perform test
-      doTruthValueEvaluationTest("examples/_testcase/set/truthValueArrayUtil/test/ArrayUtil.proof", 
-                                 "examples/_testcase/set/truthValueArrayUtil/oracle/ArrayUtil.xml",
+      doTruthValueEvaluationTest("/set/truthValueArrayUtil/test/ArrayUtil.proof", 
+                                 "/set/truthValueArrayUtil/oracle/ArrayUtil.xml",
                                  true,
                                  true,
                                  goal97,
@@ -215,15 +215,15 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
    
    /**
-    * Tests example: examples/_testcase/set/truthValueSimpleInstanceMethodContractApplication
+    * Tests example: /set/truthValueSimpleInstanceMethodContractApplication
     */
    public void testSimpleInstanceMethodContractApplication_NoOneStepSimplification() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult preResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("12.0", TruthValue.TRUE), new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE), new ExpectedTruthValueResult("11.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE)));
       // Perform test
-      doTruthValueEvaluationTest("examples/_testcase/set/truthValueSimpleInstanceMethodContractApplication/test/SimpleInstanceMethodContractApplication_NoOneStepSimplification.proof", 
-                                 "examples/_testcase/set/truthValueSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
+      doTruthValueEvaluationTest("/set/truthValueSimpleInstanceMethodContractApplication/test/SimpleInstanceMethodContractApplication_NoOneStepSimplification.proof", 
+                                 "/set/truthValueSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
                                  true,
                                  false,
                                  preResult,
@@ -231,15 +231,15 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
    
    /**
-    * Tests example: examples/_testcase/set/truthValueSimpleInstanceMethodContractApplication
+    * Tests example: /set/truthValueSimpleInstanceMethodContractApplication
     */
    public void testSimpleInstanceMethodContractApplication() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult preResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("12.0", TruthValue.TRUE), new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE), new ExpectedTruthValueResult("11.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE)));
       // Perform test
-      doTruthValueEvaluationTest("examples/_testcase/set/truthValueSimpleInstanceMethodContractApplication/test/SimpleInstanceMethodContractApplication.proof", 
-                                 "examples/_testcase/set/truthValueSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
+      doTruthValueEvaluationTest("/set/truthValueSimpleInstanceMethodContractApplication/test/SimpleInstanceMethodContractApplication.proof", 
+                                 "/set/truthValueSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
                                  true,
                                  false,
                                  preResult,
@@ -247,15 +247,15 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
 
    /**
-    * Tests example: examples/_testcase/set/truthValueSimpleMethodContractApplication
+    * Tests example: /set/truthValueSimpleMethodContractApplication
     */
    public void testSimpleMethodContractApplication_NoOneStepSimplification() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult preResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE), new ExpectedTruthValueResult("11.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE)));
       // Perform test
-      doTruthValueEvaluationTest("examples/_testcase/set/truthValueSimpleMethodContractApplication/test/SimpleMethodContractApplication_NoOneStepSimplification.proof", 
-                                 "examples/_testcase/set/truthValueSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
+      doTruthValueEvaluationTest("/set/truthValueSimpleMethodContractApplication/test/SimpleMethodContractApplication_NoOneStepSimplification.proof", 
+                                 "/set/truthValueSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
                                  true,
                                  false,
                                  preResult,
@@ -263,15 +263,15 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
    
    /**
-    * Tests example: examples/_testcase/set/truthValueSimpleMethodContractApplication
+    * Tests example: /set/truthValueSimpleMethodContractApplication
     */
    public void testSimpleMethodContractApplication() throws Exception {
       // Create expected results
       ExpectedTruthValueEvaluationResult preResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("10.0", TruthValue.TRUE), new ExpectedTruthValueResult("9.0", TruthValue.TRUE), new ExpectedTruthValueResult("11.0", TruthValue.TRUE), new ExpectedTruthValueResult("7.0", TruthValue.TRUE)));
       ExpectedTruthValueEvaluationResult terminationResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE), new ExpectedTruthValueResult("5.0", TruthValue.TRUE), new ExpectedTruthValueResult("2.0", TruthValue.TRUE)));
       // Perform test
-      doTruthValueEvaluationTest("examples/_testcase/set/truthValueSimpleMethodContractApplication/test/SimpleMethodContractApplication.proof", 
-                                 "examples/_testcase/set/truthValueSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
+      doTruthValueEvaluationTest("/set/truthValueSimpleMethodContractApplication/test/SimpleMethodContractApplication.proof", 
+                                 "/set/truthValueSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
                                  true,
                                  false,
                                  preResult,
@@ -279,7 +279,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
    
    /**
-    * Tests example: examples/_testcase/set/truthValueDifferentBranchesTest
+    * Tests example: /set/truthValueDifferentBranchesTest
     */
    public void testDifferentBranchesTest() throws Exception {
       // Create expected results
@@ -288,8 +288,8 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       ExpectedTruthValueEvaluationResult thirdResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("1.0", TruthValue.FALSE)));
       ExpectedTruthValueEvaluationResult fourthResult = new ExpectedTruthValueEvaluationResult(new ExpectedBranchResult(new ExpectedTruthValueResult("1.0", TruthValue.FALSE)));
       // Perform test
-      doTruthValueEvaluationTest("examples/_testcase/set/truthValueDifferentBranchesTest/test/DifferentBranchesTest.proof", 
-                                 "examples/_testcase/set/truthValueDifferentBranchesTest/oracle/DifferentBranchesTest.xml",
+      doTruthValueEvaluationTest("/set/truthValueDifferentBranchesTest/test/DifferentBranchesTest.proof", 
+                                 "/set/truthValueDifferentBranchesTest/oracle/DifferentBranchesTest.xml",
                                  false,
                                  false,
                                  firstResult,
@@ -299,7 +299,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
    }
    
    /**
-    * Tests example: examples/_testcase/set/truthValueMultiplePredicateResults
+    * Tests example: /set/truthValueMultiplePredicateResults
     */
    public void testMultiplePredicateResultsTest() throws Exception {
       // Create expected results
@@ -307,9 +307,9 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       ExpectedBranchResult goal95 = new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE), new ExpectedTruthValueResult("1.0", TruthValue.TRUE));
       ExpectedTruthValueEvaluationResult expectedResult = new ExpectedTruthValueEvaluationResult(goal102, goal95);
       // Perform test
-      doTruthValueEvaluationTest("examples/_testcase/set/truthValueMultiplePredicateResults/test/MultiplePredicateResultsTest.java", 
+      doTruthValueEvaluationTest("/set/truthValueMultiplePredicateResults/test/MultiplePredicateResultsTest.java", 
                                  "MultiplePredicateResultsTest[MultiplePredicateResultsTest::main(MultiplePredicateResultsTest,MultiplePredicateResultsTest)].JML normal_behavior operation contract.0", 
-                                 "examples/_testcase/set/truthValueMultiplePredicateResults/oracle/MultiplePredicateResultsTest.xml",
+                                 "/set/truthValueMultiplePredicateResults/oracle/MultiplePredicateResultsTest.xml",
                                  false,
                                  false,
                                  expectedResult);
@@ -333,7 +333,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       SymbolicExecutionEnvironment<CustomUserInterface> env = null;
       try {
          // Perform symbolic execution
-         env = doSETTest(keyRepDirectory, 
+         env = doSETTest(testCaseDirectory, 
                          proofFilePathInBaseDir, 
                          oraclePathInBaseDirFile, 
                          false, 
@@ -379,7 +379,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
       SymbolicExecutionEnvironment<CustomUserInterface> env = null;
       try {
          // Perform symbolic execution
-         env = doSETTest(keyRepDirectory, 
+         env = doSETTest(testCaseDirectory, 
                          javaPathInBaseDir, 
                          baseContractName, 
                          oraclePathInBaseDirFile,

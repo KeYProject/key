@@ -13,10 +13,10 @@ import de.uka.ilkd.key.smt.TestConsoleUserInterface;
 import de.uka.ilkd.key.smt.test.TestCommons;
 import de.uka.ilkd.key.ui.BatchMode;
 import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.util.HelperClassForTests;
 
 public class TestCE extends TestCommons {
-	public static final String testFile = System.getProperty("key.home")
-	        + File.separator + "examples" + File.separator + "_testcase"
+	public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY
 	        + File.separator + "smt" + File.separator + "ce" + File.separator;
 	private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
 	private static boolean isInstalled = false;

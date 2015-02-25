@@ -152,9 +152,7 @@ public class TestTacletBuild extends TestCase {
 
     private final HelperClassForTests helper = new HelperClassForTests();
     
-    public static final String testRules = System.getProperty("key.home")+
-        File.separator+"examples"+
-        File.separator+"_testcase"+File.separator+"tacletprefix";
+    public static final String testRules = HelperClassForTests.TESTCASE_DIRECTORY+File.separator+"tacletprefix";
     
     public void testSchemavariablesInAddrulesRespectPrefix() {        
         try {

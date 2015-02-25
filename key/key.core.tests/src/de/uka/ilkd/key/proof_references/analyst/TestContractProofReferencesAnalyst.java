@@ -25,8 +25,8 @@ public class TestContractProofReferencesAnalyst extends AbstractProofReferenceTe
     * Tests "UseOperationContractTest".
     */
    public void testUseOperationContracts() throws Exception {
-      doReferenceMethodTest(keyRepDirectory, 
-                            "examples/_testcase/proofReferences/UseOperationContractTest/UseOperationContractTest.java", 
+      doReferenceMethodTest(testCaseDirectory, 
+                            "/proofReferences/UseOperationContractTest/UseOperationContractTest.java", 
                             "UseOperationContractTest", 
                             "main", 
                             true,

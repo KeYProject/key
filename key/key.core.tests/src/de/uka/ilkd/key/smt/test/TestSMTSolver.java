@@ -15,10 +15,10 @@ package de.uka.ilkd.key.smt.test;
 import java.io.File;
 
 import junit.framework.Assert;
+import de.uka.ilkd.key.util.HelperClassForTests;
 
 public abstract class TestSMTSolver extends TestCommons {
-	public static final String testFile = System.getProperty("key.home")
-	        + File.separator + "examples" + File.separator + "_testcase"
+	public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY
 	        + File.separator + "smt" + File.separator;
 
 	protected void setUp() {

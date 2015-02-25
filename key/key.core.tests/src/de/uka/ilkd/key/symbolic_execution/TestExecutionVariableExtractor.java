@@ -6,15 +6,15 @@ package de.uka.ilkd.key.symbolic_execution;
  */
 public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTestCase {
    /**
-    * Tests example: examples/_testcase/set/variableVariableMethodContractTest
+    * Tests example: /set/variableVariableMethodContractTest
     */
    public void testVariableMethodContractTest() throws Exception {
-      doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/variableVariableMethodContractTest/test/VariableMethodContractTest.java", 
+      doSETTest(testCaseDirectory, 
+                "/set/variableVariableMethodContractTest/test/VariableMethodContractTest.java", 
                 "VariableMethodContractTest", 
                 "findMax", 
                 null,
-                "examples/_testcase/set/variableVariableMethodContractTest/oracle/VariableMethodContractTest.xml",
+                "/set/variableVariableMethodContractTest/oracle/VariableMethodContractTest.xml",
                 false,
                 true,
                 false,
@@ -31,15 +31,15 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    }
    
    /**
-    * Tests example: examples/_testcase/set/variablesConditionalCycle
+    * Tests example: /set/variablesConditionalCycle
     */
    public void testVariablesConditionalCycle() throws Exception {
-      doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/variablesConditionalCycle/test/VariablesConditionalCycle.java", 
+      doSETTest(testCaseDirectory, 
+                "/set/variablesConditionalCycle/test/VariablesConditionalCycle.java", 
                 "VariablesConditionalCycle", 
                 "main", 
                 null,
-                "examples/_testcase/set/variablesConditionalCycle/oracle/VariablesConditionalCycle.xml",
+                "/set/variablesConditionalCycle/oracle/VariablesConditionalCycle.xml",
                 false,
                 true,
                 false,
@@ -56,15 +56,15 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    }
    
    /**
-    * Tests example: examples/_testcase/set/variablesSimpleCycle
+    * Tests example: /set/variablesSimpleCycle
     */
    public void testVariablesSimpleCycle() throws Exception {
-      doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/variablesSimpleCycle/test/VariablesSimpleCycle.java", 
+      doSETTest(testCaseDirectory, 
+                "/set/variablesSimpleCycle/test/VariablesSimpleCycle.java", 
                 "VariablesSimpleCycle", 
                 "main", 
                 "something != null",
-                "examples/_testcase/set/variablesSimpleCycle/oracle/VariablesSimpleCycle.xml",
+                "/set/variablesSimpleCycle/oracle/VariablesSimpleCycle.xml",
                 false,
                 true,
                 false,
@@ -81,15 +81,15 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    }
    
    /**
-    * Tests example: examples/_testcase/set/variablesWithQuantifier
+    * Tests example: /set/variablesWithQuantifier
     */
    public void testVariablesWithQuantifier() throws Exception {
-      doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/variablesWithQuantifier/test/EnoughInfoReturn.java", 
+      doSETTest(testCaseDirectory, 
+                "/set/variablesWithQuantifier/test/EnoughInfoReturn.java", 
                 "EnoughInfoReturn", 
                 "passwordChecker", 
                 "passwords != null",
-                "examples/_testcase/set/variablesWithQuantifier/oracle/EnoughInfoReturn.xml",
+                "/set/variablesWithQuantifier/oracle/EnoughInfoReturn.xml",
                 false,
                 true,
                 false,
@@ -106,15 +106,15 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    }
    
    /**
-    * Tests example: examples/_testcase/set/variablesVariableArrayIndex
+    * Tests example: /set/variablesVariableArrayIndex
     */
    public void testVariableArrayIndex() throws Exception {
-      doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/variablesVariableArrayIndex/test/VariableArrayIndex.java", 
+      doSETTest(testCaseDirectory, 
+                "/set/variablesVariableArrayIndex/test/VariableArrayIndex.java", 
                 "VariableArrayIndex", 
                 "magic", 
                 "array != null && array.length >= 1 && index >= 0 && index < array.length",
-                "examples/_testcase/set/variablesVariableArrayIndex/oracle/VariableArrayIndex.xml",
+                "/set/variablesVariableArrayIndex/oracle/VariableArrayIndex.xml",
                 false,
                 true,
                 false,
@@ -131,15 +131,15 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    }
 
    /**
-    * Tests example: examples/_testcase/set/variablesConditionalValuesTest
+    * Tests example: /set/variablesConditionalValuesTest
     */
    public void testVariablesConditionalValuesTest_next() throws Exception {
-      doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/variablesConditionalValuesTest/test/ConditionalValuesTest.java", 
+      doSETTest(testCaseDirectory, 
+                "/set/variablesConditionalValuesTest/test/ConditionalValuesTest.java", 
                 "ConditionalValuesTest", 
                 "mainNext", 
                 null,
-                "examples/_testcase/set/variablesConditionalValuesTest/oracle/ConditionalValuesTest_next.xml",
+                "/set/variablesConditionalValuesTest/oracle/ConditionalValuesTest_next.xml",
                 false,
                 true,
                 false,
@@ -156,15 +156,15 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    }
    
    /**
-    * Tests example: examples/_testcase/set/variablesConditionalValuesTest
+    * Tests example: /set/variablesConditionalValuesTest
     */
    public void testVariablesConditionalValuesTest() throws Exception {
-      doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/variablesConditionalValuesTest/test/ConditionalValuesTest.java", 
+      doSETTest(testCaseDirectory, 
+                "/set/variablesConditionalValuesTest/test/ConditionalValuesTest.java", 
                 "ConditionalValuesTest", 
                 "main", 
                 null,
-                "examples/_testcase/set/variablesConditionalValuesTest/oracle/ConditionalValuesTest.xml",
+                "/set/variablesConditionalValuesTest/oracle/ConditionalValuesTest.xml",
                 false,
                 true,
                 false,
@@ -181,15 +181,15 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    }
    
    /**
-    * Tests example: examples/_testcase/set/variableVariablesArrayTest
+    * Tests example: /set/variableVariablesArrayTest
     */
    public void testVariableVariablesArrayTest() throws Exception {
-      doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/variableVariablesArrayTest/test/VariablesArrayTest.java", 
+      doSETTest(testCaseDirectory, 
+                "/set/variableVariablesArrayTest/test/VariablesArrayTest.java", 
                 "VariablesArrayTest", 
                 "arrayTest", 
                 null,
-                "examples/_testcase/set/variableVariablesArrayTest/oracle/VariablesArrayTest.xml",
+                "/set/variableVariablesArrayTest/oracle/VariablesArrayTest.xml",
                 false,
                 true,
                 false,
@@ -206,15 +206,15 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    }
    
    /**
-    * Tests example: examples/_testcase/set/variablesLocalVariablesTest
+    * Tests example: /set/variablesLocalVariablesTest
     */
    public void testVariablesLocalVariablesTest() throws Exception {
-      doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/variablesLocalVariablesTest/test/LocalVariablesTest.java", 
+      doSETTest(testCaseDirectory, 
+                "/set/variablesLocalVariablesTest/test/LocalVariablesTest.java", 
                 "LocalVariablesTest", 
                 "main", 
                 null,
-                "examples/_testcase/set/variablesLocalVariablesTest/oracle/LocalVariablesTest.xml",
+                "/set/variablesLocalVariablesTest/oracle/LocalVariablesTest.xml",
                 false,
                 true,
                 false,
@@ -231,15 +231,15 @@ public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTes
    }
    
    /**
-    * Tests example: examples/_testcase/set/variablesUpdateVariablesTest
+    * Tests example: /set/variablesUpdateVariablesTest
     */
    public void testUpdateVariablesTest() throws Exception {
-      doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/variablesUpdateVariablesTest/test/UpdateVariablesTest.java", 
+      doSETTest(testCaseDirectory, 
+                "/set/variablesUpdateVariablesTest/test/UpdateVariablesTest.java", 
                 "UpdateVariablesTest", 
                 "main", 
                 null,
-                "examples/_testcase/set/variablesUpdateVariablesTest/oracle/UpdateVariablesTest.xml",
+                "/set/variablesUpdateVariablesTest/oracle/UpdateVariablesTest.xml",
                 false,
                 true,
                 false,

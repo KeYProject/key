@@ -36,10 +36,10 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
     * Tests {@code complicatedMethod} without precondition.
     */
    public void testComplicatedInnerMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
+      doTest("/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
              "my.packageName.TheClass.TheInnerClass",
              "complicatedInnerMethod",
-             "examples/_testcase/set/fullqualifiedTypeNamesTest/oracle/TheInnerClass_complicatedInnerMethod.xml",
+             "/set/fullqualifiedTypeNamesTest/oracle/TheInnerClass_complicatedInnerMethod.xml",
              null,
              "{result=self.complicatedInnerMethod(z,a,b,x,o,ac)@my.packageName.TheClass.TheInnerClass; }");
    }
@@ -48,10 +48,10 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
     * Tests {@code complicatedMethod} with precondition.
     */
    public void testComplicatedMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
+      doTest("/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
              "my.packageName.TheClass",
              "complicatedMethod",
-             "examples/_testcase/set/fullqualifiedTypeNamesTest/oracle/TheClass_complicatedMethod.xml",
+             "/set/fullqualifiedTypeNamesTest/oracle/TheClass_complicatedMethod.xml",
              "a == 2 && b && x != null && \"Hello\" == x",
              "{result=self.complicatedMethod(i,a,b,x,o,ac,acArray)@my.packageName.TheClass; }");
    }
@@ -60,10 +60,10 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
     * Tests {@code complicatedMethod} without precondition.
     */
    public void testComplicatedMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
+      doTest("/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
              "my.packageName.TheClass",
              "complicatedMethod",
-             "examples/_testcase/set/fullqualifiedTypeNamesTest/oracle/TheClass_complicatedMethod.xml",
+             "/set/fullqualifiedTypeNamesTest/oracle/TheClass_complicatedMethod.xml",
              null,
              "{result=self.complicatedMethod(i,a,b,x,o,ac,acArray)@my.packageName.TheClass; }");
    }
@@ -72,10 +72,10 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
     * Tests {@code returnMethod} with precondition.
     */
    public void testReturnMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      doTest("examples/_testcase/set/methodPOTest/test/MethodPOTest.java",
+      doTest("/set/methodPOTest/test/MethodPOTest.java",
              "MethodPOTest",
              "returnMethod",
-             "examples/_testcase/set/methodPOTest/oracle/MethodPOTest_returnMethod_ParamNotNull.xml",
+             "/set/methodPOTest/oracle/MethodPOTest_returnMethod_ParamNotNull.xml",
              "param != null",
              "{result=MethodPOTest.returnMethod(param)@MethodPOTest; }");
    }
@@ -84,10 +84,10 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
     * Tests {@code returnMethod} without precondition.
     */
    public void testReturnMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      doTest("examples/_testcase/set/methodPOTest/test/MethodPOTest.java",
+      doTest("/set/methodPOTest/test/MethodPOTest.java",
              "MethodPOTest",
              "returnMethod",
-             "examples/_testcase/set/methodPOTest/oracle/MethodPOTest_returnMethod.xml",
+             "/set/methodPOTest/oracle/MethodPOTest_returnMethod.xml",
              null,
              "{result=MethodPOTest.returnMethod(param)@MethodPOTest; }");
    }
@@ -96,10 +96,10 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
     * Tests {@code voidMethod} with precondition.
     */
    public void testVoidMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      doTest("examples/_testcase/set/methodPOTest/test/MethodPOTest.java",
+      doTest("/set/methodPOTest/test/MethodPOTest.java",
              "MethodPOTest",
              "voidMethod",
-             "examples/_testcase/set/methodPOTest/oracle/MethodPOTest_voidMethod_ParamNotNull.xml",
+             "/set/methodPOTest/oracle/MethodPOTest_voidMethod_ParamNotNull.xml",
              "param != null",
              "{MethodPOTest.voidMethod(param)@MethodPOTest; }");
    }
@@ -108,10 +108,10 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
     * Tests {@code voidMethod} without precondition.
     */
    public void testVoidMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      doTest("examples/_testcase/set/methodPOTest/test/MethodPOTest.java",
+      doTest("/set/methodPOTest/test/MethodPOTest.java",
              "MethodPOTest",
              "voidMethod",
-             "examples/_testcase/set/methodPOTest/oracle/MethodPOTest_voidMethod.xml",
+             "/set/methodPOTest/oracle/MethodPOTest_voidMethod.xml",
              null,
              "{MethodPOTest.voidMethod(param)@MethodPOTest; }");
    }
@@ -130,17 +130,17 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
          // Make sure that the correct taclet options are defined.
-         originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
+         originalTacletOptions = setDefaultTacletOptions(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
          setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false, false, false, false, false, false);
+         env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false, false, false, false, false, false);
          // Extract and test try content
          String tryContent = getTryContent(env.getProof());
          assertTrue("Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".", JavaUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent));
          // Resume
-         resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, keyRepDirectory);
+         resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, testCaseDirectory);
          // Test save and reload of the proof
-         assertSaveAndReload(keyRepDirectory, javaPathInkeyRepDirectory, oraclePathInBaseDirFile, env);
+         assertSaveAndReload(testCaseDirectory, javaPathInkeyRepDirectory, oraclePathInBaseDirFile, env);
       }
       finally {
          // Restore original options

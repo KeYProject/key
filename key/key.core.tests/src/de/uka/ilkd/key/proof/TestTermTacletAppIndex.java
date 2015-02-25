@@ -36,7 +36,9 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.LRUCache;
+import de.uka.ilkd.key.utils.IOUtils;
 
 
 public class TestTermTacletAppIndex extends TestCase{   
@@ -60,9 +62,8 @@ public class TestTermTacletAppIndex extends TestCase{
     }
     
     public void setUp() {
-        TacletForTests.parse(System.getProperty("key.home")+
-                java.io.File.separator+"system"+java.io.File.separator+
-        "test/de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
+       
+        TacletForTests.parse(IOUtils.toFile(KeYResourceManager.getManager().getResourceFile(getClass(), "ruleForTestTacletIndex.taclet")));
 
         ruleRewriteNonH1H2 = NoPosTacletApp.createNoPosTacletApp(taclet("rewrite_noninteractive_h1_h2"));
         ruleNoFindNonH1H2H3 = NoPosTacletApp.createNoPosTacletApp(taclet("nofind_noninteractive_h1_h2_h3"));

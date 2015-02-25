@@ -38,7 +38,7 @@ public class TestSymbolicExecutionUtil extends AbstractSymbolicExecutionTestCase
     */
    public void testImproveReadability() {
       try {
-          KeYEnvironment<?> environment = KeYEnvironment.load(new File(keyRepDirectory, "examples/_testcase/proofReferences/InnerAndAnonymousTypeTest.java"), null, null);
+          KeYEnvironment<?> environment = KeYEnvironment.load(new File(testCaseDirectory, "/proofReferences/InnerAndAnonymousTypeTest.java"), null, null);
          Services services = environment.getServices();
          IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
          Sort intSort = integerLDT.targetSort();

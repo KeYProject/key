@@ -34,7 +34,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
 //    * @throws Exception Occurred Exception.
 //    */
 //   public void testSimpleStatiLoopInvariantTest() throws Exception {
-//      doSlicingTest("examples/_testcase/slicing/simpleStatiLoopInvariantTest/SimpleStatiLoopInvariantTest.proof", 
+//      doSlicingTest("/slicing/simpleStatiLoopInvariantTest/SimpleStatiLoopInvariantTest.proof", 
 //                    new ReturnSelector(224),
 //                    true,
 //                    12);
@@ -45,7 +45,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testSimpleLoopInvariantTest() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/simpleLoopInvariantTest/SimpleLoopInvariantTest.proof", 
+      doSlicingTest("/slicing/simpleLoopInvariantTest/SimpleLoopInvariantTest.proof", 
                     new ReturnSelector(125),
                     true,
                     9);
@@ -56,7 +56,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testArrayIndexAsVariableFieldTest() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/arrayIndexAsVariableFieldTest/ArrayIndexAsVariableFieldTest.proof", 
+      doSlicingTest("/slicing/arrayIndexAsVariableFieldTest/ArrayIndexAsVariableFieldTest.proof", 
                     new ReturnSelector(412),
                     true,
                     408, 397, 315, 256, 148);
@@ -67,7 +67,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testArrayIndexVariableTest() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/arrayIndexVariableTest/ArrayIndexVariableTest.proof", 
+      doSlicingTest("/slicing/arrayIndexVariableTest/ArrayIndexVariableTest.proof", 
                     new ReturnSelector(347),
                     true,
                     343, 332, 258, 211, 118);
@@ -78,7 +78,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testArrayIndexSideeffectsBevore() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/arrayIndexSideeffectsBevore/ArrayIndexSideeffectsBevore.proof", 
+      doSlicingTest("/slicing/arrayIndexSideeffectsBevore/ArrayIndexSideeffectsBevore.proof", 
                     new ReturnSelector(211),
                     true,
                     148, 55);
@@ -89,7 +89,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testArrayIndexSideeffectsAfter() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/arrayIndexSideeffectsAfter/ArrayIndexSideeffectsAfter.proof", 
+      doSlicingTest("/slicing/arrayIndexSideeffectsAfter/ArrayIndexSideeffectsAfter.proof", 
                     new ReturnSelector(216),
                     true,
                     163, 59);
@@ -100,7 +100,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testSimpleMultidimensionArrayTest() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/simpleMultidimensionArrayTest/SimpleMultidimensionArrayTest.proof", 
+      doSlicingTest("/slicing/simpleMultidimensionArrayTest/SimpleMultidimensionArrayTest.proof", 
                     new ReturnSelector(461),
                     true,
                     445, 441, 416, 353, 172, 133);
@@ -111,7 +111,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testSimpleArrayTest() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/simpleArrayTest/SimpleArrayTest.proof", 
+      doSlicingTest("/slicing/simpleArrayTest/SimpleArrayTest.proof", 
                     new ReturnSelector(202),
                     false,
                     182, 36, 21);
@@ -122,7 +122,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testFigure2Param_right() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/figure2Param/Figure2Param.proof", 
+      doSlicingTest("/slicing/figure2Param/Figure2Param.proof", 
                     new RightAssignmentSelector(165),
                     true,
                     151, 85);
@@ -133,7 +133,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testFigure2Local_right() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/figure2Local/Figure2Local.proof", 
+      doSlicingTest("/slicing/figure2Local/Figure2Local.proof", 
                     new RightVariableDeclarationSelector(168),
                     true,
                     154, 86);
@@ -144,7 +144,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testFigure2Instance_right() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/figure2Instance/Figure2Instance.proof", 
+      doSlicingTest("/slicing/figure2Instance/Figure2Instance.proof", 
                     new RightAssignmentSelector(269),
                     true,
                     231, 171, 169, 154, 150, 133, 99);
@@ -155,7 +155,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testValueChange() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/valueChange/ValueChange.proof", 
+      doSlicingTest("/slicing/valueChange/ValueChange.proof", 
                     new ReturnSelector(113),
                     true,
                     109, 97, 81, 77, 52);
@@ -166,7 +166,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testReadWriteTest() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/readWriteTest/ReadWriteTest.proof", 
+      doSlicingTest("/slicing/readWriteTest/ReadWriteTest.proof", 
                     new ReturnSelector(40),
                     true,
                     36, 29, 21, 11);
@@ -177,7 +177,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testAliasChanged() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/aliasChanged/AliasChanged.proof", 
+      doSlicingTest("/slicing/aliasChanged/AliasChanged.proof", 
                     new ReturnSelector(225),
                     false,
                     220, 216, 86, 57);
@@ -188,7 +188,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testAliasNotAvailable() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/aliasNotAvailable/AliasNotAvailable.proof", 
+      doSlicingTest("/slicing/aliasNotAvailable/AliasNotAvailable.proof", 
                     new ReturnSelector(200),
                     false,
                     195, 191, 107, 86);
@@ -199,7 +199,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testIntEndTest() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/intEndTest/IntEndTest.proof", 
+      doSlicingTest("/slicing/intEndTest/IntEndTest.proof", 
                     new ReturnSelector(22),
                     false,
                     18, 16);
@@ -210,7 +210,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testSimpleAliasChanged() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/simpleAliasChanged/SimpleAliasChanged.proof", 
+      doSlicingTest("/slicing/simpleAliasChanged/SimpleAliasChanged.proof", 
                     new ReturnSelector(36),
                     false,
                     24);
@@ -221,7 +221,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testInstanceFieldsAliased() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/instanceFieldsAliased/InstanceFieldsAliased.proof", 
+      doSlicingTest("/slicing/instanceFieldsAliased/InstanceFieldsAliased.proof", 
                     new ReturnSelector(194),
                     false,
                     189, 185, 68);
@@ -232,7 +232,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testNestedInstanceFields() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/nestedInstanceFields/NestedInstanceFields.proof", 
+      doSlicingTest("/slicing/nestedInstanceFields/NestedInstanceFields.proof", 
                     new ReturnSelector(153),
                     false,
                     148, 144, 41, 27);
@@ -243,7 +243,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testMethodCallTest() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/methodCallTest/MethodCallTest.proof", 
+      doSlicingTest("/slicing/methodCallTest/MethodCallTest.proof", 
                     new ReturnSelector(164),
                     false,
                     111, 39, 15);
@@ -254,7 +254,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testAliasing() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/aliasing/Aliasing.proof", 
+      doSlicingTest("/slicing/aliasing/Aliasing.proof", 
                     new ReturnSelector(62),
                     false,
                     58, 20, 15);
@@ -265,7 +265,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testNestedInstanceAccess_subResult() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/nestedInstanceAccess/NestedInstanceAccess.proof", 
+      doSlicingTest("/slicing/nestedInstanceAccess/NestedInstanceAccess.proof", 
                     new ReturnSelector(138),
                     false,
                     136, 132, 127, 113, 86, 54, 39);
@@ -276,7 +276,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testFigure2_right() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/figure2/Figure2.proof", 
+      doSlicingTest("/slicing/figure2/Figure2.proof", 
                     new RightAssignmentSelector(271),
                     false,
                     231, 168);
@@ -287,7 +287,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testFigure2_left() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/figure2/Figure2.proof", 
+      doSlicingTest("/slicing/figure2/Figure2.proof", 
                     new LeftAssignmentSelector(271),
                     false,
                     271, 231, 168);
@@ -298,7 +298,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testSimpleInstanceFields() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/simpleInstanceFields/SimpleInstanceFields.proof", 
+      doSlicingTest("/slicing/simpleInstanceFields/SimpleInstanceFields.proof", 
                     new ReturnSelector(87),
                     false,
                     82, 78, 18, 13);
@@ -309,7 +309,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testSimpleThisInstanceFields() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/simpleThisInstanceFields/SimpleThisInstanceFields.proof", 
+      doSlicingTest("/slicing/simpleThisInstanceFields/SimpleThisInstanceFields.proof", 
                     new ReturnSelector(48),
                     false,
                     46, 42, 11, 9);
@@ -320,7 +320,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testSimpleStaticFields() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/simpleStaticFields/SimpleStaticFields.proof", 
+      doSlicingTest("/slicing/simpleStaticFields/SimpleStaticFields.proof", 
                     new ReturnSelector(63),
                     false,
                     57, 15, 8);
@@ -331,7 +331,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     * @throws Exception Occurred Exception.
     */
    public void testSimpleLocalVariables() throws Exception {
-      doSlicingTest("examples/_testcase/slicing/simpleLocalVariables/SimpleLocalVariables.proof", 
+      doSlicingTest("/slicing/simpleLocalVariables/SimpleLocalVariables.proof", 
                     new ReturnSelector(24),
                     true,
                     20, 11, 7);
@@ -350,7 +350,7 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
                                 boolean fullSlize,
                                 int... expectedSlice) throws Exception {
       // Load proof
-      File proofFile = new File(keyRepDirectory, proofFileInRepository);
+      File proofFile = new File(testCaseDirectory, proofFileInRepository);
       assertTrue(proofFile.exists());
       KeYEnvironment<?> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), proofFile, null, null, true);
       try {
