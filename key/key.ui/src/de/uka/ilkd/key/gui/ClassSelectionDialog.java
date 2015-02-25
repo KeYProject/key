@@ -19,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.BoxLayout;
@@ -48,7 +49,7 @@ public class ClassSelectionDialog extends JDialog {
      */
     private static final long serialVersionUID = -7369508044709282573L;
     private boolean successful = false;
-    private JList classList;
+    private JList<WrappedKJT> classList;
     
     
     /**
@@ -69,7 +70,7 @@ public class ClassSelectionDialog extends JDialog {
         super(new JFrame(), dialogTitle, true);
         
         //create type list
-        classList = new JList();
+        classList = new JList<WrappedKJT>();
         if(allowMultipleSelection) {
             classList.setSelectionMode(
                                 ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -170,11 +171,11 @@ public class ClassSelectionDialog extends JDialog {
      * Returns the selected classes.
      */
     public ImmutableSet<KeYJavaType> getSelection() {
-        Object[] selection = classList.getSelectedValues();
+        List<WrappedKJT> selection = classList.getSelectedValuesList();
         
         ImmutableSet<KeYJavaType> result = DefaultImmutableSet.<KeYJavaType>nil();
-        for(int i = selection.length - 1; i >= 0; i--) {
-            result = result.add(((WrappedKJT) selection[i]).kjt);
+        for(int i = selection.size() - 1; i >= 0; i--) {
+            result = result.add(selection.get(i).kjt);
         }
         
         return result;

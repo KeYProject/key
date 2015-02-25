@@ -35,9 +35,9 @@ public class TestTermParser extends AbstractTestTermParser {
 
     private static Sort elem,list;
 
-    private static Function head,tail,nil,cons,isempty,p; 
+    private static Function head,tail,nil,cons,isempty; 
 
-    private static LogicVariable x,y,z,xs,ys,zs;
+    private static LogicVariable x,y,z,xs,ys;
 
     private static Term t_x,t_y,t_z,t_xs,t_ys;
     private static Term t_headxs,t_tailys,t_nil;

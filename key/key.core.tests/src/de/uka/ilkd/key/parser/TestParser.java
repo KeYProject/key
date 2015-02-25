@@ -16,10 +16,10 @@ package de.uka.ilkd.key.parser;
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.antlr.runtime.RecognitionException;
+import org.junit.Assert;
 
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
@@ -42,7 +42,7 @@ public class TestParser extends TestCase {
 	final File include = new File("include.key");
 	final Includes expected = new Includes();
 	expected.put(include.toString(),
-		RuleSourceFactory.initRuleFile(include.toURL()));
+		RuleSourceFactory.initRuleFile(include.toURI().toURL()));
 
 	final String keyFile = "\\include \"" + include.getPath() + "\";";
 	final KeYLexerF lexer = new KeYLexerF(keyFile,

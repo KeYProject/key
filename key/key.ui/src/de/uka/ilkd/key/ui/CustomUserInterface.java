@@ -13,8 +13,11 @@
 
 package de.uka.ilkd.key.ui;
 
+import static de.uka.ilkd.key.core.Main.Verbosity.DEBUG;
+
 import java.io.File;
 
+import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;

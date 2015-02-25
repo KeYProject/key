@@ -13,9 +13,9 @@
 
 package de.uka.ilkd.key.logic;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.junit.Assert;
 import org.key_project.utils.collection.DefaultImmutableSet;
 import org.key_project.utils.collection.ImmutableArray;
 import org.key_project.utils.collection.ImmutableSLList;

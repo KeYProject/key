@@ -23,13 +23,12 @@ import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
-import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -203,14 +202,6 @@ public abstract class AbstractConsoleUserInterface extends AbstractUserInterface
     * {@inheritDoc}
     */
    @Override
-   final public KeYMediator getMediator() {
-     return mediator;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
    final public boolean isAutoModeSupported(Proof proof) {
       return true; // All proofs are supported.
    }
@@ -225,7 +216,7 @@ public abstract class AbstractConsoleUserInterface extends AbstractUserInterface
                 Proof p = proofStack.head();
                 proofStack = proofStack.removeAll(p);
                 assert p.name().equals(proof.name());
-                getMediator().setProof(proofStack.head());
+                mediator.setProof(proofStack.head());
             } else {
                 // proofStack might be empty, though proof != null. This can
                 // happen for symbolic execution tests, if proofCreated was not

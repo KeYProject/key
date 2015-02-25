@@ -124,7 +124,7 @@ public class TacletIfSelectionDialog extends JPanel{
 	return panel;
     }
 
-    /** the if selecton dialog is attached to exact one model */ 
+    /** the if selection dialog is attached to exact one model */ 
     protected int current() {
 	return 0;
     }

@@ -85,8 +85,8 @@ public class IfChoiceModel extends DefaultComboBoxModel {
     }
     
 
-    public static Object[] createIfInsts ( ImmutableList<IfFormulaInstantiation> p_candidates ) {
-	Object[]                         res = new Object [ p_candidates.size () ];
+    public static IfFormulaInstantiation[] createIfInsts ( ImmutableList<IfFormulaInstantiation> p_candidates ) {
+    IfFormulaInstantiation[]                         res = new IfFormulaInstantiation [ p_candidates.size () ];
 	Iterator<IfFormulaInstantiation> it  = p_candidates.iterator ();
 	int                              i   = 0;
 

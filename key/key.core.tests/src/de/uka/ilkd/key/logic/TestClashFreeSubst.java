@@ -202,10 +202,10 @@ public class TestClashFreeSubst extends TestCase {
     }
 
     private class ToMultiVisitor extends DefaultVisitor {
-	private Stack subStack;
+	private Stack<Term> subStack;
 
 	ToMultiVisitor() {
-	    subStack = new Stack();
+	    subStack = new Stack<>();
 	}
 
 	public void visit(Term visited) {

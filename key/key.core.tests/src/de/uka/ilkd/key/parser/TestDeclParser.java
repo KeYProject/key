@@ -144,7 +144,6 @@ public class TestDeclParser extends TestCase {
 
 
     public void testGenericSortDecl() {
-	Named       n;
 	GenericSort G, H;
 	Sort        S, T;
 	

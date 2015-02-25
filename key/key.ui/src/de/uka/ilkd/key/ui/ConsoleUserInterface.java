@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.ui;
 
+import static de.uka.ilkd.key.core.Main.Verbosity.HIGH;
+import static de.uka.ilkd.key.core.Main.Verbosity.SILENT;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -23,6 +26,7 @@ import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
+import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.removegenerics.Main;
 
@@ -190,7 +194,7 @@ public class ConsoleUserInterface extends AbstractConsoleUserInterface {
                        : file.getParent();
        String proofDir = file.getParent();
        file = new File(fileExtension.equals(".key") ? poDir : proofDir, file.getName());
-       ProofSaver saver = new ProofSaver(proof, file.getAbsolutePath(), Main.INTERNAL_VERSION);
+       ProofSaver saver = new ProofSaver(proof, file.getAbsolutePath(), KeYConstants.INTERNAL_VERSION);
        try {
            saver.save();
        } catch (IOException e) {

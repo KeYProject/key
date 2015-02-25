@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.removegenerics.Main;
 
 public class BatchMode {
@@ -123,7 +124,7 @@ public class BatchMode {
     }
 
     private static void saveProof(Proof proof, String filename) throws IOException {
-        ProofSaver saver = new ProofSaver(proof, filename, Main.INTERNAL_VERSION);
+        ProofSaver saver = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
         saver.save();
     }
 
