@@ -21,6 +21,8 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.key_project.utils.java.ArrayUtil;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
@@ -43,7 +45,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
@@ -1179,7 +1180,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
             else {
                afterFirst = true;
             }
-            int index = JavaUtil.indexOf(parent.getChildren(), node);
+            int index = ArrayUtil.indexOf(parent.getChildren(), node);
             assert index >= 0 : "Node \"" + node + "\" is not contained in parents children \"" + Arrays.toString(parent.getChildren()) + "\".";
             sb.insert(0, index);
          }

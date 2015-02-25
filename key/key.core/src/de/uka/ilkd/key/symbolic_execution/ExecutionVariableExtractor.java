@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.key_project.utils.java.ObjectUtil;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -23,7 +25,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionVariable;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 
@@ -331,8 +332,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       public boolean equals(Object obj) {
          if (obj instanceof ParentDefinition) {
             ParentDefinition other = (ParentDefinition)obj;
-            return JavaUtil.equals(parent, other.parent) &&
-                   JavaUtil.equals(goalNode, other.goalNode);
+            return ObjectUtil.equals(parent, other.parent) &&
+                   ObjectUtil.equals(goalNode, other.goalNode);
          }
          else {
             return false;
@@ -384,7 +385,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          if (obj instanceof LocationDefinition) {
             LocationDefinition other = (LocationDefinition)obj;
             return programVariable == other.programVariable &&
-                   JavaUtil.equals(arrayIndex, other.arrayIndex);
+                   ObjectUtil.equals(arrayIndex, other.arrayIndex);
          }
          else {
             return false;

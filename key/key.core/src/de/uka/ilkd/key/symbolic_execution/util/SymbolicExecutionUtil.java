@@ -28,6 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+import org.key_project.utils.java.ObjectUtil;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -1203,7 +1207,7 @@ public final class SymbolicExecutionUtil {
    public static SymbolicExecutionTermLabel getSymbolicExecutionLabel(Term term) {
       if (term != null) {
          term = TermBuilder.goBelowUpdates(term);
-         return (SymbolicExecutionTermLabel)JavaUtil.search(term.getLabels(),
+         return (SymbolicExecutionTermLabel)CollectionUtil.search(term.getLabels(),
                                                             new IFilter<TermLabel>() {
             @Override
             public boolean select(TermLabel element) {
@@ -1550,7 +1554,7 @@ public final class SymbolicExecutionUtil {
                      if (element instanceof StatementBlock) {
                         StatementBlock b = (StatementBlock)block.program();
                         ImmutableArray<ProgramPrefix> prefix = b.getPrefixElements();
-                        result = JavaUtil.count(prefix, new IFilter<ProgramPrefix>() {
+                        result = CollectionUtil.count(prefix, new IFilter<ProgramPrefix>() {
                            @Override
                            public boolean select(ProgramPrefix element) {
                               return element instanceof MethodFrame;
@@ -1753,7 +1757,7 @@ public final class SymbolicExecutionUtil {
       if (!(parent.getAppliedRuleApp() instanceof ContractRuleApp)) {
          throw new ProofInputException("Only ContractRuleApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
       }
-      int childIndex = JavaUtil.indexOf(parent.childrenIterator(), node);
+      int childIndex = CollectionUtil.indexOf(parent.childrenIterator(), node);
       if (childIndex >= 3) {
          throw new ProofInputException("Branch condition of null pointer check is not supported.");
       }
@@ -1995,7 +1999,7 @@ public final class SymbolicExecutionUtil {
          throw new ProofInputException("Only LoopInvariantBuiltInRuleApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
       }
       // Make sure that branch is supported
-      int childIndex = JavaUtil.indexOf(parent.childrenIterator(), node);
+      int childIndex = CollectionUtil.indexOf(parent.childrenIterator(), node);
       if (childIndex == 1 || childIndex == 2) { // Body Preserves Invariant or Use Case
          LoopInvariantBuiltInRuleApp app = (LoopInvariantBuiltInRuleApp)parent.getAppliedRuleApp();
          // Compute invariant (last antecedent formula of the use branch)
@@ -2182,7 +2186,7 @@ public final class SymbolicExecutionUtil {
       ImmutableList<Term> newAntecedents = listNewSemisequentTerms(parent.sequent().antecedent(), node.sequent().antecedent());
       ImmutableList<Term> newSuccedents = listNewSemisequentTerms(parent.sequent().succedent(), node.sequent().succedent());
       // Find goal template which has created the represented proof node
-      int childIndex = JavaUtil.indexOf(parent.childrenIterator(), node);
+      int childIndex = CollectionUtil.indexOf(parent.childrenIterator(), node);
       TacletGoalTemplate goalTemplate;
       if (app.taclet().goalTemplates().size() + 1 == parent.childrenCount()) {
          if (childIndex == 0) {
@@ -2321,7 +2325,7 @@ public final class SymbolicExecutionUtil {
    private static Term findReplacement(Semisequent semisequent, 
                                        final PosInOccurrence posInOccurrence, 
                                        final Term replaceTerm) {
-      SequentFormula sf = JavaUtil.search(semisequent, new IFilter<SequentFormula>() {
+      SequentFormula sf = CollectionUtil.search(semisequent, new IFilter<SequentFormula>() {
          @Override
          public boolean select(SequentFormula element) {
             return checkReplaceTerm(element.formula(), posInOccurrence, replaceTerm);
@@ -3365,7 +3369,7 @@ public final class SymbolicExecutionUtil {
          OneStepSimplifierRuleApp simplifierApp = (OneStepSimplifierRuleApp)ruleApp;
          if (simplifierApp.getProtocol() != null) {
             RuleApp terminationApp =
-                    JavaUtil.search(simplifierApp.getProtocol(), new IFilter<RuleApp>() {
+                  CollectionUtil.search(simplifierApp.getProtocol(), new IFilter<RuleApp>() {
                @Override
                public boolean select(RuleApp element) {
                   return isLoopBodyTermination(node, element);
@@ -3397,7 +3401,7 @@ public final class SymbolicExecutionUtil {
    public static boolean isHeap(Operator op, HeapLDT heapLDT) {
       if (op instanceof SortedOperator) {
          final Sort opSort = ((SortedOperator) op).sort();
-         return JavaUtil.search(heapLDT.getAllHeaps(), new IFilter<LocationVariable>() {
+         return CollectionUtil.search(heapLDT.getAllHeaps(), new IFilter<LocationVariable>() {
             @Override
             public boolean select(LocationVariable element) {
                return opSort == element.sort();
@@ -3627,7 +3631,7 @@ public final class SymbolicExecutionUtil {
          else {
             // Compare all source elements including ints position info
             return first.equals(second) &&
-                   JavaUtil.equals(first.getPositionInfo(), second.getPositionInfo());
+                   ObjectUtil.equals(first.getPositionInfo(), second.getPositionInfo());
          }
       }
       else {

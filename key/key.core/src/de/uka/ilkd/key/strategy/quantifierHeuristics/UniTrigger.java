@@ -25,7 +25,6 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.util.LRUCache;
-import de.uka.ilkd.key.utils.*;
 
 
 class UniTrigger implements Trigger {

@@ -15,6 +15,9 @@
 package de.uka.ilkd.key.proof;
 
 import junit.framework.TestCase;
+
+import org.key_project.utils.java.IOUtil;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
@@ -35,7 +38,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.KeYResourceManager;
-import de.uka.ilkd.key.utils.IOUtils;
 
 
 public class TestTacletIndex extends TestCase{   
@@ -63,7 +65,7 @@ public class TestTacletIndex extends TestCase{
     }
     
     public void setUp() {
-	TacletForTests.parse(IOUtils.toFile(KeYResourceManager.getManager().getResourceFile(getClass(), "ruleForTestTacletIndex.taclet")));
+	TacletForTests.parse(IOUtil.toFile(KeYResourceManager.getManager().getResourceFile(getClass(), "ruleForTestTacletIndex.taclet")));
 
 	h1 = (RuleSet)TacletForTests.getHeuristics().lookup(new Name("h1"));
 	h2 = (RuleSet)TacletForTests.getHeuristics().lookup(new Name("h2"));

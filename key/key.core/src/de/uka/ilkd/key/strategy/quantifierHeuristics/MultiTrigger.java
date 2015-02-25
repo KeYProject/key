@@ -22,7 +22,6 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.utils.*;
 
 class MultiTrigger implements Trigger {
 

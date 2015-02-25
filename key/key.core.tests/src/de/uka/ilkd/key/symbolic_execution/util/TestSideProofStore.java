@@ -7,6 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import junit.framework.TestCase;
+
+import org.key_project.utils.java.ArrayUtil;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -121,7 +124,7 @@ public class TestSideProofStore extends TestCase {
          assertEquals(containedProofs.contains(proof), entry != null);
          assertEquals(containedProofs.contains(proof), SideProofStore.DEFAULT_INSTANCE.containsEntry(proof));
          assertEquals(containedProofs.contains(proof), SideProofStore.DEFAULT_INSTANCE.containsEntry(entry));
-         assertEquals(JavaUtil.contains(disposedProofs, proof), proof.isDisposed());
+         assertEquals(ArrayUtil.contains(disposedProofs, proof), proof.isDisposed());
       }
    }
 

@@ -5,10 +5,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.utils.IOUtils;
+
+import org.key_project.utils.java.IOUtil;
 
 public class HelperClassForUtilityTests {
-   public static final String RESOURCE_DIRECTORY = IOUtils.getProjectRoot(HelperClassForUtilityTests.class) + 
+   public static final String RESOURCE_DIRECTORY = IOUtil.getProjectRoot(HelperClassForUtilityTests.class) + 
                                                    File.separator + "resources";
 
    /**

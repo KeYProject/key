@@ -1,9 +1,10 @@
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
+import org.key_project.utils.java.ObjectUtil;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 public class Access {
    /**
@@ -88,8 +89,8 @@ public class Access {
    public boolean equals(Object obj) {
       if (obj instanceof Access) {
          Access other = (Access) obj;
-         return JavaUtil.equals(programVariable, other.getProgramVariable()) &&
-                JavaUtil.equals(dimensionExpressions, other.getDimensionExpressions());
+         return ObjectUtil.equals(programVariable, other.getProgramVariable()) &&
+                ObjectUtil.equals(dimensionExpressions, other.getDimensionExpressions());
       }
       else {
          return false;

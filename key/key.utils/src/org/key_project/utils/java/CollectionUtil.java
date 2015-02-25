@@ -15,6 +15,8 @@ package org.key_project.utils.java;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -36,6 +38,37 @@ public class CollectionUtil {
     * Forbid instances by this private constructor.
     */
    private CollectionUtil() {
+   }
+   
+   /**
+    * Returns the index of the element to search in the given iterator.
+    * @param iter The iterator to search in.
+    * @param toSearch The element to search.
+    * @return The index of the element or {@code -1} if it was not found.
+    */
+   public static <T> int indexOf(Iterator<T> iter, T toSearch) {
+      if (iter != null) {
+         int i = 0;
+         boolean found = false;
+         while (!found && iter.hasNext()) {
+            T next = iter.next();
+            if (next != null ? next.equals(toSearch) : toSearch == null) {
+               found = true;
+            }
+            else {
+               i++;
+            }
+         }
+         if (found) {
+            return i;
+         }
+         else {
+            return -1;
+         }
+      }
+      else {
+         return -1;
+      }
    }
 
    /**
@@ -376,6 +409,25 @@ public class CollectionUtil {
       }
       catch (NoSuchElementException e) {
          return null; // Iterable must be empty.
+      }
+   }
+
+   /**
+    * Performs a binary insert on the given <b>sorted</b> {@link List}.
+    * @param list The <b>sorted</b> {@link List} to insert in.
+    * @param toInsert The element to insert.
+    * @param comparator The {@link Comparator} to use.
+    */
+   public static <T> void binaryInsert(List<T> list, T toInsert, Comparator<T> comparator) {
+      if (list.isEmpty()) {
+         list.add(toInsert);
+      }
+      else {
+         int index = Collections.binarySearch(list, toInsert, comparator);
+         if (index < 0) {
+            index = (index * -1) - 1;
+         }
+         list.add(index, toInsert);
       }
    }
 }

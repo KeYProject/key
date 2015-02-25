@@ -18,13 +18,13 @@ import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.key_project.utils.java.StringUtil;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.ui.CustomUserInterface;
 
@@ -59,7 +59,7 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
          env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, baseContractName, false, false, false, false, false, false, false, false, false);
          // Extract and test try content
          String tryContent = getTryContent(env.getProof());
-         assertTrue("Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".", JavaUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent));
+         assertTrue("Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".", StringUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent));
          // Resume
          resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, testCaseDirectory);
          // Test save and reload of the proof

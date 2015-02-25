@@ -26,11 +26,24 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.SemisequentChangeInfo;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.inst.*;
-import de.uka.ilkd.key.utils.*;
+import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
+import de.uka.ilkd.key.rule.inst.InstantiationEntry;
+import de.uka.ilkd.key.rule.inst.OperatorInstantiation;
+import de.uka.ilkd.key.rule.inst.ProgramInstantiation;
+import de.uka.ilkd.key.rule.inst.ProgramListInstantiation;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.inst.TermInstantiation;
 
 
 /**

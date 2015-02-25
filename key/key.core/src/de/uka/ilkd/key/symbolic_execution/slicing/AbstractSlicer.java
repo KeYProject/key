@@ -9,6 +9,10 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+import org.key_project.utils.java.ObjectUtil;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -36,8 +40,6 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 
@@ -786,7 +788,7 @@ public abstract class AbstractSlicer {
     */
    protected Location findNewAlternative(final SortedSet<Location> oldAlternatives, 
                                          final SortedSet<Location> newAlternatives) {
-      return JavaUtil.search(oldAlternatives, new IFilter<Location>() {
+      return CollectionUtil.search(oldAlternatives, new IFilter<Location>() {
          @Override
          public boolean select(Location element) {
             return !newAlternatives.contains(element);
@@ -827,7 +829,7 @@ public abstract class AbstractSlicer {
          while (same && prefixIter.hasNext()) {
             T listNext = listIter.next();
             T prefixNext = prefixIter.next();
-            if (!JavaUtil.equals(listNext, prefixNext)) {
+            if (!ObjectUtil.equals(listNext, prefixNext)) {
                same = false;
             }
          }

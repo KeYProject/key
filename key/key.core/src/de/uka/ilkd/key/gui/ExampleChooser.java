@@ -53,8 +53,9 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.key_project.utils.java.IOUtil;
+
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.utils.IOUtils;
 
 
 public final class ExampleChooser extends JDialog {
@@ -370,7 +371,7 @@ public final class ExampleChooser extends JDialog {
 
     private static File lookForExamples() {
         // greatly simplified version without parent path lookup.
-        return new File(IOUtils.getProjectRoot(ExampleChooser.class), EXAMPLES_PATH);
+        return new File(IOUtil.getProjectRoot(ExampleChooser.class), EXAMPLES_PATH);
     }
 
     private static String fileAsString(File f) {
@@ -491,7 +492,7 @@ public final class ExampleChooser extends JDialog {
             JOptionPane.showMessageDialog(MainWindow.getInstance(),
                     "The examples directory cannot be found.\n"+
                     "Please install them at " +
-                            (examplesDirString == null ? IOUtils.getProjectRoot(ExampleChooser.class) +"/" : examplesDirString),
+                            (examplesDirString == null ? IOUtil.getProjectRoot(ExampleChooser.class) +"/" : examplesDirString),
                     "Error loading examples",
                     JOptionPane.ERROR_MESSAGE);
             return null;

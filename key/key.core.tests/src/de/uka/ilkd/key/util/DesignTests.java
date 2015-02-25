@@ -21,9 +21,11 @@ import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.utils.IOUtils;
 import junit.framework.TestCase;
+
+import org.key_project.utils.java.IOUtil;
+
+import de.uka.ilkd.key.logic.Term;
 
 
 /** 
@@ -32,7 +34,7 @@ import junit.framework.TestCase;
  */
 public class DesignTests extends TestCase {
 
-    private static final File binaryPath = new File(IOUtils.getClassLocation(Term.class), "de"+File.separator+"uka"+File.separator+"ilkd"+File.separator+"key");
+    private static final File binaryPath = new File(IOUtil.getClassLocation(Term.class), "de"+File.separator+"uka"+File.separator+"ilkd"+File.separator+"key");
           
     private static final FileFilter FILTER = new FileFilter() {
         public boolean accept(File fileName) {

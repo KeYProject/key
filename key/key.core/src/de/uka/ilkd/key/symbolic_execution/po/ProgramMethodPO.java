@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.key_project.utils.java.ObjectUtil;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -30,8 +32,8 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -41,7 +43,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * <p>
@@ -268,8 +269,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
    public boolean equals(Object obj) {
       if (obj instanceof ProgramMethodPO) {
          ProgramMethodPO other = (ProgramMethodPO)obj;
-         return JavaUtil.equals(pm, other.getProgramMethod()) &&
-                JavaUtil.equals(precondition, other.getPrecondition());
+         return ObjectUtil.equals(pm, other.getProgramMethod()) &&
+                ObjectUtil.equals(precondition, other.getPrecondition());
       }
       else {
          return false;

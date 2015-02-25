@@ -21,16 +21,19 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.NotFreeIn;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletPrefix;
 import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
-import de.uka.ilkd.key.utils.*;
 
 public class TacletPrefixBuilder {
 

@@ -14,6 +14,9 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import junit.framework.TestCase;
+
+import org.key_project.utils.java.ArrayUtil;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -107,10 +110,10 @@ public class TestProofUserManager extends TestCase {
       Proof[] proofs = {firstProof, secondProof, thirdProof};
       // Made sure that correct proofs are registered for environments
       for (Proof proof : proofs) {
-         if (JavaUtil.contains(firstEnvProofs, proof)) {
+         if (ArrayUtil.contains(firstEnvProofs, proof)) {
             assertEquals(firstEnv, ProofUserManager.getInstance().getEnvironment(proof));
          }
-         else if (JavaUtil.contains(secondEnvProofs, proof)) {
+         else if (ArrayUtil.contains(secondEnvProofs, proof)) {
             assertEquals(secondEnv, ProofUserManager.getInstance().getEnvironment(proof));
          }
          else {
@@ -120,17 +123,17 @@ public class TestProofUserManager extends TestCase {
       // Made sure that correct proofs are known 
       Proof[] currentFirstEnvProofs = ProofUserManager.getInstance().getProofs(firstEnv);
       for (Proof proof : currentFirstEnvProofs) {
-         assertTrue(JavaUtil.contains(firstEnvProofs, proof));
+         assertTrue(ArrayUtil.contains(firstEnvProofs, proof));
       }
       for (Proof proof : firstEnvProofs) {
-         assertTrue(JavaUtil.contains(currentFirstEnvProofs, proof));
+         assertTrue(ArrayUtil.contains(currentFirstEnvProofs, proof));
       }
       Proof[] currentSecondEnvProofs = ProofUserManager.getInstance().getProofs(secondEnv);
       for (Proof proof : currentSecondEnvProofs) {
-         assertTrue(JavaUtil.contains(secondEnvProofs, proof));
+         assertTrue(ArrayUtil.contains(secondEnvProofs, proof));
       }
       for (Proof proof : secondEnvProofs) {
-         assertTrue(JavaUtil.contains(currentSecondEnvProofs, proof));
+         assertTrue(ArrayUtil.contains(currentSecondEnvProofs, proof));
       }
    }
 
@@ -269,19 +272,19 @@ public class TestProofUserManager extends TestCase {
       Proof[] registeredProofs = ProofUserManager.getInstance().getProofs();
       assertNotNull(registeredProofs);
       int expectedCount = 0;
-      if (!JavaUtil.isEmpty(expectedFirstProofUsers)) {
+      if (!ArrayUtil.isEmpty(expectedFirstProofUsers)) {
          expectedCount++;
-         assertTrue(JavaUtil.contains(registeredProofs, firstProof));
+         assertTrue(ArrayUtil.contains(registeredProofs, firstProof));
          assertUser(firstProof, expectedFirstProofUsers);
       }
-      if (!JavaUtil.isEmpty(expectedSecondProofUsers)) {
+      if (!ArrayUtil.isEmpty(expectedSecondProofUsers)) {
          expectedCount++;
-         assertTrue(JavaUtil.contains(registeredProofs, secondProof));
+         assertTrue(ArrayUtil.contains(registeredProofs, secondProof));
          assertUser(secondProof, expectedSecondProofUsers);
       }
-      if (!JavaUtil.isEmpty(expectedThirdProofUsers)) {
+      if (!ArrayUtil.isEmpty(expectedThirdProofUsers)) {
          expectedCount++;
-         assertTrue(JavaUtil.contains(registeredProofs, thirdProof));
+         assertTrue(ArrayUtil.contains(registeredProofs, thirdProof));
          assertUser(thirdProof, expectedThirdProofUsers);
       }
       assertEquals(expectedCount, registeredProofs.length);
@@ -297,7 +300,7 @@ public class TestProofUserManager extends TestCase {
       assertNotNull(users);
       assertEquals(expectedUsers.length, users.length);
       for (Object user : expectedUsers) {
-         assertTrue(JavaUtil.contains(users, user));
+         assertTrue(ArrayUtil.contains(users, user));
       }
    }
 
@@ -310,7 +313,7 @@ public class TestProofUserManager extends TestCase {
       assertNotNull(proofs);
       assertEquals(expectedProofs.length, proofs.length);
       for (Proof proof : expectedProofs) {
-         assertTrue(JavaUtil.contains(proofs, proof));
+         assertTrue(ArrayUtil.contains(proofs, proof));
       }
    }
 

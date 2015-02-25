@@ -15,6 +15,9 @@ package de.uka.ilkd.key.proof_references;
 
 import java.util.Iterator;
 
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -22,8 +25,6 @@ import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * Provides utility methods which makes it easier to analyze the type hierarchy
@@ -149,7 +150,7 @@ public final class KeYTypeUtil {
    public static IProgramMethod findExplicitConstructor(Services services, final IProgramMethod implicitConstructor) {
       if (services != null && implicitConstructor != null) {
          ImmutableList<IProgramMethod> pms = services.getJavaInfo().getConstructors(implicitConstructor.getContainerType());
-         return JavaUtil.search(pms, new IFilter<IProgramMethod>() {
+         return CollectionUtil.search(pms, new IFilter<IProgramMethod>() {
             @Override
             public boolean select(IProgramMethod element) {
                if (implicitConstructor.getParameterDeclarationCount() == element.getParameterDeclarationCount()) {

@@ -44,11 +44,13 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.IFilter;
+import org.key_project.utils.java.ObjectUtil;
+
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 public class ChoiceSelector extends JDialog {
 
@@ -335,7 +337,7 @@ public class ChoiceSelector extends JDialog {
      * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
      */
     public static ChoiceEntry findChoice(ChoiceEntry[] choices, final String choice) {
-       return JavaUtil.search(choices, new IFilter<ChoiceEntry>() {
+       return ArrayUtil.search(choices, new IFilter<ChoiceEntry>() {
          @Override
          public boolean select(ChoiceEntry element) {
             return element.getChoice().equals(choice);
@@ -482,7 +484,7 @@ public class ChoiceSelector extends JDialog {
             return choice.equals(other.getChoice()) &&
                    incomplete == other.isIncomplete() &&
                    unsound == other.isUnsound() &&
-                   JavaUtil.equals(information, other.getInformation());
+                   ObjectUtil.equals(information, other.getInformation());
          }
          else {
             return false;

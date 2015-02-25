@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.key_project.utils.java.StringUtil;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
@@ -31,7 +33,6 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.ui.CustomUserInterface;
 
@@ -916,7 +917,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
       while (expectedIter.hasNext() && currentIter.hasNext()) {
          String nextExpected = expectedIter.next();
          String nextCurrent = currentIter.next();
-         assertTrue("\"" + nextExpected + "\" does not match \"" + nextCurrent + "\"", JavaUtil.equalIgnoreWhiteSpace(nextExpected, nextCurrent));
+         assertTrue("\"" + nextExpected + "\" does not match \"" + nextCurrent + "\"", StringUtil.equalIgnoreWhiteSpace(nextExpected, nextCurrent));
       }
       assertFalse(expectedIter.hasNext());
       assertFalse(currentIter.hasNext());
@@ -952,7 +953,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          assertEquals(expected.getProgramVariableString(), current.getProgramVariableString());
          assertEquals(expected.isArrayIndex(), current.isArrayIndex());
          assertEquals(expected.getArrayIndexString(), current.getArrayIndexString());
-         assertTrue("\"" + expected.getValueString() + "\" does not match \"" + current.getValueString() + "\"", JavaUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
+         assertTrue("\"" + expected.getValueString() + "\" does not match \"" + current.getValueString() + "\"", StringUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
          assertEquals(expected.getTypeString(), current.getTypeString());
          assertEquals(expected.getConditionString(), current.getConditionString());
       }

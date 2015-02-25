@@ -17,13 +17,13 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.key_project.utils.java.StringUtil;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.ui.CustomUserInterface;
 
@@ -231,7 +231,7 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
       try {
          // Extract and test try content
          String tryContent = getTryContent(env.getProof());
-         assertTrue("Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".", JavaUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent));
+         assertTrue("Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".", StringUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent));
          // Resume
          resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, testCaseDirectory);
          // Test save and reload of the proof

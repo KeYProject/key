@@ -3,6 +3,9 @@ package de.uka.ilkd.key.rule.label;
 import java.util.Collections;
 import java.util.Set;
 
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
@@ -21,8 +24,6 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * The {@link TermLabelUpdate} used to label predicates with a
@@ -84,7 +85,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
     * @return The found {@link TermLabel} or {@code} null if no element was found.
     */
    protected TermLabel getTermLabel(Set<TermLabel> labels, final Name name) {
-      return JavaUtil.search(labels, new IFilter<TermLabel>() {
+      return CollectionUtil.search(labels, new IFilter<TermLabel>() {
          @Override
          public boolean select(TermLabel element) {
             return element != null && element.name().equals(name);

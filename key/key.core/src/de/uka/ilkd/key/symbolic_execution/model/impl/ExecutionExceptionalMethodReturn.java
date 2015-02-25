@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import org.key_project.utils.java.StringUtil;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -25,7 +27,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodRetur
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -81,7 +82,7 @@ public class ExecutionExceptionalMethodReturn extends AbstractExecutionMethodRet
    protected String lazyComputeSignature() throws ProofInputException {
       String methodName = getMethodCall().getName();
       return INTERNAL_NODE_NAME_START + "exceptional return" +
-             (!JavaUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "") +
+             (!StringUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "") +
              INTERNAL_NODE_NAME_END;
    }
    

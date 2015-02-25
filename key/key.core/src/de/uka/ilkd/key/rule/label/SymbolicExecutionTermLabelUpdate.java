@@ -15,6 +15,9 @@ package de.uka.ilkd.key.rule.label;
 
 import java.util.Set;
 
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -31,8 +34,6 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * Makes sure that the ID of {@link SymbolicExecutionTermLabel}s is increased
@@ -67,7 +68,7 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
                             JavaBlock newTermJavaBlock,
                             Set<TermLabel> labels) {
       if (rule instanceof WhileInvariantRule && "LoopBodyModality".equals(hint)) {
-         TermLabel label = JavaUtil.searchAndRemove(labels, new IFilter<TermLabel>() {
+         TermLabel label = CollectionUtil.searchAndRemove(labels, new IFilter<TermLabel>() {
             @Override
             public boolean select(TermLabel element) {
                return element instanceof SymbolicExecutionTermLabel;

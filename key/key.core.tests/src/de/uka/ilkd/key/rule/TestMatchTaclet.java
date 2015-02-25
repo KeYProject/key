@@ -17,6 +17,9 @@
 package de.uka.ilkd.key.rule;
 
 import junit.framework.TestCase;
+
+import org.key_project.utils.java.IOUtil;
+
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -50,7 +53,6 @@ import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
-import de.uka.ilkd.key.utils.IOUtils;
 
 
 public class TestMatchTaclet extends TestCase {
@@ -79,7 +81,7 @@ public class TestMatchTaclet extends TestCase {
     }
 
     public void setUp() {
-        TacletForTests.setStandardFile(IOUtils.toFileString(KeYResourceManager.getManager().getResourceFile(getClass(), "testRuleMatch.txt")));
+        TacletForTests.setStandardFile(IOUtil.toFileString(KeYResourceManager.getManager().getResourceFile(getClass(), "testRuleMatch.txt")));
         TacletForTests.parse();
     
         services = TacletForTests.services();

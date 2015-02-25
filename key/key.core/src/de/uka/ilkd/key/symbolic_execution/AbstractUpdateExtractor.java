@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.ObjectUtil;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -41,7 +44,6 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -853,10 +855,10 @@ public abstract class AbstractUpdateExtractor {
       public boolean equals(Object obj) {
          if (obj instanceof ExtractLocationParameter) {
             ExtractLocationParameter other = (ExtractLocationParameter)obj;
-            return JavaUtil.equals(arrayIndex, other.arrayIndex) &&
+            return ObjectUtil.equals(arrayIndex, other.arrayIndex) &&
                    stateMember == other.stateMember &&
-                   JavaUtil.equals(parentTerm, other.parentTerm) &&
-                   JavaUtil.equals(programVariable, other.programVariable);
+                   ObjectUtil.equals(parentTerm, other.parentTerm) &&
+                   ObjectUtil.equals(programVariable, other.programVariable);
          }
          else {
             return false;
@@ -1042,7 +1044,7 @@ public abstract class AbstractUpdateExtractor {
       Map<Goal, Set<Term>> goalConditions = new HashMap<Goal, Set<Term>>();
       List<NodeGoal> sortedBranchLeafs = new LinkedList<NodeGoal>();
       for (Goal goal : valueGoals) {
-         JavaUtil.binaryInsert(sortedBranchLeafs, new NodeGoal(goal), comparator);
+         CollectionUtil.binaryInsert(sortedBranchLeafs, new NodeGoal(goal), comparator);
          goalConditions.put(goal, new LinkedHashSet<Term>());
          untriedRealGoals.add(goal.node());
       }
@@ -1077,7 +1079,7 @@ public abstract class AbstractUpdateExtractor {
                // Add waiting NodeGoals to working list
                for (NodeGoal nodeGoal : childGoals) {
                   waitingBranchLeafs.remove(nodeGoal);
-                  JavaUtil.binaryInsert(sortedBranchLeafs, nodeGoal, comparator);
+                  CollectionUtil.binaryInsert(sortedBranchLeafs, nodeGoal, comparator);
                }
             }
          }

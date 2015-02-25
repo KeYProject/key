@@ -3,6 +3,9 @@ package de.uka.ilkd.key.rule.label;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -19,8 +22,6 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * This {@link TermLabelPolicy} maintains a {@link FormulaTermLabel} on predicates.
@@ -127,7 +128,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
     * @return The found {@link FormulaTermLabel} or {@code null} if not available.
     */
    protected FormulaTermLabel searchPredicateTermLabel(ImmutableArray<TermLabel> labels) {
-      TermLabel result = JavaUtil.search(labels, new IFilter<TermLabel>() {
+      TermLabel result = CollectionUtil.search(labels, new IFilter<TermLabel>() {
          @Override
          public boolean select(TermLabel element) {
             return element instanceof FormulaTermLabel;

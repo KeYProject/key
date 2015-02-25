@@ -18,6 +18,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -34,8 +37,6 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -315,7 +316,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          assertNotNull(containerKJT);
          // Search observer function
          ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(containerKJT);
-         IObserverFunction target = JavaUtil.search(targets, new IFilter<IObserverFunction>() {
+         IObserverFunction target = CollectionUtil.search(targets, new IFilter<IObserverFunction>() {
             @Override
             public boolean select(IObserverFunction element) {
                return targetName.equals(element.toString());

@@ -13,9 +13,10 @@
 
 package de.uka.ilkd.key.proof_references.analyst;
 
+import org.key_project.utils.java.IFilter;
+
 import de.uka.ilkd.key.proof_references.AbstractProofReferenceTestCase;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 
 /**
  * Tests for {@link ClassAxiomAndInvariantProofReferencesAnalyst}.

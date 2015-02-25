@@ -24,6 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+import org.key_project.utils.java.ObjectUtil;
+
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -60,8 +64,6 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicValue;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -750,7 +752,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     */
    protected ISymbolicEquivalenceClass findEquivalentClass(ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, 
                                                            final Term term) {
-      return JavaUtil.search(equivalentClasses, new IFilter<ISymbolicEquivalenceClass>() {
+      return CollectionUtil.search(equivalentClasses, new IFilter<ISymbolicEquivalenceClass>() {
          @Override
          public boolean select(ISymbolicEquivalenceClass element) {
             return element.containsTerm(term);
@@ -825,7 +827,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                }
                else {
                   // Make sure that target is the same
-                  if (!JavaUtil.equals(association.getTarget(), existingAssociation.getTarget())) {
+                  if (!ObjectUtil.equals(association.getTarget(), existingAssociation.getTarget())) {
                      throw new ProofInputException("Multiple association targets found: " + association + " and " + existingAssociation + ".");
                   }
                }
@@ -846,7 +848,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                }
                else {
                   // Make sure that the value is the same
-                  if (!JavaUtil.equals(value.getValue(), existingValue.getValue())) {
+                  if (!ObjectUtil.equals(value.getValue(), existingValue.getValue())) {
                      throw new ProofInputException("Multiple values found: " + value + " and " + existingValue + ".");
                   }
                }

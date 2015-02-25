@@ -13,10 +13,6 @@
 
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -46,6 +42,12 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.key_project.utils.java.ObjectUtil;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -58,7 +60,6 @@ import de.uka.ilkd.key.strategy.definition.AbstractStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * <p>
@@ -463,7 +464,7 @@ public final class StrategySelectionView extends JPanel {
          for (Entry<String, List<JRadioButton>> entry : components.getPropertyButtons().entrySet()) {
             String value = sp.getProperty(entry.getKey());
             for (JRadioButton button : entry.getValue()) {
-               button.setSelected(JavaUtil.equals(button.getActionCommand(), value));
+               button.setSelected(ObjectUtil.equals(button.getActionCommand(), value));
             }
          }
          enableAll(true);

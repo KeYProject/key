@@ -15,6 +15,9 @@ package de.uka.ilkd.key.proof_references;
 
 import java.util.LinkedHashSet;
 
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
@@ -28,8 +31,6 @@ import de.uka.ilkd.key.proof_references.analyst.MethodBodyExpandProofReferencesA
 import de.uka.ilkd.key.proof_references.analyst.MethodCallProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.ProgramVariableReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * <p>
@@ -209,7 +210,7 @@ public final class ProofReferenceUtil {
    public static void merge(LinkedHashSet<IProofReference<?>> target, final IProofReference<?> reference) {
       if (!target.add(reference)) {
          // Reference exist before, so merge nodes of both references.
-         IProofReference<?> existingFirst = JavaUtil.search(target, new IFilter<IProofReference<?>>() {
+         IProofReference<?> existingFirst = CollectionUtil.search(target, new IFilter<IProofReference<?>>() {
             @Override
             public boolean select(IProofReference<?> element) {
                return element.equals(reference);

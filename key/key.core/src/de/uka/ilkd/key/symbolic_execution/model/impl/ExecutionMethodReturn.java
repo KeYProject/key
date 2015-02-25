@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.key_project.utils.java.StringUtil;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -42,7 +44,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
@@ -367,7 +368,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
    public static String createMethodReturnName(Object returnValue, String methodName) {
       return INTERNAL_NODE_NAME_START + "return" +
              (returnValue != null ? " " + returnValue + "as result" : "") +
-             (!JavaUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "") +
+             (!StringUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "") +
              INTERNAL_NODE_NAME_END;
    }
 

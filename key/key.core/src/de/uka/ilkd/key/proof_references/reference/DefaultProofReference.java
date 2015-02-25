@@ -16,9 +16,10 @@ package de.uka.ilkd.key.proof_references.reference;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
+import org.key_project.utils.java.ObjectUtil;
+
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * Default implementation of {@link IProofReference}.
@@ -105,9 +106,9 @@ public class DefaultProofReference<T> implements IProofReference<T> {
    public boolean equals(Object obj) {
       if (obj instanceof IProofReference<?>) {
          IProofReference<?> other = (IProofReference<?>)obj;
-         return JavaUtil.equals(getKind(), other.getKind()) &&
-                JavaUtil.equals(getSource(), other.getSource()) &&
-                JavaUtil.equals(getTarget(), other.getTarget());
+         return ObjectUtil.equals(getKind(), other.getKind()) &&
+                ObjectUtil.equals(getSource(), other.getSource()) &&
+                ObjectUtil.equals(getTarget(), other.getTarget());
       }
       else {
          return false;

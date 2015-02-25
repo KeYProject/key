@@ -21,6 +21,8 @@ import org.junit.Test;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
 
 import de.hentschel.visualdbc.key.ui.test.Activator;
 import de.hentschel.visualdbc.key.ui.util.ProofReferenceModelCreator;
@@ -32,8 +34,6 @@ import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
@@ -188,7 +188,7 @@ public class ProofReferenceModelCreatorTest extends AbstractProofReferenceModelC
          assertNotNull(containerKJT);
          // Search observer function
          ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(containerKJT);
-         IObserverFunction target = JavaUtil.search(targets, new IFilter<IObserverFunction>() {
+         IObserverFunction target = CollectionUtil.search(targets, new IFilter<IObserverFunction>() {
             @Override
             public boolean select(IObserverFunction element) {
                return targetName.equals(element.toString());

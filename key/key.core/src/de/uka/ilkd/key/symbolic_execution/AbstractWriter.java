@@ -16,7 +16,7 @@ package de.uka.ilkd.key.symbolic_execution;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
+import org.key_project.utils.java.XMLUtil;
 
 /**
  * Provides the basic functionality for classes like {@link ExecutionNodeWriter}
@@ -121,7 +121,7 @@ public abstract class AbstractWriter {
          sb.append(" ");
          sb.append(attributeName);
          sb.append("=\"");
-         sb.append(JavaUtil.encodeText(value));
+         sb.append(XMLUtil.encodeText(value));
          sb.append("\"");
       }
    }

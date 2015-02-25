@@ -15,6 +15,7 @@ package org.key_project.utils.testcase;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -33,6 +34,70 @@ import org.key_project.utils.java.IFilterWithException;
  * @author Martin Hentschel
  */
 public class CollectionUtilTest extends TestCase {
+   /**
+    * Tests {@link CollectionUtil#binaryInsert(List, Object, java.util.Comparator)}.
+    */
+   @Test
+   public void testBinaryInsert() {
+      Comparator<String> comparator = new Comparator<String>() {
+         @Override
+         public int compare(String o1, String o2) {
+            return o1.compareTo(o2);
+         }
+      };
+      List<String> list = new LinkedList<String>();
+      CollectionUtil.binaryInsert(list, "C", comparator);
+      assertList(list, "C");
+      CollectionUtil.binaryInsert(list, "A", comparator);
+      assertList(list, "A", "C");
+      CollectionUtil.binaryInsert(list, "F", comparator);
+      assertList(list, "A", "C", "F");
+      CollectionUtil.binaryInsert(list, "B", comparator);
+      assertList(list, "A", "B", "C", "F");
+      CollectionUtil.binaryInsert(list, "D", comparator);
+      assertList(list, "A", "B", "C", "D", "F");
+      CollectionUtil.binaryInsert(list, "E", comparator);
+      assertList(list, "A", "B", "C", "D", "E", "F");
+      CollectionUtil.binaryInsert(list, "D", comparator);
+      assertList(list, "A", "B", "C", "D", "D", "E", "F");
+      CollectionUtil.binaryInsert(list, "A", comparator);
+      assertList(list, "A", "A", "B", "C", "D", "D", "E", "F");
+      CollectionUtil.binaryInsert(list, "F", comparator);
+      assertList(list, "A", "A", "B", "C", "D", "D", "E", "F", "F");
+   }
+   
+   /**
+    * Ensures that the given {@link List} contains the expected elements.
+    * @param actual The actual {@link List}.
+    * @param expected The expected elements.
+    */
+   protected static <T> void assertList(List<T> actual, String... expected) {
+      assertEquals(expected.length, actual.size());
+      int i = 0;
+      for (T actualElement : actual) {
+         assertEquals(expected[i], actualElement);
+         i++;
+      }
+   }
+   
+   /**
+    * Tests {@link CollectionUtil#indexOf(java.util.Iterator, Object)}
+    */
+   @Test
+   public void testIndexOf_Iterator() {
+      List<String> list = new LinkedList<String>();
+      list.add("A");
+      list.add("B");
+      list.add("C");
+      assertEquals(-1, CollectionUtil.indexOf((Iterator<?>)null, null));
+      assertEquals(-1, CollectionUtil.indexOf(list.iterator(), null));
+      assertEquals(-1, CollectionUtil.indexOf((Iterator<String>)null, "A"));
+      assertEquals(0, CollectionUtil.indexOf(list.iterator(), "A"));
+      assertEquals(1, CollectionUtil.indexOf(list.iterator(), "B"));
+      assertEquals(2, CollectionUtil.indexOf(list.iterator(), "C"));
+      assertEquals(-1, CollectionUtil.indexOf(list.iterator(), "D"));
+   }
+   
    /**
     * Tests for {@link CollectionUtil#searchAndRemoveWithException(Iterable, org.key_project.util.java.IFilterWithException)}.
     */

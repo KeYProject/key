@@ -25,6 +25,8 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import org.key_project.utils.java.ArrayUtil;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -86,7 +88,6 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.TreeSettings;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 import de.uka.ilkd.key.util.Pair;
@@ -645,7 +646,7 @@ public class SymbolicExecutionTreeBuilder {
             while (bcIter.hasNext()) {
                ExecutionBranchCondition condition = bcIter.next();
                AbstractExecutionNode<?>[] conditionsChildren = condition.getChildren(); 
-               if (!JavaUtil.isEmpty(conditionsChildren)) {
+               if (!ArrayUtil.isEmpty(conditionsChildren)) {
                   if (settings.isMergeBranchConditions()) {
                      // Merge branch conditions if possible
                      boolean addingToParentRequired = false;

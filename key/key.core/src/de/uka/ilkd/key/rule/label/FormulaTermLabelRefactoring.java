@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.key_project.utils.java.CollectionUtil;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -23,7 +25,6 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * The {@link TermLabelRefactoring} used to label predicates with a
@@ -238,7 +239,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
          else {
             labels.remove(termLabel);
             Set<String> beforeIds = new LinkedHashSet<String>();
-            JavaUtil.addAll(beforeIds, termLabel.getBeforeIds());
+            CollectionUtil.addAll(beforeIds, termLabel.getBeforeIds());
             beforeIds.add(applicationLabel.getId());
             labels.add(new FormulaTermLabel(termLabel.getMajorId(), termLabel.getMinorId(), beforeIds));
          }

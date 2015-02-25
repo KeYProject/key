@@ -40,8 +40,6 @@ import org.key_project.utils.java.IOUtil;
 import org.key_project.utils.java.IOUtil.IFileVisitor;
 import org.key_project.utils.java.IOUtil.LineInformation;
 
-import de.uka.ilkd.key.utils.IOUtils;
-
 /**
  * Tests for {@link IOUtil}
  * @author Martin Hentschel
@@ -855,8 +853,8 @@ public class IOUtilTest extends TestCase {
     */
    @Test
    public void testGetClassLocation() {
-      assertNull(IOUtils.getClassLocation(null));
-      assertNotNull(IOUtils.getClassLocation(getClass()));
+      assertNull(IOUtil.getClassLocation(null));
+      assertNotNull(IOUtil.getClassLocation(getClass()));
    }
    
    /**
@@ -864,8 +862,8 @@ public class IOUtilTest extends TestCase {
     */
    @Test
    public void testGetProjectRoot() {
-      assertNull(IOUtils.getProjectRoot(null));
-      assertNotNull(IOUtils.getProjectRoot(getClass()));
+      assertNull(IOUtil.getProjectRoot(null));
+      assertNotNull(IOUtil.getProjectRoot(getClass()));
    }
    
    /**
@@ -874,26 +872,52 @@ public class IOUtilTest extends TestCase {
     */
    @Test
    public void testToURI() throws MalformedURLException {
-      assertNull(IOUtils.toURI(null));
+      assertNull(IOUtil.toURI(null));
       URL url = new URL("https://www.google.de");
-      URI uri = IOUtils.toURI(url);
+      URI uri = IOUtil.toURI(url);
       assertNotNull(uri);
       assertEquals(URI.create("https://www.google.de"), uri);
    }
    
    /**
     * Tests {@link IOUtils#toFile(URL)}
+    * @throws MalformedURLException Occurred Exception
     */
    @Test
-   public void testToFile() {
-      fail();
+   public void testToFile() throws MalformedURLException {
+      // Test null
+      assertNull(IOUtil.toFile(null));
+      // Test windows file uri
+      assertEquals(new File("C:/Test/Test.xml"), IOUtil.toFile(new URL("file:///C:/Test/Test.xml")));
+      // Test Linux uri
+      assertEquals(new File("/tmp/Test/Test.xml"), IOUtil.toFile(new URL("file:///tmp/Test/Test.xml")));
+      // Test web
+      try {
+         IOUtil.toFile(new URL("http://www.google.de"));
+         fail("Exception expected");
+      }
+      catch (IllegalArgumentException e) {
+      }
    }
    
    /**
     * Tests {@link IOUtils#toFileString(URL)}
+    * @throws MalformedURLException Occurred Exception
     */
    @Test
-   public void testToFileString() {
-      fail();
+   public void testToFileString() throws MalformedURLException {
+      // Test null
+      assertNull(IOUtil.toFileString(null));
+      // Test windows file uri
+      assertEquals("C:" + File.separator + "Test" + File.separator + "Test.xml", IOUtil.toFileString(new URL("file:///C:/Test/Test.xml")));
+      // Test Linux uri
+      assertEquals(File.separator + "tmp" + File.separator + "Test" + File.separator + "Test.xml", IOUtil.toFileString(new URL("file:///tmp/Test/Test.xml")));
+      // Test web
+      try {
+         IOUtil.toFileString(new URL("http://www.google.de"));
+         fail("Exception expected");
+      }
+      catch (IllegalArgumentException e) {
+      }
    }
 }

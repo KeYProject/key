@@ -20,6 +20,8 @@ import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
 import java.io.File;
 
+import org.key_project.utils.java.IOUtil;
+
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Proof;
@@ -32,10 +34,9 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.RuleCollection;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.utils.IOUtils;
 
 public class HelperClassForTests {
-   public static final String TESTCASE_DIRECTORY = IOUtils.getProjectRoot(HelperClassForTests.class) + 
+   public static final String TESTCASE_DIRECTORY = IOUtil.getProjectRoot(HelperClassForTests.class) + 
                                                    File.separator + "resources"+ 
                                                    File.separator + "testcase";
 

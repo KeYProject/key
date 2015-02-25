@@ -13,6 +13,10 @@
 
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+import org.key_project.utils.java.ObjectUtil;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
@@ -21,8 +25,6 @@ import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociationValueContainer;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * Default implementation of {@link ISymbolicAssociationValueContainer}.
@@ -71,13 +73,13 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
                                               final boolean isArrayIndex, 
                                               final Term arrayIndex,
                                               final Term condition) {
-      return JavaUtil.search(associations, new IFilter<ISymbolicAssociation>() {
+      return CollectionUtil.search(associations, new IFilter<ISymbolicAssociation>() {
          @Override
          public boolean select(ISymbolicAssociation element) {
             return element.getProgramVariable() == programVariable &&
                    element.isArrayIndex() == isArrayIndex &&
-                   JavaUtil.equals(element.getArrayIndex(), arrayIndex)  &&
-                   JavaUtil.equals(element.getCondition(), condition);
+                   ObjectUtil.equals(element.getArrayIndex(), arrayIndex)  &&
+                   ObjectUtil.equals(element.getCondition(), condition);
          }
       });
    }
@@ -106,13 +108,13 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
                                   final boolean isArrayIndex, 
                                   final Term arrayIndex,
                                   final Term condition) {
-      return JavaUtil.search(values, new IFilter<ISymbolicValue>() {
+      return CollectionUtil.search(values, new IFilter<ISymbolicValue>() {
          @Override
          public boolean select(ISymbolicValue element) {
             return element.getProgramVariable() == programVariable &&
                    element.isArrayIndex() == isArrayIndex &&
-                   JavaUtil.equals(element.getArrayIndex(), arrayIndex)  &&
-                   JavaUtil.equals(element.getCondition(), condition);
+                   ObjectUtil.equals(element.getArrayIndex(), arrayIndex)  &&
+                   ObjectUtil.equals(element.getCondition(), condition);
          }
       });
    }

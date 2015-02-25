@@ -687,12 +687,13 @@ public final class IOUtil {
    }
 
    public static File toFile(URL url) {
-      return new File(toURI(url));
+      URI uri = toURI(url);
+      return uri != null ? new File(uri) : null;
    }
    
    public static String toFileString(URL url) {
       File file = toFile(url);
-      return file != null ? file.getAbsolutePath() : null;
+      return file != null ? file.toString() : null;
    }
    
    public static URI toURI(URL url) {

@@ -13,12 +13,14 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+import org.key_project.utils.java.ObjectUtil;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * The labeled term class is used for terms that have a label 
@@ -70,10 +72,10 @@ class LabeledTermImpl extends TermImpl {
 
    @Override
    public TermLabel getLabel(final Name termLabelName) {
-      return JavaUtil.search(labels, new IFilter<TermLabel>() {
+      return CollectionUtil.search(labels, new IFilter<TermLabel>() {
          @Override
          public boolean select(TermLabel element) {
-            return JavaUtil.equals(element.name(), termLabelName);
+            return ObjectUtil.equals(element.name(), termLabelName);
          }
       });
    }

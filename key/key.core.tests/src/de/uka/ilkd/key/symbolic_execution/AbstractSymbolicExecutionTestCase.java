@@ -30,6 +30,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import junit.framework.TestCase;
 
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+import org.key_project.utils.java.StringUtil;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -96,8 +99,6 @@ import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTree
 import de.uka.ilkd.key.symbolic_execution.strategy.StepReturnSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -223,10 +224,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          final String SUFFIX = " ###";
          String path = tempNewOracleDirectory.toString();
          int length = Math.max(path.length(), HEADER_LINE.length());
-         String borderLines = JavaUtil.createLine("#", PREFIX.length() + length + SUFFIX.length());
+         String borderLines = StringUtil.createLine("#", PREFIX.length() + length + SUFFIX.length());
          System.out.println(borderLines);
-         System.out.println(PREFIX + HEADER_LINE + JavaUtil.createLine(" ", length - HEADER_LINE.length()) + SUFFIX);
-         System.out.println(PREFIX + path + JavaUtil.createLine(" ", length - path.length()) + SUFFIX);
+         System.out.println(PREFIX + HEADER_LINE + StringUtil.createLine(" ", length - HEADER_LINE.length()) + SUFFIX);
+         System.out.println(PREFIX + path + StringUtil.createLine(" ", length - path.length()) + SUFFIX);
          System.out.println(borderLines);
       }
    }
@@ -334,15 +335,15 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       IExecutionNode<?>[] children = parentToSearchIn.getChildren();
       while (result == null && i < children.length) {
          if (children[i] instanceof IExecutionBranchCondition && directChildToSearch instanceof IExecutionBranchCondition) {
-            if (JavaUtil.equalIgnoreWhiteSpace(children[i].getName(), directChildToSearch.getName()) &&
-                JavaUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)children[i]).getAdditionalBranchLabel(), ((IExecutionBranchCondition)directChildToSearch).getAdditionalBranchLabel()) &&
+            if (StringUtil.equalIgnoreWhiteSpace(children[i].getName(), directChildToSearch.getName()) &&
+                StringUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)children[i]).getAdditionalBranchLabel(), ((IExecutionBranchCondition)directChildToSearch).getAdditionalBranchLabel()) &&
                 children[i].getElementType().equals(directChildToSearch.getElementType())) {
                  result = children[i];
               }
          }
          else{
-            if (JavaUtil.equalIgnoreWhiteSpace(children[i].getName(), directChildToSearch.getName()) &&
-                  children[i].getElementType().equals(directChildToSearch.getElementType())) {
+            if (StringUtil.equalIgnoreWhiteSpace(children[i].getName(), directChildToSearch.getName()) &&
+                children[i].getElementType().equals(directChildToSearch.getElementType())) {
                  result = children[i];
               }
          }
@@ -375,9 +376,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Compare nodes
       assertNotNull(expected);
       assertNotNull(current);
-      assertTrue("Expected \"" + expected.getName() + "\" but is \"" + current.getName() + "\".", JavaUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
+      assertTrue("Expected \"" + expected.getName() + "\" but is \"" + current.getName() + "\".", StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
       assertEquals(expected.isPathConditionChanged(), current.isPathConditionChanged());
-      assertTrue("Expected \"" + expected.getFormatedPathCondition() + "\" but is \"" + current.getFormatedPathCondition() + "\".", JavaUtil.equalIgnoreWhiteSpace(expected.getFormatedPathCondition(), current.getFormatedPathCondition()));
+      assertTrue("Expected \"" + expected.getFormatedPathCondition() + "\" but is \"" + current.getFormatedPathCondition() + "\".", StringUtil.equalIgnoreWhiteSpace(expected.getFormatedPathCondition(), current.getFormatedPathCondition()));
       if (compareParent) {
          if (expected instanceof IExecutionBlockStartNode<?>) {
             assertTrue(current instanceof IExecutionBlockStartNode<?>);
@@ -392,10 +393,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       if (expected instanceof IExecutionBranchCondition) {
          assertTrue("Expected IExecutionBranchCondition but is " + current.getClass() + ".", current instanceof IExecutionBranchCondition);
-         assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getFormatedBranchCondition() + "\" but is \"" + ((IExecutionBranchCondition)current).getFormatedBranchCondition() + "\".", JavaUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getFormatedBranchCondition(), ((IExecutionBranchCondition)current).getFormatedBranchCondition()));
+         assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getFormatedBranchCondition() + "\" but is \"" + ((IExecutionBranchCondition)current).getFormatedBranchCondition() + "\".", StringUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getFormatedBranchCondition(), ((IExecutionBranchCondition)current).getFormatedBranchCondition()));
          assertEquals(((IExecutionBranchCondition)expected).isMergedBranchCondition(), ((IExecutionBranchCondition)current).isMergedBranchCondition());
          assertEquals(((IExecutionBranchCondition)expected).isBranchConditionComputed(), ((IExecutionBranchCondition)current).isBranchConditionComputed());
-         assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getAdditionalBranchLabel() + "\" but is \"" + ((IExecutionBranchCondition)current).getAdditionalBranchLabel() + "\".", JavaUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getAdditionalBranchLabel(), ((IExecutionBranchCondition)current).getAdditionalBranchLabel()));
+         assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getAdditionalBranchLabel() + "\" but is \"" + ((IExecutionBranchCondition)current).getAdditionalBranchLabel() + "\".", StringUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getAdditionalBranchLabel(), ((IExecutionBranchCondition)current).getAdditionalBranchLabel()));
          assertVariables((IExecutionBranchCondition)expected, (IExecutionBranchCondition)current, compareVariables, compareConstraints);
          assertConstraints((IExecutionBranchCondition)expected, (IExecutionBranchCondition)current, compareConstraints);
       }
@@ -435,13 +436,13 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       else if (expected instanceof IExecutionMethodReturn) {
          assertTrue("Expected IExecutionMethodReturn but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionMethodReturn);
-         assertTrue(((IExecutionMethodReturn)expected).getSignature() + " does not match " + ((IExecutionMethodReturn)current).getSignature(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getSignature(), ((IExecutionMethodReturn)current).getSignature()));
+         assertTrue(((IExecutionMethodReturn)expected).getSignature() + " does not match " + ((IExecutionMethodReturn)current).getSignature(), StringUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getSignature(), ((IExecutionMethodReturn)current).getSignature()));
          if (compareReturnValues) {
-            assertTrue(((IExecutionMethodReturn)expected).getNameIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getNameIncludingReturnValue(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getNameIncludingReturnValue(), ((IExecutionMethodReturn)current).getNameIncludingReturnValue()));
-            assertTrue(((IExecutionMethodReturn)expected).getSignatureIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getSignatureIncludingReturnValue(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getSignatureIncludingReturnValue(), ((IExecutionMethodReturn)current).getSignatureIncludingReturnValue()));
+            assertTrue(((IExecutionMethodReturn)expected).getNameIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getNameIncludingReturnValue(), StringUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getNameIncludingReturnValue(), ((IExecutionMethodReturn)current).getNameIncludingReturnValue()));
+            assertTrue(((IExecutionMethodReturn)expected).getSignatureIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getSignatureIncludingReturnValue(), StringUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getSignatureIncludingReturnValue(), ((IExecutionMethodReturn)current).getSignatureIncludingReturnValue()));
             assertEquals(((IExecutionMethodReturn)expected).isReturnValuesComputed(), ((IExecutionMethodReturn)current).isReturnValuesComputed());
          }
-         assertTrue(((IExecutionMethodReturn)expected).getFormatedMethodReturnCondition() + " does not match " + ((IExecutionMethodReturn)current).getFormatedMethodReturnCondition(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getFormatedMethodReturnCondition(), ((IExecutionMethodReturn)current).getFormatedMethodReturnCondition()));
+         assertTrue(((IExecutionMethodReturn)expected).getFormatedMethodReturnCondition() + " does not match " + ((IExecutionMethodReturn)current).getFormatedMethodReturnCondition(), StringUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getFormatedMethodReturnCondition(), ((IExecutionMethodReturn)current).getFormatedMethodReturnCondition()));
          assertVariables((IExecutionMethodReturn)expected, (IExecutionMethodReturn)current, compareVariables, compareConstraints);
          assertConstraints((IExecutionMethodReturn)expected, (IExecutionMethodReturn)current, compareConstraints);
          if (compareReturnValues) {
@@ -450,8 +451,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       else if (expected instanceof IExecutionExceptionalMethodReturn) {
          assertTrue("Expected IExecutionExceptionalMethodReturn but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionExceptionalMethodReturn);
-         assertTrue(((IExecutionExceptionalMethodReturn)expected).getSignature() + " does not match " + ((IExecutionExceptionalMethodReturn)current).getSignature(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionExceptionalMethodReturn)expected).getSignature(), ((IExecutionExceptionalMethodReturn)current).getSignature()));
-         assertTrue(((IExecutionExceptionalMethodReturn)expected).getFormatedMethodReturnCondition() + " does not match " + ((IExecutionExceptionalMethodReturn)current).getFormatedMethodReturnCondition(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionExceptionalMethodReturn)expected).getFormatedMethodReturnCondition(), ((IExecutionExceptionalMethodReturn)current).getFormatedMethodReturnCondition()));
+         assertTrue(((IExecutionExceptionalMethodReturn)expected).getSignature() + " does not match " + ((IExecutionExceptionalMethodReturn)current).getSignature(), StringUtil.equalIgnoreWhiteSpace(((IExecutionExceptionalMethodReturn)expected).getSignature(), ((IExecutionExceptionalMethodReturn)current).getSignature()));
+         assertTrue(((IExecutionExceptionalMethodReturn)expected).getFormatedMethodReturnCondition() + " does not match " + ((IExecutionExceptionalMethodReturn)current).getFormatedMethodReturnCondition(), StringUtil.equalIgnoreWhiteSpace(((IExecutionExceptionalMethodReturn)expected).getFormatedMethodReturnCondition(), ((IExecutionExceptionalMethodReturn)current).getFormatedMethodReturnCondition()));
          assertVariables((IExecutionExceptionalMethodReturn)expected, (IExecutionExceptionalMethodReturn)current, compareVariables, compareConstraints);
          assertConstraints((IExecutionExceptionalMethodReturn)expected, (IExecutionExceptionalMethodReturn)current, compareConstraints);
       }
@@ -522,7 +523,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             assertExecutionNode(expectedNext, currentNext, false, false, false, false, false);
             String expectedCondition = expected.getFormatedBlockCompletionCondition(expectedNext);
             String currentCondition = current.getFormatedBlockCompletionCondition(currentNext);
-            if (!JavaUtil.equalIgnoreWhiteSpace(expectedCondition, currentCondition)) {
+            if (!StringUtil.equalIgnoreWhiteSpace(expectedCondition, currentCondition)) {
                assertEquals(expectedCondition, currentCondition);
             }
          }
@@ -633,10 +634,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    protected static void assertReturnValue(IExecutionMethodReturnValue expected, IExecutionMethodReturnValue current) throws ProofInputException {
       assertNotNull(expected);
       assertNotNull(current);
-      assertTrue(expected.getName() + " does not match " + current.getName(), JavaUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
-      assertTrue(expected.getReturnValueString() + " does not match " + current.getReturnValueString(), JavaUtil.equalIgnoreWhiteSpace(expected.getReturnValueString(), current.getReturnValueString()));
+      assertTrue(expected.getName() + " does not match " + current.getName(), StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
+      assertTrue(expected.getReturnValueString() + " does not match " + current.getReturnValueString(), StringUtil.equalIgnoreWhiteSpace(expected.getReturnValueString(), current.getReturnValueString()));
       assertEquals(expected.hasCondition(), current.hasCondition());
-      assertTrue(expected.getConditionString() + " does not match " + current.getConditionString(), JavaUtil.equalIgnoreWhiteSpace(expected.getConditionString(), current.getConditionString()));
+      assertTrue(expected.getConditionString() + " does not match " + current.getConditionString(), StringUtil.equalIgnoreWhiteSpace(expected.getConditionString(), current.getConditionString()));
    }
 
    /**
@@ -667,15 +668,15 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       TestCase.assertEquals(expected.length, current.length);
       // Compare ignore order
       List<IExecutionConstraint> availableCurrentVariables = new LinkedList<IExecutionConstraint>();
-      JavaUtil.addAll(availableCurrentVariables, current);
+      CollectionUtil.addAll(availableCurrentVariables, current);
       for (int i = 0; i < expected.length; i++) {
          final IExecutionConstraint expectedVariable = expected[i];
          // Find current variable with same name
-         IExecutionConstraint currentVariable = JavaUtil.searchAndRemove(availableCurrentVariables, new IFilter<IExecutionConstraint>() {
+         IExecutionConstraint currentVariable = CollectionUtil.searchAndRemove(availableCurrentVariables, new IFilter<IExecutionConstraint>() {
             @Override
             public boolean select(IExecutionConstraint element) {
                try {
-                  return JavaUtil.equalIgnoreWhiteSpace(expectedVariable.getName(), element.getName());
+                  return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(), element.getName());
                }
                catch (ProofInputException e) {
                   throw new RuntimeException(e);
@@ -699,7 +700,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                           IExecutionConstraint current) throws ProofInputException {
       if (expected != null) {
          assertNotNull(current);
-         if (!JavaUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName())) {
+         if (!StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName())) {
             assertEquals(expected.getName(), current.getName());
          }
       }
@@ -761,15 +762,15 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       TestCase.assertEquals(expected.length, current.length);
       // Compare ignore order
       List<IExecutionVariable> availableCurrentVariables = new LinkedList<IExecutionVariable>();
-      JavaUtil.addAll(availableCurrentVariables, current);
+      CollectionUtil.addAll(availableCurrentVariables, current);
       for (int i = 0; i < expected.length; i++) {
          final IExecutionVariable expectedVariable = expected[i];
          // Find current variable with same name
-         IExecutionVariable currentVariable = JavaUtil.searchAndRemove(availableCurrentVariables, new IFilter<IExecutionVariable>() {
+         IExecutionVariable currentVariable = CollectionUtil.searchAndRemove(availableCurrentVariables, new IFilter<IExecutionVariable>() {
             @Override
             public boolean select(IExecutionVariable element) {
                try {
-                  return JavaUtil.equalIgnoreWhiteSpace(expectedVariable.getName(), element.getName());
+                  return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(), element.getName());
                }
                catch (ProofInputException e) {
                   throw new RuntimeException(e);
@@ -836,16 +837,16 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       TestCase.assertEquals(expected.length, current.length);
       // Compare ignore order
       List<IExecutionValue> availableCurrentVariables = new LinkedList<IExecutionValue>();
-      JavaUtil.addAll(availableCurrentVariables, current);
+      CollectionUtil.addAll(availableCurrentVariables, current);
       for (int i = 0; i < expected.length; i++) {
          final IExecutionValue expectedVariable = expected[i];
          // Find current variable with same name
-         IExecutionValue currentVariable = JavaUtil.searchAndRemove(availableCurrentVariables, new IFilter<IExecutionValue>() {
+         IExecutionValue currentVariable = CollectionUtil.searchAndRemove(availableCurrentVariables, new IFilter<IExecutionValue>() {
             @Override
             public boolean select(IExecutionValue element) {
                try {
-                  return JavaUtil.equalIgnoreWhiteSpace(expectedVariable.getName(), element.getName()) &&
-                         JavaUtil.equalIgnoreWhiteSpace(expectedVariable.getConditionString(), element.getConditionString());
+                  return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(), element.getName()) &&
+                         StringUtil.equalIgnoreWhiteSpace(expectedVariable.getConditionString(), element.getConditionString());
                }
                catch (ProofInputException e) {
                   throw new RuntimeException(e);
@@ -876,12 +877,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       if (expected != null) {
          assertNotNull(current);
          // Compare variable
-         assertTrue(expected.getName() + " does not match " + current.getName(), JavaUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
+         assertTrue(expected.getName() + " does not match " + current.getName(), StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
          assertEquals(expected.getTypeString(), current.getTypeString());
-         assertTrue(expected.getValueString() + " does not match " + current.getValueString(), JavaUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
+         assertTrue(expected.getValueString() + " does not match " + current.getValueString(), StringUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
          assertEquals(expected.isValueAnObject(), current.isValueAnObject());
          assertEquals(expected.isValueUnknown(), current.isValueUnknown());
-         assertTrue(expected.getConditionString() + " does not match " + current.getConditionString(), JavaUtil.equalIgnoreWhiteSpace(expected.getConditionString(), current.getConditionString()));
+         assertTrue(expected.getConditionString() + " does not match " + current.getConditionString(), StringUtil.equalIgnoreWhiteSpace(expected.getConditionString(), current.getConditionString()));
          // Compare parent
          if (compareParent) {
             assertVariable(expected.getVariable(), current.getVariable(), false, false, compareConstraints);
@@ -1132,7 +1133,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
       assertNotNull(containerKJT);
       ImmutableList<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
-      IProgramMethod pm = JavaUtil.search(pms, new IFilter<IProgramMethod>() {
+      IProgramMethod pm = CollectionUtil.search(pms, new IFilter<IProgramMethod>() {
          @Override
          public boolean select(IProgramMethod element) {
             return methodFullName.equals(element.getFullName());
@@ -1140,7 +1141,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       });
       if (pm == null) {
          pms = javaInfo.getConstructors(containerKJT);
-         pm = JavaUtil.search(pms, new IFilter<IProgramMethod>() {
+         pm = CollectionUtil.search(pms, new IFilter<IProgramMethod>() {
             @Override
             public boolean select(IProgramMethod element) {
                return methodFullName.equals(element.getFullName());
@@ -2018,7 +2019,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             assertNotNull(containerKJT);
             // Search observer function
             ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(containerKJT);
-            IObserverFunction target = JavaUtil.search(targets, new IFilter<IObserverFunction>() {
+            IObserverFunction target = CollectionUtil.search(targets, new IFilter<IObserverFunction>() {
                @Override
                public boolean select(IObserverFunction element) {
                   return targetName.equals(element.toString());

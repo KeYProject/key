@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
+import org.key_project.utils.java.ObjectUtil;
+
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.SourceElement;
@@ -32,7 +34,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 public class MethodBreakpoint extends AbstractConditionalBreakpoint {
@@ -152,7 +153,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
       Term term = ruleApp.posInOccurrence().subTerm();
       term = TermBuilder.goBelowUpdates(term);
       MethodFrame mf = JavaTools.getInnermostMethodFrame(term.javaBlock(), node.proof().getServices());
-      return JavaUtil.equals(getPm(), mf.getProgramMethod());
+      return ObjectUtil.equals(getPm(), mf.getProgramMethod());
    }
 
    @Override

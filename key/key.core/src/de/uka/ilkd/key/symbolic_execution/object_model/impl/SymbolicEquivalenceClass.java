@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
@@ -22,8 +25,6 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * Default implementation of {@link ISymbolicEquivalenceClass}.
@@ -104,7 +105,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
    public Term getRepresentative() {
       // Prefer null if contained in equivalence class
       final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-      Term nullTerm = JavaUtil.search(terms, new IFilter<Term>() {
+      Term nullTerm = CollectionUtil.search(terms, new IFilter<Term>() {
          @Override
          public boolean select(Term element) {
             return element.op() == heapLDT.getNull();
@@ -115,7 +116,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
       }
       else {
          // Prefer terms which are a program variable
-         Term representative = JavaUtil.search(terms, new IFilter<Term>() {
+         Term representative = CollectionUtil.search(terms, new IFilter<Term>() {
             @Override
             public boolean select(Term element) {
                return element.op() instanceof IProgramVariable;

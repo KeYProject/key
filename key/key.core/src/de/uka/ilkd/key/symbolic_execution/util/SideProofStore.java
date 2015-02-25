@@ -6,8 +6,11 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.proof.Proof;
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
 import de.uka.ilkd.key.ui.CustomUserInterface;
@@ -133,7 +136,7 @@ public final class SideProofStore {
     * @return The {@link Entry} with the given {@link Proof} or {@code null} if not available.
     */
    public Entry getEntry(final Proof proof) {
-      return JavaUtil.search(entries, new IFilter<Entry>() {
+      return CollectionUtil.search(entries, new IFilter<Entry>() {
          @Override
          public boolean select(Entry element) {
             return element != null && element.getProof() == proof;

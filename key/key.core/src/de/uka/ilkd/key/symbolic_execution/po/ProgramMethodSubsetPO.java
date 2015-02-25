@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.key_project.utils.java.ObjectUtil;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Position;
@@ -37,13 +39,12 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.java.visitor.UndeclaredProgramVariableCollector;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * <p>
@@ -295,8 +296,8 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
       if (obj instanceof ProgramMethodSubsetPO) {
          ProgramMethodSubsetPO other = (ProgramMethodSubsetPO)obj;
          return super.equals(obj) &&
-                JavaUtil.equals(getStartPosition(), other.getStartPosition()) &&
-                JavaUtil.equals(getEndPosition(), other.getEndPosition());
+                ObjectUtil.equals(getStartPosition(), other.getStartPosition()) &&
+                ObjectUtil.equals(getEndPosition(), other.getEndPosition());
       }
       else {
          return false;

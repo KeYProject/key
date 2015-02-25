@@ -1,8 +1,9 @@
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
+import org.key_project.utils.java.ObjectUtil;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * Represents a location like a local variable, method parameter, static field
@@ -66,7 +67,7 @@ public class Location {
    public boolean equals(Object obj) {
       if (obj instanceof Location) {
          Location other = (Location) obj;
-         return JavaUtil.equals(accesses, other.getAccesses());
+         return ObjectUtil.equals(accesses, other.getAccesses());
       }
       else {
          return false;

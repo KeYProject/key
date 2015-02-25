@@ -17,19 +17,17 @@ package de.uka.ilkd.key.proof;
 import java.util.Map;
 
 import junit.framework.TestCase;
+
+import org.key_project.utils.java.IOUtil;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.ITermTacletAppIndexCache;
-import de.uka.ilkd.key.proof.NullNewRuleListener;
-import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.TermTacletAppIndex;
-import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
@@ -38,7 +36,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.LRUCache;
-import de.uka.ilkd.key.utils.IOUtils;
 
 
 public class TestTermTacletAppIndex extends TestCase{   
@@ -63,7 +60,7 @@ public class TestTermTacletAppIndex extends TestCase{
     
     public void setUp() {
        
-        TacletForTests.parse(IOUtils.toFile(KeYResourceManager.getManager().getResourceFile(getClass(), "ruleForTestTacletIndex.taclet")));
+        TacletForTests.parse(IOUtil.toFile(KeYResourceManager.getManager().getResourceFile(getClass(), "ruleForTestTacletIndex.taclet")));
 
         ruleRewriteNonH1H2 = NoPosTacletApp.createNoPosTacletApp(taclet("rewrite_noninteractive_h1_h2"));
         ruleNoFindNonH1H2H3 = NoPosTacletApp.createNoPosTacletApp(taclet("nofind_noninteractive_h1_h2_h3"));

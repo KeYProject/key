@@ -14,6 +14,8 @@
 /** this class is used to parse in Taclet from a file that are used by tests */
 package de.uka.ilkd.key.rule;
 
+import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
+
 import java.io.File;
 import java.io.StringReader;
 
@@ -40,10 +42,9 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.RuleCollection;
-import de.uka.ilkd.key.proof.io.*;
+import de.uka.ilkd.key.proof.io.KeYFileForTests;
+import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import de.uka.ilkd.key.utils.IOUtils;
-import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
 public class TacletForTests {
 

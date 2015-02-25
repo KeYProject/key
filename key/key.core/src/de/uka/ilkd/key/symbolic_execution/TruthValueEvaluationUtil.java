@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.key_project.utils.java.ArrayUtil;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.DefaultVisitor;
@@ -35,7 +37,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -558,7 +559,7 @@ public final class TruthValueEvaluationUtil {
             if (visitedLabel instanceof FormulaTermLabel) {
                FormulaTermLabel pLabel = (FormulaTermLabel) visitedLabel;
                String[] beforeIds = pLabel.getBeforeIds();
-               if (JavaUtil.contains(beforeIds, labelId)) {
+               if (ArrayUtil.contains(beforeIds, labelId)) {
                   resultToFill.add(visited);
                }
             }

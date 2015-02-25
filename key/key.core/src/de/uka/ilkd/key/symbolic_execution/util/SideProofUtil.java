@@ -6,6 +6,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+import org.key_project.utils.java.ObjectUtil;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -292,7 +296,7 @@ public final class SideProofUtil {
    }
 
    private static boolean isOperatorASequentFormula(Sequent sequent, final Operator operator) {
-      return JavaUtil.search(sequent, new IFilter<SequentFormula>() {
+      return CollectionUtil.search(sequent, new IFilter<SequentFormula>() {
          @Override
          public boolean select(SequentFormula element) {
             return element.formula().op() == operator;
@@ -700,12 +704,12 @@ public final class SideProofUtil {
    public static Term extractOperatorTerm(Node node, final Operator operator) {
       assert node != null;
       // Search formula with the given operator in sequent (or in some cases below the updates)
-      SequentFormula sf = JavaUtil.search(node.sequent(), new IFilter<SequentFormula>() {
+      SequentFormula sf = CollectionUtil.search(node.sequent(), new IFilter<SequentFormula>() {
          @Override
          public boolean select(SequentFormula element) {
             Term term = element.formula();
             term = TermBuilder.goBelowUpdates(term);
-            return JavaUtil.equals(term.op(), operator);
+            return ObjectUtil.equals(term.op(), operator);
          }
       });
       if (sf != null) {

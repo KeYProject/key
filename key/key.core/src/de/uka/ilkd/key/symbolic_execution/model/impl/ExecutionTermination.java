@@ -15,6 +15,10 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.Iterator;
 
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+import org.key_project.utils.java.ObjectUtil;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -33,8 +37,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 
@@ -169,7 +171,7 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
       ImmutableArray<Term> result = null;
       if (term.op() instanceof ElementaryUpdate) {
          ElementaryUpdate update = (ElementaryUpdate)term.op();
-          if (JavaUtil.equals(variable, update.lhs())) {
+          if (ObjectUtil.equals(variable, update.lhs())) {
             result = term.subs();
          }
       }
@@ -229,7 +231,7 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
                Node leaf = leafsIter.next();
                if (!leaf.isClosed()) {
                   final Term toSearch = predicate;
-                  SequentFormula topLevelPredicate = JavaUtil.search(leaf.sequent().succedent(), new IFilter<SequentFormula>() {
+                  SequentFormula topLevelPredicate = CollectionUtil.search(leaf.sequent().succedent(), new IFilter<SequentFormula>() {
                      @Override
                      public boolean select(SequentFormula element) {
                         return toSearch.op() == element.formula().op();
