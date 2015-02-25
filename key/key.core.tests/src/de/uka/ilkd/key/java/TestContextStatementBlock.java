@@ -13,12 +13,13 @@
 
 package de.uka.ilkd.key.java;
 
+import org.key_project.utils.ExtList;
+
 import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.rule.TacletForTests;
-import de.uka.ilkd.key.util.ExtList;
 
 
 public class TestContextStatementBlock extends TestCase {

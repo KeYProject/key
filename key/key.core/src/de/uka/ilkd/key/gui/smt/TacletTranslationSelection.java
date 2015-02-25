@@ -38,7 +38,8 @@ import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
-import de.uka.ilkd.key.collection.ImmutableSet;
+import org.key_project.utils.collection.ImmutableSet;
+
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.proof.TacletIndex;

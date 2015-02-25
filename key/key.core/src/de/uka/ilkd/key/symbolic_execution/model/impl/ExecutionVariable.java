@@ -20,7 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableList;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;

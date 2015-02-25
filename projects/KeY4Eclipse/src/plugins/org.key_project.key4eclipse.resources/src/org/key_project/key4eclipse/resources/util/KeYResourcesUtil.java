@@ -56,13 +56,13 @@ import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
 import org.key_project.key4eclipse.resources.util.event.IKeYResourcePropertyListener;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.utils.collection.ImmutableSet;
 import org.key_project.utils.java.CollectionUtil;
 import org.key_project.utils.java.XMLUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

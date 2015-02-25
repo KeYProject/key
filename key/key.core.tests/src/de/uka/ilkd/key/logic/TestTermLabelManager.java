@@ -21,9 +21,11 @@ import java.util.List;
 import java.util.Set;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+
+import org.key_project.utils.collection.ImmutableArray;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -219,7 +221,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_updates_allRules() {
       LoggingTermLabelUpdate update = new LoggingTermLabelUpdate(new ParameterlessTermLabel(new Name("UPDATED")));
@@ -246,7 +248,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_updates_ruleSpecific() {
       LoggingTermLabelUpdate update = new LoggingTermLabelUpdate(new ParameterlessTermLabel(new Name("UPDATED")), "rule");
@@ -272,7 +274,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_childAndGrandchildPolicies_allRules() {
       LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy();
@@ -321,7 +323,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_childAndGrandchildPolicies_ruleSpecific() {
       LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy("rule");
@@ -358,7 +360,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     * @throws ProblemLoaderException Occurred Exception
     */
    public void testInstantiateLabels_directChildPolicies_allRules() throws ProblemLoaderException {
@@ -393,7 +395,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_directChildPolicies_ruleSpecific() {
       LoggingChildTermLabelPolicy policy = new LoggingChildTermLabelPolicy("rule");
@@ -426,7 +428,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_modalityTermPolicies() {
       LoggingTermLabelPolicy policy = new LoggingTermLabelPolicy();
@@ -455,7 +457,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_applicationTermPolicies() {
       LoggingTermLabelPolicy policy = new LoggingTermLabelPolicy();
@@ -479,7 +481,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_taclet() {
       Services services = null;
@@ -498,7 +500,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    /**
-    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, de.uka.ilkd.key.collection.ImmutableArray, de.uka.ilkd.key.collection.ImmutableArray, JavaBlock)}.
+    * Tests {@link TermLabelManager#instantiateLabels(Services, PosInOccurrence, de.uka.ilkd.key.rule.Rule, de.uka.ilkd.key.proof.Goal, Object, Term, de.uka.ilkd.key.logic.op.Operator, org.key_project.utils.collection.ImmutableArray, org.key_project.utils.collection.ImmutableArray, JavaBlock)}.
     */
    public void testInstantiateLabels_null() {
       ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(), null, null, null, null, null, null, null, null, null, null, null);

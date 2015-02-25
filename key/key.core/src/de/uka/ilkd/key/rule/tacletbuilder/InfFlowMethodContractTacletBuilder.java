@@ -9,14 +9,15 @@
 //
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import de.uka.ilkd.key.rule.tacletbuilder.AbstractInfFlowContractAppTacletBuilder;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import org.key_project.utils.collection.DefaultImmutableSet;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.utils.collection.ImmutableSet;
+
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;

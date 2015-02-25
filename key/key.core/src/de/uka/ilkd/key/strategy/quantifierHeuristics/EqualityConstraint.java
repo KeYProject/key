@@ -20,10 +20,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import org.key_project.utils.LRUCache;
+import org.key_project.utils.collection.DefaultImmutableSet;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.utils.collection.ImmutableSet;
+
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
@@ -37,7 +39,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
-import de.uka.ilkd.key.util.LRUCache;
 
 
 /** 

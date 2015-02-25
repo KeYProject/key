@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.strategy;
 
+import org.key_project.utils.LRUCache;
+
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.LRUCache;
 
 public abstract class NumberRuleAppCost implements RuleAppCost {
 

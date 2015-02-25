@@ -13,7 +13,9 @@
 
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
+import org.antlr.runtime.RecognitionException;
+import org.key_project.utils.collection.ImmutableArray;
+
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -28,7 +30,6 @@ import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.TacletForTests;
-import org.antlr.runtime.RecognitionException;
 
 public class TestTermParser extends AbstractTestTermParser {
 

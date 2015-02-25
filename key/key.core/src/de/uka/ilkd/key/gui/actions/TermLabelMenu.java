@@ -13,11 +13,6 @@
 
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.pp.VisibleTermLabels;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +20,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
+
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.pp.VisibleTermLabels;
 
 /**
  * This menu can be used to toggle TermLabel visibility for the SequentView.

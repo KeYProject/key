@@ -13,13 +13,14 @@
 
 package de.uka.ilkd.key.java.reference;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Reference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.util.ExtList;
 
 public class ExecutionContext
 extends JavaNonTerminalProgramElement 

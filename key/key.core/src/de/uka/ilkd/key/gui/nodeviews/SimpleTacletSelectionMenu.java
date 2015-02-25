@@ -20,7 +20,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JMenu;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableList;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.rule.PosTacletApp;

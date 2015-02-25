@@ -15,7 +15,8 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import javax.swing.JFrame;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableList;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.NotationInfo;

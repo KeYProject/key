@@ -17,7 +17,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import recoder.ServiceConfiguration;
-import recoder.abstraction.*;
+import recoder.abstraction.ClassType;
+import recoder.abstraction.Type;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.kit.UnitKit;
 import recoder.service.DefaultNameInfo;

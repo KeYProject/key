@@ -21,10 +21,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Vector;
 
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSet;
+
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;

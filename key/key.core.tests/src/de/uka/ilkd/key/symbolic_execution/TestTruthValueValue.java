@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution;
 
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValue;
 import junit.framework.TestCase;
+import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValue;
 
 /**
  * Tests for {@link TruthValue}.

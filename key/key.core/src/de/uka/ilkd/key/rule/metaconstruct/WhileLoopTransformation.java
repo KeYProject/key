@@ -16,8 +16,10 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedHashMap;
 import java.util.Stack;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import org.key_project.utils.ExtList;
+import org.key_project.utils.collection.ImmutableArray;
+import org.key_project.utils.collection.ImmutableSet;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Label;
@@ -64,7 +66,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
 
 /** Walks through a java AST in depth-left-fist-order. 
  * This walker is used to transform a loop (not only 

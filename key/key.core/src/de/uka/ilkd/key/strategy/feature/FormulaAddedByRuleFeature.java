@@ -13,9 +13,9 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;

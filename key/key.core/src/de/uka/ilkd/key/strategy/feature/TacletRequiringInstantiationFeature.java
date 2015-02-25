@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.collection.ImmutableSet;
+import org.key_project.utils.collection.ImmutableSet;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;

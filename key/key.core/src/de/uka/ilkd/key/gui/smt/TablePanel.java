@@ -15,7 +15,6 @@ package de.uka.ilkd.key.gui.smt;
 
 
 import java.awt.Dimension;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 

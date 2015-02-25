@@ -13,7 +13,15 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.*;
+import org.key_project.utils.ExtList;
+
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -21,16 +29,22 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.statement.EnhancedFor;
+import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.IForUpdates;
+import de.uka.ilkd.key.java.statement.IGuard;
+import de.uka.ilkd.key.java.statement.ILoopInit;
+import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  * 

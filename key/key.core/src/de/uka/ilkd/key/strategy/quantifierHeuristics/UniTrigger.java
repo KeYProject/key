@@ -15,16 +15,17 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableMap;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import org.key_project.utils.LRUCache;
+import org.key_project.utils.collection.DefaultImmutableSet;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableMap;
+import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.utils.collection.ImmutableSet;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.util.LRUCache;
 
 
 class UniTrigger implements Trigger {

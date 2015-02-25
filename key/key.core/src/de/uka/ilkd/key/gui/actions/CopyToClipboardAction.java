@@ -15,10 +15,10 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.pp.PosInSequent;
 
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
+import de.uka.ilkd.key.pp.PosInSequent;
 
 /**
  * Copy a term that is currently selected (i.e., under the mouse cursor)

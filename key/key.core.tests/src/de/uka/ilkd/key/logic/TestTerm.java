@@ -14,8 +14,10 @@
 package de.uka.ilkd.key.logic;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+
+import org.key_project.utils.collection.ImmutableArray;
+import org.key_project.utils.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.logic.op.Function;

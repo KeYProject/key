@@ -11,11 +11,13 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.collection;
+package org.key_project.utils.testcase.collection;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import java.util.Iterator;
+
+import org.junit.Test;
+import org.key_project.utils.collection.DefaultImmutableSet;
+import org.key_project.utils.collection.ImmutableSet;
 
 /** tests non-destructive Set implementation with String */
 
@@ -39,8 +41,10 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
 
 
     // tests add and implicitly iterator, size
+    @Test
     public void testAdd() {
-	ImmutableSet<String>[] newSet=new ImmutableSet[str.length+1];
+	@SuppressWarnings("unchecked")
+   ImmutableSet<String>[] newSet=new ImmutableSet[str.length+1];
 	newSet[0]=DefaultImmutableSet.<String>nil();
 
 	for (int i=1;i<str.length+1;i++) {
@@ -71,8 +75,10 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
     }
 
     // tests unify
+    @Test
     public void testUnion() {
-	ImmutableSet<String>[] newSet=new ImmutableSet[str.length+1];
+	@SuppressWarnings("unchecked")
+   ImmutableSet<String>[] newSet=new ImmutableSet[str.length+1];
 	newSet[0]=DefaultImmutableSet.<String>nil().add(str[0]).add(str[1]);
 	newSet[1]=DefaultImmutableSet.<String>nil().add(str[1]).add(str[2]);
 	// make the union of two sets and check if in the unions
@@ -87,6 +93,7 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
 	assertTrue(!union.contains(str[3]));
     }
 
+    @Test
     public void testUnionEmptyWithNonEmptySet() {
 	ImmutableSet<String> empty = DefaultImmutableSet.<String>nil();
 	ImmutableSet<String> hal = DefaultImmutableSet.<String>nil().add("H").add("a").add("l");
@@ -95,6 +102,7 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
 	assertEquals("Wrong size.", empty.union(hal).size(), 3);
     }
 
+    @Test
     public void testUnionRemoveDuplicates() {
 	ImmutableSet<String> hal = DefaultImmutableSet.<String>nil().add("H").add("a").add("l");
 	ImmutableSet<String> lo = DefaultImmutableSet.<String>nil().add("l").add("o");
@@ -105,6 +113,7 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
 
     
     
+    @Test
     public void testSubset() {
 	ImmutableSet<String> subSet=DefaultImmutableSet.<String>nil();
 	ImmutableSet<String> superSet=DefaultImmutableSet.<String>nil();
@@ -118,6 +127,7 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
 	assertTrue("A non empty set is subset of the empty set",!subSet.subset(DefaultImmutableSet.<String>nil()));
     }
 
+    @Test
     public void testRemove() {
 	ImmutableSet<String> set=DefaultImmutableSet.<String>nil();
 	// set={Dies,ist}
@@ -127,6 +137,7 @@ public class TestSetAsListOfString extends junit.framework.TestCase {
     }
 
 
+    @Test
     public void testToString() {
 	ImmutableSet<String> newSet=DefaultImmutableSet.<String>nil();
 	for (int i=0;i<str.length;i++) {

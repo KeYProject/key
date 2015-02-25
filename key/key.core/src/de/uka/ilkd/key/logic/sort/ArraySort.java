@@ -16,8 +16,9 @@ package de.uka.ilkd.key.logic.sort;
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import org.key_project.utils.collection.DefaultImmutableSet;
+import org.key_project.utils.collection.ImmutableSet;
+
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.Name;

@@ -4,8 +4,13 @@
  */
 package de.uka.ilkd.key.macros;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSet;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -22,10 +27,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.InfFlowProgVarRenamer;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
 
 
 /**

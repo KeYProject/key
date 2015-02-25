@@ -17,8 +17,8 @@ import org.key_project.sed.core.util.SEDAnnotationUtil;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.model.KeYVariable;
+import org.key_project.utils.collection.ImmutableArray;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.slicing.AbstractSlicer;

@@ -13,14 +13,12 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.java.recoderext.EnumClassDeclaration;
-import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
+import junit.framework.TestCase;
 import recoder.DefaultServiceConfiguration;
 import recoder.ParserException;
 import recoder.ProgramFactory;
 import recoder.ServiceConfiguration;
 import recoder.java.declaration.EnumDeclaration;
-import junit.framework.TestCase;
 
 public class TestEnumClassDeclaration extends TestCase {
 

@@ -19,9 +19,9 @@ import java.awt.Rectangle;
 import java.awt.Window;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+
 import javax.swing.AbstractButton;
 import javax.swing.JMenu;
-
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 

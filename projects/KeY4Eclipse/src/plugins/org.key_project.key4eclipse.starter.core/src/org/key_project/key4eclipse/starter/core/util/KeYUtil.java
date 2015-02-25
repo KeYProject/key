@@ -64,6 +64,8 @@ import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.SwingUtil;
 import org.key_project.util.jdt.JDTUtil;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
 import org.key_project.utils.java.IOUtil;
 import org.key_project.utils.java.IOUtil.LineInformation;
 import org.key_project.utils.java.thread.AbstractRunnableWithException;
@@ -72,8 +74,6 @@ import org.key_project.utils.java.thread.IRunnableWithException;
 import org.key_project.utils.java.thread.IRunnableWithResult;
 
 import recoder.parser.JavaCharStream;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;

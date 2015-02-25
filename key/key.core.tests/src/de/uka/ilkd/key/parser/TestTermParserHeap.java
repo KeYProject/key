@@ -1,10 +1,13 @@
 package de.uka.ilkd.key.parser;
 
+import static de.uka.ilkd.key.parser.KeYParser.NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE;
+
+import java.io.IOException;
+
+import org.antlr.runtime.RecognitionException;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
-import static de.uka.ilkd.key.parser.KeYParserF.NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE;
-import java.io.IOException;
-import org.antlr.runtime.RecognitionException;
 
 /**
  * Parser tests for heap terms.

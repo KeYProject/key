@@ -13,11 +13,11 @@
 
 package de.uka.ilkd.key.util;
 
+import static de.uka.ilkd.key.util.MiscTools.equalsOrNull;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-
-import static de.uka.ilkd.key.util.MiscTools.equalsOrNull;
 
 public class Pair<T1, T2> {    
     public final T1 first;

@@ -13,8 +13,13 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.*;
+import org.key_project.utils.collection.ImmutableArray;
+
+import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;

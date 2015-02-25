@@ -17,6 +17,8 @@ package de.uka.ilkd.key.parser;
 import java.io.IOException;
 import java.io.Reader;
 
+import org.antlr.runtime.RecognitionException;
+
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
@@ -24,9 +26,6 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-
-import org.antlr.runtime.RecognitionException;
 
 
 /** This class wraps the default KeY-Term-Parser.

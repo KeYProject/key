@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.java.recoderext.adt;
 
-import recoder.java.*;
+import recoder.java.Expression;
+import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;
 
 

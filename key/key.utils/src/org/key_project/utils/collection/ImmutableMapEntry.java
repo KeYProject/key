@@ -11,23 +11,18 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.collection;
+package org.key_project.utils.collection;
 
+/** This interface declares a tupel of two values.
+ * The first one is of type <S> and named key, the second one
+ * is of type <T> and named value
+ */
 
+public interface ImmutableMapEntry<S,T> extends java.io.Serializable {
 
-/** thrown if a duplicate is being added via addUnique() */
-public class NotUniqueException extends Exception {
+    /** @return the first part of the tupel */
+    S key();
 
-    private static final long serialVersionUID = 6565515240836947955L;
-    Object offender;
-
-    public NotUniqueException(Object o) {
-        offender = o;
-    }
-
-    @Override
-    public String toString() {
-        return "Tried to add a duplicate object to set. Offender is \n"+
-                        offender+"\nof class "+offender.getClass();
-    }
+    /** @return the second part of the tupel */
+    T value();
 }

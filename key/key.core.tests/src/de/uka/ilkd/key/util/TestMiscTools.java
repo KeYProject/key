@@ -14,10 +14,12 @@
 package de.uka.ilkd.key.util;
 
 
+import static de.uka.ilkd.key.util.MiscTools.containsWholeWord;
+import static de.uka.ilkd.key.util.MiscTools.isJMLComment;
+
 import java.io.File;
 
 import junit.framework.TestCase;
-import static de.uka.ilkd.key.util.MiscTools.*;
 
 public class TestMiscTools extends TestCase {
 

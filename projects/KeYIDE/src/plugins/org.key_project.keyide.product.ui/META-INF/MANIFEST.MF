@@ -9,8 +9,3 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Import-Package: de.uka.ilkd.key.collection,
- de.uka.ilkd.key.gui,
- org.eclipse.core.resources,
- org.eclipse.jdt.core,
- recoder.parser

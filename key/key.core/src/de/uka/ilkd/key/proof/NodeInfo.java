@@ -18,7 +18,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableList;
+
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramElement;

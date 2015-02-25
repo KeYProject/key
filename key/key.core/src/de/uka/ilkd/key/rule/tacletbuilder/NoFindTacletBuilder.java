@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import org.key_project.utils.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;

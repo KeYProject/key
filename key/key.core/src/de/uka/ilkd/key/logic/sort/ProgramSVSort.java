@@ -16,9 +16,11 @@ package de.uka.ilkd.key.logic.sort;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import org.key_project.utils.ExtList;
+import org.key_project.utils.collection.DefaultImmutableSet;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.NamedProgramElement;
@@ -77,7 +79,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  * Special "sorts" used for schema variables matching program constructs 

@@ -21,9 +21,10 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Properties;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import org.key_project.utils.collection.DefaultImmutableSet;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSet;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.core.TaskFinishedInfo;

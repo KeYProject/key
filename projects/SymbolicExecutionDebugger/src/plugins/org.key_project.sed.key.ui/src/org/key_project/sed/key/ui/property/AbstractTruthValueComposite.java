@@ -40,9 +40,9 @@ import org.key_project.key4eclipse.common.ui.decorator.TruthValueEvaluationViewe
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
+import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.java.ObjectUtil;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;

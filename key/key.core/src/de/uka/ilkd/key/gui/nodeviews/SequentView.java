@@ -13,20 +13,9 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.ADDITIONAL_HIGHLIGHT_COLOR;
 import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
-import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
-import de.uka.ilkd.key.pp.VisibleTermLabels;
-import de.uka.ilkd.key.util.Debug;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Point;
@@ -38,6 +27,18 @@ import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
+import de.uka.ilkd.key.pp.VisibleTermLabels;
+import de.uka.ilkd.key.util.Debug;
 
 /*
  * Parent class of CurrentGoalView and InnerNodeView.

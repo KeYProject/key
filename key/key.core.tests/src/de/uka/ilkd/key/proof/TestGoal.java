@@ -17,7 +17,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.collection.ImmutableList;
+
+import org.key_project.utils.collection.ImmutableList;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;

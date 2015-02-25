@@ -17,11 +17,12 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.util.ExtList;
 
 public class Guard extends JavaNonTerminalProgramElement 
     implements IGuard {

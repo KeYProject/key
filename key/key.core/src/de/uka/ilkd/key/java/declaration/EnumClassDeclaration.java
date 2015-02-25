@@ -16,13 +16,14 @@ package de.uka.ilkd.key.java.declaration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.key_project.utils.ExtList;
+
 import recoder.java.declaration.EnumConstantDeclaration;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  * This class is used for wrapping an enum into a standard class type.

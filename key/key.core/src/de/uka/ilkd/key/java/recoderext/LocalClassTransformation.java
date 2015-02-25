@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.*;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Variable;

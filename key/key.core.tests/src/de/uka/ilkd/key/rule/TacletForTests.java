@@ -19,7 +19,8 @@ import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 import java.io.File;
 import java.io.StringReader;
 
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import org.key_project.utils.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;

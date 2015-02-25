@@ -34,7 +34,7 @@ public class Synchronized extends Modifier {
      *  May contain: Comments
      */
 
-    public Synchronized(de.uka.ilkd.key.util.ExtList children) {
+    public Synchronized(org.key_project.utils.ExtList children) {
 	super(children);
     }
 

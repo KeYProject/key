@@ -33,7 +33,7 @@ public class Final extends Modifier {
      *      Abstract.
      * @param children list of children. May contain: Comments
      */
-    public Final(de.uka.ilkd.key.util.ExtList children) {
+    public Final(org.key_project.utils.ExtList children) {
 	super (children);
     }
  

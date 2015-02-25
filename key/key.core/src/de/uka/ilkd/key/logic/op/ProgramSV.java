@@ -15,7 +15,8 @@ package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
+import org.key_project.utils.collection.ImmutableArray;
+
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.LoopInitializer;

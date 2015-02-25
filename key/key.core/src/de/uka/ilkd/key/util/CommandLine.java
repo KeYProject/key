@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.util;
 
-import de.uka.ilkd.key.core.Main;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -21,6 +20,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import de.uka.ilkd.key.core.Main;
 
 /**
  * A small framework to handle command lines.

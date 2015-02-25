@@ -13,9 +13,12 @@
 
 package de.uka.ilkd.key.util;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Random;
+
 import de.uka.ilkd.key.util.net.NetworkUtils;
 
 

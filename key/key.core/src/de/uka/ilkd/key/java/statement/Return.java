@@ -12,10 +12,11 @@
 //
 
 package de.uka.ilkd.key.java.statement;
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.util.ExtList;
 /**
  *  Return.
  *  

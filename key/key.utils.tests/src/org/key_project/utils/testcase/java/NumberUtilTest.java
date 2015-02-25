@@ -1,4 +1,4 @@
-package org.key_project.utils.testcase;
+package org.key_project.utils.testcase.java;
 
 import junit.framework.TestCase;
 

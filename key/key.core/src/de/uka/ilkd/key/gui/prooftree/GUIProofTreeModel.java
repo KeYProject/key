@@ -25,7 +25,6 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-
 import de.uka.ilkd.key.gui.prooftree.ProofTreeViewFilter.NodeFilter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;

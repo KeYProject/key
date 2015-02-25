@@ -13,17 +13,19 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.CopyToClipboardAction;
-import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.CopyToClipboardAction;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 
 /**
  * Central part of MainWindow. Its main purpose is to serve as container for

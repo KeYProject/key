@@ -9,8 +9,12 @@
 //
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.collection.ImmutableMap;
-import de.uka.ilkd.key.collection.ImmutableMapEntry;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import org.key_project.utils.collection.ImmutableMap;
+import org.key_project.utils.collection.ImmutableMapEntry;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -35,8 +39,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 
 public class InfFlowContractAppFeature implements Feature {

@@ -31,7 +31,7 @@ public class Private extends VisibilityModifier {
      *      Private
      * @param children list of children. May contain: Comments
      */
-    public Private(de.uka.ilkd.key.util.ExtList children) {
+    public Private(org.key_project.utils.ExtList children) {
 	super (children);
     }
 

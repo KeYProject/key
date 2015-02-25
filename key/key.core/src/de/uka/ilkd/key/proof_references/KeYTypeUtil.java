@@ -15,10 +15,10 @@ package de.uka.ilkd.key.proof_references;
 
 import java.util.Iterator;
 
+import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.java.CollectionUtil;
 import org.key_project.utils.java.IFilter;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;

@@ -18,20 +18,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.util.Debug;
-
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.convenience.TreeWalker;
 import recoder.java.CompilationUnit;
 import recoder.java.JavaProgramFactory;
 import recoder.java.ProgramElement;
-import recoder.java.declaration.*;
+import recoder.java.declaration.EnumConstantDeclaration;
+import recoder.java.declaration.EnumConstantSpecification;
+import recoder.java.declaration.EnumDeclaration;
+import recoder.java.declaration.MemberDeclaration;
+import recoder.java.declaration.TypeDeclaration;
 import recoder.java.reference.FieldReference;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.UncollatedReferenceQualifier;
 import recoder.java.statement.Case;
 import recoder.kit.ProblemReport;
 import recoder.kit.TypeKit;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * 

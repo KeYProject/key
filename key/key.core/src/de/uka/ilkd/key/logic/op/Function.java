@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
+import org.key_project.utils.collection.ImmutableArray;
+
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;

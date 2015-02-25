@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.collection;
+package org.key_project.utils.collection;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -179,9 +179,9 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
      */
     public ImmutableList<S> toImmutableList() {
         ImmutableList<S> ret = ImmutableSLList.<S>nil();
-        Iterator it = iterator();
+        Iterator<S> it = iterator();
         while (it.hasNext()) {
-            ret = ret.prepend((S) it.next());
+            ret = ret.prepend(it.next());
         }
         return ret.reverse();
     }

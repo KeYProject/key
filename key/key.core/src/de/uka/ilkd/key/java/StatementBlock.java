@@ -13,7 +13,9 @@
 
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
+import org.key_project.utils.ExtList;
+import org.key_project.utils.collection.ImmutableArray;
+
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
 import de.uka.ilkd.key.java.statement.JavaStatement;
@@ -21,7 +23,6 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  *    Statement block.

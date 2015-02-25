@@ -18,7 +18,7 @@ import java.util.Comparator;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**

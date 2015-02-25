@@ -13,11 +13,6 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import java.awt.Point;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -25,6 +20,12 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 
 /**
  * This class implements all input listener interfaces for SequentView.

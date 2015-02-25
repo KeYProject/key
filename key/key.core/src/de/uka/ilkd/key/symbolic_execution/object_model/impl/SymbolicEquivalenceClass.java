@@ -13,11 +13,11 @@
 
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
 import org.key_project.utils.java.CollectionUtil;
 import org.key_project.utils.java.IFilter;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;

@@ -13,12 +13,19 @@
 
 package de.uka.ilkd.key.java.statement;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.*;
+import org.key_project.utils.ExtList;
+import org.key_project.utils.collection.ImmutableArray;
+
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.LoopInitializer;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.VariableScope;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  *  For.

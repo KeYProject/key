@@ -13,14 +13,20 @@
 
 package de.uka.ilkd.key.java.reference;
 
-import de.uka.ilkd.key.java.*;
+import org.key_project.utils.ExtList;
+
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.ExpressionContainer;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceData;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  *  Field reference.

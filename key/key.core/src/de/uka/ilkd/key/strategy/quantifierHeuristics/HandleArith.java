@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import org.key_project.utils.LRUCache;
+
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -23,7 +25,6 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
-import de.uka.ilkd.key.util.LRUCache;
 import de.uka.ilkd.key.util.Pair;
 
 /**

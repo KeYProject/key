@@ -13,11 +13,11 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.utils.collection.ImmutableArray;
 import org.key_project.utils.java.CollectionUtil;
 import org.key_project.utils.java.IFilter;
 import org.key_project.utils.java.ObjectUtil;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;

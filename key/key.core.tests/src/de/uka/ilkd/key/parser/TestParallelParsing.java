@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import junit.framework.TestCase;
-
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;

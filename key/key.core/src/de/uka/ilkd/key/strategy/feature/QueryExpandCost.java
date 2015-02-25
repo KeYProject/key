@@ -15,7 +15,8 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableList;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Namespace;

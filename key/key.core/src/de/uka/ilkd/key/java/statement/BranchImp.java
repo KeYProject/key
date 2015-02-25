@@ -13,9 +13,10 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  *  Branch.

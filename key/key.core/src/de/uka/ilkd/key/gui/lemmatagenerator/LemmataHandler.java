@@ -19,8 +19,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import org.key_project.utils.collection.DefaultImmutableSet;
+import org.key_project.utils.collection.ImmutableSet;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -37,7 +38,6 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletFilter;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class LemmataHandler implements TacletFilter {
         private final LemmataAutoModeOptions options;

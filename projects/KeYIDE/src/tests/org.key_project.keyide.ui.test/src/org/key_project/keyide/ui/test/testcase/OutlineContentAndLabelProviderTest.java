@@ -31,9 +31,9 @@ import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
+import org.key_project.utils.collection.ImmutableSet;
 import org.key_project.utils.java.CollectionUtil;
 
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;

@@ -34,7 +34,8 @@ import recoder.java.expression.literal.BooleanLiteral;
 import recoder.java.expression.operator.CopyAssignment;
 import recoder.java.reference.FieldReference;
 import recoder.kit.ProblemReport;
-import recoder.list.generic.*;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.util.Debug;
 
 /**

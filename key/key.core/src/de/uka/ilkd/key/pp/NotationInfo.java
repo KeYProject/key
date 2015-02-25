@@ -17,7 +17,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.*;
+import de.uka.ilkd.key.ldt.CharListLDT;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;

@@ -13,13 +13,15 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import org.key_project.utils.collection.DefaultImmutableSet;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.utils.collection.ImmutableSet;
+
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
@@ -42,7 +44,6 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
-import java.util.ArrayList;
 
 /**
  *  A proof is represented as a tree of nodes containing sequents. The initial

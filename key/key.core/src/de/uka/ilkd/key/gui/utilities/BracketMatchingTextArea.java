@@ -18,15 +18,17 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JTextArea;
+import javax.swing.WindowConstants;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
-import javax.swing.text.JTextComponent;
 import javax.swing.text.Highlighter.HighlightPainter;
+import javax.swing.text.JTextComponent;
 
 /**
  * The Class BracketMatchingTextArea provides a GUI TextArea component which

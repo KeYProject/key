@@ -14,8 +14,8 @@
 package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
+
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.pp.Notation;
 
 
 public final class CharListNotation extends Notation {

@@ -17,7 +17,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.collection.ImmutableMapEntry;
+import org.key_project.utils.collection.ImmutableMapEntry;
+
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;

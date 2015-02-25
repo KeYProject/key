@@ -19,8 +19,9 @@ import static de.uka.ilkd.key.core.Main.Verbosity.NORMAL;
 
 import java.io.File;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;

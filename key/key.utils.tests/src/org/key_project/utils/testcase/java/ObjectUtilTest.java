@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.utils.testcase;
+package org.key_project.utils.testcase.java;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

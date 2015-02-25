@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.collection;
+package org.key_project.utils.collection;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
@@ -241,8 +241,8 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	 * @param array the array to be appended
 	 * @return IList<T> the new list
 	 */
-        @Override
-	public ImmutableList<S> append(S[] array) {
+   @Override
+	public ImmutableList<S> append(S... array) {
 	    return ((ImmutableList<S>) nil()).prepend ( array ).prepend ( this );
 	}
 

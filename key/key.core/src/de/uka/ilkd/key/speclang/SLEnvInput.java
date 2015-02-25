@@ -37,8 +37,9 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSet;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaReduxFileCollection;
@@ -55,7 +56,10 @@ import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.*;
+import de.uka.ilkd.key.proof.io.AbstractEnvInput;
+import de.uka.ilkd.key.proof.io.KeYFile;
+import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;

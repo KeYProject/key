@@ -13,13 +13,20 @@
 
 package de.uka.ilkd.key.java.expression;
 
-import de.uka.ilkd.key.java.*;
+import org.key_project.utils.ExtList;
+
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceData;
+import de.uka.ilkd.key.java.TerminalProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  *  Literal.

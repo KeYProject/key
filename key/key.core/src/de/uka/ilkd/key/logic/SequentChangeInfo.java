@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
 
 /**
  * Records the changes made to a sequent. Keeps track of added and removed

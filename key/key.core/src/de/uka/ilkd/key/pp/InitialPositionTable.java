@@ -13,11 +13,12 @@
 
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.logic.SequentFormula;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.SequentFormula;
 
 /**
  * An InitialPositionTable is a PositionTable that describes the

@@ -15,11 +15,11 @@ package de.uka.ilkd.key.proof_references;
 
 import java.util.LinkedHashSet;
 
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
 import org.key_project.utils.java.CollectionUtil;
 import org.key_project.utils.java.IFilter;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;

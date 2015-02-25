@@ -14,11 +14,12 @@
 package de.uka.ilkd.key.java.statement;
 
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.NameReference;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.util.ExtList;
 /**
  *  Label jump statement.
  * 

@@ -15,8 +15,8 @@ package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;

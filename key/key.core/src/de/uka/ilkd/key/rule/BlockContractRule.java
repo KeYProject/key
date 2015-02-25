@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.InfFlowBlockContractTacletBuilder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -22,10 +21,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import org.key_project.utils.ExtList;
+import org.key_project.utils.collection.DefaultImmutableSet;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.utils.collection.ImmutableSet;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -78,18 +79,18 @@ import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
-import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.InfFlowBlockContractTacletBuilder;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.speclang.BlockWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
-import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
 
 public class BlockContractRule implements BuiltInRule {

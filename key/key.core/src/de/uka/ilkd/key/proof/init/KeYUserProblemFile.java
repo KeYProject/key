@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.antlr.runtime.RecognitionException;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
@@ -30,8 +32,6 @@ import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
-
-import org.antlr.runtime.RecognitionException;
 
 
 /** 

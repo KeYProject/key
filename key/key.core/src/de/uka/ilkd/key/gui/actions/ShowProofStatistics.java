@@ -17,8 +17,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.Pair;

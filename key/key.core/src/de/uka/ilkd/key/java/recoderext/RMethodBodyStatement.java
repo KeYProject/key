@@ -20,7 +20,12 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import recoder.java.*;
+import recoder.java.Expression;
+import recoder.java.ExpressionContainer;
+import recoder.java.Identifier;
+import recoder.java.NamedProgramElement;
+import recoder.java.ProgramElement;
+import recoder.java.SourceVisitor;
 import recoder.java.reference.MethodReference;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;

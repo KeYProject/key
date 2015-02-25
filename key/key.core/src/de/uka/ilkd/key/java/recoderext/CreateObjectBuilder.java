@@ -13,19 +13,28 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.Expression;
 import recoder.java.Identifier;
 import recoder.java.Statement;
 import recoder.java.StatementBlock;
-import recoder.java.declaration.*;
+import recoder.java.declaration.ClassDeclaration;
+import recoder.java.declaration.DeclarationSpecifier;
+import recoder.java.declaration.LocalVariableDeclaration;
+import recoder.java.declaration.MethodDeclaration;
+import recoder.java.declaration.ParameterDeclaration;
+import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
-import recoder.java.reference.*;
+import recoder.java.reference.MethodReference;
+import recoder.java.reference.TypeReference;
+import recoder.java.reference.VariableReference;
 import recoder.java.statement.Return;
-import recoder.kit.*;
+import recoder.kit.ProblemReport;
+import recoder.kit.TypeKit;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 

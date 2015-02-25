@@ -22,10 +22,11 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.label.ChildTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
-import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
+import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 
 /**
  * <p>

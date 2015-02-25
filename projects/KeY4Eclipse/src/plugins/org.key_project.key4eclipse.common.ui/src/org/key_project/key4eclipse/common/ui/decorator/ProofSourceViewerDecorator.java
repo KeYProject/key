@@ -24,10 +24,10 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.services.IDisposable;
 import org.key_project.utils.bean.Bean;
+import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.java.ObjectUtil;
 import org.key_project.utils.java.StringUtil;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;

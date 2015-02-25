@@ -14,16 +14,17 @@
 package de.uka.ilkd.key.java;
 
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.statement.*;
+import org.key_project.utils.ExtList;
+import org.key_project.utils.collection.ImmutableArray;
+
+import de.uka.ilkd.key.java.statement.Guard;
+import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.JavaStatement;
+import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.rule.TacletForTests;
-import de.uka.ilkd.key.util.ExtList;
 
 /** this class is an example how to work with a java AST. Therefore we
 * demonstrate the transformation of 'while (expr) { prg; }' to ' if

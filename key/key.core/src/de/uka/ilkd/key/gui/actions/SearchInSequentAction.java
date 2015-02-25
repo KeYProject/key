@@ -13,14 +13,15 @@
 
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+
 import javax.swing.KeyStroke;
 
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
-import java.awt.Toolkit;
 
 /*
  * Menu option for showing the sequent search bar.

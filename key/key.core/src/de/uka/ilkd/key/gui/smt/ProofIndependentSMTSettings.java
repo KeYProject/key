@@ -19,9 +19,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.Properties;
 import java.util.Map.Entry;
-
+import java.util.Properties;
 
 import de.uka.ilkd.key.settings.SettingsConverter;
 import de.uka.ilkd.key.settings.SettingsListener;

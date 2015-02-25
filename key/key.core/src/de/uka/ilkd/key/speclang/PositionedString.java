@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.speclang;
 
+import org.key_project.utils.collection.ImmutableArray;
+
 import antlr.Token;
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.label.TermLabel;
 

@@ -30,8 +30,8 @@ import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.core.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;

@@ -3,11 +3,11 @@ package de.uka.ilkd.key.rule.label;
 import java.util.Collections;
 import java.util.Set;
 
+import org.key_project.utils.collection.ImmutableArray;
+import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.java.CollectionUtil;
 import org.key_project.utils.java.IFilter;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;

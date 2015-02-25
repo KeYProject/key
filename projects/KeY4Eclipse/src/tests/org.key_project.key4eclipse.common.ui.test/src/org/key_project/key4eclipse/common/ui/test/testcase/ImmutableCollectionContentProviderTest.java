@@ -17,12 +17,11 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
-
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import org.key_project.utils.collection.DefaultImmutableSet;
+import org.key_project.utils.collection.ImmutableArray;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.utils.collection.ImmutableSet;
 
 /**
  * Tests for {@link ImmutableCollectionContentProvider}.

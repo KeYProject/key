@@ -15,12 +15,12 @@ package de.uka.ilkd.key.java.recoderext.expression.literal;
 
 import java.math.BigDecimal;
 
-import de.uka.ilkd.key.java.recoderext.KeYRecoderExtension;
-import de.uka.ilkd.key.util.ExtList;
+import org.key_project.utils.ExtList;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Literal;
+import de.uka.ilkd.key.java.recoderext.KeYRecoderExtension;
 
 /**
  * Literal for JML \real type;

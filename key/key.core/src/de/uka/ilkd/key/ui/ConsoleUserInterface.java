@@ -13,9 +13,13 @@
 
 package de.uka.ilkd.key.ui;
 
-import de.uka.ilkd.key.core.Main;
 import static de.uka.ilkd.key.core.Main.Verbosity.HIGH;
 import static de.uka.ilkd.key.core.Main.Verbosity.SILENT;
+
+import java.io.File;
+import java.io.IOException;
+
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.ApplyStrategy;
@@ -23,10 +27,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
-import static de.uka.ilkd.key.ui.AbstractUserInterface.fileName;
 import de.uka.ilkd.key.util.Pair;
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Implementation of {@link UserInterface} used by command line interface of

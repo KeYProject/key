@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -29,7 +31,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.ExtList;
 
 public class DLEmbeddedExpression extends Operator {
 

@@ -25,7 +25,12 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.*;
+import java.util.AbstractSet;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;

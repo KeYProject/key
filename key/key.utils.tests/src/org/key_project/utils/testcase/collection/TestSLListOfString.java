@@ -11,11 +11,14 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.collection;
+package org.key_project.utils.testcase.collection;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import java.util.Iterator;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
 
 /** tests non-destructive list implementation with String */
 
@@ -36,6 +39,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
     ImmutableList<String> e1;   // "A" "B" null
 
 
+    @Before
     public void setUp() {
 	a = ImmutableSLList.<String>nil().prepend("C").prepend("B").prepend("A");
 	a1 = ImmutableSLList.<String>nil()
@@ -52,8 +56,10 @@ public class TestSLListOfString extends junit.framework.TestCase {
     }
 
     // tests prepend and implicitly iterator, size
+    @Test
     public void testPrepend() {
-	ImmutableList<String>[] newList = new ImmutableList[str.length+1];
+	@SuppressWarnings("unchecked")
+   ImmutableList<String>[] newList = new ImmutableList[str.length+1];
 	newList[0] = ImmutableSLList.nil();
 
 	for (int i=1;i<str.length+1;i++) {
@@ -88,8 +94,10 @@ public class TestSLListOfString extends junit.framework.TestCase {
     }
 
     // tests append and implicitly iterator, size
+    @Test
     public void testAppend() {
-	ImmutableList<String>[] newList=new ImmutableList[str.length+1];
+	@SuppressWarnings("unchecked")
+   ImmutableList<String>[] newList=new ImmutableList[str.length+1];
 	newList[0]=ImmutableSLList.nil();
 
 	for (int i=1;i<str.length+1;i++) {
@@ -125,8 +133,10 @@ public class TestSLListOfString extends junit.framework.TestCase {
     }
 
     // tests tail,head
+    @Test
     public void testHeadTail() {
-	ImmutableList<String>[] newList=new ImmutableList[str.length+1];
+	@SuppressWarnings("unchecked")
+   ImmutableList<String>[] newList=new ImmutableList[str.length+1];
 	newList[0]=ImmutableSLList.<String>nil();
 
 	for (int i=1;i<str.length+1;i++) {
@@ -140,6 +150,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
     }
 
    // tests contains
+    @Test
     public void testContains() {
 	ImmutableList<String> newList=ImmutableSLList.<String>nil();
 
@@ -154,6 +165,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
 
   // tests removeAll
+    @Test
     public void testRemoveAll() {
 	ImmutableList<String> newList=ImmutableSLList.<String>nil();
 
@@ -167,6 +179,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
     }
 
+    @Test
     public void testRemoveFirst() {
 	ImmutableList<String> newList=ImmutableSLList.<String>nil();
 
@@ -189,6 +202,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
     }
 
+    @Test
     public void testEquals() {
 	assertTrue("a==a1",a.equals(a1));
 	assertTrue("a!=b",! a.equals(b));
@@ -200,6 +214,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
     }
 
 
+    @Test
     public void testToString() {
 	ImmutableList<String> newList=ImmutableSLList.<String>nil();
         for (String aStr : str) {

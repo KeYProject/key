@@ -13,12 +13,18 @@
 
 package de.uka.ilkd.key.java.reference;
 
-import de.uka.ilkd.key.java.*;
+import org.key_project.utils.ExtList;
+
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceData;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.util.ExtList;
 /**
  *  TypeReferences reference {@link recoder.abstraction.Type}s by name.
  *  A TypeReference can refer to an outer or inner type and hence can also

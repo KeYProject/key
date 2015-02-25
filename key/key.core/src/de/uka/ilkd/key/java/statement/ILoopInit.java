@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.java.statement;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
+import org.key_project.utils.collection.ImmutableArray;
+
 import de.uka.ilkd.key.java.LoopInitializer;
 import de.uka.ilkd.key.java.TerminalProgramElement;
 

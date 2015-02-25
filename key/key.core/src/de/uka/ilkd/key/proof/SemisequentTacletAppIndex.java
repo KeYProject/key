@@ -15,11 +15,12 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.DefaultImmutableMap;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableMap;
-import de.uka.ilkd.key.collection.ImmutableMapEntry;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import org.key_project.utils.collection.DefaultImmutableMap;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableMap;
+import org.key_project.utils.collection.ImmutableMapEntry;
+import org.key_project.utils.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;

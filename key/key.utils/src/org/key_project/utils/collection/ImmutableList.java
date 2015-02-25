@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.collection;
+package org.key_project.utils.collection;
 
 import java.util.Iterator;
 
@@ -40,7 +40,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @param array the array of the elements to be prepended
      * @return IList<T> the new list
      */
-    ImmutableList<T> prepend(T... array);
+    ImmutableList<T> prepend(@SuppressWarnings("unchecked") T... array);
 
     /** appends element to the list (non-destructive)
      * @param element to be added at the end
@@ -61,7 +61,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @param array the array to be appended
      * @return IList<T> the new list
      */
-    ImmutableList<T> append(T... array);
+    ImmutableList<T> append(@SuppressWarnings("unchecked") T... array);
 
     /** @return <T> the first element in list */
     T head();

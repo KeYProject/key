@@ -13,9 +13,10 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.logic.SequentFormula;
+import org.key_project.utils.collection.ImmutableList;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;

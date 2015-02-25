@@ -14,6 +14,9 @@ package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
+
+import javax.swing.SwingWorker;
 
 import de.uka.ilkd.key.core.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -21,9 +24,6 @@ import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.init.Profile;
-import java.util.Properties;
-
-import javax.swing.SwingWorker;
 
 /**
  * This class extends the functionality of the {@link AbstractProblemLoader}. It

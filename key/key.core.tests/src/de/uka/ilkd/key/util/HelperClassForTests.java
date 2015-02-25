@@ -20,9 +20,9 @@ import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
 import java.io.File;
 
+import org.key_project.utils.collection.ImmutableSLList;
 import org.key_project.utils.java.IOUtil;
 
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;

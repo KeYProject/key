@@ -17,10 +17,14 @@ import java.util.Iterator;
 
 import javax.swing.DefaultComboBoxModel;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.antlr.runtime.RecognitionException;
+import org.key_project.utils.collection.ImmutableList;
+
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -30,7 +34,6 @@ import de.uka.ilkd.key.proof.SVInstantiationParserException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import org.antlr.runtime.RecognitionException;
 
 
 public class IfChoiceModel extends DefaultComboBoxModel {

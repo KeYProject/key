@@ -15,10 +15,11 @@ package de.uka.ilkd.key.java;
 
 import java.io.IOException;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  *  Top level implementation of a Java {@link ProgramElement}.

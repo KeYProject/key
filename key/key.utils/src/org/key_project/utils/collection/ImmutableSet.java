@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.collection;
+package org.key_project.utils.collection;
 
 import java.util.Iterator;
 
@@ -60,7 +60,7 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
 
     /** adds an element, barfs if the element is already present
      * @param element of type <T> that has to be added to this set
-     * @throws de.uka.ilkd.key.collection.NotUniqueException if the element is already present
+     * @throws org.key_project.utils.collection.NotUniqueException if the element is already present
      */
     ImmutableSet<T> addUnique(T element) throws NotUniqueException;
 

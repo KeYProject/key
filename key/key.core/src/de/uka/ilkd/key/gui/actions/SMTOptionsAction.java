@@ -22,13 +22,13 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.IconFactory;
-import de.uka.ilkd.key.gui.smt.SMTSettingsModel;
-import de.uka.ilkd.key.gui.smt.SettingsDialog;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
+import de.uka.ilkd.key.gui.smt.SMTSettingsModel;
+import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;

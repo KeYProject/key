@@ -13,10 +13,16 @@
 
 package de.uka.ilkd.key.java.declaration;
 
-import de.uka.ilkd.key.java.*;
+import org.key_project.utils.ExtList;
+
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.declaration.modifier.Static;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.util.ExtList;
 
 
 

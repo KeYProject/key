@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.util;
+package org.key_project.utils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

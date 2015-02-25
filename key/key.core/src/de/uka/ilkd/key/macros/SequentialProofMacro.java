@@ -18,7 +18,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableList;
+
 import de.uka.ilkd.key.core.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.ProverTaskListener;

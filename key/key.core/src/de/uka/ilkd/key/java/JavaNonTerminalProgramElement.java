@@ -13,10 +13,11 @@
 
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
+import org.key_project.utils.ExtList;
+import org.key_project.utils.collection.ImmutableArray;
+
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  *  Top level implementation of a Java {@link NonTerminalProgramElement}.

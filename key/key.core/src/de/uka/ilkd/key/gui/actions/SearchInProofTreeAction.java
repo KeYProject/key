@@ -14,8 +14,9 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-import de.uka.ilkd.key.gui.MainWindow;
+
 import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.MainWindow;
 
 /*
  * Menu option for showing the proof tree search bar.

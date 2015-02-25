@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.logic;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  * represents something in logic that originates from a program like

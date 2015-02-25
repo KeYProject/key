@@ -11,12 +11,10 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.collection;
+package org.key_project.utils.collection;
 
 import java.util.Iterator;
 import java.util.Stack;
-
-import de.uka.ilkd.key.util.Debug;
 
 /**
  * This class implements the leftist heap, see &quot;Functional Data
@@ -31,7 +29,8 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 
     
 
-    public static <T extends Comparable<T>> ImmutableLeftistHeap<T> nilHeap() {
+    @SuppressWarnings("unchecked")
+   public static <T extends Comparable<T>> ImmutableLeftistHeap<T> nilHeap() {
 	return (ImmutableLeftistHeap<T>) Empty.EMPTY_HEAP;
     }
 
@@ -230,7 +229,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	/**
 	 * Use this element to construct new heaps
 	 */
-	private static final ImmutableLeftistHeap<?> EMPTY_HEAP = new Empty();
+	private static final ImmutableLeftistHeap<?> EMPTY_HEAP = new Empty<>();
 	
 	/**
 	 * Length of the right spine, i.e. the length of the path from the
@@ -385,9 +384,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	}
 
 	public T next () {
-	    Debug.assertFalse ( remainder.isEmpty (),
-				"Missing next element in " +
-				"UnsortedIterator.next()" );
+	    assert remainder.isEmpty() : "Missing next element in UnsortedIterator.next()";
 
 	    Node<T> heap = remainder.pop ();
 	    // descend in right-first order, this helps to keep the stack small
@@ -422,9 +419,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	}
 
 	public T next () {
-	    Debug.assertFalse ( remainder.isEmpty (),
-				"Missing next element in " +
-				"UnsortedIterator.next()" );
+	    assert remainder.isEmpty () : "Missing next element in SortedIterator.next()";
 
 	    T data = remainder.findMin ();
 	    remainder = remainder.deleteMin ();

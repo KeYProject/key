@@ -16,6 +16,7 @@ package de.uka.ilkd.key.settings;
 import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.Properties;
+
 import de.uka.ilkd.key.proof.io.AutoSaver;
 
 

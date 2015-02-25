@@ -13,18 +13,19 @@
 
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.collection.ImmutableSet;
+import java.util.List;
+
+import org.key_project.utils.collection.ImmutableSet;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractRule.Instantiation;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
-
-import java.util.List;
 
 public class BlockContractCompletion implements InteractiveRuleApplicationCompletion {
     

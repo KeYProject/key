@@ -13,9 +13,11 @@
 
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.MainWindow;
 import java.awt.event.ActionEvent;
+
 import javax.swing.JCheckBoxMenuItem;
+
+import de.uka.ilkd.key.gui.MainWindow;
 
 /**
  * This class can be used for adding Checkboxes to the menu.

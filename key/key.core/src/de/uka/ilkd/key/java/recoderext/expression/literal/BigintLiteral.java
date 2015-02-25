@@ -15,11 +15,10 @@ package de.uka.ilkd.key.java.recoderext.expression.literal;
 
 import java.math.BigInteger;
 
-import de.uka.ilkd.key.java.recoderext.KeYRecoderExtension;
-
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Literal;
+import de.uka.ilkd.key.java.recoderext.KeYRecoderExtension;
 
 public final class BigintLiteral extends Literal implements KeYRecoderExtension {
     

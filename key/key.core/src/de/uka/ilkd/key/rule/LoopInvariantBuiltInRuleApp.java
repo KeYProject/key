@@ -17,8 +17,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableArray;
+import org.key_project.utils.collection.ImmutableList;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;

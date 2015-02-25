@@ -120,6 +120,7 @@ import org.key_project.util.eclipse.setup.SetupStartup;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.internal.ContextMenuHelper;
+import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.helper.HelperClassForUtilityTests;
 import org.key_project.utils.java.ArrayUtil;
 import org.key_project.utils.java.CollectionUtil;
@@ -132,7 +133,6 @@ import org.key_project.utils.java.thread.AbstractRunnableWithResult;
 import org.key_project.utils.java.thread.IRunnableWithException;
 import org.key_project.utils.java.thread.IRunnableWithResult;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;

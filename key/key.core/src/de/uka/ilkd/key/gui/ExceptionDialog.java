@@ -21,6 +21,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -49,7 +50,6 @@ import javax.swing.event.ListSelectionListener;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
 import de.uka.ilkd.key.util.ExceptionTools;
-import java.awt.Window;
 
 /**
  * Dialog to display error messages.

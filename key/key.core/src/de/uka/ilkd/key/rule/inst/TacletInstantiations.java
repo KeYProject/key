@@ -14,7 +14,8 @@
 package de.uka.ilkd.key.rule.inst;
 
 
-import de.uka.ilkd.key.collection.ImmutableMap;
+import org.key_project.utils.collection.ImmutableMap;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;

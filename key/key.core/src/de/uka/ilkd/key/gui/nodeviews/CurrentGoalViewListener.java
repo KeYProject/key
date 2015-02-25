@@ -21,6 +21,7 @@ import java.awt.dnd.DragSourceAdapter;
 import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
@@ -28,13 +29,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableList;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import java.awt.event.MouseListener;
 
 /**
  * reacts on mouse events to highlight the selected part of the sequent and it

@@ -15,7 +15,9 @@ package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
+import org.key_project.utils.ExtList;
+import org.key_project.utils.collection.ImmutableArray;
+
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.NameAbstractionTable;
@@ -44,7 +46,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  * The program method represents a (pure) method in the logic.

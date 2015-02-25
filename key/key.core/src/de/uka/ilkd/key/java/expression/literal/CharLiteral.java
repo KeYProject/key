@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java.expression.literal;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
@@ -23,7 +25,6 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.util.ExtList;
 
 
 /**

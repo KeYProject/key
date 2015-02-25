@@ -15,10 +15,11 @@ package de.hentschel.visualdbc.datasource.key.rule;
 
 import java.util.LinkedHashSet;
 
+import org.key_project.utils.collection.ImmutableList;
+
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
 import de.hentschel.visualdbc.datasource.model.IDSProvableReference;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 

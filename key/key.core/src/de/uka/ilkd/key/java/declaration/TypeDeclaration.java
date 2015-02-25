@@ -13,15 +13,25 @@
 
 package de.uka.ilkd.key.java.declaration;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.*;
+import org.key_project.utils.ExtList;
+import org.key_project.utils.collection.ImmutableArray;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+
+import de.uka.ilkd.key.java.NamedProgramElement;
+import de.uka.ilkd.key.java.ParentIsInterfaceDeclaration;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.TypeScope;
+import de.uka.ilkd.key.java.VariableScope;
+import de.uka.ilkd.key.java.abstraction.ClassType;
+import de.uka.ilkd.key.java.abstraction.Constructor;
+import de.uka.ilkd.key.java.abstraction.Field;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Method;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  * Type declaration.

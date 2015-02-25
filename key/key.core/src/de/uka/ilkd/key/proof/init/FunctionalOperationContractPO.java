@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -21,10 +23,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import static de.uka.ilkd.key.java.KeYJavaASTFactory.*;
+import org.key_project.utils.collection.ImmutableArray;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -34,8 +36,8 @@ import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;

@@ -13,15 +13,20 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.Guard;
+import de.uka.ilkd.key.java.statement.IForUpdates;
+import de.uka.ilkd.key.java.statement.ILoopInit;
+import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  * This transformation is used to transform a for-loop into a while-loop.

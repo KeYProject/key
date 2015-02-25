@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
+import org.key_project.utils.collection.ImmutableArray;
+
 import de.uka.ilkd.key.java.declaration.Modifier;
 
 

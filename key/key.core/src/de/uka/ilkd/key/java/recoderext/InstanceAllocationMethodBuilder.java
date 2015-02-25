@@ -14,7 +14,11 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.java.declaration.*;
+import recoder.java.declaration.ClassDeclaration;
+import recoder.java.declaration.DeclarationSpecifier;
+import recoder.java.declaration.MethodDeclaration;
+import recoder.java.declaration.ParameterDeclaration;
+import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
 import recoder.java.reference.TypeReference;

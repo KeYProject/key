@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.LexPathOrdering;
 import de.uka.ilkd.key.logic.Term;

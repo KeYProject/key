@@ -13,10 +13,22 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.statement.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Stack;
 
-import java.util.*;
+import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.statement.Break;
+import de.uka.ilkd.key.java.statement.Continue;
+import de.uka.ilkd.key.java.statement.LabelJumpStatement;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.statement.Return;
+import de.uka.ilkd.key.java.statement.Switch;
 
 public class OuterBreakContinueAndReturnCollector extends JavaASTVisitor {
 

@@ -34,8 +34,8 @@ import recoder.service.KeYCrossReferenceSourceInfo;
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.FileCollection;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.FileCollection.Walker;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 /**
  * This class provides an infrastructure to read in multiple class files and to

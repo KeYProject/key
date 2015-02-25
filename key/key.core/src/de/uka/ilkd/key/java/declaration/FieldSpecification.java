@@ -13,12 +13,13 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.util.ExtList;
 
 /* FieldSpecification
  * taken from COMPOST and changed to achieve an immutable structure

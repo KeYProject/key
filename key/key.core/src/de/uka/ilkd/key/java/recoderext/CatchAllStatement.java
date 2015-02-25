@@ -13,7 +13,15 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import recoder.java.*;
+import recoder.java.Expression;
+import recoder.java.ExpressionContainer;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.ProgramElement;
+import recoder.java.SourceElement;
+import recoder.java.SourceVisitor;
+import recoder.java.Statement;
+import recoder.java.StatementBlock;
+import recoder.java.StatementContainer;
 import recoder.java.reference.VariableReference;
 import recoder.java.statement.JavaStatement;
 

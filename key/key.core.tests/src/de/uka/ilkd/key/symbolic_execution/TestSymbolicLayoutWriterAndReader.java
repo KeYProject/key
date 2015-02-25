@@ -23,9 +23,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import junit.framework.TestCase;
 
+import org.key_project.utils.collection.ImmutableSLList;
 import org.xml.sax.SAXException;
 
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.KeYlessAssociation;
 import de.uka.ilkd.key.symbolic_execution.SymbolicLayoutReader.KeYlessEquivalenceClass;

@@ -16,8 +16,10 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 import java.math.BigInteger;
 import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import org.key_project.utils.LRUCache;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -26,7 +28,6 @@ import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.LRUCache;
 
 /**
  * Class for analysing and modifying polynomial expressions over the integers

@@ -13,17 +13,48 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Stack;
 
-import de.uka.ilkd.key.java.*;
+import org.key_project.utils.ExtList;
+
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.Break;
+import de.uka.ilkd.key.java.statement.Case;
+import de.uka.ilkd.key.java.statement.Catch;
+import de.uka.ilkd.key.java.statement.Continue;
+import de.uka.ilkd.key.java.statement.Default;
+import de.uka.ilkd.key.java.statement.Do;
+import de.uka.ilkd.key.java.statement.Else;
+import de.uka.ilkd.key.java.statement.EnhancedFor;
+import de.uka.ilkd.key.java.statement.Finally;
+import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.Guard;
+import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.LabelJumpStatement;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.statement.Return;
+import de.uka.ilkd.key.java.statement.Switch;
+import de.uka.ilkd.key.java.statement.SynchronizedBlock;
+import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.util.ExtList;
 
 public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 

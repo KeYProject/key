@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.java.declaration.modifier;
 
-import de.uka.ilkd.key.util.ExtList;
+import org.key_project.utils.ExtList;
 
 /**
  *  Protected.

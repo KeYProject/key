@@ -34,8 +34,8 @@ import org.key_project.sed.ui.visualization.object_diagram.feature.AbstractGener
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;

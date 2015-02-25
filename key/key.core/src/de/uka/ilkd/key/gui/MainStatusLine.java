@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.util.TipOfTheDay;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -22,8 +20,15 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
+
+import de.uka.ilkd.key.util.TipOfTheDay;
 
 class MainStatusLine extends JPanel {
 

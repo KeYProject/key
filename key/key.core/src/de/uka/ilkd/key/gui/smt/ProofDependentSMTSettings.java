@@ -19,9 +19,6 @@ import java.util.EventObject;
 import java.util.LinkedHashSet;
 import java.util.Properties;
 
-
-
-
 import de.uka.ilkd.key.settings.SettingsConverter;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;

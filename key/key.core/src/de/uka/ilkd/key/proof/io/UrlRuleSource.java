@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.proof.io;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 public class UrlRuleSource

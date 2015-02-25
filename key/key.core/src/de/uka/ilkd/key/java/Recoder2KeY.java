@@ -13,8 +13,24 @@
 
 package de.uka.ilkd.key.java;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
 
 import recoder.ParserException;
 import recoder.ProgramFactory;
@@ -35,19 +51,39 @@ import recoder.service.ChangeHistory;
 import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.KeYCrossReferenceSourceInfo;
 import recoder.service.UnresolvedReferenceException;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.recoderext.*;
+import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationManager;
+import de.uka.ilkd.key.java.recoderext.ClassInitializeMethodBuilder;
+import de.uka.ilkd.key.java.recoderext.ClassPreparationMethodBuilder;
+import de.uka.ilkd.key.java.recoderext.ConstantStringExpressionEvaluator;
+import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
+import de.uka.ilkd.key.java.recoderext.CreateBuilder;
+import de.uka.ilkd.key.java.recoderext.CreateObjectBuilder;
+import de.uka.ilkd.key.java.recoderext.EnumClassBuilder;
+import de.uka.ilkd.key.java.recoderext.ExtendedIdentifier;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
+import de.uka.ilkd.key.java.recoderext.InstanceAllocationMethodBuilder;
+import de.uka.ilkd.key.java.recoderext.JMLTransformer;
+import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
+import de.uka.ilkd.key.java.recoderext.LocalClassTransformation;
+import de.uka.ilkd.key.java.recoderext.ObjectTypeIdentifier;
+import de.uka.ilkd.key.java.recoderext.PrepareObjectBuilder;
+import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.util.*;
+import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.DirectoryFileCollection;
+import de.uka.ilkd.key.util.ExceptionHandlerException;
+import de.uka.ilkd.key.util.FileCollection;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.LinkedHashMap;
+import de.uka.ilkd.key.util.ZipFileCollection;
 
 /**
  * This class is the bridge between recoder ast data structures and KeY data

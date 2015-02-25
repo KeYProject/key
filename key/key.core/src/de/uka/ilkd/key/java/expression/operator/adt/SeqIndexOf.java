@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java.expression.operator.adt;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -20,7 +22,6 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  * Represents a function giving the index of some element in a sequence (if it exists).

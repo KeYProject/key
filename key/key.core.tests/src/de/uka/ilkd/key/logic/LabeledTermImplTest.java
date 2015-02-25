@@ -14,7 +14,9 @@
 package de.uka.ilkd.key.logic;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.collection.ImmutableArray;
+
+import org.key_project.utils.collection.ImmutableArray;
+
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;

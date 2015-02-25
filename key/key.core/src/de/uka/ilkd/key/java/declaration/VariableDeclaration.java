@@ -13,13 +13,14 @@
 
 package de.uka.ilkd.key.java.declaration;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
+import org.key_project.utils.ExtList;
+import org.key_project.utils.collection.ImmutableArray;
+
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  *  Variable declaration.

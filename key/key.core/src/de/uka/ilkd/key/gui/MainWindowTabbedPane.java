@@ -1,15 +1,17 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.actions.AutoModeAction;
-import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.actions.AutoModeAction;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 
 /**
  * {@link JTabbedPane} displayed in {@link MainWindow}, to the left of

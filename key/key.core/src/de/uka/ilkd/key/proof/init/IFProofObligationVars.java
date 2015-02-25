@@ -4,11 +4,12 @@
  */
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
 
 
 /**

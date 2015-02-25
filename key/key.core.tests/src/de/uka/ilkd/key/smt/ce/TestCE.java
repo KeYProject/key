@@ -11,7 +11,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.TestConsoleUserInterface;
 import de.uka.ilkd.key.smt.test.TestCommons;
-import de.uka.ilkd.key.ui.BatchMode;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.HelperClassForTests;
 

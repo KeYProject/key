@@ -15,9 +15,8 @@ package org.key_project.key4eclipse.common.ui.test.starter;
 
 import org.eclipse.core.resources.IProject;
 import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
-
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
 
 /**
  * {@link IProjectStarter} which logs the calls of {@link #open(IProject)}.

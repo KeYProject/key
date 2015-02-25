@@ -15,8 +15,10 @@ package de.uka.ilkd.key.java;
 
 import java.util.List;
 
+import org.key_project.utils.ExtList;
+import org.key_project.utils.collection.ImmutableArray;
+
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -73,7 +75,6 @@ import de.uka.ilkd.key.rule.metaconstruct.SwitchToIf;
 import de.uka.ilkd.key.rule.metaconstruct.TypeOf;
 import de.uka.ilkd.key.rule.metaconstruct.Unpack;
 import de.uka.ilkd.key.rule.metaconstruct.UnwindLoop;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  * This is an extension of the usual {@link Recoder2KeYConverter} that supports

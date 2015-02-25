@@ -13,12 +13,13 @@
 
 package de.uka.ilkd.key.java.expression;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.util.ExtList;
 
 
 /** 

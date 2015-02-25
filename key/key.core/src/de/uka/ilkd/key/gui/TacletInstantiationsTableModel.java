@@ -19,8 +19,10 @@ import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import org.antlr.runtime.RecognitionException;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -60,7 +62,6 @@ import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.RigidnessException;
 import de.uka.ilkd.key.rule.inst.SortException;
-import org.antlr.runtime.RecognitionException;
 
 
 public class TacletInstantiationsTableModel extends AbstractTableModel {

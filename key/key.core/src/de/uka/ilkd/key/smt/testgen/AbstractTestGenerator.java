@@ -7,7 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableList;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.core.TaskFinishedInfo;

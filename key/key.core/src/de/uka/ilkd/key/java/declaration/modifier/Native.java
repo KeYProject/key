@@ -31,7 +31,7 @@ public class Native extends Modifier {
      *      Native
      * @param children list of children. May contain: Comments
      */
-    public Native(de.uka.ilkd.key.util.ExtList children) {
+    public Native(org.key_project.utils.ExtList children) {
 	super (children);
     }
 

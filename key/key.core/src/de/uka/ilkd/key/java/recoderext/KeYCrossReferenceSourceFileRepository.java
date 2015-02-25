@@ -13,10 +13,11 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.util.SpecDataLocation;
 import recoder.ServiceConfiguration;
-import recoder.io.*;
+import recoder.io.DataLocation;
+import recoder.io.DefaultSourceFileRepository;
 import recoder.java.CompilationUnit;
+import de.uka.ilkd.key.util.SpecDataLocation;
 
 /**
  * This class is used to handle source files within recoder.

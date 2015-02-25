@@ -34,7 +34,7 @@ public class Transient extends Modifier {
      *  May contain: Comments
      */
 
-    public Transient(de.uka.ilkd.key.util.ExtList children) {
+    public Transient(org.key_project.utils.ExtList children) {
 	super(children);
     }
     

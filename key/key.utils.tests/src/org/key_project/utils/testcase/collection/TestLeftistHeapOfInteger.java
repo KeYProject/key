@@ -11,18 +11,20 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.collection;
+package org.key_project.utils.testcase.collection;
 /** tests non-destructive list implementation with String */
 
-import de.uka.ilkd.key.collection.ImmutableHeap;
-import de.uka.ilkd.key.collection.ImmutableLeftistHeap;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Random;
 
-import de.uka.ilkd.key.util.ExtList;
+import org.junit.Before;
+import org.junit.Test;
+import org.key_project.utils.ExtList;
+import org.key_project.utils.collection.ImmutableHeap;
+import org.key_project.utils.collection.ImmutableLeftistHeap;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
 
 public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 
@@ -35,6 +37,7 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 
     Random rand = new Random ();
 
+    @Before
     public void setUp() {
 	a = ImmutableSLList.<Integer>nil()
 	    .prepend( Integer.valueOf ( 13 ) )
@@ -51,6 +54,7 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 	   .prepend( Integer.valueOf ( 8 ) );
     }
 
+    @Test
     public void testInsertElements() {
 	ImmutableHeap<Integer> h = ImmutableLeftistHeap.<Integer>nilHeap();
 	assertTrue("Empty heap should be empty",
@@ -146,6 +150,7 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 	return h;
     }
 
+    @Test
     public void testInsertIterator() {
 	ImmutableHeap<Integer> h = ImmutableLeftistHeap.<Integer>nilHeap();
 
@@ -171,6 +176,7 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 		    .prepend( a ).prepend( a ).prepend( a ).prepend( a ), h );
     }
 
+    @Test
     public void testInsertHeap() {
 	ImmutableHeap<Integer> h = ImmutableLeftistHeap.<Integer>nilHeap();
 
@@ -188,6 +194,7 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 	checkHeap ( a.prepend( a ).prepend ( new Integer ( 123 ) ), h );
     }
 
+    @Test
     public void testRemoveAll () {
 	ImmutableHeap<Integer> h = ImmutableLeftistHeap.<Integer>nilHeap();
 
@@ -208,6 +215,7 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 		    h, removeAll ( h, b.iterator () ) );
     }
 
+    @Test
     public void testLargeHeap () {
 	ImmutableHeap<Integer> h = ImmutableLeftistHeap.<Integer>nilHeap();
 	ImmutableList<Integer> l = ImmutableSLList.<Integer>nil();

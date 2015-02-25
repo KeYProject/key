@@ -11,10 +11,12 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.collection;
+package org.key_project.utils.testcase.collection;
 
-import de.uka.ilkd.key.collection.DefaultImmutableMap;
-import de.uka.ilkd.key.collection.ImmutableMap;
+import org.junit.Before;
+import org.junit.Test;
+import org.key_project.utils.collection.DefaultImmutableMap;
+import org.key_project.utils.collection.ImmutableMap;
 
 /** JUnit test for MapAsList<Integer,String> implementation */
 
@@ -34,6 +36,7 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 	super(name);
     }
 
+    @Before
     public void setUp() {
 	entryStr=new String[4];
 	entryInt=new Integer[4];
@@ -52,6 +55,7 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 	return map;
     }
 
+    @Test
     public void testMapEntriesAreTheSameThatHaveBeenPutInside() {
 	ImmutableMap<Integer,String> map=createMap();
 	// assert that all entries are in list
@@ -62,6 +66,7 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 	}
     }
 
+    @Test
     public void testReplaceIfSameKeyWithNewValueIsPutInMap() {
 	ImmutableMap<Integer,String> map=createMap();
 	map=map.put(Integer.valueOf(0),"Zero");
@@ -71,6 +76,7 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 	assertTrue("Null is in list but should have been replaced by Zero",!map.containsValue("Null"));
     }
 
+    @Test
     public void testImmutability() {
 	ImmutableMap<Integer,String> map=createMap();
 	ImmutableMap<Integer,String> old=map;
@@ -80,6 +86,7 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 	assertTrue("Fuenf is in old map, but it should not be there. Map is not immutable.", !old.containsValue("Fuenf"));
     }
 
+    @Test
     public void testMapCanContainSameValueWithDifferentKeys() {
 	ImmutableMap<Integer,String> map=createMap();
 	// add a mapping with a value that has been mapped to
@@ -90,6 +97,7 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 	assertSame(entryStr[1]+" is not mapped to the older key "+entryInt[1], map.get(entryInt[1]),entryStr[1]);
     }
 
+    @Test
     public void testRemoveOneMappingWithSpecifiedKey() {
 	ImmutableMap<Integer,String> map=createMap();
 	// delete map (1,"Eins")
@@ -97,6 +105,7 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 	assertTrue("Deleted Mapping found in map", !map.containsKey(entryInt[1]));
     }
 
+    @Test
     public void testRemoveAllMappingToSpecifiedValue() {
 	ImmutableMap<Integer,String> map=createMap();
 	// add a mapping with a value that has been mapped to
@@ -109,6 +118,7 @@ public class TestMapAsListFromIntegerToString extends junit.framework.TestCase {
 		   " of these values :-(", !map.containsValue(entryStr[1]));
     }
 
+    @Test
     public void testSpecialCases() {
 	ImmutableMap<Integer,String> map=DefaultImmutableMap.<Integer,String>nilMap();
 	map = map.put(Integer.valueOf(0), "A");

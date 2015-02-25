@@ -14,7 +14,11 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.Toolkit;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.KeyStroke;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;

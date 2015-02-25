@@ -14,13 +14,23 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
+import de.uka.ilkd.key.proof.BuiltInRuleIndex;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.RuleAppIndex;
+import de.uka.ilkd.key.proof.TacletAppIndex;
+import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.rule.TacletForTests;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
 
 
 //most Code are copyed from Logic.TestUpdateFactory

@@ -13,14 +13,14 @@
 
 package de.uka.ilkd.key.java.reference;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  *  Package reference.

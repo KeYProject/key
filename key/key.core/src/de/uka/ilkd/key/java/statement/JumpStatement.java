@@ -24,7 +24,7 @@ public abstract class JumpStatement extends JavaStatement {
      * @param children the children of this AST element as KeY classes.
      * May contain: Comments
      */
-    public JumpStatement(de.uka.ilkd.key.util.ExtList children) {
+    public JumpStatement(org.key_project.utils.ExtList children) {
 	super(children);
     }
 

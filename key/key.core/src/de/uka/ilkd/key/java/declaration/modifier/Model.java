@@ -24,7 +24,7 @@ public class Model extends Modifier {
     public Model() {}
 
 
-    public Model(de.uka.ilkd.key.util.ExtList children) {
+    public Model(org.key_project.utils.ExtList children) {
 	super (children);
     }
 

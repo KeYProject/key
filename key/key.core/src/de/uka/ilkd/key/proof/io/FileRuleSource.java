@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.proof.io;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 
 public class FileRuleSource extends RuleSource {

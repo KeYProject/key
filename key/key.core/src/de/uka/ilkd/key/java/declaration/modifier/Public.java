@@ -34,7 +34,7 @@ public class Public extends VisibilityModifier {
      * @param children the children of this AST element as KeY classes.
      *  May contain: Comments
      */
-    public Public(de.uka.ilkd.key.util.ExtList children) {
+    public Public(org.key_project.utils.ExtList children) {
 	super(children);
     }
 

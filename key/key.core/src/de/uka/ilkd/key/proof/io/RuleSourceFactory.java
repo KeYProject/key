@@ -1,9 +1,10 @@
 package de.uka.ilkd.key.proof.io;
 
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.KeYResourceManager;
 import java.io.File;
 import java.net.URL;
+
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.KeYResourceManager;
 
 public class RuleSourceFactory {
 

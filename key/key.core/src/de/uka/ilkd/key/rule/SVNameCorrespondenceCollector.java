@@ -13,18 +13,23 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.collection.DefaultImmutableMap;
-import de.uka.ilkd.key.collection.ImmutableMap;
+import org.key_project.utils.collection.DefaultImmutableMap;
+import org.key_project.utils.collection.ImmutableMap;
+
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SubstOp;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /**
  * This visitor is used to collect information about schema variable

@@ -15,8 +15,9 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.ImmutableMap;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import org.key_project.utils.collection.ImmutableMap;
+import org.key_project.utils.collection.ImmutableSet;
+
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;

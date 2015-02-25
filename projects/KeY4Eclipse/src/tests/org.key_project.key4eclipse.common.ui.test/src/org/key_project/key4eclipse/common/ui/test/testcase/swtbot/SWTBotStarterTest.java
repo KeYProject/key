@@ -61,8 +61,7 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
-
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableList;
 
 /**
  * SWTBot tests for {@link StarterUtil}, {@link StarterWizard},

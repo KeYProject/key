@@ -13,10 +13,11 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ExpressionContainer;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.util.ExtList;
 /**
  *  Expression jump statement.
  *  @author <TT>AutoDoc</TT>

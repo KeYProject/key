@@ -2,6 +2,7 @@ package de.uka.ilkd.key.util;
 
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
+
 import javax.swing.SwingUtilities;
 
 

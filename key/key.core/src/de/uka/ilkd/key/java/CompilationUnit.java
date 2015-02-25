@@ -17,11 +17,12 @@ package de.uka.ilkd.key.java;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
+import org.key_project.utils.ExtList;
+import org.key_project.utils.collection.ImmutableArray;
+
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  *    A node representing a single source file containing

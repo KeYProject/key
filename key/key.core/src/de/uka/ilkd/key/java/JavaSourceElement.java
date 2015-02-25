@@ -16,7 +16,7 @@ package de.uka.ilkd.key.java;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import de.uka.ilkd.key.util.ExtList;
+import org.key_project.utils.ExtList;
 
 /**
  *  Top level implementation of a Java {@link SourceElement}.

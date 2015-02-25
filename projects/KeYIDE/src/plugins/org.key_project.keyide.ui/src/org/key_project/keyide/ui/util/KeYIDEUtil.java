@@ -43,11 +43,11 @@ import org.key_project.keyide.ui.perspectives.KeYPerspective;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.jdt.JDTUtil;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.utils.collection.ImmutableSet;
 import org.key_project.utils.java.CollectionUtil;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.nodeviews.TacletMenu;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

@@ -15,12 +15,13 @@ package de.uka.ilkd.key.rule.inst;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.DefaultImmutableMap;
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableMap;
-import de.uka.ilkd.key.collection.ImmutableMapEntry;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import org.key_project.utils.collection.DefaultImmutableMap;
+import org.key_project.utils.collection.ImmutableArray;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableMap;
+import org.key_project.utils.collection.ImmutableMapEntry;
+import org.key_project.utils.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;

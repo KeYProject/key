@@ -14,9 +14,6 @@
 package de.uka.ilkd.key.java;
 
 
-import de.uka.ilkd.key.java.KeYRecoderMapping;
-import de.uka.ilkd.key.java.ModelElement;
-import de.uka.ilkd.key.java.ProgramElement;
 import java.util.HashMap;
 
 import junit.framework.TestCase;

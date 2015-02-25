@@ -4,6 +4,9 @@
  */
 package de.uka.ilkd.key.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
@@ -18,8 +21,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.VariableNameProposer;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**

@@ -19,8 +19,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 /**

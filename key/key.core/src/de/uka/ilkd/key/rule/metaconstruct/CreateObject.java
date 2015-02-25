@@ -13,7 +13,9 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.recoderext.CreateObjectBuilder;

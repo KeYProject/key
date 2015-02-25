@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.proof.init.po.snippet;
 
+import java.util.EnumMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
@@ -9,10 +13,6 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-
-import java.util.EnumMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *

@@ -13,13 +13,40 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.abstraction.*;
-import recoder.java.*;
-import recoder.java.declaration.*;
-import recoder.java.expression.literal.*;
+import recoder.abstraction.ArrayType;
+import recoder.abstraction.ClassType;
+import recoder.abstraction.PrimitiveType;
+import recoder.abstraction.Type;
+import recoder.abstraction.Variable;
+import recoder.java.CompilationUnit;
+import recoder.java.Expression;
+import recoder.java.Identifier;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.ProgramElement;
+import recoder.java.SourceElement;
+import recoder.java.declaration.ClassDeclaration;
+import recoder.java.declaration.FieldSpecification;
+import recoder.java.declaration.LocalVariableDeclaration;
+import recoder.java.declaration.MethodDeclaration;
+import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.VariableSpecification;
+import recoder.java.expression.literal.BooleanLiteral;
+import recoder.java.expression.literal.CharLiteral;
+import recoder.java.expression.literal.DoubleLiteral;
+import recoder.java.expression.literal.FloatLiteral;
+import recoder.java.expression.literal.IntLiteral;
+import recoder.java.expression.literal.LongLiteral;
+import recoder.java.expression.literal.NullLiteral;
 import recoder.java.expression.operator.CopyAssignment;
 import recoder.java.reference.FieldReference;
 import recoder.java.reference.ReferencePrefix;
@@ -27,10 +54,12 @@ import recoder.java.reference.TypeReference;
 import recoder.java.reference.VariableReference;
 import recoder.kit.TwoPassTransformation;
 import recoder.service.DefaultCrossReferenceSourceInfo;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.java.recoderext.adt.*;
+import de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral;
+import de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral;
+import de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral;
 import de.uka.ilkd.key.java.recoderext.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.java.recoderext.expression.literal.RealLiteral;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * The Java DL requires some implicit fields, that are available in each

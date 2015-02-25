@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.collection;
+package org.key_project.utils.collection;
 
 import java.util.Iterator;
 
@@ -34,7 +34,8 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
 
     /** the empty set */
-    public static final <T> DefaultImmutableSet<T> nil() {
+    @SuppressWarnings("unchecked")
+   public static final <T> DefaultImmutableSet<T> nil() {
 	return (DefaultImmutableSet<T>) NILSet.NIL;
     }
 
@@ -47,7 +48,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      * @param element of type <T> the new Set contains
      */
     protected DefaultImmutableSet(T element) {
-	elementList = (ImmutableList<T>) (ImmutableSLList.nil()).prepend(element);
+	elementList = (ImmutableList<T>) (ImmutableSLList.<T>nil()).prepend(element);
     }
 
     /** creates new set containg all elements from the elementList
@@ -70,7 +71,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     /** adds an element, barfs if the element is already present
      * @param element of type <T> that has to be added to this set
-     * @throws de.uka.ilkd.key.collection.NotUniqueException if the element is already present
+     * @throws org.key_project.utils.collection.NotUniqueException if the element is already present
      */
     public ImmutableSet<T> addUnique(T element) throws NotUniqueException {
 	if (elementList.contains(element)) {
@@ -147,7 +148,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     public ImmutableSet<T> remove(T element) {
 	final ImmutableList<T> list = elementList.removeFirst(element);
-	return (ImmutableSet<T>) (list.isEmpty() ? nil() : new DefaultImmutableSet<T>(list));
+	return (ImmutableSet<T>) (list.isEmpty() ? DefaultImmutableSet.<T>nil() : new DefaultImmutableSet<T>(list));
     }
 
 
@@ -160,7 +161,8 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 	if (!(obj instanceof ImmutableSet)) {
 	    return false;
 	}
-	ImmutableSet<T> o=(ImmutableSet<T>) obj;
+	@SuppressWarnings("unchecked")
+   ImmutableSet<T> o=(ImmutableSet<T>) obj;
 	return (o.subset(this) && this.subset(o));
     }
 
@@ -224,7 +226,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
          * 
          */
         private static final long serialVersionUID = -8055357307337694419L;
-        static final NILSet<?> NIL = new NILSet();
+        static final NILSet<?> NIL = new NILSet<>();
 
 	private NILSet() {}
 

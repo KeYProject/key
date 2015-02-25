@@ -26,8 +26,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.key_project.monkey.product.ui.model.MonKeYProof;
 import org.key_project.monkey.product.ui.model.MonKeYProofResult;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.utils.collection.ImmutableSet;
 
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

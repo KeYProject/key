@@ -13,16 +13,17 @@
 
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.key_project.utils.collection.ImmutableArray;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.util.pp.Backend;
-
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Subclass of {@link LogicPrinter} used in GUI. Any GUI-specific code for

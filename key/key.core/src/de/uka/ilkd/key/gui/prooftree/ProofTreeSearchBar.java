@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.gui.prooftree;
 
-import de.uka.ilkd.key.gui.SearchBar;
 import java.util.Vector;
 
 import javax.swing.event.DocumentEvent;
@@ -21,6 +20,8 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.text.Position;
 import javax.swing.tree.TreePath;
+
+import de.uka.ilkd.key.gui.SearchBar;
 
 class ProofTreeSearchBar
         extends SearchBar implements TreeModelListener {

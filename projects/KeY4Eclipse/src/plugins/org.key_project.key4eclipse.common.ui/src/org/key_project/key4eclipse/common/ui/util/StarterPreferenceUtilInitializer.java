@@ -19,8 +19,7 @@ import org.key_project.key4eclipse.common.ui.starter.IGlobalStarter;
 import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
 import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
 import org.key_project.key4eclipse.common.ui.starter.IProofStarter;
-
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableList;
 
 /**
  * Initializes the default preferences accessible via {@link StarterPreferenceUtil}.

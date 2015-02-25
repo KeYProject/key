@@ -1,8 +1,11 @@
 package de.uka.ilkd.key.proof.init.po.snippet;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import java.util.Iterator;
+
+import org.key_project.utils.collection.ImmutableArray;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Statement;
@@ -29,8 +32,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-
-import java.util.Iterator;
 
 /**
  *

@@ -17,7 +17,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Stack;
 
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import org.key_project.utils.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.rule.RuleApp;
 
 

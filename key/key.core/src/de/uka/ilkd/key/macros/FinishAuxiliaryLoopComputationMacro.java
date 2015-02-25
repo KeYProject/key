@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.macros;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableList;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.java.Services;

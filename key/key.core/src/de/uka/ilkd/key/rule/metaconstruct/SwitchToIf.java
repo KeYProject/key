@@ -13,18 +13,36 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.*;
+import org.key_project.utils.ExtList;
+
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.Branch;
+import de.uka.ilkd.key.java.statement.Break;
+import de.uka.ilkd.key.java.statement.Case;
+import de.uka.ilkd.key.java.statement.Catch;
+import de.uka.ilkd.key.java.statement.Default;
+import de.uka.ilkd.key.java.statement.Else;
+import de.uka.ilkd.key.java.statement.Finally;
+import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.Switch;
+import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.java.statement.Throw;
+import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.ExtList;
 
 
 /** This class is used to perform program transformations needed 

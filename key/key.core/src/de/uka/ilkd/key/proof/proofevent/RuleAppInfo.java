@@ -16,7 +16,8 @@ package de.uka.ilkd.key.proof.proofevent;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableList;
+
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 

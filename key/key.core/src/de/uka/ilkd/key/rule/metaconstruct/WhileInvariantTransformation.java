@@ -16,6 +16,8 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -36,7 +38,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used to

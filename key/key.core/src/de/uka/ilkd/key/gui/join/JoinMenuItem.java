@@ -20,7 +20,8 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableList;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.Goal;

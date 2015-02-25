@@ -1,6 +1,15 @@
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import junit.framework.TestCase;
+
+import org.antlr.runtime.RecognitionException;
+import org.key_project.utils.collection.DefaultImmutableSet;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
@@ -18,12 +27,6 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import junit.framework.TestCase;
-import org.antlr.runtime.RecognitionException;
 
 /**
  * Scaffold for antlr {@link Parser} testing.

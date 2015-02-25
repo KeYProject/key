@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.ldt;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -32,7 +34,6 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.ExtList;
 
 
 public final class SeqLDT extends LDT {

@@ -17,7 +17,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
+
+import org.key_project.utils.collection.DefaultImmutableSet;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.NamespaceSet;

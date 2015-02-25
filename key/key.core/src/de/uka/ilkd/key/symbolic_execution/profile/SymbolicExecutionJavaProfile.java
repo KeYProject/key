@@ -13,13 +13,14 @@
 
 package de.uka.ilkd.key.symbolic_execution.profile;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.utils.collection.ImmutableSet;
+
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.FormulaTermLabelFactory;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabelFactory;
@@ -31,13 +32,13 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.label.LoopBodyTermLabelUpdate;
-import de.uka.ilkd.key.rule.label.LoopInvariantNormalBehaviorTermLabelUpdate;
 import de.uka.ilkd.key.rule.label.FormulaTermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.FormulaTermLabelUpdate;
+import de.uka.ilkd.key.rule.label.LoopBodyTermLabelUpdate;
+import de.uka.ilkd.key.rule.label.LoopInvariantNormalBehaviorTermLabelUpdate;
 import de.uka.ilkd.key.rule.label.RemoveInCheckBranchesTermLabelRefactoring;
-import de.uka.ilkd.key.rule.label.StayOnOperatorTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.StayOnFormulaTermLabelPolicy;
+import de.uka.ilkd.key.rule.label.StayOnOperatorTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.SymbolicExecutionTermLabelUpdate;
 import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;

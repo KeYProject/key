@@ -15,6 +15,8 @@ package de.uka.ilkd.key.java;
 
 import java.io.IOException;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -25,7 +27,6 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
 
 /** 
  * In the DL-formulae description of Taclets the program part can have

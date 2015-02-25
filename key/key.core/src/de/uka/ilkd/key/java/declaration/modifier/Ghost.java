@@ -24,7 +24,7 @@ public class Ghost extends Modifier {
     public Ghost() {}
 
 
-    public Ghost(de.uka.ilkd.key.util.ExtList children) {
+    public Ghost(org.key_project.utils.ExtList children) {
         super (children);
     }
 

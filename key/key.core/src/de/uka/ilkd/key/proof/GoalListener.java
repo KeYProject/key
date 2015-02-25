@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableList;
+
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 
 /** interface to be implemented by a goal listener */

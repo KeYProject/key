@@ -1,11 +1,13 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import org.key_project.utils.collection.DefaultImmutableSet;
+import org.key_project.utils.collection.ImmutableSet;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
@@ -29,7 +31,6 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.pp.StringBackend;
-import java.util.Iterator;
 
 public class InfFlowProofSymbols {
 

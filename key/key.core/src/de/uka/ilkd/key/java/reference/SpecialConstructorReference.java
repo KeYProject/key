@@ -13,9 +13,13 @@
 
 package de.uka.ilkd.key.java.reference;
 
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.util.ExtList;
+import org.key_project.utils.ExtList;
+import org.key_project.utils.collection.ImmutableArray;
+
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ProgramElement;
 
 /**
  *  Occurs in a constructor declaration as the first statement

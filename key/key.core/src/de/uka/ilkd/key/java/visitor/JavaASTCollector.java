@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.java.ProgramElement;
 /** Walks through a java AST in depth-left-fist-order. 
  * You can set the type of nodes you want to collect and then start the

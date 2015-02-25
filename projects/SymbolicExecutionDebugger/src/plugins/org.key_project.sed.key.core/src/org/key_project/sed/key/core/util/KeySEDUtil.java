@@ -41,6 +41,7 @@ import org.key_project.sed.core.util.LaunchUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.jdt.JDTUtil;
+import org.key_project.utils.collection.ImmutableSet;
 import org.key_project.utils.java.CollectionUtil;
 import org.key_project.utils.java.IFilter;
 import org.key_project.utils.java.ObjectUtil;
@@ -48,7 +49,6 @@ import org.key_project.utils.java.StringUtil;
 import org.key_project.utils.java.thread.AbstractRunnableWithResult;
 import org.key_project.utils.java.thread.IRunnableWithResult;
 
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;

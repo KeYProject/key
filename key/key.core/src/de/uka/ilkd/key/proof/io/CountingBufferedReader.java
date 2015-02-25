@@ -13,7 +13,10 @@
 
 package de.uka.ilkd.key.proof.io;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.util.ProgressMonitor;

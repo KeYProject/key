@@ -13,11 +13,27 @@
 
 package de.uka.ilkd.key.java.declaration;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
+import org.key_project.utils.ExtList;
+import org.key_project.utils.collection.ImmutableArray;
+
 import de.uka.ilkd.key.java.Declaration;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.declaration.modifier.*;
-import de.uka.ilkd.key.util.ExtList;
+import de.uka.ilkd.key.java.declaration.modifier.Abstract;
+import de.uka.ilkd.key.java.declaration.modifier.Final;
+import de.uka.ilkd.key.java.declaration.modifier.Ghost;
+import de.uka.ilkd.key.java.declaration.modifier.Model;
+import de.uka.ilkd.key.java.declaration.modifier.Native;
+import de.uka.ilkd.key.java.declaration.modifier.NoState;
+import de.uka.ilkd.key.java.declaration.modifier.Private;
+import de.uka.ilkd.key.java.declaration.modifier.Protected;
+import de.uka.ilkd.key.java.declaration.modifier.Public;
+import de.uka.ilkd.key.java.declaration.modifier.Static;
+import de.uka.ilkd.key.java.declaration.modifier.StrictFp;
+import de.uka.ilkd.key.java.declaration.modifier.Synchronized;
+import de.uka.ilkd.key.java.declaration.modifier.Transient;
+import de.uka.ilkd.key.java.declaration.modifier.TwoState;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.declaration.modifier.Volatile;
 
 /**
  *  Java declaration.

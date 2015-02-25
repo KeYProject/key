@@ -14,7 +14,9 @@
 package de.uka.ilkd.key.util;
 
 
-import java.util.*;
+import java.util.EventObject;
+import java.util.LinkedList;
+import java.util.List;
 
 
 public class KeYRecoderExcHandler implements recoder.service.ErrorHandler {

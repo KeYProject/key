@@ -13,22 +13,44 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
-import recoder.java.*;
-import recoder.java.declaration.*;
+import recoder.java.CompilationUnit;
+import recoder.java.Expression;
+import recoder.java.Identifier;
+import recoder.java.Statement;
+import recoder.java.StatementBlock;
+import recoder.java.declaration.ClassDeclaration;
+import recoder.java.declaration.ClassInitializer;
+import recoder.java.declaration.DeclarationSpecifier;
+import recoder.java.declaration.FieldDeclaration;
+import recoder.java.declaration.FieldSpecification;
+import recoder.java.declaration.MethodDeclaration;
+import recoder.java.declaration.ParameterDeclaration;
+import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
 import recoder.java.expression.literal.BooleanLiteral;
 import recoder.java.expression.operator.CopyAssignment;
 import recoder.java.expression.operator.LogicalNot;
 import recoder.java.expression.operator.New;
-import recoder.java.reference.*;
-import recoder.java.statement.*;
+import recoder.java.reference.FieldReference;
+import recoder.java.reference.MethodReference;
+import recoder.java.reference.PackageReference;
+import recoder.java.reference.TypeReference;
+import recoder.java.reference.VariableReference;
+import recoder.java.statement.Branch;
+import recoder.java.statement.Catch;
+import recoder.java.statement.If;
+import recoder.java.statement.Then;
+import recoder.java.statement.Throw;
+import recoder.java.statement.Try;
 import recoder.kit.ProblemReport;
-import recoder.list.generic.*;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.util.Debug;
 
 /**

@@ -17,21 +17,13 @@ package de.uka.ilkd.key.gui.smt;
 
 
 import java.io.File;
-import java.util.*;
-
-
-
-
-
-
+import java.util.Collection;
+import java.util.LinkedList;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.SettingsListener;
-
-
-
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
 

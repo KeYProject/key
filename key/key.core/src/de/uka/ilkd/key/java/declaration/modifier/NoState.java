@@ -24,7 +24,7 @@ public class NoState extends Modifier {
     public NoState() {}
 
 
-    public NoState(de.uka.ilkd.key.util.ExtList children) {
+    public NoState(org.key_project.utils.ExtList children) {
         super (children);
     }
 

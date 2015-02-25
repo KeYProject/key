@@ -13,10 +13,11 @@
 
 package de.uka.ilkd.key.java;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.PackageReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  *  Package specification.

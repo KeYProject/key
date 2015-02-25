@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.java.abstraction;
 
-import de.uka.ilkd.key.util.ExtList;
+import org.key_project.utils.ExtList;
 
 /**
    Default constructor of class types.

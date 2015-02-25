@@ -40,8 +40,6 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 
-import org.key_project.utils.java.IOUtil;
-
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 

@@ -13,9 +13,6 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import de.uka.ilkd.key.gui.SearchBar;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.util.Pair;
 import java.awt.Color;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -24,7 +21,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
 import javax.swing.JCheckBox;
+
+import de.uka.ilkd.key.gui.SearchBar;
+import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.util.Pair;
 
 /*
  * Search bar implementing search function for SequentView.

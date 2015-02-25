@@ -76,10 +76,10 @@ import org.key_project.util.eclipse.swt.viewer.FileExtensionViewerFilter;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.thread.AbstractRunnableWithProgressAndResult;
 import org.key_project.util.thread.IRunnableWithProgressAndResult;
+import org.key_project.utils.collection.ImmutableSet;
 import org.key_project.utils.java.ObjectUtil;
 import org.key_project.utils.java.StringUtil;
 
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

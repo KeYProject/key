@@ -22,13 +22,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    org.key_project.utils.testcase.ArrayUtilTest.class,
-    org.key_project.utils.testcase.CollectionUtilTest.class,
-    org.key_project.utils.testcase.IOUtilTest.class,
-    org.key_project.utils.testcase.NumberUtilTest.class,
-    org.key_project.utils.testcase.ObjectUtilTest.class,
-    org.key_project.utils.testcase.StringUtilTest.class,
-    org.key_project.utils.testcase.XMLUtilTest.class
+    AllCollectionTests.class,
+    AllJavaTests.class
 })
 public class AllUtilsTests {
 }

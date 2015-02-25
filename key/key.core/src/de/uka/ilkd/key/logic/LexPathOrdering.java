@@ -13,13 +13,15 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.WeakHashMap;
+
+import org.key_project.utils.collection.ImmutableArray;
+
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;

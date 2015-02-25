@@ -13,14 +13,24 @@
 
 package de.uka.ilkd.key.java.statement;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.*;
+import org.key_project.utils.ExtList;
+import org.key_project.utils.collection.ImmutableArray;
+
+import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.NamedProgramElement;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  *  Labeled statement.

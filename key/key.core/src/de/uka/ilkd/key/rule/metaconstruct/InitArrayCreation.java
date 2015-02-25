@@ -15,8 +15,13 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.*;
+import org.key_project.utils.collection.ImmutableArray;
+
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -24,8 +29,11 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.expression.operator.LessThan;
+import de.uka.ilkd.key.java.expression.operator.New;
+import de.uka.ilkd.key.java.expression.operator.NewArray;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.logic.ProgramElementName;

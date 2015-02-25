@@ -17,8 +17,8 @@ import java.util.HashMap;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
+import org.key_project.utils.collection.ImmutableSet;
 
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaReader;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;

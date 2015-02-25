@@ -15,9 +15,9 @@ package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.Iterator;
 
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
@@ -25,8 +25,8 @@ import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.conditions.AbstractOrInterfaceType;
 import de.uka.ilkd.key.rule.conditions.ArrayComponentTypeCondition;
 import de.uka.ilkd.key.rule.conditions.TypeComparisonCondition;
-import de.uka.ilkd.key.rule.conditions.TypeCondition;
 import de.uka.ilkd.key.rule.conditions.TypeComparisonCondition.Mode;
+import de.uka.ilkd.key.rule.conditions.TypeCondition;
 import de.uka.ilkd.key.rule.conditions.TypeResolver.GenericSortResolver;
 import de.uka.ilkd.key.rule.conditions.TypeResolver.NonGenericSortResolver;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;

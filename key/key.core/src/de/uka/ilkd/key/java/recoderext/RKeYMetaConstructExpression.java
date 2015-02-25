@@ -22,7 +22,11 @@ package de.uka.ilkd.key.java.recoderext;
 
 import recoder.ModelException;
 import recoder.convenience.TreeWalker;
-import recoder.java.*;
+import recoder.java.Expression;
+import recoder.java.ExpressionContainer;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.ProgramElement;
+import recoder.java.SourceVisitor;
 import recoder.java.expression.Literal;
 
 

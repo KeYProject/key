@@ -1,7 +1,8 @@
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.logic.Term;
 import org.antlr.runtime.RecognitionException;
+
+import de.uka.ilkd.key.logic.Term;
 
 /**
  * Testing pretty-printing and parsing of seqGet terms in this class.

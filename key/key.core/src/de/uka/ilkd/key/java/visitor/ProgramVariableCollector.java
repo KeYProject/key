@@ -13,9 +13,10 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import java.util.LinkedHashSet;
 import java.util.Map;
+
+import org.key_project.utils.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;

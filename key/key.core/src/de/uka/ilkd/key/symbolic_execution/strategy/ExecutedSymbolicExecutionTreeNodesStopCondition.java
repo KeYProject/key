@@ -18,12 +18,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.proof.ApplyStrategy;
+import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
+import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
-import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;

@@ -33,10 +33,9 @@ import org.key_project.key4eclipse.common.ui.util.StarterDescription;
 import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
+import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
 import org.key_project.utils.java.ObjectUtil;
-
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 
 /**
  * Tests for {@link StarterUtil}.

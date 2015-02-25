@@ -19,10 +19,10 @@ import junit.framework.TestSuite;
 public class TestKey extends TestSuite {
 
     static Class<? extends TestCase>[] utilityTests = new Class[] {
-        de.uka.ilkd.key.collection.TestSetAsListOfString.class,
-        de.uka.ilkd.key.collection.TestSLListOfString.class,
-        de.uka.ilkd.key.collection.TestMapAsListFromIntegerToString.class,
-        de.uka.ilkd.key.collection.TestLeftistHeapOfInteger.class,
+        org.key_project.utils.testcase.collection.TestSetAsListOfString.class,
+        org.key_project.utils.testcase.collection.TestSLListOfString.class,
+        org.key_project.utils.testcase.collection.TestMapAsListFromIntegerToString.class,
+        org.key_project.utils.testcase.collection.TestLeftistHeapOfInteger.class,
         de.uka.ilkd.key.util.TestLexicographicComparator.class,
         de.uka.ilkd.key.util.TestVersionStringComparator.class,
         de.uka.ilkd.key.util.TestMiscTools.class,

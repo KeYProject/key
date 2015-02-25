@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
+import org.key_project.utils.ExtList;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -24,7 +26,6 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.util.ExtList;
 
 public class LineBreakpoint extends AbstractConditionalBreakpoint {
    /**

@@ -24,7 +24,7 @@ public class TwoState extends Modifier {
     public TwoState() {}
 
 
-    public TwoState(de.uka.ilkd.key.util.ExtList children) {
+    public TwoState(org.key_project.utils.ExtList children) {
         super (children);
     }
 

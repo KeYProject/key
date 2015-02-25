@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.collection.ImmutableMap;
-import de.uka.ilkd.key.collection.DefaultImmutableMap;
+import org.key_project.utils.collection.DefaultImmutableMap;
+import org.key_project.utils.collection.ImmutableMap;
+
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 public class RenameTable {

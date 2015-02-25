@@ -4,15 +4,16 @@
  */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.Taclet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 
 /**

@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableList;
+
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 
 public class MethodStackInfo implements NameCreationInfo {
