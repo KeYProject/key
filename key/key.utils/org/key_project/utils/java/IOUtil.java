@@ -23,6 +23,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.math.BigInteger;
+import java.net.URL;
+import java.security.CodeSource;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
@@ -736,5 +738,33 @@ public final class IOUtil {
     */
    public static boolean exists(File file) {
       return file != null && file.exists();
+   }
+
+   public static final File getClassLocation(Class<?> classInstance) {
+      if (classInstance != null) {
+         CodeSource cs = classInstance.getProtectionDomain().getCodeSource();
+         return cs != null ? toFile(cs.getLocation()) : null;
+      }
+      else {
+         return null;
+      }
+   }
+
+   public static final File getProjectRoot(Class<?> classInstance) {
+      File file = getClassLocation(classInstance);
+      return file != null ? file.getParentFile() : null;
+   }
+
+   public static File toFile(URL url) {
+      return new File(toURI(url));
+   }
+   
+   public static String toFileString(URL url) {
+      File file = toFile(url);
+      return file != null ? file.getAbsolutePath() : null;
+   }
+   
+   public static URI toURI(URL url) {
+      return url != null ? URI.create(url.toString()) : null;
    }
 }

@@ -2,7 +2,6 @@ package de.uka.ilkd.key.utils;
 
 import java.io.File;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.CodeSource;
 
@@ -11,11 +10,11 @@ public final class IOUtils {
    }
 
    public static final File getClassLocation(Class<?> classInstance) {
-      CodeSource cs = classInstance.getProtectionDomain().getCodeSource();
-      try {
-         return new File(cs.getLocation().toURI());
+      if (classInstance != null) {
+         CodeSource cs = classInstance.getProtectionDomain().getCodeSource();
+         return cs != null ? toFile(cs.getLocation()) : null;
       }
-      catch (URISyntaxException e) {
+      else {
          return null;
       }
    }
@@ -26,11 +25,15 @@ public final class IOUtils {
    }
 
    public static File toFile(URL url) {
-      return new File(URI.create(url.toString()));
+      return new File(toURI(url));
    }
    
    public static String toFileString(URL url) {
       File file = toFile(url);
       return file != null ? file.getAbsolutePath() : null;
+   }
+   
+   public static URI toURI(URL url) {
+      return url != null ? URI.create(url.toString()) : null;
    }
 }

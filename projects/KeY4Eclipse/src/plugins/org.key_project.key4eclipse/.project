@@ -6,6 +6,19 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
+			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
+			<arguments>
+				<dictionary>
+					<key>LaunchConfigHandle</key>
+					<value>&lt;project&gt;/.externalToolBuilders/Copy Resources and Generate Parsers (Plug-in).launch</value>
+				</dictionary>
+				<dictionary>
+					<key>incclean</key>
+					<value>true</value>
+				</dictionary>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
 			<name>org.eclipse.jdt.core.javabuilder</name>
 			<arguments>
 			</arguments>
@@ -33,19 +46,19 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>examples</name>
+			<name>key.core</name>
 			<type>2</type>
-			<locationURI>key_rep/examples</locationURI>
+			<locationURI>key_rep/key/key.core</locationURI>
 		</link>
 		<link>
-			<name>lib</name>
+			<name>key.ui</name>
 			<type>2</type>
-			<locationURI>key_lib</locationURI>
+			<locationURI>key_rep/key/key.ui</locationURI>
 		</link>
 		<link>
-			<name>system</name>
+			<name>key.utils</name>
 			<type>2</type>
-			<locationURI>key_rep/system</locationURI>
+			<locationURI>key_rep/key/key.utils</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
