@@ -16,14 +16,13 @@ package de.uka.ilkd.key.macros;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProverTaskListener;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left
@@ -98,7 +97,7 @@ public class TryCloseMacro extends AbstractProofMacro {
      * This macro is always applicable.
      */
     @Override
-    public boolean canApplyTo(KeYMediator mediator,
+    public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
         return goals != null && !goals.isEmpty();
@@ -114,7 +113,6 @@ public class TryCloseMacro extends AbstractProofMacro {
      */
     @Override
     public ProofMacroFinishedInfo applyTo(Proof proof,
-                                          KeYMediator mediator,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
@@ -127,7 +125,7 @@ public class TryCloseMacro extends AbstractProofMacro {
         //
         // create the rule application engine
         final ApplyStrategy applyStrategy =
-                new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
+                new ApplyStrategy(proof.getServices().getProfile().getSelectedGoalChooserBuilder().create());
         // assert: all goals have the same proof
 
         //

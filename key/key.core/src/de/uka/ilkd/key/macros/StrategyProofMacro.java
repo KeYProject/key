@@ -15,13 +15,12 @@ package de.uka.ilkd.key.macros;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -54,7 +53,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      *
      */
     @Override
-    public boolean canApplyTo(KeYMediator mediator,
+    public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
         return goals != null && !goals.isEmpty();
@@ -82,7 +81,6 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      */
     @Override
     public ProofMacroFinishedInfo applyTo(Proof proof,
-                                          KeYMediator mediator,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
@@ -123,7 +121,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
 
         // set a new strategy.
         Strategy oldStrategy = proof.getActiveStrategy();
-        proof.setActiveStrategy(createStrategy(mediator.getInteractiveProver().getProof(), posInOcc));
+        proof.setActiveStrategy(createStrategy(proof, posInOcc));
 
         ProofMacroFinishedInfo info =
                 new ProofMacroFinishedInfo(this, goals, proof);

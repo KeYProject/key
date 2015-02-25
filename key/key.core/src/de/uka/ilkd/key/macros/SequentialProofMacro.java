@@ -20,13 +20,11 @@ import java.util.List;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.AutoModeListener;
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProverTaskListener;
 
 /**
  * The abstract class SequentialProofMacro can be used to create compound macros
@@ -66,14 +64,14 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      * If there is no first macro, this is not applicable.
      */
     @Override
-    public boolean canApplyTo(KeYMediator mediator,
+    public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
         List<ProofMacro> macros = getProofMacros();
         if(macros.isEmpty()) {
             return false;
         } else {
-            return macros.get(0).canApplyTo(mediator, goals, posInOcc);
+            return macros.get(0).canApplyTo(proof, goals, posInOcc);
         }
     }
 
@@ -90,7 +88,6 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      */
     @Override
     public ProofMacroFinishedInfo applyTo(Proof proof,
-                                          KeYMediator mediator,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
@@ -104,13 +101,13 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
         for (final ProofMacro macro : getProofMacros()) {
             // reverse to original nodes
             for (Node initNode : initNodes) {
-                if (macro.canApplyTo(mediator, initNode, posInOcc)) {
+                if (macro.canApplyTo(initNode, posInOcc)) {
                     final ProverTaskListener pml =
                             new ProofMacroListener(macro, listener);
                     pml.taskStarted(macro.getName(), 0);
                     synchronized(macro) {
                         // wait for macro to terminate
-                        info = macro.applyTo(mediator, initNode, posInOcc, pml);
+                        info = macro.applyTo(initNode, posInOcc, pml);
                     }
                     pml.taskFinished(info);
                     info = new ProofMacroFinishedInfo(this, info);

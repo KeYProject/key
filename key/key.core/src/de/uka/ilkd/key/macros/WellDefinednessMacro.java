@@ -15,7 +15,6 @@ package de.uka.ilkd.key.macros;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -63,15 +62,13 @@ public class WellDefinednessMacro extends StrategyProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(KeYMediator mediator, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
-        final Proof proof = mediator.getSelectedProof();
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
         if (proof == null
-                || mediator.getServices() == null
-                || mediator.getServices().getSpecificationRepository() == null
+                || proof.isDisposed()
                 || !WellDefinednessCheck.isOn()) {
             return false;
         }
-        final ContractPO po = mediator.getServices().getSpecificationRepository().getPOForProof(proof);
+        final ContractPO po = proof.getServices().getSpecificationRepository().getPOForProof(proof);
         if (po instanceof WellDefinednessPO) { // applicable for all well-definedness checks
             return true;
         }

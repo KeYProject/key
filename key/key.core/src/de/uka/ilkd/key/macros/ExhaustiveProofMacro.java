@@ -19,8 +19,6 @@ import java.util.Map;
 import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
@@ -28,6 +26,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProverTaskListener;
 
 /**
  * The abstract class ExhaustiveProofMacro can be used to create compound macros
@@ -45,19 +44,19 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
     private static Map<Node, PosInOccurrence> applicableOnNodeAtPos =
             new HashMap<Node, PosInOccurrence>();
 
-    private PosInOccurrence getApplicablePosInOcc(KeYMediator mediator,
+    private PosInOccurrence getApplicablePosInOcc(Proof proof,
                                                   Goal goal,
                                                   PosInOccurrence posInOcc,
                                                   ProofMacro macro) {
         if (posInOcc == null || posInOcc.subTerm() == null) {
             return null;
-        } else if (macro.canApplyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc)) {
+        } else if (macro.canApplyTo(proof, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc)) {
             return posInOcc;
         } else {
             final Term subTerm = posInOcc.subTerm();
             PosInOccurrence res = null;
             for (int i = 0; i < subTerm.arity() && res == null; i++) {
-                res = getApplicablePosInOcc(mediator, goal, posInOcc.down(i), macro);
+                res = getApplicablePosInOcc(proof, goal, posInOcc.down(i), macro);
             }
             return res;
         }
@@ -82,7 +81,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(KeYMediator mediator,
+    public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
         Sequent seq = null;
@@ -97,7 +96,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                     PosInOccurrence searchPos =
                             PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
                     PosInOccurrence applicableAt =
-                            getApplicablePosInOcc(mediator, goal, searchPos, macro);
+                            getApplicablePosInOcc(proof, goal, searchPos, macro);
                     applicableOnNodeAtPos.put(goal.node(), applicableAt);
                 }
             }
@@ -108,7 +107,6 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
     @Override
     public ProofMacroFinishedInfo applyTo(Proof proof,
-                                          KeYMediator mediator,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
@@ -118,7 +116,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
             if (!applicableOnNodeAtPos.containsKey(goal.node())) {
                 // node has not been checked before, so do it
                 boolean canBeApplied =
-                        canApplyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc);
+                        canApplyTo(proof, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc);
                 if (!canBeApplied) {
                     // canApplyTo checks all open goals. thus, if it returns
                     // false, then this macro is not applicable at all and
@@ -133,7 +131,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                 pml.taskStarted(getName(), 0);
                 synchronized(macro) {
                     // wait for macro to terminate
-                    info = macro.applyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal),
+                    info = macro.applyTo(proof, ImmutableSLList.<Goal>nil().prepend(goal),
                                          applicableAt, pml);
                 }
                 pml.taskFinished(info);

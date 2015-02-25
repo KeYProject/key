@@ -15,7 +15,6 @@ package de.uka.ilkd.key.macros;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -56,11 +55,9 @@ public class FullUseInformationFlowContractMacro extends SequentialProofMacro {
      * If there is no first macro, this is not applicable.
      */
     @Override
-    public boolean canApplyTo(KeYMediator mediator,
+    public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
-
-        final Proof proof = mediator.getSelectedProof();
         if (proof == null) {
             return false;
         }
@@ -70,6 +67,6 @@ public class FullUseInformationFlowContractMacro extends SequentialProofMacro {
         }
         final ProofOblInput poForProof =
                 services.getSpecificationRepository().getProofOblInput(proof);
-        return (poForProof instanceof InfFlowPO) && super.canApplyTo(mediator, goals, posInOcc);
+        return (poForProof instanceof InfFlowPO) && super.canApplyTo(proof, goals, posInOcc);
     }
 }

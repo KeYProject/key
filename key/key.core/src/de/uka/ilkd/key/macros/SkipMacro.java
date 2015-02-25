@@ -6,11 +6,10 @@ package de.uka.ilkd.key.macros;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProverTaskListener;
 
 /**
  * This macro does nothing and is not applicable. It can be used to create
@@ -32,15 +31,14 @@ public class SkipMacro extends AbstractProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(KeYMediator mediator,
+    public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
         return false;
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(Proof proof,
-                                          KeYMediator mediator,
+    public ProofMacroFinishedInfo applyTo(Proof proof,                                          
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {

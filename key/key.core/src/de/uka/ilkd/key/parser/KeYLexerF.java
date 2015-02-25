@@ -19,8 +19,7 @@ import java.io.Reader;
 
 import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.ANTLRStringStream;
-
-import de.uka.ilkd.key.core.Main;
+import org.key_project.utils.java.IOUtil;
 
 /*
  * Extends generated class {@link KeYLexer} with custom constructors.
@@ -28,7 +27,7 @@ import de.uka.ilkd.key.core.Main;
 public class KeYLexerF extends KeYLexer {
 
     public KeYLexerF(InputStream file, String fileName) throws IOException {
-        this(new InputStreamReader(file, Main.DEFAULT_CHARSET), fileName);
+        this(new InputStreamReader(file, IOUtil.DEFAULT_CHARSET), fileName);
     }
 
     public KeYLexerF(Reader file, String fileName)

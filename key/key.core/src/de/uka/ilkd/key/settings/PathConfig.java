@@ -17,8 +17,6 @@ import java.io.File;
 
 import org.key_project.utils.java.IOUtil;
 
-import de.uka.ilkd.key.gui.MainWindow;
-
 /**
  * <p>
  * Keeps some central paths to files and directories.

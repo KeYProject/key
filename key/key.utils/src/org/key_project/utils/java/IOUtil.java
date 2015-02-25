@@ -24,6 +24,7 @@ import java.io.PrintStream;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.security.CodeSource;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -41,6 +42,11 @@ public final class IOUtil {
     */
    public static final int BUFFER_SIZE = 1024 * 10;
    
+   /**
+    * The default charset to use. The value is independent from the current operating system.
+    */
+   public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+
    /**
     * Forbid instances by this private constructor.
     */

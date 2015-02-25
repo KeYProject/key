@@ -19,14 +19,12 @@ import java.util.Properties;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
-import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -35,7 +33,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
-import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
@@ -58,11 +56,6 @@ public interface UserInterface
     void notifyAutomodeStopped();
 
     /**
-     * general notifications about exceptions etc.
-     */
-    void notify(NotificationEvent event);
-
-    /**
      * called to complete and apply a taclet instantiations
      * @param models the partial models with all different possible instantiations found automatically
      * @param goal the Goal where to apply
@@ -83,6 +76,10 @@ public interface UserInterface
      */
     void loadProblem(File file);
     
+    void loadingStarted();
+    
+    void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer, ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException;
+    
     void setSaveOnly(boolean s);
 
     boolean isSaveOnly();
@@ -96,8 +93,6 @@ public interface UserInterface
     public ProverTaskListener getListener();
 
     boolean applyMacro();
-
-    public void saveAll(InitConfig initConfig, File file) throws ProofInputException;
 
     /** 
      * called to open the build in examples 
@@ -128,12 +123,6 @@ public interface UserInterface
     * @return The instantiated {@link ProblemInitializer}.
      */
     ProblemInitializer createProblemInitializer(Profile profile);
-    
-    /**
-     * Returns the used {@link KeYMediator}.
-     * @return The used {@link KeYMediator}.
-     */
-    KeYMediator getMediator();
     
     /**
      * <p>

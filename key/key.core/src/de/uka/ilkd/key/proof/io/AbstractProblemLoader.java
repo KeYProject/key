@@ -26,7 +26,6 @@ import java.util.Properties;
 
 import org.antlr.runtime.MismatchedTokenException;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.proof.Node;
@@ -67,7 +66,7 @@ import de.uka.ilkd.key.util.Pair;
  * @author Martin Hentschel
  */
 public abstract class AbstractProblemLoader {
-    private static class ReplayResult {
+    public static class ReplayResult {
 
 		private Node node;
 		private List<Throwable> errors;
@@ -113,9 +112,9 @@ public abstract class AbstractProblemLoader {
     private final File bootClassPath;
 
     /**
-     * The {@link KeYMediator} to use.
+     * The {@link UserInterface} to use.
      */
-    private final KeYMediator mediator;
+    private final UserInterface ui;
 
     /**
      * The {@link Profile} to use for new {@link Proof}s.
@@ -186,7 +185,7 @@ public abstract class AbstractProblemLoader {
      * @param bootClassPath An optional boot class path.
      * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
      * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
-     * @param mediator The {@link KeYMediator} to use.
+     * @param ui The {@link UserInterface} to use.
      * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call {@link UserInterface#selectProofObligation(InitConfig)} if no {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
      */
     public AbstractProblemLoader(File file, 
@@ -194,14 +193,13 @@ public abstract class AbstractProblemLoader {
                                  File bootClassPath,
                                  Profile profileOfNewProofs, 
                                  boolean forceNewProfileOfNewProofs,
-                                 KeYMediator mediator,
+                                 UserInterface ui,
                                  boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
                                  Properties poPropertiesToForce) {
-        assert mediator != null;
         this.file = file;
         this.classPath = classPath;
         this.bootClassPath = bootClassPath;
-        this.mediator = mediator;
+        this.ui = ui;
         this.profileOfNewProofs = profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile();
         this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
         this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile = askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
@@ -216,85 +214,52 @@ public abstract class AbstractProblemLoader {
      * @throws ProblemLoaderException Occurred Exception.
      */
     public void load() throws ProofInputException, IOException, ProblemLoaderException {
+            ui.loadingStarted();
             // Read environment
             envInput = createEnvInput();
             problemInitializer = createProblemInitializer();
             initConfig = createInitConfig();
-            final UserInterface ui = mediator.getUI();
-            if (ui.isSaveOnly()) {
-                ui.saveAll(initConfig, file);
-            } else {
-                // Read proof obligation settings
-                LoadedPOContainer poContainer = createProofObligationContainer();
-                ProofAggregate proofList = null;
-                ReplayResult result = null;
-                try {
-                    if (poContainer == null) {
-                        if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
-                            if (ui.selectProofObligation(initConfig)) {
-                                return;
-                            } else {
-                                // That message would be reported otherwise. Undesired.
-                                // return new ProblemLoaderException(this, "Aborted.");
-                                return;
-                            }
-                        }
-                        else {
-                            // Do not instantiate any proof but allow the user of the DefaultProblemLoader
-                            // to access the loaded InitConfig.
+            // Read proof obligation settings
+            LoadedPOContainer poContainer = createProofObligationContainer();
+            ProofAggregate proofList = null;
+            ReplayResult result = null;
+            try {
+                if (poContainer == null) {
+                    if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
+                        if (ui.selectProofObligation(initConfig)) {
+                            return;
+                        } else {
+                            // That message would be reported otherwise. Undesired.
+                            // return new ProblemLoaderException(this, "Aborted.");
                             return;
                         }
                     }
-                    // Create and register proof at specification repository                    
-                    proofList = createProof(poContainer); 
-
-                    // try to replay first proof
-                    proof = proofList.getProof(poContainer.getProofNum());
-                    
-                    
-                    if (proof != null) {
-                    	OneStepSimplifier oss = MiscTools.findOneStepSimplifier(proof);
-                    	if (oss != null) {
-                    		oss.refresh(proof);
-                    	}
-                    	result = replayProof(proof);
-                    }
-                                        	
-                    // this message is propagated to the top level in console mode
-                    return; // Everything fine
-                }
-                finally {
-                	if (proofList != null) {
-                		// avoid double registration at specrepos as that is done already earlier in createProof
-                		// the UI method should just do the necessarily UI registrations
-                		mediator.getUI().createProofEnvironmentAndRegisterProof(poContainer.getProofOblInput(), proofList, initConfig);
-                		mediator.setProof(proof);
-                		mediator.getSelectionModel().setSelectedProof(proof);                       
-                		if (result != null) {
-                			mediator.getSelectionModel().setSelectedNode(result.getNode());
-                		} else {
-                			// should never happen as replay always returns a result object
-                			mediator.getSelectionModel().setSelectedNode(proof.root());                			
-                		}
-
-                		if ("".equals(result.getStatus())) {
-                			mediator.getUI().resetStatus(this);
-                		} else {
-                    		mediator.getUI().reportStatus(this, result.getStatus());                			
-                		}
-                		if (result.hasErrors()) {
-                			throw new ProblemLoaderException(this,
-                					"Proof could only be loaded partially.\n" +
-                							"In summary " + result.getErrorList().size() +
-                							" not loadable rule application(s) have been detected.\n" +
-                							"The first one:\n"+result.getErrorList().get(0).getMessage(), result.getErrorList().get(0));
-                		}
-                	}
-                    getMediator().resetNrGoalsClosedByHeuristics();
-                    if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
-                        ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
+                    else {
+                        // Do not instantiate any proof but allow the user of the DefaultProblemLoader
+                        // to access the loaded InitConfig.
+                        return;
                     }
                 }
+                // Create and register proof at specification repository                    
+                proofList = createProof(poContainer); 
+
+                // try to replay first proof
+                proof = proofList.getProof(poContainer.getProofNum());
+                
+                
+                if (proof != null) {
+                 OneStepSimplifier oss = MiscTools.findOneStepSimplifier(proof);
+                 if (oss != null) {
+                    oss.refresh(proof);
+                 }
+                 result = replayProof(proof);
+                }
+                                      
+                // this message is propagated to the top level in console mode
+                return; // Everything fine
+            }
+            finally {
+               ui.loadingFinished(this, poContainer, proofList, result);
             }
     }
 
@@ -368,7 +333,7 @@ public abstract class AbstractProblemLoader {
         }
         else if (filename.endsWith(".key") || filename.endsWith(".proof")) {
             // KeY problem specification or saved proof
-            return new KeYUserProblemFile(filename, file, mediator.getUI(), profileOfNewProofs);
+            return new KeYUserProblemFile(filename, file, ui, profileOfNewProofs);
 
         }
         else if (file.isDirectory()) {
@@ -397,7 +362,6 @@ public abstract class AbstractProblemLoader {
      * @return The {@link ProblemInitializer} to use.
      */
     protected ProblemInitializer createProblemInitializer() {
-        UserInterface ui = mediator.getUI();
         Profile profile = forceNewProfileOfNewProofs ? profileOfNewProofs : envInput.getProfile();
         return new ProblemInitializer(ui, new Services(profile), ui);
     }
@@ -506,8 +470,6 @@ public abstract class AbstractProblemLoader {
     }
 
     protected ReplayResult replayProof(Proof proof) throws ProofInputException, ProblemLoaderException {
-        mediator.stopInterface(true); // first stop (above) is not enough
-
         String status = "";
         List<Throwable> errors = new LinkedList<Throwable>();
         Node lastTouchedNode = proof.root();
@@ -557,14 +519,6 @@ public abstract class AbstractProblemLoader {
      */
     public File getBootClassPath() {
         return bootClassPath;
-    }
-
-    /**
-     * Returns the {@link KeYMediator} to use.
-     * @return The {@link KeYMediator} to use.
-     */
-    public KeYMediator getMediator() {
-        return mediator;
     }
 
     /**

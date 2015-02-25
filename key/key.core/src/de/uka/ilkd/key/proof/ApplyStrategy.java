@@ -25,10 +25,6 @@ import java.util.Iterator;
 import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.core.DefaultTaskFinishedInfo;
-import de.uka.ilkd.key.core.ProverTaskListener;
-import de.uka.ilkd.key.core.RuleAppListener;
-import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -631,24 +627,6 @@ public class ApplyStrategy {
         fireTaskFinished (new DefaultTaskFinishedInfo(this, result, proof, result.getTime(),
                                                       result.getAppliedRuleApps(),
                                                       result.getClosedGoals()));
-    }
-
-    // Used to combine multiple iteratively called proofs and integrate their results in final result
-    private ApplyStrategyInfo joinStrategyInfos(ApplyStrategyInfo result,
-                                                ApplyStrategyInfo subResult) {
-        if(result == null)
-            return subResult;
-        String msg = subResult.reason();
-        Proof prf = subResult.getProof();
-        Throwable err = subResult.getException();
-        if(result.isError())
-            err = result.getException();
-        Goal go = subResult.nonCloseableGoal();
-        long tme = result.getTime() + subResult.getTime();
-        int appl = result.getAppliedRuleApps() + subResult.getAppliedRuleApps();
-        int clsd = result.getClosedGoals() + subResult.getClosedGoals();
-        result = new ApplyStrategyInfo(msg,prf,err,go,tme,appl,clsd);
-        return result;
     }
 
     /**

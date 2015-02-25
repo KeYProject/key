@@ -2,11 +2,10 @@ package de.uka.ilkd.key.macros;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
@@ -40,33 +39,32 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
     }
 
     @Override
-	public boolean canApplyTo(KeYMediator mediator,
+	public boolean canApplyTo(Proof proof,
 	                          ImmutableList<Goal> goals,
 	                          PosInOccurrence posInOcc) {
         if (getCondition()) {
-            return getProofMacro().canApplyTo(mediator, goals, posInOcc);
+            return getProofMacro().canApplyTo(proof, goals, posInOcc);
         } else {
-            return getAltProofMacro().canApplyTo(mediator, goals, posInOcc);
+            return getAltProofMacro().canApplyTo(proof, goals, posInOcc);
         }
     }
 
     @Override
     public ProofMacroFinishedInfo applyTo(Proof proof,
-                                          KeYMediator mediator,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
-        setMaxSteps(mediator);
+        setMaxSteps(proof);
         int steps = getNumberSteps();
         final ProofMacro macro = getProofMacro();
-        while (getNumberSteps() > 0 && getCondition() && macro.canApplyTo(mediator, goals, posInOcc)) {
+        while (getNumberSteps() > 0 && getCondition() && macro.canApplyTo(proof, goals, posInOcc)) {
             final ProverTaskListener pml =
                     new ProofMacroListener(this, listener);
             pml.taskStarted(macro.getName(), 0);
             synchronized(macro) {
                 // wait for macro to terminate
-                info = macro.applyTo(mediator, goals, posInOcc, pml);
+                info = macro.applyTo(proof, goals, posInOcc, pml);
             }
             pml.taskFinished(info);
             steps -= info.getAppliedRules();
@@ -76,11 +74,11 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
             posInOcc = null;
         }
         final ProofMacro altMacro = getAltProofMacro();
-        if (steps > 0 && altMacro.canApplyTo(mediator, goals, posInOcc)) {
+        if (steps > 0 && altMacro.canApplyTo(proof, goals, posInOcc)) {
             final ProverTaskListener pml =
                     new ProofMacroListener(this, listener);
             pml.taskStarted(altMacro.getName(), 0);
-            info = altMacro.applyTo(mediator, goals, posInOcc, pml);
+            info = altMacro.applyTo(proof, goals, posInOcc, pml);
             synchronized(altMacro) {
                 // wait for macro to terminate
                 info = new ProofMacroFinishedInfo(this, info);
@@ -113,10 +111,10 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
      * @return the maximum number of rule applications allowed for
      * this macro
      */
-    void setMaxSteps(KeYMediator mediator) {
+    void setMaxSteps(Proof proof) {
         final int steps;
-        if (mediator.getSelectedProof() != null) {
-            steps = mediator.getSelectedProof().getSettings()
+        if (proof != null) {
+            steps = proof.getSettings()
                          .getStrategySettings().getMaxSteps();
         } else {
             steps = ProofSettings.DEFAULT_SETTINGS

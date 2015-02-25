@@ -23,7 +23,6 @@ import org.key_project.utils.collection.DefaultImmutableSet;
 import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableSet;
 
-import de.uka.ilkd.key.gui.lemmatagenerator.EmptyEnvInput;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;

@@ -6,15 +6,12 @@ package de.uka.ilkd.key.macros;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.ProverTaskListener;
-import de.uka.ilkd.key.gui.ExceptionDialog;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -48,7 +45,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(KeYMediator mediator,
+    public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
         if (goals == null || goals.head() == null
@@ -61,7 +58,6 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro {
             return false;
         }
 
-        final Proof proof = goals.head().proof();
         final Services services = proof.getServices();
 
         final RuleApp app = goals.head().node().parent().getAppliedRuleApp();
@@ -91,7 +87,6 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro {
 
     @Override
     public ProofMacroFinishedInfo applyTo(Proof proof,
-                                          KeYMediator mediator,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) {

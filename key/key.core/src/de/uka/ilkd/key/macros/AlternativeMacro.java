@@ -19,11 +19,10 @@ import java.util.List;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProverTaskListener;
 
 /**
  * The abstract class AlternativeMacro can be used to create compound macros
@@ -59,12 +58,12 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
      * If there is no first macro, this is not applicable.
      */
     @Override
-    public boolean canApplyTo(KeYMediator mediator,
+    public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
         final List<ProofMacro> macros = getProofMacros();
         for (int i = 0; i < macros.size(); i++) {
-            if (macros.get(i).canApplyTo(mediator, goals, posInOcc)) {
+            if (macros.get(i).canApplyTo(proof, goals, posInOcc)) {
                 return true;
             }
         }
@@ -81,19 +80,19 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
      *             if the macro is interrupted.
      */
     @Override
-    public ProofMacroFinishedInfo applyTo(Proof proof, KeYMediator mediator,
+    public ProofMacroFinishedInfo applyTo(Proof proof,
                                     ImmutableList<Goal> goals,
                                     PosInOccurrence posInOcc,
                                     ProverTaskListener listener) throws InterruptedException {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         for (final ProofMacro macro : getProofMacros()) {
-            if(macro.canApplyTo(mediator, goals, posInOcc)) {
+            if(macro.canApplyTo(proof, goals, posInOcc)) {
                 final ProverTaskListener pml =
                         new ProofMacroListener(macro, listener);
                 pml.taskStarted(macro.getName(), 0);
                 synchronized(macro) {
                     // wait for macro to terminate
-                    info = macro.applyTo(mediator, goals, posInOcc, pml);
+                    info = macro.applyTo(proof, goals, posInOcc, pml);
                 }
                 pml.taskFinished(info);
                 // change source to this macro ... [TODO]

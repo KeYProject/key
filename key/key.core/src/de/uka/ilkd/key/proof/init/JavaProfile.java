@@ -124,9 +124,8 @@ public class JavaProfile extends AbstractProfile {
         builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
                                    .prepend(BlockContractRule.INSTANCE)
                                    .prepend(UseDependencyContractRule.INSTANCE)
-                                   .prepend(getOneStepSimpilifier())
-        			   //.prepend(PullOutConditionalsRule.INSTANCE)  // rule at the moment unsound
-        			   .prepend(QueryExpand.INSTANCE);
+//                                   .prepend(getOneStepSimpilifier()) // TODO: Temporary disabled oss (REFACTORING_FIX_ME)
+                                   .prepend(QueryExpand.INSTANCE);
   
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact 
         // that Contract insertion rule is the FIRST element of this list!
@@ -150,7 +149,7 @@ public class JavaProfile extends AbstractProfile {
     public OneStepSimplifier getOneStepSimpilifier() {
        synchronized (this) {
           if (oneStepSimpilifier == null) {
-             oneStepSimpilifier = new OneStepSimplifier();
+//             oneStepSimpilifier = new OneStepSimplifier(); // TODO: Temporary disabled OSS (REFACTORING_FIX_ME)
           }
           return oneStepSimpilifier;
        }

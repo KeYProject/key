@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.macros;
 
-import de.uka.ilkd.key.core.ProverTaskListener;
-import de.uka.ilkd.key.core.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.TaskFinishedInfo;
 
 /**
  * Listener for the application of proof macros (which may be run in

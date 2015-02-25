@@ -15,13 +15,12 @@ package de.uka.ilkd.key.macros;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.ProverTaskListener;
-import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.TaskFinishedInfo;
 
 /**
  * The interface ProofMacro is the entry point to a general strategy extension
@@ -92,24 +91,6 @@ public interface ProofMacro {
     public String getDescription();
 
     /**
-     * Can this macro be applied?
-     * 
-     * This method should not make any changes but check if the macro can be
-     * applied or not in the given context.
-     * 
-     * This method may be called from within the GUI thread and be compatible
-     * with that fact.
-     * 
-     * @param mediator
-     *            the mediator (not <code>null</code>)
-     * @param posInOcc
-     *            the position in occurrence (may be <code>null</code>)
-     * 
-     * @return <code>true</code>, if the macro is allowed to be applied
-     */
-    public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc);
-
-    /**
      * Can this macro be applied on the given goals?
      *
      * This method should not make any changes but check if the macro can be
@@ -118,8 +99,8 @@ public interface ProofMacro {
      * This method may be called from within the GUI thread and be compatible
      * with that fact.
      *
-     * @param mediator
-     *            the mediator (not <code>null</code>)
+     * @param proof
+     *            the current {@link Proof} (not <code>null</code>)
      * @param goals
      *            the goals (not <code>null</code>)
      * @param posInOcc
@@ -127,7 +108,7 @@ public interface ProofMacro {
      *
      * @return <code>true</code>, if the macro is allowed to be applied
      */
-    public boolean canApplyTo(KeYMediator mediator,
+    public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc);
 
@@ -140,8 +121,6 @@ public interface ProofMacro {
      * This method may be called from within the GUI thread and be compatible
      * with that fact.
      *
-     * @param mediator
-     *            the mediator (not <code>null</code>)
      * @param node
      *            the node (not <code>null</code>)
      * @param posInOcc
@@ -149,8 +128,7 @@ public interface ProofMacro {
      *
      * @return <code>true</code>, if the macro is allowed to be applied
      */
-    public boolean canApplyTo(KeYMediator mediator,
-                              Node node,
+    public boolean canApplyTo(Node node,
                               PosInOccurrence posInOcc);
     
     /**
@@ -160,65 +138,6 @@ public interface ProofMacro {
      * Fixes bug #1495
      */
     public boolean isApplicableWithoutPosition();
-
-    /**
-     * Apply this macro.
-     * 
-     * This method can change the proof by applying rules to it.
-     * 
-     * This method is usually called from a dedicated thread and not the GUI
-     * thread. The thread it runs on may be interrupted. In this case, the macro
-     * may report the interruption by an {@link InterruptedException}.
-     * 
-     * A {@link ProverTaskListener} can be provided to which the progress will
-     * be reported. If no reports are desired, <code>null</code> can be used for
-     * this parameter. If more than one listener is needed, consider combining
-     * them using a single listener object using the composite pattern.
-     * 
-     * @param mediator
-     *            the mediator (not <code>null</code>)
-     * @param posInOcc
-     *            the position in occurrence (may be <code>null</code>)
-     * @param listener
-     *            the listener to use for progress reports (may be
-     *            <code>null</code>)
-     * @throws InterruptedException
-     *             if the application of the macro has been interrupted.
-     */
-    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
-                                          PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException;
-
-    /**
-     * Apply this macro on the given goals.
-     *
-     * This method can change the proof by applying rules to it.
-     *
-     * This method is usually called from a dedicated thread and not the GUI
-     * thread. The thread it runs on may be interrupted. In this case, the macro
-     * may report the interruption by an {@link InterruptedException}.
-     *
-     * A {@link ProverTaskListener} can be provided to which the progress will
-     * be reported. If no reports are desired, <code>null</code> cna be used for
-     * this parameter. If more than one listener is needed, consider combining
-     * them using a single listener object using the composite pattern.
-     *
-     * @param mediator
-     *            the mediator (not <code>null</code>)
-     * @param goals
-     *            the goals (not <code>null</code>)
-     * @param posInOcc
-     *            the position in occurrence (may be <code>null</code>)
-     * @param listener
-     *            the listener to use for progress reports (may be
-     *            <code>null</code>)
-     * @throws InterruptedException
-     *             if the application of the macro has been interrupted.
-     */
-    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
-                                          ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException;
 
     /**
      * Apply this macro on the given goals.
@@ -235,9 +154,7 @@ public interface ProofMacro {
      * them using a single listener object using the composite pattern.
      *
      * @param proof
-     *            the {@link Proof} to work with.
-     * @param mediator
-     *            the mediator (not <code>null</code>)
+     *            the current {@link Proof} (not <code>null</code>)
      * @param goals
      *            the goals (not <code>null</code>)
      * @param posInOcc
@@ -249,7 +166,6 @@ public interface ProofMacro {
      *             if the application of the macro has been interrupted.
      */
     public ProofMacroFinishedInfo applyTo(Proof proof,
-                                          KeYMediator mediator, // TODO: Avoid KeYMediator in macros because it is Swing UI specific. Modify other applyTo methods so that they know the Proof
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException;
@@ -264,12 +180,10 @@ public interface ProofMacro {
      * may report the interruption by an {@link InterruptedException}.
      *
      * A {@link ProverTaskListener} can be provided to which the progress will
-     * be reported. If no reports are desired, <code>null</code> cna be used for
+     * be reported. If no reports are desired, <code>null</code> can be used for
      * this parameter. If more than one listener is needed, consider combining
      * them using a single listener object using the composite pattern.
      *
-     * @param mediator
-     *            the mediator (not <code>null</code>)
      * @param node
      *            the node (not <code>null</code>)
      * @param posInOcc
@@ -280,17 +194,9 @@ public interface ProofMacro {
      * @throws InterruptedException
      *             if the application of the macro has been interrupted.
      */
-    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
-                                          Node node,
+    public ProofMacroFinishedInfo applyTo(Node node,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException;
-
-    /**
-     * Gets the keyboard shortcut to invoke the macro (optional).
-     * 
-     * @return null if no shortcut or the key stroke to invoke the macro.
-     */
-    public javax.swing.KeyStroke getKeyStroke();
 
     /**
      * This observer acts as intermediate instance between the reports by the

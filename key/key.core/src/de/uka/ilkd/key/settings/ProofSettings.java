@@ -25,7 +25,6 @@ import java.net.URL;
 import java.util.EventObject;
 import java.util.Properties;
 
-import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 

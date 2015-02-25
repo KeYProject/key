@@ -15,11 +15,10 @@ package de.uka.ilkd.key.macros;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProverTaskListener;
 
 /**
  *
@@ -39,19 +38,18 @@ public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacr
      */
     @Override
     public ProofMacroFinishedInfo applyTo(Proof proof,
-                                          KeYMediator mediator,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           final ProverTaskListener listener) throws InterruptedException {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         for (final ProofMacro macro : getProofMacros()) {
             // (here we do not reverse to original node)
-            if (macro.canApplyTo(mediator, goals, posInOcc)) {
+            if (macro.canApplyTo(proof, goals, posInOcc)) {
                 final ProverTaskListener pml = new ProofMacroListener(macro, listener);
                 pml.taskStarted(macro.getName(), 0);
                 synchronized(macro) {
                     // wait for macro to terminate
-                    info = macro.applyTo(mediator, goals, posInOcc, pml);
+                    info = macro.applyTo(proof, goals, posInOcc, pml);
                 }
                 pml.taskFinished(info);
                 info = new ProofMacroFinishedInfo(this, info);

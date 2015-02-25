@@ -30,8 +30,6 @@ import java.util.Vector;
 import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.core.RuleAppListener;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -81,6 +79,10 @@ import de.uka.ilkd.key.util.Pair;
  * of the proof.
  */
 public class Proof implements Named {
+    /**
+     * The time when the {@link Proof} instance was created.
+     */
+    private final long creationTime = System.currentTimeMillis();
 
     /** name of the proof */
     private final Name name;
@@ -1244,7 +1246,7 @@ public class Proof implements Named {
             this.timePerStep = timePerStep;
         }
 
-        static Statistics create(SideProofStatistics side) {
+        static Statistics create(SideProofStatistics side, long creationTime) {
         	return new Statistics(side.nodes,
                                       side.branches,
                                       side.interactiveSteps,
@@ -1256,7 +1258,7 @@ public class Proof implements Named {
                                       side.operationContractApps,
                                       side.loopInvApps,
                                       side.autoModeTime,
-                                      System.currentTimeMillis() - Main.getStartTime(),
+                                      System.currentTimeMillis() - creationTime,
                                       side.timePerStep);
         }
 
@@ -1327,7 +1329,7 @@ public class Proof implements Named {
             this.operationContractApps = tmpContr;
             this.loopInvApps = tmpInv;
             this.autoModeTime = proof.getAutoModeTime();
-            this.time = System.currentTimeMillis() - Main.getStartTime();
+            this.time = System.currentTimeMillis() - proof.creationTime;
             timePerStep = nodes<=1? .0f: (autoModeTime/(float)(nodes-1));
 
             generateSummary(proof);
@@ -1340,7 +1342,7 @@ public class Proof implements Named {
                 final long autoTime = proof.getAutoModeTime()
                         + proof.sideProofStatistics.autoModeTime;
                 final SideProofStatistics side = proof.sideProofStatistics.add(this).setAutoModeTime(autoTime);
-                stat = Statistics.create(side);
+                stat = Statistics.create(side, proof.creationTime);
             } else {
                 stat = this;
             }

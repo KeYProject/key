@@ -16,12 +16,11 @@ package de.uka.ilkd.key.macros;
 import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.ProverTaskListener;
-import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProverTaskListener;
 
 /**
  * Takes care of providing the whole ProofMacro interface by only making it
@@ -63,46 +62,20 @@ public abstract class AbstractProofMacro implements ProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        return canApplyTo(mediator, getGoals(mediator.getSelectedNode()), posInOcc);
-    }
-
-    @Override
-    public boolean canApplyTo(KeYMediator mediator,
-                              Node node,
+    public boolean canApplyTo(Node node,
                               PosInOccurrence posInOcc) {
-        return canApplyTo(mediator, getGoals(node), posInOcc);
+        return canApplyTo(node.proof(), getGoals(node), posInOcc);
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+    public ProofMacroFinishedInfo applyTo(Node node,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
-        return applyTo(mediator, getGoals(mediator.getSelectedNode()), posInOcc, listener);
-    }
-
-    @Override
-    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
-                                          Node node,
-                                          PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException {
-        return applyTo(mediator, getGoals(node), posInOcc, listener);
-    }
-    
-    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
-                                          ImmutableList<Goal> goals,
-                                          PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException {
-       return applyTo(!goals.isEmpty() ? goals.head().proof() : mediator.getInteractiveProver().getProof(), mediator, goals, posInOcc, listener);
+        return applyTo(node.proof(), getGoals(node), posInOcc, listener);
     }
 
     @Override
     public boolean isApplicableWithoutPosition() {
         return false;
-    }
-
-    @Override
-    public final javax.swing.KeyStroke getKeyStroke() {
-        return KeyStrokeManager.get(this);
     }
 }

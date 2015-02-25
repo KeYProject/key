@@ -16,6 +16,7 @@ package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 
 /**
  * Special assert statements intended for use with KeY.
@@ -27,7 +28,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public final class Assert {
     
     private static boolean assertionsEnabled () {
-        return de.uka.ilkd.key.core.Main.class.desiredAssertionStatus();
+        return FunctionalOperationContractImpl.class.desiredAssertionStatus(); // This class is only used by FunctionalOperationContractImpl
     }
     
     /**
