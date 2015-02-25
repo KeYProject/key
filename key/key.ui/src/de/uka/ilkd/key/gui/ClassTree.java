@@ -38,6 +38,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -275,9 +276,7 @@ public class ClassTree extends JTree {
      */
     public static final String getDisplayName(Services services, IObserverFunction ov) {
         StringBuffer sb = new StringBuffer();
-        String prettyName = services.getTypeConverter()
-                                    .getHeapLDT()
-                                    .getPrettyFieldName(ov);
+        String prettyName = HeapLDT.getPrettyFieldName(ov);
         if(prettyName != null) {
             sb.append(prettyName);
         } else if(ov.name() instanceof ProgramElementName) {
@@ -344,8 +343,6 @@ public class ClassTree extends JTree {
         Vector<DefaultMutableTreeNode> pathVector 
         	= new Vector<DefaultMutableTreeNode>();
         String fullClassName = kjt.getFullName();
-        int length = fullClassName.length();
-        int index = -1;
         DefaultMutableTreeNode node 
                 = (DefaultMutableTreeNode) getModel().getRoot();
         assert node != null;        

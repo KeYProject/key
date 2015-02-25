@@ -56,7 +56,7 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.util.Debug;
 
-public class GoalList extends JList {
+public class GoalList extends JList<Goal> {
     
     /**
      * 
@@ -65,6 +65,9 @@ public class GoalList extends JList {
     private final static ImageIcon keyIcon = IconFactory.keyHole(20,20);
     private final static Icon disabledGoalIcon = IconFactory.keyHoleInteractive(20, 20);
 
+    
+    
+    
     private KeYMediator mediator;   
 
     /** the model used by this view */
@@ -211,7 +214,7 @@ public class GoalList extends JList {
 	setMediator(mediator);
 	goalListModel = new GoalListModel();
 	selectingListModel = new SelectingGoalListModel ( goalListModel );
-        selectingListModel.setProof ( mediator.getSelectedProof () );
+	selectingListModel.setProof ( mediator.getSelectedProof () );
 	setModel(selectingListModel);
 	setCellRenderer(new IconCellRenderer());
 	addListSelectionListener(new GoalListSelectionListern());		
@@ -366,7 +369,7 @@ public class GoalList extends JList {
 
     private class GoalListInteractiveListener implements AutoModeListener {
 
-	/** invoked if automatic executiion of heuristics has started
+	/** invoked if automatic execution of heuristics has started
 	 */
 	public void autoModeStarted(ProofEvent e) {	    
 	    if (goalListModel.isAttentive()) {
@@ -390,7 +393,7 @@ public class GoalList extends JList {
     
     
 
-    private static class GoalListModel extends AbstractListModel {
+    private static class GoalListModel extends AbstractListModel<Goal> {
     
 	/**
          * 
@@ -569,7 +572,7 @@ public class GoalList extends JList {
      * goals. This is currently used to prevent the display of goals that appear
      * closed for the present user constraint.
      */
-    private class SelectingGoalListModel extends AbstractListModel {
+    private class SelectingGoalListModel extends AbstractListModel<Goal> {
         
         /**
          * 

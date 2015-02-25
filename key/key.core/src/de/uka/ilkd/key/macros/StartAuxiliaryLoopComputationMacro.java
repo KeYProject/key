@@ -49,7 +49,6 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro {
                 || posInOcc.subTerm() == null) {
             return false;
         }
-        final Proof proof = goals.head().proof();
         final Services services = proof.getServices();
 
         RuleApp app = goals.head().node().parent().getAppliedRuleApp();

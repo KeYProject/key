@@ -52,7 +52,6 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro {
                 || posInOcc.subTerm() == null) {
             return false;
         }
-        Proof proof = goals.head().proof();
         Services services = proof.getServices();
         ProofOblInput poForProof =
                 services.getSpecificationRepository().getProofOblInput(proof);

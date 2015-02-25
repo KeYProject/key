@@ -18,6 +18,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.MouseListener;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -45,7 +46,7 @@ public class BlockContractSelectionPanel extends JPanel {
     private static final long serialVersionUID = 1681443715264203991L;
 
     private final Services services;
-    private final JList contractList;
+    private final JList<BlockContract> contractList;
     private final TitledBorder border;
 
     public BlockContractSelectionPanel(final Services services, final boolean multipleSelection)
@@ -63,7 +64,7 @@ public class BlockContractSelectionPanel extends JPanel {
         add(scrollPane);
 
         //create contract list
-        contractList = new JList();
+        contractList = new JList<BlockContract>();
         contractList.setSelectionMode(
                 multipleSelection
                         ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
@@ -81,7 +82,7 @@ public class BlockContractSelectionPanel extends JPanel {
             private final Font PLAINFONT = getFont().deriveFont(Font.PLAIN);
 
             public Component getListCellRendererComponent(
-                    JList list,
+                    JList<?> list,
                     Object value,
                     int index,
                     boolean isSelected,
@@ -145,7 +146,7 @@ public class BlockContractSelectionPanel extends JPanel {
 
     public BlockContract getContract()
     {
-        final Object[] selection = contractList.getSelectedValues();
+        final List<BlockContract> selection = contractList.getSelectedValuesList();
         return computeContract(services, selection);
     }
 
@@ -160,17 +161,17 @@ public class BlockContractSelectionPanel extends JPanel {
      * @param selection The selected contracts.
      * @return The selected {@link BlockContract} or {@code null} if not available.
      */
-    public static BlockContract computeContract(Services services, Object[] selection) {
-       if (selection.length == 0) {
+    public static BlockContract computeContract(Services services, List<BlockContract> selection) {
+       if (selection.isEmpty()) {
            return null;
        }
-       else if (selection.length == 1) {
-           return (BlockContract) selection[0];
+       else if (selection.size() == 1) {
+           return selection.get(0);
        }
        else {
            ImmutableSet<BlockContract> contracts = DefaultImmutableSet.nil();
-           for (Object contract : selection) {
-               contracts = contracts.add((BlockContract) contract);
+           for (BlockContract contract : selection) {
+               contracts = contracts.add(contract);
            }
            return SimpleBlockContract.combine(contracts, services);
        }
