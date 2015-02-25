@@ -56,7 +56,7 @@ options {
   import java.util.Vector;
   import java.math.BigInteger;
 
-  import de.uka.ilkd.key.collection.*;
+  import org.key_project.utils.collection.*;
   import de.uka.ilkd.key.logic.*;
   import de.uka.ilkd.key.logic.op.*;
   import de.uka.ilkd.key.logic.sort.*;

@@ -28,7 +28,7 @@ options {
     import java.util.Iterator;
     import java.util.List;
 
-    import de.uka.ilkd.key.collection.*;
+    import org.key_project.utils.collection.*;
     import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.speclang.*;
     import de.uka.ilkd.key.speclang.translation.*;

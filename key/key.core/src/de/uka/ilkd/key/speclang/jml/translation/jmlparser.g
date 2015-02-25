@@ -19,7 +19,7 @@ header {
 
     import java.io.StringReader;
 
-    import de.uka.ilkd.key.collection.*;
+    import org.key_project.utils.collection.*;
     import de.uka.ilkd.key.java.JavaInfo;
     import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.java.Services;
