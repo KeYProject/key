@@ -887,9 +887,7 @@ public class IOUtilTest extends TestCase {
    public void testToFile() throws MalformedURLException {
       // Test null
       assertNull(IOUtil.toFile(null));
-      // Test windows file uri
-      assertEquals(new File("C:/Test/Test.xml"), IOUtil.toFile(new URL("file:///C:/Test/Test.xml")));
-      // Test Linux uri
+      // Test file uri
       assertEquals(new File("/tmp/Test/Test.xml"), IOUtil.toFile(new URL("file:///tmp/Test/Test.xml")));
       // Test web
       try {
@@ -908,9 +906,7 @@ public class IOUtilTest extends TestCase {
    public void testToFileString() throws MalformedURLException {
       // Test null
       assertNull(IOUtil.toFileString(null));
-      // Test windows file uri
-      assertEquals("C:" + File.separator + "Test" + File.separator + "Test.xml", IOUtil.toFileString(new URL("file:///C:/Test/Test.xml")));
-      // Test Linux uri
+      // Test file uri
       assertEquals(File.separator + "tmp" + File.separator + "Test" + File.separator + "Test.xml", IOUtil.toFileString(new URL("file:///tmp/Test/Test.xml")));
       // Test web
       try {
