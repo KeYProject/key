@@ -17,8 +17,6 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 
-
-
 import org.key_project.utils.java.IOUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -34,7 +32,7 @@ import de.uka.ilkd.key.util.Debug;
 public final class QuickSaveAction extends MainWindowAction {
 
     private static final long serialVersionUID = 8475988170848683884L;
-    private static final String TMP_DIR = IOUtil.getTempDirectory();
+    private static final File TMP_DIR = IOUtil.getTempDirectory();
     public static final String QUICK_SAVE_PATH = TMP_DIR+File.separator+".quicksave.key";
 
     public QuickSaveAction(MainWindow mainWindow) {
