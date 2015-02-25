@@ -19,9 +19,11 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.ServiceLoader;
 
+import org.key_project.utils.java.IOUtil;
+
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.WindowUserInterface;
 import de.uka.ilkd.key.gui.RecentFileMenu.RecentFileEntry;
+import de.uka.ilkd.key.gui.WindowUserInterface;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -58,9 +60,6 @@ public final class Main {
     private static final String EXPERIMENTAL = "--experimental";
     private static final String DEBUG = "--debug";
     private static final String MACRO = "--macro";
-    private static final String NO_DEBUG = "--no_debug";
-    private static final String ASSERTION = "--assertion";
-    private static final String NO_ASSERTION = "--no-assertion";
     private static final String NO_JMLSPECS = "--no-jmlspecs";
     public static final String JUSTIFY_RULES ="--justify-rules";
     private static final String PRINT_STATISTICS ="--print-statistics";
@@ -527,8 +526,8 @@ public final class Main {
      * Used by {@link de.uka.ilkd.key.gui.KeYFileChooser} (and potentially
      * others) to determine working directory. In case there is at least one
      * location (i.e. a file or directory) specified as command line argument,
-     * working directory is determined based on first location that occured in
-     * the list of arguments. Otherwise, value of System.getProperty("user.dir")
+     * working directory is determined based on first location that occurred in
+     * the list of arguments. Otherwise, value of System.getProperty("user.home")
      * is used to determine working directory.
      *
      * @return {@link File} object representing working directory.
@@ -542,7 +541,7 @@ public final class Main {
                 return f.getParentFile();
             }
         } else {
-            return new File(System.getProperty("user.dir"));
+            return IOUtil.getCurrentDirectory();
         }
     }
 

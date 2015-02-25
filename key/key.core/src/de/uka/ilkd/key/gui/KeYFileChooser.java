@@ -19,12 +19,15 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
+
+import org.key_project.utils.java.IOUtil;
+
 import de.uka.ilkd.key.core.Main;
 
 
 public class KeYFileChooser {
     
-    private static final File HOME_DIR = new File(System.getProperty("user.home"));
+    private static final File HOME_DIR = IOUtil.getHomeDirectory();
     private static final FileFilter FILTER = new FileFilter() {
         public boolean accept(File f) {
             return 

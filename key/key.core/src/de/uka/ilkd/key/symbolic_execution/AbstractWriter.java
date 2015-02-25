@@ -16,6 +16,7 @@ package de.uka.ilkd.key.symbolic_execution;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.key_project.utils.java.StringUtil;
 import org.key_project.utils.java.XMLUtil;
 
 /**
@@ -27,7 +28,7 @@ public abstract class AbstractWriter {
    /**
     * New line.
     */
-   public static final String NEW_LINE = System.getProperty("line.separator");
+   public static final String NEW_LINE = StringUtil.NEW_LINE;
    
    /**
     * The used leading white space in each level.

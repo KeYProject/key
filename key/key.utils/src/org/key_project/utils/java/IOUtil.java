@@ -699,4 +699,20 @@ public final class IOUtil {
    public static URI toURI(URL url) {
       return url != null ? URI.create(url.toString()) : null;
    }
+
+   /**
+    * Returns the current directory.
+    * @return The current directory.
+    */
+   public static File getCurrentDirectory() {
+      return new File(".").getAbsoluteFile().getParentFile();
+   }
+
+   /**
+    * Returns the temporary directory.
+    * @return The temporary directory.
+    */
+   public static File getTempDirectory() {
+      return new File(System.getProperty("java.io.tmpdir"));
+   }
 }

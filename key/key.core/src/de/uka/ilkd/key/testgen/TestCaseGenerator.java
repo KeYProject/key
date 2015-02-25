@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.key_project.utils.java.StringUtil;
+
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -53,7 +55,7 @@ public class TestCaseGenerator {
 	 * <p>
 	 * <b>Do not use {@code \n}!</b>
 	 */
-	public static final String NEW_LINE = System.getProperty("line.separator");
+	public static final String NEW_LINE = StringUtil.NEW_LINE;
 
 	private static final String NULLABLE = "/*@ nullable */";
 	public static final String ALL_OBJECTS = "allObjects";

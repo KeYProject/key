@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.testgen;
 
 import java.util.HashSet;
+
+import org.key_project.utils.java.StringUtil;
+
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -15,7 +18,7 @@ public class ReflectionClassCreator {
     * <p>
     * <b>Do not use {@code \n}!</b>
     */
-   public static final String NEW_LINE = System.getProperty("line.separator");
+   public static final String NEW_LINE = StringUtil.NEW_LINE;
 
     public static final String NAME_OF_CLASS = "RFL";
 

@@ -2,6 +2,8 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 
+import org.key_project.utils.java.IOUtil;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
@@ -12,7 +14,7 @@ public class AutoSave extends MainWindowAction {
 
     public AutoSave(MainWindow mainWindow) {
         super(mainWindow);
-        setTooltip("Proofs will be automatically saved to +" + System.getProperty("java.io.tmpdir") +
+        setTooltip("Proofs will be automatically saved to +" + IOUtil.getTempDirectory() +
         		"periodically and when finished.");
         setName("Auto Save Proofs");
         setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSavePeriod() > 0);

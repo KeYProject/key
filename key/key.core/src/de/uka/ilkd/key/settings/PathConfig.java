@@ -15,6 +15,8 @@ package de.uka.ilkd.key.settings;
 
 import java.io.File;
 
+import org.key_project.utils.java.IOUtil;
+
 import de.uka.ilkd.key.gui.MainWindow;
 
 /**
@@ -51,7 +53,7 @@ public class PathConfig {
      * Initializes the instance variables with the default settings.
      */
     static {
-        setKeyConfigDir(System.getProperty("user.home") + File.separator + KEY_DIRECTORY_NAME);
+        setKeyConfigDir(IOUtil.getHomeDirectory() + File.separator + KEY_DIRECTORY_NAME);
     }
     
     /**

@@ -40,6 +40,8 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 
+import org.key_project.utils.java.IOUtil;
+
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
@@ -293,12 +295,11 @@ public class FileChooser extends JPanel{
         
         private KeYFileChooser getFileChooser(String title) {
            if (fileChooser == null) {
-                    String initDir = System.getProperty("user.dir");
-                    fileChooser = KeYFileChooser.getFileChooser(initDir);
-                }
-                fileChooser.setDialogTitle(title);
-                fileChooser.prepare();
-                return fileChooser;
+              fileChooser = KeYFileChooser.getFileChooser(title);
+           }
+           fileChooser.setDialogTitle(title);
+           fileChooser.prepare();
+           return fileChooser;
        }
         
         private JButton getHelpButton(){

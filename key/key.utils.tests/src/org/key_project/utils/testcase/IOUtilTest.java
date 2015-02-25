@@ -47,6 +47,16 @@ import org.key_project.utils.java.IOUtil.LineInformation;
  */
 public class IOUtilTest extends TestCase {
    /**
+    * Tests {@link IOUtil#getCurrentDirectory()}
+    */
+   @Test
+   public void testGetCurrentDirectory() {
+      File currentDir = IOUtil.getCurrentDirectory();
+      assertNotNull(currentDir);
+      System.out.println(currentDir);
+   }
+   
+   /**
     * Tests {@link IOUtil#exists(File)}
     */
    @Test

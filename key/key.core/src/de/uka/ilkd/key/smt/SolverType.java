@@ -612,12 +612,11 @@ abstract class AbstractSolverType implements SolverType {
 	 }
 
 	 private static boolean checkEnvVariable(String cmd) {
-		 String filesep = System.getProperty("file.separator");
 		 String path = System.getenv("PATH");
 
-		 String[] res = path.split(System.getProperty("path.separator"));
+		 String[] res = path.split(File.pathSeparator);
 		 for (String s : res) {
-			 File file = new File(s + filesep + cmd);
+			 File file = new File(s + File.separator + cmd);
 			 if (file.exists()) {
 				 return true;
 			 }

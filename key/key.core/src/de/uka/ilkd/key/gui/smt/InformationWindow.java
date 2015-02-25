@@ -26,6 +26,9 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.Element;
 
 
+
+import org.key_project.utils.java.StringUtil;
+
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.model.Model;
@@ -152,9 +155,9 @@ public class InformationWindow extends JDialog {
 			public String getText(){
 				int caretPosition = content.getDocument().getLength();
 				Element root = content.getDocument().getDefaultRootElement();
-				String text = "1" + System.getProperty("line.separator");
+				String text = "1" + StringUtil.NEW_LINE;
 				for(int i = 2; i < root.getElementIndex( caretPosition ) + 2; i++){
-					text += i + System.getProperty("line.separator");
+					text += i + StringUtil.NEW_LINE;
 				}
 				return text;
 			}

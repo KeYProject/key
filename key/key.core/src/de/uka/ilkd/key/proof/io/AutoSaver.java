@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.EventObject;
 
+import org.key_project.utils.java.IOUtil;
+
 import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.Proof;
@@ -36,7 +38,7 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class AutoSaver implements ProverTaskListener {
 
-    private final static String TMP_DIR = System.getProperty("java.io.tmpdir");
+    private final static File TMP_DIR = IOUtil.getTempDirectory();
     private final static String PREFIX = TMP_DIR+File.separator+".autosave.";
     
     private Proof proof;
