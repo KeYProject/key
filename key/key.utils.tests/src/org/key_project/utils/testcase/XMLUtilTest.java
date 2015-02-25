@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.util.test.testcase;
+package org.key_project.utils.testcase;
 
 import java.util.LinkedList;
 import java.util.List;

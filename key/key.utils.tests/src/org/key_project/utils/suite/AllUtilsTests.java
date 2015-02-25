@@ -11,37 +11,24 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.util.test.model;
+package org.key_project.utils.suite;
 
-@SuppressWarnings("unused")
-public class ClassB extends ClassA {
-   private int privateField = 42;
-   
-   protected int protectedField = 43;
-   
-   public int publicField = 44;
-   
-   int defaultField = 45;
-   
-   private String onlyInB = "B";
-   
-   private int getPrivate() {
-      return 662;
-   }
-   
-   public int getPublic() {
-      return 663;
-   }
-   
-   protected int getProtected() {
-      return 664;
-   }
-   
-   int getDefault() {
-      return 665;
-   }
-   
-   private String onlyInB() {
-      return "B";
-   }
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+
+/**
+ * Run all contained JUnit 4 test cases.
+ * @author Martin Hentschel
+ */
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+    org.key_project.utils.testcase.ArrayUtilTest.class,
+    org.key_project.utils.testcase.CollectionUtilTest.class,
+    org.key_project.utils.testcase.IOUtilTest.class,
+    org.key_project.utils.testcase.NumberUtilTest.class,
+    org.key_project.utils.testcase.ObjectUtilTest.class,
+    org.key_project.utils.testcase.StringUtilTest.class,
+    org.key_project.utils.testcase.XMLUtilTest.class
+})
+public class AllUtilsTests {
 }

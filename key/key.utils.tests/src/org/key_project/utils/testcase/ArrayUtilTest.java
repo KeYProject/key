@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.util.test.testcase;
+package org.key_project.utils.testcase;
 
 import java.util.Comparator;
 
@@ -66,7 +66,7 @@ public class ArrayUtilTest extends TestCase {
       }
    }
    
-   private <T> void assertArray(T[] current, T... expected) {
+   private <T> void assertArray(T[] current, @SuppressWarnings("unchecked") T... expected) {
       assertNotNull(current);
       assertEquals(current.length, expected.length);
       for (int i = 0; i < current.length; i++) {

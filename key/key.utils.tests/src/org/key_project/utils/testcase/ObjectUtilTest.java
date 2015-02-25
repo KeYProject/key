@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.util.test.testcase;
+package org.key_project.utils.testcase;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -21,9 +21,9 @@ import java.util.Comparator;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.key_project.util.test.model.ClassA;
-import org.key_project.util.test.model.ClassB;
 import org.key_project.utils.java.ObjectUtil;
+import org.key_project.utils.model.ClassA;
+import org.key_project.utils.model.ClassB;
 
 /**
  * Tests for {@link ObjectUtil}

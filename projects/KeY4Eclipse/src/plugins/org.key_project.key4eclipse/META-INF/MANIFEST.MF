@@ -6,7 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.7.100"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: .,
  key.core/lib/antlr.jar,
  key.core/lib/recoderKey.jar,
@@ -136,8 +136,10 @@ Export-Package: .,
  org.key_project.key4eclipse.event,
  org.key_project.key4eclipse.util,
  org.key_project.utils.bean,
+ org.key_project.utils.helper,
  org.key_project.utils.java,
  org.key_project.utils.java.thread,
+ org.key_project.utils.model,
  recoder,
  recoder.abstraction,
  recoder.bytecode,

@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.util.test.testcase;
+package org.key_project.utils.testcase;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -20,28 +20,27 @@ import java.io.CharArrayWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
 import org.junit.Test;
-import org.key_project.util.eclipse.BundleUtil;
-import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.util.test.Activator;
-import org.key_project.util.test.util.TestUtilsUtil;
+import org.key_project.utils.helper.HelperClassForUtilityTests;
 import org.key_project.utils.java.CollectionUtil;
 import org.key_project.utils.java.IFilter;
 import org.key_project.utils.java.IOUtil;
 import org.key_project.utils.java.IOUtil.IFileVisitor;
 import org.key_project.utils.java.IOUtil.LineInformation;
+
+import de.uka.ilkd.key.utils.IOUtils;
 
 /**
  * Tests for {@link IOUtil}
@@ -73,15 +72,15 @@ public class IOUtilTest extends TestCase {
       File alsoYesDir = IOUtil.createTempDirectory("contains", "alsoYes");
       File noDir = IOUtil.createTempDirectory("contains", "no");
       try {
-         File yesFile = TestUtilsUtil.createFile(new File(yesDir, "Hello.txt"), "Hello");
-         File yesFolder = TestUtilsUtil.createFolder(new File(yesDir, "yesSub"));
-         File yesSubFile = TestUtilsUtil.createFile(new File(yesFolder, "Hello.txt"), "Hello");
-         File alsoYesFile = TestUtilsUtil.createFile(new File(alsoYesDir, "Hello.txt"), "Hello");
-         File alsoYesFolder = TestUtilsUtil.createFolder(new File(alsoYesDir, "yesSub"));
-         File alsoYesSubFile = TestUtilsUtil.createFile(new File(alsoYesFolder, "Hello.txt"), "Hello");
-         File noFile = TestUtilsUtil.createFile(new File(noDir, "Hello.txt"), "Hello");
-         File noFolder = TestUtilsUtil.createFolder(new File(noDir, "yesSub"));
-         File noSubFile = TestUtilsUtil.createFile(new File(noFolder, "Hello.txt"), "Hello");
+         File yesFile = HelperClassForUtilityTests.createFile(new File(yesDir, "Hello.txt"), "Hello");
+         File yesFolder = HelperClassForUtilityTests.createFolder(new File(yesDir, "yesSub"));
+         File yesSubFile = HelperClassForUtilityTests.createFile(new File(yesFolder, "Hello.txt"), "Hello");
+         File alsoYesFile = HelperClassForUtilityTests.createFile(new File(alsoYesDir, "Hello.txt"), "Hello");
+         File alsoYesFolder = HelperClassForUtilityTests.createFolder(new File(alsoYesDir, "yesSub"));
+         File alsoYesSubFile = HelperClassForUtilityTests.createFile(new File(alsoYesFolder, "Hello.txt"), "Hello");
+         File noFile = HelperClassForUtilityTests.createFile(new File(noDir, "Hello.txt"), "Hello");
+         File noFolder = HelperClassForUtilityTests.createFolder(new File(noDir, "yesSub"));
+         File noSubFile = HelperClassForUtilityTests.createFile(new File(noFolder, "Hello.txt"), "Hello");
          List<File> parents = CollectionUtil.toList(yesDir, alsoYesDir);
          assertFalse(IOUtil.contains((Iterable<File>)null, yesFile));
          assertFalse(IOUtil.contains(parents, null));
@@ -115,12 +114,12 @@ public class IOUtilTest extends TestCase {
       File yesDir = IOUtil.createTempDirectory("contains", "yes");
       File noDir = IOUtil.createTempDirectory("contains", "no");
       try {
-         File yesFile = TestUtilsUtil.createFile(new File(yesDir, "Hello.txt"), "Hello");
-         File yesFolder = TestUtilsUtil.createFolder(new File(yesDir, "yesSub"));
-         File yesSubFile = TestUtilsUtil.createFile(new File(yesFolder, "Hello.txt"), "Hello");
-         File noFile = TestUtilsUtil.createFile(new File(noDir, "Hello.txt"), "Hello");
-         File noFolder = TestUtilsUtil.createFolder(new File(noDir, "yesSub"));
-         File noSubFile = TestUtilsUtil.createFile(new File(noFolder, "Hello.txt"), "Hello");
+         File yesFile = HelperClassForUtilityTests.createFile(new File(yesDir, "Hello.txt"), "Hello");
+         File yesFolder = HelperClassForUtilityTests.createFolder(new File(yesDir, "yesSub"));
+         File yesSubFile = HelperClassForUtilityTests.createFile(new File(yesFolder, "Hello.txt"), "Hello");
+         File noFile = HelperClassForUtilityTests.createFile(new File(noDir, "Hello.txt"), "Hello");
+         File noFolder = HelperClassForUtilityTests.createFolder(new File(noDir, "yesSub"));
+         File noSubFile = HelperClassForUtilityTests.createFile(new File(noFolder, "Hello.txt"), "Hello");
          assertFalse(IOUtil.contains((File)null, yesFile));
          assertFalse(IOUtil.contains(yesDir, null));
          assertFalse(IOUtil.contains((File)null, null));
@@ -499,19 +498,18 @@ public class IOUtilTest extends TestCase {
     * Tests {@link IOUtil#computeLineInformation(File)}
     */
    @Test
-   public void testComputeLineInformation_File() throws IOException, CoreException {
-      // Create test files
-      IProject project = TestUtilsUtil.createProject("IOUtilTest_testComputeLineStartIndices_File"); 
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/lineIndicesTest", project);
-      IFile file = project.getFile("Text.txt");
+   public void testComputeLineInformation_File() throws IOException {
+      // Get test file
+      File textFile = new File(HelperClassForUtilityTests.RESOURCE_DIRECTORY + File.separator + "lineIndicesTest" + File.separator + "Text.txt");
+      assertTrue(textFile.isFile());
       // Test null
-      assertLineInformation((IFile)null);
+      assertLineInformation((File)null);
       // Test unix file
-      assertLineInformation(convertTextFile(file, "Text_Unix.txt", "\r"), 0, 1, 2, 9, 16, 17, 24, 50, 23661, 23662, 23663, 23671, 23672);
+      assertLineInformation(convertTextFile(textFile, "Text_Unix.txt", "\r"), 0, 1, 2, 9, 16, 17, 24, 50, 23661, 23662, 23663, 23671, 23672);
       // Test mac file
-      assertLineInformation(convertTextFile(file, "Text_Mac.txt", "\n"), 0, 1, 2, 9, 16, 17, 24, 50, 23661, 23662, 23663, 23671, 23672);
+      assertLineInformation(convertTextFile(textFile, "Text_Mac.txt", "\n"), 0, 1, 2, 9, 16, 17, 24, 50, 23661, 23662, 23663, 23671, 23672);
       // Test dos file
-      assertLineInformation(convertTextFile(file, "Text_DOS.txt", "\r\n"), 0, 2, 4, 12, 20, 22, 30, 57, 23669, 23671, 23673, 23682, 23684);
+      assertLineInformation(convertTextFile(textFile, "Text_DOS.txt", "\r\n"), 0, 2, 4, 12, 20, 22, 30, 57, 23669, 23671, 23673, 23682, 23684);
    }
    
    /**
@@ -531,13 +529,13 @@ public class IOUtilTest extends TestCase {
     * @throws CoreException Occurred Exception
     * @throws IOException Occurred Exception
     */
-   protected IFile convertTextFile(IFile source, String newFileName, String lineBreak) throws CoreException, IOException {
+   protected File convertTextFile(File source, String newFileName, String lineBreak) throws IOException {
       assertNotNull(source);
       assertTrue(source.exists());
       assertNotNull(newFileName);
       // Create new file content
       CharArrayWriter writer = new CharArrayWriter();
-      BufferedReader reader = new BufferedReader(new InputStreamReader(source.getContents()));
+      BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(source)));
       try {
          String line = null;
          while ((line = reader.readLine()) != null) {
@@ -546,12 +544,9 @@ public class IOUtilTest extends TestCase {
          }
          String newText = writer.toString();
          // Create new file
-         IFile target = source.getParent().getFile(new Path(newFileName));
-         if (!target.exists()) {
-            target.create(new ByteArrayInputStream(newText.getBytes()), true, null);
-         }
-         else {
-            target.setContents(new ByteArrayInputStream(newText.getBytes()), true, true, null);
+         File target = new File(source.getParentFile(), newFileName);
+         try (FileWriter targetWriter = new FileWriter(target)) {
+            targetWriter.write(newText);
          }
          return target;
       }
@@ -567,8 +562,8 @@ public class IOUtilTest extends TestCase {
     * @param expectedIndices The expected line indices.
     * @throws IOException Occurred Exception.
     */
-   protected void assertLineInformation(IFile file, int... expectedIndices) throws IOException {
-      LineInformation[] result = IOUtil.computeLineInformation(file != null ? ResourceUtil.getLocation(file) : null);
+   protected void assertLineInformation(File file, int... expectedIndices) throws IOException {
+      LineInformation[] result = IOUtil.computeLineInformation(file != null ? file : null);
       assertNotNull(result);
       assertEquals(expectedIndices.length, result.length);
       for (int i = 0; i < expectedIndices.length; i++) {
@@ -791,17 +786,17 @@ public class IOUtilTest extends TestCase {
        IOUtil.delete(tmpFile);
        assertFalse(tmpFile.exists());
        // Test empty directory
-       TestUtilsUtil.createFolder(tmpFile);
+       HelperClassForUtilityTests.createFolder(tmpFile);
        IOUtil.delete(tmpFile);
        assertFalse(tmpFile.exists());
        // Test directory with content
-       TestUtilsUtil.createFolder(tmpFile);
-       File subDir = TestUtilsUtil.createFolder(new File(tmpFile, "subDir"));
-       File subFile = TestUtilsUtil.createFile(new File(tmpFile, "subFile.txt"), "test");
-       File subDir2 = TestUtilsUtil.createFolder(new File(tmpFile, "subDir"));
-       File subSubDir2 = TestUtilsUtil.createFolder(new File(subDir2, "subDir"));
-       File subSubSubDir2 = TestUtilsUtil.createFolder(new File(subSubDir2, "subDir"));
-       File subSubSubDir2File = TestUtilsUtil.createFile(new File(subSubSubDir2, "subFile.txt"), "test");
+       HelperClassForUtilityTests.createFolder(tmpFile);
+       File subDir = HelperClassForUtilityTests.createFolder(new File(tmpFile, "subDir"));
+       File subFile = HelperClassForUtilityTests.createFile(new File(tmpFile, "subFile.txt"), "test");
+       File subDir2 = HelperClassForUtilityTests.createFolder(new File(tmpFile, "subDir"));
+       File subSubDir2 = HelperClassForUtilityTests.createFolder(new File(subDir2, "subDir"));
+       File subSubSubDir2 = HelperClassForUtilityTests.createFolder(new File(subSubDir2, "subDir"));
+       File subSubSubDir2File = HelperClassForUtilityTests.createFile(new File(subSubSubDir2, "subFile.txt"), "test");
        IOUtil.delete(tmpFile);
        assertFalse(tmpFile.exists());
        assertFalse(subDir.exists());
@@ -853,5 +848,52 @@ public class IOUtilTest extends TestCase {
       else {
          assertFalse(IOUtil.copy(null, new ByteArrayOutputStream()));
       }
+   }
+   
+   /**
+    * Tests {@link IOUtils#getClassLocation(Class)}
+    */
+   @Test
+   public void testGetClassLocation() {
+      assertNull(IOUtils.getClassLocation(null));
+      assertNotNull(IOUtils.getClassLocation(getClass()));
+   }
+   
+   /**
+    * Tests {@link IOUtils#getProjectRoot(Class)}
+    */
+   @Test
+   public void testGetProjectRoot() {
+      assertNull(IOUtils.getProjectRoot(null));
+      assertNotNull(IOUtils.getProjectRoot(getClass()));
+   }
+   
+   /**
+    * Tests {@link IOUtils#toURI(java.net.URL)}
+    * @throws MalformedURLException Occurred Exception
+    */
+   @Test
+   public void testToURI() throws MalformedURLException {
+      assertNull(IOUtils.toURI(null));
+      URL url = new URL("https://www.google.de");
+      URI uri = IOUtils.toURI(url);
+      assertNotNull(uri);
+      assertEquals(URI.create("https://www.google.de"), uri);
+   }
+   
+   /**
+    * Tests {@link IOUtils#toFile(URL)}
+    */
+   @Test
+   public void testToFile() {
+      fail();
+   }
+   
+   /**
+    * Tests {@link IOUtils#toFileString(URL)}
+    */
+   @Test
+   public void testToFileString() {
+      fail();
    }
 }

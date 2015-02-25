@@ -11,53 +11,37 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.util.test.model;
+package org.key_project.utils.model;
 
 @SuppressWarnings("unused")
-public class ClassA {
-   private int privateField = 1;
+public class ClassB extends ClassA {
+   private int privateField = 42;
    
-   protected int protectedField = 2;
+   protected int protectedField = 43;
    
-   public int publicField = 3;
+   public int publicField = 44;
    
-   int defaultField = 4;
+   int defaultField = 45;
    
-   private String onlyInA = "A";
+   private String onlyInB = "B";
    
-   private boolean booleanField = true;
-   
-   public static int staticField = -42;
-
-   public static boolean staticBooleanField = false;
-   
-   public static String staticStringField = null;
-
    private int getPrivate() {
-      return 42;
+      return 662;
    }
    
    public int getPublic() {
-      return 43;
+      return 663;
    }
    
    protected int getProtected() {
-      return 44;
+      return 664;
    }
    
    int getDefault() {
-      return 45;
+      return 665;
    }
    
-   private int getValue(Integer value) {
-      return value;
-   }
-   
-   private int getValue(Integer first, Integer second) {
-      return first + second;
-   }
-   
-   private String onlyInA() {
-      return "A";
+   private String onlyInB() {
+      return "B";
    }
 }

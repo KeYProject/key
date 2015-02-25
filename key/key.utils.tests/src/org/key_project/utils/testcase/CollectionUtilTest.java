@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.util.test.testcase;
+package org.key_project.utils.testcase;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -728,7 +728,7 @@ public class CollectionUtilTest extends TestCase {
     * @param collection The {@link Collections} to test.
     * @param expectedItems The expected items.
     */
-   protected <T> void assertCollectionItems(Collection<T> collection, T... expectedItems) {
+   protected <T> void assertCollectionItems(Collection<T> collection, @SuppressWarnings("unchecked") T... expectedItems) {
       assertNotNull(collection);
       assertEquals(collection.size(), expectedItems.length);
       Iterator<T> iter = collection.iterator();

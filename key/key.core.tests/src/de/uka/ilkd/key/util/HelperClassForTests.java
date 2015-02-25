@@ -34,12 +34,6 @@ import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.utils.IOUtils;
 
-/**
- * @author bubel
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 public class HelperClassForTests {
    public static final String TESTCASE_DIRECTORY = IOUtils.getProjectRoot(HelperClassForTests.class) + 
                                                    File.separator + "resources"+ 
