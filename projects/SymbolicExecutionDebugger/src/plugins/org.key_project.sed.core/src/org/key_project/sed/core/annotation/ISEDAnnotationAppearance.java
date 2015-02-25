@@ -1,7 +1,7 @@
 package org.key_project.sed.core.annotation;
 
 import org.eclipse.swt.graphics.RGB;
-import org.key_project.util.bean.IBean;
+import org.key_project.utils.bean.IBean;
 
 /**
  * Defines the appearance of an {@link ISEDAnnotation}.

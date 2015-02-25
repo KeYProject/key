@@ -21,11 +21,11 @@ import java.util.Iterator;
 import org.eclipse.core.runtime.Assert;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.monkey.product.ui.util.MonKeYUtil;
-import org.key_project.util.bean.Bean;
-import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.SwingUtil;
-import org.key_project.util.java.thread.AbstractRunnableWithResult;
-import org.key_project.util.java.thread.IRunnableWithResult;
+import org.key_project.utils.bean.Bean;
+import org.key_project.utils.java.StringUtil;
+import org.key_project.utils.java.thread.AbstractRunnableWithResult;
+import org.key_project.utils.java.thread.IRunnableWithResult;
 
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;

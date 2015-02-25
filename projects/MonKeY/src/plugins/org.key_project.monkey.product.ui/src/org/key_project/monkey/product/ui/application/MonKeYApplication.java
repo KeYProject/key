@@ -22,9 +22,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.key_project.monkey.product.ui.batch.MonKeYBatchMode;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.SwingUtil;
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.StringUtil;
 
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;

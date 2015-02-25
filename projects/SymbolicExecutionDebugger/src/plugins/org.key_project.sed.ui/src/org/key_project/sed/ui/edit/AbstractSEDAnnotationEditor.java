@@ -2,7 +2,7 @@ package org.key_project.sed.ui.edit;
 
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.util.bean.Bean;
+import org.key_project.utils.bean.Bean;
 
 /**
  * Provides a basic implementation of {@link ISEDAnnotationEditor}.

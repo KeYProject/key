@@ -15,7 +15,7 @@ package de.hentschel.visualdbc.datasource.model.implementation;
 
 import java.util.Iterator;
 
-import org.key_project.util.java.ObjectUtil;
+import org.key_project.utils.java.ObjectUtil;
 
 import de.hentschel.visualdbc.datasource.model.IDSOperation;
 import de.hentschel.visualdbc.datasource.model.IDSOperationContract;

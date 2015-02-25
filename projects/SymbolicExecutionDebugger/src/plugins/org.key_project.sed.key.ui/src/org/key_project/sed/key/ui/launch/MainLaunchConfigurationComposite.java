@@ -73,11 +73,11 @@ import org.key_project.sed.key.ui.util.LogUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.viewer.FileExtensionViewerFilter;
-import org.key_project.util.java.ObjectUtil;
-import org.key_project.util.java.StringUtil;
-import org.key_project.util.java.thread.AbstractRunnableWithProgressAndResult;
-import org.key_project.util.java.thread.IRunnableWithProgressAndResult;
 import org.key_project.util.jdt.JDTUtil;
+import org.key_project.util.thread.AbstractRunnableWithProgressAndResult;
+import org.key_project.util.thread.IRunnableWithProgressAndResult;
+import org.key_project.utils.java.ObjectUtil;
+import org.key_project.utils.java.StringUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Position;

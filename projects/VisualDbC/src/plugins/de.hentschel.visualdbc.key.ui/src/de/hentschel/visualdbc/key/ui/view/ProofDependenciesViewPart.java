@@ -39,9 +39,9 @@ import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.job.ObjectsSchedulingRule;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.thread.AbstractRunnableWithResult;
-import org.key_project.util.java.thread.IRunnableWithResult;
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.thread.AbstractRunnableWithResult;
+import org.key_project.utils.java.thread.IRunnableWithResult;
 
 import de.hentschel.visualdbc.dbcmodel.DbcModel;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelFactory;

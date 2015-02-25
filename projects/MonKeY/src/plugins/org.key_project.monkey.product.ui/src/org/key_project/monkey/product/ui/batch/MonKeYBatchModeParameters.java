@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.key_project.monkey.product.ui.util.MonKeYUtil;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.StringUtil;
 
 /**
  * Represents the parameters of {@link MonKeYBatchMode}.

@@ -47,12 +47,12 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.jdt.JDTUtil;
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+import org.key_project.utils.java.IOUtil;
+import org.key_project.utils.java.ObjectUtil;
 
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.ExampleChooser;

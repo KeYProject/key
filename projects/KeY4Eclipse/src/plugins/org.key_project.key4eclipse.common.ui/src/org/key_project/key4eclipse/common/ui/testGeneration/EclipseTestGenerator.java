@@ -24,8 +24,8 @@ import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.dialog.TextFieldMessageDialog;
-import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
+import org.key_project.utils.java.StringUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;

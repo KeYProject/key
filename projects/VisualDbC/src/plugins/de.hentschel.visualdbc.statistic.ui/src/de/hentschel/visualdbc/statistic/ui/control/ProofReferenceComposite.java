@@ -53,7 +53,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.ObjectUtil;
+import org.key_project.utils.java.ObjectUtil;
 
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcOperation;
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcType;

@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.key_project.sed.ui.util.SEDImages;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.StringUtil;
 
 /**
  * This {@link WizardPage} defines a comment.

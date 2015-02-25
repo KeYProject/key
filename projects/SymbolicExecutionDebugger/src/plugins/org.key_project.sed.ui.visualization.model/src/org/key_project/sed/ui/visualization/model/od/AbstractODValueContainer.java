@@ -20,7 +20,6 @@
 package org.key_project.sed.ui.visualization.model.od;
 
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EObject;
 
 /**

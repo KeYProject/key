@@ -18,7 +18,7 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.services.Graphiti;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.object_diagram.provider.ObjectDiagramTypeProvider;
-import org.key_project.util.java.IOUtil;
+import org.key_project.utils.java.IOUtil;
 
 /**
  * A new wizard to create Object Diagrams.

@@ -52,9 +52,9 @@ import org.key_project.key4eclipse.resources.test.Activator;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.IFilter;
 import org.key_project.util.test.util.TestUtilsUtil;
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.IFilter;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;

@@ -19,9 +19,9 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.key_project.util.java.StringUtil;
-import org.key_project.util.java.XMLUtil;
-import org.key_project.util.java.XMLUtil.ITagReplacer;
+import org.key_project.utils.java.StringUtil;
+import org.key_project.utils.java.XMLUtil;
+import org.key_project.utils.java.XMLUtil.ITagReplacer;
 
 /**
  * Tests for {@link XMLUtil}.

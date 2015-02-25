@@ -60,7 +60,7 @@ import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.sed.ui.visualization.util.VisualizationPreferences;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.ArrayUtil;
+import org.key_project.utils.java.ArrayUtil;
 
 /**
  * The {@link DiagramBehavior} of an {@link ExecutionTreeDiagramEditor}.

@@ -21,9 +21,9 @@ import java.util.Comparator;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.test.model.ClassA;
 import org.key_project.util.test.model.ClassB;
+import org.key_project.utils.java.ObjectUtil;
 
 /**
  * Tests for {@link ObjectUtil}

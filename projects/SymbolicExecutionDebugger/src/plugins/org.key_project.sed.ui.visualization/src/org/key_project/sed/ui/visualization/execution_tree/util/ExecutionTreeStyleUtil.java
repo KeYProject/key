@@ -24,8 +24,8 @@ import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.VisualizationPreferences;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.IFilter;
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.IFilter;
 
 /**
  * Provides the style used in execution trees.

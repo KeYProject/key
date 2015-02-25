@@ -11,31 +11,19 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.util.java.thread;
+package org.key_project.util.thread;
+
+import org.eclipse.jface.operation.IRunnableWithProgress;
 
 /**
- * Provides a basic implementation of {@link IRunnableWithProgressAndResult}.
+ * Extended functionality of an {@link IRunnableWithProgress} that 
+ * returns also one single result available via {@link #getResult()}.
  * @author Martin Hentschel
  */
-public abstract class AbstractRunnableWithProgressAndResult<T> implements IRunnableWithProgressAndResult<T> {
+public interface IRunnableWithProgressAndResult<T> extends IRunnableWithProgress {
     /**
-     * The result.
+     * Returns the result.
+     * @return The single result.
      */
-    private T result;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public T getResult() {
-        return result;
-    }
-
-    /**
-     * Sets the result.
-     * @param result The result to ste.
-     */
-    protected void setResult(T result) {
-        this.result = result;
-    }
+    public T getResult();
 }

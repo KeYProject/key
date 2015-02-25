@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.key_project.util.java.ObjectUtil;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.ObjectUtil;
+import org.key_project.utils.java.StringUtil;
 
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSDriver;

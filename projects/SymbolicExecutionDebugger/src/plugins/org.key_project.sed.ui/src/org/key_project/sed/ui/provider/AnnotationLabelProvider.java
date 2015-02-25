@@ -12,7 +12,7 @@ import org.key_project.sed.core.model.event.ISEDAnnotationListener;
 import org.key_project.sed.core.model.event.SEDAnnotationEvent;
 import org.key_project.sed.ui.util.SEDUIUtil;
 import org.key_project.util.eclipse.swt.viewer.AbstractLabelProvider;
-import org.key_project.util.java.ObjectUtil;
+import org.key_project.utils.java.ObjectUtil;
 
 /**
  * An {@link ITableLabelProvider} which shows the registered 

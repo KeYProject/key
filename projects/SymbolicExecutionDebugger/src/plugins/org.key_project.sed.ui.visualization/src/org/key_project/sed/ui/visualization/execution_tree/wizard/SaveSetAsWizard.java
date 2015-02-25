@@ -21,8 +21,8 @@ import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUti
 import org.key_project.sed.ui.visualization.execution_tree.wizard.page.ModelFileSaveOptionsWizardPage;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.swt.wizard.page.ContentWizardNewFileCreationPage;
-import org.key_project.util.java.thread.AbstractRunnableWithProgressAndResult;
-import org.key_project.util.java.thread.IRunnableWithProgressAndResult;
+import org.key_project.util.thread.AbstractRunnableWithProgressAndResult;
+import org.key_project.util.thread.IRunnableWithProgressAndResult;
 
 /**
  * This {@link Wizard} to save an {@link ILaunch} as SET file. 

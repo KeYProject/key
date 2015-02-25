@@ -43,7 +43,7 @@ import org.eclipse.ui.PlatformUI;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.viewer.ButtonViewer;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.StringUtil;
 
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector.ChoiceEntry;

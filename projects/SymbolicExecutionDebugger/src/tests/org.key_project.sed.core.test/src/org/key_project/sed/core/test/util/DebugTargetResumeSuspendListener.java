@@ -21,7 +21,7 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
-import org.key_project.util.java.ObjectUtil;
+import org.key_project.utils.java.ObjectUtil;
 
 /**
  * This {@link IDebugEventSetListener} can be used to execute some code

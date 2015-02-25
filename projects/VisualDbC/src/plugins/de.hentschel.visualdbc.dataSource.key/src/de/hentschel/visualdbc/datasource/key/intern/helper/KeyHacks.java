@@ -16,8 +16,8 @@ package de.hentschel.visualdbc.datasource.key.intern.helper;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
-import org.key_project.util.java.ObjectUtil;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.ObjectUtil;
+import org.key_project.utils.java.StringUtil;
 
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.uka.ilkd.key.java.Services;

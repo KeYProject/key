@@ -35,7 +35,6 @@ import org.eclipse.jface.resource.StringConverter;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
-import org.key_project.sed.core.model.ISEDGroupable;
 import org.key_project.sed.core.model.ISEDBaseMethodReturn;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchStatement;
@@ -44,6 +43,7 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISEDGroupable;
 import org.key_project.sed.core.model.ISEDIDElement;
 import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
@@ -60,9 +60,9 @@ import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.ISourcePathProvider;
 import org.key_project.sed.core.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.StringUtil;
-import org.key_project.util.java.XMLUtil;
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.StringUtil;
+import org.key_project.utils.java.XMLUtil;
 
 /**
  * <p>

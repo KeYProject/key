@@ -17,7 +17,7 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
-import org.key_project.util.java.ArrayUtil;
+import org.key_project.utils.java.ArrayUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
 

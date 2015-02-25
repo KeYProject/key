@@ -14,7 +14,6 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IPerspectiveDescriptor;
-import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
@@ -23,9 +22,9 @@ import org.key_project.sed.ui.visualization.test.Activator;
 import org.key_project.sed.ui.visualization.view.ExecutionTreeView;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
+import org.key_project.utils.java.IOUtil;
+import org.key_project.utils.java.StringUtil;
 
 /**
  * Provides the basic functionality to test the visualization of symbolic execution trees.

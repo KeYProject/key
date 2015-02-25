@@ -27,7 +27,7 @@ import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.sourcesummary.ISEDSourceModel;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.SEDBreadthFirstIterator;
-import org.key_project.util.java.ArrayUtil;
+import org.key_project.utils.java.ArrayUtil;
 
 /**
  * Provides a basic implementation of {@link ISEDThread}.

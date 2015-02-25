@@ -24,8 +24,8 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.ui.IMarkerResolution2;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
-import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
+import org.key_project.utils.java.StringUtil;
 
 /**
  * Provides the QuickFixes for the KeY{@link IMarker}.

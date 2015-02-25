@@ -32,8 +32,8 @@ import org.junit.runner.RunWith;
 import org.key_project.key4eclipse.test.suite.CustomParameterized;
 import org.key_project.key4eclipse.test.suite.CustomParameterized.CustomParameters;
 import org.key_project.key4eclipse.util.KeYExampleUtil;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.IOUtil;
+import org.key_project.utils.java.StringUtil;
 
 import de.uka.ilkd.key.core.Main;
 

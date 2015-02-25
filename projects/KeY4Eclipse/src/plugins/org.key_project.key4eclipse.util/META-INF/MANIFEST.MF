@@ -12,12 +12,12 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jdt.core;bundle-version="3.6.2";resolution:=optional,
  org.eclipse.jdt.ui;bundle-version="3.7.0";resolution:=optional,
  org.eclipse.emf.common;bundle-version="2.7.0",
- org.eclipse.ui.views.properties.tabbed;bundle-version="3.5.300";resolution:=optional
+ org.eclipse.ui.views.properties.tabbed;bundle-version="3.5.300";resolution:=optional,
+ org.key_project.key4eclipse;bundle-version="1.0.0";visibility:=reexport
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
-Export-Package: org.key_project.util.bean,
- org.key_project.util.eclipse,
+Export-Package: org.key_project.util.eclipse,
  org.key_project.util.eclipse.job,
  org.key_project.util.eclipse.preference,
  org.key_project.util.eclipse.preference.event,
@@ -30,5 +30,5 @@ Export-Package: org.key_project.util.bean,
  org.key_project.util.eclipse.swt.wizard.page,
  org.key_project.util.eclipse.view.editorInView,
  org.key_project.util.java,
- org.key_project.util.java.thread,
- org.key_project.util.jdt
+ org.key_project.util.jdt,
+ org.key_project.util.thread

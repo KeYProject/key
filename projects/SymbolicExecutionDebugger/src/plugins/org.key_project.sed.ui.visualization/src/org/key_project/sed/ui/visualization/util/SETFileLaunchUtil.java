@@ -24,8 +24,8 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.key_project.sed.core.util.LaunchUtil;
-import org.key_project.util.java.ObjectUtil;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.ObjectUtil;
+import org.key_project.utils.java.StringUtil;
 
 /**
  * Provides constants and functionality to launch SET files.

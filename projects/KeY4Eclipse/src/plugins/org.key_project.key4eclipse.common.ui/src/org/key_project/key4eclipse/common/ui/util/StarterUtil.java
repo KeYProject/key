@@ -33,10 +33,10 @@ import org.key_project.key4eclipse.common.ui.starter.IProjectStarter;
 import org.key_project.key4eclipse.common.ui.starter.IProofStarter;
 import org.key_project.key4eclipse.common.ui.wizard.StarterWizard;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+import org.key_project.utils.java.ObjectUtil;
+import org.key_project.utils.java.StringUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;

@@ -23,7 +23,7 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.key_project.keyide.ui.editor.KeYEditor;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.StringUtil;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;

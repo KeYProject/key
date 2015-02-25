@@ -11,13 +11,13 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.util.bean;
+package org.key_project.utils.bean;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-import org.key_project.util.java.ArrayUtil;
+import org.key_project.utils.java.ArrayUtil;
 
 /**
  * Implements the basic methods that a Java bean should have and 

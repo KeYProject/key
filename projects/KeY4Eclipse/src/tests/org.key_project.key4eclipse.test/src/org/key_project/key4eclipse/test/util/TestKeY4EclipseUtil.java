@@ -13,7 +13,7 @@
 
 package org.key_project.key4eclipse.test.util;
 
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.StringUtil;
 
 /**
  * Provides static methods that makes testing easier.

@@ -7,9 +7,9 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.IFilter;
 import org.key_project.util.jdt.JDTUtil;
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.IFilter;
 
 /**
  * Represents an observer function as known by KeY.

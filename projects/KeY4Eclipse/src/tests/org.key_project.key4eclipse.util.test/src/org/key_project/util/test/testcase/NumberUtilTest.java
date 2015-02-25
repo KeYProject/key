@@ -3,7 +3,7 @@ package org.key_project.util.test.testcase;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.key_project.util.java.NumberUtil;
+import org.key_project.utils.java.NumberUtil;
 
 /**
  * Tests for {@link NumberUtil}.

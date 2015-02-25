@@ -99,13 +99,12 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.viewer.ObservableTreeViewer;
 import org.key_project.util.eclipse.swt.viewer.event.IViewerUpdateListener;
 import org.key_project.util.eclipse.swt.viewer.event.ViewerUpdateEvent;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.ObjectUtil;
-import org.key_project.util.java.StringUtil;
-import org.key_project.util.java.thread.AbstractRunnableWithResult;
-import org.key_project.util.java.thread.IRunnableWithResult;
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.ObjectUtil;
+import org.key_project.utils.java.StringUtil;
+import org.key_project.utils.java.thread.AbstractRunnableWithResult;
+import org.key_project.utils.java.thread.IRunnableWithResult;
 
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector.ChoiceEntry;
@@ -1071,7 +1070,7 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
             if (file != null) {
                File localFile = ResourceUtil.getLocation(file);
                return localFile != null ? 
-                      PROTOCOL_FILE_PREFIX + IOUtil.encodeURIPath(localFile.getAbsolutePath()) : 
+                      PROTOCOL_FILE_PREFIX + ResourceUtil.encodeURIPath(localFile.getAbsolutePath()) : 
                       PROTOCOL_RESOURCE + file.getFullPath();
             }
             else {
@@ -1394,7 +1393,7 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
             }
             else if (event.location.startsWith(PROTOCOL_FILE_PREFIX)) {
                String location = event.location.substring(PROTOCOL_FILE_PREFIX.length());
-               File locationFile = new File(IOUtil.decodeURIPath(location));
+               File locationFile = new File(ResourceUtil.decodeURIPath(location));
                files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(new Path(locationFile.getAbsolutePath()));
             }
             if (!ArrayUtil.isEmpty(files)) {

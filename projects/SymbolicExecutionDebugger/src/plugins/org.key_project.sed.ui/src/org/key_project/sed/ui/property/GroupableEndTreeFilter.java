@@ -15,9 +15,9 @@ package org.key_project.sed.ui.property;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jface.viewers.IFilter;
-import org.key_project.sed.core.model.ISEDGroupable;
 import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.util.java.ArrayUtil;
+import org.key_project.sed.core.model.ISEDGroupable;
+import org.key_project.utils.java.ArrayUtil;
 
 /**
  * {@link IFilter} implementation used to check if

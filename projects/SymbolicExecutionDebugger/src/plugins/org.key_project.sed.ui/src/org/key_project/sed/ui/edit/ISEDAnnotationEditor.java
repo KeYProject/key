@@ -5,7 +5,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.util.bean.IBean;
+import org.key_project.utils.bean.IBean;
 
 /**
  * An editor used to edit {@link ISEDAnnotation}s.

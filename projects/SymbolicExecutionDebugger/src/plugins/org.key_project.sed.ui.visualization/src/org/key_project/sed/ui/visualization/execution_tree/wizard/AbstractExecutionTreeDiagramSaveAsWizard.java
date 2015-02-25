@@ -36,7 +36,7 @@ import org.key_project.sed.ui.visualization.execution_tree.wizard.page.ModelFile
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.wizard.page.ContentWizardNewFileCreationPage;
-import org.key_project.util.java.ObjectUtil;
+import org.key_project.utils.java.ObjectUtil;
 
 /**
  * A {@link BasicNewResourceWizard} which is used to define a diagram and model file.

@@ -41,8 +41,8 @@ import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.CreateDebugNodeWizard;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.ObjectUtil;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.ObjectUtil;
+import org.key_project.utils.java.StringUtil;
 
 /**
  * {@link WizardPage} to define the initial values of new {@link ISEDDebugNode}s.

@@ -65,8 +65,8 @@ import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.java.IOUtil;
 import org.key_project.util.jdt.JDTUtil;
+import org.key_project.utils.java.IOUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.TermCreationException;

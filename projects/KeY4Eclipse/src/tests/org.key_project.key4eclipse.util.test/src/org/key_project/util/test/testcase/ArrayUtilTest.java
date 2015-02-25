@@ -18,10 +18,10 @@ import java.util.Comparator;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.IFilter;
+import org.key_project.utils.java.ObjectUtil;
+import org.key_project.utils.java.StringUtil;
 
 /**
  * Tests for {@link ArrayUtil}

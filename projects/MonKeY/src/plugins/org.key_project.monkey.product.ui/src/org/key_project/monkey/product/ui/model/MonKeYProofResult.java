@@ -13,7 +13,8 @@
 
 package org.key_project.monkey.product.ui.model;
 
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.StringUtil;
+
 
 /**
  * Represents the proof status of a {@link MonKeYProof}.

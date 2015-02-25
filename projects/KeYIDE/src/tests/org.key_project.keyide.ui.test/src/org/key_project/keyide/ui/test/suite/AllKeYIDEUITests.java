@@ -15,7 +15,8 @@ package org.key_project.keyide.ui.test.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.key_project.keyide.ui.test.testcase.*;
+import org.key_project.keyide.ui.test.testcase.OutlineContentAndLabelProviderTest;
+import org.key_project.keyide.ui.test.testcase.TreeViewerIteratorTest;
 
 /**
  * Run all contained JUnit 4 test cases.

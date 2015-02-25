@@ -15,7 +15,7 @@ package org.key_project.util.test.testcase;
 
 import java.beans.PropertyChangeEvent;
 
-import org.key_project.util.bean.Bean;
+import org.key_project.utils.bean.Bean;
 
 /**
  * Tests for {@link Bean}.

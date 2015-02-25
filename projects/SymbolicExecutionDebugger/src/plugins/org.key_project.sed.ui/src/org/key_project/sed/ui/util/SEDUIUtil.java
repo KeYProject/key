@@ -69,14 +69,14 @@ import org.key_project.sed.ui.edit.ISEDAnnotationEditor;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.ObjectUtil;
-import org.key_project.util.java.StringUtil;
-import org.key_project.util.java.thread.AbstractRunnableWithException;
-import org.key_project.util.java.thread.AbstractRunnableWithResult;
-import org.key_project.util.java.thread.IRunnableWithException;
-import org.key_project.util.java.thread.IRunnableWithResult;
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.ObjectUtil;
+import org.key_project.utils.java.StringUtil;
+import org.key_project.utils.java.thread.AbstractRunnableWithException;
+import org.key_project.utils.java.thread.AbstractRunnableWithResult;
+import org.key_project.utils.java.thread.IRunnableWithException;
+import org.key_project.utils.java.thread.IRunnableWithResult;
 
 /**
  * Provides static methods which makes working with the Eclipse Debug UI and 

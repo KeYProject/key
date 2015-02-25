@@ -24,7 +24,7 @@ import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandle
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.ArrayUtil;
+import org.key_project.utils.java.ArrayUtil;
 
 public class ConvertJavaToKeYProjectHandler extends AbstractSaveExecutionHandler {
    /**

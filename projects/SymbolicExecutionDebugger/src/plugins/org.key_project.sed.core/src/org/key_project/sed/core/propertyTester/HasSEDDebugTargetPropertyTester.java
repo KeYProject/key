@@ -17,8 +17,8 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.IFilter;
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.IFilter;
 
 /**
  * This property tester can be used to make sure that an {@link ILaunch} 

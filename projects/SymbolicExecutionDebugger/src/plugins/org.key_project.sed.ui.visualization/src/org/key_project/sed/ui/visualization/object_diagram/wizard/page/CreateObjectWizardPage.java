@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.key_project.sed.ui.visualization.model.od.ODObject;
 import org.key_project.sed.ui.visualization.object_diagram.wizard.CreateObjectWizard;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.StringUtil;
 
 /**
  * {@link WizardPage} to define the initial values of new {@link ODObject}s.

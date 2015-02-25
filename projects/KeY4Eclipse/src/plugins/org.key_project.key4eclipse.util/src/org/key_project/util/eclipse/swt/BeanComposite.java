@@ -19,8 +19,8 @@ import java.beans.PropertyChangeSupport;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewPart;
-import org.key_project.util.bean.IBean;
-import org.key_project.util.java.ArrayUtil;
+import org.key_project.utils.bean.IBean;
+import org.key_project.utils.java.ArrayUtil;
 
 /**
  * A {@link Composite} which is also an {@link IBean} and allows to

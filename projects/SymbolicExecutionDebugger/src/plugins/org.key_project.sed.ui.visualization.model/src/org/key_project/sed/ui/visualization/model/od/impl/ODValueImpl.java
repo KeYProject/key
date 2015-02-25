@@ -20,12 +20,9 @@
 package org.key_project.sed.ui.visualization.model.od.impl;
 
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.ecore.EClass;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
-
 import org.key_project.sed.ui.visualization.model.od.ODPackage;
 import org.key_project.sed.ui.visualization.model.od.ODValue;
 

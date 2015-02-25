@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.util.java.thread;
+package org.key_project.utils.java.thread;
 
 /**
  * <p>

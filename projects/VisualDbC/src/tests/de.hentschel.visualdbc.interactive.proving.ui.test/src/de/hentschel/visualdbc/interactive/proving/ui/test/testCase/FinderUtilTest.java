@@ -30,6 +30,7 @@ import de.hentschel.visualdbc.interactive.proving.ui.finder.IDbcFinder;
 import de.hentschel.visualdbc.interactive.proving.ui.finder.IDbcFinderFactory;
 import de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DSFinderFactory0;
 import de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DSFinderFactory1;
+import de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DSFinderFactory1.Finder1;
 import de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DSFinderFactory2;
 import de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DSFinderFactoryMinus1;
 import de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DSFinderFactoryMinus2;
@@ -38,7 +39,6 @@ import de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DbcFinderF
 import de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DbcFinderFactory2;
 import de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DbcFinderFactoryMinus1;
 import de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DbcFinderFactoryMinus2;
-import de.hentschel.visualdbc.interactive.proving.ui.test.dummyFinder.DSFinderFactory1.Finder1;
 import de.hentschel.visualdbc.interactive.proving.ui.util.FinderUtil;
 
 /**

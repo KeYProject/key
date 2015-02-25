@@ -21,7 +21,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.keyide.ui.Activator;
 import org.key_project.keyide.ui.providers.BranchFolder;
-import org.key_project.keyide.ui.util.LogUtil;
 import org.key_project.util.eclipse.BundleUtil;
 
 import de.uka.ilkd.key.proof.Node;

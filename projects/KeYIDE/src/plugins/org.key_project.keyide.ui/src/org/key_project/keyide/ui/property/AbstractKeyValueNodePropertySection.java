@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.StringUtil;
 
 /**
  * Provides the basic functionality to show multiple key value pairs.

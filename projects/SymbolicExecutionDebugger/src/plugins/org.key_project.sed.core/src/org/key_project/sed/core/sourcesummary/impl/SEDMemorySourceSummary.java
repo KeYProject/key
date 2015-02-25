@@ -4,8 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.sed.core.sourcesummary.ISEDSourceSummary;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
 
 /**
  * The default implementation of {@link ISEDSourceSummary}.

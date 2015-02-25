@@ -8,8 +8,8 @@ import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
 import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.IFilter;
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.IFilter;
 
 /**
  * The {@link ISEDAnnotationType} used for breakpoints.

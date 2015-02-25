@@ -37,11 +37,11 @@ import org.key_project.key4eclipse.resources.ui.view.VerificationStatusView;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.ObjectUtil;
-import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.SWTBotCustomProgressBar;
 import org.key_project.util.test.util.TestUtilsUtil;
+import org.key_project.utils.java.IOUtil;
+import org.key_project.utils.java.ObjectUtil;
+import org.key_project.utils.java.StringUtil;
 
 /**
  * SWTBot tests for {@link VerificationStatusView}.

@@ -20,7 +20,6 @@
 package org.key_project.sed.ui.visualization.model.od.impl;
 
 import org.eclipse.emf.ecore.EClass;
-
 import org.key_project.sed.ui.visualization.model.od.ODPackage;
 import org.key_project.sed.ui.visualization.model.od.ODState;
 

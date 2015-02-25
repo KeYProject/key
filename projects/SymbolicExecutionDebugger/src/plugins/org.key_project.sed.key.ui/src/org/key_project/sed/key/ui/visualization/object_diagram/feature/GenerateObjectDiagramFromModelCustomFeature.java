@@ -37,7 +37,7 @@ import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUti
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.ObjectUtil;
+import org.key_project.utils.java.ObjectUtil;
 
 import de.uka.ilkd.key.gui.smt.CETree;
 import de.uka.ilkd.key.smt.model.Heap;

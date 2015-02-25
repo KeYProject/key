@@ -28,10 +28,12 @@ import java.awt.image.ImageProducer;
 import java.awt.image.IndexColorModel;
 import java.awt.image.RGBImageFilter;
 import java.awt.image.WritableRaster;
+import java.io.File;
 
 import javax.swing.Icon;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
@@ -53,6 +55,32 @@ public final class ImageUtil {
      * Forbid instances.
      */
     private ImageUtil() {
+    }
+    
+    /**
+     * <p>
+     * Returns the file system icon for the given existing file.
+     * </p>
+     * <p>
+     * <b>Attention: </b> The caller is responsible to dispose the created {@link Image}!
+     * </p>
+     * @param file The file for that the system icon is needed.
+     * @return The file system icon or {@code null} if no existing file is given.
+     */
+    public static org.eclipse.swt.graphics.Image getFileSystemIcon(File file) {
+        org.eclipse.swt.graphics.Image image = null;
+        if (file != null && file.exists()) {
+            FileSystemView view = FileSystemView.getFileSystemView();
+            if (view != null) {
+                Icon icon = view.getSystemIcon(file);
+                if (icon != null) {
+                    BufferedImage bufferedImage = ImageUtil.toBufferedImage(icon);
+                    ImageData imageData = ImageUtil.convertToImageData(bufferedImage);
+                    image = new org.eclipse.swt.graphics.Image(Display.getDefault(), imageData);
+                }
+            }
+        }
+        return image;
     }
     
     /**

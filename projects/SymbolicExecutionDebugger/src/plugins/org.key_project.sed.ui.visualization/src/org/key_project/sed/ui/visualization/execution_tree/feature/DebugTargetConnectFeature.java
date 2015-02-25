@@ -36,7 +36,7 @@ import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeD
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
-import org.key_project.util.java.CollectionUtil;
+import org.key_project.utils.java.CollectionUtil;
 
 /**
  * An {@link ICustomFeature} that connects the given {@link Diagram}

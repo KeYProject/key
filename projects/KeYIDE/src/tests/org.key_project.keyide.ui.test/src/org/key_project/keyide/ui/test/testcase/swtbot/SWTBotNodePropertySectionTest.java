@@ -21,8 +21,8 @@ import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.property.NodePropertySection;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
-import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
+import org.key_project.utils.java.ObjectUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Node;

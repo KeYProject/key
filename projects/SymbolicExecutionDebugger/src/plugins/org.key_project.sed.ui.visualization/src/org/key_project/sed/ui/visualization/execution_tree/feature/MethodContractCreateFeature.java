@@ -19,8 +19,8 @@ import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.ISEDMethodContract;
+import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodContract;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
 

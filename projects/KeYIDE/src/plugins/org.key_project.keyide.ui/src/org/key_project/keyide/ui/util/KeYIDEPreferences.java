@@ -13,6 +13,7 @@
 
 package org.key_project.keyide.ui.util;
 
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.key_project.keyide.ui.Activator;
 

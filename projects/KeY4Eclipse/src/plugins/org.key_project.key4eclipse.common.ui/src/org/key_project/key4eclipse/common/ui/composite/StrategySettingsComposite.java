@@ -41,9 +41,9 @@ import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.util.eclipse.swt.IntegerVerifyListener;
-import org.key_project.util.java.ObjectUtil;
-import org.key_project.util.java.StringUtil;
-import org.key_project.util.java.XMLUtil;
+import org.key_project.utils.java.ObjectUtil;
+import org.key_project.utils.java.StringUtil;
+import org.key_project.utils.java.XMLUtil;
 
 import de.uka.ilkd.key.core.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;

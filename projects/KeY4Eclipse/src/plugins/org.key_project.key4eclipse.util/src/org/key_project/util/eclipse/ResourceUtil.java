@@ -40,8 +40,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.key_project.util.Activator;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.IOUtil;
+import org.key_project.utils.java.StringUtil;
 
 /**
  * Provides static methods to work with workspace resources.
@@ -52,6 +52,39 @@ public class ResourceUtil {
     * Forbid instances by this private constructor.
     */
    private ResourceUtil() {
+   }
+   
+   /**
+    * Encodes the given path as URI path by escaping special characters
+    * like spaces.
+    * @param path The path to encode.
+    * @return The encoded URI path.
+    */
+   public static String encodeURIPath(String path) {
+      if (path != null) {
+         org.eclipse.emf.common.util.URI uri = org.eclipse.emf.common.util.URI.createFileURI(path);
+         return uri.devicePath();
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Decodes the given URI path by interpreting three-digit escape sequences as 
+    * the bytes of a UTF-8 encoded character and replacing them with the 
+    * characters they represent. Incomplete escape sequences are ignored and 
+    * invalid UTF-8 encoded bytes are treated as extended ASCII characters.
+    * @param uriPath The URI path to decode.
+    * @return The decoded URI path.
+    */
+   public static String decodeURIPath(String uriPath) {
+      if (uriPath != null) {
+         return org.eclipse.emf.common.util.URI.decode(uriPath);
+      }
+      else {
+         return null;
+      }
    }
    
    /**

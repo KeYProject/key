@@ -61,9 +61,9 @@ import org.key_project.sed.core.util.SEDAnnotationUtil;
 import org.key_project.sed.core.util.SEDBreadthFirstIterator;
 import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.IFilter;
+import org.key_project.utils.java.ObjectUtil;
 
 /**
  * <p>

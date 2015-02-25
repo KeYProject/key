@@ -42,8 +42,8 @@ import org.eclipse.gmf.runtime.diagram.ui.requests.EditCommandRequestWrapper;
 import org.eclipse.gmf.runtime.emf.core.util.EObjectAdapter;
 import org.eclipse.gmf.runtime.emf.type.core.IHintedType;
 import org.eclipse.gmf.runtime.emf.type.core.requests.SetRequest;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.StringUtil;
 
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
 import de.hentschel.visualdbc.datasource.model.IDSProof;

@@ -28,8 +28,8 @@ import org.key_project.key4eclipse.resources.projectinfo.MethodInfo;
 import org.key_project.key4eclipse.resources.projectinfo.ObserverFunctionInfo;
 import org.key_project.key4eclipse.resources.ui.Activator;
 import org.key_project.util.eclipse.BundleUtil;
-import org.key_project.util.java.thread.AbstractRunnableWithResult;
-import org.key_project.util.java.thread.IRunnableWithResult;
+import org.key_project.utils.java.thread.AbstractRunnableWithResult;
+import org.key_project.utils.java.thread.IRunnableWithResult;
 
 /**
  * <p>

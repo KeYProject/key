@@ -42,7 +42,7 @@ import org.key_project.sed.core.sourcesummary.ISEDSourceSummary;
 import org.key_project.sed.ui.util.LaunchViewManager;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.CollectionUtil;
+import org.key_project.utils.java.CollectionUtil;
 
 /**
  * <p>

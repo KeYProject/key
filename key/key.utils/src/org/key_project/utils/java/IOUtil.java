@@ -11,9 +11,8 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.util.java;
+package org.key_project.utils.java;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,6 +22,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.math.BigInteger;
+import java.net.URI;
 import java.net.URL;
 import java.security.CodeSource;
 import java.security.MessageDigest;
@@ -30,16 +30,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.swing.Icon;
-import javax.swing.filechooser.FileSystemView;
-
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.widgets.Display;
-import org.key_project.util.eclipse.swt.ImageUtil;
 
 /**
  * Provides static methods to work with java IO.
@@ -253,32 +243,6 @@ public final class IOUtil {
 
    /**
     * <p>
-    * Returns the file system icon for the given existing file.
-    * </p>
-    * <p>
-    * <b>Attention: </b> The caller is responsible to dispose the created {@link Image}!
-    * </p>
-    * @param file The file for that the system icon is needed.
-    * @return The file system icon or {@code null} if no existing file is given.
-    */
-   public static Image getFileSystemIcon(File file) {
-       Image image = null;
-       if (file != null && file.exists()) {
-           FileSystemView view = FileSystemView.getFileSystemView();
-           if (view != null) {
-               Icon icon = view.getSystemIcon(file);
-               if (icon != null) {
-                   BufferedImage bufferedImage = ImageUtil.toBufferedImage(icon);
-                   ImageData imageData = ImageUtil.convertToImageData(bufferedImage);
-                   image = new Image(Display.getDefault(), imageData);
-               }
-           }
-       }
-       return image;
-   }
-
-   /**
-    * <p>
     * Computes line information for each text line in the given {@link File}.
     * A {@link LineInformation} consists of the offset from the beginning of the
     * file for each line and the indices of tabs {@code '\t'} in each line.
@@ -446,7 +410,7 @@ public final class IOUtil {
             this.tabIndices = new int[tabIndices.size()];
             int i = 0;
             for (Integer index : tabIndices) {
-               Assert.isNotNull(index);
+               assert index != null;
                this.tabIndices[i] = index.intValue();
                i++;
             }
@@ -696,39 +660,6 @@ public final class IOUtil {
             target.close();
          }
       }   
-   }
-   
-   /**
-    * Encodes the given path as URI path by escaping special characters
-    * like spaces.
-    * @param path The path to encode.
-    * @return The encoded URI path.
-    */
-   public static String encodeURIPath(String path) {
-      if (path != null) {
-         URI uri = URI.createFileURI(path);
-         return uri.devicePath();
-      }
-      else {
-         return null;
-      }
-   }
-
-   /**
-    * Decodes the given URI path by interpreting three-digit escape sequences as 
-    * the bytes of a UTF-8 encoded character and replacing them with the 
-    * characters they represent. Incomplete escape sequences are ignored and 
-    * invalid UTF-8 encoded bytes are treated as extended ASCII characters.
-    * @param uriPath The URI path to decode.
-    * @return The decoded URI path.
-    */
-   public static String decodeURIPath(String uriPath) {
-      if (uriPath != null) {
-         return URI.decode(uriPath);
-      }
-      else {
-         return null;
-      }
    }
 
    /**

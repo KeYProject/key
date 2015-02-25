@@ -28,9 +28,9 @@ import org.key_project.key4eclipse.resources.test.Activator;
 import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.BundleUtil;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IOUtil;
+import org.key_project.utils.java.StringUtil;
 
 // TODO: Test also the line number in all tests!
 public class MarkerTests extends AbstractResourceTest {

@@ -50,6 +50,11 @@
 			<type>2</type>
 			<locationURI>key_rep/key/key.core</locationURI>
 		</link>
+      <link>
+         <name>key.core.tests</name>
+         <type>2</type>
+         <locationURI>key_rep/key/key.core.tests</locationURI>
+      </link>
 		<link>
 			<name>key.ui</name>
 			<type>2</type>
@@ -60,5 +65,10 @@
 			<type>2</type>
 			<locationURI>key_rep/key/key.utils</locationURI>
 		</link>
+      <link>
+         <name>key.utils.tests</name>
+         <type>2</type>
+         <locationURI>key_rep/key/key.utils.tests</locationURI>
+      </link>
 	</linkedResources>
 </projectDescription>

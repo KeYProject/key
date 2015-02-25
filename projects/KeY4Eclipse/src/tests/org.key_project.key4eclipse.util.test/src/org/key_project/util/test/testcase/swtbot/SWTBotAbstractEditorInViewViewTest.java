@@ -34,12 +34,12 @@ import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
 import org.key_project.util.eclipse.view.editorInView.EditorInViewEditorSite;
 import org.key_project.util.eclipse.view.editorInView.EditorInViewWorkbenchPage;
 import org.key_project.util.eclipse.view.editorInView.IGlobalEnablement;
-import org.key_project.util.java.thread.AbstractRunnableWithResult;
-import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.util.PropertyChangeListenerLogger;
 import org.key_project.util.test.util.TestUtilsUtil;
 import org.key_project.util.test.view.GraphitiEditorInViewView;
 import org.key_project.util.test.view.TextControlEditorInViewView;
+import org.key_project.utils.java.thread.AbstractRunnableWithResult;
+import org.key_project.utils.java.thread.IRunnableWithResult;
 
 /**
  * Tests {@link AbstractEditorInViewView}, {@link EditorInViewEditorSite} and

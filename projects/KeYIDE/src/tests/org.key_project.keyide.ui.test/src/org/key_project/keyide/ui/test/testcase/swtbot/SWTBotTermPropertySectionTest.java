@@ -21,10 +21,10 @@ import org.junit.Test;
 import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.property.TermPropertySection;
-import org.key_project.util.java.ObjectUtil;
-import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 import org.key_project.util.test.util.TestUtilsUtil;
+import org.key_project.utils.java.ObjectUtil;
+import org.key_project.utils.java.StringUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.Term;

@@ -29,8 +29,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.XMLUtil;
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.XMLUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ClassTree;

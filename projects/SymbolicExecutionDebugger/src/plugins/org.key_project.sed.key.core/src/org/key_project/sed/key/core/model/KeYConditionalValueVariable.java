@@ -20,7 +20,7 @@ import org.eclipse.debug.core.model.IValue;
 import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDVariable;
 import org.key_project.sed.core.util.LogUtil;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.StringUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;

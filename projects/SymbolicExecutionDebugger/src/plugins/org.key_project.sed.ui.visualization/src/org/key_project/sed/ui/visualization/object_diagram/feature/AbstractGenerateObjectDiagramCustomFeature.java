@@ -34,7 +34,7 @@ import org.key_project.sed.ui.visualization.model.od.ODAssociation;
 import org.key_project.sed.ui.visualization.model.od.ODModel;
 import org.key_project.sed.ui.visualization.model.od.ODObject;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
-import org.key_project.util.java.CollectionUtil;
+import org.key_project.utils.java.CollectionUtil;
 
 /**
  * Provides the basic functionality to generate object diagrams.

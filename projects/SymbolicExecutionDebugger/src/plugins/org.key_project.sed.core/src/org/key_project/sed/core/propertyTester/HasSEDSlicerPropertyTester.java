@@ -18,7 +18,7 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.slicing.ISEDSlicer;
-import org.key_project.util.java.ArrayUtil;
+import org.key_project.utils.java.ArrayUtil;
 
 /**
  * This property tester can be used to make sure that an {@link ISEDVariable} 

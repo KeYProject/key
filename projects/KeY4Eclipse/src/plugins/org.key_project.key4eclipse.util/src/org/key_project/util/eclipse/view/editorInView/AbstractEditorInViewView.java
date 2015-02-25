@@ -39,8 +39,8 @@ import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.services.IEvaluationService;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.view.AbstractBeanViewPart;
-import org.key_project.util.java.ObjectUtil;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.ObjectUtil;
+import org.key_project.utils.java.StringUtil;
 
 /**
  * <p>

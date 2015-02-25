@@ -42,8 +42,8 @@ import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
 import org.key_project.keyide.ui.perspectives.KeYPerspective;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.jdt.JDTUtil;
+import org.key_project.utils.java.CollectionUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;

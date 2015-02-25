@@ -43,7 +43,7 @@ import org.eclipse.ui.internal.PartListenerList2;
 import org.eclipse.ui.internal.PartSite;
 import org.eclipse.ui.services.IDisposable;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.java.ObjectUtil;
+import org.key_project.utils.java.ObjectUtil;
 
 /**
  * <p>

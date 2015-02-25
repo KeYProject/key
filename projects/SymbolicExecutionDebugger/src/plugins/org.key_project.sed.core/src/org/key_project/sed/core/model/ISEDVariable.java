@@ -16,6 +16,7 @@ package org.key_project.sed.core.model;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDVariable;
+import org.key_project.sed.core.model.memory.SEDMemoryVariable;
 
 /**
  * A variable of a node in the symbolic execution tree,

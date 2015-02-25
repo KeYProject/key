@@ -13,9 +13,9 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.util.SEDAnnotationUtil;
 import org.key_project.sed.ui.wizard.page.NewCommentWizardPage;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.IFilter;
+import org.key_project.utils.java.ObjectUtil;
 
 /**
  * The new comment {@link Wizard} which creates a comment via {@link CommentAnnotation}s.

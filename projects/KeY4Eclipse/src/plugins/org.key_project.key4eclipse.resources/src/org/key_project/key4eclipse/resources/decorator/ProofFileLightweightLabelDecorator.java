@@ -26,7 +26,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
-import org.key_project.util.java.CollectionUtil;
+import org.key_project.utils.java.CollectionUtil;
 
 /**
  * Decorates the proof folder of KeY projects.

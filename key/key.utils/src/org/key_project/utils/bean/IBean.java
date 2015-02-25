@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.util.bean;
+package org.key_project.utils.bean;
 
 import java.beans.PropertyChangeListener;
 

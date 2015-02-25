@@ -40,7 +40,7 @@ import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.sed.ui.util.SEDImages;
 import org.key_project.sed.ui.util.SEDUIUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.ArrayUtil;
+import org.key_project.utils.java.ArrayUtil;
 
 /**
  * This {@link Dialog} is used to list all {@link ISEDAnnotationLink}s of

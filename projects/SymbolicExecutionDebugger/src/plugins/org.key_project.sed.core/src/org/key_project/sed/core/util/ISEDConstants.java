@@ -16,8 +16,8 @@ package org.key_project.sed.core.util;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.PresentationContext;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.TreeModelViewer;
 import org.key_project.sed.core.model.ISEDBaseMethodReturn;
-import org.key_project.sed.core.model.ISEDGroupable;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDGroupable;
 import org.key_project.sed.core.model.ISEDMethodCall;
 
 /**

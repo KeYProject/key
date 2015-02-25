@@ -1,4 +1,4 @@
-package org.key_project.util.java;
+package org.key_project.utils.java;
 
 /**
  * Provides utility methods to work with numbers.

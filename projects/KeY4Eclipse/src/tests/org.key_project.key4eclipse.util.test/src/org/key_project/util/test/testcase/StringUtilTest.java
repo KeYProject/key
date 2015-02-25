@@ -18,7 +18,7 @@ import java.util.Comparator;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.StringUtil;
 
 /**
  * Tests for {@link StringUtil}

@@ -21,10 +21,14 @@ package org.key_project.sed.ui.visualization.model.od.util;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
-
 import org.eclipse.emf.ecore.util.Switch;
-
-import org.key_project.sed.ui.visualization.model.od.*;
+import org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer;
+import org.key_project.sed.ui.visualization.model.od.ODAssociation;
+import org.key_project.sed.ui.visualization.model.od.ODModel;
+import org.key_project.sed.ui.visualization.model.od.ODObject;
+import org.key_project.sed.ui.visualization.model.od.ODPackage;
+import org.key_project.sed.ui.visualization.model.od.ODState;
+import org.key_project.sed.ui.visualization.model.od.ODValue;
 
 /**
  * <!-- begin-user-doc -->

@@ -23,12 +23,12 @@ import de.hentschel.visualdbc.datasource.key.test.testCase.EnumTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.GeneralizationTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.InnerTypeTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.InvariantTest;
-import de.hentschel.visualdbc.datasource.key.test.testCase.LogUtilTest;
-import de.hentschel.visualdbc.datasource.key.test.testCase.ModelFieldTest;
-import de.hentschel.visualdbc.datasource.key.test.testCase.TypeTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.KeyConnectionTest;
+import de.hentschel.visualdbc.datasource.key.test.testCase.LogUtilTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.MethodTest;
+import de.hentschel.visualdbc.datasource.key.test.testCase.ModelFieldTest;
 import de.hentschel.visualdbc.datasource.key.test.testCase.PackageTest;
+import de.hentschel.visualdbc.datasource.key.test.testCase.TypeTest;
 
 /**
  * Run all contained JUnit 4 test cases.

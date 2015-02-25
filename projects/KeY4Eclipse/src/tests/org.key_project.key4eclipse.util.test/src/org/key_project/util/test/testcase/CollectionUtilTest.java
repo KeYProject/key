@@ -24,9 +24,9 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.IFilterWithException;
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+import org.key_project.utils.java.IFilterWithException;
 
 /**
  * Tests for {@link CollectionUtil}.

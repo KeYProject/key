@@ -15,7 +15,7 @@ package org.key_project.util.eclipse.swt;
 
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.StringUtil;
 
 /**
  * This {@link VerifyListener} can be used to ensure that valid integers are defined.

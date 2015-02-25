@@ -25,7 +25,7 @@ import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.SEDPreorderIterator;
-import org.key_project.util.java.ObjectUtil;
+import org.key_project.utils.java.ObjectUtil;
 
 /**
  * <p>

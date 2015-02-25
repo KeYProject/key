@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.key_project.util.eclipse.job.ScheduledJobCollector;
-import org.key_project.util.java.IFilter;
+import org.key_project.utils.java.IFilter;
 
 /**
  * Tests for {@link ScheduledJobCollector}.

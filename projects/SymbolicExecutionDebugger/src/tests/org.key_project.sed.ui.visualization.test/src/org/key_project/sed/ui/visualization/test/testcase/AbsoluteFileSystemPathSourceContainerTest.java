@@ -21,8 +21,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
 import org.junit.Test;
 import org.key_project.sed.ui.visualization.launch.AbsoluteFileSystemPathSourceContainer;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.ObjectUtil;
+import org.key_project.utils.java.IOUtil;
+import org.key_project.utils.java.ObjectUtil;
 
 /**
  * Tests for {@link AbsoluteFileSystemPathSourceContainer}.

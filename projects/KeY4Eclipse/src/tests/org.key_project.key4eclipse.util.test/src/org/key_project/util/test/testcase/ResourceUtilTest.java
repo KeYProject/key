@@ -30,16 +30,56 @@ import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.ResourceUtil.IFileOpener;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.IOUtil;
+import org.key_project.utils.java.StringUtil;
 
 /**
  * Contains tests for {@link ResourceUtil}
  * @author Martin Hentschel
  */
 public class ResourceUtilTest extends TestCase {
+   /**
+    * {@link ResourceUtil#encodeURIPath(String)}.
+    */
+   @Test
+   public void testEncodeURIPath() {
+      // Test null
+      assertEquals(null, ResourceUtil.encodeURIPath(null));
+      // Test normal URIs
+      assertEquals("A", ResourceUtil.encodeURIPath("A"));
+      assertEquals("A/B", ResourceUtil.encodeURIPath("A/B"));
+      assertEquals("/Users/MyName/MyFile.html", ResourceUtil.encodeURIPath("/Users/MyName/MyFile.html"));
+      assertEquals("C:/Users/MyName/MyFile.html", ResourceUtil.encodeURIPath("C:\\Users\\MyName\\MyFile.html"));
+      assertEquals("./MyName/MyFile.html", ResourceUtil.encodeURIPath(".\\MyName\\MyFile.html"));
+      assertEquals("./MyName/MyFile.html", ResourceUtil.encodeURIPath("./MyName/MyFile.html"));
+      assertEquals("../../MyName/MyFile.html", ResourceUtil.encodeURIPath("..\\..\\MyName\\MyFile.html"));
+      assertEquals("../../MyName/MyFile.html", ResourceUtil.encodeURIPath("../../MyName/MyFile.html"));
+      // Test URIs with spaces
+      assertEquals("/Users/My%20Name/My%20File.html", ResourceUtil.encodeURIPath("/Users/My Name/My File.html"));
+      assertEquals("C:/Users/My%20Name/My%20File.html", ResourceUtil.encodeURIPath("C:\\Users\\My Name\\My File.html"));
+   }
+   
+   /**
+    * {@link ResourceUtil#decodeURIPath(String)}.
+    */
+   @Test
+   public void testDecodeURIPath() {
+      // Test null
+      assertEquals(null, ResourceUtil.decodeURIPath(null));
+      // Test normal URIs
+      assertEquals("A", ResourceUtil.decodeURIPath("A"));
+      assertEquals("A/B", ResourceUtil.decodeURIPath("A/B"));
+      assertEquals("/Users/MyName/MyFile.html", ResourceUtil.decodeURIPath("/Users/MyName/MyFile.html"));
+      assertEquals("C:/Users/MyName/MyFile.html", ResourceUtil.decodeURIPath("C:/Users/MyName/MyFile.html"));
+      assertEquals("./MyName/MyFile.html", ResourceUtil.decodeURIPath("./MyName/MyFile.html"));
+      assertEquals("../../MyName/MyFile.html", ResourceUtil.decodeURIPath("../../MyName/MyFile.html"));
+      // Test URIs with spaces
+      assertEquals("/Users/My Name/My File.html", ResourceUtil.decodeURIPath("/Users/My%20Name/My%20File.html"));
+      assertEquals("C:/Users/My Name/My File.html", ResourceUtil.decodeURIPath("C:/Users/My%20Name/My%20File.html"));
+   }
+   
    /**
     * Tests {@link ResourceUtil#createFolder(org.eclipse.core.resources.IContainer, String)}.
     */

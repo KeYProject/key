@@ -21,7 +21,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.ui.property.ISEDDebugNodeTabContent;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.java.ArrayUtil;
+import org.key_project.utils.java.ArrayUtil;
 
 /**
  * {@link IFilter} implementation used to check if

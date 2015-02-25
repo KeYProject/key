@@ -118,17 +118,19 @@ import org.key_project.swtbot.swing.bot.finder.waits.Conditions;
 import org.key_project.util.eclipse.Logger;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.setup.SetupStartup;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.ObjectUtil;
-import org.key_project.util.java.StringUtil;
-import org.key_project.util.java.thread.AbstractRunnableWithException;
-import org.key_project.util.java.thread.AbstractRunnableWithResult;
-import org.key_project.util.java.thread.IRunnableWithException;
-import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.internal.ContextMenuHelper;
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
+import org.key_project.utils.java.IOUtil;
+import org.key_project.utils.java.ObjectUtil;
+import org.key_project.utils.java.StringUtil;
+import org.key_project.utils.java.thread.AbstractRunnableWithException;
+import org.key_project.utils.java.thread.AbstractRunnableWithResult;
+import org.key_project.utils.java.thread.IRunnableWithException;
+import org.key_project.utils.java.thread.IRunnableWithResult;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -143,8 +145,6 @@ import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
-import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -1436,7 +1436,7 @@ public class TestUtilsUtil {
       KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
       assertNotNull(containerKJT);
       ImmutableList<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
-      IProgramMethod pm = JavaUtil.search(pms, new IFilter<IProgramMethod>() {
+      IProgramMethod pm = CollectionUtil.search(pms, new IFilter<IProgramMethod>() {
          @Override
          public boolean select(IProgramMethod element) {
             return methodFullName.equals(element.getFullName());
@@ -1598,7 +1598,7 @@ public class TestUtilsUtil {
             IViewPart viewPart = view.getReference().getView(true);
             IActionBars bar = viewPart.getViewSite().getActionBars();
             IContributionItem[] items = bar.getToolBarManager().getItems();
-            IContributionItem item = ArrayUtil.search(items, new org.key_project.util.java.IFilter<IContributionItem>() {
+            IContributionItem item = ArrayUtil.search(items, new IFilter<IContributionItem>() {
                @Override
                public boolean select(IContributionItem element) {
                   return ObjectUtil.equals(id, element.getId());

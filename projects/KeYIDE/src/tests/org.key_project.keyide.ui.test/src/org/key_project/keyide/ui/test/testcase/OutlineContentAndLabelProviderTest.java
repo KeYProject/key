@@ -29,9 +29,9 @@ import org.key_project.keyide.ui.test.Activator;
 import org.key_project.keyide.ui.test.util.TreeViewerIterator;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
+import org.key_project.utils.java.CollectionUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.op.IProgramMethod;

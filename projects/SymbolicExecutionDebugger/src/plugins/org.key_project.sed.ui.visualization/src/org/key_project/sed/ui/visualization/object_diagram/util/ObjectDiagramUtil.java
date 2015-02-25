@@ -29,8 +29,8 @@ import org.key_project.sed.ui.visualization.model.od.ODObject;
 import org.key_project.sed.ui.visualization.object_diagram.perspective.StateVisualizationPerspectiveFactory;
 import org.key_project.sed.ui.visualization.util.VisualizationPreferences;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
+import org.key_project.utils.java.CollectionUtil;
+import org.key_project.utils.java.IFilter;
 
 /**
  * Provides static methods for object diagrams.

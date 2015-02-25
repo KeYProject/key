@@ -24,8 +24,8 @@ import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.StringUtil;
+import org.key_project.utils.java.ArrayUtil;
+import org.key_project.utils.java.StringUtil;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;

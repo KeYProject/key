@@ -11,7 +11,7 @@ import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.slicing.ISEDSlicer;
 import org.key_project.sed.ui.wizard.SliceWizard;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.ArrayUtil;
+import org.key_project.utils.java.ArrayUtil;
 
 /**
  * Opens a dialog to select an available {@link ISEDSlicer} and performs the slicing.

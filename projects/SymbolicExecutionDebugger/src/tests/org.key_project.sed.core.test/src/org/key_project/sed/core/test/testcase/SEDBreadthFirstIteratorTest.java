@@ -22,7 +22,7 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.SEDBreadthFirstIterator;
-import org.key_project.util.java.CollectionUtil;
+import org.key_project.utils.java.CollectionUtil;
 
 /**
  * Contains tests for {@link SEDBreadthFirstIterator}.

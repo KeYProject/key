@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.util.java;
+package org.key_project.utils.java;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -88,7 +88,7 @@ public class CollectionUtil {
     * @param objects The objects array to convert.
     * @return The created {@link List}.
     */
-   public static <T> List<T> toList(T... objects) {
+   public static <T> List<T> toList(@SuppressWarnings("unchecked") T... objects) {
       if (objects != null) {
          List<T> result = new ArrayList<T>(objects.length);
          for (T obj : objects) {
@@ -107,7 +107,7 @@ public class CollectionUtil {
     * @param objects The objects array to convert.
     * @return The created {@link Set}.
     */
-   public static <T> Set<T> toSet(T... objects) {
+   public static <T> Set<T> toSet(@SuppressWarnings("unchecked") T... objects) {
       if (objects != null) {
          Set<T> result = new LinkedHashSet<T>(objects.length);
          for (T obj : objects) {
@@ -126,7 +126,7 @@ public class CollectionUtil {
     * @param collection The {@link Collection} to add to.
     * @param elementsToAdd The elements to add.
     */
-   public static <T> void addAll(Collection<T> collection, T... elementsToAdd) {
+   public static <T> void addAll(Collection<T> collection, @SuppressWarnings("unchecked") T... elementsToAdd) {
       if (collection != null && elementsToAdd != null) {
          for (T toAdd : elementsToAdd) {
             collection.add(toAdd);
@@ -155,7 +155,7 @@ public class CollectionUtil {
     * @param elementsToRemove The elements to remove.
     * @return {@code true} if the {@link Collection} changed as result of this call.
     */
-   public static <T> boolean removeAll(Collection<T> collection, T... elementsToRemove) {
+   public static <T> boolean removeAll(Collection<T> collection, @SuppressWarnings("unchecked") T... elementsToRemove) {
       if (collection != null && elementsToRemove != null) {
          boolean result = false;
          for (T toAdd : elementsToRemove) {

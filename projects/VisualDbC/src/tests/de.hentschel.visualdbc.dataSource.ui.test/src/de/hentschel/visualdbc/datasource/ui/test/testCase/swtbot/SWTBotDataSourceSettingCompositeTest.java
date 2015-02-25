@@ -35,9 +35,9 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.junit.Test;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.thread.AbstractRunnableWithResult;
-import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.util.TestUtilsUtil;
+import org.key_project.utils.java.thread.AbstractRunnableWithResult;
+import org.key_project.utils.java.thread.IRunnableWithResult;
 
 import de.hentschel.visualdbc.datasource.model.DSPackageManagement;
 import de.hentschel.visualdbc.datasource.model.IDSConnectionSetting;

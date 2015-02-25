@@ -20,8 +20,8 @@ import junit.framework.TestCase;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Test;
-import org.key_project.util.java.thread.AbstractRunnableWithProgressAndResult;
-import org.key_project.util.java.thread.IRunnableWithProgressAndResult;
+import org.key_project.util.thread.AbstractRunnableWithProgressAndResult;
+import org.key_project.util.thread.IRunnableWithProgressAndResult;
 
 /**
  * Tests for {@link AbstractRunnableWithProgressAndResult}.
