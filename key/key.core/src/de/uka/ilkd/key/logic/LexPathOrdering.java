@@ -47,11 +47,16 @@ public class LexPathOrdering implements TermOrdering {
     }
 
     private abstract static class CompRes {
+
+        // used in anonymous classes inheriting from CompRes
+        @SuppressWarnings("unused")
         public boolean uncomparable () { return false; }
         public boolean eq ()           { return false; }
         public boolean gt ()           { return false; }
         public boolean lt ()           { return false; }
         public boolean geq()           { return gt() || eq(); }
+        // kept for symmetry reasons
+        @SuppressWarnings("unused")
         public boolean leq ()          { return lt() || eq(); }
     }
 
@@ -412,12 +417,6 @@ public class LexPathOrdering implements TermOrdering {
      */
     private boolean isVar (Operator op) {
         return op instanceof QuantifiableVariable;
-    }
-
-    private int sign (int p) {
-        if ( p > 0 ) return 1;
-        else if ( p < 0 ) return -1;
-        return 0;
     }
 
     /**

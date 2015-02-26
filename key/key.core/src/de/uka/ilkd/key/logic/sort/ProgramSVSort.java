@@ -18,8 +18,6 @@ import java.util.Map;
 
 import org.key_project.utils.ExtList;
 import org.key_project.utils.collection.DefaultImmutableSet;
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;
@@ -72,9 +70,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -421,10 +417,6 @@ public abstract class ProgramSVSort extends AbstractSort {
 
 	public ProgramVariableSort() {
 	    super(new Name("Variable"));
-	}
-
-	ProgramVariableSort(Name name) {
-	    super(name);
 	}
 
 	public boolean canStandFor(Term t) {
@@ -1256,166 +1248,6 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    return false;
 	}
     }
-
-    private abstract static class NameMatchingSort 
-	extends ProgramSVSort {
-
-	protected final String[] matchingNames;
-	
-	private final boolean ignorePrivatePrefix;
-
-	public NameMatchingSort(Name name, boolean ignorePrivatePrefix) {
-	    super(name);
-	    this.matchingNames = new String[1];
-	    this.ignorePrivatePrefix = ignorePrivatePrefix;
-	}
-
-	public NameMatchingSort(Name name,
-				String nameStr, 
-				boolean ignorePrivatePrefix) {
-	    super(name);
-	    this.matchingNames = new String[]{nameStr};
-	    this.ignorePrivatePrefix = ignorePrivatePrefix;
-	}
-
-	public NameMatchingSort(Name name,
-				String[] nameStrs, 
-				boolean ignorePrivatePrefix) {
-	    super(name);
-	    this.matchingNames = nameStrs;
-	    this.ignorePrivatePrefix = ignorePrivatePrefix;
-	}
-
-	protected int compareNames(Name name) {
-	    final String toCmp;
-	    if (ignorePrivatePrefix && name instanceof ProgramElementName) {
-	        toCmp = ((ProgramElementName)name).getProgramName();
-	        for(int i=0; i<matchingNames.length; i++) {
-		  if(toCmp.equals(matchingNames[i]))
-		    return i;
-		}
-		return -1;
-	    } else {
-	        toCmp = name.toString();
-	        for(int i=0; i<matchingNames.length; i++) {
-		  if(toCmp.equals(matchingNames[i]))
-		    return i;
-		}
-		return -1;
-	    }
-	}
-
-	protected boolean allowed(ProgramElement pe, 
-				  TermServices services) {
-	    final Name peName; 
-	    if (pe instanceof Named) {		
-		peName = ((Named)pe).name();		
-	    } else if (pe instanceof NamedProgramElement) {
-		peName = ((NamedProgramElement)pe).getProgramElementName();
-	    } else {
-		return false;
-	    }	    
-	    return (compareNames(peName) >= 0);
-	}
-
-	public boolean canStandFor(Term t) {
-	    if (t.op() instanceof ProgramInLogic) {
-		return (compareNames(t.op().name()) >= 0);
-	    }
-	    return false;
-	}
-
-	protected boolean canStandFor(ProgramElement pe,
-				      Services services) {
-	    return allowed(pe, services);
-	}	
-
-    }
-
-
-    private static final class MethodNameReferenceSort 
-	extends NameMatchingSort {
-
-	private ImmutableList<Name> reverseSignature = ImmutableSLList.<Name>nil();
-	private final String fullTypeName;
-
-	public MethodNameReferenceSort(Name name,
-	                               String methodName, 
-				       String declaredInType) {
-	    super(name, methodName, false);
-	    this.fullTypeName = declaredInType;
-	}
-
-	public MethodNameReferenceSort(Name name,
-	                               String[] methodNames, 
-				       String declaredInType) {
-	    super(name, methodNames, false);
-	    this.fullTypeName = declaredInType;
-	}
-
-	public MethodNameReferenceSort(Name name,
-	                               String methodName, 
-				       String declaredInType,
-				       ImmutableList<Name> signature) {
-	    this(name, methodName, declaredInType);	    
-	    this.reverseSignature = reverse(signature);
-	}
-
-	public MethodNameReferenceSort(Name name,
-	                               String[] methodNames, 
-				       String declaredInType,
-				       ImmutableList<Name> signature) {
-	    this(name, methodNames, declaredInType);	    
-	    this.reverseSignature = reverse(signature);
-	}
-
-	private ImmutableList<Name> reverse(ImmutableList<Name> names) {
-	    ImmutableList<Name> result = ImmutableSLList.<Name>nil();
-        for (Name name1 : names) {
-            result = result.append(name1);
-        }
-	    return result;
-	}
-
-	private ImmutableList<Type> createSignature(Services services) {
-	    ImmutableList<Type> result = ImmutableSLList.<Type>nil();
-        for (Name aReverseSignature : reverseSignature) {
-            result = result.prepend(services.getJavaInfo()
-                    .getKeYJavaType("" + aReverseSignature));
-        }
-	    return result;
-	}
-
-
-	public boolean canStandFor(ProgramElement pe,
-				   ExecutionContext ec,
-				   Services services) {
-
-	    if (pe instanceof MethodReference) {
-		final MethodReference mr = (MethodReference)pe;
-		final int cmpRes = compareNames(mr.getProgramElementName());
-		if (cmpRes >= 0) {
-		    final KeYJavaType kjt = 
-			services.getJavaInfo().getKeYJavaType(fullTypeName);
-		    final MethodDeclaration master = 
-			services.getJavaInfo().getProgramMethod
-			(kjt, matchingNames[cmpRes], createSignature(services), kjt).
-			getMethodDeclaration();
-		    return master == mr.method
-		          (services, mr.determineStaticPrefixType(services,ec),
-		                  ec).getMethodDeclaration();
-		}
-	    }
-	    return false;
-	}
-
-	public boolean canStandFor(Term t) {
-	    return (t.op() instanceof IProgramMethod && 
-		    !((IProgramMethod) t.op()).isModel());
-	}
-
-    }
-
 
     private static final class ArrayLengthSort extends ProgramSVSort {
 
