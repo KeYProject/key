@@ -16,7 +16,6 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.If;
@@ -36,13 +35,11 @@ public class ExecutionBranchStatement extends AbstractExecutionBlockStartNode<Br
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
-    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
    public ExecutionBranchStatement(ITreeSettings settings, 
-                                   KeYMediator mediator, 
                                    Node proofNode) {
-      super(settings, mediator, proofNode);
+      super(settings, proofNode);
    }
 
    /**

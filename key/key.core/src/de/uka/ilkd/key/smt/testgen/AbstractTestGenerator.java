@@ -9,13 +9,6 @@ import java.util.Vector;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.ProverTaskListener;
-import de.uka.ilkd.key.core.TaskFinishedInfo;
-import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
-import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
-import de.uka.ilkd.key.gui.smt.SMTSettings;
-import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -27,11 +20,17 @@ import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.TestGenerationSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult;
@@ -41,6 +40,7 @@ import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
+import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -52,18 +52,18 @@ import de.uka.ilkd.key.util.ProofStarter;
  * Subclasses are used to realize the user interface specific functionality.
  */
 public abstract class AbstractTestGenerator {
-   private final KeYMediator mediator;
+   private final UserInterface ui;
    private final Proof originalProof;
    private SolverLauncher launcher;
    private List<Proof> proofs;
    
    /**
     * Constructor.
-    * @param mediator The {@link KeYMediator} to use.
+    * @param ui The {@link UserInterface} to use.
     * @param originalProof The {@link Proof} to generate test cases for.
     */
-   public AbstractTestGenerator(KeYMediator mediator, Proof originalProof) {
-      this.mediator = mediator;
+   public AbstractTestGenerator(UserInterface ui, Proof originalProof) {
+      this.ui = ui;
       this.originalProof = originalProof;
    }
 
@@ -107,16 +107,16 @@ public abstract class AbstractTestGenerator {
           log.write(".");
           final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
           TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
-          final ProverTaskListener ptl = mediator.getUI().getListener();
+          final ProverTaskListener ptl = ui.getListener();
           try {
              if (stopRequest != null && stopRequest.shouldStop()) {
                 return;
              }
-             selectProof(mediator, proof);
+             selectProof(ui, proof);
 
              ptl.taskStarted(macro.getName(), 0);
              synchronized(macro) {
-                          info = macro.applyTo(proof, mediator, proof.openEnabledGoals(), null, ptl);
+                          info = macro.applyTo(proof, proof.openEnabledGoals(), null, ptl);
              }
              problems.addAll(SMTProblem.createSMTProblems(proof));
           } catch (final InterruptedException e) {
@@ -133,10 +133,10 @@ public abstract class AbstractTestGenerator {
        }
     }
     finally {
-       handleAllProofsPerformed(mediator);
+       handleAllProofsPerformed(ui);
     }
     log.writeln("\nDone applying semantic blasting.");
-    selectProof(mediator, originalProof);
+    selectProof(ui, originalProof);
     // getMediator().setInteractive(true);
     // getMediator().startInterface(true);
     final Proof proof = originalProof;
@@ -179,7 +179,7 @@ public abstract class AbstractTestGenerator {
     return;
    }
 
-   protected void handleAllProofsPerformed(KeYMediator mediator) {
+   protected void handleAllProofsPerformed(UserInterface ui) {
       // Work has only to be done in the MainWindow implementation.
    }
 
@@ -189,13 +189,13 @@ public abstract class AbstractTestGenerator {
    public void dispose() {
       if (proofs != null) {
          for (final Proof p : proofs) {
-            mediator.getUI().removeProof(p);
+            ui.removeProof(p);
             p.dispose();
          }
       }
    }
 
-   protected void selectProof(KeYMediator mediator, Proof proof) {
+   protected void selectProof(UserInterface ui, Proof proof) {
       // Work has only to be done in the MainWindow implementation.
    }
 
@@ -301,10 +301,10 @@ public abstract class AbstractTestGenerator {
             }
          }
       }  
-      return createProof(mediator, oldProof, "Test Case for NodeNr: " + node.serialNr(), newSequent);
+      return createProof(ui, oldProof, "Test Case for NodeNr: " + node.serialNr(), newSequent);
    }
    
-   protected Proof createProof(KeYMediator mediator, Proof oldProof, String newName, Sequent newSequent) throws ProofInputException {
+   protected Proof createProof(UserInterface ui, Proof oldProof, String newName, Sequent newSequent) throws ProofInputException {
       ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(oldProof, false);
       ProofStarter starter = SideProofUtil.createSideProof(env, newSequent, newName);
       Proof proof = starter.getProof();
@@ -431,8 +431,8 @@ public abstract class AbstractTestGenerator {
       return proofs;
    }
    
-   protected KeYMediator getMediator() {
-      return mediator;
+   protected UserInterface getUI () {
+      return ui;
    }
 
    /**

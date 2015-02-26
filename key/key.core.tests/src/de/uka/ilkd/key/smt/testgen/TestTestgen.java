@@ -2,12 +2,12 @@ package de.uka.ilkd.key.smt.testgen;
 
 import java.io.File;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.macros.TestGenMacro;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SolverType;
-import de.uka.ilkd.key.smt.TestConsoleUserInterface;
 import de.uka.ilkd.key.smt.test.TestCommons;
-import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 public class TestTestgen extends TestCommons{
@@ -54,20 +54,21 @@ public class TestTestgen extends TestCommons{
 		return type;
 	}
 	
-	public void testMiddle(){
-		
-		UserInterface ui = new TestConsoleUserInterface(false, false);
-		KeYMediator mediator = ui.getMediator();
+	public void testMiddle() throws Exception {
 		File file = new File(testFile + "middle.key");
-		ui.loadProblem(file);
+		KeYEnvironment<CustomUserInterface> env = KeYEnvironment.load(file, null, null);
 		try {
+		   Proof proof = env.getLoadedProof();
+		   assertNotNull(proof);
 			TestGenMacro macro = new TestGenMacro();
-			macro.applyTo(mediator, null, null);
-			assertEquals(mediator.getSelectedProof().openGoals().size(), 5);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+			macro.applyTo(proof, proof.openEnabledGoals(), null, null);
+			assertEquals(proof.openGoals().size(), 5);
 		}
-		
+		finally {
+		   if (env != null) {
+	         env.dispose();
+		   }
+		}
 	}
 
 }

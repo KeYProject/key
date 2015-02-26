@@ -15,7 +15,6 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import org.key_project.utils.java.StringUtil;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.Throw;
@@ -37,15 +36,13 @@ public class ExecutionExceptionalMethodReturn extends AbstractExecutionMethodRet
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
-    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param methodCall The {@link IExecutionMethodCall} which is now returned.
     */
    public ExecutionExceptionalMethodReturn(ITreeSettings settings, 
-                                           KeYMediator mediator, 
                                            Node proofNode,
                                            ExecutionMethodCall methodCall) {
-      super(settings, mediator, proofNode, methodCall);
+      super(settings, proofNode, methodCall);
    }
 
    /**

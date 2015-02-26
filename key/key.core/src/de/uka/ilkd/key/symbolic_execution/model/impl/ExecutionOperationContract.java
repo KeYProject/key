@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -80,13 +79,11 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
-    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
    public ExecutionOperationContract(ITreeSettings settings, 
-                                     KeYMediator mediator, 
                                      Node proofNode) {
-      super(settings, mediator, proofNode);
+      super(settings, proofNode);
    }
 
    /**

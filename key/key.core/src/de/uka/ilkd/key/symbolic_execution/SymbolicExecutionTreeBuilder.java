@@ -29,7 +29,6 @@ import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableSLList;
 import org.key_project.utils.java.ArrayUtil;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -158,11 +157,6 @@ import de.uka.ilkd.key.util.Pair;
  */
 public class SymbolicExecutionTreeBuilder {
    /**
-    * The used mediator during proof.
-    */
-   private final KeYMediator mediator;
-   
-   /**
     * The {@link Proof} from which the symbolic execution tree is extracted.
     */
    private Proof proof;
@@ -244,27 +238,23 @@ public class SymbolicExecutionTreeBuilder {
 
    /**
     * Constructor.
-    * @param mediator The used {@link KeYMediator} during proof.
     * @param proof The {@link Proof} to extract the symbolic execution tree from.
     * @param mergeBranchConditions {@code true} merge branch conditions which means that a branch condition never contains another branch condition or {@code false} allow that branch conditions contains branch conditions.
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
     */
-   public SymbolicExecutionTreeBuilder(KeYMediator mediator, 
-                                       Proof proof,
+   public SymbolicExecutionTreeBuilder(Proof proof,
                                        boolean mergeBranchConditions,
                                        boolean useUnicode,
                                        boolean usePrettyPrinting,
                                        boolean variablesAreOnlyComputedFromUpdates) {
-      assert mediator != null;
       assert proof != null;
-      this.mediator = mediator;
       this.proof = proof;
       this.isUninterpretedPredicateUsed = AbstractOperationPO.getUninterpretedPredicate(getProof()) != null;
       this.settings = new TreeSettings(mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
       this.exceptionVariable = SymbolicExecutionUtil.extractExceptionVariable(proof);
-      this.startNode = new ExecutionStart(settings, mediator, proof.root());
+      this.startNode = new ExecutionStart(settings, proof.root());
       this.keyNodeMapping.put(proof.root(), this.startNode);
       initMethodCallStack(proof.root(), proof.getServices());
    }
@@ -451,14 +441,6 @@ public class SymbolicExecutionTreeBuilder {
       proof = null;
       startNode = null;
    }
-   
-   /**
-    * Returns the used {@link KeYMediator} during proof.
-    * @return The used {@link KeYMediator} during proof.
-    */
-   public KeYMediator getMediator() {
-      return mediator;
-   }
 
    /**
     * Returns the {@link Proof} from which the symbolic execution tree is extracted.
@@ -608,7 +590,7 @@ public class SymbolicExecutionTreeBuilder {
                      if (visitedNode.getAppliedRuleApp().rule() instanceof BuiltInRule) {
                         additionalBranchLabel = childNode.getNodeInfo().getBranchLabel();
                      }
-                     ExecutionBranchCondition condition = new ExecutionBranchCondition(settings, mediator, childNode, additionalBranchLabel);
+                     ExecutionBranchCondition condition = new ExecutionBranchCondition(settings, childNode, additionalBranchLabel);
                      // Add branch condition to the branch condition attributes for later adding to the proof tree. This is required for instance to filter out branches after the symbolic execution has finished.
                      List<ExecutionBranchCondition> list = parentToBranchConditionMapping.get(parentToAddTo);
                      if (list == null) {
@@ -763,7 +745,7 @@ public class SymbolicExecutionTreeBuilder {
                 !SymbolicExecutionUtil.isForLoopCondition(node, statement)) { // do while and for loops exists only in the first iteration where the loop condition is not evaluated. They are transfered into while loops in later proof nodes. 
                ExecutionLoopCondition condition = keyNodeLoopConditionMapping.get(node);
                if (condition == null) {
-                  condition = new ExecutionLoopCondition(settings, mediator, node);
+                  condition = new ExecutionLoopCondition(settings, node);
                   addChild(parentToAddTo, condition);
                   keyNodeLoopConditionMapping.put(node, condition);
                   // Set call stack on new created node
@@ -867,47 +849,47 @@ public class SymbolicExecutionTreeBuilder {
             PositionInfo posInfo = statement.getPositionInfo();
             // Determine the node representation and create it if one is available
             if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement)) {
-               result = new ExecutionMethodCall(settings, mediator, node);
+               result = new ExecutionMethodCall(settings, node);
             }
             else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp())) {
                if (!SymbolicExecutionUtil.hasLoopBodyLabel(node.getAppliedRuleApp())) {
-                  result = new ExecutionTermination(settings, mediator, node, exceptionVariable, null);
+                  result = new ExecutionTermination(settings, node, exceptionVariable, null);
                   startNode.addTermination((ExecutionTermination)result);
                }
             }
             else if (SymbolicExecutionUtil.isBranchStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
                if (isNotInImplicitMethod(node)) {
-                  result = new ExecutionBranchStatement(settings, mediator, node);
+                  result = new ExecutionBranchStatement(settings, node);
                   addToBlockMap(node, (ExecutionBranchStatement)result);
                }
             }
             else if (SymbolicExecutionUtil.isLoopStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
                if (isNotInImplicitMethod(node)) {
-                  result = new ExecutionLoopStatement(settings, mediator, node);
+                  result = new ExecutionLoopStatement(settings, node);
                   addToBlockMap(node, (ExecutionLoopStatement)result);
                }
             }
             else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
                if (isNotInImplicitMethod(node)) {
-                  result = new ExecutionStatement(settings, mediator, node);
+                  result = new ExecutionStatement(settings, node);
                }
             }
          }
          else if (SymbolicExecutionUtil.isOperationContract(node, node.getAppliedRuleApp())) {
             if (isNotInImplicitMethod(node)) {
-               result = new ExecutionOperationContract(settings, mediator, node);
+               result = new ExecutionOperationContract(settings, node);
             }
          }
          else if (SymbolicExecutionUtil.isLoopInvariant(node, node.getAppliedRuleApp())) {
             if (isNotInImplicitMethod(node)) {
-               result = new ExecutionLoopInvariant(settings, mediator, node);
+               result = new ExecutionLoopInvariant(settings, node);
                // Initialize new call stack of the preserves loop invariant branch
                initNewLoopBodyMethodCallStack(node);
             }
          }
       }
       else if (SymbolicExecutionUtil.isLoopBodyTermination(node, node.getAppliedRuleApp())) {
-         result = new ExecutionTermination(settings, mediator, node, exceptionVariable, TerminationKind.LOOP_BODY);
+         result = new ExecutionTermination(settings, node, exceptionVariable, TerminationKind.LOOP_BODY);
          startNode.addTermination((ExecutionTermination)result);
       }
       return result;
@@ -1212,11 +1194,11 @@ public class SymbolicExecutionTreeBuilder {
                      IExecutionNode<?> callSEDNode = keyNodeMapping.get(callNode);
                      if (callSEDNode instanceof ExecutionMethodCall) { // Could be the start node if the initial sequent already contains some method frames.
                         if (methodReturn) {
-                           result = new ExecutionMethodReturn(settings, mediator, node, (ExecutionMethodCall)callSEDNode);
+                           result = new ExecutionMethodReturn(settings, node, (ExecutionMethodCall)callSEDNode);
                            completions.addMethodReturn(result);
                         }
                         else {
-                           result = new ExecutionExceptionalMethodReturn(settings, mediator, node, (ExecutionMethodCall)callSEDNode);
+                           result = new ExecutionExceptionalMethodReturn(settings, node, (ExecutionMethodCall)callSEDNode);
                            completions.addMethodReturn(result);
                         }
                      }

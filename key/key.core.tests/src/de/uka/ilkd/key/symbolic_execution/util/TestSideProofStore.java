@@ -98,7 +98,7 @@ public class TestSideProofStore extends TestCase {
     * @param disposedProofs The expected disposed {@link Proof}s.
     * @param expectedEntries The expected entries in {@link SideProofStore#DEFAULT_INSTANCE}.
     */
-   private void assertEntries(Proof[] allProofs, Proof[] disposedProofs, Pair<String, Proof>... expectedEntries) {
+   private void assertEntries(Proof[] allProofs, Proof[] disposedProofs, @SuppressWarnings("unchecked") Pair<String, Proof>... expectedEntries) {
       // Test entries
       List<Proof> containedProofs = new LinkedList<Proof>();
       assertEquals(expectedEntries.length, SideProofStore.DEFAULT_INSTANCE.countEntries());

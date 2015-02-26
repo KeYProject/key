@@ -68,6 +68,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ThreadUtilities;
@@ -76,7 +77,7 @@ import de.uka.ilkd.key.util.ThreadUtilities;
 public class KeYMediator {
 
     /** The user interface */
-    private UserInterface ui;
+    private AbstractMediatorUserInterface ui;
 
     private InteractiveProver interactiveProver;
 
@@ -130,7 +131,7 @@ public class KeYMediator {
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
      */
-    public KeYMediator(UserInterface ui) {
+    public KeYMediator(AbstractMediatorUserInterface ui) {
 	this.ui             = ui;
 
 	notationInfo        = new NotationInfo();
@@ -649,7 +650,7 @@ public class KeYMediator {
     /** returns the user interface
      * @return the user interface
      */
-    public UserInterface getUI() {
+    public AbstractMediatorUserInterface getUI() {
         return ui;
     }
 

@@ -635,12 +635,12 @@ public final class SymbolicExecutionUtil {
          Sequent sequent = proofNode.sequent();
          for (SequentFormula sf : sequent.antecedent()) {
             if (!containsSymbolicExecutionLabel(sf.formula())) {
-               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, node.getModalityPIO(), sf.formula()));
+               constraints.add(new ExecutionConstraint(node.getSettings(), proofNode, node.getModalityPIO(), sf.formula()));
             }
          }
          for (SequentFormula sf : sequent.succedent()) {
             if (!containsSymbolicExecutionLabel(sf.formula())) {
-               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, node.getModalityPIO(), tb.not(sf.formula())));
+               constraints.add(new ExecutionConstraint(node.getSettings(), proofNode, node.getModalityPIO(), tb.not(sf.formula())));
             }
          }
          return constraints.toArray(new IExecutionConstraint[constraints.size()]);

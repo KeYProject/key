@@ -69,12 +69,6 @@ public interface UserInterface
      * @return true if removal has been granted
      */
     boolean confirmTaskRemoval(String message);
-
-    /**
-     * loads the problem or proof from the given file
-     * @param file the File with the problem description or the proof
-     */
-    void loadProblem(File file);
     
     void loadingStarted();
     
@@ -91,13 +85,6 @@ public interface UserInterface
     boolean macroChosen();
 
     public ProverTaskListener getListener();
-
-    boolean applyMacro();
-
-    /** 
-     * called to open the build in examples 
-     */
-    void openExamples();
 
     /**
      * completes rule applications of built in rules
@@ -197,15 +184,6 @@ public interface UserInterface
      * @param proof The {@link Proof} to remove.
      */
     void removeProof(Proof proof);
-
-    /**
-     * save proof in file. If autoSave is on, this will potentially overwrite already
-     * existing proof files with the same name. Otherwise the save dialog pops up.
-     * For loaded proofs both are turned off by default, i.e. only manual saving is
-     * possible, and the save dialog never pops up automatically (except for hitting
-     * the "Save ..." or "Save current proof" button).
-     */
-    File saveProof(Proof proof, String fileExtension);
     
     /**
      * This method is called if no {@link LoadedPOContainer} was created

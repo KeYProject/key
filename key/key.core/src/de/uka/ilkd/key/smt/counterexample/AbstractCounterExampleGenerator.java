@@ -3,20 +3,20 @@ package de.uka.ilkd.key.smt.counterexample;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.ProverTaskListener;
-import de.uka.ilkd.key.core.TaskFinishedInfo;
-import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -44,32 +44,32 @@ public abstract class AbstractCounterExampleGenerator {
    
    /**
     * Searches a counter example for the given {@link Sequent}.
-    * @param mediator The {@link KeYMediator} to use.
+    * @param ui The {@link UserInterface} to use.
     * @param oldProof The old {@link Proof} used as template to instantiate a new one.
     * @param oldSequent The {@link Sequent} to find a counter example for.
     * @throws ProofInputException Occurred Exception.
     */
-   public void searchCounterExample(KeYMediator mediator, 
+   public void searchCounterExample(UserInterface ui, 
                                     Proof oldProof, 
                                     Sequent oldSequent) throws ProofInputException {
       if (!isSolverAvailable()) {
          throw new IllegalStateException("Can't find SMT solver " + SolverType.Z3_CE_SOLVER.getName());
       }
       
-      final Proof proof = createProof(mediator, oldProof, oldSequent, "Semantics Blasting: " + oldProof.name());
+      final Proof proof = createProof(ui, oldProof, oldSequent, "Semantics Blasting: " + oldProof.name());
       final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
       TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
-      final ProverTaskListener ptl = mediator.getUI().getListener();
+      final ProverTaskListener ptl = ui.getListener();
       ptl.taskStarted(macro.getName(), 0);
 
       try {
           synchronized(macro) { // TODO: Useless? No other thread has access to macro wait for macro to terminate
-              info = macro.applyTo(proof, mediator, proof.openEnabledGoals(), null, ptl);
+              info = macro.applyTo(proof, proof.openEnabledGoals(), null, ptl);
           }
       } catch (InterruptedException e) {
           Debug.out("Semantics blasting interrupted");
       } finally {
-          semanticsBlastingCompleted(mediator);
+          semanticsBlastingCompleted(ui);
           ptl.taskFinished(info);
       }
 
@@ -91,14 +91,14 @@ public abstract class AbstractCounterExampleGenerator {
    
    /**
     * Creates a new {@link Proof}.
-    * @param mediator The {@link KeYMediator} to use.
+    * @param ui The {@link UserInterface} to use.
     * @param oldProof The old {@link Proof} used as template to instantiate a new one.
     * @param oldSequent The {@link Sequent} to find a counter example for.
     * @param proofName The name for the new proof.
     * @return The created {@link Proof}.
     * @throws ProofInputException Ocurred Exception
     */
-   protected abstract Proof createProof(KeYMediator mediator, 
+   protected abstract Proof createProof(UserInterface ui, 
                                         Proof oldProof, 
                                         Sequent oldSequent,
                                         String proofName) throws ProofInputException;
@@ -116,9 +116,9 @@ public abstract class AbstractCounterExampleGenerator {
    
    /**
     * This method is called after the {@link SemanticsBlastingMacro} has been executed.
-    * @param mediator The {@link KeYMediator} to use.
+    * @param ui The {@link UserInterface} to use.
     */
-   protected void semanticsBlastingCompleted(KeYMediator mediator) {
+   protected void semanticsBlastingCompleted(UserInterface ui) {
    }
    
    /**

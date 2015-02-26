@@ -142,7 +142,7 @@ import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
-import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -363,7 +363,7 @@ public final class MainWindow extends JFrame  {
      *
      * @param userInterface The UserInterface.
      */
-    private KeYMediator getMainWindowMediator(UserInterface userInterface) {
+    private KeYMediator getMainWindowMediator(AbstractMediatorUserInterface userInterface) {
         KeYMediator result = new KeYMediator(userInterface);
         result.addKeYSelectionListener(proofListener);
         result.addAutoModeListener(proofListener);

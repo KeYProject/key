@@ -19,7 +19,6 @@ import java.util.Set;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.Field;
@@ -70,7 +69,6 @@ public class ExecutionValue extends AbstractExecutionValue {
 
    /**
     * Constructor.
-    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param variable The parent {@link ExecutionVariable} which contains this value.
     * @param valueProofNode The {@link Node} in the value site proof from which this value was extracted.
@@ -79,8 +77,7 @@ public class ExecutionValue extends AbstractExecutionValue {
     * @param valueString The value as human readable string.
     * @param typeString The type of the value.
     */
-   public ExecutionValue(KeYMediator mediator, 
-                         Node proofNode, 
+   public ExecutionValue(Node proofNode, 
                          ExecutionVariable variable,
                          boolean valueUnknown, 
                          Term value, 
@@ -88,7 +85,7 @@ public class ExecutionValue extends AbstractExecutionValue {
                          String typeString,
                          Term condition,
                          String conditionString) {
-      super(variable.getSettings(), mediator, proofNode, variable, condition, value);
+      super(variable.getSettings(), proofNode, variable, condition, value);
       this.valueUnknown = valueUnknown;
       this.valueString = valueString;
       this.typeString = typeString;

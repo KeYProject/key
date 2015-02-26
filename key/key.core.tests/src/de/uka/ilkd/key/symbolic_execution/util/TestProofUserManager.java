@@ -43,7 +43,7 @@ public class TestProofUserManager extends TestCase {
       Object firstUser = new Object();
       Object secondUser = new Object();
       Object thirdUser = new Object();
-      CustomUserInterface ui = new CustomUserInterface(false);
+      CustomUserInterface ui = new CustomUserInterface();
       KeYEnvironment<?> firstEnv = new KeYEnvironment<CustomUserInterface>(ui, null);
       KeYEnvironment<?> secondEnv = new KeYEnvironment<CustomUserInterface>(ui, null);
       // Add firstProof with firstEnv

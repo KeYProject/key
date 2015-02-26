@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
@@ -27,12 +26,11 @@ public class ExecutionConstraint extends AbstractExecutionElement implements IEx
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
-    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param term The {@link Term} representing the constraint.
     */
-   public ExecutionConstraint(ITreeSettings settings, KeYMediator mediator, Node proofNode, PosInOccurrence modalityPIO, Term term) {
-      super(settings, mediator, proofNode);
+   public ExecutionConstraint(ITreeSettings settings, Node proofNode, PosInOccurrence modalityPIO, Term term) {
+      super(settings, proofNode);
       assert term != null;
       assert modalityPIO != null;
       this.term = term;

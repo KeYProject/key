@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -45,7 +44,6 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
-    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param programVariable The represented {@link IProgramVariable} which value is shown.
     * @param parentValue The parent {@link IExecutionValue} or {@code null} if not available.
@@ -54,14 +52,13 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
     * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
     */
    public AbstractExecutionVariable(ITreeSettings settings, 
-                                    KeYMediator mediator, 
                                     Node proofNode, 
                                     IProgramVariable programVariable, 
                                     IExecutionValue parentValue, 
                                     Term arrayIndex, 
                                     Term additionalCondition,
                                     PosInOccurrence modalityPIO) {
-      super(settings, mediator, proofNode);
+      super(settings, proofNode);
       this.programVariable = programVariable;
       this.parentValue = parentValue;
       this.arrayIndex = arrayIndex;

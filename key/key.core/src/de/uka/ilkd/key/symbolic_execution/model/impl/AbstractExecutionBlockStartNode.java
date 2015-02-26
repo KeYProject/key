@@ -3,7 +3,6 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
@@ -28,11 +27,10 @@ public abstract class AbstractExecutionBlockStartNode<S extends SourceElement> e
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
-    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public AbstractExecutionBlockStartNode(ITreeSettings settings, KeYMediator mediator, Node proofNode) {
-      super(settings, mediator, proofNode);
+   public AbstractExecutionBlockStartNode(ITreeSettings settings, Node proofNode) {
+      super(settings, proofNode);
    }
 
    /**

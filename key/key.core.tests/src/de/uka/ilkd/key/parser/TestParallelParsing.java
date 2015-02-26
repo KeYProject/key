@@ -22,6 +22,7 @@ import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * This {@link TestCase} tests the parallel usage of {@link KeYParser}

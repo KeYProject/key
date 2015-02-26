@@ -41,6 +41,7 @@ import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.counterexample.AbstractCounterExampleGenerator;
 import de.uka.ilkd.key.smt.counterexample.AbstractSideProofCounterExampleGenerator;
+import de.uka.ilkd.key.ui.UserInterface;
 
 @SuppressWarnings("serial")
 public class CounterExampleAction extends MainWindowAction {
@@ -152,10 +153,23 @@ public class CounterExampleAction extends MainWindowAction {
      */
     public static class MainWindowCounterExampleGenerator extends AbstractCounterExampleGenerator {
        /**
+        * The {@link KeYMediator} to use.
+        */
+       private final KeYMediator mediator;
+       
+       /**
+        * Constructor.
+        * @param mediator The {@link KeYMediator} to use.
+        */
+       public MainWindowCounterExampleGenerator(KeYMediator mediator) {
+          this.mediator = mediator;
+       }
+
+      /**
         * {@inheritDoc}
         */
        @Override
-       protected Proof createProof(KeYMediator mediator, Proof oldProof, Sequent oldSequent, String proofName) {
+       protected Proof createProof(UserInterface ui, Proof oldProof, Sequent oldSequent, String proofName) {
           Sequent newSequent = createNewSequent(oldSequent);
           InitConfig newInitConfig = oldProof.getInitConfig().deepCopy();
           Proof proof = new Proof(proofName,
@@ -185,7 +199,7 @@ public class CounterExampleAction extends MainWindowAction {
         * {@inheritDoc}
         */
        @Override
-       protected void semanticsBlastingCompleted(KeYMediator mediator) {
+       protected void semanticsBlastingCompleted(UserInterface ui) {
           mediator.setInteractive(true);
           mediator.startInterface(true);
        }
@@ -210,8 +224,8 @@ public class CounterExampleAction extends MainWindowAction {
 
         @Override
         protected Void doInBackground() throws Exception {
-//           new MainWindowCounterExampleGenerator().searchCounterExample(getMediator(), oldProof, oldSequent);
-           new NoMainWindowCounterExampleGenerator().searchCounterExample(getMediator(), oldProof, oldSequent);
+//           new MainWindowCounterExampleGenerator(getMediator()).searchCounterExample(getMediator().getUI(), oldProof, oldSequent);
+           new NoMainWindowCounterExampleGenerator().searchCounterExample(getMediator().getUI(), oldProof, oldSequent);
            return null;
         }
 

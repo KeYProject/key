@@ -38,8 +38,6 @@ import org.key_project.utils.java.IFilter;
 import org.key_project.utils.java.StringUtil;
 import org.xml.sax.SAXException;
 
-import de.uka.ilkd.key.core.AutoModeListener;
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Position;
@@ -56,7 +54,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpointconditions;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
@@ -103,8 +100,8 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomUserInterface;
-import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -1198,7 +1195,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
-      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
+      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
       builder.analyse();
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<CustomUserInterface>(environment, builder);
@@ -1252,7 +1249,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
-      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
+      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
       builder.analyse();
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<CustomUserInterface>(environment, builder);
@@ -1296,7 +1293,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
-      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
+      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
       builder.analyse();
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<CustomUserInterface>(environment, builder);
@@ -1354,7 +1351,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, useOperationContracts, useLoopInvarints, nonExecutionBranchHidingSideProofs, aliasChecks);
       // Create symbolic execution tree which contains only the start node at beginning
-      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(environment.getMediator(), proof, mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
+      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
       builder.analyse();
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<CustomUserInterface>(environment, builder);
@@ -1406,14 +1403,14 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       KeYEnvironment<CustomUserInterface> reloadedEnv = null;
       SymbolicExecutionTreeBuilder reloadedBuilder = null;
       try {
-         ProofSaver saver = new ProofSaver(env.getProof(), tempFile.getAbsolutePath(), Main.INTERNAL_VERSION);
+         ProofSaver saver = new ProofSaver(env.getProof(), tempFile.getAbsolutePath(), KeYConstants.INTERNAL_VERSION);
          assertNull(saver.save());
          // Load proof from saved *.proof file
          reloadedEnv = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), tempFile, null, null, true);
          Proof reloadedProof = reloadedEnv.getLoadedProof();
          assertNotSame(env.getProof(), reloadedProof);
          // Recreate symbolic execution tree
-         reloadedBuilder = new SymbolicExecutionTreeBuilder(env.getUi().getMediator(), reloadedProof, false, false, false, false);
+         reloadedBuilder = new SymbolicExecutionTreeBuilder(reloadedProof, false, false, false, false);
          reloadedBuilder.analyse();
          assertSetTreeAfterStep(reloadedBuilder, oraclePathInBaseDirFile, baseDir);
       }
@@ -1428,68 +1425,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             tempFile.delete();
             assertFalse(tempFile.exists());
          }
-      }
-   }
-   
-   /**
-    * Waits until the auto mode has stopped.
-    * @param ui The {@link UserInterface} to wait for.
-    */
-   protected void waitForAutoMode(UserInterface ui) {
-      assertNotNull(ui);
-      AutoModeFinishListener listener = new AutoModeFinishListener();
-      ui.getMediator().addAutoModeListener(listener);
-      try {
-         final int TIMEOUT = 20 * 1000;
-         long startTime = System.currentTimeMillis();
-         while (!listener.hasAutoModeStopped()) {
-            try {
-               Thread.sleep(100);
-               if (System.currentTimeMillis() > startTime + TIMEOUT) {
-                  fail("Timeout during waiting of auto mode completed.");
-               }
-            }
-            catch (InterruptedException e) {
-            }
-         }
-         assertTrue(listener.hasAutoModeStopped());
-      }
-      finally {
-         ui.getMediator().removeAutoModeListener(listener);
-      }
-   }
-   
-   /**
-    * Utility class used by {@link AbstractSymbolicExecutionTestCase#waitForAutoMode(UserInterface)}.
-    * @author Martin Hentschel
-    */
-   private static class AutoModeFinishListener implements AutoModeListener {
-      /**
-       * Done flag.
-       */
-      private boolean done = false;
-      
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public void autoModeStarted(ProofEvent e) {
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public void autoModeStopped(ProofEvent e) {
-         done = true;
-      }
-
-      /**
-       * Checks if the auto mode has stopped.
-       * @return {@code true} stopped, {@code false} still running or never started.
-       */
-      public boolean hasAutoModeStopped() {
-         return done;
       }
    }
    

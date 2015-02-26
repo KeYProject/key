@@ -7,11 +7,7 @@ import java.util.List;
 import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
-import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
-import de.uka.ilkd.key.gui.smt.SMTSettings;
-import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -19,7 +15,11 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.settings.TestGenerationSettings;
 import de.uka.ilkd.key.smt.SMTObjTranslator;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
@@ -31,21 +31,20 @@ import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.model.Model;
 
 public class ModelGenerator implements SolverLauncherListener{
+   private final Services services;
 
-	private KeYMediator mediator;
 	private Sequent seq;
 
 
 	//models that have been found until now
-	private List<Model> models;
+	private final List<Model> models;
 	//how many models we are looking for
-	private int target;
+	private final int target;
 
 
-	public ModelGenerator(Sequent s, int target, KeYMediator mediator) {
-		this.mediator = mediator;
+	public ModelGenerator(Sequent s, int target, Services services) {
 		this.seq = s;	
-
+		this.services = services;
 		this.target = target;
 		models = new LinkedList<Model>();
 	}
@@ -60,7 +59,7 @@ public class ModelGenerator implements SolverLauncherListener{
 		SolverType solver = SolverType.Z3_CE_SOLVER;
 		SMTProblem problem = new SMTProblem(sequentToTerm(seq));
 		launcher.addListener(this);
-		launcher.launch(problem, mediator.getServices(), solver);		
+		launcher.launch(problem, services, solver);		
 	}
 	/**
 	 * Creates a SolverLauncher with the appropriate settings.
@@ -114,8 +113,8 @@ public class ModelGenerator implements SolverLauncherListener{
 	private boolean addModelToTerm(Model m){
 		//System.out.println("Model to term");
 
-		TermBuilder tb = mediator.getServices().getTermBuilder();
-		Namespace variables = mediator.getServices().getNamespaces().programVariables();
+		TermBuilder tb = services.getTermBuilder();
+		Namespace variables = services.getNamespaces().programVariables();
 		Term tmodel=tb.tt();
 		for(String c : m.getConstants().keySet()){
 
@@ -169,7 +168,7 @@ public class ModelGenerator implements SolverLauncherListener{
 
 		ImmutableList<Term> ante = ImmutableSLList.nil();
 
-		final TermBuilder tb = mediator.getServices().getTermBuilder();
+		final TermBuilder tb = services.getTermBuilder();
 		ante = ante.append(tb.tt());
 		for (SequentFormula f : s.antecedent()) {
 			ante = ante.append(f.formula());

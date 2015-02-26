@@ -15,9 +15,9 @@ package de.uka.ilkd.key.ui;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.KeYFileChooser;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -25,17 +25,18 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.ProblemLoader;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 
 public abstract class AbstractUserInterface implements UserInterface {
 
@@ -43,14 +44,6 @@ public abstract class AbstractUserInterface implements UserInterface {
     protected boolean saveOnly = false;
 
     private ProverTaskListener pml = null;
-
-    protected ProblemLoader getProblemLoader(File file, List<File> classPath,
-                                             File bootClassPath, KeYMediator mediator) {
-        final ProblemLoader pl =
-                new ProblemLoader(file, classPath, bootClassPath,
-                                  AbstractProfile.getDefaultProfile(), false, mediator, true, null, this);
-        return pl;
-    }
 
     @Override
     public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
@@ -88,46 +81,6 @@ public abstract class AbstractUserInterface implements UserInterface {
         return new CompositePTListener(this, pml);
     }
 
-    @Override
-    public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput,
-          ProofAggregate proofList, InitConfig initConfig) {
-       final ProofEnvironment env = new ProofEnvironment(initConfig);
-       env.addProofEnvironmentListener(this);
-       env.registerProof(proofOblInput, proofList);
-       return env;
-    }
-
-
-   protected static Pair<File, String> fileName(Proof proof, String fileExtension) {
-       // TODO: why do we use GUI components here?
-       final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
-
-       File selectedFile = null;
-       if (proof != null) {
-          selectedFile = proof.getProofFile();
-       }
-       // Suggest default file name if required
-       final String defaultName;
-       if (selectedFile == null) {
-           defaultName = MiscTools.toValidFileName(proof.name().toString()) + fileExtension;
-           selectedFile = new File(jFC.getCurrentDirectory(), defaultName);
-       } else if (selectedFile.getName().endsWith(".proof") && fileExtension.equals(".proof")) {
-           defaultName = selectedFile.getName();
-       } else {
-           String proofName = proof.name().toString();
-           if (proofName.endsWith(".key")) {
-               proofName = proofName.substring(0, proofName.lastIndexOf(".key"));
-           } else if (proofName.endsWith(".proof")) {
-               proofName = proofName.substring(0, proofName.lastIndexOf(".proof"));
-           }
-           defaultName = MiscTools.toValidFileName(proofName) + fileExtension;
-           selectedFile = new File(selectedFile.getParentFile(), defaultName);
-       }
-       return new Pair<File, String>(selectedFile, defaultName);
-   }
-
- 
-
    /**
      * {@inheritDoc}
      */
@@ -139,6 +92,13 @@ public abstract class AbstractUserInterface implements UserInterface {
        return proofList.getFirstProof();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate) {
+       // Nothing to do
+    }
  
     /**
      * {@inheritDoc}
@@ -161,8 +121,8 @@ public abstract class AbstractUserInterface implements UserInterface {
        }
     }
 
-    abstract protected void macroStarted(String message, int size);
-    abstract protected void macroFinished(TaskFinishedInfo info);
+    protected abstract void macroStarted(String message, int size);
+    protected abstract void macroFinished(TaskFinishedInfo info);
 
 
     private class ProofMacroListenerAdapter implements ProverTaskListener {
@@ -181,5 +141,69 @@ public abstract class AbstractUserInterface implements UserInterface {
         public void taskFinished(TaskFinishedInfo info) {
             macroFinished(info);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isAutoModeSupported(Proof proof) {
+       return true; // All proofs are supported.
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AbstractProblemLoader load(Profile profile,
+                                     File file,
+                                     List<File> classPath,
+                                     File bootClassPath,
+                                     Properties poPropertiesToForce,
+                                     boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
+       AbstractProblemLoader loader = null;
+       try {
+          loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, profile, forceNewProfileOfNewProofs,
+                                                 this, false, poPropertiesToForce);
+          loader.load();
+          return loader;
+       }
+       catch(ProblemLoaderException e) {
+           if (loader != null && loader.getProof() != null) {
+               loader.getProof().dispose();
+           }
+           // rethrow that exception
+           throw e;
+       }
+       catch (Throwable e) {
+           if (loader != null && loader.getProof() != null) {
+               loader.getProof().dispose();
+           }
+           throw new ProblemLoaderException(loader, e);
+       }
+    }
+
+    @Override
+    public ProblemInitializer createProblemInitializer(Profile profile) {
+        ProblemInitializer pi = new ProblemInitializer(this, new Services(profile), this);
+        return pi;
+    }
+
+    @Override
+    public void loadingStarted() {
+    }
+
+    @Override
+    public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer, ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
+       if (proofList != null) {
+          // avoid double registration at specrepos as that is done already earlier in createProof
+          // the UI method should just do the necessarily UI registrations
+          createProofEnvironmentAndRegisterProof(poContainer.getProofOblInput(), proofList, loader.getInitConfig());
+       }
+    }
+
+    @Override
+    public boolean confirmTaskRemoval(String string) {
+        return true;
     }
 }

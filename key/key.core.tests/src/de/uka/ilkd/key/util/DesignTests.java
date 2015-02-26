@@ -189,8 +189,6 @@ public class DesignTests extends TestCase {
                 if (allClasses[i].getName().contains("KeYMediator")) continue;
                 
                 for (Field f : allClasses[i].getDeclaredFields()) {
-                    Package pkg = f.getType().getPackage();
-                    String pkgname = pkg != null ? pkg.getName() : "";
                     if (java.awt.Component.class.isAssignableFrom(f.getType())) { //|| pkgname.contains("key.gui")) { as long as the mediator and settings are in the GUI
                         System.out.println("Illegal GUI reference at field " + f.getName() + " declared in class " + allClasses[i].getName());
                         badClasses.add(allClasses[i]);

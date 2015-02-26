@@ -18,10 +18,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.removegenerics.Main;
 
 public class BatchMode {
 

@@ -92,7 +92,6 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                             IProgramVariable programVariable,
                             Term additionalCondition) {
       super(parentNode.getSettings(), 
-            parentNode.getMediator(), 
             proofNode, 
             programVariable, 
             parentValue, 
@@ -121,7 +120,6 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                             ExecutionValue lengthValue,
                             Term additionalCondition) {
       super(parentNode.getSettings(), 
-            parentNode.getMediator(), 
             proofNode, 
             null, 
             parentValue, 
@@ -206,8 +204,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                   conditionString = formatTerm(condition, services);
                }
                // Update result
-               result.add(new ExecutionValue(getMediator(),
-                                             getProofNode(),
+               result.add(new ExecutionValue(getProofNode(),
                                              this,
                                              false,
                                              value,
@@ -225,8 +222,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                   conditionString = formatTerm(condition, services);
                }
                // Update result
-               result.add(new ExecutionValue(getMediator(),
-                                             getProofNode(),
+               result.add(new ExecutionValue(getProofNode(),
                                              this,
                                              true,
                                              null,

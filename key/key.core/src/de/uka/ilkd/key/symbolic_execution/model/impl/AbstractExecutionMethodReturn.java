@@ -3,7 +3,6 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -53,15 +52,13 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
-    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param methodCall The {@link IExecutionMethodCall} which is now returned.
     */
    public AbstractExecutionMethodReturn(ITreeSettings settings, 
-                                        KeYMediator mediator, 
                                         Node proofNode, 
                                         ExecutionMethodCall methodCall) {
-      super(settings, mediator, proofNode);
+      super(settings, proofNode);
       assert methodCall != null;
       this.methodCall = methodCall;
       this.methodCall.addMethodReturn(this);

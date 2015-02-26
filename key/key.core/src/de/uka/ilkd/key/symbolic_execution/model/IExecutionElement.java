@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Node;
@@ -32,12 +31,6 @@ public interface IExecutionElement {
     * @return The {@link ITreeSettings} to use.
     */
    public ITreeSettings getSettings();
-   
-   /**
-    * Returns the used {@link KeYMediator} during proof.
-    * @return The used {@link KeYMediator} during proof.
-    */
-   public KeYMediator getMediator();
    
    /**
     * Returns the {@link Services} used in {@link #getProof()}.

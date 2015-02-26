@@ -30,12 +30,13 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
-import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.ui.Verbosity;
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
@@ -170,7 +171,7 @@ public final class Main {
             cl.parse(args);
             evaluateOptions(cl);
             fileArguments = cl.getFileArguments();
-            UserInterface userInterface = createUserInterface(fileArguments);
+            AbstractMediatorUserInterface userInterface = createUserInterface(fileArguments);
             loadCommandLineFiles(userInterface, fileArguments);
         } catch (ExceptionInInitializerError e) {
             System.err.println("D'oh! It seems that KeY was not built properly!");
@@ -185,7 +186,7 @@ public final class Main {
 
     }
 
-    public static void loadCommandLineFiles(UserInterface ui, List<File> fileArguments) {
+    public static void loadCommandLineFiles(AbstractMediatorUserInterface ui, List<File> fileArguments) {
         if (!fileArguments.isEmpty()) {
             ui.setMacro(autoMacro);
             ui.setSaveOnly(saveAllContracts);
@@ -420,7 +421,7 @@ public final class Main {
      * @return a <code>UserInterface</code> based on the value of
      *         <code>uiMode</code>
      */
-    private static UserInterface createUserInterface(List<File> fileArguments) {
+    private static AbstractMediatorUserInterface createUserInterface(List<File> fileArguments) {
 
         if (uiMode == UiMode.AUTO) {
             // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see bug #1216
@@ -545,13 +546,5 @@ public final class Main {
      */
     public static String getStatisticsFile() {
         return statisticsFile;
-    }
-
-    /** Command line output verbosity levels. */
-    public static final class Verbosity {
-        public static final byte SILENT = 0;
-        public static final byte NORMAL = 1;
-        public static final byte HIGH = 2;
-        public static final byte DEBUG = 4;
     }
 }

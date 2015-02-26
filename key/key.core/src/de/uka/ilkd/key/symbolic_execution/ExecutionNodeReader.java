@@ -36,7 +36,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
@@ -1025,14 +1024,6 @@ public class ExecutionNodeReader {
        */
       public AbstractKeYlessExecutionElement(String name) {
          this.name = name;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public KeYMediator getMediator() {
-         return null;
       }
       
       /**

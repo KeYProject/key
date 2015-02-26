@@ -21,7 +21,6 @@ import java.util.Map.Entry;
 
 import org.key_project.utils.java.StringUtil;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.MethodReference;
@@ -72,15 +71,13 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
-    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param methodCall The {@link IExecutionMethodCall} which is now returned.
     */
    public ExecutionMethodReturn(ITreeSettings settings,
-                                KeYMediator mediator, 
                                 Node proofNode, 
                                 ExecutionMethodCall methodCall) {
-      super(settings, mediator, proofNode, methodCall);
+      super(settings, proofNode, methodCall);
    }
 
    /**
@@ -277,7 +274,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                      Term returnValue = SideProofUtil.extractOperatorValue(goal, input.getOperator());
                      assert returnValue != null;
                      returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), returnValue, services);
-                     return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), getModalityPIO(), returnValue, null)};
+                     return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getProofNode(), getModalityPIO(), returnValue, null)};
                   }
                   else {
                      // Group equal values of different branches
@@ -296,7 +293,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                      // Create result
                      if (valueNodeMap.size() == 1) {
                         Term returnValue = valueNodeMap.keySet().iterator().next();
-                        return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), getModalityPIO(), returnValue, null)};
+                        return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getProofNode(), getModalityPIO(), returnValue, null)};
                      }
                      else {
                         IExecutionMethodReturnValue[] result = new IExecutionMethodReturnValue[valueNodeMap.size()];
@@ -312,7 +309,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                               condition = SymbolicExecutionUtil.simplify(info.getProof(), condition);
                            }
                            condition = SymbolicExecutionUtil.improveReadability(condition, info.getProof().getServices());
-                           result[i] = new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), getModalityPIO(), entry.getKey(), condition);
+                           result[i] = new ExecutionMethodReturnValue(getSettings(), getProofNode(), getModalityPIO(), entry.getKey(), condition);
                            i++;
                         }
                         return result;

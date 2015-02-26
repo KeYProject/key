@@ -16,7 +16,6 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -42,13 +41,11 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement> impleme
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
-    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
    public ExecutionStart(ITreeSettings settings,
-                         KeYMediator mediator, 
                          Node proofNode) {
-      super(settings, mediator, proofNode);
+      super(settings, proofNode);
    }
 
    /**

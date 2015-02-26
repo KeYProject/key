@@ -292,7 +292,7 @@ public final class SideProofStore {
       public Entry(String description, Proof proof) {
          this.description = description;
          this.proof = proof;
-         CustomUserInterface ui = new CustomUserInterface(false);
+         CustomUserInterface ui = new CustomUserInterface();
          this.environment = new KeYEnvironment<CustomUserInterface>(ui, proof.getInitConfig(), proof);
       }
 

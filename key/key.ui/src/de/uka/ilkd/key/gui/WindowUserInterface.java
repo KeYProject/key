@@ -21,11 +21,8 @@ import java.util.Properties;
 
 import javax.swing.JOptionPane;
 
-import org.key_project.utils.collection.ImmutableList;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.ApplyStrategy;
@@ -33,12 +30,10 @@ import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
@@ -46,13 +41,14 @@ import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.ui.AbstractUserInterface;
-import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
+import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.KeYConstants;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -66,7 +62,7 @@ import de.uka.ilkd.key.util.Pair;
  * @author mattias ulbrich
  */
 
-public class WindowUserInterface extends AbstractUserInterface {
+public class WindowUserInterface extends AbstractMediatorUserInterface {
 
     private final MainWindow mainWindow;
     private int numOfInvokedMacros;
@@ -109,11 +105,6 @@ public class WindowUserInterface extends AbstractUserInterface {
     @Override
     public void progressStopped(Object sender) {
         mainWindow.getMediator().startInterface(true);
-    }
-
-    @Override
-    public void proofCreated(ProblemInitializer sender,
-                             ProofAggregate proofAggregate) {
     }
 
     @Override
@@ -291,51 +282,13 @@ public class WindowUserInterface extends AbstractUserInterface {
         return (result != null && result.complete()) ? result : null;
     }
 
-    @Override
-    public ProblemInitializer createProblemInitializer(Profile profile) {
-        ProblemInitializer pi = new ProblemInitializer(this,
-                new Services(profile), this);
-        return pi;
-    }
-
    /**
-    * Returns the used {@link KeYMediator}.
-    * @return The used {@link KeYMediator}.
+    * {@inheritDoc}
     */
+   @Override
    public KeYMediator getMediator() {
       return mainWindow.getMediator();
    }
-
-   public boolean applyMacro() {
-      assert macroChosen();
-      final ProofMacro macro = getMacro();
-      if (macro.canApplyTo(getMediator().getSelectedNode(), null)) {
-          Debug.out("[ APPLY " + getMacro().getClass().getSimpleName() + " ]");
-          Proof proof = getMediator().getSelectedProof();
-          TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
-          ProverTaskListener ptl = getListener();
-          try {
-              getMediator().stopInterface(true);
-              getMediator().setInteractive(false);
-              ptl.taskStarted(macro.getName(), 0);
-              synchronized(macro) {
-                  // wait for macro to terminate
-                  info = macro.applyTo(getMediator().getSelectedNode(), null, ptl);
-              }
-          } catch(InterruptedException ex) {
-              Debug.out("Proof macro has been interrupted:");
-              Debug.out(ex);
-          } finally {
-              ptl.taskFinished(info);
-              getMediator().setInteractive(true);
-              getMediator().startInterface(true);
-          }
-          return true;
-      } else {
-          System.out.println(macro.getClass().getSimpleName() + " not applicable!");
-      }
-      return false;
-  }
 
    
    /**
@@ -350,82 +303,13 @@ public class WindowUserInterface extends AbstractUserInterface {
                                     boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
       if (file != null) {
          mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
-      } 
-      
-      AbstractProblemLoader loader = null;
+      }
       try {
          getMediator().stopInterface(true);
-         loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, profile, forceNewProfileOfNewProofs,
-                                                this, false, poPropertiesToForce);
-         loader.load();
-         return loader;
-      }
-      catch(ProblemLoaderException e) {
-          if (loader != null && loader.getProof() != null) {
-              loader.getProof().dispose();
-          }
-          // rethrow that exception
-          throw e;
-      }
-      catch (Throwable e) {
-          if (loader != null && loader.getProof() != null) {
-              loader.getProof().dispose();
-          }
-          throw new ProblemLoaderException(loader, e);
+         return super.load(profile, file, classPath, bootClassPath, poPropertiesToForce, forceNewProfileOfNewProofs);
       }
       finally {
          getMediator().startInterface(true);
-      }
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void startAndWaitForAutoMode(Proof proof) {
-      startAutoMode(proof);
-      waitWhileAutoMode();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void startAutoMode(Proof proof) {
-      KeYMediator mediator = getMediator();
-      mediator.setProof(proof);
-      mediator.startAutoMode();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void startAutoMode(Proof proof, ImmutableList<Goal> goals) {
-      KeYMediator mediator = getMediator();
-      mediator.setProof(proof);
-      mediator.startAutoMode(goals);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void stopAutoMode() {
-      getMediator().stopAutoMode();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void waitWhileAutoMode() {
-      while (getMediator().isInAutoMode()) { // Wait until auto mode has stopped.
-         try {
-            Thread.sleep(100);
-         }
-         catch (InterruptedException e) {
-         }
       }
    }
 
@@ -438,7 +322,13 @@ public class WindowUserInterface extends AbstractUserInterface {
       return mainWindow.getProofList().containsProof(proof);
    }
 
-   @Override
+   /**
+    * save proof in file. If autoSave is on, this will potentially overwrite already
+    * existing proof files with the same name. Otherwise the save dialog pops up.
+    * For loaded proofs both are turned off by default, i.e. only manual saving is
+    * possible, and the save dialog never pops up automatically (except for hitting
+    * the "Save ..." or "Save current proof" button).
+    */
    public File saveProof(Proof proof, String fileExtension) {
        final MainWindow mainWindow = MainWindow.getInstance();
        final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
@@ -468,6 +358,34 @@ public class WindowUserInterface extends AbstractUserInterface {
        return file;
    }
 
+   protected static Pair<File, String> fileName(Proof proof, String fileExtension) {
+       // TODO: why do we use GUI components here?
+       final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
+
+       File selectedFile = null;
+       if (proof != null) {
+          selectedFile = proof.getProofFile();
+       }
+       // Suggest default file name if required
+       final String defaultName;
+       if (selectedFile == null) {
+           defaultName = MiscTools.toValidFileName(proof.name().toString()) + fileExtension;
+           selectedFile = new File(jFC.getCurrentDirectory(), defaultName);
+       } else if (selectedFile.getName().endsWith(".proof") && fileExtension.equals(".proof")) {
+           defaultName = selectedFile.getName();
+       } else {
+           String proofName = proof.name().toString();
+           if (proofName.endsWith(".key")) {
+               proofName = proofName.substring(0, proofName.lastIndexOf(".key"));
+           } else if (proofName.endsWith(".proof")) {
+               proofName = proofName.substring(0, proofName.lastIndexOf(".proof"));
+           }
+           defaultName = MiscTools.toValidFileName(proofName) + fileExtension;
+           selectedFile = new File(selectedFile.getParentFile(), defaultName);
+       }
+       return new Pair<File, String>(selectedFile, defaultName);
+   }
+   
    /**
     * {@inheritDoc}
     */
@@ -498,14 +416,13 @@ public class WindowUserInterface extends AbstractUserInterface {
    @Override
    public void loadingStarted() {
       getMediator().stopInterface(true);
+      super.loadingStarted();
    }
 
    @Override
    public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer, ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
+      super.loadingFinished(loader, poContainer, proofList, result);
       if (proofList != null) {
-         // avoid double registration at specrepos as that is done already earlier in createProof
-         // the UI method should just do the necessarily UI registrations
-         this.createProofEnvironmentAndRegisterProof(poContainer.getProofOblInput(), proofList, loader.getInitConfig());
          getMediator().setProof(loader.getProof());
          getMediator().getSelectionModel().setSelectedProof(loader.getProof());                       
          if (result != null) {
@@ -532,5 +449,53 @@ public class WindowUserInterface extends AbstractUserInterface {
         if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
             ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
         }
+   }
+   
+   
+   
+
+   
+   /**
+    * Loads the given location and returns all required references as {@link KeYEnvironment}
+    * with KeY's {@link MainWindow}.
+    * @param location The location to load.
+    * @param classPaths The class path entries to use.
+    * @param bootClassPath The boot class path to use.
+    * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already visible?
+    * @return The {@link KeYEnvironment} which contains all references to the loaded location.
+    * @throws ProblemLoaderException Occurred Exception
+    */
+   public static KeYEnvironment<UserInterface> loadInMainWindow(File location,
+                                                                List<File> classPaths,
+                                                                File bootClassPath,
+                                                                boolean makeMainWindowVisible) throws ProblemLoaderException {
+      return loadInMainWindow(null, location, classPaths, bootClassPath, false, makeMainWindowVisible);
+   }
+   
+   /**
+    * Loads the given location and returns all required references as {@link KeYEnvironment}
+    * with KeY's {@link MainWindow}.
+    * @param profile The {@link Profile} to use.
+    * @param location The location to load.
+    * @param classPaths The class path entries to use.
+    * @param bootClassPath The boot class path to use.
+    * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already visible?
+    * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
+    * @return The {@link KeYEnvironment} which contains all references to the loaded location.
+    * @throws ProblemLoaderException Occurred Exception
+    */
+   public static KeYEnvironment<UserInterface> loadInMainWindow(Profile profile,
+                                                                File location,
+                                                                List<File> classPaths,
+                                                                File bootClassPath,
+                                                                boolean forceNewProfileOfNewProofs,
+                                                                boolean makeMainWindowVisible) throws ProblemLoaderException {
+      MainWindow main = MainWindow.getInstance();
+      if (makeMainWindowVisible && !main.isVisible()) {
+          main.setVisible(true);
+      }
+      AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, null, forceNewProfileOfNewProofs);
+      InitConfig initConfig = loader.getInitConfig();
+      return new KeYEnvironment<UserInterface>(main.getUserInterface(), initConfig, loader.getProof());
    }
 }

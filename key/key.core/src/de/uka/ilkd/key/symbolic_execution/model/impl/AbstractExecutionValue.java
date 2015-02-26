@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -47,19 +46,17 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement im
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
-    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param variable The parent {@link IExecutionVariable} which contains this value.
     * @param condition The condition.
     * @param value The value.
     */
    public AbstractExecutionValue(ITreeSettings settings, 
-                                 KeYMediator mediator, 
                                  Node proofNode, 
                                  IExecutionVariable variable, 
                                  Term condition,
                                  Term value) {
-      super(settings, mediator, proofNode);
+      super(settings, proofNode);
       this.variable = variable;
       this.condition = condition;
       this.value = value;

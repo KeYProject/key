@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -74,15 +73,13 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
-    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param additionalBranchLabel The optional additional branch label.
     */
    public ExecutionBranchCondition(ITreeSettings settings, 
-                                   KeYMediator mediator, 
                                    Node proofNode, 
                                    String additionalBranchLabel) {
-      super(settings, mediator, proofNode);
+      super(settings, proofNode);
       this.additionalBranchLabel = additionalBranchLabel;
    }
 

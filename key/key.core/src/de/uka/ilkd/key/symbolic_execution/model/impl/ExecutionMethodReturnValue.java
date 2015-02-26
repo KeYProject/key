@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
@@ -55,18 +54,16 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
-    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param returnValue The return value.
     * @param condition The optional condition or {@code null} if no condition is available.
     */
    public ExecutionMethodReturnValue(ITreeSettings settings,
-                                     KeYMediator mediator, 
                                      Node proofNode, 
                                      PosInOccurrence modalityPIO,
                                      Term returnValue, 
                                      Term condition) {
-      super(settings, mediator, proofNode);
+      super(settings, proofNode);
       assert returnValue != null;
       assert modalityPIO != null;
       this.returnValue = returnValue;

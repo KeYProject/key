@@ -429,8 +429,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                                     IProgramVariable programVariable,
                                     Term arrayIndex,
                                     Term additionalCondition) {
-         super(parentNode.getSettings(), 
-               parentNode.getMediator(), 
+         super(parentNode.getSettings(),
                proofNode, 
                programVariable, 
                null, 
@@ -504,8 +503,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                                         Term arrayIndex,
                                         Term additionalCondition,
                                         ExtractedExecutionValue parentValue) {
-         super(parentNode.getSettings(), 
-               parentNode.getMediator(), 
+         super(parentNode.getSettings(),
                proofNode, 
                programVariable, 
                parentValue, 
@@ -567,7 +565,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                                      IExecutionVariable variable, 
                                      Term condition, 
                                      Term value) {
-         super(parentNode.getSettings(), parentNode.getMediator(), proofNode, variable, condition, value);
+         super(parentNode.getSettings(), proofNode, variable, condition, value);
          this.parentNode = parentNode;
       }
 

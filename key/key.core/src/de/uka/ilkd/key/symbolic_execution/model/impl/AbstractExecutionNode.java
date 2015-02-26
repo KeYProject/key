@@ -21,7 +21,6 @@ import java.util.Map;
 import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -104,13 +103,11 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
-    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
    public AbstractExecutionNode(ITreeSettings settings,
-                                KeYMediator mediator, 
                                 Node proofNode) {
-      super(settings, mediator, proofNode);
+      super(settings, proofNode);
    }
 
    /**

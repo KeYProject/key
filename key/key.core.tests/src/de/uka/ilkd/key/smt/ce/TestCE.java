@@ -2,16 +2,15 @@ package de.uka.ilkd.key.smt.ce;
 
 import java.io.File;
 
-import junit.framework.Assert;
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SolverType;
-import de.uka.ilkd.key.smt.TestConsoleUserInterface;
 import de.uka.ilkd.key.smt.test.TestCommons;
-import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 public class TestCE extends TestCommons {
@@ -102,28 +101,29 @@ public class TestCE extends TestCommons {
 		assertTrue(this.correctResult(testFile + "types9.key", true));
 	}
 
-	public void testMiddle() {
-		UserInterface ui = new TestConsoleUserInterface(false, false);
-		KeYMediator mediator = ui.getMediator();
+	public void testMiddle() throws Exception {
 		File file = new File(testFile + "middle.key");
-		ui.loadProblem(file);
+		KeYEnvironment<CustomUserInterface> env = KeYEnvironment.load(file, null, null);
 		try {
+		   Proof proof = env.getLoadedProof();
+		   assertNotNull(proof);
 			FinishSymbolicExecutionMacro se = new FinishSymbolicExecutionMacro();
-			se.applyTo(mediator, null, null);
+			se.applyTo(proof, proof.openEnabledGoals(), null, null);
 			TryCloseMacro close = new TryCloseMacro();
-			close.applyTo(mediator, null, null);
+			close.applyTo(proof, proof.openEnabledGoals(), null, null);
 			// should not be provable
-			assertTrue(ui.getMediator().getSelectedProof().openGoals().size() > 0);
+			assertTrue(proof.openGoals().size() > 0);
 			// there should be a counterexample for each goal...
-			for (Goal g : ui.getMediator().getSelectedProof().openGoals()) {
-				mediator.getSelectionModel().setSelectedGoal(g);
+			for (Goal g : proof.openGoals()) {
 				SemanticsBlastingMacro sb = new SemanticsBlastingMacro();
-				sb.applyTo(mediator, null, null);
-				Assert.assertTrue(correctResult(mediator.getSelectedGoal(),
-				        false));
+				sb.applyTo(g.node(), null, null);
+				assertTrue(correctResult(g, false));
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		}
+		finally {
+		   if (env != null) {
+		      env.dispose();
+		   }
 		}
 	}
 }

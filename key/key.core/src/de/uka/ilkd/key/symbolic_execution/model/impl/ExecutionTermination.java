@@ -21,7 +21,6 @@ import org.key_project.utils.java.CollectionUtil;
 import org.key_project.utils.java.IFilter;
 import org.key_project.utils.java.ObjectUtil;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -68,17 +67,15 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement> i
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
-    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param exceptionVariable Contains the exception variable which is used to check if the executed program in proof terminates normally.
     * @param terminationKind The {@link TerminationKind} or {@code null} to compute it when it is requested the first time (normal or exceptional termination only).
     */
    public ExecutionTermination(ITreeSettings settings,
-                               KeYMediator mediator, 
                                Node proofNode, 
                                IProgramVariable exceptionVariable, 
                                TerminationKind terminationKind) {
-      super(settings, mediator, proofNode);
+      super(settings, proofNode);
       this.exceptionVariable = exceptionVariable;
       this.terminationKind = terminationKind;
    }
