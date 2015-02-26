@@ -16,7 +16,6 @@ package de.uka.ilkd.key.pp;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
@@ -33,7 +32,6 @@ import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -46,7 +44,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -316,45 +313,6 @@ public class LogicPrinter {
     }
 
 
-    private static void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
-	for(SequentFormula cf : s) {
-	    cf.formula().execPostOrder(oc);
-	}
-    }
-
-
-    private static Set<SchemaVariable> collectSchemaVars(Taclet t) {
-
-	Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
-	OpCollector oc = new OpCollector();
-
-	//find, assumes
-	for(SchemaVariable sv: t.getIfFindVariables()) {
-	    result.add(sv);
-	}
-
-	//add, replacewith
-	for(TacletGoalTemplate tgt : t.goalTemplates()) {
-	    collectSchemaVarsHelper(tgt.sequent(), oc);
-	    if(tgt instanceof AntecSuccTacletGoalTemplate) {
-		collectSchemaVarsHelper(
-			((AntecSuccTacletGoalTemplate)tgt).replaceWith(), oc);
-	    } else if(tgt instanceof RewriteTacletGoalTemplate) {
-		((RewriteTacletGoalTemplate)tgt).replaceWith()
-					        .execPostOrder(oc);
-	    }
-	}
-
-	for(Operator op : oc.ops()) {
-	    if(op instanceof SchemaVariable) {
-		result.add((SchemaVariable)op);
-	    }
-	}
-
-	return result;
-    }
-
-
     /**
      * Pretty-print a taclet. Line-breaks are taken care of.
      *
@@ -428,9 +386,7 @@ public class LogicPrinter {
     }
 
     protected void printAttribs(Taclet taclet) throws IOException{
-//        if (taclet.noninteractive()) {
-//            layouter.brk().print("\\noninteractive");
-//        }
+        // no attributes exist for non-rewrite taclets at the moment
     }
 
     protected void printRewriteAttributes(RewriteTaclet taclet) throws IOException{
