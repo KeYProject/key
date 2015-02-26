@@ -20,7 +20,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * A specieal kind of gui proof tree node to show intermediate intermediate steps of the 
+ * A special kind of gui proof tree node to show intermediate intermediate steps of the 
  * {@link de.uka.ilkd.key.rule.OneStepSimplifier}.
  * 
  * These nodes are leaves.
