@@ -159,7 +159,7 @@ public class FileChooser extends JPanel{
         }
         
 
-        private JList      axiomsList;
+        private JList<File>      axiomsList;
         private JButton    addAxiomFileButton;
         private JButton    removeAxiomFileButton;
         private JButton    helpButton;
@@ -408,8 +408,8 @@ public class FileChooser extends JPanel{
                                 
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                        Object values[] = getAxiomsList().getSelectedValues();
-                                        for(Object o : values){
+                                        List<File> values = getAxiomsList().getSelectedValuesList();
+                                        for(File o : values){
                                                 listModel.removeElement(o);
                                         }
                                         

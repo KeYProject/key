@@ -56,3 +56,6 @@ smt-solvers
 *.snm
 
 /projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.pdf
+
+
+key/key.utils.tests/resources/lineIndicesTest/Text_DOS.txt

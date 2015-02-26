@@ -32,21 +32,9 @@ public class LemmataAutoModeOptions {
          * The path of the file containing the rules that should be proven.
          * */
         private String pathOfRuleFile;
-        
-        /**
-         * CommandLine object, where all options are parsed already
-         */
-        
-        private CommandLine cl;
-        
+                
         private Collection<String> filesForAxioms = new LinkedList<String>();
 
-        /**
-         * The names of the rules that should be proven. If this container is
-         * empty this means that every rule contained in
-         * <code>pathRuleFile</code> must be proven.
-         */
-        private final LinkedList<String> rules = new LinkedList<String>();
         /**
          * The time out for each proof. If <code>timeout<0</code> no time out is
          * used.
