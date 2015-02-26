@@ -39,9 +39,6 @@ import de.uka.ilkd.key.util.Pair;
 
 public abstract class AbstractUserInterface implements UserInterface {
 
-    private static String INDEX_FILE = "automaticJAVADL.txt";
-    private static String IF_INDEX_FILE = "automaticMacroInfFlow.txt";
-
     private ProofMacro autoMacro = new SkipMacro();
     protected boolean saveOnly = false;
 
