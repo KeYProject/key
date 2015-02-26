@@ -163,7 +163,7 @@ public class TestRecoder2KeY extends TestCase {
 
     private void testClass(String is) {
         try {
-            CompilationUnit cu = c2k.readCompilationUnit(is);
+            c2k.readCompilationUnit(is);
         } catch (RuntimeException e) {
             System.err.println("An error occured while parsing: '" + is + "'");
             throw e;

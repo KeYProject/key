@@ -486,16 +486,14 @@ public class PrettyPrinter {
     }
 
     protected Position getRelativePosition(SourceElement first) {
-        try {
-            if (indentMap.containsKey(first)) {
-                return indentMap.get(first);
-            } else {
-                if (first!=null) return first.getRelativePosition();
+        if (indentMap.containsKey(first)) {
+            return indentMap.get(first);
+        } else {
+            if (first!=null) return first.getRelativePosition();
 
-            }
-        } finally {
-            return Position.UNDEFINED;
         }
+
+        return Position.UNDEFINED;
     }
 
     /**
@@ -2992,6 +2990,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
+    @SuppressWarnings("unchecked")
     public void printSchemaVariable(SchemaVariable x) throws java.io.IOException {
     	if(x instanceof ProgramSV){
     		if (!noSemicolons) {

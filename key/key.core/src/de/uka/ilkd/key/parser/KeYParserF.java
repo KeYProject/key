@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
 /**
  * Extends generated class {@link KeYParser} with custom constructors.
@@ -32,14 +33,14 @@ public class KeYParserF extends KeYParser {
 
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF,
             ParserConfig schemaConfig, ParserConfig normalConfig,
-            HashMap taclet2Builder, ImmutableSet<Taclet> taclets) {
+            HashMap<Taclet, TacletBuilder> taclet2Builder, ImmutableSet<Taclet> taclets) {
         super(mode, new CommonTokenStream(keYLexerF), schemaConfig,
                 normalConfig, taclet2Builder, taclets);
     }
 
     public KeYParserF(ParserMode mode, TokenStream lexer,
             ParserConfig schemaConfig, ParserConfig normalConfig,
-            HashMap taclet2Builder, ImmutableSet<Taclet> taclets) {
+            HashMap<Taclet, TacletBuilder> taclet2Builder, ImmutableSet<Taclet> taclets) {
         super(mode, lexer, schemaConfig, normalConfig, taclet2Builder, taclets);
     }
 

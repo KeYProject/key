@@ -28,6 +28,7 @@ public class UnfittingReplacewithException
     public UnfittingReplacewithException(String description,
 					 String filename,
 					 int line , int column) {
+    super();
 	this.filename = filename;
 	this.line = line;
 	this.charPositionInLine = column;
@@ -36,7 +37,7 @@ public class UnfittingReplacewithException
     
 
     public String getMessage() {
-	return description;
+	return (filename != null ? filename + ":" :  "") + description;
     }			
     
 }

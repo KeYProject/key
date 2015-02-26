@@ -24,7 +24,7 @@ import de.uka.ilkd.key.util.Debug;
 
 public class TestKeYRecoderMapping extends TestCase{
 
-    private HashMap map, revmap;
+    private HashMap<Object, Object> map, revmap;
     private recoder.java.ProgramElement rp,rp2;
     private ProgramElement kp;
     private recoder.ModelElement rm, rm2;
@@ -39,8 +39,8 @@ public class TestKeYRecoderMapping extends TestCase{
 
 
     public void setUp(){
-        map = new HashMap();
-        revmap = new HashMap();
+        map = new HashMap<Object, Object>();
+        revmap = new HashMap<Object, Object>();
         rp = new recoder.java.declaration.ClassDeclaration();
         kp = new EmptyStatement();
         rm = new recoder.java.statement.Case();
