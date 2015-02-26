@@ -26,10 +26,6 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class JavaNonTerminalProgramElement 
 			extends JavaProgramElement
  			implements NonTerminalProgramElement {
-
-    
-    private int hashCode;
-
     
     public JavaNonTerminalProgramElement() {
     }

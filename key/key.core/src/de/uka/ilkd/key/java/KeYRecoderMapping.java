@@ -140,6 +140,7 @@ public class KeYRecoderMapping{
     }
 
     
+    @SuppressWarnings("unchecked")
     public KeYRecoderMapping copy() {
 	return new KeYRecoderMapping((HashMap<Object, Object>)map.clone(),
 				     (HashMap<Object, Object>)revMap.clone(),

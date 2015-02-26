@@ -95,7 +95,8 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 	    Debug.out("ProgramReplace:", inst);
 	    addChild((ProgramElement)inst);
 	} else if (inst instanceof ImmutableArray/*<ProgramElement>*/) {
-	    final ImmutableArray<ProgramElement> instArray = (ImmutableArray<ProgramElement>)inst;        
+	    @SuppressWarnings("unchecked")
+        final ImmutableArray<ProgramElement> instArray = (ImmutableArray<ProgramElement>)inst;        
 	    // the assertion ensures the intended instanceof check from above
 	    assert instArray.size() == 0 || instArray.last() instanceof ProgramElement;
 	    addChildren(instArray);

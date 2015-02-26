@@ -19,6 +19,11 @@ import de.uka.ilkd.key.speclang.jml.translation.JMLTranslator;
  */
 public abstract class EscapeExpression extends Operator {
 
+    /**
+     * generated UID
+     */
+    private static final long serialVersionUID = -5679001759804380826L;
+    
     protected final String functionName;
 
     /**

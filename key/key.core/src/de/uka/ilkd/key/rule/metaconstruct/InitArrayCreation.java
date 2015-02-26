@@ -233,7 +233,6 @@ public class InitArrayCreation extends InitArray {
 	        throw new RuntimeException("Array dimension does not match its definition. This is a Java syntax error.",e);
 	    }
         final int dimension = arrayType.getDimension();
-        final Expression[] size = { }; // XXX don't know what that is for
         Type baseType = arrayType;
         TypeReference baseTypeRef = null;
         while (baseType instanceof ArrayType) {

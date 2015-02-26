@@ -36,6 +36,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                     "information flow specification.");
         }
         assert ImmutableList.class.equals(BasicSnippetData.Key.INF_FLOW_SPECS.getType());
+        @SuppressWarnings("unchecked")
         ImmutableList<InfFlowSpec>
             origInfFlowSpecs =
                 (ImmutableList<InfFlowSpec>) d.get(BasicSnippetData.Key.INF_FLOW_SPECS);

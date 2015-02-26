@@ -15,6 +15,11 @@ import de.uka.ilkd.key.util.MiscTools;
  */
 public class RegisteredEscapeExpression extends EscapeExpression {
 
+    /**
+     * generated UID
+     */
+    private static final long serialVersionUID = 5400879603292633806L;
+    
     private final String mapEscape;
 
     RegisteredEscapeExpression(String mapEscape, List<Expression> arguments) {

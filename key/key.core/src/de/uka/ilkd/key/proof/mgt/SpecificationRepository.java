@@ -1148,7 +1148,6 @@ public final class SpecificationRepository {
                     }
                     ProgramVariable resultVar = tb.resultVar(pm, false);
 
-                    boolean definitionFound = false;
                     // This assumes there is one operation contract for each model pm per class
                     // We need to construct an inheritance chain of contracts starting at the bottom
                     ImmutableList<FunctionalOperationContract> lookupContracts =
@@ -1181,7 +1180,6 @@ public final class SpecificationRepository {
                                                       representsFromContract, selfVar, paramVars,
                                                       atPreVars);
                             result = result.add(modelMethodRepresentsAxiom);
-                            definitionFound = true;
                             break;
                         }
                     }

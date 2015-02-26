@@ -17,6 +17,11 @@ package de.uka.ilkd.key.proof.init;
  */
 public class ProofInputException extends Exception {
 
+    /**
+     * Serial UID (generated)
+     */
+    private static final long serialVersionUID = 1627043675372779404L;
+
     public ProofInputException(Exception e) {
         super(e);
     }

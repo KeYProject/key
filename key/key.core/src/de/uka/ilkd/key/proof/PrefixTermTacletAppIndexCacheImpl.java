@@ -51,6 +51,7 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
     }
 
     private int hits = 0, total = 0;
+    @SuppressWarnings("unused")
     private void countAccess(boolean hit) {
         ++total;
         if ( hit ) ++hits;

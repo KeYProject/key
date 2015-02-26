@@ -303,23 +303,6 @@ public class KeYProgModelInfo{
     }
 
     /**
-     * create a recoder package reference out of a IDENT (DOT IDENT)+
-     * String
-     */
-    private recoder.java.reference.PackageReference
-	createPackageReference(String pkgName) {
-	final int lastDot = pkgName.lastIndexOf('.');
-	if (lastDot != -1) {
-	    return new recoder.java.reference.PackageReference
-		(createPackageReference
-		 (pkgName.substring(0,lastDot)),
-		  new recoder.java.Identifier(pkgName.substring(lastDot+1)));
-	}
-	return new recoder.java.reference.PackageReference
-	    (new recoder.java.Identifier(pkgName));
-    }
-
-    /**
      * checks if name refers to a package
      * @param name a String with the name to be checked
      * @return true iff name refers to a package

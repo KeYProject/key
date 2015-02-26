@@ -33,13 +33,10 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.SuperArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Final;
-import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
-import de.uka.ilkd.key.java.declaration.modifier.Static;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -484,41 +481,6 @@ public class Recoder2KeYTypeConverter {
                         parentReference, length, fields));
                 members.add(arrayMethodBuilder.getCreateArrayMethod(parentReference,
                         prepare, fields));
-    }
-
-    /**
-     * creates an implicit field of the given name and type
-     * 
-     * @param name
-     *            a String with the name of the implicit field
-     * @param typeRef
-     *            a TypeReference refering to the type as which the new field
-     *            has to be declared
-     * @param isStatic
-     *            a boolean that forces a field to become static or non static
-     * @return the new created FieldDeclaration <br>
-     *         </br> </code>private (static) typeRef name</code>
-     */
-    private FieldDeclaration createImplicitArrayField(String name,
-            TypeReference typeRef, boolean isStatic, KeYJavaType prefix) {
-
-        ImplicitFieldSpecification varSpec = new ImplicitFieldSpecification(
-                new LocationVariable(new ProgramElementName(Recoder2KeYConverter.makeAdmissibleName(name),
-                                     Recoder2KeYConverter.makeAdmissibleName(prefix.getSort().name().toString())),
-                                     typeRef.getKeYJavaType(), 
-                                     prefix, 
-                                     isStatic,
-                                     false), 
-                typeRef.getKeYJavaType());
-        // no recoder dependance
-        // insertToMap(recoderVarSpec, varSpec);
-        Modifier[] modifiers = new Modifier[isStatic ? 2 : 1];
-        modifiers[0] = new Private();
-        if (isStatic) {
-            modifiers[1] = new Static();
-        }
-        return new FieldDeclaration(modifiers, typeRef,
-                new FieldSpecification[] { varSpec }, false);
     }
 
     /**
