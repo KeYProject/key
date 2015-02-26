@@ -25,8 +25,6 @@ import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableSLList;
 import org.key_project.utils.collection.ImmutableSet;
 
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -53,7 +51,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.MiscTools;
 
 
-public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListener {
+public final class OneStepSimplifier implements BuiltInRule {
 
     private static final int APPLICABILITY_CACHE_SIZE = 1000;
     private static final int DEFAULT_CACHE_SIZE = 10000;
@@ -537,6 +535,13 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
     //public interface
     //-------------------------------------------------------------------------
 
+    public static void refreshOSS(Proof proof) {
+        OneStepSimplifier simplifierInstance = MiscTools.findOneStepSimplifier(proof);
+        if (simplifierInstance != null) {
+           simplifierInstance.refresh(proof);
+        }
+    }
+    
     public void refresh(Proof proof) {
         active = ProofIndependentSettings.DEFAULT_INSTANCE
                         .getGeneralSettings()
@@ -625,22 +630,6 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
     @Override
     public String toString() {
         return displayName();
-    }
-
-
-    @Override
-    public void selectedNodeChanged(KeYSelectionEvent e) {
-        //don't care
-    }
-
-
-    @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
-        Proof proof = e.getSource().getSelectedProof(); 
-        OneStepSimplifier simplifierInstance = MiscTools.findOneStepSimplifier(proof);
-        if (simplifierInstance == this) {
-            refresh(proof);
-        }
     }
 
     /**

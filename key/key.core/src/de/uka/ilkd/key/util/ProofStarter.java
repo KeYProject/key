@@ -220,10 +220,7 @@ public class ProofStarter {
            }
 
            if (proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification()) {
-              OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof);
-              if (simplifier != null) {
-                 simplifier.refresh(proof);
-              }
+              OneStepSimplifier.refreshOSS(proof);
            }
            proof.setActiveStrategy(factory.create(proof, strategyProperties));
 

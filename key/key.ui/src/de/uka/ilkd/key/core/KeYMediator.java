@@ -69,7 +69,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
-import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
@@ -101,13 +100,6 @@ public class KeYMediator {
     private boolean minimizeInteraction; // minimize user interaction
 
     private TacletFilter filterForInteractiveProving;
-    
-    /**
-     * The currently used {@link OneStepSimplifier} which has to be changed
-     * when the current {@link Proof} lives in a different {@link Profile}
-     * than the {@link Proof} before.
-     */
-    private OneStepSimplifier currentOneStepSimplifier;
 
     /**
      * An optional used {@link AutoSaver}.
@@ -346,18 +338,7 @@ public class KeYMediator {
             newProof.addRuleAppListener(proofListener);
         }
 
-        // moved from layout main here; but does not actually belong here at all;
-        // we should get that rule to behave like a normal built-in rule
-//        OneStepSimplifier newSimplifier = MiscTools.findOneStepSimplifier(newProof); // TODO: Reimplement OSS (REFACTORING_FIX_ME)
-//        if (currentOneStepSimplifier != newSimplifier) {
-//            if (currentOneStepSimplifier != null) {
-//                removeKeYSelectionListener(currentOneStepSimplifier);
-//            }
-//            currentOneStepSimplifier = newSimplifier;
-//            if (currentOneStepSimplifier != null) {
-//                addKeYSelectionListener(currentOneStepSimplifier);
-//            }
-//        }
+        OneStepSimplifier.refreshOSS(newProof);
 
         keySelectionModel.setSelectedProof(newProof);
     }

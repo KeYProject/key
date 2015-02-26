@@ -25,6 +25,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.util.ProofStarter;
 
 /**

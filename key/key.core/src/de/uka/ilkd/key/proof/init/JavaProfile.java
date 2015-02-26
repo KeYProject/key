@@ -124,7 +124,7 @@ public class JavaProfile extends AbstractProfile {
         builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
                                    .prepend(BlockContractRule.INSTANCE)
                                    .prepend(UseDependencyContractRule.INSTANCE)
-//                                   .prepend(getOneStepSimpilifier()) // TODO: Temporary disabled oss (REFACTORING_FIX_ME)
+                                   .prepend(getOneStepSimpilifier())
                                    .prepend(QueryExpand.INSTANCE);
   
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact 
@@ -149,7 +149,7 @@ public class JavaProfile extends AbstractProfile {
     public OneStepSimplifier getOneStepSimpilifier() {
        synchronized (this) {
           if (oneStepSimpilifier == null) {
-//             oneStepSimpilifier = new OneStepSimplifier(); // TODO: Temporary disabled OSS (REFACTORING_FIX_ME)
+             oneStepSimpilifier = new OneStepSimplifier();
           }
           return oneStepSimpilifier;
        }

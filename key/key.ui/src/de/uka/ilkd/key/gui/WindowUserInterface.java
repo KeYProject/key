@@ -424,7 +424,6 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
       super.loadingFinished(loader, poContainer, proofList, result);
       if (proofList != null) {
          getMediator().setProof(loader.getProof());
-         getMediator().getSelectionModel().setSelectedProof(loader.getProof());                       
          if (result != null) {
             getMediator().getSelectionModel().setSelectedNode(result.getNode());
          } else {
