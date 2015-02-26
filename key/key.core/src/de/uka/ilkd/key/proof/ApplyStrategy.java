@@ -544,9 +544,13 @@ public class ApplyStrategy {
     }
 
     public synchronized ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals) {
+       ProofSettings settings = proof.getSettings();
+       StrategySettings stratSet = settings.getStrategySettings();
+       return start(proof, goals, stratSet);
+    }
 
-        ProofSettings settings = proof.getSettings();
-        StrategySettings stratSet = settings.getStrategySettings();
+    public synchronized ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, StrategySettings stratSet) {
+
         int maxSteps = stratSet.getMaxSteps();
         long timeout = stratSet.getTimeout();
 
@@ -564,11 +568,7 @@ public class ApplyStrategy {
      * discouraged.
      *
      * @return
-     *
-     * @deprecated Use {@link #start(Proof, ImmutableList)}. Adjust the settings
-     *             beforehand if needed
      */
-    @Deprecated
     public synchronized ApplyStrategyInfo start(Proof proof,
                                                 ImmutableList<Goal> goals,
                                                 int maxSteps,

@@ -1,24 +1,28 @@
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.key_project.utils.collection.ImmutableList;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.macros.FinishAuxiliaryBlockComputationMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProverTaskListener;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.MiscTools;
 
 public abstract class AbstractMediatorUserInterface extends AbstractUserInterface{
    /** 
@@ -52,7 +56,7 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
       if (macro.canApplyTo(getMediator().getSelectedNode(), null)) {
           Debug.out("[ APPLY " + getMacro().getClass().getSimpleName() + " ]");
           Proof proof = getMediator().getSelectedProof();
-          TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
+          ProofMacroFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
           ProverTaskListener ptl = getListener();
           try {
               getMediator().stopInterface(true);
@@ -76,6 +80,45 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
       }
       return false;
   }
+   
+   @Override
+   protected void macroFinished(ProofMacroFinishedInfo info) {
+      super.macroFinished(info);
+      if (info.getMacro() instanceof FinishAuxiliaryBlockComputationMacro) { // TODO: Pass the other values via ProofMacroFinishedInfo (REFACTORING_FIX_ME)
+         Proof initiatingProof = info.getProof();
+         saveSideProof(proof);
+         // make everyone listen to the proof remove
+         getMediator().startInterface(true);
+         initiatingProof.addSideProof(proof);
+         getMediator().getUI().removeProof(proof);
+         getMediator().getSelectionModel().setSelectedGoal(initiatingGoal);
+         // go into automode again
+         getMediator().stopInterface(true);
+      }
+   }
+
+   /**
+    * Try to save a side proof.
+    * Saving does not rely on UI features, but failures are reported to the UI.
+    * @param proof
+    */
+   private void saveSideProof(Proof proof) {
+       String proofName = proof.name().toString();
+       if (proofName.endsWith(".key")) {
+           proofName = proofName.substring(0, proofName.lastIndexOf(".key"));
+       } else if (proofName.endsWith(".proof")) {
+           proofName = proofName.substring(0, proofName.lastIndexOf(".proof"));
+       }
+       final String filename = MiscTools.toValidFileName(proofName) + ".proof";
+       final File toSave = new File(proof.getProofFile().getParentFile(), filename);
+       final KeYResourceManager krm = KeYResourceManager.getManager();
+       final ProofSaver ps = new ProofSaver(proof, toSave.getAbsolutePath(), krm.getSHA1());
+       try {
+           ps.save();
+       } catch (IOException e) {
+           reportException(this, null, e);
+       }
+   }
 
    @Override
    public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput,

@@ -65,7 +65,6 @@ import de.uka.ilkd.key.util.Pair;
 public class WindowUserInterface extends AbstractMediatorUserInterface {
 
     private final MainWindow mainWindow;
-    private int numOfInvokedMacros;
 
     private final LinkedList<InteractiveRuleApplicationCompletion> completions =
             new LinkedList<InteractiveRuleApplicationCompletion>();
@@ -76,7 +75,6 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
         completions.add(new DependencyContractCompletion());
         completions.add(new LoopInvariantRuleCompletion());
         completions.add(new BlockContractCompletion(mainWindow));
-        this.numOfInvokedMacros = 0;
     }
 
     /**
@@ -130,7 +128,7 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
     @Override
     public void taskFinished(TaskFinishedInfo info) {
         if (info.getSource() instanceof ApplyStrategy) {
-            if (numOfInvokedMacros == 0) {
+            if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
             }
             ApplyStrategy.ApplyStrategyInfo result =
@@ -154,7 +152,7 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
             }
             mainWindow.displayResults(info.toString());
         } else if (info.getSource() instanceof ProofMacro) {
-            if (numOfInvokedMacros == 0) {
+            if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
                 assert info instanceof ProofMacroFinishedInfo;
                 Proof proof = info.getProof();
@@ -195,13 +193,6 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
         Runtime.getRuntime().gc();
     }
 
-
-    @Override
-    protected void macroFinished(TaskFinishedInfo info) {
-        numOfInvokedMacros--;
-    }
-
-
     protected boolean inStopAtFirstUncloseableGoalMode(Proof proof) {
         return proof.getSettings().getStrategySettings()
                 .getActiveStrategyProperties().getProperty(
@@ -218,12 +209,6 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
     @Override
     public void taskStarted(String message, int size) {
         mainWindow.setStatusLine(message, size);
-    }
-
-    @Override
-    protected void macroStarted(String message,
-                                int size) {
-        numOfInvokedMacros++;
     }
 
     @Override

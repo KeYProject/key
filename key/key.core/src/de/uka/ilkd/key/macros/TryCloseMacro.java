@@ -15,6 +15,7 @@ package de.uka.ilkd.key.macros;
 
 
 import org.key_project.utils.collection.ImmutableList;
+import org.key_project.utils.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.ApplyStrategy;
@@ -130,12 +131,7 @@ public class TryCloseMacro extends AbstractProofMacro {
 
         //
         // set the max number of steps if given
-        int oldNumberOfSteps = mediator.getMaxAutomaticSteps();
-        if(getNumberSteps() > 0) {
-            mediator.setMaxAutomaticSteps(getNumberSteps());
-        } else {
-            setNumberSteps(oldNumberOfSteps);
-        }
+       
         final ProofMacro macroAdapter = new SkipMacro() {
             @Override
             public String getName() { return ""; }
@@ -161,7 +157,10 @@ public class TryCloseMacro extends AbstractProofMacro {
         try {
             for (final Goal goal : goals) {
                 Node node = goal.node();
-                final ApplyStrategyInfo result = applyStrategy.start(proof, goal);
+                int maxSteps = getNumberSteps() > 0 ? getNumberSteps() : proof.getSettings().getStrategySettings().getMaxSteps();
+                final ApplyStrategyInfo result = 
+                      applyStrategy.start(proof, ImmutableSLList.<Goal>nil().prepend(goal), 
+                            maxSteps, -1, false);
                 //final Goal closedGoal;
 
                 // retreat if not closed
@@ -189,9 +188,6 @@ public class TryCloseMacro extends AbstractProofMacro {
                 }
             }
         } finally {
-            // reset the old number of steps
-            mediator.setMaxAutomaticSteps(oldNumberOfSteps);
-            setNumberSteps(oldNumberOfSteps);
             applyStrategy.removeProverTaskObserver(pml);
             final ImmutableList<Goal> resultingGoals =
                     setDifference(proof.openGoals(), ignoredOpenGoals);

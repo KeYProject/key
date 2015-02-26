@@ -41,7 +41,6 @@ import de.uka.ilkd.key.util.removegenerics.Main;
 public class ConsoleUserInterface extends AbstractMediatorUserInterface {
    private static final int PROGRESS_BAR_STEPS = 50;
    private static final String PROGRESS_MARK = ">";
-   int numOfInvokedMacros;
 
 
    // Substitute for TaskTree (GUI) to facilitate side proofs in console mode
@@ -75,7 +74,6 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
     public ConsoleUserInterface(byte verbosity, boolean loadOnly) {
         this.verbosity = verbosity;
         this.mediator  = new KeYMediator(this);
-        this.numOfInvokedMacros = 0;
         this.loadOnly = loadOnly;
     }
 
@@ -143,7 +141,7 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
        final Object result2 = info.getResult();
        if (info.getSource() instanceof ApplyStrategy ||
            info.getSource() instanceof ProofMacro) {
-           if (numOfInvokedMacros == 0) {
+           if (!isAtLeastOneMacroRunning()) {
                printResults(openGoals, info, result2);
            } else if (!macroChosen()) {
                finish(proof);
@@ -211,11 +209,6 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
    }
 
     @Override
-    final protected void macroFinished(TaskFinishedInfo info) {
-        numOfInvokedMacros--;
-    }
-
-    @Override
     final public void progressStarted(Object sender) {
         // TODO Implement ProblemInitializerListener.progressStarted
         if(verbosity >= Verbosity.DEBUG) {
@@ -270,12 +263,6 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
                 System.out.print(PROGRESS_MARK);
             }
         }
-    }
-
-    @Override
-    final protected void macroStarted(String message,
-                                int size) {
-        numOfInvokedMacros++;
     }
 
     @Override

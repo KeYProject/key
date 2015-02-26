@@ -25,7 +25,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.util.ProofStarter;
 
 /**
@@ -228,18 +227,6 @@ public class CustomUserInterface extends AbstractUserInterface {
             autoModeThread = null;
          }
       }
-   }
-
-   @Override
-   protected void macroStarted(String message, int size) {
-      // TODO Auto-generated method stub
-      
-   }
-
-   @Override
-   protected void macroFinished(TaskFinishedInfo info) {
-      // TODO Auto-generated method stub
-      
    }
 
    @Override

@@ -19,6 +19,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -44,6 +45,8 @@ public abstract class AbstractUserInterface implements UserInterface {
     protected boolean saveOnly = false;
 
     private ProverTaskListener pml = null;
+
+    private int numOfInvokedMacros = 0;
 
     @Override
     public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
@@ -120,10 +123,18 @@ public abstract class AbstractUserInterface implements UserInterface {
           event.getSource().removeProofEnvironmentListener(this);
        }
     }
+    
+    public boolean isAtLeastOneMacroRunning() {
+       return numOfInvokedMacros != 0;
+    }
 
-    protected abstract void macroStarted(String message, int size);
-    protected abstract void macroFinished(TaskFinishedInfo info);
+    protected void macroStarted(String message, int size) {
+        numOfInvokedMacros++;
+    }
 
+    protected void macroFinished(ProofMacroFinishedInfo info) {
+        numOfInvokedMacros--;
+    }
 
     private class ProofMacroListenerAdapter implements ProverTaskListener {
 
@@ -139,7 +150,9 @@ public abstract class AbstractUserInterface implements UserInterface {
 
         @Override
         public void taskFinished(TaskFinishedInfo info) {
-            macroFinished(info);
+            if (info instanceof ProofMacroFinishedInfo) {
+               macroFinished((ProofMacroFinishedInfo)info);
+            }
         }
     }
 
