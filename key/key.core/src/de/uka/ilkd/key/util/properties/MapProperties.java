@@ -14,8 +14,9 @@ public class MapProperties extends AbstractProperties {
         map = new IdentityHashMap<Object, Object>(expectedSize);
     }
 
+    @SuppressWarnings("unchecked")
     public MapProperties(MapProperties original) {
-        map = (IdentityHashMap) original.map.clone();
+        map = (IdentityHashMap<Object, Object>) original.map.clone();
     }
     
     /* (non-Javadoc)
