@@ -29,29 +29,6 @@ PARSER_BEGIN(SchemaJavaParser)
 
 package de.uka.ilkd.key.parser.schemajava;
 
-import java.io.*;
-import java.util.*;
-
-import recoder.*;
-import recoder.list.generic.*;
-import recoder.java.*;
-import recoder.java.declaration.*;
-import recoder.java.declaration.modifier.*;
-import recoder.java.expression.*;
-import recoder.java.expression.literal.*;
-import recoder.java.expression.operator.*;
-import recoder.java.reference.*;
-import recoder.java.statement.*;
-import recoder.io.*;
-
-import recoder.abstraction.TypeArgument.WildcardMode;
-
-import de.uka.ilkd.key.java.recoderext.*;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-
 /**
    JavaCC AST generation specification based on the original Java1.1
    grammar that comes with javacc, and includes the modification of D. Williams

@@ -65,10 +65,10 @@ public class TestDeclarationProgramVariableCollector  extends TestCase {
         test_block = null;    
     }
     
-    private HashSet toNames(Set programVariables) {
-	HashSet result = new HashSet();
-        for (Object programVariable : programVariables) {
-            String name = "" + ((Named) programVariable).name();
+    private HashSet<String> toNames(Set<? extends Named> programVariables) {
+	HashSet<String> result = new HashSet<>();
+        for (Named programVariable : programVariables) {
+            String name = "" + programVariable.name();
             if (result.contains(name)) {
                 System.out.println("Warning: Program variables have same name." +
                         " Probably unsane test case");
@@ -85,7 +85,7 @@ public class TestDeclarationProgramVariableCollector  extends TestCase {
 	    dpvc = new DeclarationProgramVariableCollector(test_block[i].program(), 
                                                            TacletForTests.services());
 	    dpvc.start();
-	    HashSet names = toNames(dpvc.result());
+	    HashSet<String> names = toNames(dpvc.result());
 
 
 	    assertTrue("Too many variables collected. Collected:" + 

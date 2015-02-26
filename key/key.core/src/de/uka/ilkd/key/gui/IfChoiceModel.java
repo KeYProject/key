@@ -40,9 +40,11 @@ public class IfChoiceModel extends DefaultComboBoxModel {
 
 
     /**
-     * 
+     * generated UID
      */
     private static final long serialVersionUID = -5388696072469119661L;
+    
+    
     private static final String manualText="Manual Input";
     private String manualInput;
     //    private RuleApp app;

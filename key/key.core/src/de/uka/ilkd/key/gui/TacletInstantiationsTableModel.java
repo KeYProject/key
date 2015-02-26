@@ -184,9 +184,11 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
         return originalApp;
     }
 
-    /** number of colums
-     * @return number of colums
+    /** 
+     * number of columns
+     * @return number of columns
      */
+    @Override
     public int getColumnCount() {
         return 2;
     }
@@ -194,6 +196,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     /** number of rows
      * @return number of rows
      */
+    @Override
     public int getRowCount() {
         return entries.size();
     }
@@ -201,6 +204,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     /** returns true iff an instantiation is missing
      * @return true iff an instantiation is missing
      */
+    @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return (rowIndex > noEditRow) && (columnIndex > 0);
     }
@@ -511,7 +515,8 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 
     }
 
-    /** sets the Value of the cell */
+    /** sets the value of the cell */
+    @Override
     public void setValueAt(Object instantiation, int rowIndex,
                            int columnIndex) {
 	entries.get(rowIndex)[columnIndex] = instantiation;
@@ -520,6 +525,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     /** get value at the specified row and col
      * @return the value
      */
+    @Override
     public Object getValueAt(int row, int col) {
         return  entries.get(row)[col];
     }

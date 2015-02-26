@@ -77,12 +77,12 @@ public class FinishAuxiliaryMethodComputationMacro
         tacletBuilder.setInfFlowVars(ifVars);
         tacletBuilder.setReplacewith(result);
         final Taclet rwTaclet = tacletBuilder.buildTaclet();
-        initiatingGoal.proof().addLabeledTotalTerm(result);
-        initiatingGoal.proof().addLabeledIFSymbol(rwTaclet);
+        initiatingProof.addLabeledTotalTerm(result);
+        initiatingProof.addLabeledIFSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
-        initiatingGoal.proof().unionIFSymbols(proof.getIFSymbols());
-        initiatingGoal.proof().getIFSymbols().useProofSymbols();
+        initiatingProof.unionIFSymbols(proof.getIFSymbols());
+        initiatingProof.getIFSymbols().useProofSymbols();
 
         // close auxiliary computation proof
         ThreadUtilities.invokeAndWait(new Runnable() {

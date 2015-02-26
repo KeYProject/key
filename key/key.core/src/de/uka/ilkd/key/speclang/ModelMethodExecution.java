@@ -19,12 +19,9 @@ import org.key_project.utils.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -78,8 +75,8 @@ public final class ModelMethodExecution extends ClassAxiom {
     @Override
     public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, Services services) {
 
-        Name tacletName = MiscTools.toValidTacletName(name);
-        TacletGenerator TG = TacletGenerator.getInstance();
+      // Name tacletName = MiscTools.toValidTacletName(name);
+      //  TacletGenerator TG = TacletGenerator.getInstance();
         return null;
 //            return TG.generateModelMethodExecutionTaclets(tacletName,
 //                                                          kjt,
