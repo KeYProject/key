@@ -102,7 +102,7 @@ import javax.swing.tree.TreePath;
     always will) make use of contains(), which should thus be fast.
 */
 public class ExpansionState
-    extends AbstractSet
+    extends AbstractSet<TreePath>
     implements Serializable
 {
     /**
@@ -112,7 +112,7 @@ public class ExpansionState
 
     private JTree tree;
 
-    private Set paths;
+    private Set<TreePath> paths;
 
     private transient Listener listener;
 
@@ -124,7 +124,7 @@ public class ExpansionState
     {
         tree = t;
         
-        paths = new LinkedHashSet();
+        paths = new LinkedHashSet<TreePath>();
 
         listener = createListener();
 
@@ -145,7 +145,7 @@ public class ExpansionState
         This is equivalent to using the normal constructor, and then
         calling setPaths(tree, state).
     */
-    public ExpansionState(JTree tree, Collection state)
+    public ExpansionState(JTree tree, Collection<TreePath> state)
     {
         this(tree, state, false);
     }
@@ -154,7 +154,7 @@ public class ExpansionState
         This is equivalent to using the normal constructor, and then
         calling setPaths(tree, state, false);
     */
-    public ExpansionState(JTree tree, Collection state, boolean assumeCollapsed)
+    public ExpansionState(JTree tree, Collection<TreePath> state, boolean assumeCollapsed)
     {
         this(tree);
 
@@ -185,7 +185,7 @@ public class ExpansionState
             // from below.
 
             if (tree.isExpanded(rootPath))
-                for (Enumeration e = tree.getExpandedDescendants(rootPath); e.hasMoreElements();)
+                for (Enumeration<TreePath> e = tree.getExpandedDescendants(rootPath); e.hasMoreElements();)
                     paths.add(e.nextElement());
         }
     }
@@ -201,12 +201,12 @@ public class ExpansionState
         return paths.isEmpty();
     }
 
-    public boolean contains(Object item)
+    public boolean contains(TreePath item)
     {
         return paths.contains(item);
     }
 
-    public boolean containsAll(Collection c)
+    public boolean containsAll(Collection<?> c)
     {
         return paths.containsAll(c);
     }
@@ -231,7 +231,7 @@ public class ExpansionState
     /**
        Are all the ancestors (including the paths) expanded?
     */
-    public boolean containsAllAncestors(Collection c)
+    public boolean containsAllAncestors(Collection<TreePath> c)
     {
         for (Object aC : c)
             if (!containsAncestors((TreePath) aC))
@@ -241,18 +241,18 @@ public class ExpansionState
     }
 
 
-    public Iterator iterator()
+    public Iterator<TreePath> iterator()
     {
-        return new Iterator()
+        return new Iterator<TreePath>()
         {
-            Iterator i = paths.iterator();
+            final Iterator<TreePath> i = paths.iterator();
 
             public boolean hasNext()
             {
                 return i.hasNext();
             }
 
-            public Object next()
+            public TreePath next()
             {
                 return i.next();
             }
@@ -294,7 +294,7 @@ public class ExpansionState
     }
 
 
-    public Collection state(Collection result)
+    public Collection<TreePath> state(Collection<TreePath> result)
     {
         result.clear();
         result.addAll(paths);
@@ -377,7 +377,7 @@ public class ExpansionState
     */
     public static void expandAll(JTree tree, TreePath path)
     {
-        for (Object o : extremalPaths(tree.getModel(), path, new LinkedHashSet())) tree.expandPath((TreePath) o);
+        for (Object o : extremalPaths(tree.getModel(), path, new LinkedHashSet<TreePath>())) tree.expandPath((TreePath) o);
     }
 
 
@@ -391,7 +391,7 @@ public class ExpansionState
         The extremal paths are stored in the order in which they appear
         in pre-order in the tree model.
     */
-    private static Collection extremalPaths(TreeModel data, TreePath path, Collection result)
+    private static Collection<TreePath> extremalPaths(TreeModel data, TreePath path, Collection<TreePath> result)
     {
         result.clear();
 
@@ -403,7 +403,7 @@ public class ExpansionState
         return result;
     }
 
-    private static void extremalPathsImpl(TreeModel data, TreePath path, Collection result)
+    private static void extremalPathsImpl(TreeModel data, TreePath path, Collection<TreePath> result)
     {
         Object node = path.getLastPathComponent();
         
@@ -442,7 +442,7 @@ public class ExpansionState
         expand paths. If any TreeWillExpandListeners veto that, the
         result is undefined.
     */
-    public static Collection paths(JTree tree, Collection result)
+    public static Collection<TreePath> paths(JTree tree, Collection<TreePath> result)
     {
         result.clear();
 
@@ -461,7 +461,7 @@ public class ExpansionState
         return result;
     }
 
-    private static void pathsImpl(JTree tree, TreeModel data, TreePath path, Collection result)
+    private static void pathsImpl(JTree tree, TreeModel data, TreePath path, Collection<TreePath> result)
     {
         boolean expanded = tree.isExpanded(path);
 
@@ -490,7 +490,7 @@ public class ExpansionState
         Will give undefined results if any TreeWillExpandListeners veto.
         This implementation does not assume all paths are collapsed.
      */
-    public static void setPaths(JTree tree, Collection paths)
+    public static void setPaths(JTree tree, Collection<TreePath> paths)
     {
         setPaths(tree, paths, false);
     }
@@ -499,7 +499,7 @@ public class ExpansionState
         is expanded. That way, the iteration over the tree nodes only goes
         to the maximum level of the nodes in 'paths'.
     */
-    public static void setPaths(JTree tree, Collection paths, boolean assumeCollapsed)
+    public static void setPaths(JTree tree, Collection<TreePath> paths, boolean assumeCollapsed)
     {
         TreeModel data = tree.getModel();
         
@@ -523,7 +523,7 @@ public class ExpansionState
             setPathsImpl(tree, data, new TreePath(root), Integer.MAX_VALUE, paths);
     }
 
-    private static void setPathsImpl(JTree tree, TreeModel data, TreePath path, int maxLevel, Collection paths)
+    private static void setPathsImpl(JTree tree, TreeModel data, TreePath path, int maxLevel, Collection<TreePath> paths)
     {
         if (maxLevel > 0)
         {
@@ -646,9 +646,9 @@ public class ExpansionState
         // itself)
         private void removeDescendants(TreePath path)
         {
-            for (Iterator i = paths.iterator(); i.hasNext();)
+            for (Iterator<TreePath> i = paths.iterator(); i.hasNext();)
             {
-                TreePath current = (TreePath)i.next();
+                TreePath current = i.next();
 
                 if (current.isDescendant(path))
                     i.remove();
