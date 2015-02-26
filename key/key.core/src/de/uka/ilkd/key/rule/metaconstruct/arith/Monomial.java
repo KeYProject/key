@@ -180,6 +180,7 @@ public class Monomial {
      * Extended euclidian algorithm for computing cofactors. This satisfies the
      * equation <code>gcd(a,b)=a*cofactor(a,b)+b*cofactor(b,a)</code>
      */
+    @SuppressWarnings("unused")
     private BigInteger cofactor(BigInteger v0, BigInteger v1) {
         final boolean neg = v0.signum () < 0;
         v0 = v0.abs ();

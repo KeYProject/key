@@ -23,37 +23,19 @@ import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-
+/**
+ * Computes the pow function for literals. Computation fails if second argument is negative
+ * or exceeds Integer.MAX_VALUE (the latter due to restrictions of class BigInteger).
+ * 
+ */
 public final class MetaPow extends AbstractTermTransformer {
 
     public MetaPow() {
 	super(new Name("#pow"), 2);
     }
 
-
-    /** 
-     *  checks whether the result is consistent with the axiom div_axiom 
-     */
-    private boolean checkResult(BigInteger a, BigInteger b, BigInteger result) {	
-
-	//    (gt(b,0) -> (leq(0,sub(a,mul(result,b))) & lt(sub(a,mul(result,b)),b))  ) 
-	if ( b.compareTo(BigInteger.ZERO) > 0 )
-	    return (( BigInteger.ZERO.compareTo(a.subtract(result.multiply(b))) <= 0 ) && 
-		    ( a.subtract(result.multiply(b)).compareTo(b) < 0));
-
-	//    ( lt(b,0) -> (leq(0,sub(a,mul(result,b))) & lt(sub(a,mul(result,b)),neg(b)))  ) 
-	if ( b.compareTo(BigInteger.ZERO) < 0 )
-	    return (( BigInteger.ZERO.compareTo(a.subtract(result.multiply(b))) <= 0 ) && 
-		    ( a.subtract(result.multiply(b)).compareTo(b.negate()) < 0));
-	
-	return false;
-    }
-
-
     /** calculates the resulting term. */
     public Term transform(Term term, SVInstantiations svInst, Services services) {
-    	
-    	
     	Term arg1 = term.sub(0);
     	Term arg2 = term.sub(1);
     	BigInteger bigIntArg1;
