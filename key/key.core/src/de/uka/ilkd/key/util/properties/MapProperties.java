@@ -7,11 +7,11 @@ public class MapProperties extends AbstractProperties {
     private final IdentityHashMap<Object, Object> map;
 
     public MapProperties() {
-        map = new IdentityHashMap<Object, Object >();
+        map = new IdentityHashMap<>();
     }
 
     public MapProperties(int expectedSize) {
-        map = new IdentityHashMap<Object, Object>(expectedSize);
+        map = new IdentityHashMap<>(expectedSize);
     }
 
     @SuppressWarnings("unchecked")

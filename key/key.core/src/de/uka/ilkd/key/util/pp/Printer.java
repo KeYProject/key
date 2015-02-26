@@ -40,9 +40,6 @@ class Printer {
     /** position in current line. */
     private int pos;
 
-    /** total chars written */
-    private int totalOut=0;
-
     /** Back-end for the pretty-printed output */
     private Backend back;
 
@@ -63,7 +60,6 @@ class Printer {
     void print(String s) throws IOException {
 	back.print(s);
 	pos+=back.measure(s);
-	totalOut+=back.measure(s);
     }
 
     /** begin a block */
@@ -176,7 +172,6 @@ class Printer {
      */
     private void newLine() throws IOException {
 	back.newLine();
-	totalOut++;
 	if (pos>0) {
 	    writeSpaces(pos);
 	}
@@ -203,6 +198,5 @@ class Printer {
 	    n-=SPACES;
 	}
 	back.print(spaces.substring(0,n));
-	totalOut+=n;
     }
 }
