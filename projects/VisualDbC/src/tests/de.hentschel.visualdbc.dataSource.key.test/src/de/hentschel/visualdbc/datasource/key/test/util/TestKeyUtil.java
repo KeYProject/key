@@ -471,7 +471,7 @@ public final class TestKeyUtil {
          // Close task
          TestCase.assertTrue(connection instanceof KeyConnection);
          KeyConnection kc = (KeyConnection)connection;
-         kc.closeTaskWithoutInteraction();
+         kc.closeTaskWithoutInteraction(proof);
          frame.bot().waitWhile(Conditions.hasSelection(tree));
          TestCase.assertEquals(0, tree.getSelectedObjects().length);
          TestCase.assertEquals(0, tree.getModel().getChildCount(tree.getModel().getRoot()));

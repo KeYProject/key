@@ -31,9 +31,9 @@ import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.keyide.ui.editor.KeYEditor;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.core.KeYSelectionModel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -46,12 +46,12 @@ import de.uka.ilkd.key.proof.Proof;
  */
 public abstract class AbstractNodePropertySection extends AbstractPropertySection {
    /**
-    * The observed {@link KeYMediator} which provides the currently selected {@link Node}.
+    * The observed {@link KeYSelectionModel} which provides the currently selected {@link Node}.
     */
-   private KeYMediator mediator;
+   private KeYSelectionModel selectionModel;
    
    /**
-    * The used {@link KeYSelectionListener} to observe {@link #mediator}.
+    * The used {@link KeYSelectionListener} to observe {@link #selectionModel}.
     */
    private KeYSelectionListener selectionListener = new KeYSelectionListener() {
       @Override
@@ -125,18 +125,18 @@ public abstract class AbstractNodePropertySection extends AbstractPropertySectio
    @Override
    public void setInput(IWorkbenchPart part, ISelection selection) {
       super.setInput(part, selection);
-      if (mediator != null) {
-         mediator.removeKeYSelectionListener(selectionListener);
-         mediator = null;
+      if (selectionModel != null) {
+         selectionModel.removeKeYSelectionListener(selectionListener);
+         selectionModel = null;
       }
       part = updatePart(part);
       if (part instanceof KeYEditor) {
-         mediator = ((KeYEditor) part).getMediator();
-         if (mediator != null) {
-            mediator.addKeYSelectionListener(selectionListener);
+         selectionModel = ((KeYEditor) part).getSelectionModel();
+         if (selectionModel != null) {
+            selectionModel.addKeYSelectionListener(selectionListener);
          }
       }
-      updateShownContent(mediator, getSelectedNode());
+      updateShownContent(getSelectedNode());
    }
    
    /**
@@ -159,7 +159,7 @@ public abstract class AbstractNodePropertySection extends AbstractPropertySectio
       Display.getDefault().asyncExec(new Runnable() {
          @Override
          public void run() {
-            updateShownContent(mediator, getSelectedNode());
+            updateShownContent(getSelectedNode());
          }
       });
    }
@@ -169,15 +169,14 @@ public abstract class AbstractNodePropertySection extends AbstractPropertySectio
     * @return The selected {@link Node}.
     */
    protected Node getSelectedNode() {
-      return mediator != null ? mediator.getSelectedNode() : null;
+      return selectionModel != null ? selectionModel.getSelectedNode() : null;
    }
 
    /**
     * Updates the shown content.
-    * @param mediator The {@link KeYMediator} to use.
     * @param node The {@link Node} to show.
     */
-   protected abstract void updateShownContent(KeYMediator mediator, Node node);
+   protected abstract void updateShownContent(Node node);
 
    /**
     * Sets the given items in the {@link List}.
@@ -200,8 +199,8 @@ public abstract class AbstractNodePropertySection extends AbstractPropertySectio
     */
    @Override
    public void dispose() {
-      if (mediator != null) {
-         mediator.removeKeYSelectionListener(selectionListener);
+      if (selectionModel != null) {
+         selectionModel.removeKeYSelectionListener(selectionListener);
       }
       super.dispose();
    }

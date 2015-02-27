@@ -47,6 +47,8 @@ public abstract class AbstractUserInterface implements UserInterface {
     private ProverTaskListener pml = null;
 
     private int numOfInvokedMacros = 0;
+    
+    private boolean minimizeInteraction; // minimize user interaction
 
     @Override
     public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
@@ -204,5 +206,15 @@ public abstract class AbstractUserInterface implements UserInterface {
     @Override
     public boolean confirmTaskRemoval(String string) {
         return true;
+    }
+    
+    @Override
+    public boolean isMinimizeInteraction() {
+       return minimizeInteraction;
+    }
+
+    @Override
+    public void setMinimizeInteraction(boolean minimizeInteraction) {
+       this.minimizeInteraction = minimizeInteraction;
     }
 }

@@ -98,8 +98,6 @@ public class KeYMediator {
      */
     private KeYSelectionModel keySelectionModel;
 
-    private boolean minimizeInteraction; // minimize user interaction
-
     private TacletFilter filterForInteractiveProving;
 
     /**
@@ -225,12 +223,12 @@ public class KeYMediator {
     }
 
     /** simplified user interface? */
-    public boolean minimizeInteraction() {
-       return minimizeInteraction;
+    public boolean isMinimizeInteraction() {
+       return ui.isMinimizeInteraction();
     }
 
-    public void setMinimizeInteraction(boolean b) {
-       minimizeInteraction = b;
+    public void setMinimizeInteraction(boolean minimizeInteraction) {
+       ui.setMinimizeInteraction(minimizeInteraction);
     }
     
     public void setAutoSave(int interval) {
@@ -431,7 +429,7 @@ public class KeYMediator {
 	    TacletApp firstApp = it.next();
             boolean ifSeqInteraction =
                !firstApp.taclet().ifSequent().isEmpty() ;
-            if (minimizeInteraction && !firstApp.complete()) {
+            if (ui.isMinimizeInteraction() && !firstApp.complete()) {
                 ImmutableList<TacletApp> ifSeqCandidates =
                     firstApp.findIfFormulaInstantiations(goal.sequent(),
 		        getServices());

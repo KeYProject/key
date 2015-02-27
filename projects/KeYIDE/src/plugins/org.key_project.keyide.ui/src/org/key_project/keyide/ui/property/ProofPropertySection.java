@@ -15,7 +15,6 @@ package org.key_project.keyide.ui.property;
 
 import java.util.List;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Proof.Statistics;
@@ -30,7 +29,7 @@ public class ProofPropertySection extends AbstractKeyValueNodePropertySection {
     * {@inheritDoc}
     */
    @Override
-   protected void updateShownContent(KeYMediator mediator, Node node) {
+   protected void updateShownContent(Node node) {
       // Reset old values
       resetTexts();
       // Show new values

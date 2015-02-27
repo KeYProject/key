@@ -25,6 +25,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
 import org.key_project.utils.java.StringUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionModel;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -68,17 +69,17 @@ public abstract class AbstractSWTBotKeYEditorPropertiesTest extends AbstractSWTB
                editor.setFocus();
             }
             // Test root
-            KeYMediator mediator = environment.getMediator();
-            pSteps.assertNodeTab(editor, keyEditor, propertiesView, mediator, mediator.getSelectedNode());
+            KeYSelectionModel selectionModel = keyEditor.getSelectionModel();
+            pSteps.assertNodeTab(editor, keyEditor, propertiesView, selectionModel.getSelectedNode());
             // Apply rule interactively
-            applyTaclet(mediator, mediator.getSelectedNode().sequent(), false, 0, PosInTerm.getTopLevel(), "impRight");
-            pSteps.assertNodeTab(editor, keyEditor, propertiesView, mediator, mediator.getSelectedNode());
+            applyTaclet(selectionModel, selectionModel.getSelectedNode().sequent(), false, 0, PosInTerm.getTopLevel(), "impRight");
+            pSteps.assertNodeTab(editor, keyEditor, propertiesView, selectionModel.getSelectedNode());
             // Select root
-            mediator.getSelectionModel().setSelectedNode(proof.root());
-            pSteps.assertNodeTab(editor, keyEditor, propertiesView, mediator, mediator.getSelectedNode());
+            selectionModel.setSelectedNode(proof.root());
+            pSteps.assertNodeTab(editor, keyEditor, propertiesView, selectionModel.getSelectedNode());
             // Finish proof
             environment.getUi().waitWhileAutoMode();
-            pSteps.assertNodeTab(editor, keyEditor, propertiesView, mediator, mediator.getSelectedNode());
+            pSteps.assertNodeTab(editor, keyEditor, propertiesView, selectionModel.getSelectedNode());
          }
       };
       doEditorTest(projectName, pathToSourceFilesInBundle, true, contractName, false, steps);
@@ -101,7 +102,6 @@ public abstract class AbstractSWTBotKeYEditorPropertiesTest extends AbstractSWTB
       public void assertNodeTab(SWTBotEditor editor,
                                 KeYEditor keyEditor,
                                 SWTBotView propertiesView,
-                                KeYMediator mediator,
                                 Node node) throws Exception;
    }
    

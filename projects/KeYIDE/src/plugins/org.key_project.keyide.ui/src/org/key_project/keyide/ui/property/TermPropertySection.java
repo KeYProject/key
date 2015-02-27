@@ -29,7 +29,6 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.utils.java.ObjectUtil;
 import org.key_project.utils.java.StringUtil;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Term;
@@ -161,7 +160,7 @@ public class TermPropertySection extends AbstractNodePropertySection {
     * {@inheritDoc}
     */
    @Override
-   protected void updateShownContent(KeYMediator mediator, Node node) {
+   protected void updateShownContent(Node node) {
       // Show position
       PosInSequent pis = editor != null ? editor.getSelectedPosInSequent() : null;
       pioText.setText(posInSequentToString(pis));

@@ -46,7 +46,7 @@ public class ProofPropertyTester extends PropertyTester {
       Proof proof = null;
       if (receiver instanceof KeYEditor) {
          KeYEditor editor = (KeYEditor) receiver;
-         proof = editor.getMediator().getSelectedProof();
+         proof = editor.getCurrentProof();
       }
       // Test proof
       if (PROPERTY_IS_NOT_CLOSED.equals(property)) {

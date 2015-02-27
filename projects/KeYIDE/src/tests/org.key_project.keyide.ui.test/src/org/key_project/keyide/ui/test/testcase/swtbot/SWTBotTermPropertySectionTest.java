@@ -26,7 +26,6 @@ import org.key_project.util.test.util.TestUtilsUtil;
 import org.key_project.utils.java.ObjectUtil;
 import org.key_project.utils.java.StringUtil;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
@@ -69,15 +68,14 @@ public class SWTBotTermPropertySectionTest extends AbstractSWTBotKeYEditorProper
          public void assertNodeTab(SWTBotEditor editor,
                                    KeYEditor keyEditor,
                                    SWTBotView propertiesView, 
-                                   KeYMediator mediator, 
                                    Node node) throws Exception {
-            assertTermTab(propertiesView, mediator, keyEditor.getSelectedPosInSequent());
+            assertTermTab(propertiesView, keyEditor.getSelectedPosInSequent());
             TestUtilsUtil.setCursorLocation(editor.bot().styledText(), 8, 8);
-            assertTermTab(propertiesView, mediator, keyEditor.getSelectedPosInSequent());
+            assertTermTab(propertiesView, keyEditor.getSelectedPosInSequent());
             TestUtilsUtil.setCursorLocation(editor.bot().styledText(), 0, 0);
-            assertTermTab(propertiesView, mediator, keyEditor.getSelectedPosInSequent());
+            assertTermTab(propertiesView, keyEditor.getSelectedPosInSequent());
             TestUtilsUtil.setCursorLocation(editor.bot().styledText(), 8, 100);
-            assertTermTab(propertiesView, mediator, keyEditor.getSelectedPosInSequent());
+            assertTermTab(propertiesView, keyEditor.getSelectedPosInSequent());
          }
       };
    }
@@ -85,11 +83,9 @@ public class SWTBotTermPropertySectionTest extends AbstractSWTBotKeYEditorProper
    /**
     * Tests the shown {@link PosInSequent}.
     * @param propertiesView The properties view.
-    * @param mediator The {@link KeYMediator} to use.
     * @param pis The expected shown {@link PosInSequent}.
     */
    protected void assertTermTab(SWTBotView propertiesView, 
-                                KeYMediator mediator, 
                                 PosInSequent pis) {
       SWTBotTabbedPropertyList tabs = getPropertiesTabs(propertiesView);
       assertTrue(tabs.hasTabItem("Term"));

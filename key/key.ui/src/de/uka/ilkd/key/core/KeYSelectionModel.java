@@ -40,7 +40,7 @@ public class KeYSelectionModel {
     private KeYSelectionEvent selectionEvent =
 	new KeYSelectionEvent(this);
 
-    KeYSelectionModel() {
+    public KeYSelectionModel() {
 	listenerList = Collections.synchronizedList(new ArrayList<KeYSelectionListener>(5));
 	goalIsValid = false;
     }

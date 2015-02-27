@@ -24,7 +24,6 @@ import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.property.TacletPropertySection;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Node;
 
 /**
@@ -65,7 +64,6 @@ public class SWTBotTacletPropertySectionTest extends AbstractSWTBotKeYEditorProp
          public void assertNodeTab(SWTBotEditor editor,
                                    KeYEditor keyEditor,
                                    SWTBotView propertiesView, 
-                                   KeYMediator mediator, 
                                    Node node) throws Exception {
             SWTBotTabbedPropertyList tabs = getPropertiesTabs(propertiesView);
             assertTrue(tabs.hasTabItem("Taclet"));

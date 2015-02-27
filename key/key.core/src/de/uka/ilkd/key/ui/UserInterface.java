@@ -199,4 +199,8 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @return the new {@link ProofEnvironment} where the {@link ProofAggregate} has been registered
      */
      ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, ProofAggregate proofList, InitConfig initConfig);
+
+     boolean isMinimizeInteraction();
+     
+     void setMinimizeInteraction(boolean minimizeInteraction);
 }

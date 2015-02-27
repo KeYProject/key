@@ -481,7 +481,7 @@ public class InteractiveProver implements InterruptListener {
         java.util.HashSet<Taclet> applicableRules = new java.util.HashSet<Taclet>();
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
         for (NoPosTacletApp app : tacletInstances) {
-            if (mediator().minimizeInteraction()) {
+            if (mediator().isMinimizeInteraction()) {
                 ImmutableList<TacletApp> ifCandidates
                         = app.findIfFormulaInstantiations(
                                 mediator().getSelectedGoal().sequent(),

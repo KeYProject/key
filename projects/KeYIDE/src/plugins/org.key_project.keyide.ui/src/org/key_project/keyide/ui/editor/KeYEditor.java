@@ -70,10 +70,10 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.utils.bean.IBean;
 import org.key_project.utils.java.ArrayUtil;
 
-import de.uka.ilkd.key.core.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.core.KeYSelectionModel;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -84,6 +84,9 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.ProofUserManager;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
+import de.uka.ilkd.key.ui.AutoModeListener;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -258,6 +261,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    private State breakpointsActivatedState;
    
+   private KeYSelectionModel selectionModel;
+   
    /**
     * Listens for changes on {@link #breakpointsActivatedState}.
     */
@@ -291,11 +296,11 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       if(breakpointManager!=null){
          DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(breakpointManager);
       }
-      if (getMediator() != null) {
-         getMediator().removeAutoModeListener(autoModeListener);
+      if (getUI() != null) {
+         getUI().removeAutoModeListener(autoModeListener);
       }
-      if (environment != null) {
-         environment.getMediator().removeKeYSelectionListener(keySelectionListener);
+      if (selectionModel != null) {
+         selectionModel.removeKeYSelectionListener(keySelectionListener);
       }
       if (currentProof != null) {
          currentProof.removeProofTreeListener(proofTreeListener);
@@ -363,15 +368,23 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             else {
                throw new CoreException(LogUtil.getLogger().createErrorStatus("Unsupported editor input \"" + input + "\"."));
             }
+            if (getUI() instanceof AbstractMediatorUserInterface) {
+               KeYMediator mediator = ((AbstractMediatorUserInterface) getUI()).getMediator();
+               selectionModel = mediator.getSelectionModel();
+               mediator.setProof(currentProof);
+            }
+            else {
+               selectionModel = new KeYSelectionModel();
+               selectionModel.setProof(currentProof);
+            }
             breakpointManager = new KeYBreakpointManager(currentProof);
             DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(breakpointManager);
             ProofUserManager.getInstance().addUser(currentProof, environment, this);
-            this.environment.getMediator().setProof(currentProof);
-            this.environment.getMediator().setMinimizeInteraction(true);
-            if (this.getEnvironment().getMediator().getSelectedNode() == null) {
-               this.getEnvironment().getMediator().getSelectionModel().setSelectedNode(currentProof.root());
+            getUI().setMinimizeInteraction(true);
+            if (selectionModel == null) {
+               selectionModel.setSelectedNode(currentProof.root());
             }
-            this.currentNode = this.getEnvironment().getMediator().getSelectedNode();
+            this.currentNode = selectionModel.getSelectedNode();
             configureProofForBreakpoints();
          }
          else {
@@ -392,8 +405,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    @Override
    public void createPartControl(Composite parent) {
       super.createPartControl(parent);
-      getMediator().addKeYSelectionListener(keySelectionListener);
-      getMediator().addAutoModeListener(autoModeListener);
+      selectionModel.addKeYSelectionListener(keySelectionListener);
+      getUI().addAutoModeListener(autoModeListener);
       ISourceViewer sourceViewer = getSourceViewer();
       viewerDecorator = new ProofSourceViewerDecorator(sourceViewer);
       viewerDecorator.addPropertyChangeListener(ProofSourceViewerDecorator.PROP_SELECTED_POS_IN_SEQUENT, new PropertyChangeListener() {
@@ -608,8 +621,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    public void setCurrentNode(Node currentNode) {
       this.currentNode = currentNode;
-      getMediator().setMinimizeInteraction(true);
-      viewerDecorator.showNode(currentNode, getMediator());
+      getUI().setMinimizeInteraction(true);
+      viewerDecorator.showNode(currentNode, SymbolicExecutionUtil.createNotationInfo(currentProof));
    }
    
    /**
@@ -660,7 +673,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       if (IContentOutlinePage.class.equals(adapter)) {
          synchronized (this) {
             if (outlinePage == null) {
-               outlinePage = new ProofTreeContentOutlinePage(getCurrentProof(), getEnvironment());
+               outlinePage = new ProofTreeContentOutlinePage(getCurrentProof(), getEnvironment(), selectionModel);
             }
          }
          return outlinePage;
@@ -716,15 +729,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       KeYEnvironment<?> environment = getEnvironment();
       return environment != null ? environment.getUi() : null;
    }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public KeYMediator getMediator() {
-      KeYEnvironment<?> environment = getEnvironment();
-      return environment != null ? environment.getMediator() : null;
-   }
    
    /**
     * {@inheritDoc}
@@ -732,6 +736,14 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    @Override
    public Proof getCurrentProof() {
       return currentProof;
+   }
+
+   /**
+    * Returns the used {@link KeYSelectionModel}.
+    * @return The used {@link KeYSelectionModel}.
+    */
+   public KeYSelectionModel getSelectionModel() {
+      return selectionModel;
    }
 
    @Override

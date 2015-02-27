@@ -51,7 +51,6 @@ import de.hentschel.visualdbc.key.ui.editor.DbcModelEditorInput;
 import de.hentschel.visualdbc.key.ui.editor.NothingActionBarContributor;
 import de.hentschel.visualdbc.key.ui.util.LogUtil;
 import de.hentschel.visualdbc.key.ui.util.ProofReferenceModelCreator;
-import de.uka.ilkd.key.core.AutoModeListener;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -60,6 +59,7 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+import de.uka.ilkd.key.ui.AutoModeListener;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -368,7 +368,7 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
       }
       // Remove old listener
       if (userInterface != null) {
-         userInterface.getMediator().removeAutoModeListener(autoModeListener);
+         userInterface.removeAutoModeListener(autoModeListener);
       }
       if (proofs != null) {
          for (Proof proof : proofs) {
@@ -386,7 +386,7 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
       }
       // Add new listeners
       if (userInterface != null && !ArrayUtil.isEmpty(proofs)) {
-         userInterface.getMediator().addAutoModeListener(autoModeListener);
+         userInterface.addAutoModeListener(autoModeListener);
          for (Proof proof : proofs) {
             proof.addProofTreeListener(proofTreeListener);
          }
@@ -536,7 +536,7 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
          proofProvider.removeProofProviderListener(proofProviderListener);
       }
       if (userInterface != null) {
-         userInterface.getMediator().removeAutoModeListener(autoModeListener);
+         userInterface.removeAutoModeListener(autoModeListener);
       }
       if (proofs != null) {
          for (Proof proof : proofs) {

@@ -58,7 +58,7 @@ public class SWTBotNodeCounterExampleGeneratorJobTest extends TestCase {
          env = KeYEnvironment.load(ResourceUtil.getLocation(proofFile), null, null);
          Goal goal = env.getLoadedProof().openGoals().head();
          // Generate test cases
-         NodeCounterExampleGeneratorJob job = new NodeCounterExampleGeneratorJob(env.getMediator(), goal.node());
+         NodeCounterExampleGeneratorJob job = new NodeCounterExampleGeneratorJob(env.getUi(), goal.node());
          job.schedule();
          TestUtilsUtil.waitForJobs();
          // Test generated stuff

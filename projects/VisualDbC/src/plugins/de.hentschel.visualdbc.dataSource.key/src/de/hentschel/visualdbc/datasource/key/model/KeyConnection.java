@@ -121,6 +121,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -286,8 +287,7 @@ public class KeyConnection extends MemoryConnection {
          // Establish connection
          if (interactive) {
             environment = WindowUserInterface.loadInMainWindow(location, classPathEntries, bootClassPath, true);
-            KeYMediator mediator = environment.getMediator();
-            mediator.addGUIListener(mainGuiListener);
+            getMediator().addGUIListener(mainGuiListener);
          }
          else {
             environment = KeYEnvironment.load(location, classPathEntries, bootClassPath);
@@ -302,6 +302,19 @@ public class KeyConnection extends MemoryConnection {
       }
       catch (Exception e) {
          throw new DSException(e);
+      }
+   }
+
+   /**
+    * Returns the {@link KeYMediator} if available and {@code null} otherwise.
+    * @return The {@link KeYMediator} if available and {@code null} otherwise.
+    */
+   public KeYMediator getMediator() {
+      if (environment.getUi() instanceof AbstractMediatorUserInterface) {
+         return ((AbstractMediatorUserInterface) environment.getUi()).getMediator();
+      }
+      else {
+         return null;
       }
    }
 
@@ -1536,8 +1549,9 @@ public class KeyConnection extends MemoryConnection {
          proof.dispose();
       }
       // Remove listener and proof environment
-      if (environment != null) {
-         environment.getMediator().removeGUIListener(mainGuiListener);
+      KeYMediator mediator = getMediator();
+      if (mediator != null) {
+         mediator.removeGUIListener(mainGuiListener);
          try {
             final MainWindow oldMain = MainWindow.getInstance();
             if (oldMain.getUserInterface() == environment.getUi()) {
@@ -1732,7 +1746,9 @@ public class KeyConnection extends MemoryConnection {
     */
    public void selectProof(Proof proof) {
       Assert.isNotNull(proof);
-      environment.getMediator().setProof(proof);
+      KeYMediator mediator = getMediator();
+      Assert.isNotNull(mediator);
+      mediator.setProof(proof);
    }
 
    /**
@@ -1753,9 +1769,10 @@ public class KeyConnection extends MemoryConnection {
 
    /**
     * Closes the active task without user interaction.
+    * @param proof The {@link KeyProof} to close.
     */
-   public void closeTaskWithoutInteraction() {
-      environment.getUi().removeProof(environment.getMediator().getSelectedProof());
+   public void closeTaskWithoutInteraction(KeyProof proof) {
+      environment.getUi().removeProof(proof.getProof());
    }
    
    /**

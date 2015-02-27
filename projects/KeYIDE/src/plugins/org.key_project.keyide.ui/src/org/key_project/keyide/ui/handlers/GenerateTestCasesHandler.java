@@ -28,7 +28,7 @@ public class GenerateTestCasesHandler extends AbstractSaveExecutionHandler {
          IEditorPart editorPart = HandlerUtil.getActiveEditor(event);
          if (editorPart instanceof KeYEditor) {
             KeYEditor editor = (KeYEditor) editorPart;
-            if (!editor.getMediator().isInAutoMode()) {
+            if (!editor.getUI().isInAutoMode()) {
                Proof currentProof = editor.getCurrentProof();
                IProject currentProject = editor.getProject();
                if (currentProof != null && currentProject != null) {

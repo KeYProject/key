@@ -33,14 +33,15 @@ import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
-import de.uka.ilkd.key.core.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.core.KeYSelectionModel;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.AutoModeListener;
 
 /**
  * A class to display the correct Outline for the current {@link Proof}
@@ -55,7 +56,9 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
    private LazyProofTreeContentProvider contentProvider;
    
    private ProofTreeLabelProvider labelProvider;
-   
+
+   private final KeYSelectionModel selectionModel;
+
    /**
     * {@link KeYSelectionListener} to sync the KeYSelection with the {@link TreeSelection}.
     */
@@ -89,11 +92,12 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
     * Constructor.
     * @param proof The {@link Proof} for this Outline.
     */
-   public ProofTreeContentOutlinePage(Proof proof, KeYEnvironment<?> environment) {
+   public ProofTreeContentOutlinePage(Proof proof, KeYEnvironment<?> environment, KeYSelectionModel selectionModel) {
       this.proof = proof;
       this.environment = environment;
-      environment.getMediator().addKeYSelectionListener(listener);
-      environment.getMediator().addAutoModeListener(autoModeListener);
+      this.selectionModel = selectionModel;
+      selectionModel.addKeYSelectionListener(listener);
+      environment.getUi().addAutoModeListener(autoModeListener);
    }
 
    /**
@@ -101,8 +105,8 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
     */
    @Override
    public void dispose(){
-      environment.getMediator().removeKeYSelectionListener(listener);
-      environment.getMediator().removeAutoModeListener(autoModeListener);
+      selectionModel.removeKeYSelectionListener(listener);
+      environment.getUi().removeAutoModeListener(autoModeListener);
       if (contentProvider != null) {
          contentProvider.dispose();
       }
@@ -149,7 +153,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
     */
    protected void handleAutoModeStarted(ProofEvent e) {
       // Ignore mediator selection changes while auto mode is running (Behavior of original KeY UI and solves problem with selection synchronization with the shown TreeViewer)
-      environment.getMediator().removeKeYSelectionListener(listener);
+      selectionModel.removeKeYSelectionListener(listener);
    }
 
    /**
@@ -159,7 +163,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
    protected void handleAutoModeStopped(ProofEvent e) {
       if (e.getSource() == proof) {
          // Listen for mediator selection changes caused by the user to synchronize them with the shown TreeViewer 
-         environment.getMediator().addKeYSelectionListener(listener);
+         selectionModel.addKeYSelectionListener(listener);
          // Make sure that correct selected node is shown
          updateSelectedNodeThreadSafe();
       }
@@ -186,7 +190,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
     * when the selection of the {@link KeYMediator} has changed.
     */
    protected void updateSelectedNode() {
-      Node mediatorNode = environment.getMediator().getSelectedNode();
+      Node mediatorNode = selectionModel.getSelectedNode();
       Object selectedNode = getSelectedNode();
       if (mediatorNode != selectedNode) {
          // Make sure that Node to select is loaded in lazy TreeViewer
@@ -231,9 +235,9 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
    public void selectionChanged(SelectionChangedEvent event) {
       // Change selected node of mediator only if content provider is not in refresh phase after stopping the auto mode
       Node node = getSelectedNode(event.getSelection());
-      Node mediatorNode = environment.getMediator().getSelectedNode();
+      Node mediatorNode = selectionModel.getSelectedNode();
       if (node != mediatorNode) {
-         environment.getMediator().getSelectionModel().setSelectedNode(node);
+         selectionModel.setSelectedNode(node);
       }
       // Fire event to listener
       super.selectionChanged(event); 

@@ -13,6 +13,8 @@ import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 import org.key_project.utils.java.StringUtil;
 
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.WindowUserInterface;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -35,7 +37,7 @@ public class SWTBotProofGenerateTestsJobTest extends AbstractGenerateTestsJobTes
    @Test
    public void testTestGeneration() throws Exception {
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
-      KeYEnvironment<?> env = null;
+      KeYEnvironment<WindowUserInterface> env = null;
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          bot.closeAllEditors();
@@ -54,23 +56,25 @@ public class SWTBotProofGenerateTestsJobTest extends AbstractGenerateTestsJobTes
          IFile proofFile = src.getFile("IntegerUtil.proof");
          assertTrue(proofFile.exists());
          // Open Proof
-         env = KeYEnvironment.load(ResourceUtil.getLocation(proofFile), null, null);
+         env = WindowUserInterface.loadInMainWindow(ResourceUtil.getLocation(proofFile), null, null, false);
+         KeYMediator mediator = env.getUi().getMediator();
+         assertNotNull(mediator);
          Proof proof = env.getLoadedProof();
-         Proof mediatorProof = env.getMediator().getSelectedProof();
+         Proof mediatorProof = mediator.getSelectedProof();
          assertSame(proof, mediatorProof);
-         Node mediatorNode = env.getMediator().getSelectedNode();
-         Goal mediatorGoal = env.getMediator().getSelectedGoal();
+         Node mediatorNode = mediator.getSelectedNode();
+         Goal mediatorGoal = mediator.getSelectedGoal();
          // Generate test cases
-         ProofGenerateTestsJob job = new ProofGenerateTestsJob(project.getProject(), proof, env.getMediator());
+         ProofGenerateTestsJob job = new ProofGenerateTestsJob(project.getProject(), proof, env.getUi());
          job.schedule();
          TestUtilsUtil.waitForJobs();
          // Test generated stuff
          assertTestProjectAndOpenedEditor(bot, project, proof.name().toString());
          // Ensure that same objects are still selected in the mediator
          assertFalse(proof.isDisposed());
-         assertSame(mediatorProof, env.getMediator().getSelectedProof());
-         assertSame(mediatorNode, env.getMediator().getSelectedNode());
-         assertSame(mediatorGoal, env.getMediator().getSelectedGoal());
+         assertSame(mediatorProof, mediator.getSelectedProof());
+         assertSame(mediatorNode, mediator.getSelectedNode());
+         assertSame(mediatorGoal, mediator.getSelectedGoal());
       }
       finally {
          if (env != null) {

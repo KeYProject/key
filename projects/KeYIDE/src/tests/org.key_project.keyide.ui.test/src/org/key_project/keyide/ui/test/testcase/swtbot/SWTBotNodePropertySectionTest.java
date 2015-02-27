@@ -24,8 +24,8 @@ import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 import org.key_project.utils.java.ObjectUtil;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * SWTBot tests for {@link NodePropertySection}.
@@ -65,13 +65,12 @@ public class SWTBotNodePropertySectionTest extends AbstractSWTBotKeYEditorProper
          public void assertNodeTab(SWTBotEditor editor,
                                    KeYEditor keyEditor,
                                    SWTBotView propertiesView, 
-                                   KeYMediator mediator, 
                                    Node node) throws Exception {
             SWTBotTabbedPropertyList tabs = getPropertiesTabs(propertiesView);
             assertTrue(tabs.hasTabItem("Node"));
             assertTrue(tabs.selectTabItem("Node"));
             assertEquals(validate(ProofTreeLabelProvider.getNodeText(node)), propertiesView.bot().text(0).getText());
-            assertEquals(validate(ProofSourceViewerDecorator.ruleToString(mediator, node.getAppliedRuleApp(), false)), propertiesView.bot().text(1).getText());
+            assertEquals(validate(ProofSourceViewerDecorator.ruleToString(node.proof().getServices(), SymbolicExecutionUtil.createNotationInfo(node), node.getAppliedRuleApp(), false)), propertiesView.bot().text(1).getText());
             assertEquals(node.getNodeInfo().getInteractiveRuleApplication(), propertiesView.bot().checkBox(0).isChecked());
             assertEquals(node.isClosed(), propertiesView.bot().checkBox(1).isChecked());
             assertEquals(validate(node.getNodeInfo().getFirstStatementString()), propertiesView.bot().text(2).getText());

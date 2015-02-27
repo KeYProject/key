@@ -27,7 +27,6 @@ import de.hentschel.visualdbc.datasource.model.IDSProvableReference;
 import de.hentschel.visualdbc.datasource.model.event.DSProofEvent;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryProof;
-import de.uka.ilkd.key.core.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
@@ -37,6 +36,7 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.ui.AutoModeListener;
 
 /**
  * Special KeY implementation of {@link IDSProof}.

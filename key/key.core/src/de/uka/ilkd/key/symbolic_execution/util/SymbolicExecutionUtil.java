@@ -3751,6 +3751,16 @@ public final class SymbolicExecutionUtil {
       Proof proof = element != null ? element.getProof() : null;
       return createNotationInfo(proof);
    }
+
+   /**
+    * Creates the {@link NotationInfo} for the given {@link Node}.
+    * @param node The {@link Node} to create its {@link NotationInfo}.
+    * @return The created {@link NotationInfo}.
+    */
+   public static NotationInfo createNotationInfo(Node node) {
+      Proof proof = node != null ? node.proof() : null;
+      return createNotationInfo(proof);
+   }
    
    /**
     * Creates the {@link NotationInfo} for the given {@link Proof}.

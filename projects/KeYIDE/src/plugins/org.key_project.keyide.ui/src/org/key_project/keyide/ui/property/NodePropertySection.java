@@ -27,8 +27,8 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.utils.java.ObjectUtil;
 import org.key_project.utils.java.StringUtil;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * This {@link AbstractPropertySection} shows the content of a {@link Node}.
@@ -154,10 +154,10 @@ public class NodePropertySection extends AbstractNodePropertySection {
     * {@inheritDoc}
     */
    @Override
-   protected void updateShownContent(KeYMediator mediator, Node node) {
+   protected void updateShownContent(Node node) {
       if (node != null) {
          SWTUtil.setText(nameText, ProofTreeLabelProvider.getNodeText(node));
-         SWTUtil.setText(appliedRuleText, ProofSourceViewerDecorator.ruleToString(node.proof().getServices(), mediator.getNotationInfo(), node.getAppliedRuleApp(), false));
+         SWTUtil.setText(appliedRuleText, ProofSourceViewerDecorator.ruleToString(node.proof().getServices(), SymbolicExecutionUtil.createNotationInfo(node), node.getAppliedRuleApp(), false));
          interactiveRuleButton.setSelection(node.getNodeInfo().getInteractiveRuleApplication());
          closedButton.setSelection(node.isClosed());
          SWTUtil.setText(firstStatementText, node.getNodeInfo().getFirstStatementString());
