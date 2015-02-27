@@ -11,7 +11,7 @@ use POSIX qw(strftime);
 #
 # Configuration variables
 my $orig_path = &getcwd;
-my $path_to_key = realpath(dirname($0) . "/..");
+my $path_to_key = realpath(dirname($0) . "/../key.core");
 my $path_to_examples = $path_to_key . "/examples/";
 my $path_to_automated = "index/";
 my $path_to_header = $path_to_examples . $path_to_automated . "headerJavaDL.txt";
@@ -400,7 +400,7 @@ sub runAuto {
   if ($option{'verbose'}) { $verbosity = "--verbose 2"; }
   if ($option{'noAuto'}) { $automode = ""; }
   if ($option{'args'}) { $arguments = $option{'args'}; }
-  my $command = "'" . $path_to_key . "/bin/key' $vmparams $automode $verbosity $statisticsCmd $arguments '$dk'";
+  my $command = "'" . $path_to_key . "/../scripts/key' $vmparams $automode $verbosity $statisticsCmd $arguments '$dk'";
   print "Command is: $command\n" unless $option{'silent'};
   my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
@@ -436,7 +436,7 @@ sub reloadFile {
 	return;
     }
 
-    my $command = "'" . $path_to_key . "/bin/key' $vmparams --auto-loadonly '$dk'";
+    my $command = "'" . $path_to_key . "/../scripts/key' $vmparams --auto-loadonly '$dk'";
     # print "Command is: $command\n";
     my $before = time;
     my $result = &system_timeout($time_limit, $command);

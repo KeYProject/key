@@ -529,7 +529,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
     }
 
-    private void refresh(Proof proof) {
+    private void refresh(Proof proof) {        
         ProofIndependentSettings settings = proof.getProofIndependentSettings();
         if (settings == null) {
             settings = ProofIndependentSettings.DEFAULT_INSTANCE;
@@ -537,7 +537,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         
         boolean newActive = settings.getGeneralSettings().oneStepSimplification();
         
-        if (active != newActive) {
+        if (active != newActive || lastProof != proof) {
             active = newActive;
             if(active && proof != null && !proof.closed()) {
                 initIndices(proof);
