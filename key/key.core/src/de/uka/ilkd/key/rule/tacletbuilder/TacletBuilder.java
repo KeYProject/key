@@ -333,7 +333,7 @@ public abstract class TacletBuilder {
        }
     }
 
-    static class TacletBuilderException extends IllegalArgumentException {
+    public static class TacletBuilderException extends IllegalArgumentException {
 	
       
         /**
@@ -349,7 +349,7 @@ public abstract class TacletBuilder {
             this.errorMessage = errorMessage;
         }
         
-        TacletBuilderException(TacletBuilder tb,  String errorMessage) {
+        public TacletBuilderException(TacletBuilder tb,  String errorMessage) {
            this(tb.getName(), errorMessage);
         }
         

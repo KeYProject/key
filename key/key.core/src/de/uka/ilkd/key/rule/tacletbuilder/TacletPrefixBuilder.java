@@ -47,7 +47,7 @@ public class TacletPrefixBuilder {
 
     protected ImmutableMap<SchemaVariable,TacletPrefix> prefixMap = DefaultImmutableMap.<SchemaVariable,TacletPrefix>nilMap();
 
-    TacletPrefixBuilder(TacletBuilder tacletBuilder) {
+    public TacletPrefixBuilder(TacletBuilder tacletBuilder) {
 	this.tacletBuilder=tacletBuilder;
     }
 

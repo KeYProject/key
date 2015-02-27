@@ -191,7 +191,7 @@ public abstract class Taclet implements Rule, Named {
     /** Integer to cache the hashcode */
     private int hashcode = 0;    
     
-    private Trigger trigger;
+    private final Trigger trigger;
     
     /* TODO: find better solution*/
     private final boolean surviveSymbExec;

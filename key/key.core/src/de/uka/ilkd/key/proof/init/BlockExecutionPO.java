@@ -11,6 +11,12 @@ import java.util.Properties;
 
 import org.key_project.utils.collection.ImmutableList;
 
+import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
+import de.uka.ilkd.key.informationflow.po.InfFlowCompositePO;
+import de.uka.ilkd.key.informationflow.po.InfFlowPO;
+import de.uka.ilkd.key.informationflow.po.InfFlowProofSymbols;
+import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
+import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -23,8 +29,6 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
-import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 

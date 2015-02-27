@@ -28,6 +28,8 @@ import javax.swing.event.EventListenerList;
 import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableMapEntry;
 
+import de.uka.ilkd.key.informationflow.po.InfFlowCompositePO;
+import de.uka.ilkd.key.informationflow.po.InfFlowPO;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -44,8 +46,6 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
-import de.uka.ilkd.key.proof.init.InfFlowCompositePO;
-import de.uka.ilkd.key.proof.init.InfFlowPO;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.event.ProofSaverEvent;
