@@ -14,8 +14,8 @@
 package de.uka.ilkd.key.gui;
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -71,7 +71,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
      */
     private static final long serialVersionUID = 5285420522875326156L;
     /** the instantiations entries */
-    private Vector<Object[]> entries;
+    private ArrayList<Object[]> entries;
     /** the related rule application */
     private final TacletApp originalApp;
     /** the integer defines the row until which no editing is possible */
@@ -122,18 +122,16 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 
     /** creates a Vector with the row entries of the table
     */
-    private Vector<Object[]> createEntryArray(TacletApp tacletApp) {
-        Vector<Object[]> rowVec = new Vector<Object[]>();
+    private ArrayList<Object[]> createEntryArray(TacletApp tacletApp) {
+        ArrayList<Object[]> rowVec = new ArrayList<Object[]>();
         Iterator<SchemaVariable> it = tacletApp.instantiations().svIterator();
         int count = 0;
 
         while (it.hasNext()) {
             SchemaVariable sv = it.next();
-            Object[] column = new Object[2];
-            column[0] = sv;
-            column[1] = ProofSaver.printAnything(
-	        tacletApp.instantiations().getInstantiation(sv), 
-                services);
+            final Object[] column = new Object[] {
+                    sv, 
+                    ProofSaver.printAnything(tacletApp.instantiations().getInstantiation(sv), services)};
             rowVec.add(column);
             count++;
         }
