@@ -27,7 +27,6 @@ import org.key_project.swtbot.swing.bot.SwingBotJFrame;
 import org.key_project.swtbot.swing.bot.SwingBotJMenu;
 import org.key_project.swtbot.swing.bot.SwingBotJTree;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
-import org.key_project.util.test.util.TestUtilsUtil;
 import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -49,7 +48,7 @@ public class SWTBotExampleTest extends AbstractSetupTestCase {
             // Open KeY
             KeYUtil.openMainWindowAsync();
             // Get KeY window
-            SwingBotJFrame frame = TestUtilsUtil.keyGetMainWindow();
+            SwingBotJFrame frame = TestKeY4EclipseUtil.keyGetMainWindow();
             // Open example dialog.
             SwingBotJMenu fileMenu = frame.bot().jMenuBar().menu("File");
             fileMenu.item("Load Example").click();
@@ -61,15 +60,15 @@ public class SWTBotExampleTest extends AbstractSetupTestCase {
             SwingBotJButton loadButton = dialog.bot().jButton("Load Example");
             loadButton.clickAndWait();
             // Start proof
-            TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-            TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("Cell", "Cell", "Cell()", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("Cell", "Cell", "Cell()", "0", "normal_behavior"));
+            TestKeY4EclipseUtil.keyStartSelectedProofInProofManagementDiaolog();
+            TestKeY4EclipseUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("Cell", "Cell", "Cell()", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("Cell", "Cell", "Cell()", "0", "normal_behavior"));
             // Finish proof automatically
-            TestUtilsUtil.keyFinishSelectedProofAutomatically(frame, MethodTreatment.EXPAND);
+            TestKeY4EclipseUtil.keyFinishSelectedProofAutomatically(frame, MethodTreatment.EXPAND);
             // Clear proof list
             KeYUtil.clearProofList(MainWindow.getInstance());
             TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
             // Close main window
-            TestUtilsUtil.keyCloseMainWindow();
+            TestKeY4EclipseUtil.keyCloseMainWindow();
         }
         finally {
             SWTBotPreferences.TIMEOUT = originalTimeout;

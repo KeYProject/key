@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
+import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.swtbot.swing.bot.SwingBot;
 import org.key_project.swtbot.swing.bot.SwingBotJDialog;
 import org.key_project.swtbot.swing.bot.SwingBotJFrame;
@@ -495,7 +496,7 @@ public final class TestKeyUtil {
             TestCase.assertEquals(1, proof.getProofListeners().length);
             TestCase.assertEquals(0, proofLogger.getClosedEvents().size());
             TestCase.assertEquals(0, proofLogger.getReferenceChangedEvents().size());
-            TestUtilsUtil.keyFinishSelectedProofAutomatically(frame, methodTreatment);
+            TestKeY4EclipseUtil.keyFinishSelectedProofAutomatically(frame, methodTreatment);
             TestCase.assertTrue(proof.isClosed());
             TestCase.assertEquals(1, proofLogger.getClosedEvents().size());
             TestCase.assertEquals(proof, proofLogger.getClosedEvents().get(0).getSource());

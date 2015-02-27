@@ -24,9 +24,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
-
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IContainer;
@@ -105,25 +102,14 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.intro.IIntroManager;
-import org.key_project.swtbot.swing.bot.AbstractSwingBotComponent;
-import org.key_project.swtbot.swing.bot.SwingBot;
-import org.key_project.swtbot.swing.bot.SwingBotJButton;
-import org.key_project.swtbot.swing.bot.SwingBotJDialog;
-import org.key_project.swtbot.swing.bot.SwingBotJFrame;
-import org.key_project.swtbot.swing.bot.SwingBotJRadioButton;
-import org.key_project.swtbot.swing.bot.SwingBotJTabbedPane;
-import org.key_project.swtbot.swing.bot.SwingBotJTree;
-import org.key_project.swtbot.swing.bot.finder.waits.Conditions;
 import org.key_project.util.eclipse.Logger;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.setup.SetupStartup;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.internal.ContextMenuHelper;
-import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.helper.HelperClassForUtilityTests;
 import org.key_project.utils.java.ArrayUtil;
-import org.key_project.utils.java.CollectionUtil;
 import org.key_project.utils.java.IFilter;
 import org.key_project.utils.java.IOUtil;
 import org.key_project.utils.java.ObjectUtil;
@@ -132,20 +118,6 @@ import org.key_project.utils.java.thread.AbstractRunnableWithException;
 import org.key_project.utils.java.thread.AbstractRunnableWithResult;
 import org.key_project.utils.java.thread.IRunnableWithException;
 import org.key_project.utils.java.thread.IRunnableWithResult;
-
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.ProofManagementDialog;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.mgt.EnvNode;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
-import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
-import de.uka.ilkd.key.ui.UserInterface;
-import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
  * Provides static methods that make testing easier.
@@ -510,143 +482,6 @@ public class TestUtilsUtil {
       Display.getDefault().syncExec(run);
       return run.getResult();
    }
-  
-   /**
-    * Returns the {@link SwingBotJFrame} that handles the {@link MainWindow}
-    * of KeY.
-    * @return The {@link SwingBotJFrame} for KeY's {@link MainWindow}.
-    */
-   public static SwingBotJFrame keyGetMainWindow() {
-       SwingBot bot = new SwingBot();
-       SwingBotJFrame frame = bot.jFrame("KeY " + KeYResourceManager.getManager().getVersion());
-       TestCase.assertNotNull(frame);
-       TestCase.assertTrue(frame.isOpen());
-       return frame;
-   }
-   
-   /**
-    * Closes the opened {@link MainWindow} of KeY.
-    */
-   public static void keyCloseMainWindow() {
-       SwingBotJFrame frame = TestUtilsUtil.keyGetMainWindow();
-       frame.close();
-       TestCase.assertFalse(frame.isOpen());
-   }
-   
-   /**
-    * Returns the {@link SwingBotJDialog} that handles the opened
-    * {@link ProofManagementDialog} of KeY.
-    * @param mainWindow The parent main window.
-    * @return The {@link SwingBotJDialog} for the {@link ProofManagementDialog}.
-    */
-   public static SwingBotJDialog keyGetProofManagementDiaolog(SwingBotJFrame mainWindow) {
-       SwingBotJDialog dialog = mainWindow.bot().jDialog("Proof Management");
-       TestCase.assertNotNull(dialog);
-       TestCase.assertTrue(dialog.isOpen());
-       return dialog;
-   }
-   
-   /**
-    * Starts the selected proof in the opened {@link ProofManagementDialog}.
-    */
-   public static void keyStartSelectedProofInProofManagementDiaolog() {
-       SwingBotJFrame frame = TestUtilsUtil.keyGetMainWindow();
-       SwingBotJDialog dialog = TestUtilsUtil.keyGetProofManagementDiaolog(frame);
-       TestCase.assertTrue(dialog.isOpen());
-       SwingBotJButton startButton = dialog.bot().jButton("Start Proof");
-       startButton.clickAndWait();
-       TestCase.assertFalse(dialog.isOpen());
-   }
-   
-   /**
-    * Goes to the selected proof in the opened {@link ProofManagementDialog}.
-    */
-   public static void keyGoToSelectedProofInProofManagementDiaolog() {
-       SwingBotJFrame frame = TestUtilsUtil.keyGetMainWindow();
-       SwingBotJDialog dialog = TestUtilsUtil.keyGetProofManagementDiaolog(frame);
-       TestCase.assertTrue(dialog.isOpen());
-       SwingBotJButton goToButton = dialog.bot().jButton("Go to Proof");
-       goToButton.clickAndWait();
-       TestCase.assertFalse(dialog.isOpen());
-   }
-   
-   /**
-    * Makes sure that the correct proofs are shown in the proof tree.
-    * @param selectedProof The expected selected proof.
-    * @param availableProofs The expected available proofs.
-    */
-   public static void keyCheckProofs(String selectedProof, String... availableProofs) {
-       SwingBotJFrame frame = TestUtilsUtil.keyGetMainWindow();
-       SwingBotJTree tree = frame.bot().jTree(TaskTreeModel.class);
-       TestUtilsUtil.keyCheckAvailableProofs(tree, availableProofs);
-       TestUtilsUtil.keyCheckSelectedProof(tree, selectedProof);
-   }
-   
-   /**
-    * Makes sure that the correct proof is selected.
-    * @param tree The tree.
-    * @param expectedProofName The name of the expected proof.
-    */
-   public static void keyCheckSelectedProof(SwingBotJTree tree,
-                                            String expectedProofName) {
-      Object[] selectedObjects = tree.getSelectedObjects();
-      TestCase.assertEquals(1, selectedObjects.length);
-      TestCase.assertTrue(selectedObjects[0] instanceof TaskTreeNode);
-      Proof proof = ((TaskTreeNode)selectedObjects[0]).proof();
-      TestCase.assertEquals(expectedProofName, proof.name().toString());
-   }
-
-   /**
-    * Makes sure that the correct proofs are available.
-    * @param tree The tree.
-    * @param expectedProofNames The name of the expected proofs.
-    */
-   public static void keyCheckAvailableProofs(SwingBotJTree tree,
-                                              String... expectedProofNames) {
-      TreeModel model = tree.getModel();
-      TestCase.assertEquals(expectedProofNames.length, model.getChildCount(model.getRoot()));
-      for (int i = 0; i < expectedProofNames.length; i++) {
-          Object child = model.getChild(model.getRoot(), i);
-          TestCase.assertTrue(child instanceof TaskTreeNode);
-          Proof proof = ((TaskTreeNode)child).proof();
-          TestCase.assertEquals(expectedProofNames[i], proof.name().toString());
-      }
-   }
-
-   /**
-    * Returns the {@link Proof} in the proof list at
-    * the given index.
-    * @param envIndex The index of the {@link ProofEnvironment}.
-    * @param proofIndex The index of the {@link Proof} in the {@link ProofEnvironment}.
-    * @return The found {@link ProofEnvironment}.
-    */
-   public static Proof keyGetProof(int envIndex, int proofIndex) {
-       SwingBotJFrame frame = TestUtilsUtil.keyGetMainWindow();
-       SwingBotJTree tree = frame.bot().jTree(TaskTreeModel.class);
-       return keyGetProof(tree, envIndex, proofIndex);
-   }
-   
-   /**
-    * Returns the {@link ProofEnvironment} in the proof list at
-    * the given index.
-    * @param tree The {@link SwingBotJTree} to search in.
-    * @param envIndex The index of the {@link ProofEnvironment}.
-    * @param proofIndex The index of the {@link Proof} in the {@link ProofEnvironment}.
-    * @return The found {@link ProofEnvironment}.
-    */
-   public static Proof keyGetProof(SwingBotJTree tree, int envIndex, int proofIndex) {
-       TestCase.assertNotNull(tree);
-       TestCase.assertTrue(envIndex >= 0);
-       TestCase.assertTrue(proofIndex >= 0);
-       TreeModel model = tree.getModel();
-       TestCase.assertNotNull(model);
-       TestCase.assertTrue(envIndex < model.getChildCount(model.getRoot()));
-       Object child = model.getChild(model.getRoot(), envIndex);
-       TestCase.assertTrue(child instanceof EnvNode);
-       TreeNode proofNode = ((EnvNode)child).getChildAt(proofIndex);
-       TestCase.assertTrue(child instanceof TaskTreeNode);
-       return ((TaskTreeNode)proofNode).proof();
-   }
    
    /**
     * Blocks the current {@link Thread} until the given {@link Job} has finished.
@@ -756,56 +591,6 @@ public class TestUtilsUtil {
        * Contracts
        */
       CONTRACTS
-   }
-   
-   /**
-    * Sets the method treatment in KeY's main window.
-    * @param methodTreatment The method treatment to use.
-    */
-   public static void keySetMethodTreatment(MethodTreatment methodTreatment) {
-      keySetMethodTreatment(keyGetMainWindow(), methodTreatment);
-   }
-   
-   /**
-    * Sets the method treatment in KeY.
-    * @param frame The given KeY frame.
-    * @param methodTreatment The method treatment to use.
-    */
-   public static void keySetMethodTreatment(SwingBotJFrame frame, MethodTreatment methodTreatment) {
-      // Set proof search strategy settings
-      SwingBotJTabbedPane pane = frame.bot().jTabbedPane();
-      TestCase.assertEquals("Proof Search Strategy", pane.getTitleAt(2));
-      AbstractSwingBotComponent<?> tabComponent = pane.select(2);
-      if (MethodTreatment.CONTRACTS.equals(methodTreatment)) {
-         SwingBotJRadioButton contractsButton = tabComponent.bot().jRadioButton("Contract", 1);
-         contractsButton.click();
-      }
-      else {
-         SwingBotJRadioButton expandButton = tabComponent.bot().jRadioButton("Expand", 2);
-         expandButton.click();
-      }
-      TestCase.assertEquals("Proof", pane.getTitleAt(0));
-      pane.select(0);
-   }
-
-   /**
-    * Executes the "Start/stop automated proof search" on the given KeY frame.
-    * @param frame The given KeY frame.
-    * @param methodTreatment The method treatment to use.
-    */
-   public static void keyFinishSelectedProofAutomatically(SwingBotJFrame frame, MethodTreatment methodTreatment) {
-      keySetMethodTreatment(frame, methodTreatment);
-      // Run proof completion
-      frame.bot().jTree().unselectAll();
-      frame.bot().waitWhile(Conditions.hasSelection(frame.bot().jTree()));
-      SwingBotJButton button = frame.bot().jButtonWithTooltip("Start/stop automated proof search");
-      button.click();
-      frame.bot().waitUntil(Conditions.hasSelection(frame.bot().jTree()));
-      // Close result dialog
-      SwingBotJDialog proofClosedDialog = frame.bot().jDialog("Proof closed");
-      proofClosedDialog.bot().jButton("OK").click();
-      proofClosedDialog.bot().waitUntil(Conditions.componentCloses(proofClosedDialog));
-      TestCase.assertFalse(proofClosedDialog.isOpen());   
    }
 
    /**
@@ -1407,30 +1192,6 @@ public class TestUtilsUtil {
    }
    
    /**
-    * Searches a {@link IProgramMethod} in the given {@link Services}.
-    * @param services The {@link Services} to search in.
-    * @param containerTypeName The name of the type which contains the method.
-    * @param methodFullName The method name to search.
-    * @return The first found {@link IProgramMethod} in the type.
-    */
-   public static IProgramMethod searchProgramMethod(Services services, 
-                                                    String containerTypeName, 
-                                                    final String methodFullName) {
-      JavaInfo javaInfo = services.getJavaInfo();
-      KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
-      assertNotNull(containerKJT);
-      ImmutableList<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
-      IProgramMethod pm = CollectionUtil.search(pms, new IFilter<IProgramMethod>() {
-         @Override
-         public boolean select(IProgramMethod element) {
-            return methodFullName.equals(element.getFullName());
-         }
-      });
-      assertNotNull(pm);
-      return pm;
-   }
-   
-   /**
     * Sets the cursor location in the given {@link AbstractSWTBot}.
     * @param widget The {@link AbstractSWTBot} to set cursor location in,.
     * @param x The x coordinate inside the widget to set.
@@ -1458,50 +1219,6 @@ public class TestUtilsUtil {
             notify(SWT.MouseMove, event, widget);
          }
       }.notifyMouseMove(x, y);
-   }
-
-   /**
-    * Blocks the current thread until the auto mode has started.
-    * @param ui The {@link UserInterface} to wait for its auto mode.
-    */
-   public static void waitUntilAutoMode(SWTBot bot, final UserInterface ui) {
-      bot.waitUntil(new ICondition() {
-         @Override
-         public boolean test() throws Exception {
-            return ui.isInAutoMode();
-         }
-         
-         @Override
-         public void init(SWTBot bot) {
-         }
-         
-         @Override
-         public String getFailureMessage() {
-            return "UserInterface \"" + ui + "\" is not in automode.";
-         }
-      });
-   }
-
-   /**
-    * Blocks the current thread while the auto mode is running.
-    * @param ui The {@link UserInterface} to wait for its auto mode.
-    */
-   public static void waitWhileAutoMode(SWTBot bot, final UserInterface ui) {
-      bot.waitUntil(new ICondition() {
-         @Override
-         public boolean test() throws Exception {
-            return !ui.isInAutoMode();
-         }
-         
-         @Override
-         public void init(SWTBot bot) {
-         }
-         
-         @Override
-         public String getFailureMessage() {
-            return "UserInterface \"" + ui + "\" is still in automode.";
-         }
-      });
    }
 
    /**

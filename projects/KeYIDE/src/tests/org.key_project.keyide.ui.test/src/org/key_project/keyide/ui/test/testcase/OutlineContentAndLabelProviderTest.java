@@ -22,6 +22,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.Test;
+import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
@@ -61,7 +62,7 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
       File location = ResourceUtil.getLocation(src);
       // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
       KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(location, null, null);
-      IProgramMethod pm = TestUtilsUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
+      IProgramMethod pm = TestKeY4EclipseUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
       ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
       FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);
       Proof proof = environment.createProof(foc.createProofObl(environment.getInitConfig(), foc));

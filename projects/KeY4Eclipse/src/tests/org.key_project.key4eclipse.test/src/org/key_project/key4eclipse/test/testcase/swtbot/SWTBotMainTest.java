@@ -17,9 +17,9 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.swtbot.swing.bot.SwingBotJFrame;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
-import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -38,7 +38,7 @@ public class SWTBotMainTest extends AbstractSetupTestCase {
     public void testOpeningMainWindow() throws InterruptedException, InvocationTargetException {
         // Open KeY user interface and make sure that a window is opened.
         KeYUtil.openMainWindowAsync();
-        SwingBotJFrame frame = TestUtilsUtil.keyGetMainWindow();
+        SwingBotJFrame frame = TestKeY4EclipseUtil.keyGetMainWindow();
         assertTrue(frame.isOpen());
         assertNotNull(MainWindow.getInstance());
         assertTrue(MainWindow.getInstance().isVisible());

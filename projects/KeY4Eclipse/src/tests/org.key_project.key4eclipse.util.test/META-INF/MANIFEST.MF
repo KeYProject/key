@@ -14,7 +14,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.junit;bundle-version="4.8.1",
  org.eclipse.swtbot.go;bundle-version="2.0.4",
  org.key_project.swtbot.swing;bundle-version="1.0.0",
- org.key_project.key4eclipse;bundle-version="1.0.0",
  org.key_project.util;bundle-version="1.0.0",
  org.eclipse.graphiti;bundle-version="[0.11.0,0.12.0)",
  org.eclipse.graphiti.examples.common;bundle-version="[0.11.0,0.12.0)",
@@ -27,10 +26,18 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: KeY Project
-Export-Package: org.key_project.util.test.editor,
+Export-Package: org.key_project.util.test,
+ org.key_project.util.test.editor,
  org.key_project.util.test.perspective,
  org.key_project.util.test.suite,
  org.key_project.util.test.suite.swtbot,
  org.key_project.util.test.testcase,
+ org.key_project.util.test.testcase.swtbot,
  org.key_project.util.test.util,
- org.key_project.util.test.view
+ org.key_project.util.test.util.internal,
+ org.key_project.util.test.view,
+ org.key_project.utils.helper,
+ org.key_project.utils.model,
+ org.key_project.utils.suite,
+ org.key_project.utils.testcase.collection,
+ org.key_project.utils.testcase.java
