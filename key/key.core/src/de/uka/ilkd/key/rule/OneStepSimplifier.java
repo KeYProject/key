@@ -529,6 +529,18 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
     }
 
+    private void refresh(Proof proof) {
+        ProofIndependentSettings settings = proof.getProofIndependentSettings();
+        if (settings == null) {
+            settings = ProofIndependentSettings.DEFAULT_INSTANCE;
+        }
+        active = settings.getGeneralSettings().oneStepSimplification();
+        if(active && proof != null && !proof.closed()) {
+            initIndices(proof);
+        } else {
+            shutdownIndices();
+        }
+    }
 
 
     //-------------------------------------------------------------------------
@@ -542,18 +554,6 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
     }
     
-    public void refresh(Proof proof) {
-        active = ProofIndependentSettings.DEFAULT_INSTANCE
-                        .getGeneralSettings()
-                        .oneStepSimplification();
-        if(active && proof != null && !proof.closed()) {
-            initIndices(proof);
-        } else {
-            shutdownIndices();
-        }
-    }
-
-
     @Override
     public boolean isApplicable(Goal goal,
                     PosInOccurrence pio) {

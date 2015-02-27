@@ -96,7 +96,7 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
        * solve the whole issue by not at all registering side proofs in the GUI, but instead using the proof starter.
        * And maybe extend the proof starter by an option save after completion, so that the proofs get saved
        */
-      if (info.getMacro() instanceof AbstractFinishAuxiliaryComputationMacro) { // TODO: Pass the other values via ProofMacroFinishedInfo (REFACTORING_FIX_ME)
+      if (info.getMacro() instanceof AbstractFinishAuxiliaryComputationMacro) {
          Proof initiatingProof = info.getProof();
          Object sideProofObject = info.getValueFor(IFProofMacroConstants.SIDE_PROOF);
          if (sideProofObject instanceof Proof) { 

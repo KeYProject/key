@@ -102,7 +102,6 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Provides the basic functionality of {@link TestCase}s which tests
@@ -2074,10 +2073,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(enabled);
       if (proof != null && !proof.isDisposed()) {
          proof.getProofIndependentSettings().getGeneralSettings().setOneStepSimplification(enabled);
-         OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof.getServices().getProfile());
-         if (simplifier != null) {
-            simplifier.refresh(proof);
-         }
+         OneStepSimplifier.refreshOSS(proof);
       }
    }
 }

@@ -220,8 +220,9 @@ public class ProofStarter {
            }
 
            if (proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification()) {
-              OneStepSimplifier.refreshOSS(proof);
+               OneStepSimplifier.refreshOSS(proof);
            }
+
            proof.setActiveStrategy(factory.create(proof, strategyProperties));
 
            profile.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
@@ -240,6 +241,7 @@ public class ProofStarter {
                                                        .equals(StrategyProperties.STOPMODE_NONCLOSE);
            ApplyStrategy.ApplyStrategyInfo result;
            proof.setRuleAppIndexToAutoMode();
+           
            result = prover.start(proof, goals, maxSteps, timeout, stopMode);
            
            if (result.isError()) {

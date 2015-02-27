@@ -24,10 +24,7 @@ public abstract class AbstractSideProofCounterExampleGenerator extends AbstractC
       ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(oldProof, false);
       ProofStarter starter = SideProofUtil.createSideProof(env, newSequent, proofName);
       Proof proof = starter.getProof();
-      OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof.getServices().getProfile());
-      if (simplifier != null) {
-         simplifier.refresh(proof);
-      }
+      OneStepSimplifier.refreshOSS(proof);
       return proof;
    }
 }

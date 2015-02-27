@@ -53,12 +53,8 @@ public class OneStepSimplificationToggleAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
 	boolean b = ((AbstractButton) e.getSource()).isSelected();
 	ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(b);
-//	ProofSettings.DEFAULT_SETTINGS.getGeneralSettings()
-//	        .setOneStepSimplification(b);
-	OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(getMediator().getProfile());
-	if (simplifier != null) {
-	   simplifier.refresh(getMediator().getSelectedProof());
-	}
+	OneStepSimplifier.refreshOSS(getMediator().getSelectedProof());
+	
     }
 
    @Override
