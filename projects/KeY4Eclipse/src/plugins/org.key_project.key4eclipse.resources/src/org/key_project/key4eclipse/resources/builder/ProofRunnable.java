@@ -20,7 +20,6 @@ import org.key_project.utils.java.StringUtil;
 
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SingleProof;
@@ -34,6 +33,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomUserInterface;
+import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -241,7 +241,7 @@ public class ProofRunnable implements Runnable {
       try {
          File location = ResourceUtil.getLocation(file);
          // Create proof file content
-         ProofSaver saver = new ProofSaver(proof, location.getAbsolutePath(), Main.INTERNAL_VERSION);
+         ProofSaver saver = new ProofSaver(proof, location.getAbsolutePath(), KeYConstants.INTERNAL_VERSION);
          ByteArrayOutputStream out = new ByteArrayOutputStream();
          String errorMessage = saver.save(out);
          if (errorMessage != null) {

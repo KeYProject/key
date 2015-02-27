@@ -71,7 +71,6 @@ import org.key_project.utils.java.CollectionUtil;
 import org.key_project.utils.java.StringUtil;
 import org.key_project.utils.java.XMLUtil;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
@@ -1102,15 +1101,6 @@ public class MonKeYComposite extends Composite implements IProofProvider {
    public UserInterface getUI() {
       KeYEnvironment<?> environment = getEnvironment();
       return environment != null ? environment.getUi() : null;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public KeYMediator getMediator() {
-      KeYEnvironment<?> environment = getEnvironment();
-      return environment != null ? environment.getMediator() : null;
    }
 
    /**

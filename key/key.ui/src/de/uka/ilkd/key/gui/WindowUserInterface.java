@@ -46,7 +46,6 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
-import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -304,7 +303,8 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
     */
    @Override
    public boolean isAutoModeSupported(Proof proof) {
-      return mainWindow.getProofList().containsProof(proof);
+      return super.isAutoModeSupported(proof) &&
+             mainWindow.getProofList().containsProof(proof);
    }
 
    /**
@@ -449,10 +449,10 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
-   public static KeYEnvironment<UserInterface> loadInMainWindow(File location,
-                                                                List<File> classPaths,
-                                                                File bootClassPath,
-                                                                boolean makeMainWindowVisible) throws ProblemLoaderException {
+   public static KeYEnvironment<WindowUserInterface> loadInMainWindow(File location,
+                                                                      List<File> classPaths,
+                                                                      File bootClassPath,
+                                                                      boolean makeMainWindowVisible) throws ProblemLoaderException {
       return loadInMainWindow(null, location, classPaths, bootClassPath, false, makeMainWindowVisible);
    }
    
@@ -468,18 +468,18 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
-   public static KeYEnvironment<UserInterface> loadInMainWindow(Profile profile,
-                                                                File location,
-                                                                List<File> classPaths,
-                                                                File bootClassPath,
-                                                                boolean forceNewProfileOfNewProofs,
-                                                                boolean makeMainWindowVisible) throws ProblemLoaderException {
+   public static KeYEnvironment<WindowUserInterface> loadInMainWindow(Profile profile,
+                                                                      File location,
+                                                                      List<File> classPaths,
+                                                                      File bootClassPath,
+                                                                      boolean forceNewProfileOfNewProofs,
+                                                                      boolean makeMainWindowVisible) throws ProblemLoaderException {
       MainWindow main = MainWindow.getInstance();
       if (makeMainWindowVisible && !main.isVisible()) {
           main.setVisible(true);
       }
       AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, null, forceNewProfileOfNewProofs);
       InitConfig initConfig = loader.getInitConfig();
-      return new KeYEnvironment<UserInterface>(main.getUserInterface(), initConfig, loader.getProof());
+      return new KeYEnvironment<WindowUserInterface>(main.getUserInterface(), initConfig, loader.getProof());
    }
 }

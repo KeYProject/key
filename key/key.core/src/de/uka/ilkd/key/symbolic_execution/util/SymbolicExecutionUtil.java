@@ -3741,4 +3741,27 @@ public final class SymbolicExecutionUtil {
          }
       }
    }
+   
+   /**
+    * Creates the {@link NotationInfo} for the given {@link IExecutionElement}.
+    * @param element The {@link IExecutionElement} to create its {@link NotationInfo}.
+    * @return The created {@link NotationInfo}.
+    */
+   public static NotationInfo createNotationInfo(IExecutionElement element) {
+      Proof proof = element != null ? element.getProof() : null;
+      return createNotationInfo(proof);
+   }
+   
+   /**
+    * Creates the {@link NotationInfo} for the given {@link Proof}.
+    * @param proof The {@link Proof} to create its {@link NotationInfo}.
+    * @return The created {@link NotationInfo}.
+    */
+   public static NotationInfo createNotationInfo(Proof proof) {
+      NotationInfo notationInfo = new NotationInfo();
+      if (proof != null && !proof.isDisposed()) {
+         notationInfo.setAbbrevMap(proof.abbreviations());
+      }
+      return notationInfo;
+   }
 }

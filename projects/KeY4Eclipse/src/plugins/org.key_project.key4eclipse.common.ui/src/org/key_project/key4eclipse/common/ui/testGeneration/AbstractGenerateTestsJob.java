@@ -4,10 +4,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.testgen.MemoryTestGenerationLog;
 import de.uka.ilkd.key.smt.testgen.StopRequest;
+import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * A {@link Job} which provides the basic functionality to generate test cases.
@@ -26,21 +26,21 @@ public abstract class AbstractGenerateTestsJob extends Job {
     * @param sourceProject The {@link IProject} which provides the source code.
     * @param testFileName The name of the test file to generate.
     * @param proof The {@link Proof} to generate test cases for.
-    * @param mediator The {@link KeYMediator} to use.
+    * @param ui The {@link UserInterface} to use.
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws Exception Occurred Exception.
     */
    protected void generateTests(final IProject sourceProject, 
                                 final String testFileName, 
                                 final Proof proof, 
-                                final KeYMediator mediator, 
+                                final UserInterface ui, 
                                 final IProgressMonitor monitor) throws Exception {
       EclipseTestGenerator testGenerator = null;
       try {
          MemoryTestGenerationLog log = new MemoryTestGenerationLog();
          testGenerator = new EclipseTestGenerator(sourceProject, 
                                                   testFileName, 
-                                                  mediator, 
+                                                  ui, 
                                                   proof);
          testGenerator.generateTestCases(new StopRequest() {
             @Override

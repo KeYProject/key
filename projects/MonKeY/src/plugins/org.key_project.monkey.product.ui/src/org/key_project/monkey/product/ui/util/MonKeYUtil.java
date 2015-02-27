@@ -30,6 +30,7 @@ import org.key_project.utils.collection.ImmutableSet;
 
 import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.WindowUserInterface;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
@@ -89,7 +90,7 @@ public final class MonKeYUtil {
       monitor.beginTask("Loading in KeY", IProgressMonitor.UNKNOWN);
       KeYEnvironment<?> environment;
       if (showKeYMainWindow) {
-         environment = KeYEnvironment.loadInMainWindow(location, null, bootClassPath, true);
+         environment = WindowUserInterface.loadInMainWindow(location, null, bootClassPath, true);
       }
       else {
          environment = KeYEnvironment.load(location, null, bootClassPath);

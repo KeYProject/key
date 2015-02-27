@@ -15,7 +15,6 @@ package org.key_project.key4eclipse.starter.core.util;
 
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -49,12 +48,6 @@ public interface IProofProvider {
     * @return The {@link KeYEnvironment} in which all of {@link #getCurrentProofs()} lives or {@code null} if not available.
     */
    public KeYEnvironment<?> getEnvironment();
-   
-   /**
-    * Returns the used {@link KeYMediator}.
-    * @return The used {@link KeYMediator}.
-    */
-   public KeYMediator getMediator();
    
    /**
     * Adds the given {@link IProofProviderListener}.

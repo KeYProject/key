@@ -49,7 +49,6 @@ import de.hentschel.visualdbc.interactive.proving.ui.util.InteractiveConnectionU
 import de.hentschel.visualdbc.interactive.proving.ui.util.event.IInteractiveConnectionUtilListener;
 import de.hentschel.visualdbc.interactive.proving.ui.util.event.InteractiveConnectionUtilEvent;
 import de.hentschel.visualdbc.key.ui.util.LogUtil;
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -215,15 +214,6 @@ public class ProofProviderAdapterFactory implements IAdapterFactory {
             }
          }
          return result;
-      }
-      
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public KeYMediator getMediator() {
-         UserInterface ui = getUI();
-         return ui != null ? ui.getMediator() : null;
       }
 
       /**

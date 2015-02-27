@@ -29,9 +29,10 @@ import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.utils.java.StringUtil;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * This composite provides the content shown in {@link KeYDebugNodePropertySection}
@@ -105,18 +106,18 @@ public class KeYTabComposite extends Composite {
    public void updateContent(IKeYSEDDebugNode<?> node) {
       String name = null;
       Node keyNode = null;
-      KeYMediator mediator = null;
+      NotationInfo notationInfo = null;
       if (node != null) {
          keyNode = node.getExecutionNode().getProofNode();
-         mediator = node.getExecutionNode().getMediator();
+         notationInfo = SymbolicExecutionUtil.createNotationInfo(node.getExecutionNode());
          name = keyNode.serialNr() + ": " + keyNode.name(); // Copied from ProofRenderer
       }
       SWTUtil.setText(nodeText, name);
       if (keyNode != null && !keyNode.proof().isDisposed()) {
-         sequentViewerDecorator.showNode(keyNode, mediator);
+         sequentViewerDecorator.showNode(keyNode, notationInfo);
       }
       else {
-         sequentViewerDecorator.showNode(null, mediator);
+         sequentViewerDecorator.showNode(null, notationInfo);
       }
    }
 }

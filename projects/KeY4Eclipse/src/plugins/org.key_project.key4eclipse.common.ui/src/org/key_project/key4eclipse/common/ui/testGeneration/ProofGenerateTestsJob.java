@@ -7,8 +7,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * A {@link Job} which generates test for a given proof file.
@@ -26,21 +26,21 @@ public class ProofGenerateTestsJob extends AbstractGenerateTestsJob {
    private final Proof proof;
    
    /**
-    * The {@link KeYMediator} to use.
+    * The {@link UserInterface} to use.
     */
-   private final KeYMediator mediator;
+   private final UserInterface ui;
    
    /**
     * Constructor.
     * @param sourceProject The {@link IProject} which provides the source code.
     * @param proof The {@link Proof} to generate test cases for.
-    * @param mediator The {@link KeYMediator} to use.
+    * @param ui The {@link UserInterface} to use.
     */
-   public ProofGenerateTestsJob(IProject sourceProject, Proof proof, KeYMediator mediator) {
+   public ProofGenerateTestsJob(IProject sourceProject, Proof proof, UserInterface ui) {
       super();
       this.sourceProject = sourceProject;
       this.proof = proof;
-      this.mediator = mediator;
+      this.ui = ui;
    }
 
    /**
@@ -52,7 +52,7 @@ public class ProofGenerateTestsJob extends AbstractGenerateTestsJob {
          generateTests(sourceProject, 
                        proof.name().toString(), 
                        proof, 
-                       mediator, 
+                       ui, 
                        monitor);
          return Status.OK_STATUS;
       }

@@ -27,7 +27,6 @@ import org.key_project.utils.java.StringUtil;
 import org.key_project.utils.java.thread.AbstractRunnableWithResult;
 import org.key_project.utils.java.thread.IRunnableWithResult;
 
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -43,6 +42,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.ProofUserManager;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -278,7 +278,7 @@ public class MonKeYProof extends Bean {
                    ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(maxRuleApplications);
                    ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
                    proof.getSettings().getStrategySettings().setMaxSteps(maxRuleApplications);
-                   proof.setActiveStrategy(environment.getMediator().getProfile().getDefaultStrategyFactory().create(proof, sp));
+                   proof.setActiveStrategy(proof.getServices().getProfile().getDefaultStrategyFactory().create(proof, sp));
                 }
              });
              // Start interactive proof automatically
@@ -533,7 +533,7 @@ public class MonKeYProof extends Bean {
    public boolean save(String proofDirectory) throws IOException {
       if (hasProofInKeY()) {
          File file = new File(proofDirectory, getProofFileName());
-         ProofSaver saver = new ProofSaver(proof, file.getAbsolutePath(), Main.INTERNAL_VERSION);
+         ProofSaver saver = new ProofSaver(proof, file.getAbsolutePath(), KeYConstants.INTERNAL_VERSION);
          String errorMessage = saver.save();
          if (errorMessage != null) {
             throw new IOException(errorMessage);

@@ -161,7 +161,7 @@ public abstract class AbstractUserInterface implements UserInterface {
      */
     @Override
     public boolean isAutoModeSupported(Proof proof) {
-       return true; // All proofs are supported.
+       return proof != null && !proof.isDisposed(); // All not disposed proofs are supported.
     }
     
     /**

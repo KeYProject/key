@@ -40,7 +40,6 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.view.AbstractViewBasedView;
 import org.key_project.utils.java.CollectionUtil;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -282,14 +281,6 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView impleme
    @Override
    public UserInterface getUI() {
       return environment != null ? environment.getUi() : null;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public KeYMediator getMediator() {
-      return environment != null ? environment.getMediator() : null;
    }
 
    /**

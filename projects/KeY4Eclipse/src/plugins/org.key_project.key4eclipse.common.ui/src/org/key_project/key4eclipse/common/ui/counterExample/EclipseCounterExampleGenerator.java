@@ -12,10 +12,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.internal.dialogs.FilteredPreferenceDialog;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
-import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.smt.SolverListener.InternSMTProblem;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SolverLauncher;

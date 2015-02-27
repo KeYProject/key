@@ -219,4 +219,13 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
          }
       }
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isAutoModeSupported(Proof proof) {
+      return super.isAutoModeSupported(proof) && 
+             getMediator().getSelectedProof() == proof;
+   }
 }

@@ -835,7 +835,7 @@ public class ProofManager {
       initConfig.setTaclets(sourceInitConfig.getTaclets());
       // Create new ProofEnvironment and initialize it with values from initial one.
       initConfig.getServices().setJavaModel(sourceInitConfig.getServices().getJavaModel());
-      KeYEnvironment<CustomUserInterface> keyEnv = new KeYEnvironment<CustomUserInterface>(new CustomUserInterface(false), initConfig);
+      KeYEnvironment<CustomUserInterface> keyEnv = new KeYEnvironment<CustomUserInterface>(new CustomUserInterface(), initConfig);
       return keyEnv;
    }
    

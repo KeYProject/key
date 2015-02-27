@@ -61,6 +61,7 @@ import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValue;
 import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.TruthValueEvaluationResult;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -302,9 +303,9 @@ public abstract class AbstractTruthValueComposite implements IDisposable {
             // Show term and results
             Sequent sequent = createSequentToShow(branchResult.getCondition(), succedent);
             TruthValue value = viewerDecorator.showSequent(sequent, 
-                                                               executionNode.getServices(), 
-                                                               executionNode.getMediator(), 
-                                                               branchResult);
+                                                           executionNode.getServices(), 
+                                                           SymbolicExecutionUtil.createNotationInfo(executionNode), 
+                                                           branchResult);
             viewerGroup.setBackground(viewerDecorator.getColor(value));
          }
       }

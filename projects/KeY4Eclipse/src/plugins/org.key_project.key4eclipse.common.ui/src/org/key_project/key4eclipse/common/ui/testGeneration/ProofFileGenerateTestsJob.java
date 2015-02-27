@@ -44,7 +44,7 @@ public class ProofFileGenerateTestsJob extends AbstractGenerateTestsJob {
          generateTests(proofFile.getProject(), 
                        ResourceUtil.getFileNameWithoutExtension(proofFile), 
                        env.getLoadedProof(), 
-                       env.getMediator(), 
+                       env.getUi(), 
                        monitor);
          return Status.OK_STATUS;
       }

@@ -88,6 +88,7 @@ import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.WindowUserInterface;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
@@ -284,7 +285,7 @@ public class KeyConnection extends MemoryConnection {
          
          // Establish connection
          if (interactive) {
-            environment = KeYEnvironment.loadInMainWindow(location, classPathEntries, bootClassPath, true);
+            environment = WindowUserInterface.loadInMainWindow(location, classPathEntries, bootClassPath, true);
             KeYMediator mediator = environment.getMediator();
             mediator.addGUIListener(mainGuiListener);
          }

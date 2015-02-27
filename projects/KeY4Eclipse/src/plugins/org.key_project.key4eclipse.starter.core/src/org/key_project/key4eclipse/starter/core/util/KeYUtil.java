@@ -98,6 +98,7 @@ import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -1413,7 +1414,7 @@ public final class KeYUtil {
       try {
          File location = ResourceUtil.getLocation(file);
          // Create proof file content
-         ProofSaver saver = new ProofSaver(proof, location.getAbsolutePath(), Main.INTERNAL_VERSION);
+         ProofSaver saver = new ProofSaver(proof, location.getAbsolutePath(), KeYConstants.INTERNAL_VERSION);
          ByteArrayOutputStream out = new ByteArrayOutputStream();
          String errorMessage = saver.save(out);
          if (errorMessage != null) {

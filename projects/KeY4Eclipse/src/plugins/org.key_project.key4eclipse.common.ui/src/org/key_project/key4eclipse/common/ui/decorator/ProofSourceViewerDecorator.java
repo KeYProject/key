@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
@@ -145,15 +146,15 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * @param node The {@link Node} to show.
     * @param mediator The {@link KeYMediator} to use.
     */
-   public void showNode(Node node, KeYMediator mediator) {
+   public void showNode(Node node, NotationInfo notationInfo) {
       this.node = node;
       String str;
       if (node != null) {
          filter = new IdentitySequentPrintFilter(node.sequent());
          printer = new LogicPrinter(new ProgramPrinter(null), 
-                                    mediator.getNotationInfo(), 
+                                    notationInfo, 
                                     node.proof().getServices());
-         str = computeText(mediator, node, filter, printer);
+         str = computeText(notationInfo, node, filter, printer);
       }
       else {
          filter = null;
@@ -178,37 +179,34 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     */
    public String showSequent(Sequent sequent, 
                              Services services, 
-                             KeYMediator mediator, 
+                             NotationInfo notationInfo, 
                              VisibleTermLabels visibleLabels) {
       this.node = null;
       filter = null;
       if (visibleLabels != null) {
          printer = new SequentViewLogicPrinter(new ProgramPrinter(null), 
-                                               mediator.getNotationInfo(), 
+                                               notationInfo, 
                                                services,
                                                visibleLabels);
       }
       else {
          printer = new LogicPrinter(new ProgramPrinter(null), 
-                                    mediator.getNotationInfo(), 
+                                    notationInfo, 
                                     services);
       }
-      String str = computeText(mediator, sequent, printer);
+      String str = computeText(sequent, printer);
       viewer.setDocument(new Document(str));
       return str;
    }
    
    /**
     * Computes the text to show in the {@link KeYEditor}} which consists
-    * of the sequent including the applied rule.
-    * @param mediator The {@link KeYMediator} to use.
-    * @param node The {@link Node} to use.
-    * @param filter The {@link SequentPrintFilter} to use.
+    * of the {@link Sequent} including the applied rule.
+    * @param sequent The {@link Sequent} to conert into text.
     * @param printer The {@link LogicPrinter} to use.
     * @return The text to show.
     */
-   public static String computeText(KeYMediator mediator, 
-                                    Sequent sequent, 
+   public static String computeText(Sequent sequent, 
                                     LogicPrinter printer) {
       printer.printSequent(sequent);
       String s = printer.toString();
@@ -217,14 +215,14 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    
    /**
     * Computes the text to show in the {@link KeYEditor}} which consists
-    * of the sequent including the applied rule.
-    * @param mediator The {@link KeYMediator} to use.
+    * of the {@link Sequent} including the applied rule.
+    * @param notationInfo The {@link NotationInfo} to use.
     * @param node The {@link Node} to use.
     * @param filter The {@link SequentPrintFilter} to use.
     * @param printer The {@link LogicPrinter} to use.
     * @return The text to show.
     */
-   public static String computeText(KeYMediator mediator, 
+   public static String computeText(NotationInfo notationInfo,
                                     Node node, 
                                     SequentPrintFilter filter, 
                                     LogicPrinter printer) {
@@ -233,11 +231,11 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
       String s = printer.toString();
       RuleApp app = node.getAppliedRuleApp();
       s += "\nNode Nr " + node.serialNr() + "\n";
-      s += ruleToString(mediator, app, true);
+      s += ruleToString(node.proof().getServices(), notationInfo, app, true);
       return s;
    }
    
-   public static String ruleToString(KeYMediator mediator, RuleApp app, boolean withHeadder) {
+   public static String ruleToString(Services services, NotationInfo notationInfo, RuleApp app, boolean withHeadder) {
       String s = StringUtil.EMPTY_STRING;
       if ( app != null ) {
          if (withHeadder) {
@@ -246,8 +244,8 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
          if (app.rule() instanceof Taclet) {
         LogicPrinter tacPrinter = new LogicPrinter 
             (new ProgramPrinter(null),                        
-             mediator.getNotationInfo(),
-             mediator.getServices(),
+             notationInfo,
+             services,
              true);  
         tacPrinter.printTaclet((Taclet)(app.rule()));    
         s += tacPrinter;

@@ -32,7 +32,7 @@ public class GenerateTestCasesHandler extends AbstractSaveExecutionHandler {
                Proof currentProof = editor.getCurrentProof();
                IProject currentProject = editor.getProject();
                if (currentProof != null && currentProject != null) {
-                  Job job = new ProofGenerateTestsJob(currentProject, currentProof, editor.getMediator());
+                  Job job = new ProofGenerateTestsJob(currentProject, currentProof, editor.getUI());
                   job.schedule();
                }
             }

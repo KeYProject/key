@@ -33,7 +33,6 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.utils.collection.ImmutableList;
 
 import de.uka.ilkd.key.core.AutoModeListener;
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.proof.Goal;
@@ -228,10 +227,6 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    
    public SymbolicExecutionTreeBuilder getBuilder() {
       return getEnvironment().getBuilder();
-   }
-   
-   public KeYMediator getMediator() {
-      return getEnvironment().getMediator();
    }
    
    public UserInterface getUi() {
@@ -450,9 +445,10 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     */
    @Override
    public boolean canSuspend() {
+      
       return super.canSuspend() && 
              getMediator().isInAutoMode() && // Only if the auto mode is in progress
-             getMediator().getSelectedProof() == getProof(); // And the auto mode handles this proof
+             getUi().isAutoModeSupported(getProof()); // And the auto mode handles this proof
    }
    
    /**

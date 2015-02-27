@@ -1,5 +1,6 @@
 package org.key_project.key4eclipse.common.ui.completion;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.layout.TableColumnLayout;
@@ -167,9 +168,10 @@ public class BlockContractCompletion extends AbstractInteractiveRuleApplicationC
        * Returns the selected {@link Contract}.
        * @return The selected {@link Contract} or {@code null} if not available.
        */
+      @SuppressWarnings("unchecked")
       protected BlockContract getSelectedContract() {
-         final Object[] selection = SWTUtil.toArray(viewer.getSelection());
-         return BlockContractSelectionPanel.computeContract(services, selection);
+         final List<?> selection = SWTUtil.toList(viewer.getSelection());
+         return BlockContractSelectionPanel.computeContract(services, (List<BlockContract>) selection);
       }
 
       /**

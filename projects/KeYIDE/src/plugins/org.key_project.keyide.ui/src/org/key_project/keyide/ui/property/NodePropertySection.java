@@ -157,7 +157,7 @@ public class NodePropertySection extends AbstractNodePropertySection {
    protected void updateShownContent(KeYMediator mediator, Node node) {
       if (node != null) {
          SWTUtil.setText(nameText, ProofTreeLabelProvider.getNodeText(node));
-         SWTUtil.setText(appliedRuleText, ProofSourceViewerDecorator.ruleToString(mediator, node.getAppliedRuleApp(), false));
+         SWTUtil.setText(appliedRuleText, ProofSourceViewerDecorator.ruleToString(node.proof().getServices(), mediator.getNotationInfo(), node.getAppliedRuleApp(), false));
          interactiveRuleButton.setSelection(node.getNodeInfo().getInteractiveRuleApplication());
          closedButton.setSelection(node.isClosed());
          SWTUtil.setText(firstStatementText, node.getNodeInfo().getFirstStatementString());

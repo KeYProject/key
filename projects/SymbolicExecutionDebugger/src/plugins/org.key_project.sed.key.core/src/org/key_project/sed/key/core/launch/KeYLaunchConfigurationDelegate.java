@@ -213,7 +213,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
     
     protected SymbolicExecutionEnvironment<?> instantiateProofWithoutUserInterface(String launchConfigurationName,
                                                                                    KeYLaunchSettings settings) throws Exception {
-       UserInterface ui = new CustomUserInterface(false);
+       UserInterface ui = new CustomUserInterface();
        return instantiateProof(ui, launchConfigurationName, settings);
     }
     
@@ -261,7 +261,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           proof = ui.createProof(initConfig, input);
        }
        // Create symbolic execution tree builder
-       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, settings.isMergeBranchConditions(), settings.isUseUnicode(), settings.isUsePrettyPrinting(), settings.isVariablesAreOnlyComputedFromUpdates());
+       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, settings.isMergeBranchConditions(), settings.isUseUnicode(), settings.isUsePrettyPrinting(), settings.isVariablesAreOnlyComputedFromUpdates());
        builder.analyse();
        // Create environment used for symbolic execution
        return new SymbolicExecutionEnvironment<UserInterface>(ui, initConfig, builder);

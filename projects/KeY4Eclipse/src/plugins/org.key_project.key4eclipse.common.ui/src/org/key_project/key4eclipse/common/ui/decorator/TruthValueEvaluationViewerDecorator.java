@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PositionTable;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
@@ -103,14 +104,14 @@ public class TruthValueEvaluationViewerDecorator extends ProofSourceViewerDecora
     * Shows the given {@link Term} and visualizes the {@link BranchResult}.
     * @param sequent The {@link Term} to show.
     * @param services The {@link Services} to use.
-    * @param mediator The {@link KeYMediator} to use.
+    * @param notationInfo The {@link NotationInfo} to use.
     * @param branchResult The {@link BranchResult}s to visualize.
     * @return The shown {@link TruthValue} of {@link Term} to show.
     */
    public TruthValue showSequent(Sequent sequent, 
-                                     Services services, 
-                                     KeYMediator mediator, 
-                                     final BranchResult branchResult) {
+                                 Services services, 
+                                 NotationInfo notationInfo, 
+                                 final BranchResult branchResult) {
       // Show Term
       VisibleTermLabels visibleTermLabels = new VisibleTermLabels() {
          @Override
@@ -118,7 +119,7 @@ public class TruthValueEvaluationViewerDecorator extends ProofSourceViewerDecora
             return true; //!ObjectUtil.equals(name, branchResult.getTermLabelName());
          }
       };
-      String text = showSequent(sequent, services, mediator, visibleTermLabels);
+      String text = showSequent(sequent, services, notationInfo, visibleTermLabels);
       // Highlight results of all terms
       LogicPrinter printer = getPrinter();
       InitialPositionTable ipt = printer.getInitialPositionTable();
