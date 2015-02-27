@@ -17,7 +17,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.Proof.Statistics;
+import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.util.Pair;
 
 /**
