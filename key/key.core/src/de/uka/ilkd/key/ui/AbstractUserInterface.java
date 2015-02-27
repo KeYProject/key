@@ -197,7 +197,7 @@ public abstract class AbstractUserInterface implements UserInterface {
     @Override
     public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer, ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
        if (proofList != null) {
-          // avoid double registration at specrepos as that is done already earlier in createProof
+          // avoid double registration at spec repos as that is done already earlier in createProof
           // the UI method should just do the necessarily UI registrations
           createProofEnvironmentAndRegisterProof(poContainer.getProofOblInput(), proofList, loader.getInitConfig());
        }

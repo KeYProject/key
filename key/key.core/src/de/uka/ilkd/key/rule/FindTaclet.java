@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.tacletbuilder.FindTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.util.Pair;
 
 
 /** 
@@ -131,7 +132,7 @@ public abstract class FindTaclet extends Taclet {
      * @param services the Services
      * @return a pair of updated match conditions and the unwrapped term without the ignored updates (Which have been added to the update context in the match conditions)
      */
-    private IgnoreUpdateMatchResult matchAndIgnoreUpdatePrefix(final Term term,
+    private Pair<Term,MatchConditions> matchAndIgnoreUpdatePrefix(final Term term,
             final Term template, MatchConditions matchCond, final TermServices services) {
 
         final Operator sourceOp   = term.op ();
@@ -147,7 +148,7 @@ public abstract class FindTaclet extends Taclet {
             return matchAndIgnoreUpdatePrefix(UpdateApplication.getTarget(term), 
                     template, matchCond, services);       
         } else {
-            return new IgnoreUpdateMatchResult(term, matchCond);
+            return new Pair<Term, MatchConditions>(term, matchCond);
         }
     }
 
@@ -171,10 +172,10 @@ public abstract class FindTaclet extends Taclet {
             Services services) {
         
         if (ignoreTopLevelUpdates()) {
-            IgnoreUpdateMatchResult resultUpdateMatch = 
+        	Pair</* term below updates */Term, MatchConditions> resultUpdateMatch = 
                     matchAndIgnoreUpdatePrefix(term, find(), matchCond, services);
-            term = resultUpdateMatch.termWithoutMatchedUpdates;
-            matchCond = resultUpdateMatch.matchCond;
+            term = resultUpdateMatch.first;
+            matchCond = resultUpdateMatch.second;
         }
         
         return match(term, find(), matchCond, services);
@@ -369,16 +370,6 @@ public abstract class FindTaclet extends Taclet {
         final BoundVarsVisitor bvv = new BoundVarsVisitor();
         bvv.visit(find());
         return bvv.getBoundVariables();
-    }
-    
-    private static final class IgnoreUpdateMatchResult {
-        public Term termWithoutMatchedUpdates;
-        public MatchConditions matchCond;
-
-        public IgnoreUpdateMatchResult(Term term, MatchConditions matchCond) {
-            this.termWithoutMatchedUpdates = term;
-            this.matchCond = matchCond;
-        }
     }
     
 }
