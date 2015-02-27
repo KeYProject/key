@@ -13,12 +13,16 @@
 
 package de.uka.ilkd.key.ui;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.key_project.utils.collection.ImmutableList;
 
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -56,8 +60,16 @@ public class CustomUserInterface extends AbstractUserInterface {
     * An optional {@link IUserInterfaceCustomization}.
     */
    private final IUserInterfaceCustomization customiaztion;
-      
+
+   /**
+    * The currently running {@link AutoModeThread}.
+    */
    private AutoModeThread autoModeThread;
+   
+   /**
+    * Contains all available {@link AutoModeListener}.
+    */
+   private final List<AutoModeListener> autoModeListener = new LinkedList<AutoModeListener>();
    
    /**
     * Constructor.
@@ -177,8 +189,7 @@ public class CustomUserInterface extends AbstractUserInterface {
    @Override
    public synchronized void stopAutoMode() {
       if (isInAutoMode()) {
-         autoModeThread.stop();
-         autoModeThread = null;
+         autoModeThread.cancel();
       }
    }
 
@@ -193,6 +204,7 @@ public class CustomUserInterface extends AbstractUserInterface {
       }
    }
    
+   @Override
    public synchronized boolean isInAutoMode() {
       return autoModeThread != null;
    }
@@ -214,6 +226,7 @@ public class CustomUserInterface extends AbstractUserInterface {
       @Override
       public void run() {
          try {
+            fireAutoModeStarted(new ProofEvent(proof));
             ProofStarter starter = new ProofStarter(getListener(), false);
             starter.init(proof);
             if (goals != null) {
@@ -225,7 +238,54 @@ public class CustomUserInterface extends AbstractUserInterface {
          }
          finally {
             autoModeThread = null;
+            fireAutoModeStopped(new ProofEvent(proof));
          }
+      }
+      
+      public void cancel() {
+         stop(); // Stop the currently running thread
+         autoModeThread = null;
+         fireAutoModeStopped(new ProofEvent(proof));
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addAutoModeListener(AutoModeListener p) {
+      if (p != null) {
+         autoModeListener.add(p);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeAutoModeListener(AutoModeListener p) {
+      if (p != null) {
+         autoModeListener.remove(p);
+      }
+   }
+
+   /**
+    * fires the event that automatic execution has started
+    */
+   protected void fireAutoModeStarted(ProofEvent e) {
+      AutoModeListener[] listener = autoModeListener.toArray(new AutoModeListener[autoModeListener.size()]);
+      for (AutoModeListener aListenerList : listener) {
+         aListenerList.autoModeStarted(e);
+      }
+   }
+
+   /**
+    * fires the event that automatic execution has stopped
+    */
+   protected void fireAutoModeStopped(ProofEvent e) {
+      AutoModeListener[] listener = autoModeListener.toArray(new AutoModeListener[autoModeListener.size()]);
+      for (AutoModeListener aListenerList : listener) {
+         aListenerList.autoModeStopped(e);
       }
    }
 

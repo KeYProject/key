@@ -32,7 +32,6 @@ import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.AutoModeListener;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.proof.Goal;
@@ -56,6 +55,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointSt
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.ui.AutoModeListener;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -128,7 +128,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
       super(target, true);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
-      getMediator().addAutoModeListener(autoModeListener);
+      getUi().addAutoModeListener(autoModeListener);
       target.registerDebugNode(this);
       initializeAnnotations();
    }
@@ -250,7 +250,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStarted(ProofEvent e) {
-      if (e.getSource() == getProof() && getMediator().isInAutoMode()) { // Sadly auto mode started events are misused and do not really indicate that a auto mode is running
+      if (e.getSource() == getProof() && getUi().isInAutoMode()) { // Sadly auto mode started events are misused and do not really indicate that a auto mode is running
          try {
             // Inform UI that the process is resumed
             super.resume();
@@ -266,7 +266,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      if (e.getSource() == getProof() && !getMediator().isInAutoMode()) { // Sadly auto mode stopped events are misused and do not really indicate that a auto mode has stopped
+      if (e.getSource() == getProof() && !getUi().isInAutoMode()) { // Sadly auto mode stopped events are misused and do not really indicate that a auto mode has stopped
          try {
             updateExecutionTree(getBuilder());
          }
@@ -333,7 +333,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @throws DebugException Occurred Exception
     */
    public void disconnect() throws DebugException {
-      getMediator().removeAutoModeListener(autoModeListener);
+      getUi().removeAutoModeListener(autoModeListener);
    }
    
    /**
@@ -341,7 +341,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     */
    @Override
    public void terminate() throws DebugException {
-      getMediator().removeAutoModeListener(autoModeListener);
+      getUi().removeAutoModeListener(autoModeListener);
       super.terminate();
    }
    
@@ -351,7 +351,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    @Override
    public boolean canResume() {
       return super.canResume() && 
-             !getMediator().isInAutoMode() && // Only one proof completion per time is possible
+             !getUi().isInAutoMode() && // Only one proof completion per time is possible
              getUi().isAutoModeSupported(getProof()); // Otherwise Auto Mode is not available.
    }
    
@@ -447,7 +447,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    public boolean canSuspend() {
       
       return super.canSuspend() && 
-             getMediator().isInAutoMode() && // Only if the auto mode is in progress
+             getUi().isInAutoMode() && // Only if the auto mode is in progress
              getUi().isAutoModeSupported(getProof()); // And the auto mode handles this proof
    }
    

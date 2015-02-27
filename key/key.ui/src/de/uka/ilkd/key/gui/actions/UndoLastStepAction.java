@@ -19,7 +19,6 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.KeyStroke;
 
-import de.uka.ilkd.key.core.AutoModeListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.IconFactory;
@@ -28,6 +27,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.ui.AutoModeListener;
 
 /**
  * This action undoes the last rule application on the currently selected

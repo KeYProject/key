@@ -102,20 +102,6 @@ public abstract class AbstractUserInterface implements UserInterface {
     public void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate) {
        // Nothing to do
     }
- 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void notifyAutoModeBeingStarted() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void notifyAutomodeStopped() {
-    }
 
     @Override
     public void proofUnregistered(ProofEnvironmentEvent event) {

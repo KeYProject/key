@@ -133,7 +133,6 @@ import org.key_project.utils.java.thread.AbstractRunnableWithResult;
 import org.key_project.utils.java.thread.IRunnableWithException;
 import org.key_project.utils.java.thread.IRunnableWithResult;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -1465,12 +1464,11 @@ public class TestUtilsUtil {
     * Blocks the current thread until the auto mode has started.
     * @param ui The {@link UserInterface} to wait for its auto mode.
     */
-   public static void waitUntilAutoMode(SWTBot bot, UserInterface ui) {
-      final KeYMediator mediator = ui.getMediator(); 
+   public static void waitUntilAutoMode(SWTBot bot, final UserInterface ui) {
       bot.waitUntil(new ICondition() {
          @Override
          public boolean test() throws Exception {
-            return mediator.isInAutoMode();
+            return ui.isInAutoMode();
          }
          
          @Override
@@ -1479,7 +1477,7 @@ public class TestUtilsUtil {
          
          @Override
          public String getFailureMessage() {
-            return "Mediator \"" + mediator + "\" is not in automode.";
+            return "UserInterface \"" + ui + "\" is not in automode.";
          }
       });
    }
@@ -1488,12 +1486,11 @@ public class TestUtilsUtil {
     * Blocks the current thread while the auto mode is running.
     * @param ui The {@link UserInterface} to wait for its auto mode.
     */
-   public static void waitWhileAutoMode(SWTBot bot, UserInterface ui) {
-      final KeYMediator mediator = ui.getMediator(); 
+   public static void waitWhileAutoMode(SWTBot bot, final UserInterface ui) {
       bot.waitUntil(new ICondition() {
          @Override
          public boolean test() throws Exception {
-            return !mediator.isInAutoMode();
+            return !ui.isInAutoMode();
          }
          
          @Override
@@ -1502,7 +1499,7 @@ public class TestUtilsUtil {
          
          @Override
          public String getFailureMessage() {
-            return "Mediator \"" + mediator + "\" is still in automode.";
+            return "UserInterface \"" + ui + "\" is still in automode.";
          }
       });
    }

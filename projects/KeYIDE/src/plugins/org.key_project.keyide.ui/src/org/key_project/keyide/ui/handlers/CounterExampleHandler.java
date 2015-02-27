@@ -47,7 +47,7 @@ public class CounterExampleHandler extends AbstractSaveExecutionHandler {
             Object[] elements = SWTUtil.toArray(selection);
             for (Object element : elements) {
                 if (element instanceof Node) {
-                    Job job = new NodeCounterExampleGeneratorJob(editor.getMediator(), (Node) element);
+                    Job job = new NodeCounterExampleGeneratorJob(editor.getUI(), (Node) element);
                     job.schedule();
                 }
             }

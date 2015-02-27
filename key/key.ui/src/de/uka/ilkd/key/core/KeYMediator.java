@@ -69,6 +69,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
+import de.uka.ilkd.key.ui.AutoModeListener;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ThreadUtilities;
 

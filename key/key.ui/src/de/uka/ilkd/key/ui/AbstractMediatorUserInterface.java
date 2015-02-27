@@ -224,8 +224,46 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
     * {@inheritDoc}
     */
    @Override
+   public boolean isInAutoMode() {
+      return getMediator().isInAutoMode();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public boolean isAutoModeSupported(Proof proof) {
       return super.isAutoModeSupported(proof) && 
              getMediator().getSelectedProof() == proof;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addAutoModeListener(AutoModeListener p) {
+      getMediator().addAutoModeListener(p);;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeAutoModeListener(AutoModeListener p) {
+      getMediator().removeAutoModeListener(p);
+   }
+
+   /**
+    * these methods are called immediately before automode is started to ensure that
+    * the GUI can respond in a reasonable way, e.g., change the cursor to a waiting cursor
+    */
+   public void notifyAutoModeBeingStarted() {
+   }
+
+   /**
+    * these methods are called when automode has been stopped to ensure that
+    * the GUI can respond in a reasonable way, e.g., change the cursor to the default
+    */
+   public void notifyAutomodeStopped() {
    }
 }

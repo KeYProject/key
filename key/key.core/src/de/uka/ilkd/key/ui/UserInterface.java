@@ -40,21 +40,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public interface UserInterface
-    extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor, ProofEnvironmentListener {
-
-    /**
-     * these methods are called immediately before automode is started to ensure that
-     * the GUI can respond in a reasonable way, e.g., change the cursor to a waiting cursor
-     */
-    void notifyAutoModeBeingStarted();
-
-    /**
-     * these methods are called when automode has been stopped to ensure that
-     * the GUI can respond in a reasonable way, e.g., change the cursor to the default
-     */
-    void notifyAutomodeStopped();
-
+public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor, ProofEnvironmentListener {
     /**
      * called to complete and apply a taclet instantiations
      * @param models the partial models with all different possible instantiations found automatically
@@ -140,13 +126,24 @@ public interface UserInterface
      */
     Proof createProof(InitConfig initConfig, ProofOblInput input) throws ProofInputException;
     
+    
+    public void addAutoModeListener(AutoModeListener p);
+
+    public void removeAutoModeListener(AutoModeListener p);
+    
     /**
      * Checks if the auto mode of this {@link UserInterface} supports the given {@link Proof}.
      * @param proof The {@link Proof} to check.
      * @return {@code true} auto mode support proofs, {@code false} auto mode don't support proof.
      */
     boolean isAutoModeSupported(Proof proof);
-    
+
+    /**
+     * Checks if the auto mode is currently running.
+     * @return {@code true} auto mode is running, {@code false} auto mode is not running.
+     */
+    boolean isInAutoMode();
+
     /**
      * Starts the auto mode for the given {@link Proof}.
      * @param proof The {@link Proof} to start auto mode of.

@@ -17,7 +17,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.Icon;
 import javax.swing.SwingWorker;
 
-import de.uka.ilkd.key.core.AutoModeListener;
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -41,6 +40,7 @@ import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.counterexample.AbstractCounterExampleGenerator;
 import de.uka.ilkd.key.smt.counterexample.AbstractSideProofCounterExampleGenerator;
+import de.uka.ilkd.key.ui.AutoModeListener;
 import de.uka.ilkd.key.ui.UserInterface;
 
 @SuppressWarnings("serial")

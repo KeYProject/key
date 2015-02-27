@@ -45,7 +45,6 @@ import org.key_project.utils.java.ObjectUtil;
 import org.key_project.utils.java.StringUtil;
 import org.key_project.utils.java.XMLUtil;
 
-import de.uka.ilkd.key.core.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Proof;
@@ -62,6 +61,7 @@ import de.uka.ilkd.key.strategy.definition.OneOfStrategyPropertyDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.ui.AutoModeListener;
 
 /**
  * This {@link Composite} allows to edit the {@link StrategySettings} of
@@ -200,7 +200,6 @@ public class StrategySettingsComposite extends Composite {
       Proof oldProof = proof;
       KeYMediator oldMediator = mediator;
       proof = proofProvider != null ? proofProvider.getCurrentProof() : null;
-      mediator = proofProvider != null ? proofProvider.getMediator() : null;
       if (oldProof != proof && oldProof != null && !oldProof.isDisposed()) {
          oldProof.getSettings().getStrategySettings().removeSettingsListener(settingsListener);
       }

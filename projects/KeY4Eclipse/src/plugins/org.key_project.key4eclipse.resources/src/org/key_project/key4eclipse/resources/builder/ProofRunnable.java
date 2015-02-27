@@ -34,7 +34,6 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 
@@ -144,10 +143,7 @@ public class ProofRunnable implements Runnable {
          ps.init(new SingleProof(proof, pe.getProofObl().name()));
          ps.start();
          
-         OneStepSimplifier oss = MiscTools.findOneStepSimplifier(proof);
-         if (oss != null) {
-            oss.refresh(proof);
-         }
+         OneStepSimplifier.refreshOSS(proof);
          return proof;
    }
    
@@ -193,10 +189,7 @@ public class ProofRunnable implements Runnable {
       sb.append(StringUtil.NEW_LINE);
       if(!proof.closed()){
          boolean uncloseable = false;
-         OneStepSimplifier oss = MiscTools.findOneStepSimplifier(proof);
-         if (oss != null) {
-            oss.refresh(proof);
-         }
+         OneStepSimplifier.refreshOSS(proof);
          for(Goal goal : proof.openGoals()){
             
             if(!SymbolicExecutionUtil.hasApplicableRules(goal)){

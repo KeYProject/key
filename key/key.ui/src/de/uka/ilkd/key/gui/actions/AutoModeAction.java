@@ -23,7 +23,6 @@ import javax.swing.KeyStroke;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.AutoModeListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.IconFactory;
@@ -34,6 +33,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.ui.AutoModeListener;
 
 public final class AutoModeAction extends MainWindowAction {
 
