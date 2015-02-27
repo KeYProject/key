@@ -7,16 +7,21 @@ import java.util.List;
 import org.key_project.utils.collection.ImmutableList;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.macros.AbstractFinishAuxiliaryComputationMacro;
 import de.uka.ilkd.key.macros.IFProofMacroConstants;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.macros.StartAuxiliaryBlockComputationMacro;
+import de.uka.ilkd.key.macros.StartAuxiliaryLoopComputationMacro;
+import de.uka.ilkd.key.macros.StartAuxiliaryMethodComputationMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -105,6 +110,30 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
              // go into automode again
              getMediator().stopInterface(true);
          }
+      } else if (info.getMacro() instanceof StartAuxiliaryBlockComputationMacro ||
+              info.getMacro() instanceof StartAuxiliaryMethodComputationMacro ||
+              info.getMacro() instanceof StartAuxiliaryLoopComputationMacro) {
+          final Proof proof = info.getProof();
+          final Object poObject = info.getValueFor(IFProofMacroConstants.PO_FOR_NEW_SIDE_PROOF);
+
+          if (poObject instanceof ProofOblInput) {
+              ProofOblInput po = (ProofOblInput) poObject;
+              final Proof p;
+              synchronized (po) {
+                  try {
+                    p = createProof(proof.getEnv().getInitConfigForEnvironment(), po);
+                } catch (ProofInputException e) {
+                    getMediator().notify(new ExceptionFailureEvent("PO generation for side proof failed.", e));
+                    return;
+                } 
+              }
+              p.unionIFSymbols(proof.getIFSymbols());
+              // stop interface again, because it is activated by the proof
+              // change through startProver; the ProofMacroWorker will activate
+              // it again at the right time
+              getMediator().stopInterface(true);
+              getMediator().setInteractive(false);
+          }
       }
    }
 

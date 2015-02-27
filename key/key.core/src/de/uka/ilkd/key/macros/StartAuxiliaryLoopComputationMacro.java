@@ -12,13 +12,11 @@ import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.LoopInvExecutionPO;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.ui.UserInterface;
 
 public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro {
 
@@ -82,19 +80,11 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro {
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) {
-        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
-        if (goals.head().node().parent() == null) {
-            return info;
-        }
-        RuleApp app = goals.head().node().parent().getAppliedRuleApp();
-        if (!(app instanceof LoopInvariantBuiltInRuleApp)) {
-            return info;
-        }
+        final LoopInvariantBuiltInRuleApp loopInvRuleApp = (LoopInvariantBuiltInRuleApp) 
+                goals.head().node().parent().getAppliedRuleApp();
 
         final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
 
-        final LoopInvariantBuiltInRuleApp loopInvRuleApp =
-                (LoopInvariantBuiltInRuleApp) app;
         final LoopInvariant loopInv = loopInvRuleApp.getInvariant();
         final IFProofObligationVars ifVars =
                 loopInvRuleApp.getInformationFlowProofObligationVars();
@@ -102,29 +92,16 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro {
                 loopInvRuleApp.getExecutionContext();
         final Term guardTerm = loopInvRuleApp.getGuard();
 
-
         final LoopInvExecutionPO loopInvExecPO =
                 new LoopInvExecutionPO(initConfig, loopInv,
                                        ifVars.symbExecVars.labelHeapAtPreAsAnonHeapFunc(),
                                        goals.head(), executionContext,
                                        guardTerm,
                                        proof.getServices());
-        final UserInterface ui = mediator.getUI();
-        try {
-            final Proof p;
-            synchronized (loopInvExecPO) {
-                p = ui.createProof(initConfig, loopInvExecPO);
-            }
-            p.unionIFSymbols(proof.getIFSymbols());
-            // stop interface again, because it is activated by the proof
-            // change through startProver; the ProofMacroWorker will activate
-            // it again at the right time
-            mediator.stopInterface(true);
-            mediator.setInteractive(false);
-            info = new ProofMacroFinishedInfo(this, p);
-        } catch (ProofInputException exc) {
-            ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
-        }
+        
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, proof);
+        info.addInfo(IFProofMacroConstants.PO_FOR_NEW_SIDE_PROOF, loopInvExecPO);
+
         return info;
     }
 }

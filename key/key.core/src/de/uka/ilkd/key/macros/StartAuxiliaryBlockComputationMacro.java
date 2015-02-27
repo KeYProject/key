@@ -15,13 +15,11 @@ import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.ui.UserInterface;
 
 
 /**
@@ -90,18 +88,11 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro {
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) {
-        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
-        if (goals.head().node().parent() == null) {
-            return info;
-        }
-        final RuleApp app = goals.head().node().parent().getAppliedRuleApp();
-        if (!(app instanceof BlockContractBuiltInRuleApp)) {
-            return info;
-        }
+        final BlockContractBuiltInRuleApp blockRuleApp = 
+                (BlockContractBuiltInRuleApp) goals.head().node().parent().getAppliedRuleApp();
 
         final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
 
-        final BlockContractBuiltInRuleApp blockRuleApp = (BlockContractBuiltInRuleApp) app;
         final BlockContract contract = blockRuleApp.getContract();
         final IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
 
@@ -110,22 +101,11 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro {
                                      ifVars.symbExecVars.labelHeapAtPreAsAnonHeapFunc(),
                                      goals.head(), blockRuleApp.getExecutionContext(),
                                      proof.getServices());
-        final UserInterface ui = mediator.getUI();
-        try {
-            final Proof p;
-            synchronized (blockExecPO) {
-                p = ui.createProof(initConfig, blockExecPO);
-            }
-            p.unionIFSymbols(proof.getIFSymbols());
-            // stop interface again, because it is activated by the proof
-            // change through startProver; the ProofMacroWorker will activate
-            // it again at the right time
-            mediator.stopInterface(true);
-            mediator.setInteractive(false);
-            info = new ProofMacroFinishedInfo(this, p);
-        } catch (ProofInputException exc) {
-            ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
-        }
+        
+        
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, proof);
+        info.addInfo(IFProofMacroConstants.PO_FOR_NEW_SIDE_PROOF, blockExecPO);
+
         return info;
     }
 }
