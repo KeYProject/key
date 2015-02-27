@@ -428,6 +428,9 @@ public class Proof implements Named {
         return pis;
     }
 
+    
+    
+    
     public InfFlowProofSymbols removeInfFlowProofSymbols() {
         InfFlowProofSymbols symbols = infFlowSymbols;
         infFlowSymbols = new InfFlowProofSymbols();

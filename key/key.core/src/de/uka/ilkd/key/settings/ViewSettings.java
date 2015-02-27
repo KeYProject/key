@@ -41,7 +41,6 @@ public class ViewSettings implements Settings, Cloneable {
     private static final String USE_UNICODE = "[View]UseUnicodeSymbols";
     private static final String HIDE_PACKAGE_PREFIX = "[View]HidePackagePrefix";
     private static final String CONFIRM_EXIT = "[View]ConfirmExit";
-    private static final String SHOW_UNINSTANTIATED_TACLET = "[View]UninstantiatedTaclet";
     
     /** default max number of displayed tooltip lines is 40 */
     private int maxTooltipLines = 40;

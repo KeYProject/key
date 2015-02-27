@@ -15,12 +15,12 @@ package de.uka.ilkd.key.settings;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringBufferInputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.EventObject;
 import java.util.Properties;
@@ -166,7 +166,7 @@ public class ProofSettings {
     }
 
 	/** Used by loadSettings() and loadSettingsFromString(...) */
-	public void loadSettingsFromStream(InputStream in) {
+	public void loadSettingsFromStream(Reader in) {
 	    Properties defaultProps = new Properties ();
 
 	    if ( PROVER_CONFIG_FILE_TEMPLATE == null )
@@ -202,25 +202,20 @@ public class ProofSettings {
      * Loads the the former settings from configuration file.
      */
     public void loadSettings(){
-	try {
-	    FileInputStream in = new FileInputStream(PROVER_CONFIG_FILE);
-	    try { 
-	        loadSettingsFromStream(in);
-	    } finally {
-	        in.close();
-	    }
-	} catch (IOException e){
-            System.err.println
-		("Warning: no proof-settings could be loaded, using defaults");
-	    Debug.out(e);
-	}
+    	try(FileReader in = new FileReader(PROVER_CONFIG_FILE)) { 
+    		loadSettingsFromStream(in);
+    	} catch (IOException e){
+    		System.err.println
+    		("Warning: no proof-settings could be loaded, using defaults");
+    		Debug.out(e);
+    	}
     }
 
     /** Used to load Settings from a .key file*/
     public void loadSettingsFromString(String s) {
         if (s == null) return;      
-        StringBufferInputStream in = new StringBufferInputStream(s);
-        loadSettingsFromStream(in);
+        StringReader reader = new StringReader(s);
+        loadSettingsFromStream(reader);
     }
 
     /** returns the StrategySettings object
