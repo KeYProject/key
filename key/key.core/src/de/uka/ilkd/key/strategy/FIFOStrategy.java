@@ -83,4 +83,9 @@ public class FIFOStrategy implements Strategy {
         }
     }
 
+    @Override
+    public boolean isStopAtFirstNonCloseableGoal() {
+       return false;
+    }
+
 }

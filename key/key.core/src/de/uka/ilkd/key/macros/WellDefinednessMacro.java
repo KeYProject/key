@@ -124,5 +124,10 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
                 RuleAppCostCollector collector) {
         }
+
+        @Override
+        public boolean isStopAtFirstNonCloseableGoal() {
+           return false;
+        }
     }
 }

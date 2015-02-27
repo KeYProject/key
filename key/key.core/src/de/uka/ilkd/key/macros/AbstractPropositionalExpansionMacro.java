@@ -132,5 +132,10 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
                 RuleAppCostCollector collector) {
         }
 
+        @Override
+        public boolean isStopAtFirstNonCloseableGoal() {
+           return false;
+        }
+
     }
 }

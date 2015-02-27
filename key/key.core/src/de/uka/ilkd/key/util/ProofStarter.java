@@ -15,6 +15,7 @@ package de.uka.ilkd.key.util;
 
 import org.key_project.utils.collection.ImmutableList;
 
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -35,6 +36,9 @@ import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.settings.StrategySettings;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
+import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
@@ -121,12 +125,12 @@ public class ProofStarter {
 
     private long timeout = -1L;
 
-    private StrategyProperties strategyProperties;
-
     private ProverTaskListener ptl;
     
     private AutoSaver autoSaver;
-
+    
+    private Strategy strategy;
+    
     /**
      * creates an instance of the ProofStarter
      * @param the ProofEnvironment in which the proof shall be performed
@@ -192,9 +196,16 @@ public class ProofStarter {
         this.maxSteps = maxSteps;
     }
 
+    public void setStrategy(Strategy strategy) {
+        this.strategy = strategy;
+    }
 
-    public void setStrategy(StrategyProperties sp) {
-        this.strategyProperties = (StrategyProperties) sp.clone();
+    public void setStrategyProperties(StrategyProperties sp) {
+       final Profile profile = proof.getInitConfig().getProfile();
+       StrategyFactory factory = strategy != null ?
+                                 profile.getStrategyFactory(strategy.name()) :
+                                 profile.getDefaultStrategyFactory();
+       setStrategy(factory.create(proof, sp));
     }
 
     /**
@@ -212,18 +223,18 @@ public class ProofStarter {
     public ApplyStrategyInfo start(ImmutableList<Goal> goals) {
         try {
            final Profile profile = proof.getInitConfig().getProfile();
-           final StrategyFactory factory = profile.getDefaultStrategyFactory();
-           if (strategyProperties == null) {
-              strategyProperties =
-                      factory.getSettingsDefinition().getDefaultPropertiesFactory()
-                      .createDefaultStrategyProperties();
+           
+           if (strategy == null) {
+              StrategyFactory factory = profile.getDefaultStrategyFactory();
+              StrategyProperties sp = factory.getSettingsDefinition().getDefaultPropertiesFactory().createDefaultStrategyProperties();;
+              strategy = factory.create(proof, sp);
            }
 
            if (proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification()) {
                OneStepSimplifier.refreshOSS(proof);
            }
 
-           proof.setActiveStrategy(factory.create(proof, strategyProperties));
+           proof.setActiveStrategy(strategy);
 
            profile.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
 
@@ -237,12 +248,13 @@ public class ProofStarter {
               prover.addProverTaskObserver(autoSaver);
            }
 
-           boolean stopMode = strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
-                                                       .equals(StrategyProperties.STOPMODE_NONCLOSE);
+           if (strategy instanceof JavaCardDLStrategy) {
+              
+           }
            ApplyStrategy.ApplyStrategyInfo result;
            proof.setRuleAppIndexToAutoMode();
            
-           result = prover.start(proof, goals, maxSteps, timeout, stopMode);
+           result = prover.start(proof, goals, maxSteps, timeout, strategy.isStopAtFirstNonCloseableGoal());
            
            if (result.isError()) {
                throw new RuntimeException("Proof attempt failed due to exception:"
@@ -269,15 +281,11 @@ public class ProofStarter {
        this.proof = proof;
        this.setMaxRuleApplications(proof.getSettings().getStrategySettings().getMaxSteps());
        this.setTimeout(proof.getSettings().getStrategySettings().getTimeout());
-       this.setStrategy(proof.getSettings().getStrategySettings().getActiveStrategyProperties());
+       this.setStrategy(proof.getActiveStrategy());
     }
     
     public void init(ProofAggregate proofAggregate) {
-    	this.proof = proofAggregate.getFirstProof();
-
-    	this.setMaxRuleApplications(proof.getSettings().getStrategySettings().getMaxSteps());
-    	this.setTimeout(proof.getSettings().getStrategySettings().getTimeout());
-    	this.setStrategy(proof.getSettings().getStrategySettings().getActiveStrategyProperties());
+    	init(proofAggregate.getFirstProof());
     }
 
     /**

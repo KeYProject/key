@@ -115,6 +115,11 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
             return super.isApprovedApp(app, pio, goal);
         }
 
+      @Override
+      public boolean isStopAtFirstNonCloseableGoal() {
+         return false;
+      }
+
     }
 
 }

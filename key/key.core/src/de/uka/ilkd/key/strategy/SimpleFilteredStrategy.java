@@ -95,4 +95,9 @@ public class SimpleFilteredStrategy implements Strategy {
                                PosInOccurrence pio,
                                Goal goal,
                                RuleAppCostCollector collector) {}
+
+    @Override
+    public boolean isStopAtFirstNonCloseableGoal() {
+       return false;
+    }
 }

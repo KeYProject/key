@@ -233,6 +233,11 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
                                    Goal goal,
                                    RuleAppCostCollector collector) {
         }
+
+        @Override
+        public boolean isStopAtFirstNonCloseableGoal() {
+           return false;
+        }
     }
 
 }

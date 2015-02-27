@@ -158,5 +158,10 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
                 RuleAppCostCollector collector) {
         }
 
+        @Override
+        public boolean isStopAtFirstNonCloseableGoal() {
+           return false;
+        }
+
     }
 }

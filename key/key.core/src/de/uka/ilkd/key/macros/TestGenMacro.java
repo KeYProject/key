@@ -101,6 +101,11 @@ public class TestGenMacro extends StrategyProofMacro {
 		public Name name() {
 			return TestGenStrategy.NAME;
 		}
+
+      @Override
+      public boolean isStopAtFirstNonCloseableGoal() {
+         return false;
+      }
 	}
 
 	/*

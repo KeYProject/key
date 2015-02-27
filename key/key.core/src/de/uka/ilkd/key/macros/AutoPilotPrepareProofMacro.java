@@ -188,6 +188,11 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
             delegate.instantiateApp(app, pio, goal, collector);
         }
 
+        @Override
+        public boolean isStopAtFirstNonCloseableGoal() {
+           return false;
+        }
+
     }
 
     @Override

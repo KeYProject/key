@@ -23,6 +23,11 @@ import de.uka.ilkd.key.rule.RuleApp;
  * a RuleApp with regard to a specific strategy
  */
 public interface Strategy extends Named {
+    /**
+     * Checks if the {@link Strategy} should stop at the first non closeable {@link Goal}.
+     * @return {@code true} stop, {@code false} continue on other {@link Goal}s.
+     */
+    boolean isStopAtFirstNonCloseableGoal();
 
     /**
      * Evaluate the cost of a <code>RuleApp</code>.

@@ -3203,4 +3203,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermFeature ff;
         final TermFeature nullTerm;
     }
+
+   @Override
+   public boolean isStopAtFirstNonCloseableGoal() {
+      return strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY).equals(StrategyProperties.STOPMODE_NONCLOSE);
+   }
 }

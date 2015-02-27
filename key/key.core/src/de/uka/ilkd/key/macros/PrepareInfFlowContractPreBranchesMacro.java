@@ -134,6 +134,11 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
                                              Goal goal) {
             return computeCost(app, pio, goal);
         }
+
+        @Override
+        public boolean isStopAtFirstNonCloseableGoal() {
+           return false;
+        }
     }
 
 }
