@@ -248,10 +248,7 @@ public abstract class AbstractProblemLoader {
                 
                 
                 if (proof != null) {
-                 OneStepSimplifier oss = MiscTools.findOneStepSimplifier(proof);
-                 if (oss != null) {
-                    oss.refresh(proof);
-                 }
+                 OneStepSimplifier.refreshOSS(proof);
                  result = replayProof(proof);
                 }
                                       
