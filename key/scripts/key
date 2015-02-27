@@ -59,11 +59,7 @@ fi
 echo "Using KeY installation from:      $KEY_HOME"
 
 
-if [ -z "$KEY_LIB" ] ; then
-   KEY_LIB="$KEY_HOME/key-ext-jars"
-else
-echo "Using libraries from:             $KEY_LIB"
-fi
+KEY_LIB="$KEY_HOME/key.core/lib"
 
 
 #
@@ -72,7 +68,7 @@ fi
 
 key_ext_jars="antlr.jar recoderKey.jar"
 
-keyclasspath="$KEY_HOME/system/binary/"
+keyclasspath="$KEY_HOME/key.core/bin:$KEY_HOME/key.ui/bin:$KEY_HOME/key.utils/bin"
 
 
 for i in $key_ext_jars ; do
