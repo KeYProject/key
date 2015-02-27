@@ -20,6 +20,7 @@ import org.key_project.utils.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
+import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.ApplyStrategy;
@@ -336,5 +337,12 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
    @Override
    public KeYMediator getMediator() {
       return mediator;
+   }
+
+   @Override
+   public void notify(NotificationEvent event) {
+      if(verbosity >= Verbosity.DEBUG) {
+         System.out.println(event);
+      }
    }
 }

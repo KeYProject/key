@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.ApplyStrategy;
@@ -481,5 +482,10 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
       AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, null, forceNewProfileOfNewProofs);
       InitConfig initConfig = loader.getInitConfig();
       return new KeYEnvironment<WindowUserInterface>(main.getUserInterface(), initConfig, loader.getProof());
+   }
+
+   @Override
+   public void notify(NotificationEvent event) {
+      mainWindow.notify(event);
    }
 }

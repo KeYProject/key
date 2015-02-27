@@ -8,6 +8,7 @@ import org.key_project.utils.collection.ImmutableList;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
+import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.AbstractFinishAuxiliaryComputationMacro;
 import de.uka.ilkd.key.macros.IFProofMacroConstants;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -266,4 +267,6 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
     */
    public void notifyAutomodeStopped() {
    }
+
+   public abstract void notify(NotificationEvent event);
 }

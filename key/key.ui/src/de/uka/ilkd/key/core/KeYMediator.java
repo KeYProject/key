@@ -28,7 +28,6 @@ import org.key_project.utils.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.TacletMatchCompletionDialog;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
@@ -948,7 +947,7 @@ public class KeYMediator {
      * @param event the NotificationEvent
      */
     public void notify(NotificationEvent event) {
-       MainWindow.getInstance().notify(event);
+       ui.notify(event);
     }
 
     /** return the chosen profile */
