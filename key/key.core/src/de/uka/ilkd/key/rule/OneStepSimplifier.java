@@ -544,7 +544,6 @@ public final class OneStepSimplifier implements BuiltInRule {
             } else {
                 shutdownIndices();
             }
-            lastProof = proof;
         }
     }
 
