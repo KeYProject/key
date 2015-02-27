@@ -33,9 +33,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>key.utils</name>
+			<name>key.src</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-5-PROJECT_LOC%7D/key/key.utils</locationURI>
+			<locationURI>$%7BPARENT-5-PROJECT_LOC%7D/key/key.utils/src</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
