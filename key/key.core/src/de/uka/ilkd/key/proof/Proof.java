@@ -153,7 +153,7 @@ public class Proof implements Named {
     /**
      * Aggregated proof statistics from other proofs which contributed to this one.
      */
-    SideProofStatistics sideProofStatistics = null;
+    private SideProofStatistics sideProofStatistics = null;
 
     /** 
      * constructs a new empty proof with name 
@@ -1024,7 +1024,6 @@ public class Proof implements Named {
         }
     }
 
-
     /**
      * retrieves number of branches
      */
@@ -1158,5 +1157,13 @@ public class Proof implements Named {
      */
     public void setProofFile(File proofFile) {
        this.proofFile = proofFile;
+    }
+
+    /**
+     * returns statistics of possible side proofs that contributed to this proof
+     * @return sie proof statistics
+     */
+    public SideProofStatistics getSideProofStatistics() {
+        return sideProofStatistics;
     }
 }

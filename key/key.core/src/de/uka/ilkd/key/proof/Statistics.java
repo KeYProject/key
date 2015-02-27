@@ -159,8 +159,8 @@ public class Statistics {
         final Statistics stat;
         if (sideProofs) {
             final long autoTime = proof.getAutoModeTime()
-                    + proof.sideProofStatistics.autoModeTime;
-            final SideProofStatistics side = proof.sideProofStatistics.add(this).setAutoModeTime(autoTime);
+                    + proof.getSideProofStatistics().autoModeTime;
+            final SideProofStatistics side = proof.getSideProofStatistics().add(this).setAutoModeTime(autoTime);
             stat = Statistics.create(side, proof.creationTime);
         } else {
             stat = this;
