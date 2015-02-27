@@ -53,10 +53,10 @@ public class AutoModePropertyTester extends PropertyTester {
          UserInterface userInterface = editor.getUI();
          if (userInterface != null) {
             if (PROPERTY_IS_NOT_AUTO_MODE.equals(property)) {
-               return !userInterface.getMediator().isInAutoMode();
+               return !userInterface.isInAutoMode();
             }
             if (PROPERTY_IS_AUTO_MODE.equals(property)) {
-               return userInterface.getMediator().isInAutoMode();
+               return userInterface.isInAutoMode();
             }
          }
          else {

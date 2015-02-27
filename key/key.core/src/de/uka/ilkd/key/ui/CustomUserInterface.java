@@ -243,7 +243,7 @@ public class CustomUserInterface extends AbstractUserInterface {
       }
       
       public void cancel() {
-         stop(); // Stop the currently running thread
+         stop(); // Stop the currently running thread // TODO: Find better solution (REFACTORING_FIX_ME)
          autoModeThread = null;
          fireAutoModeStopped(new ProofEvent(proof));
       }

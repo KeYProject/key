@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<project name="key" default="copyAndGenerate" basedir=".">
+
+  <target name="copyAndGenerate">
+     <!-- Load custom targets properties from properties file -->
+     <property file="customTargets.properties" />
+     <!-- Call original ant file -->
+     <ant antfile="${key.rep}/key/key.core/eclipse-builder.xml" target="copyAndGenerate" dir="${key.rep}/key/key.core">
+     	   <property name="build.dir" value="${basedir}/bin" />
+  	  </ant>
+  </target>
+
+  <target name="clean">
+   <!-- Load custom targets properties from properties file -->
+   <property file="customTargets.properties" />
+   <!-- Call original ant file -->
+   <ant antfile="${key.rep}/key/key.core/eclipse-builder.xml" target="clean" dir="${key.rep}/key/key.core">
+       <property name="build.dir" value="${basedir}/bin" />
+   </ant>
+  </target>
+
+</project>
