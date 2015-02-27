@@ -21,7 +21,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.BlockInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.util.ThreadUtilities;
 
 /**
  *
@@ -33,17 +32,21 @@ public class FinishAuxiliaryBlockComputationMacro
     @Override
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {
-        if (proof == null) {
-            return false;
+                              PosInOccurrence posInOcc) {        
+        if (proof != null && proof.getServices() != null) {
+            final ProofOblInput poForProof =
+                    proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+            if (poForProof instanceof BlockExecutionPO) {
+                final Goal initiatingGoal = ((BlockExecutionPO)poForProof).getInitiatingGoal();
+                if (initiatingGoal.node().parent() != null) {
+                    final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
+                    if (app instanceof BlockContractBuiltInRuleApp) {
+                        return true;
+                    }
+                }
+            }
         }
-        final Services services = proof.getServices();
-        if (services == null) {
-            return false;
-        }
-        final ProofOblInput poForProof =
-                services.getSpecificationRepository().getProofOblInput(proof);
-        return poForProof instanceof BlockExecutionPO;
+        return false;
     }
 
     @Override
@@ -51,63 +54,68 @@ public class FinishAuxiliaryBlockComputationMacro
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) {
-        if (proof == null) {
-            return null;
-        }
+        assert canApplyTo(proof, goals, posInOcc);
 
-        final ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals, proof);
         final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-        if (!(poForProof instanceof BlockExecutionPO)) {
-            return info;
-        }
-
+        
+        // must be BlockExecutionPO otherwise canApplyTo would not have been true
+        // and we assume that before calling this method, the applicability of the macro was checked
+        
         final Goal initiatingGoal = ((BlockExecutionPO) poForProof).getInitiatingGoal();
         final Proof initiatingProof = initiatingGoal.proof();
         final Services services = initiatingProof.getServices();
 
-        if (initiatingGoal.node().parent() == null) {
-            return info;
-        }
+        // initiating goal must not be root and it is the result of a block contract application
+        // otherwise the applicable check would have already failed
+        // and we assume that before calling this method, the applicability of the macro was checked
         final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
-        if (!(app instanceof BlockContractBuiltInRuleApp)) {
-            return info;
-        }
-        final BlockContractBuiltInRuleApp blockRuleApp =
-                (BlockContractBuiltInRuleApp)app;
+
+        final BlockContractBuiltInRuleApp blockRuleApp = (BlockContractBuiltInRuleApp)app;
         final BlockContract contract = blockRuleApp.getContract();
         IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
         ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
 
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
+        final Taclet rwTaclet = buildBlockInfFlowUnfoldTaclet(
+                services, blockRuleApp, contract, ifVars, result);
+        
+        initiatingProof.addLabeledTotalTerm(result);
+        initiatingProof.addLabeledIFSymbol(rwTaclet);
+        initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        
+        addContractApplicationTaclets(initiatingGoal, proof);
+        initiatingProof.unionIFSymbols(proof.getIFSymbols());
+        initiatingProof.getIFSymbols().useProofSymbols();
+
+        
+        final ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, initiatingGoal);
+        info.addInfo(IFProofMacroConstants.SIDE_PROOF, proof);
+                
+        return info;
+    }
+
+    /**
+     * constructs a taclet to unfold block contracts for information flow reasoning
+     * @param services the Services
+     * @param blockRuleApp the rule application of the block contract
+     * @param contract the block contract
+     * @param ifVars variables specific for the IF proof obligation
+     * @param result the term representing the result (?) // TODO: someone who knows what the taclet does please provide a description
+     * @return the created taclet
+     */
+    private Taclet buildBlockInfFlowUnfoldTaclet(
+            final Services services,
+            final BlockContractBuiltInRuleApp blockRuleApp,
+            final BlockContract contract, IFProofObligationVars ifVars,
+            final Term result) {
         final BlockInfFlowUnfoldTacletBuilder tacletBuilder =
                 new BlockInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setContract(contract);
         tacletBuilder.setExecutionContext(blockRuleApp.getExecutionContext());
         tacletBuilder.setInfFlowVars(ifVars);
         tacletBuilder.setReplacewith(result);
-        final Taclet rwTaclet = tacletBuilder.buildTaclet();
-        initiatingProof.addLabeledTotalTerm(result);
-        initiatingProof.addLabeledIFSymbol(rwTaclet);
-        initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-        addContractApplicationTaclets(initiatingGoal, proof);
-        initiatingProof.unionIFSymbols(proof.getIFSymbols());
-        initiatingProof.getIFSymbols().useProofSymbols();
-
-        // close auxiliary computation proof
-        ThreadUtilities.invokeAndWait(new Runnable() {
-            public void run() {
-                saveSideProof(proof, mediator);
-                // make everyone listen to the proof remove
-                mediator.startInterface(true);
-                initiatingProof.addSideProof(proof);
-                mediator.getUI().removeProof(proof);
-                mediator.getSelectionModel().setSelectedGoal(initiatingGoal);
-                // go into automode again
-                mediator.stopInterface(true);
-            }
-        });
-        return new ProofMacroFinishedInfo(this, initiatingGoal);
+        return tacletBuilder.buildTaclet();
     }
 }

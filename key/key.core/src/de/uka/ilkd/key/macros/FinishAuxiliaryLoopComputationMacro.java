@@ -6,18 +6,17 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.LoopInvExecutionPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.LoopInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.util.ThreadUtilities;
 
 public class FinishAuxiliaryLoopComputationMacro extends
         AbstractFinishAuxiliaryComputationMacro {
@@ -26,16 +25,20 @@ public class FinishAuxiliaryLoopComputationMacro extends
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
-        if (proof == null) {
-            return false;
+        if (proof != null && proof.getServices() != null) {
+            final ProofOblInput poForProof =
+                    proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+
+            if (poForProof instanceof LoopInvExecutionPO) {
+                final Node parentOfInitiatingGoal = ((LoopInvExecutionPO) poForProof).getInitiatingGoal().node().parent();
+                if (parentOfInitiatingGoal != null &&
+                        parentOfInitiatingGoal.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
+                    return true;
+                }
+            }
         }
-        final Services services = proof.getServices();
-        if (services == null) {
-            return false;
-        }
-        final ProofOblInput poForProof =
-                services.getSpecificationRepository().getProofOblInput(proof);
-        return poForProof instanceof LoopInvExecutionPO;
+
+        return false;
     }
 
     @Override
@@ -43,31 +46,16 @@ public class FinishAuxiliaryLoopComputationMacro extends
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) {
-        if (proof == null) {
-            return null;
-        }
-
-        final ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals, proof);
         final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-        if (!(poForProof instanceof LoopInvExecutionPO)) {
-            return info;
-        }
         final LoopInvExecutionPO loopInvExecPO = (LoopInvExecutionPO) poForProof;
 
         final Goal initiatingGoal = loopInvExecPO.getInitiatingGoal();
         final Proof initiatingProof = initiatingGoal.proof();
         final Services services = initiatingProof.getServices();
 
-        if (initiatingGoal.node().parent() == null) {
-            return info;
-        }
-        final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
-        if (!(app instanceof LoopInvariantBuiltInRuleApp)) {
-            return info;
-        }
-        final LoopInvariantBuiltInRuleApp loopInvRuleApp =
-                (LoopInvariantBuiltInRuleApp)app;
+        final LoopInvariantBuiltInRuleApp loopInvRuleApp = 
+                (LoopInvariantBuiltInRuleApp) initiatingGoal.node().parent().getAppliedRuleApp();
         LoopInvariant loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
         loopInv = loopInv != null ? loopInv : loopInvRuleApp.getInvariant();
         IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
@@ -90,19 +78,10 @@ public class FinishAuxiliaryLoopComputationMacro extends
         initiatingGoal.proof().unionIFSymbols(proof.getIFSymbols());
         initiatingGoal.proof().getIFSymbols().useProofSymbols();
 
-        // close auxiliary computation proof
-        ThreadUtilities.invokeAndWait(new Runnable() {
-            public void run() {
-                saveSideProof(proof, mediator);
-                // make everyone listen to the proof remove
-                mediator.startInterface(true);
-                initiatingProof.addSideProof(proof);
-                mediator.getUI().removeProof(proof);
-                mediator.getSelectionModel().setSelectedGoal(initiatingGoal);
-                // go into automode again
-                mediator.stopInterface(true);
-            }
-        });
-        return new ProofMacroFinishedInfo(this, initiatingGoal);
+        final ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, initiatingGoal);
+        
+        info.addInfo(IFProofMacroConstants.SIDE_PROOF, proof);
+        
+        return info;
     }
 }

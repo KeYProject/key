@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.macros;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableSLList;
 
@@ -20,6 +23,9 @@ import de.uka.ilkd.key.proof.Proof.Statistics;
  */
 public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
 
+    private final Map<String, Object> proofMacroSpecificData = new HashMap<>();
+    
+    
     ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals,
                            Proof proof, long time, int appliedRules,
                            int closedGoals) {
@@ -99,6 +105,14 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
                  ? (info.getGoals().size() - goals.size()) : 0);
     }
 
+    public void addInfo(String key, Object value) {
+        proofMacroSpecificData.put(key, value);
+    }
+    
+    public Object getValueFor(String key) {
+        return proofMacroSpecificData.get(key);
+    }
+    
     public ProofMacro getMacro() {
         return (ProofMacro)getSource();
     }

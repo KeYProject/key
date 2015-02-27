@@ -27,7 +27,7 @@ import de.uka.ilkd.key.util.InfFlowProgVarRenamer;
  *
  * @author christoph
  */
-abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractProofMacro {
+public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractProofMacro {
 
     @Override
     public String getName() {

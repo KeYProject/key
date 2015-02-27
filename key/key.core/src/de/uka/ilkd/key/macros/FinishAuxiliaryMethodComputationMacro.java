@@ -20,7 +20,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.MethodInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
-import de.uka.ilkd.key.util.ThreadUtilities;
 
 /**
  *
@@ -33,16 +32,14 @@ public class FinishAuxiliaryMethodComputationMacro
     public boolean canApplyTo(Proof proof,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
-        if (proof == null) {
-            return false;
+        if (proof != null && proof.getServices() != null) {
+            final ProofOblInput poForProof =
+                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+            if (poForProof instanceof SymbolicExecutionPO) {
+                return true;
+            }
         }
-        final Services services = proof.getServices();
-        if (services == null) {
-            return false;
-        }
-        final ProofOblInput poForProof =
-                services.getSpecificationRepository().getProofOblInput(proof);
-        return poForProof instanceof SymbolicExecutionPO;
+        return false;
     }
 
     @Override
@@ -50,16 +47,9 @@ public class FinishAuxiliaryMethodComputationMacro
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) {
-        if (proof == null) {
-            return null;
-        }
 
-        final ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals, proof);
         final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-        if (!(poForProof instanceof SymbolicExecutionPO)) {
-            return info;
-        }
         final Goal initiatingGoal = ((SymbolicExecutionPO) poForProof).getInitiatingGoal();
         final Proof initiatingProof = initiatingGoal.proof();
         final Services services = initiatingProof.getServices();
@@ -83,20 +73,10 @@ public class FinishAuxiliaryMethodComputationMacro
         addContractApplicationTaclets(initiatingGoal, proof);
         initiatingProof.unionIFSymbols(proof.getIFSymbols());
         initiatingProof.getIFSymbols().useProofSymbols();
-
-        // close auxiliary computation proof
-        ThreadUtilities.invokeAndWait(new Runnable() {
-            public void run() {
-                saveSideProof(proof, mediator);
-                // make everyone listen to the proof remove
-                mediator.startInterface(true);
-                initiatingProof.addSideProof(proof);
-                mediator.getUI().removeProof(proof);
-                mediator.getSelectionModel().setSelectedGoal(initiatingGoal);
-                // go into automode again
-                mediator.stopInterface(true);
-            }
-        });
-        return new ProofMacroFinishedInfo(this, initiatingGoal);
+        
+        final ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, initiatingGoal);
+        info.addInfo(IFProofMacroConstants.SIDE_PROOF, proof);
+        
+        return info; 
     }
 }
