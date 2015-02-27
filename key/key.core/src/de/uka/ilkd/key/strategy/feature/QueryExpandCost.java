@@ -169,21 +169,6 @@ public class QueryExpandCost implements Feature {
 			return sum;
 		}
 	}
-
-	private static Term findLiteral(Term t, IntegerLDT iLDT){
-		//if(t.op() instanceof Function && iLDT.hasLiteralFunction((Function)t.op())){
-		if(t.op() == iLDT.getNumberSymbol()){
-			return t;
-		}else{
-			for(int i=0;i<t.arity();i++){
-				Term tmp = findLiteral(t.sub(i), iLDT);
-				if(tmp!=null){
-					return tmp;
-				}
-			}
-		}
-		return null;
-	}
 	
 	/** The method checks if the same rule has been applied earlier on this branch
 	 *  at the same position in the sequent. This method detects repetitive rule
@@ -230,37 +215,6 @@ public class QueryExpandCost implements Feature {
 			node=node.parent();
 		}
 		return false;
-	}
-
-	private static int computeCostFromTermSize(Term t){
-		int depth = t.depth();
-		int depthcost = (depth*(depth+10)*5)-100;
-		
-		// System.out.print("  query term depth: "+t.depth());
-		return depthcost;   //Subtract 100 because t.depth() is usually greater than 2. 		
-	}
-	
-	private static int computeCostFromOuterTerm(PosInOccurrence pos){
-		PosInOccurrence posUp=pos.up();
-		final Term t = pos.subTerm();
-		int depth=0;
-		Term posChild = t;
-		Term upTerm=null;
-		//Compute the depth of the outer term.
-		while(posUp!=null && posUp.subTerm().sort()!=Sort.FORMULA){
-			 upTerm= posUp.subTerm();
-			 for(int i=0;i<upTerm.arity();i++){
-				 Term sub=upTerm.sub(i);
-				 if(sub==posChild) continue; //skip the term that leads to the query in focus of the rule application.
-				 depth=Math.max(depth, sub.depth());
-			 }
-			 depth++;
-			 posChild=upTerm;
-			 posUp=posUp.up();
-		}
-
-		// System.out.print("  outer depth: "+depth);
-		return depth*(depth+10)*5;
 	}
 
 	public int getMaxRepetitionsOnSameTerm(){
