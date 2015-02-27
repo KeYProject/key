@@ -534,14 +534,18 @@ public final class OneStepSimplifier implements BuiltInRule {
         if (settings == null) {
             settings = ProofIndependentSettings.DEFAULT_INSTANCE;
         }
-        active = settings.getGeneralSettings().oneStepSimplification();
-        if(active && proof != null && !proof.closed()) {
-            initIndices(proof);
-        } else {
-            shutdownIndices();
+        
+        boolean newActive = settings.getGeneralSettings().oneStepSimplification();
+        
+        if (active != newActive) {
+            active = newActive;
+            if(active && proof != null && !proof.closed()) {
+                initIndices(proof);
+            } else {
+                shutdownIndices();
+            }
         }
     }
-
 
     //-------------------------------------------------------------------------
     //public interface

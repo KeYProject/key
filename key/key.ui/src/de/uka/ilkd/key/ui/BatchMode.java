@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.KeYConstants;
 
@@ -81,7 +82,7 @@ public class BatchMode {
      * @param proofClosed information whether the proof has been closed.
      */
     private static void saveStatistics(String file, Object result,
-                                 Proof.Statistics statistics,
+                                 Statistics statistics,
                                  boolean proofClosed,
                                  String fileName) {
         
