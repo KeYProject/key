@@ -24,7 +24,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.util.MiscTools;
 
 public class OneStepSimplificationToggleAction extends MainWindowAction {
 
@@ -45,7 +44,6 @@ public class OneStepSimplificationToggleAction extends MainWindowAction {
 
         final boolean oneStepSimplificationOn = 
         		ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
-//            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().oneStepSimplification();
         setSelected(oneStepSimplificationOn);
     }
 

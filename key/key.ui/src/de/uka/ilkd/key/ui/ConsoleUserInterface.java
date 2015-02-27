@@ -25,6 +25,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -91,7 +92,7 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
            System.out.println("[ DONE  ... rule application ]");
            if (verbosity >= Verbosity.HIGH) {
                System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
-               final Proof.Statistics stat = info.getProof().statistics();
+               final Statistics stat = info.getProof().statistics();
                System.out.println("Proof steps: "+stat.nodes);
                System.out.println("Branches: "+stat.branches);
                System.out.println("Automode Time: "+stat.autoModeTime+"ms");

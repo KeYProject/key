@@ -10,7 +10,7 @@ import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.Proof.Statistics;
+import de.uka.ilkd.key.proof.Statistics;
 
 /**
  * An information object with additional information about the
