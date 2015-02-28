@@ -30,7 +30,6 @@ import java.util.Vector;
 import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.informationflow.po.InfFlowProofSymbols;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -48,8 +47,6 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
@@ -135,12 +132,6 @@ public class Proof implements Named {
     /** list of rule app listeners */
     private List<RuleAppListener> ruleAppListenerList = Collections.synchronizedList(new ArrayList<RuleAppListener>(10));
     /**
-     * For saving and loading Information-Flow proofs, we need to remember the
-     * according taclets, program variables, functions and such.
-     */
-    private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
-
-    /**
      * Contains all registered {@link ProofDisposedListener}.
      */
     private final List<ProofDisposedListener> proofDisposedListener = new LinkedList<ProofDisposedListener>();
@@ -149,11 +140,6 @@ public class Proof implements Named {
      * The {@link File} under which this {@link Proof} was saved the last time if available or {@code null} otherwise.
      */
     private File proofFile;
-
-    /**
-     * Aggregated proof statistics from other proofs which contributed to this one.
-     */
-    private SideProofStatistics sideProofStatistics = null;
 
     /** 
      * constructs a new empty proof with name 
@@ -431,77 +417,6 @@ public class Proof implements Named {
     
     
     
-    public InfFlowProofSymbols removeInfFlowProofSymbols() {
-        InfFlowProofSymbols symbols = infFlowSymbols;
-        infFlowSymbols = new InfFlowProofSymbols();
-        return symbols;
-    }
-
-    public InfFlowProofSymbols getIFSymbols() {
-        assert infFlowSymbols != null;
-        return infFlowSymbols;
-    }
-
-    public void addIFSymbol(Object s) {
-        assert s != null;
-        if (s instanceof Term) {
-            infFlowSymbols.add((Term)s);
-        } else if (s instanceof Named) {
-            infFlowSymbols.add((Named)s);
-        } else {
-            throw new UnsupportedOperationException("Not a valid proof symbol for IF proofs.");
-        }
-    }
-
-    public void addLabeledIFSymbol(Object s) {
-        assert s != null;
-        if (s instanceof Term) {
-            infFlowSymbols.addLabeled((Term)s);
-        } else if (s instanceof Named) {
-            infFlowSymbols.addLabeled((Named)s);
-        } else {
-            throw new UnsupportedOperationException("Not a valid proof symbol for IF proofs.");
-        }
-    }
-
-    public void addTotalTerm(Term p) {
-        assert p != null;
-        infFlowSymbols.addTotalTerm(p);
-    }
-
-    public void addLabeledTotalTerm(Term p) {
-        assert p != null;
-        infFlowSymbols.addLabeledTotalTerm(p);
-    }
-
-    public void addGoalTemplates(Taclet t) {
-        assert t != null;
-        ImmutableList<TacletGoalTemplate> temps = t.goalTemplates();
-        assert temps != null;
-        for (TacletGoalTemplate tgt: temps) {
-            for (SequentFormula sf: tgt.sequent().antecedent().toList()) {
-                addLabeledTotalTerm(sf.formula());
-            }
-            for (SequentFormula sf: tgt.sequent().succedent().toList()) {
-                addLabeledTotalTerm(sf.formula());
-            }
-        }
-    }
-
-    public void unionIFSymbols(InfFlowProofSymbols symbols) {
-        assert symbols != null;
-        infFlowSymbols = infFlowSymbols.union(symbols);
-    }
-
-    public void unionLabeledIFSymbols(InfFlowProofSymbols symbols) {
-        assert symbols != null;
-        infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
-    }
-
-    public String printIFSymbols() {
-        return infFlowSymbols.printProofSymbols();
-    }
-
     /**
      * returns the list of open goals
      * @return list with the open goals
@@ -1056,32 +971,6 @@ public class Proof implements Named {
         return result.toString();
     }
 
-    public boolean hasSideProofs() {
-        return this.sideProofStatistics != null;
-    }
-
-    public void addSideProof(Proof proof) {
-        assert proof != null;
-        if (proof.hasSideProofs()) {
-        	if (this.hasSideProofs()) {
-        		sideProofStatistics = sideProofStatistics.add(proof.sideProofStatistics);
-        	} else {
-        		sideProofStatistics = SideProofStatistics.create(proof.sideProofStatistics);
-        	}
-        	proof.sideProofStatistics = null;
-        }
-        addSideProofStatistics(proof.statistics());
-    }
-
-    private void addSideProofStatistics(Statistics stat) {
-        assert stat != null;
-        if (this.hasSideProofs()) {
-            sideProofStatistics = sideProofStatistics.add(stat);
-        } else {
-            sideProofStatistics = SideProofStatistics.create(stat);
-        }
-    }
-
     /** fires the event that a rule has been applied */
     protected void fireRuleApplied(ProofEvent p_e) {
         synchronized (ruleAppListenerList) {
@@ -1160,13 +1049,5 @@ public class Proof implements Named {
      */
     public void setProofFile(File proofFile) {
        this.proofFile = proofFile;
-    }
-
-    /**
-     * returns statistics of possible side proofs that contributed to this proof
-     * @return sie proof statistics
-     */
-    public SideProofStatistics getSideProofStatistics() {
-        return sideProofStatistics;
     }
 }

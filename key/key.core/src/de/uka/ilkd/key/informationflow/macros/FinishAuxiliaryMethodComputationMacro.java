@@ -8,7 +8,9 @@ import org.key_project.utils.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.InfFlowContractPO;
+import de.uka.ilkd.key.informationflow.po.InfFlowPO;
 import de.uka.ilkd.key.informationflow.po.SymbolicExecutionPO;
+import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.MethodInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -53,7 +55,7 @@ public class FinishAuxiliaryMethodComputationMacro
         final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
         final Goal initiatingGoal = ((SymbolicExecutionPO) poForProof).getInitiatingGoal();
-        final Proof initiatingProof = initiatingGoal.proof();
+        final InfFlowProof initiatingProof = (InfFlowProof) initiatingGoal.proof();
         final Services services = initiatingProof.getServices();
         final InfFlowContractPO ifPO =
                 (InfFlowContractPO) services.getSpecificationRepository()
@@ -73,7 +75,7 @@ public class FinishAuxiliaryMethodComputationMacro
         initiatingProof.addLabeledIFSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
-        initiatingProof.unionIFSymbols(proof.getIFSymbols());
+        initiatingProof.unionIFSymbols(((InfFlowPO) proof).getIFSymbols());
         initiatingProof.getIFSymbols().useProofSymbols();
         
         final ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, initiatingGoal);

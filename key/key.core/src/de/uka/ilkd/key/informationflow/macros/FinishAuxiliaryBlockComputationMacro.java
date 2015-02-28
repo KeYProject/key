@@ -8,6 +8,7 @@ import org.key_project.utils.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.BlockExecutionPO;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
+import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.BlockInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -65,7 +66,7 @@ public class FinishAuxiliaryBlockComputationMacro
         // and we assume that before calling this method, the applicability of the macro was checked
         
         final Goal initiatingGoal = ((BlockExecutionPO) poForProof).getInitiatingGoal();
-        final Proof initiatingProof = initiatingGoal.proof();
+        final InfFlowProof initiatingProof = (InfFlowProof) initiatingGoal.proof();
         final Services services = initiatingProof.getServices();
 
         // initiating goal must not be root and it is the result of a block contract application
@@ -88,7 +89,7 @@ public class FinishAuxiliaryBlockComputationMacro
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         
         addContractApplicationTaclets(initiatingGoal, proof);
-        initiatingProof.unionIFSymbols(proof.getIFSymbols());
+        initiatingProof.unionIFSymbols(((InfFlowProof)proof).getIFSymbols());
         initiatingProof.getIFSymbols().useProofSymbols();
 
         

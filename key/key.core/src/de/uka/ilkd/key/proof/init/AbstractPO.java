@@ -144,9 +144,8 @@ public abstract class AbstractPO implements IPersistablePO {
                 DefaultImmutableSet.nil();
         for (ClassAxiom nodeAxiom : axioms) {
             final Pair<Sort, IObserverFunction> node =
-                    new Pair<Sort, IObserverFunction>(
-                    nodeAxiom.getKJT().getSort(),
-                                                     nodeAxiom.getTarget());
+                    new Pair<Sort, IObserverFunction>(nodeAxiom.getKJT().getSort(), 
+                            nodeAxiom.getTarget());
             if (reach(start, node, axioms, services) && reach(node, start, axioms, services)) {
                 result = result.add(node);
             }

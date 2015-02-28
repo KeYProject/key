@@ -28,8 +28,9 @@ import javax.swing.event.EventListenerList;
 import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableMapEntry;
 
-import de.uka.ilkd.key.informationflow.po.InfFlowCompositePO;
 import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
+import de.uka.ilkd.key.informationflow.po.InfFlowCompositePO;
+import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -150,12 +151,12 @@ public class ProofSaver {
           final StrategySettings strategySettings = proof.getSettings().getStrategySettings();
           final StrategyProperties strategyProperties = strategySettings.getActiveStrategyProperties();
           if (po instanceof AbstractInfFlowPO
-                  && (po instanceof InfFlowCompositePO || !proof.getIFSymbols().isFreshContract())) {
+                  && (po instanceof InfFlowCompositePO || !((InfFlowProof)proof).getIFSymbols().isFreshContract())) {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_TRUE);
               strategySettings.setActiveStrategyProperties(strategyProperties);
               for (SequentFormula s: proof.root().sequent().succedent().toList()) {
-                  proof.addLabeledTotalTerm(s.formula());
+                  ((InfFlowProof)proof).addLabeledTotalTerm(s.formula());
               }
           } else {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
@@ -165,7 +166,7 @@ public class ProofSaver {
           ps.println(writeSettings(proof.getSettings()));
 
           if (po instanceof AbstractInfFlowPO
-                  && (po instanceof InfFlowCompositePO || !proof.getIFSymbols().isFreshContract())) {
+                  && (po instanceof InfFlowCompositePO || !((InfFlowProof)proof).getIFSymbols().isFreshContract())) {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_FALSE);
               strategySettings.setActiveStrategyProperties(strategyProperties);
@@ -180,7 +181,7 @@ public class ProofSaver {
           if(po instanceof IPersistablePO &&
                   (!(po instanceof AbstractInfFlowPO)
                           || (!(po instanceof InfFlowCompositePO)
-                                  && proof.getIFSymbols().isFreshContract()))) {
+                                  && ((InfFlowProof)proof).getIFSymbols().isFreshContract()))) {
               Properties properties = new Properties();
               ((IPersistablePO)po).fillSaveProperties(properties);
               StringWriter writer = new StringWriter();
@@ -194,10 +195,10 @@ public class ProofSaver {
           } else {
               if (po instanceof AbstractInfFlowPO
                       && (po instanceof InfFlowCompositePO
-                              || !proof.getIFSymbols().isFreshContract())) {
+                              || !((InfFlowProof)proof).getIFSymbols().isFreshContract())) {
                   Properties properties = new Properties();
                   ((IPersistablePO)po).fillSaveProperties(properties);
-                  ps.print(proof.printIFSymbols());
+                  ps.print(((InfFlowProof)proof).printIFSymbols());
               }
               final Sequent problemSeq = proof.root().sequent();
               ps.println("\\problem {");

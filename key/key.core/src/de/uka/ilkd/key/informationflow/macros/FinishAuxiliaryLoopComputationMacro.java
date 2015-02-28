@@ -3,7 +3,9 @@ package de.uka.ilkd.key.informationflow.macros;
 import org.key_project.utils.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
+import de.uka.ilkd.key.informationflow.po.InfFlowPO;
 import de.uka.ilkd.key.informationflow.po.LoopInvExecutionPO;
+import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.LoopInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -53,7 +55,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
         final LoopInvExecutionPO loopInvExecPO = (LoopInvExecutionPO) poForProof;
 
         final Goal initiatingGoal = loopInvExecPO.getInitiatingGoal();
-        final Proof initiatingProof = initiatingGoal.proof();
+        final InfFlowProof initiatingProof = (InfFlowProof) initiatingGoal.proof();
         final Services services = initiatingProof.getServices();
 
         final LoopInvariantBuiltInRuleApp loopInvRuleApp = 
@@ -73,12 +75,12 @@ public class FinishAuxiliaryLoopComputationMacro extends
         tacletBuilder.setReplacewith(result);
         tacletBuilder.setGuard(loopInvExecPO.getGuard());
         final Taclet rwTaclet = tacletBuilder.buildTaclet();
-        initiatingGoal.proof().addLabeledTotalTerm(result);
-        initiatingGoal.proof().addLabeledIFSymbol(rwTaclet);
+        initiatingProof.addLabeledTotalTerm(result);
+        initiatingProof.addLabeledIFSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
-        initiatingGoal.proof().unionIFSymbols(proof.getIFSymbols());
-        initiatingGoal.proof().getIFSymbols().useProofSymbols();
+        initiatingProof.unionIFSymbols(((InfFlowPO) proof).getIFSymbols());
+        initiatingProof.getIFSymbols().useProofSymbols();
 
         final ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, initiatingGoal);
         

@@ -33,6 +33,7 @@ import de.uka.ilkd.key.informationflow.po.SymbolicExecutionPO;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
+import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowBlockContractTacletBuilder;
 import de.uka.ilkd.key.java.Expression;
@@ -356,7 +357,9 @@ public class BlockContractRule implements BuiltInRule {
         final LocationVariable baseHeap =
                 services.getTypeConverter().getHeapLDT().getHeap();
         final TermBuilder tb = services.getTermBuilder();
-        final Proof proof = infFlowGoal.proof();
+        
+        assert infFlowGoal.proof() instanceof InfFlowProof;
+        final InfFlowProof proof = (InfFlowProof) infFlowGoal.proof();
 
         final boolean hasSelf = variables.self != null;
         final boolean hasRes = variables.result != null;
@@ -633,7 +636,7 @@ public class BlockContractRule implements BuiltInRule {
         return NAME.toString();
     }
 
-    static SequentFormula buildBodyPreservesSequent(InfFlowPOSnippetFactory f, Proof proof) {
+    static SequentFormula buildBodyPreservesSequent(InfFlowPOSnippetFactory f, InfFlowProof proof) {
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);

@@ -1,6 +1,8 @@
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.informationflow.proof;
 
-final class SideProofStatistics extends Statistics {
+import de.uka.ilkd.key.proof.Statistics;
+
+public final class SideProofStatistics extends Statistics {
     private final int sideProofs;
 
     private SideProofStatistics(int sideProofs,
@@ -65,7 +67,7 @@ final class SideProofStatistics extends Statistics {
                                            this.autoModeTime + stat.autoModeTime);
     }
 
-    SideProofStatistics add(Statistics stat) {
+    public SideProofStatistics add(Statistics stat) {
     	return new SideProofStatistics(this.sideProofs+1, this.nodes + stat.nodes,
                                            this.branches + stat.branches,
                                            this.interactiveSteps + stat.interactiveSteps,
@@ -79,7 +81,7 @@ final class SideProofStatistics extends Statistics {
                                            this.autoModeTime + stat.autoModeTime);
     }
 
-    SideProofStatistics setAutoModeTime(long autoTime) {
+    public SideProofStatistics setAutoModeTime(long autoTime) {
         return new SideProofStatistics(sideProofs, nodes, branches, interactiveSteps,
                         quantifierInstantiations, ossApps, totalRuleApps, smtSolverApps,
                         dependencyContractApps, operationContractApps, loopInvApps, autoTime);

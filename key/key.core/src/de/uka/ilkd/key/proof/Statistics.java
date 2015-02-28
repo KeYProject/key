@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
+import de.uka.ilkd.key.informationflow.proof.SideProofStatistics;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
@@ -65,7 +67,7 @@ public class Statistics {
         this.timePerStep = timePerStep;
     }
 
-    static Statistics create(SideProofStatistics side, long creationTime) {
+    static Statistics create(Statistics side, long creationTime) {
     	return new Statistics(side.nodes,
                                   side.branches,
                                   side.interactiveSteps,
@@ -155,15 +157,17 @@ public class Statistics {
     }
 
     private void generateSummary(Proof proof) {
-        final boolean sideProofs = proof.hasSideProofs();
-        final Statistics stat;
-        if (sideProofs) {
-            final long autoTime = proof.getAutoModeTime()
-                    + proof.getSideProofStatistics().autoModeTime;
-            final SideProofStatistics side = proof.getSideProofStatistics().add(this).setAutoModeTime(autoTime);
-            stat = Statistics.create(side, proof.creationTime);
-        } else {
-            stat = this;
+        Statistics stat = this;
+       
+        boolean sideProofs = false;
+        if (proof instanceof InfFlowProof) { // TODO: get rid of that instanceof by subclassing
+            sideProofs = ((InfFlowProof) proof).hasSideProofs();
+            if (sideProofs) {
+                final long autoTime = proof.getAutoModeTime()
+                        + ((InfFlowProof)proof).getSideProofStatistics().autoModeTime;
+                final SideProofStatistics side = ((InfFlowProof) proof).getSideProofStatistics().add(this).setAutoModeTime(autoTime);
+                stat = Statistics.create(side, proof.creationTime);
+            } 
         }
 
         final String nodeString =
@@ -173,7 +177,10 @@ public class Statistics {
                         EnhancedStringBuffer.format(stat.branches).toString()));
         summaryList.add(new Pair<String, String>("Interactive steps", "" +
                         stat.interactiveSteps));
+        
+        
         final long time = sideProofs ? stat.autoModeTime : proof.getAutoModeTime();
+        
         summaryList.add(new Pair<String, String>("Automode time",
                         EnhancedStringBuffer.formatTime(time).toString()));
         if (time >= 10000) {

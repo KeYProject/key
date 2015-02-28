@@ -27,6 +27,7 @@ import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
+import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowLoopInvariantTacletBuilder;
 import de.uka.ilkd.key.java.JavaTools;
@@ -463,9 +464,10 @@ public final class WhileInvariantRule implements BuiltInRule {
                         false);
         goal.addTaclet(infData.infFlowApp,
                        SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-        goal.proof().addIFSymbol(infData.applPredTerm);
-        goal.proof().addIFSymbol(infData.infFlowApp);
-        goal.proof().addGoalTemplates(infData.infFlowApp);
+        final InfFlowProof proof = (InfFlowProof) goal.proof();
+        proof.addIFSymbol(infData.applPredTerm);
+        proof.addIFSymbol(infData.infFlowApp);
+        proof.addGoalTemplates(infData.infFlowApp);
     }
 
     private static InfFlowData setUpInfFlowValidityGoal(Goal infFlowGoal,
@@ -522,7 +524,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term finalTerm =
                 tb.imp(tb.label(selfComposedExec, ParameterlessTermLabel.SELF_COMPOSITION_LABEL),
                        post);
-        infFlowGoal.proof().addLabeledIFSymbol(selfComposedExec);
+        ((InfFlowProof)infFlowGoal.proof()).addLabeledIFSymbol(selfComposedExec);
         infFlowGoal.addFormula(new SequentFormula(finalTerm), false, true);
 
         return infFlowData;

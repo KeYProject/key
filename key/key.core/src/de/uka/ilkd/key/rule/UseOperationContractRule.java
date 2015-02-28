@@ -24,6 +24,7 @@ import org.key_project.utils.collection.ImmutableSLList;
 import org.key_project.utils.collection.ImmutableSet;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
+import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowMethodContractTacletBuilder;
 import de.uka.ilkd.key.java.Expression;
@@ -530,9 +531,10 @@ public final class UseOperationContractRule implements BuiltInRule {
         // method contract precondition as an assumption to the post goal
         // (in case the precondition cannot be proved easily)
         goal.addFormula(new SequentFormula(finalPreTerm), true, false);
-        goal.proof().addIFSymbol(contractApplPredTerm);
-        goal.proof().addIFSymbol(informationFlowContractApp);
-        goal.proof().addGoalTemplates(informationFlowContractApp);
+        final InfFlowProof proof = (InfFlowProof) goal.proof();
+        proof.addIFSymbol(contractApplPredTerm);
+        proof.addIFSymbol(informationFlowContractApp);
+        proof.addGoalTemplates(informationFlowContractApp);
     }
 
 
