@@ -93,16 +93,16 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
      *
      * @return the proofMacro.
      */
-    abstract ProofMacro getProofMacro();
+    protected abstract ProofMacro getProofMacro();
 
     /**
      * Gets the alternative proof macro for the else-branch.
      *
      * @return the proofMacro.
      */
-    abstract ProofMacro getAltProofMacro();
+    protected abstract ProofMacro getAltProofMacro();
 
-    abstract boolean getCondition();
+    protected abstract boolean getCondition();
 
     /**
      * Sets the maximum number of rule applications allowed for
@@ -111,7 +111,7 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
      * @return the maximum number of rule applications allowed for
      * this macro
      */
-    void setMaxSteps(Proof proof) {
+    protected void setMaxSteps(Proof proof) {
         final int steps;
         if (proof != null) {
             steps = proof.getSettings()

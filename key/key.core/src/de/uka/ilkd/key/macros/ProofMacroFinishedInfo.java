@@ -62,19 +62,19 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
         this(macro, goal, proof, proof == null ? null : proof.statistics());
     }
 
-    ProofMacroFinishedInfo(ProofMacro macro, Goal goal) {
+    public ProofMacroFinishedInfo(ProofMacro macro, Goal goal) {
         this(macro, goal, goal.proof());
     }
 
-    ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals) {
+    public ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals) {
         this(macro, goals, goals.isEmpty() ? null : goals.head().proof());
     }
 
-    ProofMacroFinishedInfo(ProofMacro macro, Proof proof) {
+    public ProofMacroFinishedInfo(ProofMacro macro, Proof proof) {
         this(macro, proof.openEnabledGoals(), proof);
     }
 
-    ProofMacroFinishedInfo(ProofMacro macro, ProofMacroFinishedInfo info) {
+    public ProofMacroFinishedInfo(ProofMacro macro, ProofMacroFinishedInfo info) {
         this(macro, info.getGoals(), info.getProof());
     }
 
