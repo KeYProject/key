@@ -11,7 +11,7 @@ import java.util.Properties;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
+import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -22,13 +22,15 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 
 
@@ -36,14 +38,12 @@ import de.uka.ilkd.key.speclang.InformationFlowContract;
  *
  * @author christoph
  */
-public class InfFlowContractPO extends AbstractInfFlowPO
-        implements ContractPO, InfFlowLeavePO {
+public class SymbolicExecutionPO extends AbstractInfFlowPO
+        implements ContractPO, InfFlowCompositePO {
 
     private final InformationFlowContract contract;
-
     private final ProofObligationVars symbExecVars;
-
-    private final IFProofObligationVars ifVars;
+    private final Goal initiatingGoal;
 
     /**
      * For saving and loading Information-Flow proofs, we need to remember the
@@ -51,68 +51,67 @@ public class InfFlowContractPO extends AbstractInfFlowPO
      */
     private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
 
-    public InfFlowContractPO(InitConfig initConfig,
-                             InformationFlowContract contract) {
-        super(initConfig, contract.getName());
-        this.contract = contract;
-
-        // generate proof obligation variables
-        final IProgramMethod pm = contract.getTarget();
-        symbExecVars =
-                new ProofObligationVars(pm, contract.getKJT(), environmentServices);
-
-        assert (symbExecVars.pre.self == null) == (pm.isStatic());
-        ifVars = new IFProofObligationVars(symbExecVars, environmentServices);
-
-        // add new information flow symbols
-        // (by the way: why only formal parameters?)
-        for (Term formalParam : symbExecVars.formalParams) {
-            addIFSymbol(formalParam);
-        }
-        for (Term formalParam : ifVars.c1.formalParams) {
-            addIFSymbol(formalParam);
-        }
-        for (Term formalParam : ifVars.c2.formalParams) {
-            addIFSymbol(formalParam);
-        }
+    /** To be used only for auxiliary proofs where the services object of
+     * the actual proof has to be used instead of the initial services form
+     * the InitConfig.
+     */
+    public SymbolicExecutionPO(InitConfig initConfig,
+                               InformationFlowContract contract,
+                               ProofObligationVars symbExecVars,
+                               Goal initiatingGoal,
+                               Services services) {
+        this(initConfig, contract, symbExecVars, initiatingGoal);
+        this.environmentServices = services;
     }
+
+
+    public SymbolicExecutionPO(InitConfig initConfig,
+                               InformationFlowContract contract,
+                               ProofObligationVars symbExecVars,
+                               Goal initiatingGoal) {
+        super(initConfig,
+              ContractFactory.generateContractName(contract.getPODisplayName(),
+                                                   contract.getKJT(),
+                                                   contract.getTarget(),
+                                                   contract.getTarget().getContainerType(),
+                                                   contract.getTarget().getStartPosition().getLine()));
+        this.contract = contract;
+        this.symbExecVars = symbExecVars;
+        this.initiatingGoal = initiatingGoal;
+    }
+
 
     @Override
     public void readProblem() throws ProofInputException {
-        assert proofConfig == null;
+        // generate snippet factory for symbolic execution
+        BasicPOSnippetFactory symbExecFactory =
+                POSnippetFactory.getBasicFactory(contract, symbExecVars,
+                                                 initiatingGoal.proof().getServices());
 
-        proofConfig = environmentConfig.deepCopy();
-        Services proofServices = proofConfig.getServices();
+        // symbolic execution under precondition
+        final Term symExec =
+                symbExecFactory.create(BasicPOSnippetFactory.Snippet.SYMBOLIC_EXEC_WITH_PRE);
 
-        // create proof obligation
-        InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
-                                                   ifVars.c2, proofServices);
-        final Term selfComposedExec =
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
-        final Term post =
-                f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
-        final Term finalTerm = tb.imp(selfComposedExec, post);
-        addLabeledIFSymbol(selfComposedExec);
+        // register final term
+        assignPOTerms(tb.not(symExec));
 
-        // register final term, taclets and collect class axioms
-        assignPOTerms(finalTerm);
-        collectClassAxioms(contract.getKJT(), proofConfig);
-
-        for (final NoPosTacletApp t: taclets) {
-            if (t.taclet().name().toString().startsWith("Class_invariant_axiom")) {
-                addIFSymbol(t.taclet());
-            }
+        // add class axioms
+        final Proof initiatingProof = initiatingGoal.proof();
+        if (initiatingProof != null) {
+            // proof is not loaded
+            final AbstractOperationPO initiatingPO =
+                    (AbstractOperationPO) specRepos.getProofOblInput(initiatingProof);
+            taclets = initiatingPO.getInitialTaclets();
         }
     }
 
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof InfFlowContractPO)) {
+        if (!(po instanceof SymbolicExecutionPO)) {
             return false;
         }
-        final InfFlowContractPO cPO = (InfFlowContractPO) po;
+        final SymbolicExecutionPO cPO = (SymbolicExecutionPO) po;
         return contract.equals(cPO.contract);
     }
 
@@ -174,13 +173,14 @@ public class InfFlowContractPO extends AbstractInfFlowPO
 
     @Override
     public InformationFlowContract getContract() {
-        return (InformationFlowContract) contract;
+        return contract;
     }
 
 
-    public IFProofObligationVars getIFVars() {
-        return ifVars;
+    public Goal getInitiatingGoal() {
+        return initiatingGoal;
     }
+
 
     /**
      * {@inheritDoc}
@@ -188,28 +188,8 @@ public class InfFlowContractPO extends AbstractInfFlowPO
     @Override
     public void fillSaveProperties(Properties properties) throws IOException {
         super.fillSaveProperties(properties);
-        properties.setProperty("contract", contract.getName());
+        properties.setProperty("Non-interference contract", contract.getName());
     }
-
-
-    /**
-     * Instantiates a new proof obligation with the given settings.
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
-     * @return The instantiated proof obligation.
-     */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {
-       final String contractName = properties.getProperty("contract");
-       final Contract contract =
-               initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
-       if (contract == null) {
-          throw new RuntimeException("Contract not found: " + contractName);
-       }
-       else {
-          return new LoadedPOContainer(contract.createProofObl(initConfig), 0);
-       }
-    }
-
 
     @Override
     public InfFlowProofSymbols getIFSymbols() {
@@ -218,7 +198,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO
     }
 
     @Override
-    public final void addIFSymbol(Term t) {
+    public void addIFSymbol(Term t) {
         assert t != null;
         infFlowSymbols.add(t);
     }
@@ -258,22 +238,35 @@ public class InfFlowContractPO extends AbstractInfFlowPO
     }
 
 
+
     @Override
-    public IFProofObligationVars getLeaveIFVars() {
-        return getIFVars();
+    public AbstractInfFlowPO getChildPO() {
+        Proof initiatingProof = getInitiatingGoal().proof();
+        Services initiatingServices = initiatingProof.getServices();
+        ProofOblInput initiatingPO =
+                initiatingServices.getSpecificationRepository().getProofOblInput(initiatingProof);
+        assert initiatingPO instanceof AbstractInfFlowPO : "Information flow auxiliary " +
+                "proof started from within non-information flow proof!?!";
+        return (AbstractInfFlowPO)initiatingPO;
     }
 
 
-    // the following code is legacy code
+    @Override
+    public IFProofObligationVars getLeaveIFVars() {
+        return getChildPO().getLeaveIFVars();
+    }
+
+
+// the following code is legacy code
     @Override
     @Deprecated
     protected ImmutableList<StatementBlock> buildOperationBlocks(
-                                        ImmutableList<LocationVariable> formalParVars,
-                                        ProgramVariable selfVar,
-                                        ProgramVariable resultVar,
-                                        Services services) {
+            ImmutableList<LocationVariable> formalParVars,
+            ProgramVariable selfVar,
+            ProgramVariable resultVar,
+            Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                 "Please use the POSnippetFactory instead.");
+                "Please use the POSnippetFactory instead.");
     }
 
 
@@ -285,7 +278,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO
                           Map<LocationVariable, LocationVariable> atPreVars,
                           Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                                                "Please use the POSnippetFactory instead.");
+                 "Please use the POSnippetFactory instead.");
     }
 
 
@@ -299,28 +292,25 @@ public class InfFlowContractPO extends AbstractInfFlowPO
                            Map<LocationVariable, LocationVariable> atPreVars,
                            Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                                                "Please use the POSnippetFactory instead.");
+                 "Please use the POSnippetFactory instead.");
     }
 
 
     @Override
     @Deprecated
     protected Term buildFrameClause(List<LocationVariable> modHeaps,
-                                    Map<Term, Term> heapToAtPre,
-                                    ProgramVariable selfVar,
-                                    ImmutableList<ProgramVariable> paramVars,
-                                    Services services) {
+            Map<Term, Term> heapToAtPre, ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars, Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                                                "Please use the POSnippetFactory instead.");
+                "Please use the POSnippetFactory instead.");
     }
 
 
     @Override
     @Deprecated
     protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-                                       ImmutableList<ProgramVariable> paramVars,
-                                       Services services) {
+            ImmutableList<ProgramVariable> paramVars, Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                                                "Please use the POSnippetFactory instead.");
+                "Please use the POSnippetFactory instead.");
     }
 }

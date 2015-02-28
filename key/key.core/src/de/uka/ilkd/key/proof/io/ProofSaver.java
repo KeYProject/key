@@ -29,7 +29,7 @@ import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableMapEntry;
 
 import de.uka.ilkd.key.informationflow.po.InfFlowCompositePO;
-import de.uka.ilkd.key.informationflow.po.InfFlowPO;
+import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -149,7 +149,7 @@ public class ProofSaver {
           //settings
           final StrategySettings strategySettings = proof.getSettings().getStrategySettings();
           final StrategyProperties strategyProperties = strategySettings.getActiveStrategyProperties();
-          if (po instanceof InfFlowPO
+          if (po instanceof AbstractInfFlowPO
                   && (po instanceof InfFlowCompositePO || !proof.getIFSymbols().isFreshContract())) {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_TRUE);
@@ -164,7 +164,7 @@ public class ProofSaver {
           }
           ps.println(writeSettings(proof.getSettings()));
 
-          if (po instanceof InfFlowPO
+          if (po instanceof AbstractInfFlowPO
                   && (po instanceof InfFlowCompositePO || !proof.getIFSymbols().isFreshContract())) {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_FALSE);
@@ -178,7 +178,7 @@ public class ProofSaver {
 
           //\problem or \proofObligation
           if(po instanceof IPersistablePO &&
-                  (!(po instanceof InfFlowPO)
+                  (!(po instanceof AbstractInfFlowPO)
                           || (!(po instanceof InfFlowCompositePO)
                                   && proof.getIFSymbols().isFreshContract()))) {
               Properties properties = new Properties();
@@ -192,7 +192,7 @@ public class ProofSaver {
                 writer.close();
               }
           } else {
-              if (po instanceof InfFlowPO
+              if (po instanceof AbstractInfFlowPO
                       && (po instanceof InfFlowCompositePO
                               || !proof.getIFSymbols().isFreshContract())) {
                   Properties properties = new Properties();

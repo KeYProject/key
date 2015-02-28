@@ -11,39 +11,40 @@ import java.util.Properties;
 
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
+import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
+import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.ContractFactory;
 
 
 /**
  *
  * @author christoph
  */
-public class InfFlowContractPO extends AbstractInfFlowPO
-        implements ContractPO, InfFlowLeavePO {
+public class BlockExecutionPO extends AbstractInfFlowPO
+        implements InfFlowCompositePO {
 
-    private final InformationFlowContract contract;
-
+    private final BlockContract contract;
     private final ProofObligationVars symbExecVars;
-
-    private final IFProofObligationVars ifVars;
+    private final Goal initiatingGoal;
+    private final ExecutionContext context;
 
     /**
      * For saving and loading Information-Flow proofs, we need to remember the
@@ -51,79 +52,71 @@ public class InfFlowContractPO extends AbstractInfFlowPO
      */
     private InfFlowProofSymbols infFlowSymbols = new InfFlowProofSymbols();
 
-    public InfFlowContractPO(InitConfig initConfig,
-                             InformationFlowContract contract) {
-        super(initConfig, contract.getName());
+    /** To be used only for auxiliary proofs where the services object of
+     * the actual proof has to be used instead of the initial services form
+     * the InitConfig.
+     */
+    public BlockExecutionPO(InitConfig initConfig,
+                            BlockContract contract,
+                            ProofObligationVars symbExecVars,
+                            Goal initiatingGoal,
+                            ExecutionContext context,
+                            Services services) {
+        this(initConfig, contract, symbExecVars, initiatingGoal, context);
+        this.environmentServices = services;
+    }
+
+    public BlockExecutionPO(InitConfig initConfig,
+                            BlockContract contract,
+                            ProofObligationVars symbExecVars,
+                            Goal initiatingGoal,
+                            ExecutionContext context) {
+        super(initConfig,
+              ContractFactory.generateContractName(contract.getName(), contract.getKJT(),
+                                                   contract.getTarget(),
+                                                   contract.getTarget().getContainerType(),
+                                                   contract.getBlock().getStartPosition().getLine()));
         this.contract = contract;
-
-        // generate proof obligation variables
-        final IProgramMethod pm = contract.getTarget();
-        symbExecVars =
-                new ProofObligationVars(pm, contract.getKJT(), environmentServices);
-
-        assert (symbExecVars.pre.self == null) == (pm.isStatic());
-        ifVars = new IFProofObligationVars(symbExecVars, environmentServices);
-
-        // add new information flow symbols
-        // (by the way: why only formal parameters?)
-        for (Term formalParam : symbExecVars.formalParams) {
-            addIFSymbol(formalParam);
-        }
-        for (Term formalParam : ifVars.c1.formalParams) {
-            addIFSymbol(formalParam);
-        }
-        for (Term formalParam : ifVars.c2.formalParams) {
-            addIFSymbol(formalParam);
-        }
+        this.symbExecVars = symbExecVars;
+        this.initiatingGoal = initiatingGoal;
+        this.context = context;
     }
 
     @Override
     public void readProblem() throws ProofInputException {
-        assert proofConfig == null;
+        // generate snippet factory for symbolic execution
+        BasicPOSnippetFactory symbExecFactory =
+                POSnippetFactory.getBasicFactory(contract, symbExecVars,
+                                                 context, environmentServices);
 
-        proofConfig = environmentConfig.deepCopy();
-        Services proofServices = proofConfig.getServices();
+        // symbolic execution
+        final Term symExec =
+                symbExecFactory.create(BasicPOSnippetFactory.Snippet.BLOCK_EXEC_WITH_PRE);
 
-        // create proof obligation
-        InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
-                                                   ifVars.c2, proofServices);
-        final Term selfComposedExec =
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
-        final Term post =
-                f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
-        final Term finalTerm = tb.imp(selfComposedExec, post);
-        addLabeledIFSymbol(selfComposedExec);
+        // final symbolic execution term
+        final Term finalTerm = tb.applyElementary(symbExecVars.pre.heap,
+                                                  tb.not(symExec));
 
-        // register final term, taclets and collect class axioms
+        // register final term
         assignPOTerms(finalTerm);
-        collectClassAxioms(contract.getKJT(), proofConfig);
 
-        for (final NoPosTacletApp t: taclets) {
-            if (t.taclet().name().toString().startsWith("Class_invariant_axiom")) {
-                addIFSymbol(t.taclet());
-            }
+        // add class axioms
+        final Proof initiatingProof = initiatingGoal.proof();
+        if (initiatingProof != null) {
+            // proof is not loaded
+            final AbstractOperationPO initiatingPO =
+                    (AbstractOperationPO) specRepos.getProofOblInput(initiatingProof);
+            taclets = initiatingPO.getInitialTaclets();
         }
     }
-
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof InfFlowContractPO)) {
+        if (!(po instanceof BlockExecutionPO)) {
             return false;
         }
-        final InfFlowContractPO cPO = (InfFlowContractPO) po;
+        final BlockExecutionPO cPO = (BlockExecutionPO) po;
         return contract.equals(cPO.contract);
-    }
-
-
-    @Override
-    public Term getMbyAtPre() {
-        if (contract.hasMby()) {
-            return symbExecVars.pre.mbyAtPre;
-        } else {
-            return null;
-        }
     }
 
 
@@ -132,7 +125,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO
      */
     @Override
     protected String buildPOName(boolean transactionFlag) {
-        return getContract().getName();
+        return contract.getName();
     }
 
 
@@ -168,19 +161,23 @@ public class InfFlowContractPO extends AbstractInfFlowPO
      */
     @Override
     protected Modality getTerminationMarker() {
-        return getContract().getModality();
+        return contract.getModality();
     }
 
 
-    @Override
-    public InformationFlowContract getContract() {
-        return (InformationFlowContract) contract;
+    public Goal getInitiatingGoal() {
+        return initiatingGoal;
     }
 
 
-    public IFProofObligationVars getIFVars() {
-        return ifVars;
+    public ExecutionContext getExecutionContext() {
+        return context;
     }
+
+
+//    public IFProofObligationVars getIFProofObligationVars() {
+//        return if
+//    }
 
     /**
      * {@inheritDoc}
@@ -188,28 +185,8 @@ public class InfFlowContractPO extends AbstractInfFlowPO
     @Override
     public void fillSaveProperties(Properties properties) throws IOException {
         super.fillSaveProperties(properties);
-        properties.setProperty("contract", contract.getName());
+        properties.setProperty("Non-interference contract", contract.getUniqueName());
     }
-
-
-    /**
-     * Instantiates a new proof obligation with the given settings.
-     * @param initConfig The already load {@link InitConfig}.
-     * @param properties The settings of the proof obligation to instantiate.
-     * @return The instantiated proof obligation.
-     */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {
-       final String contractName = properties.getProperty("contract");
-       final Contract contract =
-               initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
-       if (contract == null) {
-          throw new RuntimeException("Contract not found: " + contractName);
-       }
-       else {
-          return new LoadedPOContainer(contract.createProofObl(initConfig), 0);
-       }
-    }
-
 
     @Override
     public InfFlowProofSymbols getIFSymbols() {
@@ -218,7 +195,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO
     }
 
     @Override
-    public final void addIFSymbol(Term t) {
+    public void addIFSymbol(Term t) {
         assert t != null;
         infFlowSymbols.add(t);
     }
@@ -258,9 +235,22 @@ public class InfFlowContractPO extends AbstractInfFlowPO
     }
 
 
+
+    @Override
+    public AbstractInfFlowPO getChildPO() {
+        Proof initiatingProof = getInitiatingGoal().proof();
+        Services initiatingServices = initiatingProof.getServices();
+        ProofOblInput initiatingPO =
+                initiatingServices.getSpecificationRepository().getProofOblInput(initiatingProof);
+        assert initiatingPO instanceof AbstractInfFlowPO : "Information flow auxiliary " +
+                "proof started from within non-information flow proof!?!";
+        return (AbstractInfFlowPO)initiatingPO;
+    }
+
+
     @Override
     public IFProofObligationVars getLeaveIFVars() {
-        return getIFVars();
+        return getChildPO().getLeaveIFVars();
     }
 
 

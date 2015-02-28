@@ -1,17 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.uka.ilkd.key.informationflow.po;
 
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 
-
-/**
- *
- * @author christoph
- */
 public interface InfFlowPO {
 
     public IFProofObligationVars getLeaveIFVars();
@@ -27,4 +18,5 @@ public interface InfFlowPO {
     public void addLabeledIFSymbol(Named n);
 
     public void unionLabeledIFSymbols(InfFlowProofSymbols symbols);
+    
 }
