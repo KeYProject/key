@@ -13,6 +13,8 @@ import de.uka.ilkd.key.informationflow.macros.AbstractFinishAuxiliaryComputation
 import de.uka.ilkd.key.informationflow.macros.StartAuxiliaryBlockComputationMacro;
 import de.uka.ilkd.key.informationflow.macros.StartAuxiliaryLoopComputationMacro;
 import de.uka.ilkd.key.informationflow.macros.StartAuxiliaryMethodComputationMacro;
+import de.uka.ilkd.key.informationflow.po.InfFlowPO;
+import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.macros.IFProofMacroConstants;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -98,10 +100,10 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
        * And maybe extend the proof starter by an option save after completion, so that the proofs get saved
        */
       if (info.getMacro() instanceof AbstractFinishAuxiliaryComputationMacro) {
-         Proof initiatingProof = info.getProof();
+    	 InfFlowProof initiatingProof = (InfFlowProof) info.getProof();
          Object sideProofObject = info.getValueFor(IFProofMacroConstants.SIDE_PROOF);
-         if (sideProofObject instanceof Proof) { 
-             final Proof sideProof = (Proof) sideProofObject;
+         if (sideProofObject instanceof InfFlowProof) { 
+             final InfFlowProof sideProof = (InfFlowProof) sideProofObject;
              saveSideProof(sideProof);
              initiatingProof.addSideProof(sideProof);
              // make everyone listen to the proof remove
@@ -114,15 +116,15 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
       } else if (info.getMacro() instanceof StartAuxiliaryBlockComputationMacro ||
               info.getMacro() instanceof StartAuxiliaryMethodComputationMacro ||
               info.getMacro() instanceof StartAuxiliaryLoopComputationMacro) {
-          final Proof proof = info.getProof();
+          final InfFlowProof proof = (InfFlowProof) info.getProof();
           final Object poObject = info.getValueFor(IFProofMacroConstants.PO_FOR_NEW_SIDE_PROOF);
 
-          if (poObject instanceof ProofOblInput) {
-              ProofOblInput po = (ProofOblInput) poObject;
-              final Proof p;
+          if (poObject instanceof InfFlowPO) {
+        	  InfFlowPO po = (InfFlowPO) poObject;
+              final InfFlowProof p;
               synchronized (po) {
                   try {
-                    p = createProof(proof.getEnv().getInitConfigForEnvironment(), po);
+                    p = (InfFlowProof) createProof(proof.getEnv().getInitConfigForEnvironment(), po);
                 } catch (ProofInputException e) {
                     getMediator().notify(new ExceptionFailureEvent("PO generation for side proof failed.", e));
                     return;
