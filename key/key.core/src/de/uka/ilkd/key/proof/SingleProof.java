@@ -20,6 +20,9 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.util.Collections;
+import java.util.List;
+
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 
 public class SingleProof extends ProofAggregate {
@@ -64,7 +67,12 @@ public class SingleProof extends ProofAggregate {
     }
     
     @Override    
-    public ProofAggregate[] getChildren() {
-        return new ProofAggregate[0];
+    public List<ProofAggregate> getChildren() {
+        return Collections.emptyList();
     }
+
+	@Override
+	public ProofAggregate getChildrenAt(int i) {
+		throw new IndexOutOfBoundsException("Tried to access child of SingleProof");
+	}
 }

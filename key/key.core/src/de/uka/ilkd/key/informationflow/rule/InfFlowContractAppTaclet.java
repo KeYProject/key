@@ -26,12 +26,10 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletApplPart;
 import de.uka.ilkd.key.rule.TacletAttributes;
 import de.uka.ilkd.key.rule.TacletPrefix;
-import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.properties.Properties;
 
@@ -58,7 +56,8 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
      * PrepareInfFlowContractPreBranchesMacro to decide how to prepare the
      * formulas resulting from information flow contract applications.
      */
-    public static final Properties.Property<ImmutableList<Term>> INF_FLOW_CONTRACT_APPL_PROPERTY =
+    @SuppressWarnings("unchecked")
+	public static final Properties.Property<ImmutableList<Term>> INF_FLOW_CONTRACT_APPL_PROPERTY =
             new Properties.Property<ImmutableList<Term>>(
                     (Class<ImmutableList<Term>>) (Class<?>) ImmutableList.class,
                      "information flow contract applicaton property");

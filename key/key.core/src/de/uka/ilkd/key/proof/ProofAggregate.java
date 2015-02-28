@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.util.List;
+
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 
@@ -26,7 +28,7 @@ public abstract class ProofAggregate {
 
    public static ProofAggregate createProofAggregate(ProofAggregate[] proofs, String name) {
       if (proofs.length>1) {            
-         return new CompoundProof(proofs, name);
+         return new CompoundProof(name, proofs);
       } else {
          return proofs[0];
       }
@@ -39,7 +41,7 @@ public abstract class ProofAggregate {
          for (int i=0; i<proofs.length; i++) {
             singles[i] = new SingleProof(proofs[i], name);
          }
-         return new CompoundProof(singles, name);
+         return new CompoundProof(name, singles);
       } else {
          return new SingleProof(proofs[0], name);
       }
@@ -89,9 +91,13 @@ public abstract class ProofAggregate {
 
    public abstract ProofStatus getStatus();
 
-   public abstract ProofAggregate[] getChildren();
+   public abstract List<ProofAggregate> getChildren();
+
+   public abstract ProofAggregate getChildrenAt(int i);
 
    public Proof getProof(int proofNum) {
       return getProofs()[proofNum];
    }
+
+   
 }

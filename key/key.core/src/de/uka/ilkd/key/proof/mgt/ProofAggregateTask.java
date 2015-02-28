@@ -33,12 +33,12 @@ public class ProofAggregateTask extends DefaultMutableTreeNode
 
     public ProofAggregateTask(ProofAggregate ps) {
         super(ps);       
-        proofs=new TaskTreeNode[ps.size()];
-        for (int i=0; i<ps.size(); i++) {
-            if (ps.getChildren()[i] instanceof SingleProof) {
-                proofs[i] = new BasicTask(ps.getChildren()[i]);
+        proofs = new TaskTreeNode[ps.size()];
+        for (int i = 0; i<ps.size(); i++) {
+            if (ps.getChildrenAt(i) instanceof SingleProof) {
+                proofs[i] = new BasicTask(ps.getChildrenAt(i));
             } else {
-                proofs[i]=new ProofAggregateTask(ps.getChildren()[i]);
+                proofs[i]=new ProofAggregateTask(ps.getChildrenAt(i));
             }
         }
         proofList=ps;
