@@ -51,8 +51,10 @@ import org.key_project.utils.java.CollectionUtil;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.nodeviews.TacletMenu;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -62,6 +64,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomUserInterface;
+import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * Provides utility method for the KeYIDE.
@@ -233,27 +236,28 @@ public final class KeYIDEUtil {
 
    /**
     * <p>
-    * Collects all applicable {@link TacletApp}s for a given {@link PosInSequent} and {@link KeYMediator}.
+    * Collects all applicable {@link TacletApp}s for a given {@link PosInOccurrence} and {@link UserInterface}.
     * </p>
     * <p>
     * The code behaves like the {@link TacletMenu}.
     * </p>
-    * @param mediator - the {@link KeYMediator} of the current {@link Proof}.
-    * @param pos - the {@link PosInSequent} to find the {@link TacletApp}s for.
+    * @param ui - the {@link UserInterface} of the current {@link Proof}.
+    * @param goal - the current {@link Goal}
+    * @param pos - the {@link PosInOccurrence} to find the {@link TacletApp}s for.
     * @return {@link ImmutableList} - the {@link ImmutableList} with all applicable {@link TacletApp}s.
     */
-   public static ImmutableList<TacletApp> findTaclets(KeYMediator mediator, PosInSequent pos) {
+   public static ImmutableList<TacletApp> findTaclets(UserInterface ui, Goal goal, PosInOccurrence pos) {
       if (pos != null) {
-         ImmutableList<TacletApp> findList = mediator.getFindTaclet(pos);
-         ImmutableList<TacletApp> rewriteList = mediator.getRewriteTaclet(pos);
-         ImmutableList<TacletApp> noFindList = mediator.getNoFindTaclet();
+         ImmutableList<TacletApp> findList = ui.getFindTaclet(goal, pos);
+         ImmutableList<TacletApp> rewriteList = ui.getRewriteTaclet(goal, pos);
+         ImmutableList<TacletApp> noFindList = ui.getNoFindTaclet(goal);
          
          ImmutableList<TacletApp> find = TacletMenu.removeRewrites(findList).prepend(rewriteList);
          
          TacletMenu.TacletAppComparator comp = new TacletMenu.TacletAppComparator();
          ImmutableList<TacletApp> allTaclets = TacletMenu.sort(find, comp);
          
-         if (pos != null && pos.isSequent()) {
+         if (pos != null) {
             allTaclets = allTaclets.prepend(noFindList);
          }
          
@@ -267,12 +271,13 @@ public final class KeYIDEUtil {
    /**
     * Collects all applicable {@link BuiltInRule}s.
     * @param mediator The {@link KeYMediator} of the current {@link Proof}.
+    * @param goal The {@link Goal} at which to apply rule.
     * @param pos The {@link PosInSequent} to find the {@link TacletApp}s for.
     * @return The {@link ImmutableList} with all applicable {@link BuiltInRule}s.
     */
-   public static ImmutableList<BuiltInRule> findBuiltInRules(KeYMediator mediator, PosInSequent pos) {
+   public static ImmutableList<BuiltInRule> findBuiltInRules(UserInterface ui, Goal goal, PosInSequent pos) {
       if (pos != null) {
-         return mediator.getBuiltInRule(pos.getPosInOccurrence());
+         return ui.getBuiltInRule(goal, pos.getPosInOccurrence());
       }
       else {
          return ImmutableSLList.<BuiltInRule>nil();

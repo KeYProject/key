@@ -205,7 +205,7 @@ public class CustomUserInterface extends AbstractUserInterface {
    }
    
    @Override
-   public synchronized boolean isInAutoMode() {
+   public boolean isInAutoMode() {
       return autoModeThread != null;
    }
 

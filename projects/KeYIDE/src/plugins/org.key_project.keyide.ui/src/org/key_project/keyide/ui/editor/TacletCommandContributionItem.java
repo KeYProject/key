@@ -18,7 +18,9 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.ui.UserInterface;
 
 
 /**
@@ -27,15 +29,20 @@ import de.uka.ilkd.key.rule.TacletApp;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class TacletCommandContributionItem extends CommandContributionItem {
+   /**
+    * The {@link Goal} at which to apply the rule.
+    */
+   private final Goal goal;
+   
    /***
     * The {@link TacletApp} to apply.
     */
    private final TacletApp app;
    
    /**
-    * The {@link KeYMediator} to use.
+    * The {@link UserInterface} to use.
     */
-   private final KeYMediator mediator;
+   private final UserInterface ui;
    
    /**
     * The {@link PosInSequent} to apply {@link TacletApp} on.
@@ -46,13 +53,14 @@ public class TacletCommandContributionItem extends CommandContributionItem {
     * The constructor with the additional parameters.
     * @param contributionParameters - the {@link CommandContributionItemParameter}.
     * @param app - the {@link TacletApp}.
-    * @param mediator - the {@link KeYMediator}.
+    * @param ui - the {@link UserInterface}.
     * @param pos - the {@link PosInSequent}.
     */
-   public TacletCommandContributionItem(CommandContributionItemParameter contributionParameters, TacletApp app, KeYMediator mediator, PosInSequent pos) {
+   public TacletCommandContributionItem(CommandContributionItemParameter contributionParameters, Goal goal, TacletApp app, UserInterface ui, PosInSequent pos) {
       super(contributionParameters);
+      this.goal = goal;
       this.app = app;
-      this.mediator = mediator;
+      this.ui = ui;
       this.pos = pos;
    }
    
@@ -65,13 +73,21 @@ public class TacletCommandContributionItem extends CommandContributionItem {
    }
    
    /**
-    * Returns the {@link KeYMediator} to use.
+    * Returns the {@link UserInterface} to use.
     * @return The {@link KeYMediator} to use.
     */
-   public KeYMediator getMediator() {
-      return mediator;
+   public UserInterface getUi() {
+      return ui;
    }
    
+   /**
+    * Returns the {@link Goal} at which to apply the rule.
+    * @return The {@link Goal} at which to apply the rule.
+    */
+   public Goal getGoal() {
+      return goal;
+   }
+
    /**
     * Returns the {@link PosInSequent} to apply {@link TacletApp} on.
     * @return The {@link PosInSequent} to apply {@link TacletApp} on.

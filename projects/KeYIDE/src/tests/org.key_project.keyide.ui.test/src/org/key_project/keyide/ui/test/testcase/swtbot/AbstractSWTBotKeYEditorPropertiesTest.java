@@ -72,7 +72,7 @@ public abstract class AbstractSWTBotKeYEditorPropertiesTest extends AbstractSWTB
             KeYSelectionModel selectionModel = keyEditor.getSelectionModel();
             pSteps.assertNodeTab(editor, keyEditor, propertiesView, selectionModel.getSelectedNode());
             // Apply rule interactively
-            applyTaclet(selectionModel, selectionModel.getSelectedNode().sequent(), false, 0, PosInTerm.getTopLevel(), "impRight");
+            applyTaclet(keyEditor.getUI(), selectionModel.getSelectedGoal(), selectionModel.getSelectedNode().sequent(), false, 0, PosInTerm.getTopLevel(), "impRight");
             pSteps.assertNodeTab(editor, keyEditor, propertiesView, selectionModel.getSelectedNode());
             // Select root
             selectionModel.setSelectedNode(proof.root());

@@ -25,8 +25,8 @@ import org.key_project.keyide.ui.util.KeYIDEUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.utils.collection.ImmutableList;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -46,28 +46,28 @@ public class TacletContextMenu extends ExtensionContributionFactory {
       IEditorPart activeEditor = WorkbenchUtil.getActiveEditor();
       if (activeEditor instanceof KeYEditor) {
          KeYEditor keyEditor = (KeYEditor)activeEditor;
-         KeYMediator mediator = keyEditor.getMediator();
-         if (mediator != null && mediator.getSelectedNode().getAppliedRuleApp() == null) {
+         Goal goal = keyEditor.getSelectionModel().getSelectedGoal();
+         if (goal != null) {
             PosInSequent pos = keyEditor.getSelectedPosInSequent();
             // Add taclet rules
-            ImmutableList<TacletApp> appList = KeYIDEUtil.findTaclets(mediator, pos);
+            ImmutableList<TacletApp> appList = KeYIDEUtil.findTaclets(keyEditor.getUI(), goal, pos.getPosInOccurrence());
             if (appList != null) {
                Iterator<TacletApp> it = appList.iterator();
                while (it.hasNext()) {
                   TacletApp app = it.next();
                   CommandContributionItemParameter p = new CommandContributionItemParameter(serviceLocator, "", "org.key_project.keyide.ui.commands.applyrule", SWT.PUSH);
                   p.label = app.rule().displayName();
-                  TacletCommandContributionItem item = new TacletCommandContributionItem(p, app, mediator, pos);
+                  TacletCommandContributionItem item = new TacletCommandContributionItem(p, goal, app, keyEditor.getUI(), pos);
                   item.setVisible(true);
                   additions.addContributionItem(item, null);
                }
             }
             // Add built in rules
-            ImmutableList<BuiltInRule> builtInRules = KeYIDEUtil.findBuiltInRules(mediator, pos);
+            ImmutableList<BuiltInRule> builtInRules = KeYIDEUtil.findBuiltInRules(keyEditor.getUI(), goal, pos);
             for (BuiltInRule rule : builtInRules) {
                CommandContributionItemParameter p = new CommandContributionItemParameter(serviceLocator, "", "org.key_project.keyide.ui.commands.applyrule", SWT.PUSH);
                p.label = rule.displayName();
-               BuiltInRuleCommandContributionItem item = new BuiltInRuleCommandContributionItem(p, rule, mediator, pos);
+               BuiltInRuleCommandContributionItem item = new BuiltInRuleCommandContributionItem(p, goal, rule, keyEditor.getUI(), pos);
                item.setVisible(true);
                additions.addContributionItem(item, null);
             }

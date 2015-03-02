@@ -46,13 +46,14 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomUserInterface;
+import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * Provides the basic functionality to test the {@link KeYEditor}.
@@ -219,10 +220,15 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
     * @param pit The {@link PosInTerm}.
     * @param tacletName The name of the {@link Taclet} to apply.
     */
-   protected void applyTaclet(KeYMediator mediator, Sequent sequent, boolean inAntecedent, int index, PosInTerm pit, final String tacletName) {
+   protected void applyTaclet(UserInterface ui, 
+                              Goal goal, 
+                              Sequent sequent, 
+                              boolean inAntecedent, 
+                              int index, 
+                              PosInTerm pit, 
+                              final String tacletName) {
       PosInOccurrence pio = new PosInOccurrence((inAntecedent ? sequent.antecedent() : sequent.succedent()).get(index), pit, inAntecedent);
-      PosInSequent pis = PosInSequent.createCfmaPos(pio);
-      ImmutableList<TacletApp> rules = KeYIDEUtil.findTaclets(mediator, pis);
+      ImmutableList<TacletApp> rules = KeYIDEUtil.findTaclets(ui, goal, pio);
       TacletApp tacletApp = CollectionUtil.search(rules, new IFilter<TacletApp>() {
          @Override
          public boolean select(TacletApp element) {
@@ -230,6 +236,6 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
          }
       });
       assertNotNull(tacletApp);
-      mediator.selectedTaclet(tacletApp, pis);
+      ui.selectedTaclet(tacletApp.taclet(), goal, pio);
    }
 }

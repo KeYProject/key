@@ -18,7 +18,9 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * A customized {@link CommandContributionItem} which contains a {@link BuiltInRule}, a {@link KeYMediator} and a {@link PosInSequent}.
@@ -26,15 +28,20 @@ import de.uka.ilkd.key.rule.BuiltInRule;
  * @author Martin Hentschel
  */
 public class BuiltInRuleCommandContributionItem extends CommandContributionItem {
+   /**
+    * The {@link Goal} at which to apply rule.
+    */
+   private final Goal goal;
+   
    /***
     * The {@link BuiltInRule} to apply.
     */
    private final BuiltInRule rule;
    
    /**
-    * The {@link KeYMediator} to use.
+    * The {@link UserInterface} to use.
     */
-   private final KeYMediator mediator;
+   private final UserInterface ui;
    
    /**
     * The {@link PosInSequent} to apply {@link BuiltInRule} on.
@@ -45,13 +52,15 @@ public class BuiltInRuleCommandContributionItem extends CommandContributionItem 
     * The constructor with the additional parameters.
     * @param contributionParameters - the {@link CommandContributionItemParameter}.
     * @param rule - the {@link BuiltInRule}.
-    * @param mediator - the {@link KeYMediator}.
+    * @param goal - the {@link Goal}.
+    * @param ui - the {@link UserInterface}.
     * @param pos - the {@link PosInSequent}.
     */
-   public BuiltInRuleCommandContributionItem(CommandContributionItemParameter contributionParameters, BuiltInRule rule, KeYMediator mediator, PosInSequent pos) {
+   public BuiltInRuleCommandContributionItem(CommandContributionItemParameter contributionParameters, Goal goal, BuiltInRule rule, UserInterface ui, PosInSequent pos) {
       super(contributionParameters);
+      this.goal = goal;
       this.rule = rule;
-      this.mediator = mediator;
+      this.ui = ui;
       this.pos = pos;
    }
    
@@ -64,11 +73,11 @@ public class BuiltInRuleCommandContributionItem extends CommandContributionItem 
    }
    
    /**
-    * Returns the {@link KeYMediator} to use.
-    * @return The {@link KeYMediator} to use.
+    * Returns the {@link UserInterface} to use.
+    * @return The {@link UserInterface} to use.
     */
-   public KeYMediator getMediator() {
-      return mediator;
+   public UserInterface getUi() {
+      return ui;
    }
    
    /**
@@ -77,5 +86,13 @@ public class BuiltInRuleCommandContributionItem extends CommandContributionItem 
     */
    public PosInSequent getPosInSequent() {
       return pos;
+   }
+
+   /**
+    * Returns the {@link Goal}.
+    * @return The {@link Goal}.
+    */
+   public Goal getGoal() {
+      return goal;
    }
 }

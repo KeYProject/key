@@ -384,7 +384,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	}
 
 	public T next () {
-	    assert remainder.isEmpty() : "Missing next element in UnsortedIterator.next()";
+	    assert !remainder.isEmpty() : "Missing next element in UnsortedIterator.next()";
 
 	    Node<T> heap = remainder.pop ();
 	    // descend in right-first order, this helps to keep the stack small
@@ -419,7 +419,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	}
 
 	public T next () {
-	    assert remainder.isEmpty () : "Missing next element in SortedIterator.next()";
+	    assert !remainder.isEmpty () : "Missing next element in SortedIterator.next()";
 
 	    T data = remainder.findMin ();
 	    remainder = remainder.deleteMin ();

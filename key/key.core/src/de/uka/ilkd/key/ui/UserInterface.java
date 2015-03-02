@@ -20,6 +20,7 @@ import java.util.Properties;
 import org.key_project.utils.collection.ImmutableList;
 
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -37,7 +38,11 @@ import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor, ProofEnvironmentListener {
@@ -47,29 +52,21 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @param goal the Goal where to apply
      */
     void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal);
-
-    /**
-     * asks if removal of a task is completed. This is useful to display a dialog to the user and asking her or
-     * if on command line to allow it always.
-     * @param message
-     * @return true if removal has been granted
-     */
-    boolean confirmTaskRemoval(String message);
     
     void loadingStarted();
     
     void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer, ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException;
-    
-    void setSaveOnly(boolean s);
 
-    boolean isSaveOnly();
-
+    // TODO: SHould not be required
     void setMacro(ProofMacro macro);
 
+    // TODO: SHould not be required
     ProofMacro getMacro();
 
+    // TODO: Required?
     boolean macroChosen();
 
+    // TODO: REmove me
     public ProverTaskListener getListener();
 
     /**
@@ -203,4 +200,56 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      boolean isMinimizeInteraction();
      
      void setMinimizeInteraction(boolean minimizeInteraction);
+
+     /**
+      * collects all applicable RewriteTaclets of the current goal (called by the
+      * SequentViewer)
+      *
+      * @return a list of Taclets with all applicable RewriteTaclets
+      */
+   public abstract ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal, PosInOccurrence pos);
+
+   /**
+    * collects all applicable FindTaclets of the current goal (called by the
+    * SequentViewer)
+    *
+    * @return a list of Taclets with all applicable FindTaclets
+    */
+   public abstract ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal, PosInOccurrence pos);
+
+   /**
+    * collects all applicable NoFindTaclets of the current goal (called by the
+    * SequentViewer)
+    *
+    * @return a list of Taclets with all applicable NoFindTaclets
+    */
+   public abstract ImmutableList<TacletApp> getNoFindTaclet(Goal focusedGoal);
+
+   /**
+    * collects all built-in rules that are applicable at the given sequent
+    * position 'pos'.
+    *
+    * @param pos the PosInSequent where to look for applicable rules
+    */
+   public abstract ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos);
+   
+   public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos);
+   
+   /**
+    * Apply a RuleApp and continue with update simplification or strategy
+    * application according to current settings.
+    * @param app
+    * @param goal
+    */
+   public void applyInteractive(RuleApp app, Goal goal);
+   
+   /** selected rule to apply
+    * @param rule the selected built-in rule
+    * @param pos the PosInSequent describes the position where to apply the
+    * rule
+    * @param forced a boolean indicating that if the rule is complete or can be made complete
+    * automatically then the rule should be applied automatically without asking the user at all
+    * (e.g. if a loop invariant is available do not ask the user to provide one)
+    */
+   public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced);
 }

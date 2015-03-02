@@ -20,10 +20,10 @@ import org.eclipse.swt.widgets.Event;
 import org.key_project.keyide.ui.editor.BuiltInRuleCommandContributionItem;
 import org.key_project.keyide.ui.editor.TacletCommandContributionItem;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * A {@link AbstractHandler} to handle the manual appliance of a {@link TacletApp}.
@@ -43,16 +43,18 @@ public class ApplyRuleHandler extends AbstractHandler {
          if (data instanceof TacletCommandContributionItem) {
             TacletCommandContributionItem item = (TacletCommandContributionItem)data;
             TacletApp app = item.getTacletApp();
-            KeYMediator mediator = item.getMediator();
+            UserInterface ui = item.getUi();
             PosInSequent pos = item.getPosInSequent();
-            mediator.selectedTaclet(app, pos);
+            if (!ui.selectedTaclet(app.taclet(), item.getGoal(), pos.getPosInOccurrence())) {
+               throw new IllegalStateException("Taclet application failed." + app.rule().name());
+            }
          }
          else if (data instanceof BuiltInRuleCommandContributionItem) {
             BuiltInRuleCommandContributionItem item = (BuiltInRuleCommandContributionItem)data;
             BuiltInRule rule = item.getRule();
-            KeYMediator mediator = item.getMediator();
+            UserInterface ui = item.getUi();
             PosInSequent pos = item.getPosInSequent();
-            mediator.selectedBuiltInRule(rule, pos.getPosInOccurrence(), false);
+            ui.selectedBuiltInRule(item.getGoal(), rule, pos.getPosInOccurrence(), false);
          }
       }
       return null;

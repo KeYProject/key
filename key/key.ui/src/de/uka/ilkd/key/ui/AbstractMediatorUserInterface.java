@@ -271,4 +271,14 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
    }
 
    public abstract void notify(NotificationEvent event);
+
+   /**
+    * asks if removal of a task is completed. This is useful to display a dialog to the user and asking her or
+    * if on command line to allow it always.
+    * @param message
+    * @return true if removal has been granted
+    */
+   public boolean confirmTaskRemoval(String string) {
+       return true;
+   }
 }

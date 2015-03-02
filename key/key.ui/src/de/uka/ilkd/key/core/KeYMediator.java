@@ -14,8 +14,6 @@
 package de.uka.ilkd.key.core;
 
 import java.util.EventObject;
-import java.util.Iterator;
-import java.util.LinkedList;
 
 import javax.swing.Action;
 import javax.swing.SwingUtilities;
@@ -23,12 +21,9 @@ import javax.swing.event.EventListenerList;
 
 import org.key_project.utils.collection.ImmutableList;
 import org.key_project.utils.collection.ImmutableSLList;
-import org.key_project.utils.collection.ImmutableSet;
 
-import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
-import de.uka.ilkd.key.gui.TacletMatchCompletionDialog;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
@@ -61,7 +56,6 @@ import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -374,34 +368,6 @@ public class KeYMediator {
         }
     }
 
-    public ImmutableSet<TacletApp> getTacletApplications(Goal g, String name,
-                                                PosInOccurrence p) {
-       return interactiveProver.getAppsForName(g, name, p);
-    }
-
-
-    public ImmutableSet<TacletApp> getTacletApplications(Goal            goal,
-						String          name,
-                                                PosInOccurrence pos,
-                                                TacletFilter    filter) {
-       return interactiveProver.getAppsForName(goal, name, pos,
-					       filter);
-    }
-
-    /**
-     * collects all applications of a rule given by its name at a give position in the sequent
-     * @param name
-     * 				the name of the BuiltInRule for which applications are collected.
-     * @param pos
-     * 				the position in the sequent where the BuiltInRule should be applied
-     * @return
-     * 				a SetOf<RuleApp> with all possible applications of the rule
-     */
-    public ImmutableSet<IBuiltInRuleApp> getBuiltInRuleApplications(String name, PosInOccurrence pos)
-    {
-    	return interactiveProver.getBuiltInRuleAppsForName(name, pos);
-    }
-
     /**
      * selected rule to apply; opens a dialog
      * @param tacletApp the TacletApp which has been selected
@@ -409,67 +375,11 @@ public class KeYMediator {
      * rule
      */
     public void selectedTaclet(TacletApp tacletApp, PosInSequent pos) {
-	Goal goal = keySelectionModel.getSelectedGoal();
+   Goal goal = keySelectionModel.getSelectedGoal();
         Debug.assertTrue(goal != null);
-        selectedTaclet(tacletApp.taclet(), goal, pos.getPosInOccurrence());
-    }
-
-
-    public boolean selectedTaclet(Taclet taclet, Goal goal,
-				  PosInOccurrence pos) {
-	ImmutableSet<TacletApp> applics =
-           getTacletApplications(goal, taclet.name().toString(), pos);
-        if (applics.size() == 0) {
-            notify(new GeneralFailureEvent("Taclet application failed." + taclet.name()));
-           return false;
+        if (!getUI().selectedTaclet(tacletApp.taclet(), goal, pos.getPosInOccurrence())) {
+           getUI().notify(new GeneralFailureEvent("Taclet application failed." + tacletApp.rule().name()));
         }
-	Iterator<TacletApp> it = applics.iterator();
-	if (applics.size() == 1) {
-	    TacletApp firstApp = it.next();
-            boolean ifSeqInteraction =
-               !firstApp.taclet().ifSequent().isEmpty() ;
-            if (ui.isMinimizeInteraction() && !firstApp.complete()) {
-                ImmutableList<TacletApp> ifSeqCandidates =
-                    firstApp.findIfFormulaInstantiations(goal.sequent(),
-		        getServices());
-
-                if (ifSeqCandidates.size() == 1) {
-                    ifSeqInteraction = false;
-                    firstApp = ifSeqCandidates.head();
-                }
-                TacletApp tmpApp =
-                    firstApp.tryToInstantiate(getServices());
-                if (tmpApp != null) firstApp = tmpApp;
-
-            }
-	    if (ifSeqInteraction || !firstApp.complete()) {
-	    	LinkedList<TacletApp> l = new LinkedList<TacletApp>();
-	    	l.add(firstApp);
-            ApplyTacletDialogModel[] models = TacletMatchCompletionDialog.completeAndApplyApp(l, goal, this);
-	    	ui.completeAndApplyTacletMatch(models, goal);
-	    } else {
-	    	applyInteractive(firstApp, goal);
-	    }
-	} else if (applics.size() > 1) {
-            java.util.List<TacletApp> appList = new java.util.LinkedList<TacletApp>();
-
-	    for (int i = 0; i < applics.size(); i++) {
-	        TacletApp rapp = it.next();
-                appList.add(rapp);
-            }
-
-            if (appList.size()==0) {
-                 assert false;
-                 return false;
-            }
-
-            ApplyTacletDialogModel[] models = TacletMatchCompletionDialog.completeAndApplyApp(
-                    appList, goal, this);
-
-            ui.completeAndApplyTacletMatch(models, goal);
-
-        }
-        return true;
     }
 
 
@@ -482,30 +392,7 @@ public class KeYMediator {
      * (e.g. if a loop invariant is available do not ask the user to provide one)
      */
     public void selectedBuiltInRule(BuiltInRule rule, PosInOccurrence pos, boolean forced) {
-    	Goal goal = keySelectionModel.getSelectedGoal();
-    	assert goal != null;
-
-    	ImmutableSet<IBuiltInRuleApp> set = interactiveProver.
-    			getBuiltInRuleApp(rule, pos);
-    	if (set.size() > 1) {
-    		System.err.println("keymediator:: Expected a single app. If " +
-    				"it is OK that there are more than one " +
-    				"built-in rule apps. You have to add a " +
-    				"selection dialog here");
-    		System.err.println("keymediator:: Ambigous applications, " +
-    				"taking the first in list.");
-    	}
-
-    	IBuiltInRuleApp app = set.iterator().next();
-
-    	if (!app.complete()) {
-    		app = ui.completeBuiltInRuleApp(app, goal, forced);
-    	}
-
-    	if (app != null && app.rule() == rule) {
-    		goal.apply(app);
-    		return;
-    	}
+    	 getUI().selectedBuiltInRule(getSelectedGoal(), rule, pos, forced);
     }
 
 
@@ -516,7 +403,7 @@ public class KeYMediator {
      * @param goal
      */
     public void applyInteractive(RuleApp app, Goal goal) {
-        interactiveProver.applyInteractive(app, goal);
+        getUI().applyInteractive(app, goal);
     }
 
 
@@ -527,7 +414,7 @@ public class KeYMediator {
      */
 
     public ImmutableList<TacletApp> getFindTaclet(PosInSequent pos) {
-    	return interactiveProver.getFindTaclet(pos);
+    	return getUI().getFindTaclet(getSelectedGoal(), pos.getPosInOccurrence());
     }
 
     /** collects all applicable RewriteTaclets of the current goal
@@ -535,7 +422,7 @@ public class KeYMediator {
      * @return a list of Taclets with all applicable RewriteTaclets
      */
     public ImmutableList<TacletApp> getRewriteTaclet(PosInSequent pos) {
-    	return interactiveProver.getRewriteTaclet(pos);
+    	return getUI().getRewriteTaclet(getSelectedGoal(), pos.getPosInOccurrence());
     }
 
     /** collects all applicable NoFindTaclets of the current goal
@@ -543,15 +430,15 @@ public class KeYMediator {
      * @return a list of Taclets with all applicable NoFindTaclets
      */
     public ImmutableList<TacletApp> getNoFindTaclet() {
-    	return interactiveProver.getNoFindTaclet();
+    	return getUI().getNoFindTaclet(getSelectedGoal());
     }
 
     /** collects all built-in rules
      * @return a list of all applicable built-in rules
      */
     public ImmutableList<BuiltInRule> getBuiltInRule(PosInOccurrence pos) {
-	return interactiveProver.getBuiltInRule
-	    (pos);
+	return getUI().getBuiltInRule
+	    (getSelectedGoal(), pos);
     }
 
     /** adds a listener to the KeYSelectionModel, so that the listener
