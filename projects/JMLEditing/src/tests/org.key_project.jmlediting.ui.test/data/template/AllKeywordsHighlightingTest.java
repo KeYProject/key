@@ -10,13 +10,15 @@ public abstract class AllKeywordsHighlightingTest {
    private /*@ spec_public */ int numCalls;
    private /*@ spec_protected*/ int handledCalls;
    private boolean needsRefresh;
-   private Object[] obs;
+   private /*@ nullable */ Object[] obs;
    
    //@ private model int i ;
    //@ private model int j;
    //@ represents i = numCalls + handledCalls;
    //@ represents j \such_that j==0;
    //@ private ghost java.lang.Double d1,d2,d3;
+   //@ protected ghost \real myReal;
+   //@ protected ghost \bigint myBigInt;
    
    /*@
      @ public normal_behavior
@@ -104,7 +106,7 @@ public abstract class AllKeywordsHighlightingTest {
      @   requires \not_specified;   
      @   requires \same;
      @*/
-   protected /*@helper*/ void tryBreakEverything() {
+   protected /*@helper*/ void tryBreakEverything(/*@ non_null */ String s) {
       
    }
 

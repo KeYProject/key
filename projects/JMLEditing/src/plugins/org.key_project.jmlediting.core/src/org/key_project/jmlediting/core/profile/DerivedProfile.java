@@ -8,6 +8,7 @@ import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 
 /**
  * An implementation of {@link IEditableDerivedProfile}.
@@ -214,6 +215,11 @@ public class DerivedProfile extends AbstractJMLProfile implements
    public Set<IJMLPrimary> getSupportedPrimaries() {
       // Derived profiles cannot define new primaries
       return this.parentProfile.getSupportedPrimaries();
+   }
+
+   @Override
+   public Set<IUserDefinedKeywordContentDescription> getSupportedContentDescriptions() {
+      return this.parentProfile.getSupportedContentDescriptions();
    }
 
 }

@@ -5,6 +5,8 @@ import java.util.Set;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
+import org.key_project.jmlediting.core.validation.IJMLValidator;
 
 /**
  * Defines a profile for a JML variant.
@@ -44,6 +46,15 @@ public interface IJMLProfile {
    Set<IJMLPrimary> getSupportedPrimaries();
 
    /**
+    * Returns a set of supported content descriptions which the user may use to
+    * create other keywords dynamically.
+    *
+    * @return a set of all supported content descriptions, which is not
+    *         modifiable
+    */
+   Set<IUserDefinedKeywordContentDescription> getSupportedContentDescriptions();
+
+   /**
     * Returns an extension to the project for the given key and type. This can
     * be used put or get extensions to a profile which is not worth for a single
     * method because it is not generic.
@@ -67,5 +78,13 @@ public interface IJMLProfile {
     * @return a new parser to parse JML according to this profile
     */
    IJMLParser createParser();
+
+   /**
+    * Returns a Set of Validators that this Profile provides.
+    *
+    * @return a Set of Validators the Profile provides or an Empty Set if there
+    *         are no Validators.
+    */
+   Set<IJMLValidator> getValidators();
 
 }

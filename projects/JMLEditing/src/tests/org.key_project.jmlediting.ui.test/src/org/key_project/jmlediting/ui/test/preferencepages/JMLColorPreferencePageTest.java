@@ -74,6 +74,7 @@ public class JMLColorPreferencePageTest {
       bot.sleep(100);
       this.navigateToJMLColorSettings();
       this.setCommentColorButton();
+      bot.sleep(1000);
    }
 
    @AfterClass
@@ -110,6 +111,7 @@ public class JMLColorPreferencePageTest {
 
          }
       });
+      bot.sleep(500);
    }
 
    /*
@@ -143,10 +145,13 @@ public class JMLColorPreferencePageTest {
       RGB testColor = new RGB(255, 0, 0);
       this.setColor(testColor);
       bot.button("Apply").click();
+      // Need to wait until the UI events has been processed
+      bot.sleep(1000);
       assertEquals("Not the right JML-Color was set.", testColor,
             JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.COMMENT));
       bot.button("Restore Defaults").click();
       bot.button("Apply").click();
+      bot.sleep(1000);
       assertEquals("Restore Default JML Color did not work.",
             ColorProperty.COMMENT.getDefaultColor(),
             JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.COMMENT));

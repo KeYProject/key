@@ -1,12 +1,17 @@
 package org.key_project.jmlediting.core.profile.persistence.internal;
 
 import org.eclipse.core.runtime.Platform;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceException;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
 public class InstantiateKeywordsPersistence extends KeywordPersistence {
+
+   public InstantiateKeywordsPersistence(final IJMLProfile profile) {
+      super(profile);
+   }
 
    @Override
    protected void validateKeywordToPersist(final IKeyword keyword)

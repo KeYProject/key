@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 
 public class JMLProfileHelper {
 
@@ -47,5 +48,16 @@ public class JMLProfileHelper {
          }
       }
       return Collections.unmodifiableSet(result);
+   }
+
+   public static IUserDefinedKeywordContentDescription getDescriptionById(
+         final String id, final IJMLProfile profile) {
+      for (final IUserDefinedKeywordContentDescription descr : profile
+            .getSupportedContentDescriptions()) {
+         if (descr.getId().equals(id)) {
+            return descr;
+         }
+      }
+      return null;
    }
 }

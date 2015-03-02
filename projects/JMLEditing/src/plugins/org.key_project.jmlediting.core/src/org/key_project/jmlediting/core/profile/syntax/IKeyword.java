@@ -40,16 +40,9 @@ public interface IKeyword {
    /**
     * Creates a new {@link IKeywordAutoProposer} which makes proposals for the
     * content of this keyword.
-    * 
+    *
     * @return an {@link IKeywordAutoProposer}
     */
    IKeywordAutoProposer createAutoProposer();
-
-   /**
-    * Creates an IKeywordContentRefactorer with the given Input.
-    *
-    * @return an IKeywordContentRefactorer
-    */
-   IKeywordContentRefactorer createRefactorer();
 
 }

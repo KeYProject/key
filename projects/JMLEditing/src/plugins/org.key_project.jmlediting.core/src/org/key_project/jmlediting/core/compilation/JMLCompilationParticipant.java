@@ -12,6 +12,7 @@ import org.eclipse.jdt.core.compiler.CategorizedProblem;
 import org.eclipse.jdt.core.compiler.CompilationParticipant;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.compiler.ReconcileContext;
+import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 import org.eclipse.jdt.internal.compiler.problem.ProblemSeverities;
 import org.key_project.jmlediting.core.Activator;
@@ -22,6 +23,9 @@ import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
+import org.key_project.jmlediting.core.utilities.JMLValidationError;
+import org.key_project.jmlediting.core.validation.JMLValidationContext;
+import org.key_project.jmlediting.core.validation.JMLValidationEngine;
 import org.key_project.util.eclipse.Logger;
 
 /**
@@ -62,7 +66,6 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          // Detect all comments in the file and then parse it
          final CommentLocator locator = new CommentLocator(source);
          for (final CommentRange jmlComment : locator.findJMLCommentRanges()) {
-            final boolean loopKeywordFound = false;
             final IJMLParser parser = JMLPreferencesHelper
                   .getProjectActiveJMLProfile(res.getProject()).createParser();
             try {
@@ -81,7 +84,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                         new String[] { error.getErrorMessage() },
                         new String[] { error.getErrorMessage() },
                         ProblemSeverities.Error, error.getErrorOffset(), error
-                              .getErrorOffset(), -1, -1));
+                        .getErrorOffset(), -1, -1));
                }
 
                // And now put the problems to the context to make them visible
@@ -115,19 +118,33 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          final String source = new String(context.getContents());
          // Remove all JML Error markers from the file
          ParseErrorMarkerUpdater.removeErrorMarkers(res);
+         ValidationErrorMarkerUpdater.removeErrorMarkers(res);
          // Detect all comments in the file and then parse it
          final CommentLocator locator = new CommentLocator(source);
          final List<CommentRange> jmlComments = locator.findJMLCommentRanges();
+         // Start Preparation for Validation
+         final org.eclipse.jdt.core.dom.CompilationUnit ast;
+         final ASTParser parser = ASTParser
+               .newParser(ASTParser.K_COMPILATION_UNIT);
+         parser.setKind(ASTParser.K_COMPILATION_UNIT);
+         parser.setSource(source.toCharArray());
+         parser.setResolveBindings(true);
+         ast = (org.eclipse.jdt.core.dom.CompilationUnit) parser
+               .createAST(null);
+         final IJMLParser jmlParser = JMLPreferencesHelper
+               .getProjectActiveJMLProfile(res.getProject()).createParser();
+         final JMLValidationContext jmlContext = new JMLValidationContext(
+               source, jmlComments, ast, jmlParser);
+         final JMLValidationEngine engine = new JMLValidationEngine(
+               JMLPreferencesHelper
+               .getProjectActiveJMLProfile(res.getProject()),
+               jmlContext);
+         // End of Preparation
+         final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
          for (final CommentRange jmlComment : jmlComments) {
-            final IJMLParser parser = JMLPreferencesHelper
-                  .getProjectActiveJMLProfile(res.getProject()).createParser();
             try {
-               final IASTNode parseResult = parser.parse(source, jmlComment);
-               /*
-                * final IJMLValidationContext jmlContext = new
-                * JMLValidationContext( parseResult, res, jmlComments.subList(
-                * jmlComments.indexOf(jmlComment) + 1, jmlComments.size()));
-                */
+               final IASTNode node = jmlParser.parse(source, jmlComment);
+               errors.addAll(engine.validateComment(node));
                // Throw away the result, here only a parse exception is
                // interesting
             }
@@ -136,6 +153,8 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                ParseErrorMarkerUpdater.createErrorMarkers(res, source, e);
             }
          }
+         // TODO: Unify ErrorMarkerUpdater
+         ValidationErrorMarkerUpdater.createErrorMarkers(res, source, errors);
       }
    }
 }

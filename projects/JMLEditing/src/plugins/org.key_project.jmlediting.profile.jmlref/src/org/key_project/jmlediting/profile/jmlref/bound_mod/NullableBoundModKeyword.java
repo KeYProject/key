@@ -3,18 +3,18 @@ package org.key_project.jmlediting.profile.jmlref.bound_mod;
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 
 /**
- * The implementation of the nullable keyword.
+ * Nullable as bound modifier.
  *
  * @author Moritz Lichter
  *
  */
-public class NullableKeyword extends AbstractEmptyKeyword implements
+public class NullableBoundModKeyword extends AbstractEmptyKeyword implements
       IBoundVarModifierKeyword {
 
    /**
     * Creates a new instance.
     */
-   public NullableKeyword() {
+   public NullableBoundModKeyword() {
       super("nullable");
    }
 

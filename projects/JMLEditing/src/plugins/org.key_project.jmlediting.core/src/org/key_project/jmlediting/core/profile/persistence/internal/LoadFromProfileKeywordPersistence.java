@@ -1,5 +1,6 @@
 package org.key_project.jmlediting.core.profile.persistence.internal;
 
+import org.key_project.jmlediting.core.profile.IDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceException;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
@@ -9,9 +10,9 @@ public class LoadFromProfileKeywordPersistence extends KeywordPersistence {
 
    private final IJMLProfile parentProfile;
 
-   public LoadFromProfileKeywordPersistence(final IJMLProfile parentProfile) {
-      super();
-      this.parentProfile = parentProfile;
+   public LoadFromProfileKeywordPersistence(final IDerivedProfile profile) {
+      super(profile);
+      this.parentProfile = profile.getParentProfile();
    }
 
    @Override
