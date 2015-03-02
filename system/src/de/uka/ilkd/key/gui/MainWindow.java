@@ -146,7 +146,7 @@ public final class MainWindow extends JFrame  {
     private final KeYMediator mediator;
 
     /** the user interface which direct all notifications to this window */
-    private final UserInterface userInterface;
+    private final WindowUserInterface userInterface;
 
     /** the status line */
     private MainStatusLine statusLine;
@@ -1376,7 +1376,7 @@ public final class MainWindow extends JFrame  {
 	return recentFileMenu;
     }
 
-    public UserInterface getUserInterface() {
+    public WindowUserInterface getUserInterface() {
         return userInterface;
     }
 

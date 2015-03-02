@@ -262,7 +262,11 @@ public class ProofSaver {
                
                // there may be more than one path
                while (0 <= tmp.indexOf("\"",i) && tmp.indexOf("\"",i) < l) {
-                   // path is always put in quotation marks
+            	   if(!relPathString.isEmpty()) {
+            		   relPathString += ", ";
+            	   }
+            	   
+            	   // path is always put in quotation marks
                    int k = tmp.indexOf("\"",i)+1;
                    int j = tmp.indexOf("\"", k);
 

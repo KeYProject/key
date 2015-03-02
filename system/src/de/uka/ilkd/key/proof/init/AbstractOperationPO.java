@@ -205,9 +205,21 @@ public abstract class AbstractOperationPO extends AbstractPO {
                   }
               }
           }
+
+          Term permsFor = tb.tt();
+          if(pm.getHeapCount(proofServices) == 2 && proofServices.getTypeConverter().getHeapLDT().getPermissionHeap() != null) {
+              int stateCount = pm.getStateCount();
+              for(int i=0;i<stateCount;i++) {
+                  LocationVariable h = heaps.get(i);
+                  LocationVariable p = heaps.get(i+stateCount);
+                  final Term pf = tb.permissionsFor(p, h);
+                  permsFor = tb.and(permsFor, pf);
+              }
+          }
+
           final Term pre =
                   tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, heaps, proofServices),
-                          getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
+                          permsFor, getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
           // build program term
           Term postTerm = getPost(modHeaps, selfVar, paramVars, resultVar, null, atPreVars, proofServices);
           // Add uninterpreted predicate
@@ -322,9 +334,20 @@ public abstract class AbstractOperationPO extends AbstractPO {
          final ImmutableList<StatementBlock> sb =
                  buildOperationBlocks(formalParamVars, selfVar, resultVar, proofServices);
 
+         Term permsFor = tb.tt();
+         if(pm.getHeapCount(proofServices) == 2 && proofServices.getTypeConverter().getHeapLDT().getPermissionHeap() != null) {
+             int stateCount = pm.getStateCount();
+             for(int i=0;i<stateCount;i++) {
+                 LocationVariable h = modHeaps.get(i);
+                 LocationVariable p = modHeaps.get(i+stateCount);
+                 final Term pf = tb.permissionsFor(p, h);
+                 permsFor = tb.and(permsFor, pf);
+             }
+         }
+
          // build precondition
          Term pre = tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modHeaps, proofServices),
-                                 getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
+                                 permsFor, getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
          if(isTransactionApplicable()) {
              // Need to add assumptions about the transaction depth
              try {

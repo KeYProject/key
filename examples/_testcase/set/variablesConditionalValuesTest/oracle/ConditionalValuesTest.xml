@@ -49,6 +49,10 @@
          <branchCondition name="not(equals(x,null))" pathCondition="not(equals(x,null))" pathConditionChanged="true" branchCondition="not(equals(x,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <variable name="x" isArrayIndex="false">
                <value name="x {true}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="value" isArrayIndex="false">
+                     <value name="value {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
                </value>
             </variable>
             <variable name="y" isArrayIndex="false">
@@ -99,6 +103,10 @@
                         </variable>
                      </value>
                      <value name="y {not(equals(y,x))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,x))">
+                        <variable name="value" isArrayIndex="false">
+                           <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
                      </value>
                   </variable>
                   <variable name="exc" isArrayIndex="false">

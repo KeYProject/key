@@ -11,5 +11,6 @@
       <association name="next" programVariable="next" isArrayIndex="false" target="o3" condition="true"/>
    </object>
    <object xml:id="o3" name="SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next)" type="SimpleLinkedOjbects">
+      <value name="value" programVariable="value" isArrayIndex="false" value="int::select(heap,SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$value)" type="int" condition="true"/>
    </object>
 </model>

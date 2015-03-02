@@ -12,6 +12,7 @@
       <association name="next" programVariable="next" isArrayIndex="false" target="o2" condition="true"/>
    </object>
    <object xml:id="o2" name="SimpleLinkedOjbectsInstanceVariable::select(heap,self,SimpleLinkedOjbectsInstanceVariable::$next)" type="SimpleLinkedOjbectsInstanceVariable">
+      <value name="value" programVariable="value" isArrayIndex="false" value="int::select(heap,SimpleLinkedOjbectsInstanceVariable::select(heap,self,SimpleLinkedOjbectsInstanceVariable::$next),SimpleLinkedOjbectsInstanceVariable::$value)" type="int" condition="true"/>
       <association name="next" programVariable="next" isArrayIndex="false" target="o2" condition="true"/>
    </object>
 </model>

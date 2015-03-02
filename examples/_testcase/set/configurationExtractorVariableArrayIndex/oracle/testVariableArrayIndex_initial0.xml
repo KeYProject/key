@@ -6,6 +6,7 @@
    </state>
    <object xml:id="o1" name="int[]::select(heap,self,VariableArrayIndex::$array)" type="int[]">
       <value name="length" programVariable="length" isArrayIndex="false" value="length(int[]::select(heap,self,VariableArrayIndex::$array))" type="int" condition="true"/>
+      <value name="[int::select(heap,self,VariableArrayIndex::$index)]" isArrayIndex="true" arrayIndex="int::select(heap,self,VariableArrayIndex::$index)" value="int::select(heap,int[]::select(heap,self,VariableArrayIndex::$array),arr(int::select(heap,self,VariableArrayIndex::$index)))" type="int" condition="true"/>
    </object>
    <object xml:id="o2" name="self" type="VariableArrayIndex">
       <value name="index" programVariable="index" isArrayIndex="false" value="int::select(heap,self,VariableArrayIndex::$index)" type="int" condition="true"/>

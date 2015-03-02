@@ -57,8 +57,7 @@ public class TestTestgen extends TestCommons{
 	
 	public void testMiddle(){
 		
-		UserInterface ui = new TestConsoleUserInterface(new BatchMode("test",
-		        false), false);
+		UserInterface ui = new TestConsoleUserInterface(false, false);
 		KeYMediator mediator = ui.getMediator();
 		File file = new File(testFile + "middle.key");
 		ui.loadProblem(file);

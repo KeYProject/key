@@ -10,5 +10,6 @@
    <object xml:id="o1" name="x" type="ConfigurationExtractorWithOperationContractsTest.IntWrapper">
    </object>
    <object xml:id="o2" name="y" type="ConfigurationExtractorWithOperationContractsTest.IntWrapper">
+      <value name="value" programVariable="value" isArrayIndex="false" value="int::select(heap,y,ConfigurationExtractorWithOperationContractsTest.IntWrapper::$value)" type="int" condition="true"/>
    </object>
 </model>

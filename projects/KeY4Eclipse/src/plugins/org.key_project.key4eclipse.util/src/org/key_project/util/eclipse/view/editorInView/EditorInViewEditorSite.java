@@ -25,9 +25,9 @@ import org.eclipse.ui.IKeyBindingService;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.PartSite;
 import org.eclipse.ui.services.IDisposable;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
@@ -43,8 +43,8 @@ import org.key_project.util.eclipse.WorkbenchUtil;
  * @see AbstractEditorInViewView
  * @see EditorInViewWorkbenchPage
  */
-@SuppressWarnings({ "deprecation" })
-public class EditorInViewEditorSite implements IEditorSite, IDisposable {
+@SuppressWarnings({ "deprecation", "restriction" })
+public class EditorInViewEditorSite extends PartSite implements IEditorSite, IDisposable {
    /**
     * The {@link IViewSite} of an {@link IViewPart} which contains an {@link IEditorPart}.
     */
@@ -76,6 +76,7 @@ public class EditorInViewEditorSite implements IEditorSite, IDisposable {
    public EditorInViewEditorSite(IViewSite wrapperViewSite, 
                                  EditorInViewWorkbenchPage page, 
                                  IEditorActionBarContributor wrappedEditorContributor) {
+      super(((PartSite)wrapperViewSite).getModel(), wrapperViewSite.getPart(), null, null);
       Assert.isNotNull(page);
       Assert.isNotNull(wrapperViewSite);
       this.page = page;
@@ -249,19 +250,6 @@ public class EditorInViewEditorSite implements IEditorSite, IDisposable {
     * </p>
     */
    @Override
-   public IWorkbenchPart getPart() {
-      return wrapperViewSite.getPart();
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * The call is delegated to the {@link IViewSite}.
-    * </p>
-    */
-   @Override
    public ISelectionProvider getSelectionProvider() {
       return wrapperViewSite.getSelectionProvider();
    }
@@ -290,45 +278,6 @@ public class EditorInViewEditorSite implements IEditorSite, IDisposable {
    @Override
    public void setSelectionProvider(ISelectionProvider provider) {
       wrapperViewSite.setSelectionProvider(provider);
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * The call is delegated to the {@link IViewSite}.
-    * </p>
-    */
-   @Override
-   public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
-      return wrapperViewSite.getAdapter(adapter);
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * The call is delegated to the {@link IViewSite}.
-    * </p>
-    */
-   @Override
-   public Object getService(@SuppressWarnings("rawtypes") Class api) {
-      return wrapperViewSite.getService(api);
-   }
-
-   /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * The call is delegated to the {@link IViewSite}.
-    * </p>
-    */
-   @Override
-   public boolean hasService(@SuppressWarnings("rawtypes") Class api) {
-      return wrapperViewSite.hasService(api);
    }
 
    /**

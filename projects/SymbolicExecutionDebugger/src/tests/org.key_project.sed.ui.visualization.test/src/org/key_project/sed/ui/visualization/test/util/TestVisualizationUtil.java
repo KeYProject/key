@@ -46,6 +46,7 @@ import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTre
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.view.ExecutionTreeView;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Provides static methods that make testing easier.
@@ -114,6 +115,8 @@ public final class TestVisualizationUtil {
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       SWTBotView setView = TestVisualizationUtil.getSymbolicExecutionTreeView(bot);
       setView.setFocus();
+      TestUtilsUtil.sleep(500); // A short delay to ensure that properties view is also updated
+      TestUtilsUtil.waitForJobs();
    }
 
    /**
