@@ -21,7 +21,6 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Proof;
@@ -35,7 +34,6 @@ import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -115,8 +113,7 @@ public class ProofStarter {
         }
 
     }
-
-
+    
     private Proof proof;
 
     private int maxSteps = 2000;
@@ -177,7 +174,7 @@ public class ProofStarter {
     public void setTimeout(long timeout) {
         this.timeout = timeout;
     }
-
+    
     /**
      * Returns the maximal steps to be performed.
      * @return The maximal steps to be performed.
@@ -244,13 +241,10 @@ public class ProofStarter {
               prover.addProverTaskObserver(autoSaver);
            }
 
-           if (strategy instanceof JavaCardDLStrategy) {
-              
-           }
            ApplyStrategy.ApplyStrategyInfo result;
            proof.setRuleAppIndexToAutoMode();
            
-           result = prover.start(proof, goals, maxSteps, timeout, strategy.isStopAtFirstNonCloseableGoal());
+           result = prover.start(proof, goals, maxSteps, timeout, strategy.isStopAtFirstNonCloseableGoal());          
            
            if (result.isError()) {
                throw new RuntimeException("Proof attempt failed due to exception:"
@@ -267,8 +261,8 @@ public class ProofStarter {
            }
 
            return result;
-        }
-        finally {
+        } 
+        finally {         
            proof.setRuleAppIndexToInteractiveMode();
         }
     }
