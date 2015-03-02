@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -287,16 +288,21 @@ public class IOUtilTest extends TestCase {
          assertEquals(0, visitor.getVisitedFiles().size());
          // Test visiting
          IOUtil.visit(tempDir, visitor);
-         Collections.sort(visitor.getVisitedFiles()); // Ensure same order in all operating systems
+         Collections.sort(visitor.getVisitedFiles(), new Comparator<File>() {
+            @Override
+            public int compare(File o1, File o2) {
+                return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());
+            }
+         }); // Ensure same order in all operating systems
          assertEquals(8, visitor.getVisitedFiles().size());
          assertEquals(tempDir, visitor.getVisitedFiles().get(0));
-         assertEquals(emptyFolder, visitor.getVisitedFiles().get(1));
-         assertEquals(subDir, visitor.getVisitedFiles().get(2));
-         assertEquals(subFile, visitor.getVisitedFiles().get(3));
-         assertEquals(subSubDir, visitor.getVisitedFiles().get(4));
-         assertEquals(subSubA, visitor.getVisitedFiles().get(5));
-         assertEquals(subSubB, visitor.getVisitedFiles().get(6));
-         assertEquals(text, visitor.getVisitedFiles().get(7));
+         assertEquals(text, visitor.getVisitedFiles().get(1));
+         assertEquals(emptyFolder, visitor.getVisitedFiles().get(2));
+         assertEquals(subDir, visitor.getVisitedFiles().get(3));
+         assertEquals(subFile, visitor.getVisitedFiles().get(4));
+         assertEquals(subSubDir, visitor.getVisitedFiles().get(5));
+         assertEquals(subSubA, visitor.getVisitedFiles().get(6));
+         assertEquals(subSubB, visitor.getVisitedFiles().get(7));
       }
       finally {
          IOUtil.delete(tempDir);
