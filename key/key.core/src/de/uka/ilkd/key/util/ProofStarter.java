@@ -13,9 +13,8 @@
 
 package de.uka.ilkd.key.util;
 
-import org.key_project.utils.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -36,7 +35,6 @@ import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;

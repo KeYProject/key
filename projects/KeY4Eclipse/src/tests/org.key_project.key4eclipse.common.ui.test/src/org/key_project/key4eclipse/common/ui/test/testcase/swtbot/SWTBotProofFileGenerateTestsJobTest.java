@@ -9,9 +9,9 @@ import org.key_project.key4eclipse.common.ui.test.Activator;
 import org.key_project.key4eclipse.common.ui.testGeneration.ProofFileGenerateTestsJob;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
-import org.key_project.utils.java.StringUtil;
 
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.test.TestZ3;

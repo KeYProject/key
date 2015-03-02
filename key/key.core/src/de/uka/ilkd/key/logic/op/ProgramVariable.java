@@ -15,7 +15,7 @@ package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
 
-import org.key_project.utils.ExtList;
+import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;

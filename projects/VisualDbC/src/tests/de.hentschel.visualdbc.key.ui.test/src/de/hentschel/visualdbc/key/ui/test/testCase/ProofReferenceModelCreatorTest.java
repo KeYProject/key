@@ -18,12 +18,12 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
 import org.key_project.util.test.util.TestUtilsUtil;
-import org.key_project.utils.collection.ImmutableSet;
-import org.key_project.utils.java.CollectionUtil;
-import org.key_project.utils.java.IFilter;
 
 import de.hentschel.visualdbc.key.ui.test.Activator;
 import de.hentschel.visualdbc.key.ui.util.ProofReferenceModelCreator;

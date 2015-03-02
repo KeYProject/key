@@ -15,8 +15,8 @@ package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.Iterator;
 
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;

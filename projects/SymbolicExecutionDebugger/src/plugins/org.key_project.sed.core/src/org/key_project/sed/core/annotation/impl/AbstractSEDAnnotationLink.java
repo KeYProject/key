@@ -5,7 +5,7 @@ import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.impl.AbstractSEDDebugElement;
-import org.key_project.utils.bean.Bean;
+import org.key_project.util.bean.Bean;
 
 /**
  * Provides the basic functionality of {@link ISEDAnnotationLink}s.

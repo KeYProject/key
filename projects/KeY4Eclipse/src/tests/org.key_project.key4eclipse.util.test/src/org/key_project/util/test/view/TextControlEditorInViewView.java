@@ -15,10 +15,10 @@ package org.key_project.util.test.view;
 
 import org.eclipse.ui.IEditorInput;
 import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.editor.TextControlEditor;
 import org.key_project.util.test.editor.TextControlEditorContributor;
-import org.key_project.utils.java.thread.AbstractRunnableWithResult;
-import org.key_project.utils.java.thread.IRunnableWithResult;
 
 /**
  * Contains a {@link TextControlEditor} instance but shows by default

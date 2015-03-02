@@ -13,8 +13,8 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;

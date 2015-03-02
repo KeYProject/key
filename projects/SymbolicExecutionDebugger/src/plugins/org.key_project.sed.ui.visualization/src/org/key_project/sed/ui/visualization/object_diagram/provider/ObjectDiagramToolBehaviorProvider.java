@@ -18,7 +18,7 @@ import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.tb.DefaultToolBehaviorProvider;
 import org.eclipse.graphiti.tb.IContextButtonPadData;
 import org.eclipse.graphiti.tb.IToolBehaviorProvider;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * {@link IToolBehaviorProvider} specific implementation for object diagrams.

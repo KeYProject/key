@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.informationflow.proof;
 
-import org.key_project.utils.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.InfFlowProofSymbols;
 import de.uka.ilkd.key.logic.Named;

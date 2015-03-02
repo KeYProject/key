@@ -58,7 +58,7 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeVisu
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.ICustomFeatureFactory;
 import org.key_project.sed.ui.visualization.util.LogUtil;
-import org.key_project.utils.java.CollectionUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.osgi.framework.Bundle;
 
 /**

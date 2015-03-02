@@ -15,8 +15,8 @@ package de.uka.ilkd.key.rule.inst;
 
 import java.util.Iterator;
 
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.logic.op.SchemaVariable;

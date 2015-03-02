@@ -36,13 +36,13 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil.IRunnableWithDocume
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.SwingUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.jdt.JDTUtil;
-import org.key_project.utils.collection.ImmutableSet;
-import org.key_project.utils.java.StringUtil;
-import org.key_project.utils.java.thread.AbstractRunnableWithResult;
-import org.key_project.utils.java.thread.IRunnableWithResult;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Position;

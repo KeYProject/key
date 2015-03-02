@@ -29,8 +29,8 @@ import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.utils.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;

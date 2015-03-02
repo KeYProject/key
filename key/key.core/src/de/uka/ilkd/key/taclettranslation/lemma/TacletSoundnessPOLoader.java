@@ -22,8 +22,8 @@ import java.util.Vector;
 
 import javax.swing.SwingUtilities;
 
-import org.key_project.utils.collection.DefaultImmutableSet;
-import org.key_project.utils.collection.ImmutableSet;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.proof.CompoundProof;
 import de.uka.ilkd.key.proof.Proof;

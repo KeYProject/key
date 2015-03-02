@@ -16,8 +16,8 @@ package de.uka.ilkd.key.logic.sort;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.utils.ExtList;
-import org.key_project.utils.collection.DefaultImmutableSet;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.DefaultImmutableSet;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;

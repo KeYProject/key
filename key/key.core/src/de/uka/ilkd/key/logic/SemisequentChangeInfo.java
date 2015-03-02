@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.logic;
 
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Records the changes made to a semisequent. Keeps track of added and

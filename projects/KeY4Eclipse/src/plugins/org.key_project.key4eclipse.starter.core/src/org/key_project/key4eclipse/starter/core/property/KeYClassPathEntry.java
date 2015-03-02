@@ -19,8 +19,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.utils.java.ObjectUtil;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * Represents a class path entry for KeY.

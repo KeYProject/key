@@ -24,8 +24,8 @@ import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeToolBehaviorProvider;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.SaveAsExecutionTreeDiagramWizard;
 import org.key_project.sed.ui.visualization.util.PaletteHideableDiagramEditor;
-import org.key_project.utils.java.ArrayUtil;
-import org.key_project.utils.java.IFilter;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
 
 /**
  * {@link DiagramEditor} for Symbolic Execution Tree Diagrams.

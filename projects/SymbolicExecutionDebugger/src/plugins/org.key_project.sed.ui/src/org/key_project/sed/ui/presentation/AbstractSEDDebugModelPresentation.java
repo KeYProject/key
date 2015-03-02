@@ -24,7 +24,7 @@ import org.key_project.sed.core.model.ISEDValue;
 import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.sed.ui.util.SEDImages;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * Provides a basic implementation of {@link IDebugModelPresentation} 

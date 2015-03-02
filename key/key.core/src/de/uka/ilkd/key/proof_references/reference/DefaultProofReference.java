@@ -16,7 +16,7 @@ package de.uka.ilkd.key.proof_references.reference;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;

@@ -16,8 +16,8 @@ package org.key_project.util.test.testcase;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.key_project.utils.java.thread.AbstractRunnableWithException;
-import org.key_project.utils.java.thread.IRunnableWithException;
+import org.key_project.util.java.thread.AbstractRunnableWithException;
+import org.key_project.util.java.thread.IRunnableWithException;
 
 /**
  * Tests for {@link AbstractRunnableWithException}.

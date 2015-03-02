@@ -15,7 +15,7 @@ package de.uka.ilkd.key.java.expression;
 
 import java.io.IOException;
 
-import org.key_project.utils.ExtList;
+import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PrettyPrinter;

@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.key_project.utils.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooser;

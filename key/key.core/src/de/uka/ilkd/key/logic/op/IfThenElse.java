@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import org.key_project.utils.collection.ImmutableArray;
-import org.key_project.utils.collection.ImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;

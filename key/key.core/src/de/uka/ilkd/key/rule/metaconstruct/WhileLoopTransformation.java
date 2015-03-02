@@ -16,9 +16,9 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedHashMap;
 import java.util.Stack;
 
-import org.key_project.utils.ExtList;
-import org.key_project.utils.collection.ImmutableArray;
-import org.key_project.utils.collection.ImmutableSet;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;

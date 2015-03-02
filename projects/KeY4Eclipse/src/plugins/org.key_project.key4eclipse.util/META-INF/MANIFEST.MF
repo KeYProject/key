@@ -17,6 +17,8 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.util,
+ org.key_project.util.bean,
+ org.key_project.util.collection,
  org.key_project.util.eclipse,
  org.key_project.util.eclipse.job,
  org.key_project.util.eclipse.preference,
@@ -30,10 +32,6 @@ Export-Package: org.key_project.util,
  org.key_project.util.eclipse.swt.wizard.page,
  org.key_project.util.eclipse.view.editorInView,
  org.key_project.util.java,
+ org.key_project.util.java.thread,
  org.key_project.util.jdt,
- org.key_project.util.thread,
- org.key_project.utils,
- org.key_project.utils.bean,
- org.key_project.utils.collection,
- org.key_project.utils.java,
- org.key_project.utils.java.thread
+ org.key_project.util.thread

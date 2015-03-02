@@ -16,7 +16,7 @@ package de.uka.ilkd.key.ui;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.key_project.utils.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;

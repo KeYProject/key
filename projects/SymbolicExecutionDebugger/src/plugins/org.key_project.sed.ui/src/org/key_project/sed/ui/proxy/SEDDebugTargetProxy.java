@@ -23,7 +23,7 @@ import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.sed.ui.util.SEDUIUtil;
-import org.key_project.utils.java.CollectionUtil;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * <p>

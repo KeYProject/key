@@ -16,7 +16,7 @@ package de.uka.ilkd.key.java.declaration;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.key_project.utils.ExtList;
+import org.key_project.util.ExtList;
 
 import recoder.java.declaration.EnumConstantDeclaration;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

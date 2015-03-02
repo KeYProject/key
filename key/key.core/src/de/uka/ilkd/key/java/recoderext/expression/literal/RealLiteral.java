@@ -15,7 +15,7 @@ package de.uka.ilkd.key.java.recoderext.expression.literal;
 
 import java.math.BigDecimal;
 
-import org.key_project.utils.ExtList;
+import org.key_project.util.ExtList;
 
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;

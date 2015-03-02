@@ -62,9 +62,9 @@ import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.view.ParentBasedTabbedPropertySheetPage;
-import org.key_project.utils.java.ArrayUtil;
-import org.key_project.utils.java.CollectionUtil;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * This view shows the symbolic execution tree of selected {@link ISEDDebugTarget}s

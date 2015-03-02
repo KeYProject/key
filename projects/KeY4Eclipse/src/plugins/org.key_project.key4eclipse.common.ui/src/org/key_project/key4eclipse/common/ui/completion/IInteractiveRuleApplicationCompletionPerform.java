@@ -5,7 +5,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.services.IDisposable;
 import org.key_project.key4eclipse.common.ui.wizard.CompleteBuiltInRuleAppWizard;
 import org.key_project.key4eclipse.common.ui.wizard.page.CompleteBuiltInRuleAppWizardPage;
-import org.key_project.utils.bean.IBean;
+import org.key_project.util.bean.IBean;
 
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 

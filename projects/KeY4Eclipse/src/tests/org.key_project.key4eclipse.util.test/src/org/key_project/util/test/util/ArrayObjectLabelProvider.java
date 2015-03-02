@@ -16,7 +16,7 @@ package org.key_project.util.test.util;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * Implementation of {@link ITableLabelProvider} for {@link ArrayObject}s.

@@ -40,8 +40,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.key_project.util.Activator;
-import org.key_project.utils.java.IOUtil;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * Provides static methods to work with workspace resources.

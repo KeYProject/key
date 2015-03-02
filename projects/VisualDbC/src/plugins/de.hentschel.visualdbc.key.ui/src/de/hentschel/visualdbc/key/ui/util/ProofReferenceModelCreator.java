@@ -19,12 +19,12 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSet;
-import org.key_project.utils.java.CollectionUtil;
-import org.key_project.utils.java.IFilter;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 
 import de.hentschel.visualdbc.datasource.key.intern.helper.KeyHacks;
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;

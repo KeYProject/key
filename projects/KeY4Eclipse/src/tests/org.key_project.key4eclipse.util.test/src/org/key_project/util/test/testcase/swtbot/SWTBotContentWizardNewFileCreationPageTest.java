@@ -33,8 +33,8 @@ import org.junit.Test;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.wizard.page.ContentWizardNewFileCreationPage;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
-import org.key_project.utils.java.IOUtil;
 
 /**
  * Tests for {@link ContentWizardNewFileCreationPage}.

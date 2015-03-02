@@ -19,7 +19,7 @@ import org.key_project.sed.core.slicing.ISEDSlicer;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.slicing.KeYThinBackwardSlicer;
 import org.key_project.sed.key.core.test.Activator;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * SWTBot tests for {@link KeYThinBackwardSlicer}.

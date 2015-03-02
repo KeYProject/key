@@ -39,11 +39,11 @@ import org.key_project.swtbot.swing.bot.SwingBotJDialog;
 import org.key_project.swtbot.swing.bot.SwingBotJLabel;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.SwingUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
-import org.key_project.utils.java.CollectionUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Node;

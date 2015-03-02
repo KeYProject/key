@@ -16,8 +16,8 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.key_project.utils.collection.DefaultImmutableSet;
-import org.key_project.utils.collection.ImmutableSet;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Operator;

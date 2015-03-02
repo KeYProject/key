@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
-import org.key_project.utils.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;

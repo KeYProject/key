@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.proof;
 
-import org.key_project.utils.collection.ImmutableArray;
-import org.key_project.utils.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;

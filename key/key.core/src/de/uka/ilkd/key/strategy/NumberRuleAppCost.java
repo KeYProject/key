@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.strategy;
 
-import org.key_project.utils.LRUCache;
+import org.key_project.util.LRUCache;
 
 import de.uka.ilkd.key.util.Debug;
 

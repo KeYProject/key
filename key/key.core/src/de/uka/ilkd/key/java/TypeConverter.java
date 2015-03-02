@@ -16,10 +16,10 @@ package de.uka.ilkd.key.java;
 
 import java.util.Map;
 
-import org.key_project.utils.ExtList;
-import org.key_project.utils.collection.ImmutableArray;
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import recoder.service.ConstantEvaluator;
 import de.uka.ilkd.key.java.abstraction.ArrayType;

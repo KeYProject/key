@@ -35,11 +35,11 @@ import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.ResourceUtil.IFileOpener;
-import org.key_project.utils.java.CollectionUtil;
-import org.key_project.utils.java.IFilter;
-import org.key_project.utils.java.IOUtil;
-import org.key_project.utils.java.ObjectUtil;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.ExampleChooser.Example;

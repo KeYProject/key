@@ -1,6 +1,6 @@
 package org.key_project.key4eclipse.common.ui.completion;
 
-import org.key_project.utils.bean.Bean;
+import org.key_project.util.bean.Bean;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;

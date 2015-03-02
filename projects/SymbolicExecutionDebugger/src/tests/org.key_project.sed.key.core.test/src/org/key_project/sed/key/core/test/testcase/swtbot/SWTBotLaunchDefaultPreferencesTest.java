@@ -36,8 +36,8 @@ import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.ui.text.SymbolicallyReachedAnnotation;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
-import org.key_project.utils.java.ArrayUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;

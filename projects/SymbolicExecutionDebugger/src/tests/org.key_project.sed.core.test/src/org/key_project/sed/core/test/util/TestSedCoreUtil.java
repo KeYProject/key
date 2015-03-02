@@ -109,16 +109,16 @@ import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
 import org.key_project.sed.ui.util.SEDUIUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithException;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithException;
+import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.util.TestUtilsUtil;
-import org.key_project.utils.java.ArrayUtil;
-import org.key_project.utils.java.CollectionUtil;
-import org.key_project.utils.java.IFilter;
-import org.key_project.utils.java.ObjectUtil;
-import org.key_project.utils.java.StringUtil;
-import org.key_project.utils.java.thread.AbstractRunnableWithException;
-import org.key_project.utils.java.thread.AbstractRunnableWithResult;
-import org.key_project.utils.java.thread.IRunnableWithException;
-import org.key_project.utils.java.thread.IRunnableWithResult;
 
 /**
  * Provides static methods that makes testing easier

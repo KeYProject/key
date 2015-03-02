@@ -44,9 +44,9 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.key_project.utils.java.ArrayUtil;
-import org.key_project.utils.java.IFilter;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.settings.ChoiceSettings;

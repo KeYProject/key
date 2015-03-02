@@ -21,9 +21,9 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
-import org.key_project.utils.java.ArrayUtil;
-import org.key_project.utils.java.IFilter;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * <p>

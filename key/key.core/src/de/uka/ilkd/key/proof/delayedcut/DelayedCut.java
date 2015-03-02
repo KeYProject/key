@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.proof.delayedcut;
 
 
-import org.key_project.utils.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;

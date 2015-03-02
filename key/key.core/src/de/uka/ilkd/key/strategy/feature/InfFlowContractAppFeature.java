@@ -12,8 +12,8 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.key_project.utils.collection.ImmutableMap;
-import org.key_project.utils.collection.ImmutableMapEntry;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableMapEntry;
 
 import de.uka.ilkd.key.informationflow.po.BlockExecutionPO;
 import de.uka.ilkd.key.informationflow.po.InfFlowContractPO;

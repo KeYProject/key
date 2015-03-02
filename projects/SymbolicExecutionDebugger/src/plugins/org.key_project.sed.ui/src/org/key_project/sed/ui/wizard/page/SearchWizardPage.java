@@ -14,7 +14,7 @@ import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
 import org.key_project.sed.ui.composite.AnnotationAppearanceComposite;
 import org.key_project.sed.ui.util.SEDImages;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * This {@link WizardPage} defines search criteria.

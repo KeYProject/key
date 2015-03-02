@@ -39,9 +39,9 @@ import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorato
 import org.key_project.key4eclipse.common.ui.decorator.TruthValueEvaluationViewerDecorator;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;

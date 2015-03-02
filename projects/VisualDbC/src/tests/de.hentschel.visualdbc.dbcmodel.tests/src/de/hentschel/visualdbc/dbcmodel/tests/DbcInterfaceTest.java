@@ -19,10 +19,9 @@
  */
 package de.hentschel.visualdbc.dbcmodel.tests;
 
+import junit.textui.TestRunner;
 import de.hentschel.visualdbc.dbcmodel.DbcInterface;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelFactory;
-
-import junit.textui.TestRunner;
 
 /**
  * <!-- begin-user-doc -->

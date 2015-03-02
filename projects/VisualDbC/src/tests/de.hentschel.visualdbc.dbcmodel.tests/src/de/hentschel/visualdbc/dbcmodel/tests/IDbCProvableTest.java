@@ -19,9 +19,8 @@
  */
 package de.hentschel.visualdbc.dbcmodel.tests;
 
-import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
-
 import junit.framework.TestCase;
+import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
 
 /**
  * <!-- begin-user-doc -->

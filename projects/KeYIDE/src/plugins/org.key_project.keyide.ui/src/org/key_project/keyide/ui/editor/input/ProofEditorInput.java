@@ -16,7 +16,7 @@ package org.key_project.keyide.ui.editor.input;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.ui.IEditorInput;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;

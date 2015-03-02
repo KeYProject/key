@@ -24,7 +24,7 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.actions.CommandAction;
 import org.eclipse.ui.services.IDisposable;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * This save as action is similar to created commands of

@@ -66,9 +66,9 @@ import org.key_project.keyide.ui.util.LogUtil;
 import org.key_project.keyide.ui.views.IStrategySettingsPage;
 import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
 import org.key_project.keyide.ui.views.StrategySettingsPage;
+import org.key_project.util.bean.IBean;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.utils.bean.IBean;
-import org.key_project.utils.java.ArrayUtil;
+import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;

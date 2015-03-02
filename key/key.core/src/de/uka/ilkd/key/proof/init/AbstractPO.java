@@ -16,9 +16,9 @@ package de.uka.ilkd.key.proof.init;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.key_project.utils.collection.DefaultImmutableSet;
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSet;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;

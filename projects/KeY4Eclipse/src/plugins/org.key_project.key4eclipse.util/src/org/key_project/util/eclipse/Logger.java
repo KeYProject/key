@@ -19,8 +19,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.key_project.utils.java.thread.AbstractRunnableWithResult;
-import org.key_project.utils.java.thread.IRunnableWithResult;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 
 /**
  * <p>

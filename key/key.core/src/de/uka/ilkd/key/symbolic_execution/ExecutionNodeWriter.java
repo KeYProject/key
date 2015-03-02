@@ -21,8 +21,8 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.java.ArrayUtil;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;

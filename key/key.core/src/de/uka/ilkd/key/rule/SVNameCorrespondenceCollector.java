@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.rule;
 
-import org.key_project.utils.collection.DefaultImmutableMap;
-import org.key_project.utils.collection.ImmutableMap;
+import org.key_project.util.collection.DefaultImmutableMap;
+import org.key_project.util.collection.ImmutableMap;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;

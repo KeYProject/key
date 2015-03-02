@@ -11,8 +11,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.key_project.key4eclipse.common.ui.provider.ContractLabelProvider;
 import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.utils.collection.ImmutableSet;
 
 import de.uka.ilkd.key.gui.ContractSelectionPanel;
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;

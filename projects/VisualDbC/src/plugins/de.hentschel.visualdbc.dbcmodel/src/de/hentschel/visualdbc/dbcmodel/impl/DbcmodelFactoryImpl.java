@@ -19,14 +19,36 @@
  */
 package de.hentschel.visualdbc.dbcmodel.impl;
 
-import de.hentschel.visualdbc.dbcmodel.*;
 import java.util.Properties;
+
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.impl.EFactoryImpl;
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
+
+import de.hentschel.visualdbc.dbcmodel.DbCAxiomContract;
+import de.hentschel.visualdbc.dbcmodel.DbcAttribute;
+import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
+import de.hentschel.visualdbc.dbcmodel.DbcClass;
+import de.hentschel.visualdbc.dbcmodel.DbcConstructor;
+import de.hentschel.visualdbc.dbcmodel.DbcEnum;
+import de.hentschel.visualdbc.dbcmodel.DbcEnumLiteral;
+import de.hentschel.visualdbc.dbcmodel.DbcInterface;
+import de.hentschel.visualdbc.dbcmodel.DbcInvariant;
+import de.hentschel.visualdbc.dbcmodel.DbcMethod;
+import de.hentschel.visualdbc.dbcmodel.DbcModel;
+import de.hentschel.visualdbc.dbcmodel.DbcOperationContract;
+import de.hentschel.visualdbc.dbcmodel.DbcPackage;
+import de.hentschel.visualdbc.dbcmodel.DbcProof;
+import de.hentschel.visualdbc.dbcmodel.DbcProofObligation;
+import de.hentschel.visualdbc.dbcmodel.DbcProofReference;
+import de.hentschel.visualdbc.dbcmodel.DbcProofStatus;
+import de.hentschel.visualdbc.dbcmodel.DbcProperty;
+import de.hentschel.visualdbc.dbcmodel.DbcVisibility;
+import de.hentschel.visualdbc.dbcmodel.DbcmodelFactory;
+import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 
 
 /**

@@ -19,15 +19,13 @@
  */
 package de.hentschel.visualdbc.dbcmodel.impl;
 
-import de.hentschel.visualdbc.dbcmodel.DbcProperty;
-import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
-
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.ecore.EClass;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
+
+import de.hentschel.visualdbc.dbcmodel.DbcProperty;
+import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 
 /**
  * <!-- begin-user-doc -->

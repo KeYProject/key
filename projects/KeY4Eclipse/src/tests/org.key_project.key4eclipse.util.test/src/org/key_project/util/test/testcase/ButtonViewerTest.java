@@ -37,10 +37,10 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.Test;
+import org.key_project.util.bean.Bean;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.viewer.ButtonViewer;
-import org.key_project.utils.bean.Bean;
-import org.key_project.utils.java.CollectionUtil;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * Tests for {@link ButtonViewer}.

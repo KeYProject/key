@@ -2,7 +2,7 @@ package de.uka.ilkd.key.testgen;
 
 import java.util.HashSet;
 
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.KeYConstants;

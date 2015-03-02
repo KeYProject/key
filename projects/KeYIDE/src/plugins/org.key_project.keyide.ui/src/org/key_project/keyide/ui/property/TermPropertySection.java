@@ -26,8 +26,8 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.utils.java.ObjectUtil;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;

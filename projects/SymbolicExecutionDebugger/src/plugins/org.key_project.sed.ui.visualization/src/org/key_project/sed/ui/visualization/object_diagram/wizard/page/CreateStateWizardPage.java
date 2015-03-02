@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.key_project.sed.ui.visualization.model.od.ODState;
 import org.key_project.sed.ui.visualization.object_diagram.wizard.CreateStateWizard;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * {@link WizardPage} to define the initial values of new {@link ODState}s.

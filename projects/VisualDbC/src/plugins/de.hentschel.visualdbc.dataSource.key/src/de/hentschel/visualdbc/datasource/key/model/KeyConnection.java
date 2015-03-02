@@ -36,13 +36,13 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.SwingUtil;
-import org.key_project.utils.collection.ImmutableArray;
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSet;
-import org.key_project.utils.java.CollectionUtil;
-import org.key_project.utils.java.ObjectUtil;
 
 import de.hentschel.visualdbc.datasource.key.intern.helper.KeyHacks;
 import de.hentschel.visualdbc.datasource.key.intern.helper.OpenedProof;

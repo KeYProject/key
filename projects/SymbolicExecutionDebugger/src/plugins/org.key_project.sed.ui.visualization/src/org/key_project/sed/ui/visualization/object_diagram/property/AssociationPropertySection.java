@@ -26,7 +26,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.ui.visualization.model.od.ODAssociation;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * {@link ISection} implementation to show properties of {@link ODAssociation}s.

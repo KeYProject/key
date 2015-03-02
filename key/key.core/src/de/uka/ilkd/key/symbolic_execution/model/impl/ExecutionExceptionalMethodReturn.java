@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

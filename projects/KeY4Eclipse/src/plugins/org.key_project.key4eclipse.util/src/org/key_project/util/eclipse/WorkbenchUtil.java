@@ -50,9 +50,9 @@ import org.eclipse.ui.services.IEvaluationService;
 import org.eclipse.ui.views.navigator.ResourceComparator;
 import org.eclipse.ui.wizards.newresource.BasicNewFolderResourceWizard;
 import org.key_project.util.eclipse.swt.viewer.FileSelectionValidator;
-import org.key_project.utils.java.ArrayUtil;
-import org.key_project.utils.java.IFilter;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * Provides static methods 

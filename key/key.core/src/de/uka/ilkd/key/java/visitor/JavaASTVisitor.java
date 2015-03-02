@@ -12,7 +12,7 @@
 //
 
 package de.uka.ilkd.key.java.visitor;
-import org.key_project.utils.collection.ImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.CompilationUnit;

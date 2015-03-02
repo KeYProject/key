@@ -26,7 +26,7 @@ import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
 import org.eclipse.ui.internal.views.properties.tabbed.view.TabbedPropertyList;
 import org.eclipse.ui.internal.views.properties.tabbed.view.TabbedPropertyList.ListElement;
 import org.eclipse.ui.views.properties.tabbed.ITabItem;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * This represents a {@link TabbedPropertyList} widget.

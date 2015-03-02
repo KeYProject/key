@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.key_project.utils.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;

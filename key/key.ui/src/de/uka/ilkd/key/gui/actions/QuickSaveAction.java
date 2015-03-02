@@ -17,7 +17,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 
-import org.key_project.utils.java.IOUtil;
+import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;

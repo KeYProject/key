@@ -61,12 +61,12 @@ import org.eclipse.swt.widgets.Display;
 import org.key_project.util.Activator;
 import org.key_project.util.eclipse.Logger;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.utils.java.ArrayUtil;
-import org.key_project.utils.java.CollectionUtil;
-import org.key_project.utils.java.IFilter;
-import org.key_project.utils.java.ObjectUtil;
-import org.key_project.utils.java.thread.AbstractRunnableWithException;
-import org.key_project.utils.java.thread.IRunnableWithException;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithException;
+import org.key_project.util.java.thread.IRunnableWithException;
 
 /**
  * Provides static methods to work with JDT.

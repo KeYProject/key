@@ -19,23 +19,19 @@
  */
 package de.hentschel.visualdbc.dbcmodel.impl;
 
-import de.hentschel.visualdbc.dbcmodel.AbstractDbcProofContainer;
-import de.hentschel.visualdbc.dbcmodel.DbcProof;
-import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
-
 import java.util.Collection;
 
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.EObjectImpl;
-
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
+
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcProofContainer;
+import de.hentschel.visualdbc.dbcmodel.DbcProof;
+import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 
 /**
  * <!-- begin-user-doc -->

@@ -15,11 +15,11 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.Iterator;
 
-import org.key_project.utils.collection.ImmutableArray;
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.java.CollectionUtil;
-import org.key_project.utils.java.IFilter;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.SequentFormula;

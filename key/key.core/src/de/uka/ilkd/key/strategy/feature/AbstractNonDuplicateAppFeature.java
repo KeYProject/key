@@ -15,9 +15,9 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
 
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableMap;
-import org.key_project.utils.collection.ImmutableMapEntry;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableMapEntry;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;

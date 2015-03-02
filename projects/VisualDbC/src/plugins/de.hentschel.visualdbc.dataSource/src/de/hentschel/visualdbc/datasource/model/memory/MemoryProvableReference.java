@@ -13,7 +13,7 @@
 
 package de.hentschel.visualdbc.datasource.model.memory;
 
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ObjectUtil;
 
 import de.hentschel.visualdbc.datasource.model.IDSProvable;
 import de.hentschel.visualdbc.datasource.model.IDSProvableReference;

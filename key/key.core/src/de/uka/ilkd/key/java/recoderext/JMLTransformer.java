@@ -20,10 +20,10 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import org.key_project.utils.collection.DefaultImmutableSet;
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSLList;
-import org.key_project.utils.collection.ImmutableSet;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Constructor;

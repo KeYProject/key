@@ -15,7 +15,7 @@ package org.key_project.sed.key.core.propertyTester;
 
 import org.eclipse.core.expressions.PropertyTester;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
-import org.key_project.utils.java.ArrayUtil;
+import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 

@@ -50,8 +50,8 @@ import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
-import org.key_project.utils.bean.Bean;
-import org.key_project.utils.bean.IBean;
+import org.key_project.util.bean.Bean;
+import org.key_project.util.bean.IBean;
 
 /**
  * <p>

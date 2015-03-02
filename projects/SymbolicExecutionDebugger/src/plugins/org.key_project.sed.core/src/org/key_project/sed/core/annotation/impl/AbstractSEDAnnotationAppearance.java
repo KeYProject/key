@@ -4,7 +4,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.RGB;
 import org.key_project.sed.core.annotation.ISEDAnnotationAppearance;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
-import org.key_project.utils.bean.Bean;
+import org.key_project.util.bean.Bean;
 
 /**
  * Provides the basic functionality of {@link ISEDAnnotationAppearance}s.

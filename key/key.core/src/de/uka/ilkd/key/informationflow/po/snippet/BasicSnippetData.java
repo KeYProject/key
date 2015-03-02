@@ -3,9 +3,9 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 import java.util.EnumMap;
 import java.util.List;
 
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSLList;
-import org.key_project.utils.collection.ImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Label;

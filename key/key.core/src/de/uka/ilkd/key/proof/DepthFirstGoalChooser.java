@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.proof;
 
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Helper class for managing a list of goals on which rules are applied.

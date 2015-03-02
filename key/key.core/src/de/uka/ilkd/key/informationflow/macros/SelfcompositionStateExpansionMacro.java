@@ -2,7 +2,7 @@ package de.uka.ilkd.key.informationflow.macros;
 
 import java.util.Set;
 
-import org.key_project.utils.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
 import de.uka.ilkd.key.java.Services;

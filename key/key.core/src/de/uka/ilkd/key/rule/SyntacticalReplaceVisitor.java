@@ -21,9 +21,9 @@ package de.uka.ilkd.key.rule;
 
 import java.util.Stack;
 
-import org.key_project.utils.collection.DefaultImmutableMap;
-import org.key_project.utils.collection.ImmutableArray;
-import org.key_project.utils.collection.ImmutableMap;
+import org.key_project.util.collection.DefaultImmutableMap;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableMap;
 
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;

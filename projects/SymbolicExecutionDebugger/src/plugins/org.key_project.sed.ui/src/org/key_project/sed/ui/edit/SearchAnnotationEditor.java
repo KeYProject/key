@@ -18,9 +18,9 @@ import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.impl.SearchAnnotation;
 import org.key_project.sed.ui.wizard.SearchWizard;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.utils.java.StringUtil;
-import org.key_project.utils.java.thread.AbstractRunnableWithResult;
-import org.key_project.utils.java.thread.IRunnableWithResult;
+import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 
 /**
  * An {@link ISEDAnnotationEditor} to edit {@link SearchAnnotation}s.

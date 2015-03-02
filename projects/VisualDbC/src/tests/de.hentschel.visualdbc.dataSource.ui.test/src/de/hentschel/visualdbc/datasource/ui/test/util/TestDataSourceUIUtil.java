@@ -16,8 +16,8 @@ package de.hentschel.visualdbc.datasource.ui.test.util;
 import java.util.Map;
 
 import org.eclipse.swt.widgets.Control;
-import org.key_project.utils.java.thread.AbstractRunnableWithResult;
-import org.key_project.utils.java.thread.IRunnableWithResult;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 
 import de.hentschel.visualdbc.datasource.model.IDSDriver;
 import de.hentschel.visualdbc.datasource.ui.composite.DataSourceComposite;

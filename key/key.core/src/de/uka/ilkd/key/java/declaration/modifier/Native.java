@@ -12,6 +12,8 @@
 //
 
 package de.uka.ilkd.key.java.declaration.modifier;
+import org.key_project.util.ExtList;
+
 import de.uka.ilkd.key.java.declaration.Modifier;
 
 /**
@@ -31,7 +33,7 @@ public class Native extends Modifier {
      *      Native
      * @param children list of children. May contain: Comments
      */
-    public Native(org.key_project.utils.ExtList children) {
+    public Native(ExtList children) {
 	super (children);
     }
 

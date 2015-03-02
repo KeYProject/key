@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java.declaration.modifier;
 
+import org.key_project.util.ExtList;
+
 import de.uka.ilkd.key.java.declaration.Modifier;
 
 /**
@@ -34,7 +36,7 @@ public class Transient extends Modifier {
      *  May contain: Comments
      */
 
-    public Transient(org.key_project.utils.ExtList children) {
+    public Transient(ExtList children) {
 	super(children);
     }
     

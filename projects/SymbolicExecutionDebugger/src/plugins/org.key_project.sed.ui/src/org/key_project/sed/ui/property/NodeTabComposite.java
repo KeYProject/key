@@ -29,7 +29,7 @@ import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.sed.ui.util.SEDImages;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * This composite provides the content shown in {@link SEDDebugNodePropertySection}

@@ -38,9 +38,9 @@ import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithException;
+import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.jdt.JDTUtil;
-import org.key_project.utils.java.thread.AbstractRunnableWithException;
-import org.key_project.utils.java.thread.IRunnableWithException;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;

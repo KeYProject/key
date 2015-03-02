@@ -16,8 +16,8 @@ package de.uka.ilkd.key.symbolic_execution;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.key_project.utils.java.StringUtil;
-import org.key_project.utils.java.XMLUtil;
+import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.XMLUtil;
 
 /**
  * Provides the basic functionality for classes like {@link ExecutionNodeWriter}

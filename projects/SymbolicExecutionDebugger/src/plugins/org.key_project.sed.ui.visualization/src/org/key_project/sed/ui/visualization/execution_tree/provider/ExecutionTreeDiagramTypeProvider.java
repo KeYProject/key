@@ -37,7 +37,7 @@ import org.key_project.sed.ui.visualization.execution_tree.service.SEDIndependen
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDNotificationService;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * {@link IDiagramTypeProvider} specific implementation for execution tree diagrams.

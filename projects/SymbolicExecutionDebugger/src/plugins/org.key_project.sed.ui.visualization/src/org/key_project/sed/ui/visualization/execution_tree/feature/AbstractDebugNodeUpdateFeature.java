@@ -56,10 +56,10 @@ import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeSty
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
-import org.key_project.utils.java.ArrayUtil;
-import org.key_project.utils.java.CollectionUtil;
-import org.key_project.utils.java.IFilterWithException;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilterWithException;
+import org.key_project.util.java.StringUtil;
 
 /**
  * <p>

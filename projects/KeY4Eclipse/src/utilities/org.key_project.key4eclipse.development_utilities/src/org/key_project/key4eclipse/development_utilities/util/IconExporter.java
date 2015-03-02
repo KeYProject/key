@@ -36,7 +36,7 @@ import org.junit.Test;
 import org.key_project.key4eclipse.development_utilities.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.swt.ImageUtil;
-import org.key_project.utils.java.IOUtil;
+import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.gui.IconFactory;
 

@@ -25,7 +25,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Element;
 
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SolverType;

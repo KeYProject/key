@@ -17,8 +17,8 @@ import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
 import org.key_project.sed.core.sourcesummary.ISEDSourceRange;
 import org.key_project.sed.ui.text.SymbolicallyReachedAnnotation;
 import org.key_project.sed.ui.util.LogUtil;
-import org.key_project.utils.java.thread.AbstractRunnableWithResult;
-import org.key_project.utils.java.thread.IRunnableWithResult;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 
 /**
  * An {@link IJavaEditorTextHover} which provides quick fix proposals

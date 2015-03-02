@@ -50,8 +50,8 @@ import org.key_project.sed.key.core.model.KeYStatement;
 import org.key_project.sed.key.core.model.KeYTermination;
 import org.key_project.sed.key.core.model.KeYThread;
 import org.key_project.sed.key.core.model.KeYVariable;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.jdt.JDTUtil;
-import org.key_project.utils.collection.ImmutableList;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;

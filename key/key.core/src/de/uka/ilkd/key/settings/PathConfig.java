@@ -15,7 +15,7 @@ package de.uka.ilkd.key.settings;
 
 import java.io.File;
 
-import org.key_project.utils.java.IOUtil;
+import org.key_project.util.java.IOUtil;
 
 /**
  * <p>

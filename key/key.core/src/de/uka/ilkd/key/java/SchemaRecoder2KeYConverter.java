@@ -15,8 +15,8 @@ package de.uka.ilkd.key.java;
 
 import java.util.List;
 
-import org.key_project.utils.ExtList;
-import org.key_project.utils.collection.ImmutableArray;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

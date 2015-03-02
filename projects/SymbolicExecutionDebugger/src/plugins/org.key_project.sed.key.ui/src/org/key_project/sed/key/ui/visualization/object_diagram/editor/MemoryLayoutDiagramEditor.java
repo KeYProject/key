@@ -52,7 +52,7 @@ import org.key_project.sed.ui.visualization.util.NonPersistableDiagramEditorInpu
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.utils.java.ArrayUtil;
+import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;

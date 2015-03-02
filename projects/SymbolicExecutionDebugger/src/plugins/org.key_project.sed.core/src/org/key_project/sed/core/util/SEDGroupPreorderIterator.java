@@ -17,7 +17,7 @@ import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDGroupable;
-import org.key_project.utils.java.ArrayUtil;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * <p>

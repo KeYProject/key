@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import org.key_project.utils.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;

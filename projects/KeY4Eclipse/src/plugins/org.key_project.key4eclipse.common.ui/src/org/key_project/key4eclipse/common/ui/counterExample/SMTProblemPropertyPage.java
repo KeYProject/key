@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PropertyPage;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
-import org.key_project.utils.java.ArrayUtil;
+import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.gui.smt.CETree;
 import de.uka.ilkd.key.gui.smt.InformationWindow;

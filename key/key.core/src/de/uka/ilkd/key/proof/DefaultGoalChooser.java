@@ -15,8 +15,8 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
 
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**

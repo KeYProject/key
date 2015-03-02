@@ -16,7 +16,7 @@ package de.uka.ilkd.key.speclang;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;

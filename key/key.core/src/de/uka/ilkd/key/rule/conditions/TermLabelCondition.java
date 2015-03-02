@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
-import org.key_project.utils.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;

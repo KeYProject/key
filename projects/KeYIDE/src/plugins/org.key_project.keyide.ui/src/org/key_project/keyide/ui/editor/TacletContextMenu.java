@@ -22,8 +22,8 @@ import org.eclipse.ui.menus.ExtensionContributionFactory;
 import org.eclipse.ui.menus.IContributionRoot;
 import org.eclipse.ui.services.IServiceLocator;
 import org.key_project.keyide.ui.util.KeYIDEUtil;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.utils.collection.ImmutableList;
 
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;

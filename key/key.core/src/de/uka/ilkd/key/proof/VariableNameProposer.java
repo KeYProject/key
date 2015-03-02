@@ -16,7 +16,7 @@ package de.uka.ilkd.key.proof;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.key_project.utils.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;

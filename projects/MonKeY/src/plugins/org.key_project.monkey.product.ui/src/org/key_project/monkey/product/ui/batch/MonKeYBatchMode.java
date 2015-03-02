@@ -35,8 +35,8 @@ import org.key_project.monkey.product.ui.util.MonKeYUtil;
 import org.key_project.monkey.product.ui.util.MonKeYUtil.MonKeYProofSums;
 import org.key_project.util.eclipse.ApplicationUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.utils.java.IOUtil;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
 

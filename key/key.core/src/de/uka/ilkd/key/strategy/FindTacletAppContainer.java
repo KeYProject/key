@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.strategy;
 
-import org.key_project.utils.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PIOPathIterator;

@@ -16,8 +16,8 @@ package de.uka.ilkd.key.proof_references.analyst;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
-import org.key_project.utils.collection.DefaultImmutableSet;
-import org.key_project.utils.collection.ImmutableSet;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

@@ -19,7 +19,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
-import org.key_project.utils.java.ArrayUtil;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * Rule to avoid multiple {@link KeYProjectBuildJob}s run simultaneously.

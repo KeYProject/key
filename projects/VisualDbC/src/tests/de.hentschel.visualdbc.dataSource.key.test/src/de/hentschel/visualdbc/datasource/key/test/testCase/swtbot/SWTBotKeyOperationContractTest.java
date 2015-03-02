@@ -20,9 +20,9 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
-import org.key_project.utils.java.CollectionUtil;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
 import de.hentschel.visualdbc.datasource.key.model.KeyOperationContract;

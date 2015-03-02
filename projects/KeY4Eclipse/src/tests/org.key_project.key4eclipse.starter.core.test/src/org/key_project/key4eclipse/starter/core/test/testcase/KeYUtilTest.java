@@ -38,11 +38,11 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.IRunnableWithDocument;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
-import org.key_project.utils.java.ArrayUtil;
-import org.key_project.utils.java.IOUtil;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;

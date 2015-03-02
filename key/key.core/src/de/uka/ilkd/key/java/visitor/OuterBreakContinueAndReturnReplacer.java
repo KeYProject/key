@@ -16,7 +16,7 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.Map;
 import java.util.Stack;
 
-import org.key_project.utils.ExtList;
+import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;

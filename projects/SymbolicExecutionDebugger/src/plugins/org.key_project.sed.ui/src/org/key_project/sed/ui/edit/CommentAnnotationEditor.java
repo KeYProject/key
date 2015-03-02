@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.key_project.sed.core.annotation.impl.CommentAnnotation;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * An {@link ISEDAnnotationEditor} to edit {@link CommentAnnotation}s.

@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
-import org.key_project.utils.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;

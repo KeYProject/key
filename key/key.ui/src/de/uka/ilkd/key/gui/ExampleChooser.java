@@ -53,7 +53,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.key_project.utils.java.IOUtil;
+import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.util.Debug;
 

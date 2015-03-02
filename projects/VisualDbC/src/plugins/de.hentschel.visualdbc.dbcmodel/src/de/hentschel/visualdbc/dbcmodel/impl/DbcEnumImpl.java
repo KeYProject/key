@@ -19,10 +19,10 @@
  */
 package de.hentschel.visualdbc.dbcmodel.impl;
 
+import org.eclipse.emf.ecore.EClass;
+
 import de.hentschel.visualdbc.dbcmodel.DbcEnum;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
-
-import org.eclipse.emf.ecore.EClass;
 
 /**
  * <!-- begin-user-doc -->

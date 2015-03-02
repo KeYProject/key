@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Position;

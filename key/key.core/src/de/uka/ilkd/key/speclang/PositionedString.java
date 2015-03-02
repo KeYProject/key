@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.speclang;
 
-import org.key_project.utils.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableArray;
 
 import antlr.Token;
 import de.uka.ilkd.key.java.Position;

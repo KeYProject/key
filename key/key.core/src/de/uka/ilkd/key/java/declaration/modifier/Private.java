@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java.declaration.modifier;
 
+import org.key_project.util.ExtList;
+
 
 /**
  *  Private.
@@ -31,7 +33,7 @@ public class Private extends VisibilityModifier {
      *      Private
      * @param children list of children. May contain: Comments
      */
-    public Private(org.key_project.utils.ExtList children) {
+    public Private(ExtList children) {
 	super (children);
     }
 

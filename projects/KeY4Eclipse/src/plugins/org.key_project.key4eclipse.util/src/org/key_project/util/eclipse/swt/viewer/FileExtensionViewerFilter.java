@@ -25,7 +25,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.key_project.util.Activator;
 import org.key_project.util.eclipse.Logger;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * This {@link ViewerFilter} can be used to filter {@link IFile}s by 

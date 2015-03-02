@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Display;
 import org.key_project.monkey.product.ui.model.MonKeYProof;
 import org.key_project.monkey.product.ui.model.MonKeYProofResult;
 import org.key_project.monkey.product.ui.util.MonKeYUtil;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.proof.Proof;
 

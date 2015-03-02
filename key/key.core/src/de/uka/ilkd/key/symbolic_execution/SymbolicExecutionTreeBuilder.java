@@ -25,9 +25,9 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSLList;
-import org.key_project.utils.java.ArrayUtil;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.PositionInfo;

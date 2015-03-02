@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;

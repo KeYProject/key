@@ -60,9 +60,9 @@ import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.ISourcePathProvider;
 import org.key_project.sed.core.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.utils.java.ArrayUtil;
-import org.key_project.utils.java.StringUtil;
-import org.key_project.utils.java.XMLUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.XMLUtil;
 
 /**
  * <p>

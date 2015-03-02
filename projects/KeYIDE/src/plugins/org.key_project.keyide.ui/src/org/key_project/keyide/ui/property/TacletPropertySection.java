@@ -16,7 +16,7 @@ package org.key_project.keyide.ui.property;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
 import de.uka.ilkd.key.proof.Node;

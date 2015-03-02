@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import org.key_project.util.ExtList;
+
 /**
  *  Jump statement.
  *  @author <TT>AutoDoc</TT>
@@ -24,7 +26,7 @@ public abstract class JumpStatement extends JavaStatement {
      * @param children the children of this AST element as KeY classes.
      * May contain: Comments
      */
-    public JumpStatement(org.key_project.utils.ExtList children) {
+    public JumpStatement(ExtList children) {
 	super(children);
     }
 

@@ -3,7 +3,7 @@ package org.key_project.sed.core.annotation;
 import org.key_project.sed.core.annotation.impl.AbstractSEDAnnotation;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDIDElement;
-import org.key_project.utils.bean.IBean;
+import org.key_project.util.bean.IBean;
 
 /**
  * <p>

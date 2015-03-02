@@ -12,8 +12,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.utils.java.NumberUtil;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.NumberUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * A log manager is responsible to write and read {@link LogRecord}s

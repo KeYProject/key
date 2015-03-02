@@ -21,7 +21,7 @@ import org.eclipse.jdt.internal.ui.wizards.JavaProjectWizard;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardPage;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * Provides a basic functionality for new wizards that are based on 

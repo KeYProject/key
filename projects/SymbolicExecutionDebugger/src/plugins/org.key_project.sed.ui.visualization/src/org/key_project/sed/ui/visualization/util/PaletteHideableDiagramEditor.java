@@ -39,7 +39,7 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
 import org.key_project.util.eclipse.view.editorInView.GlobalEnablementWrapperAction;
 import org.key_project.util.eclipse.view.editorInView.IGlobalEnablement;
-import org.key_project.utils.java.CollectionUtil;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * <p>

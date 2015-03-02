@@ -31,11 +31,11 @@ import org.key_project.swtbot.swing.bot.SwingBotJRadioButton;
 import org.key_project.swtbot.swing.bot.SwingBotJTabbedPane;
 import org.key_project.swtbot.swing.bot.SwingBotJTree;
 import org.key_project.swtbot.swing.bot.finder.waits.Conditions;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.java.CollectionUtil;
-import org.key_project.utils.java.IFilter;
-import org.key_project.utils.java.StringUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;

@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java.declaration.modifier;
 
+import org.key_project.util.ExtList;
+
 import de.uka.ilkd.key.java.declaration.Modifier;
 
 
@@ -24,7 +26,7 @@ public class TwoState extends Modifier {
     public TwoState() {}
 
 
-    public TwoState(org.key_project.utils.ExtList children) {
+    public TwoState(ExtList children) {
         super (children);
     }
 

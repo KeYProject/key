@@ -19,14 +19,15 @@
  */
 package de.hentschel.visualdbc.dbcmodel.impl;
 
-import de.hentschel.visualdbc.dbcmodel.DbcInterface;
-import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
-
 import java.util.Collection;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.util.EDataTypeUniqueEList;
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
+
+import de.hentschel.visualdbc.dbcmodel.DbcInterface;
+import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 
 /**
  * <!-- begin-user-doc -->

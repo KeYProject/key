@@ -61,8 +61,8 @@ import org.key_project.util.eclipse.ProjectViewFilter;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.viewer.FileExtensionViewerFilter;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
-import org.key_project.utils.java.StringUtil;
 
 /**
  * Provides the {@link PropertyPage} that is used to configure KeY specific

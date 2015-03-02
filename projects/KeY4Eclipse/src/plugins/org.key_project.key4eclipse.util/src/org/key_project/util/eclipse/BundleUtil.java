@@ -33,7 +33,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.key_project.util.Activator;
-import org.key_project.utils.java.IOUtil;
+import org.key_project.util.java.IOUtil;
 import org.osgi.framework.Bundle;
 
 /**

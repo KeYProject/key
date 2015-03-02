@@ -19,9 +19,8 @@
  */
 package de.hentschel.visualdbc.dbcmodel.tests;
 
-import de.hentschel.visualdbc.dbcmodel.AbstractDbcProofContainer;
-
 import junit.framework.TestCase;
+import de.hentschel.visualdbc.dbcmodel.AbstractDbcProofContainer;
 
 /**
  * <!-- begin-user-doc -->

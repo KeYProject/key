@@ -20,7 +20,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import org.key_project.utils.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;

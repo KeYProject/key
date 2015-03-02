@@ -21,8 +21,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Vector;
 
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;

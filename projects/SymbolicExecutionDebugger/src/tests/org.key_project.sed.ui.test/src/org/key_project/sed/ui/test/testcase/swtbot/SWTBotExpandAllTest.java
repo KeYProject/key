@@ -9,9 +9,9 @@ import org.junit.Test;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.ui.command.ExpandAllCommand;
 import org.key_project.sed.ui.util.SEDUIUtil;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
-import org.key_project.utils.java.ArrayUtil;
 
 /**
  * Tests {@link ExpandAllCommand} and 

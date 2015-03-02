@@ -32,8 +32,8 @@ import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.utils.java.ObjectUtil;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * This composite provides the content shown in {@link SourcePropertySection}

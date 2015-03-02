@@ -44,10 +44,10 @@ import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.key4eclipse.common.ui.util.StarterDescription;
 import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.java.ObjectUtil;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * {@link PreferencePage} to define the used application starter.

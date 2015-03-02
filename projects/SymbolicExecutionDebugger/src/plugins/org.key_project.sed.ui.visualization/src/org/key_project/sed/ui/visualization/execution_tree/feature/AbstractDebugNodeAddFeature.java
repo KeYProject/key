@@ -48,7 +48,7 @@ import org.key_project.sed.core.util.SEDGroupPreorderIterator;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeStyleUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * Provides a basic implementation of {@link IAddFeature} for {@link ISEDDebugNode}s.

@@ -16,10 +16,10 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.utils.collection.DefaultImmutableMap;
-import org.key_project.utils.collection.DefaultImmutableSet;
-import org.key_project.utils.collection.ImmutableMap;
-import org.key_project.utils.collection.ImmutableSet;
+import org.key_project.util.collection.DefaultImmutableMap;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;

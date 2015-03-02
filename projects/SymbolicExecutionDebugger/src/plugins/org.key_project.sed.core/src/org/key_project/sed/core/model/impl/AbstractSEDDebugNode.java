@@ -44,9 +44,9 @@ import org.key_project.sed.core.model.event.ISEDAnnotationLinkListener;
 import org.key_project.sed.core.model.event.SEDAnnotationLinkEvent;
 import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
 import org.key_project.sed.core.util.SEDAnnotationUtil;
-import org.key_project.utils.java.ArrayUtil;
-import org.key_project.utils.java.IFilter;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * <p>

@@ -37,9 +37,9 @@ import org.key_project.key4eclipse.common.ui.provider.StarterDescriptionLabelPro
 import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.key_project.key4eclipse.common.ui.util.StarterDescription;
 import org.key_project.key4eclipse.common.ui.wizard.StarterWizard;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * {@link WizardPage} used in {@link StarterWizard} to select a {@link StarterDescription}.

@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.antlr.runtime.RecognitionException;
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;

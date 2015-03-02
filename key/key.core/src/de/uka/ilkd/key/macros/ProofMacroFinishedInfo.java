@@ -3,8 +3,8 @@ package de.uka.ilkd.key.macros;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.DefaultTaskFinishedInfo;

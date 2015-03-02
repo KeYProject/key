@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSLList;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * Represents a location like a local variable, method parameter, static field

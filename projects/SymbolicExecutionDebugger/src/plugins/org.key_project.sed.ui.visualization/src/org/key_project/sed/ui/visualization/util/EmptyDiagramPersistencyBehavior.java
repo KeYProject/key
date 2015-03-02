@@ -13,7 +13,7 @@ import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
-import org.key_project.utils.java.IOUtil;
+import org.key_project.util.java.IOUtil;
 
 /**
  * An extended {@link DefaultPersistencyBehavior} which allows to create

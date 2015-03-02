@@ -13,7 +13,7 @@ import org.eclipse.debug.internal.ui.viewers.update.DebugEventHandler;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.ui.util.LogUtil;
-import org.key_project.utils.java.CollectionUtil;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * An {@link DebugEventHandler} handling {@link ISEDThread}s.

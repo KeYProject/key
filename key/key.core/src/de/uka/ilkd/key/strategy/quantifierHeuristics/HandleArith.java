@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import org.key_project.utils.LRUCache;
+import org.key_project.util.LRUCache;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;

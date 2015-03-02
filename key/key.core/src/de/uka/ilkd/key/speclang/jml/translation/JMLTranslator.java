@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import antlr.Token;
 import de.uka.ilkd.key.java.JavaInfo;

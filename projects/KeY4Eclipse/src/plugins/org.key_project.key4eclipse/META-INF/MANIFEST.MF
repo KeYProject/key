@@ -6,7 +6,9 @@ Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.7.100",
- org.key_project.util;bundle-version="1.0.0"
+ org.key_project.util;bundle-version="1.0.0",
+ org.junit;bundle-version="4.11.0",
+ org.key_project.util.test;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: .,
  key.core/lib/antlr.jar,

@@ -49,11 +49,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.junit.Test;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.ArrayObject;
 import org.key_project.util.test.util.ArrayObjectLabelProvider;
-import org.key_project.utils.java.CollectionUtil;
-import org.key_project.utils.java.IOUtil;
-import org.key_project.utils.java.StringUtil;
 
 /**
  * Contains tests for {@link SWTUtil}.

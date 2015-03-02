@@ -39,10 +39,10 @@ import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.junit.Test;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.TestUtilsUtil;
-import org.key_project.utils.java.StringUtil;
 
 /**
  * Tests for {@link JDTUtil}

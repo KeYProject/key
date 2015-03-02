@@ -20,12 +20,10 @@
  */
 package de.hentschel.visualdbc.dbcmodel.tests;
 
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
 import de.hentschel.visualdbc.dbcmodel.DbcProofObligation;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelFactory;
-
-import junit.framework.TestCase;
-
-import junit.textui.TestRunner;
 
 /**
  * <!-- begin-user-doc -->

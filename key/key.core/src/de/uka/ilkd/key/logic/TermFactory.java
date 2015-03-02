@@ -15,7 +15,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.Map;
 
-import org.key_project.utils.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;

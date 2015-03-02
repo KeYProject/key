@@ -19,7 +19,7 @@ import java.io.Reader;
 
 import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.ANTLRStringStream;
-import org.key_project.utils.java.IOUtil;
+import org.key_project.util.java.IOUtil;
 
 /*
  * Extends generated class {@link KeYLexer} with custom constructors.

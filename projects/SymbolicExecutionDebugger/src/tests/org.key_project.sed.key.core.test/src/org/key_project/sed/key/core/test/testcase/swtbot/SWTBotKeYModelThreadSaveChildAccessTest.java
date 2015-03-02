@@ -29,8 +29,8 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
-import org.key_project.utils.java.CollectionUtil;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 

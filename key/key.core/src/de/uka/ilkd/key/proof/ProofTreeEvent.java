@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.proof;
 
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /** Encapsulates information describing changes to a proof tree, and
  * used to notify proof tree listeners of the change.  

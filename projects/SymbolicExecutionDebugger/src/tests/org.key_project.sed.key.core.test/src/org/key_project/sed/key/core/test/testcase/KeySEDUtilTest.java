@@ -29,9 +29,9 @@ import org.junit.Test;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
-import org.key_project.utils.java.StringUtil;
 
 import de.uka.ilkd.key.java.Position;
 

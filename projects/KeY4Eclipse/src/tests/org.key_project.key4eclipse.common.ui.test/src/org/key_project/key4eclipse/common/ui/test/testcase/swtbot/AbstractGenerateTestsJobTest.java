@@ -14,10 +14,10 @@ import org.eclipse.ui.IEditorReference;
 import org.hamcrest.core.IsAnything;
 import org.key_project.key4eclipse.common.ui.testGeneration.EclipseTestGenerator;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
-import org.key_project.utils.java.IOUtil;
-import org.key_project.utils.java.StringUtil;
 
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 

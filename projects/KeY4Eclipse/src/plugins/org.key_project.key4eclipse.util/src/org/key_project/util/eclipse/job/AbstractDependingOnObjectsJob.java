@@ -15,7 +15,7 @@ package org.key_project.util.eclipse.job;
 
 import org.eclipse.core.runtime.jobs.Job;
 import org.key_project.util.eclipse.JobUtil;
-import org.key_project.utils.java.ArrayUtil;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * Abstract super class for {@link Job}s depending on a single {@link Object}

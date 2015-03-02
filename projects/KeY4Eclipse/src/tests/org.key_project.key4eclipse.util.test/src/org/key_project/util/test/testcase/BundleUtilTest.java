@@ -30,9 +30,9 @@ import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.TestUtilsUtil;
-import org.key_project.utils.java.IOUtil;
 
 /**
  * Contains tests for {@link BundleUtil}

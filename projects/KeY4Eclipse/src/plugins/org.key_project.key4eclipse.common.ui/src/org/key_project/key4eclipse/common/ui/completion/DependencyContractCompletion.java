@@ -14,7 +14,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
 import org.key_project.util.eclipse.swt.viewer.AbstractSimpleHTMLLabelProvider;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.gui.DependencyContractCompletion.TermStringWrapper;
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;

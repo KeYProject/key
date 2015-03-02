@@ -19,7 +19,6 @@
  */
 package de.hentschel.visualdbc.dbcmodel.util;
 
-import de.hentschel.visualdbc.dbcmodel.*;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.util.Switch;
@@ -33,7 +32,9 @@ import de.hentschel.visualdbc.dbcmodel.AbstractDbcProofContainer;
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcSpecification;
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcType;
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcTypeContainer;
+import de.hentschel.visualdbc.dbcmodel.DbCAxiomContract;
 import de.hentschel.visualdbc.dbcmodel.DbcAttribute;
+import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
 import de.hentschel.visualdbc.dbcmodel.DbcClass;
 import de.hentschel.visualdbc.dbcmodel.DbcConstructor;
 import de.hentschel.visualdbc.dbcmodel.DbcEnum;

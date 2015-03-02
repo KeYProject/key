@@ -24,7 +24,7 @@ import java.util.Properties;
 import org.eclipse.core.runtime.CoreException;
 import org.key_project.key4eclipse.Activator;
 import org.key_project.util.eclipse.BundleUtil;
-import org.key_project.utils.java.IOUtil;
+import org.key_project.util.java.IOUtil;
 import org.osgi.framework.Bundle;
 
 import de.uka.ilkd.key.core.Main;

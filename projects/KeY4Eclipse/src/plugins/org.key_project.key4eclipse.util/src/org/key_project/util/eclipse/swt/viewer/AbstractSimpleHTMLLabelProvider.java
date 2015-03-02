@@ -20,8 +20,8 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Event;
-import org.key_project.utils.java.StringUtil;
-import org.key_project.utils.java.XMLUtil;
+import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.XMLUtil;
 
 /**
  * <p>

@@ -25,8 +25,8 @@ import org.key_project.sed.core.model.ISEDValue;
 import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDValue;
 import org.key_project.sed.key.core.util.LogUtil;
-import org.key_project.utils.java.CollectionUtil;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;

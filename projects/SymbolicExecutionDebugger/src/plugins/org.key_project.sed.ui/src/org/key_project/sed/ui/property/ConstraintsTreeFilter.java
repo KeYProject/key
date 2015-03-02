@@ -18,7 +18,7 @@ import org.eclipse.jface.viewers.IFilter;
 import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDGroupable;
-import org.key_project.utils.java.ArrayUtil;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * {@link IFilter} implementation used to check if

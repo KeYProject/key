@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.java.expression.literal;
 
-import org.key_project.utils.ExtList;
+import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PositionInfo;

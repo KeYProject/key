@@ -20,7 +20,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
-import org.key_project.utils.java.IOUtil;
+import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.core.Main;
 

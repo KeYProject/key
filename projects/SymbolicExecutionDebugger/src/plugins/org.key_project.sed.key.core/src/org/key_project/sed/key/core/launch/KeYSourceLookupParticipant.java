@@ -24,8 +24,8 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant;
 import org.key_project.sed.core.model.ISourcePathProvider;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
-import org.key_project.utils.java.CollectionUtil;
-import org.key_project.utils.java.IFilter;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.proof.JavaModel;
 

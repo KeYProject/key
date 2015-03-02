@@ -25,8 +25,8 @@ import java.util.Vector;
 
 import javax.swing.event.EventListenerList;
 
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableMapEntry;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMapEntry;
 
 import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
 import de.uka.ilkd.key.informationflow.po.InfFlowCompositePO;

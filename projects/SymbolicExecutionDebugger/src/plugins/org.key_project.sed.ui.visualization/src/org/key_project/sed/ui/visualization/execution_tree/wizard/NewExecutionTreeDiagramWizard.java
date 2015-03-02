@@ -17,7 +17,7 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.services.Graphiti;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
-import org.key_project.utils.java.IOUtil;
+import org.key_project.util.java.IOUtil;
 
 /**
  * A new wizard to create Symbolic Execution Tree Diagrams.

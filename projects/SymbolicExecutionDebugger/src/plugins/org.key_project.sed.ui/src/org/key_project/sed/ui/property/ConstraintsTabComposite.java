@@ -37,8 +37,8 @@ import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.sed.ui.util.SEDImages;
 import org.key_project.sed.ui.util.SEDUIPreferenceUtil;
 import org.key_project.util.eclipse.swt.viewer.AbstractMultiLineLabelProvider;
-import org.key_project.utils.java.ArrayUtil;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * This composite provides the content shown in {@link ConstraintsNodePropertySection}

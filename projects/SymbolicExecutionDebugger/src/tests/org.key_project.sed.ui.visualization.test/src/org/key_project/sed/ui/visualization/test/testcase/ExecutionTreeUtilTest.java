@@ -41,9 +41,9 @@ import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeD
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.test.util.TestVisualizationUtil;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
-import org.key_project.utils.java.IOUtil;
 
 /**
  * Tests for {@link ExecutionTreeUtil}

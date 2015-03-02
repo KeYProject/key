@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java.declaration.modifier;
 
+import org.key_project.util.ExtList;
+
 
 /**
  *  Public.
@@ -34,7 +36,7 @@ public class Public extends VisibilityModifier {
      * @param children the children of this AST element as KeY classes.
      *  May contain: Comments
      */
-    public Public(org.key_project.utils.ExtList children) {
+    public Public(ExtList children) {
 	super(children);
     }
 

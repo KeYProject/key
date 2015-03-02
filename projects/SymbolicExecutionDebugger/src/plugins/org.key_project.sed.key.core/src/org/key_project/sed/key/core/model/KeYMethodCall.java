@@ -31,8 +31,8 @@ import org.key_project.sed.core.model.impl.AbstractSEDMethodCall;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.jdt.JDTUtil;
-import org.key_project.utils.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofInputException;

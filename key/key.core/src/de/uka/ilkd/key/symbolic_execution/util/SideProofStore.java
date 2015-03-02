@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.key_project.utils.java.CollectionUtil;
-import org.key_project.utils.java.IFilter;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Proof;

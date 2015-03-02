@@ -15,7 +15,7 @@ package de.hentschel.visualdbc.datasource.key.rule;
 
 import java.util.LinkedHashSet;
 
-import org.key_project.utils.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableList;
 
 import de.hentschel.visualdbc.datasource.key.model.KeyConnection;
 import de.hentschel.visualdbc.datasource.model.IDSProvableReference;

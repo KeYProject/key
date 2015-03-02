@@ -26,8 +26,8 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuilder;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
-import org.key_project.utils.java.ArrayUtil;
-import org.key_project.utils.java.IFilter;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
 
 public class KeY4EclipseResourcesUiTestUtil {
 

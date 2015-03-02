@@ -30,7 +30,7 @@ import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.util.ISEDConstants;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
-import org.key_project.utils.java.ArrayUtil;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * <p>

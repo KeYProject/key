@@ -18,13 +18,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.key_project.utils.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.ui.AutoModeListener;
 
 /**
  * The abstract class SequentialProofMacro can be used to create compound macros

@@ -15,7 +15,7 @@ package org.key_project.util.eclipse.job;
 
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
-import org.key_project.utils.java.ArrayUtil;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * This {@link ISchedulingRule} can be used to let {@link Job}s waiting

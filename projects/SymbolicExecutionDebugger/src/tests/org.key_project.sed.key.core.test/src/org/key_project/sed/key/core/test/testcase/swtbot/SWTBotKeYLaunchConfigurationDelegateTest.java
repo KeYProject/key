@@ -32,8 +32,8 @@ import org.key_project.sed.key.core.launch.KeYLaunchConfigurationDelegate;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
-import org.key_project.utils.java.StringUtil;
 
 /**
  * SWTBot tests for {@link KeYLaunchConfigurationDelegate}.

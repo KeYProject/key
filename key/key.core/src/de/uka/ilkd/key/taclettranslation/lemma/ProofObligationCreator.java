@@ -15,7 +15,7 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.Collection;
 
-import org.key_project.utils.collection.ImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;

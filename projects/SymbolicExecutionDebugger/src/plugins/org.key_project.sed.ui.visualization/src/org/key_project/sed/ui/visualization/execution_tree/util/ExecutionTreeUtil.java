@@ -35,8 +35,8 @@ import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDGroupable;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
-import org.key_project.utils.java.IOUtil;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * Provides static utility methods for execution tree diagrams.

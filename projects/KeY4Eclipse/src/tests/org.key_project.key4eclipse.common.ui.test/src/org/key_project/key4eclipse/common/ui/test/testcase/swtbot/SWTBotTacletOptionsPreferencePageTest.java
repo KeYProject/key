@@ -24,9 +24,9 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTabItem;
 import org.junit.Test;
 import org.key_project.key4eclipse.common.ui.preference.page.TacletOptionsPreferencePage;
+import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
-import org.key_project.utils.java.ObjectUtil;
 
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector.ChoiceEntry;

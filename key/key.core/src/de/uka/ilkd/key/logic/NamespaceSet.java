@@ -15,7 +15,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.Iterator;
 
-import org.key_project.utils.collection.ImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 public class NamespaceSet {
 

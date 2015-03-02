@@ -19,9 +19,9 @@ import java.io.IOException;
 import org.junit.After;
 import org.junit.Before;
 import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
-import org.key_project.utils.java.IOUtil;
-import org.key_project.utils.java.StringUtil;
 
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;

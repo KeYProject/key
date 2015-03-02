@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.ui.services.IDisposable;
-import org.key_project.utils.java.ObjectUtil;
+import org.key_project.util.java.ObjectUtil;
 
 import de.hentschel.visualdbc.datasource.key.intern.helper.OpenedProof;
 import de.hentschel.visualdbc.datasource.key.rule.KeyProofReferenceUtil;

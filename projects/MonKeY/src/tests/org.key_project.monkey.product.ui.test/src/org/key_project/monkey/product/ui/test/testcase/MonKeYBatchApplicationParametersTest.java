@@ -23,8 +23,8 @@ import java.util.Map.Entry;
 import junit.framework.TestCase;
 
 import org.key_project.monkey.product.ui.batch.MonKeYBatchModeParameters;
-import org.key_project.utils.java.CollectionUtil;
-import org.key_project.utils.java.IOUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IOUtil;
 
 /**
  * Tests for {@link MonKeYBatchModeParameters}

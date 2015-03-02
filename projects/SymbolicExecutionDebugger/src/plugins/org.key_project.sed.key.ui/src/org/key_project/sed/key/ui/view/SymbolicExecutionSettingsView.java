@@ -38,7 +38,7 @@ import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.view.AbstractViewBasedView;
-import org.key_project.utils.java.CollectionUtil;
+import org.key_project.util.java.CollectionUtil;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;

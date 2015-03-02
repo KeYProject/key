@@ -25,7 +25,7 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.ui.visualization.object_diagram.feature.GenerateObjectDiagramFromSEDNodeCustomFeature;
 import org.key_project.sed.ui.visualization.object_diagram.wizard.SaveAsObjectDiagramWizard;
 import org.key_project.sed.ui.visualization.util.PaletteHideableDiagramEditor;
-import org.key_project.utils.java.StringUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * {@link DiagramEditor} for Object Diagrams.

@@ -105,19 +105,19 @@ import org.eclipse.ui.intro.IIntroManager;
 import org.key_project.util.eclipse.Logger;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.setup.SetupStartup;
+import org.key_project.util.helper.HelperClassForUtilityTests;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithException;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithException;
+import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.internal.ContextMenuHelper;
-import org.key_project.utils.helper.HelperClassForUtilityTests;
-import org.key_project.utils.java.ArrayUtil;
-import org.key_project.utils.java.IFilter;
-import org.key_project.utils.java.IOUtil;
-import org.key_project.utils.java.ObjectUtil;
-import org.key_project.utils.java.StringUtil;
-import org.key_project.utils.java.thread.AbstractRunnableWithException;
-import org.key_project.utils.java.thread.AbstractRunnableWithResult;
-import org.key_project.utils.java.thread.IRunnableWithException;
-import org.key_project.utils.java.thread.IRunnableWithResult;
 
 /**
  * Provides static methods that make testing easier.

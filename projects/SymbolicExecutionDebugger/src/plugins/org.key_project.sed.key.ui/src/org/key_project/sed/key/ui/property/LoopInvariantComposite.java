@@ -18,8 +18,8 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.model.KeYLoopBodyTermination;
 import org.key_project.sed.key.core.model.KeYLoopInvariant;
-import org.key_project.utils.java.CollectionUtil;
-import org.key_project.utils.java.IFilter;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;

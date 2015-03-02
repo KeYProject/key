@@ -15,8 +15,8 @@ package org.key_project.key4eclipse.common.ui.test.starter;
 
 import org.eclipse.jdt.core.IMethod;
 import org.key_project.key4eclipse.common.ui.starter.IMethodStarter;
-import org.key_project.utils.collection.ImmutableList;
-import org.key_project.utils.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * {@link IMethodStarter} which logs the calls of {@link #open(IMethod)}.
