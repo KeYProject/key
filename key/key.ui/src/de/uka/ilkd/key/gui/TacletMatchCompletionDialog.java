@@ -321,7 +321,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 				 JOptionPane.ERROR_MESSAGE);   
 			    return ;
 			}
-			mediator().applyInteractive(app, goal);
+			mediator().getUI().getProofControl().applyInteractive(app, goal);
 		}  catch (Exception exc) {
 		    if (exc instanceof SVInstantiationExceptionWithPosition) {
                         errorPositionKnown(exc.getMessage(),

@@ -339,11 +339,11 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         }
 
         ImmutableList<TacletApp> allTacletsAtFindPosition = ImmutableSLList.<TacletApp>nil();
+      KeYMediator r = seqView.getMediator();
 
         // if in replaceWithMode only apps that contain at least one replacewith
         // are collected. Otherwise only those without a replacewith.
-        for (final TacletApp app : seqView.getMediator()
-                .getFindTaclet(findPos)) {
+        for (final TacletApp app : r.getUI().getProofControl().getFindTaclet(r.getSelectedGoal(), findPos.getPosInOccurrence())) {
             if (filter.satisfiesFilterCondition(app.taclet())) {
                 allTacletsAtFindPosition = allTacletsAtFindPosition
                         .prepend(app);
@@ -516,7 +516,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             return;
         }
         final KeYMediator mediator = seqView.getMediator();
-        mediator.applyInteractive(app, mediator.getSelectedGoal());
+        mediator.getUI().getProofControl().applyInteractive(app, mediator.getSelectedGoal());
     }
 
     /**

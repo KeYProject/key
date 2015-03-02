@@ -283,13 +283,17 @@ public class ProofTreeView extends JPanel {
 
     private void register() {
 	mediator.addKeYSelectionListener(proofListener);
-	mediator.addAutoModeListener(proofListener);
+	// This method delegates the request only to the UserInterface which implements the functionality.
+   // No functionality is allowed in this method body!
+   mediator.getUI().getProofControl().addAutoModeListener(proofListener);
 	mediator.addGUIListener(guiListener);
     }
 
     private void unregister() {
 	mediator.removeKeYSelectionListener(proofListener);
-	mediator.removeAutoModeListener(proofListener);
+	// This method delegates the request only to the UserInterface which implements the functionality.
+   // No functionality is allowed in this method body!
+   mediator.getUI().getProofControl().removeAutoModeListener(proofListener);
 	mediator.removeGUIListener(guiListener);
     }
 
@@ -1085,9 +1089,15 @@ public class ProofTreeView extends JPanel {
 	    // is the node a goal?
             if(invokedGoal == null) {
                 ImmutableList<Goal> enabledGoals = proof.getSubtreeEnabledGoals(invokedNode);
-                mediator().startAutoMode(enabledGoals);
+               KeYMediator r = mediator();
+                // This method delegates the request only to the UserInterface which implements the functionality.
+               // No functionality is allowed in this method body!
+               r.getUI().getProofControl().startAutoMode(r.getSelectedProof(), enabledGoals);
             } else {
-                mediator().startAutoMode(ImmutableSLList.<Goal>nil().prepend(invokedGoal));
+                KeYMediator r = mediator();
+               // This method delegates the request only to the UserInterface which implements the functionality.
+               // No functionality is allowed in this method body!
+               r.getUI().getProofControl().startAutoMode(r.getSelectedProof(), ImmutableSLList.<Goal>nil().prepend(invokedGoal));
             }
 	}
 

@@ -1526,7 +1526,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             assertFalse(target.isTerminated());
             // Resume launch directly in KeY
             if (!clearProofListInKeYBeforeDisconnect) {
-               MainWindow.getInstance().getMediator().startAutoMode();
+               MainWindow.getInstance().getUserInterface().getProofControl().startAutoMode(MainWindow.getInstance().getMediator().getSelectedProof());
                KeYUtil.waitWhileMainWindowIsFrozen(MainWindow.getInstance());
             }
             // Test the unmodified execution tree

@@ -366,7 +366,9 @@ public final class MainWindow extends JFrame  {
     private KeYMediator getMainWindowMediator(AbstractMediatorUserInterface userInterface) {
         KeYMediator result = new KeYMediator(userInterface);
         result.addKeYSelectionListener(proofListener);
-        result.addAutoModeListener(proofListener);
+        // This method delegates the request only to the UserInterface which implements the functionality.
+      // No functionality is allowed in this method body!
+      result.getUI().getProofControl().addAutoModeListener(proofListener);
         result.addGUIListener(new MainGUIListener());
         return result;
     }
@@ -396,7 +398,7 @@ public final class MainWindow extends JFrame  {
         final boolean stupidMode =
         		  ProofIndependentSettings.DEFAULT_INSTANCE
         		  .getGeneralSettings().tacletFilter();
-        mediator.setMinimizeInteraction(stupidMode);
+        userInterface.getProofControl().setMinimizeInteraction(stupidMode);
 
         // set up actions
         openFileAction            = new OpenFileAction(this);

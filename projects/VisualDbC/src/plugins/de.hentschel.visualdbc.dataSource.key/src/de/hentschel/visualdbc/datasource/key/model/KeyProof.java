@@ -120,7 +120,7 @@ public class KeyProof extends MemoryProof implements IDisposable {
       this.connection = connection;
       this.connection.registerProof(this); // Register KeyProof in KeyConnection to make sure that it is disposed during disconnect.
       proof.addProofTreeListener(proofTreeListener);
-      MainWindow.getInstance().getMediator().addAutoModeListener(autoModeListener);
+      MainWindow.getInstance().getUserInterface().getProofControl().addAutoModeListener(autoModeListener);
       analyzeProofInput(proofResult);
    }
 
@@ -251,7 +251,7 @@ public class KeyProof extends MemoryProof implements IDisposable {
    @Override
    public void dispose() {
       proof.removeProofTreeListener(proofTreeListener);
-      MainWindow.getInstance().getMediator().removeAutoModeListener(autoModeListener);
+      MainWindow.getInstance().getUserInterface().getProofControl().removeAutoModeListener(autoModeListener);
       MainWindow.getInstance().getUserInterface().removeProof(proof);
    }
 }

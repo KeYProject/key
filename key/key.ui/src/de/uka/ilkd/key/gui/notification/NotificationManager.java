@@ -94,7 +94,9 @@ public class NotificationManager {
     public NotificationManager(KeYMediator mediator, JFrame comp) {        
         
         notificationListener = new NotificationListener();
-        mediator.addAutoModeListener(notificationListener);
+        // This method delegates the request only to the UserInterface which implements the functionality.
+      // No functionality is allowed in this method body!
+      mediator.getUI().getProofControl().addAutoModeListener(notificationListener);
         setDefaultNotification(comp);
     }
     

@@ -99,12 +99,13 @@ class CurrentGoalViewListener
                         //built in rules may have side effects on the set of applicable
                         //taclets
                         final ImmutableList<BuiltInRule> builtInRules
-                                = mediator.getBuiltInRule(mousePos.getPosInOccurrence());
+                                = mediator.getUI().getProofControl().getBuiltInRule
+                         (mediator.getSelectedGoal(), mousePos.getPosInOccurrence());
 
                         menu = new TacletMenu(currentGoalView,
-                                mediator.getFindTaclet(mousePos),
-                                mediator.getRewriteTaclet(mousePos),
-                                mediator.getNoFindTaclet(),
+                                mediator.getUI().getProofControl().getFindTaclet(mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
+                                mediator.getUI().getProofControl().getRewriteTaclet(mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
+                                mediator.getUI().getProofControl().getNoFindTaclet(mediator.getSelectedGoal()),
                                 builtInRules,
                                 mousePos);
 

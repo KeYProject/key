@@ -32,10 +32,8 @@ import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -53,18 +51,19 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
 import de.uka.ilkd.key.ui.AutoModeListener;
-import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.ui.ProofControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
-
+/**
+ * The {@link KeYMediator} provides control logic for the user interface implemented in Swing.
+ * <p>
+ * <strong>Attention: </strong> Logic to apply rules has to be implemented user interface independent in the {@link ProofControl}!
+ */
 public class KeYMediator {
 
     /** The user interface */
@@ -198,15 +197,6 @@ public class KeYMediator {
        return selectedProof != null ? selectedProof.getServices() : null;
     }
 
-    /** simplified user interface? */
-    public boolean isMinimizeInteraction() {
-       return ui.getProofControl().isMinimizeInteraction();
-    }
-
-    public void setMinimizeInteraction(boolean minimizeInteraction) {
-       ui.getProofControl().setMinimizeInteraction(minimizeInteraction);
-    }
-    
     public void setAutoSave(int interval) {
         autoSaver = interval>0 ? new AutoSaver(interval, true): null;
     }
@@ -344,81 +334,6 @@ public class KeYMediator {
         } else {
             return ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getMaxSteps();
         }
-    }
-
-    /**
-     * selected rule to apply; opens a dialog
-     * @param tacletApp the TacletApp which has been selected
-     * @param pos the PosInSequent describes the position where to apply the
-     * rule
-     */
-    public void selectedTaclet(TacletApp tacletApp, PosInSequent pos) {
-        // This method delegates the request only to the UserInterface which implements the functionality.
-        // No functionality is allowed in this method body!
-        Goal goal = getSelectedGoal();
-        Debug.assertTrue(goal != null);
-        getUI().getProofControl().selectedTaclet(tacletApp.taclet(), goal, pos.getPosInOccurrence());
-    }
-
-
-    /** selected rule to apply
-     * @param rule the selected built-in rule
-     * @param pos the PosInSequent describes the position where to apply the
-     * rule
-     * @param forced a boolean indicating that if the rule is complete or can be made complete
-     * automatically then the rule should be applied automatically without asking the user at all
-     * (e.g. if a loop invariant is available do not ask the user to provide one)
-     */
-    public void selectedBuiltInRule(BuiltInRule rule, PosInOccurrence pos, boolean forced) {
-       // This method delegates the request only to the UserInterface which implements the functionality.
-       // No functionality is allowed in this method body!
-    	 getUI().getProofControl().selectedBuiltInRule(getSelectedGoal(), rule, pos, forced);
-    }
-
-
-    /**
-     * Apply a RuleApp and continue with update simplification or strategy
-     * application according to current settings.
-     * @param app
-     * @param goal
-     */
-    public void applyInteractive(RuleApp app, Goal goal) {
-        getUI().getProofControl().applyInteractive(app, goal);
-    }
-
-
-
-    /** collects all applicable FindTaclets of the current goal
-     * (called by the SequentViewer)
-     * @return a list of Taclets with all applicable FindTaclets
-     */
-
-    public ImmutableList<TacletApp> getFindTaclet(PosInSequent pos) {
-    	return getUI().getProofControl().getFindTaclet(getSelectedGoal(), pos.getPosInOccurrence());
-    }
-
-    /** collects all applicable RewriteTaclets of the current goal
-     * (called by the SequentViewer)
-     * @return a list of Taclets with all applicable RewriteTaclets
-     */
-    public ImmutableList<TacletApp> getRewriteTaclet(PosInSequent pos) {
-    	return getUI().getProofControl().getRewriteTaclet(getSelectedGoal(), pos.getPosInOccurrence());
-    }
-
-    /** collects all applicable NoFindTaclets of the current goal
-     * (called by the SequentViewer)
-     * @return a list of Taclets with all applicable NoFindTaclets
-     */
-    public ImmutableList<TacletApp> getNoFindTaclet() {
-    	return getUI().getProofControl().getNoFindTaclet(getSelectedGoal());
-    }
-
-    /** collects all built-in rules
-     * @return a list of all applicable built-in rules
-     */
-    public ImmutableList<BuiltInRule> getBuiltInRule(PosInOccurrence pos) {
-	return getUI().getProofControl().getBuiltInRule
-	    (getSelectedGoal(), pos);
     }
 
     /** adds a listener to the KeYSelectionModel, so that the listener
@@ -559,15 +474,6 @@ public class KeYMediator {
      */
     public Node getSelectedNode() {
  	return keySelectionModel.getSelectedNode();
-    }
-
-    /**
-     * Start automatic application of rules on open goals.
-     */
-    public void startAutoMode() {
-	if (ensureProofLoaded()) {
-	    startAutoMode(getSelectedProof().openEnabledGoals());
-	}
     }
 
     /**
@@ -923,33 +829,5 @@ public class KeYMediator {
     */
    public AutoSaver getAutoSaver() {
       return autoSaver;
-   }
-   
-   /**
-    * Start automatic application of rules on specified goals.
-    * @param goals
-    */
-   public void startAutoMode(ImmutableList<Goal> goals) {
-      // This method delegates the request only to the UserInterface which implements the functionality.
-      // No functionality is allowed in this method body!
-      getUI().getProofControl().startAutoMode(getSelectedProof(), goals);
-   }
-
-   public void stopAutoMode() {
-      // This method delegates the request only to the UserInterface which implements the functionality.
-      // No functionality is allowed in this method body!
-      getUI().getProofControl().stopAutoMode();
-   }
-   
-   public void addAutoModeListener(AutoModeListener p) {
-      // This method delegates the request only to the UserInterface which implements the functionality.
-      // No functionality is allowed in this method body!
-      getUI().getProofControl().addAutoModeListener(p);
-   }
-
-   public void removeAutoModeListener(AutoModeListener p) {
-      // This method delegates the request only to the UserInterface which implements the functionality.
-      // No functionality is allowed in this method body!
-      getUI().getProofControl().removeAutoModeListener(p);
    }
 }

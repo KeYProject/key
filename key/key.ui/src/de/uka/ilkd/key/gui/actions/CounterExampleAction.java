@@ -92,19 +92,21 @@ public class CounterExampleAction extends MainWindowAction {
             }
         };
         getMediator().addKeYSelectionListener(selListener);
-        getMediator().addAutoModeListener(new AutoModeListener() {
-            @Override
-            public void autoModeStarted(ProofEvent e) {
-                getMediator().removeKeYSelectionListener(selListener);
-                setEnabled(false);
-            }
-
-            @Override
-            public void autoModeStopped(ProofEvent e) {
-                getMediator().addKeYSelectionListener(selListener);
-                selListener.selectedNodeChanged(null);
-            }
-        });
+        // This method delegates the request only to the UserInterface which implements the functionality.
+      // No functionality is allowed in this method body!
+      getMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
+                  @Override
+                  public void autoModeStarted(ProofEvent e) {
+                      getMediator().removeKeYSelectionListener(selListener);
+                      setEnabled(false);
+                  }
+      
+                  @Override
+                  public void autoModeStopped(ProofEvent e) {
+                      getMediator().addKeYSelectionListener(selListener);
+                      selListener.selectedNodeChanged(null);
+                  }
+              });
         selListener.selectedNodeChanged(new KeYSelectionEvent(getMediator().getSelectionModel()));
     }
 

@@ -204,14 +204,14 @@ public class StrategySettingsComposite extends Composite {
          oldProof.getSettings().getStrategySettings().removeSettingsListener(settingsListener);
       }
       if (oldMediator != mediator && oldMediator != null) {
-         oldMediator.removeAutoModeListener(autoModeListener);
+         oldMediator.getUI().getProofControl().removeAutoModeListener(autoModeListener);
       }
       if (proof != null && !proof.isDisposed()) {
          if (oldProof != proof) {
             proof.getSettings().getStrategySettings().addSettingsListener(settingsListener);
          }
          if (oldMediator != mediator && mediator != null) {
-            mediator.addAutoModeListener(autoModeListener);
+            mediator.getUI().getProofControl().addAutoModeListener(autoModeListener);
          }
          Name strategyName = proof.getSettings().getStrategySettings().getStrategy();
          Profile profile = proof.getInitConfig().getProfile();
@@ -473,7 +473,7 @@ public class StrategySettingsComposite extends Composite {
          proofProvider.removeProofProviderListener(proofProviderListener);
       }
       if (mediator != null) {
-         mediator.removeAutoModeListener(autoModeListener);
+         mediator.getUI().getProofControl().removeAutoModeListener(autoModeListener);
       }
       if (proof != null && !proof.isDisposed()) {
          proof.getSettings().getStrategySettings().removeSettingsListener(settingsListener);

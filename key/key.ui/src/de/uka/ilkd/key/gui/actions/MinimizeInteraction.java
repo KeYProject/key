@@ -41,7 +41,7 @@ public class MinimizeInteraction extends KeYMenuCheckBox {
     @Override
     public void handleClickEvent() {
         boolean b = isSelected();
-        mainWindow.getMediator().setMinimizeInteraction(b);
+        mainWindow.getUserInterface().getProofControl().setMinimizeInteraction(b);
         ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setTacletFilter(b);
     }
 

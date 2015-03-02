@@ -689,7 +689,7 @@ public final class KeYUtil {
              public void run(MainWindow main) {
                 // Start interactive proof automatically
                 main.getMediator().setProof(proof);
-                main.getMediator().startAutoMode(goals);
+                main.getUserInterface().getProofControl().startAutoMode(proof);
                 // Wait for interactive prover
                 KeYUtil.waitWhileMainWindowIsFrozen(main);
              }

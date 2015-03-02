@@ -38,6 +38,7 @@ import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * This sequent view displays the sequent of an open goal and allows selection
@@ -273,7 +274,12 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      * rule
      */
     void selectedTaclet(TacletApp taclet, PosInSequent pos) {
-        getMediator().selectedTaclet(taclet, pos);
+        KeYMediator r = getMediator();
+      // This method delegates the request only to the UserInterface which implements the functionality.
+        // No functionality is allowed in this method body!
+        Goal goal = r.getSelectedGoal();
+        Debug.assertTrue(goal != null);
+        r.getUI().getProofControl().selectedTaclet(taclet.taclet(), goal, pos.getPosInOccurrence());
     }
 
     /**

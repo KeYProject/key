@@ -23,6 +23,7 @@ import javax.swing.KeyStroke;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.IconFactory;
@@ -114,34 +115,36 @@ public final class AutoModeAction extends MainWindowAction {
             }
         });
     
-        getMediator().addAutoModeListener(new AutoModeListener() {
-    
-            /**
-             * invoked if automatic execution has started
-             */
-            public void autoModeStarted(ProofEvent e) {
-        	if (associatedProof != null) {
-        	    associatedProof.removeProofTreeListener(ptl);
-        	}
-        	putValue(Action.NAME, "Stop");
-        	putValue(Action.SMALL_ICON, stopLogo);
-                putValue(Action.ACCELERATOR_KEY, STOP_KEY);
-            }
-    
-            /**
-             * invoked if automatic execution has stopped
-             */
-            public void autoModeStopped(ProofEvent e) {
-        	if (associatedProof != null && associatedProof == e.getSource()
-        	        && !associatedProof.containsProofTreeListener(ptl)) {
-        	    associatedProof.addProofTreeListener(ptl);
-        	}
-        	putValue(Action.NAME, getStartCommand());
-        	putValue(Action.SMALL_ICON, startLogo);
-                putValue(Action.ACCELERATOR_KEY, START_KEY);
-            }
-    
-        });
+        // This method delegates the request only to the UserInterface which implements the functionality.
+      // No functionality is allowed in this method body!
+      getMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
+          
+                  /**
+                   * invoked if automatic execution has started
+                   */
+                  public void autoModeStarted(ProofEvent e) {
+              	if (associatedProof != null) {
+              	    associatedProof.removeProofTreeListener(ptl);
+              	}
+              	putValue(Action.NAME, "Stop");
+              	putValue(Action.SMALL_ICON, stopLogo);
+                      putValue(Action.ACCELERATOR_KEY, STOP_KEY);
+                  }
+          
+                  /**
+                   * invoked if automatic execution has stopped
+                   */
+                  public void autoModeStopped(ProofEvent e) {
+              	if (associatedProof != null && associatedProof == e.getSource()
+              	        && !associatedProof.containsProofTreeListener(ptl)) {
+              	    associatedProof.addProofTreeListener(ptl);
+              	}
+              	putValue(Action.NAME, getStartCommand());
+              	putValue(Action.SMALL_ICON, startLogo);
+                      putValue(Action.ACCELERATOR_KEY, START_KEY);
+                  }
+          
+              });
     
     }
     
@@ -162,12 +165,21 @@ public final class AutoModeAction extends MainWindowAction {
 	// (very fast), the glasspane won't be quick
 	// enough to catch the second event. Therefore
 	// we make a second check (which is a %%%HACK)
-	if (!getMediator().isInAutoMode())
-	    getMediator().startAutoMode();
-	else {
+	if (!getMediator().isInAutoMode()) {
+      KeYMediator r = getMediator();
+      Proof proof = r.getSelectedProof();
+      if (r.getUI().getProofControl().isAutoModeSupported(proof)) {
+          // This method delegates the request only to the UserInterface which implements the functionality.
+         // No functionality is allowed in this method body!
+         r.getUI().getProofControl().startAutoMode(proof, proof.openEnabledGoals());
+      }
+   }
+   else {
 	    // this interface is no longer used (MU)
 //	    getMediator().interrupted(e);
-	    getMediator().stopAutoMode();
+	    // This method delegates the request only to the UserInterface which implements the functionality.
+      // No functionality is allowed in this method body!
+      getMediator().getUI().getProofControl().stopAutoMode();
 	}
     }
 

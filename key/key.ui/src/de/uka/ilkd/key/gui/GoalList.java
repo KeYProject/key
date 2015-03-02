@@ -272,13 +272,17 @@ public class GoalList extends JList<Goal> {
 
     private void register() {	
 	mediator().addKeYSelectionListener(selectionListener);
-	mediator().addAutoModeListener(interactiveListener);
+	// This method delegates the request only to the UserInterface which implements the functionality.
+   // No functionality is allowed in this method body!
+   mediator().getUI().getProofControl().addAutoModeListener(interactiveListener);
 	mediator().addGUIListener(guiListener);
     }
 
     private void unregister() {
 	mediator().removeKeYSelectionListener(selectionListener);
-	mediator().removeAutoModeListener(interactiveListener);
+	// This method delegates the request only to the UserInterface which implements the functionality.
+   // No functionality is allowed in this method body!
+   mediator().getUI().getProofControl().removeAutoModeListener(interactiveListener);
 	mediator().removeGUIListener(guiListener);
     }
 
