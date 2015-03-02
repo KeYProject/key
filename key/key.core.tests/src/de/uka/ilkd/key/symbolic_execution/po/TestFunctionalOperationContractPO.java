@@ -59,7 +59,9 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
          env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, baseContractName, false, false, false, false, false, false, false, false, false);
          // Extract and test try content
          String tryContent = getTryContent(env.getProof());
-         assertTrue("Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".", StringUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent));
+         if (!StringUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent)) {
+            assertEquals(expectedTryContent, tryContent);
+         }
          // Resume
          resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, testCaseDirectory);
          // Test save and reload of the proof
