@@ -56,7 +56,11 @@ options {
   import java.util.Vector;
   import java.math.BigInteger;
 
-  import org.key_project.utils.collection.*;
+  import org.key_project.util.collection.DefaultImmutableSet;
+  import org.key_project.util.collection.ImmutableArray;
+  import org.key_project.util.collection.ImmutableList;
+  import org.key_project.util.collection.ImmutableSLList;
+  import org.key_project.util.collection.ImmutableSet;
   import de.uka.ilkd.key.logic.*;
   import de.uka.ilkd.key.logic.op.*;
   import de.uka.ilkd.key.logic.sort.*;
