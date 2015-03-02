@@ -173,6 +173,8 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      */
     void startAndWaitForAutoMode(Proof proof);
     
+    public void startFocussedAutoMode(PosInOccurrence focus, Goal goal);
+    
     /**
      * Removes the given {@link Proof} from this {@link UserInterface}.
      * @param proof The {@link Proof} to remove.

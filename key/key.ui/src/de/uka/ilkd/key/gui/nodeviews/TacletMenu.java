@@ -523,7 +523,7 @@ public class TacletMenu extends JMenu {
                         birmi.forcedApplication());
 
 	    } else if (e.getSource() instanceof FocussedRuleApplicationMenuItem) {
-	        mediator.getInteractiveProver ()
+	        mediator.getUI ()
 	            .startFocussedAutoMode ( pos.getPosInOccurrence (),
 	                                     mediator.getSelectedGoal () );
 	    } else {

@@ -13,9 +13,6 @@
 
 package de.uka.ilkd.key.ui;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
@@ -23,6 +20,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -65,11 +63,6 @@ public class CustomUserInterface extends AbstractUserInterface {
     * The currently running {@link AutoModeThread}.
     */
    private AutoModeThread autoModeThread;
-   
-   /**
-    * Contains all available {@link AutoModeListener}.
-    */
-   private final List<AutoModeListener> autoModeListener = new LinkedList<AutoModeListener>();
    
    /**
     * Constructor.
@@ -165,23 +158,15 @@ public class CustomUserInterface extends AbstractUserInterface {
    @Override
    public synchronized void startAndWaitForAutoMode(Proof proof) {
       if (!isInAutoMode()) {
-         autoModeThread = new AutoModeThread(proof);
+         autoModeThread = new AutoModeThread(proof, proof.openEnabledGoals(), null);
          autoModeThread.run();
       }
    }
 
    @Override
-   public synchronized void startAutoMode(Proof proof, ImmutableList<Goal> goals) {
+   public synchronized void startAutoMode(Proof proof, ImmutableList<Goal> goals, ProverTaskListener ptl) {
       if (!isInAutoMode()) {
-         autoModeThread = new AutoModeThread(proof, goals);
-         autoModeThread.start();
-      }
-   }
-
-   @Override
-   public synchronized void startAutoMode(Proof proof) {
-      if (!isInAutoMode()) {
-         autoModeThread = new AutoModeThread(proof);
+         autoModeThread = new AutoModeThread(proof, goals, ptl);
          autoModeThread.start();
       }
    }
@@ -213,21 +198,22 @@ public class CustomUserInterface extends AbstractUserInterface {
       private final Proof proof;
       
       private final ImmutableList<Goal> goals;
+      
+      private final ProverTaskListener ptl;
 
-      public AutoModeThread(Proof proof) {
-         this(proof, null);
-      }
-
-      public AutoModeThread(Proof proof, ImmutableList<Goal> goals) {
+      public AutoModeThread(Proof proof, ImmutableList<Goal> goals, ProverTaskListener ptl) {
          this.proof = proof;
          this.goals = goals;
+         this.ptl = ptl;
       }
 
       @Override
       public void run() {
          try {
             fireAutoModeStarted(new ProofEvent(proof));
-            ProofStarter starter = new ProofStarter(getListener(), false);
+            ProofStarter starter = ptl != null ?
+                                   new ProofStarter(new CompositePTListener(getListener(), ptl), false) :
+                                   new ProofStarter(getListener(), false);
             starter.init(proof);
             if (goals != null) {
                starter.start(goals);
@@ -246,46 +232,6 @@ public class CustomUserInterface extends AbstractUserInterface {
          stop(); // Stop the currently running thread // TODO: Find better solution (REFACTORING_FIX_ME)
          autoModeThread = null;
          fireAutoModeStopped(new ProofEvent(proof));
-      }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void addAutoModeListener(AutoModeListener p) {
-      if (p != null) {
-         autoModeListener.add(p);
-      }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void removeAutoModeListener(AutoModeListener p) {
-      if (p != null) {
-         autoModeListener.remove(p);
-      }
-   }
-
-   /**
-    * fires the event that automatic execution has started
-    */
-   protected void fireAutoModeStarted(ProofEvent e) {
-      AutoModeListener[] listener = autoModeListener.toArray(new AutoModeListener[autoModeListener.size()]);
-      for (AutoModeListener aListenerList : listener) {
-         aListenerList.autoModeStarted(e);
-      }
-   }
-
-   /**
-    * fires the event that automatic execution has stopped
-    */
-   protected void fireAutoModeStopped(ProofEvent e) {
-      AutoModeListener[] listener = autoModeListener.toArray(new AutoModeListener[autoModeListener.size()]);
-      for (AutoModeListener aListenerList : listener) {
-         aListenerList.autoModeStopped(e);
       }
    }
 

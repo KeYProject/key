@@ -244,6 +244,7 @@ public class Proof implements Named {
         if (isDisposed()) {
             return;
         }
+        clearAndDetachRuleAppIndexes();
 
         // Do required cleanup
         if (getServices() != null) {

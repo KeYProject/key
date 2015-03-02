@@ -234,8 +234,6 @@ public class ProofStarter {
 
            proof.setActiveStrategy(strategy);
 
-           profile.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
-
            IGoalChooser goalChooser = profile.getSelectedGoalChooserBuilder().create();
            ApplyStrategy prover = new ApplyStrategy(goalChooser);
            if (ptl != null) {

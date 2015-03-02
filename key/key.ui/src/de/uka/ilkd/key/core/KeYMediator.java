@@ -20,12 +20,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
@@ -72,8 +70,6 @@ public class KeYMediator {
     /** The user interface */
     private AbstractMediatorUserInterface ui;
 
-    private InteractiveProver interactiveProver;
-
     /** the notation info used to print sequents */
     private final NotationInfo notationInfo;
 
@@ -98,14 +94,6 @@ public class KeYMediator {
      */
     private AutoSaver autoSaver = AutoSaver.getDefaultInstance();
 
-    
-    /**
-     * list of proof listeners and interactive proof listeners. We use an
-     * immutable list to store listeners to allow for addition/removal within
-     * listener code
-     */
-    private ImmutableList<AutoModeListener> automodeListenerList = ImmutableSLList.nil();
-
     /**
      * boolean flag indicating if the GUI is in auto mode
      */
@@ -122,13 +110,8 @@ public class KeYMediator {
 	proofListener       = new KeYMediatorProofListener();
 	proofTreeListener   = new KeYMediatorProofTreeListener();
 	keySelectionModel   = new KeYSelectionModel();
-	interactiveProver   = new InteractiveProver(this);
 
-	addAutoModeListener(proofListener);
-
-	// There may be other interruption listeners, but the interaction
-	// engine listens by default.
-	addInterruptedListener(interactiveProver);
+	ui.addAutoModeListener(proofListener);
     }
 
 
@@ -329,18 +312,13 @@ public class KeYMediator {
             newProof.addProofTreeListener(proofTreeListener);
             newProof.addRuleAppListener(proofListener);
         }
+        if (getAutoSaver() != null) {
+           getAutoSaver().setProof(newProof);
+        }
 
         OneStepSimplifier.refreshOSS(newProof);
 
         keySelectionModel.setSelectedProof(newProof);
-    }
-
-
-    /**
-     * Get the interactive prover.
-     */
-    public InteractiveProver getInteractiveProver() {
-	return interactiveProver;
     }
 
 
@@ -375,11 +353,11 @@ public class KeYMediator {
      * rule
      */
     public void selectedTaclet(TacletApp tacletApp, PosInSequent pos) {
-   Goal goal = keySelectionModel.getSelectedGoal();
+        // This method delegates the request only to the UserInterface which implements the functionality.
+        // No functionality is allowed in this method body!
+        Goal goal = getSelectedGoal();
         Debug.assertTrue(goal != null);
-        if (!getUI().selectedTaclet(tacletApp.taclet(), goal, pos.getPosInOccurrence())) {
-           getUI().notify(new GeneralFailureEvent("Taclet application failed." + tacletApp.rule().name()));
-        }
+        getUI().selectedTaclet(tacletApp.taclet(), goal, pos.getPosInOccurrence());
     }
 
 
@@ -392,6 +370,8 @@ public class KeYMediator {
      * (e.g. if a loop invariant is available do not ask the user to provide one)
      */
     public void selectedBuiltInRule(BuiltInRule rule, PosInOccurrence pos, boolean forced) {
+       // This method delegates the request only to the UserInterface which implements the functionality.
+       // No functionality is allowed in this method body!
     	 getUI().selectedBuiltInRule(getSelectedGoal(), rule, pos, forced);
     }
 
@@ -469,32 +449,6 @@ public class KeYMediator {
      */
     public void removeGUIListener(GUIListener listener) {
 	listenerList.remove(GUIListener.class, listener);
-    }
-
-    /**
-     * fires the event that automatic execution has started
-     */
-    protected void fireAutoModeStarted(ProofEvent e) {
-        for (AutoModeListener aListenerList : automodeListenerList) {
-            aListenerList.autoModeStarted(e);
-        }
-    }
-
-    /**
-     * fires the event that automatic execution has stopped
-     */
-    public void fireAutoModeStopped(ProofEvent e) {
-        for (AutoModeListener aListenerList : automodeListenerList) {
-            aListenerList.autoModeStopped(e);
-        }
-    }
-    
-    public void addAutoModeListener(AutoModeListener p) {
-       automodeListenerList = automodeListenerList.prepend(p);
-    }
-
-    public void removeAutoModeListener(AutoModeListener p) {
-       automodeListenerList = automodeListenerList.removeAll(p);
     }
 
          
@@ -617,17 +571,9 @@ public class KeYMediator {
     }
 
     /**
-     * Start automatic application of rules on specified goals.
-     * @param goals
+     * Interrupts all registered {@link InterruptListener}s.
      */
-    public void startAutoMode(ImmutableList<Goal> goals) {
-       interactiveProver.startAutoMode(goals);
-    }
-
-    /**
-     * Stop automatic application of rules.
-     */
-    public void stopAutoMode() {
+    public void interrupt() {
         for (InterruptListener listener :
                listenerList.getListeners(InterruptListener.class)) {
             listener.interruptionPerformed();
@@ -670,8 +616,8 @@ public class KeYMediator {
             ui.notifyAutoModeBeingStarted();
             if (b) {
                inAutoMode = true;
-               fireAutoModeStarted(
-                  new ProofEvent(getSelectedProof()));
+               getUI().fireAutoModeStarted(
+                  new ProofEvent(getSelectedProof())); // TODO: Is this wrong use of auto mode really required?
             }
          }
       };
@@ -684,7 +630,7 @@ public class KeYMediator {
          public void run() {
             if ( b ) {
                inAutoMode = false;
-               fireAutoModeStopped (new ProofEvent(getSelectedProof()));
+               getUI().fireAutoModeStopped (new ProofEvent(getSelectedProof())); // TODO: Is this wrong use of auto mode really required?
             }
             ui.notifyAutomodeStopped();
             if (getSelectedProof() != null)
@@ -977,5 +923,33 @@ public class KeYMediator {
     */
    public AutoSaver getAutoSaver() {
       return autoSaver;
+   }
+   
+   /**
+    * Start automatic application of rules on specified goals.
+    * @param goals
+    */
+   public void startAutoMode(ImmutableList<Goal> goals) {
+      // This method delegates the request only to the UserInterface which implements the functionality.
+      // No functionality is allowed in this method body!
+      getUI().startAutoMode(getSelectedProof(), goals);
+   }
+
+   public void stopAutoMode() {
+      // This method delegates the request only to the UserInterface which implements the functionality.
+      // No functionality is allowed in this method body!
+      getUI().stopAutoMode();
+   }
+   
+   public void addAutoModeListener(AutoModeListener p) {
+      // This method delegates the request only to the UserInterface which implements the functionality.
+      // No functionality is allowed in this method body!
+      getUI().addAutoModeListener(p);
+   }
+
+   public void removeAutoModeListener(AutoModeListener p) {
+      // This method delegates the request only to the UserInterface which implements the functionality.
+      // No functionality is allowed in this method body!
+      getUI().removeAutoModeListener(p);
    }
 }

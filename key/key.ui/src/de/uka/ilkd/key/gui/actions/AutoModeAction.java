@@ -162,7 +162,7 @@ public final class AutoModeAction extends MainWindowAction {
 	// (very fast), the glasspane won't be quick
 	// enough to catch the second event. Therefore
 	// we make a second check (which is a %%%HACK)
-	if (!mainWindow.frozen)
+	if (!getMediator().isInAutoMode())
 	    getMediator().startAutoMode();
 	else {
 	    // this interface is no longer used (MU)

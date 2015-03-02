@@ -3,11 +3,17 @@ package de.uka.ilkd.key.ui;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+
+import javax.swing.SwingWorker;
 
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.informationflow.macros.AbstractFinishAuxiliaryComputationMacro;
 import de.uka.ilkd.key.informationflow.macros.StartAuxiliaryBlockComputationMacro;
@@ -15,12 +21,16 @@ import de.uka.ilkd.key.informationflow.macros.StartAuxiliaryLoopComputationMacro
 import de.uka.ilkd.key.informationflow.macros.StartAuxiliaryMethodComputationMacro;
 import de.uka.ilkd.key.informationflow.po.InfFlowPO;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.IFProofMacroConstants;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.proof.ApplyStrategy;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -29,6 +39,8 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
@@ -50,6 +62,8 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
     * @param file the File with the problem description or the proof
     */
    public abstract void loadProblem(File file);
+
+   private AutoModeWorker worker;
 
    protected ProblemLoader getProblemLoader(File file, List<File> classPath,
                                             File bootClassPath, KeYMediator mediator) {
@@ -171,7 +185,55 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
       env.registerProof(proofOblInput, proofList);
       return env;
    }
+
+   /**
+    * these methods are called immediately before automode is started to ensure that
+    * the GUI can respond in a reasonable way, e.g., change the cursor to a waiting cursor
+    */
+   public void notifyAutoModeBeingStarted() {
+   }
+
+   /**
+    * these methods are called when automode has been stopped to ensure that
+    * the GUI can respond in a reasonable way, e.g., change the cursor to the default
+    */
+   public void notifyAutomodeStopped() {
+   }
+
+   public abstract void notify(NotificationEvent event);
+
+   /**
+    * asks if removal of a task is completed. This is useful to display a dialog to the user and asking her or
+    * if on command line to allow it always.
+    * @param message
+    * @return true if removal has been granted
+    */
+   public boolean confirmTaskRemoval(String string) {
+       return true;
+   }
    
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos) {
+      boolean result = super.selectedTaclet(taclet, goal, pos);
+      if (!result) {
+         notify(new GeneralFailureEvent("Taclet application failed." + taclet.name()));
+      }
+      return result;
+   }
+   
+   @Override
+   public void fireAutoModeStarted(ProofEvent e) {
+      super.fireAutoModeStarted(e);
+   }
+
+   @Override
+   public void fireAutoModeStopped(ProofEvent e) {
+      super.fireAutoModeStopped(e);
+   }
+
    /**
     * {@inheritDoc}
     */
@@ -185,20 +247,15 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
     * {@inheritDoc}
     */
    @Override
-   public void startAutoMode(Proof proof) {
-      KeYMediator mediator = getMediator();
-      mediator.setProof(proof);
-      mediator.startAutoMode();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void startAutoMode(Proof proof, ImmutableList<Goal> goals) {
-      KeYMediator mediator = getMediator();
-      mediator.setProof(proof);
-      mediator.startAutoMode(goals);
+   public void startAutoMode(Proof proof, ImmutableList<Goal> goals, ProverTaskListener ptl) {
+      if (goals.isEmpty()) {
+         notify(new GeneralInformationEvent("No enabled goals available."));
+         return;
+     }
+     worker = new AutoModeWorker(proof, goals, ptl);
+     getMediator().stopInterface(true);
+     getMediator().setInteractive(false);
+     worker.execute();
    }
 
    /**
@@ -206,7 +263,10 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
     */
    @Override
    public void stopAutoMode() {
-      getMediator().stopAutoMode();
+      if (worker != null) {
+         worker.cancel(true);
+      }
+      getMediator().interrupt();
    }
 
    /**
@@ -240,45 +300,82 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
              getMediator().getSelectedProof() == proof;
    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void addAutoModeListener(AutoModeListener p) {
-      getMediator().addAutoModeListener(p);;
-   }
 
-   /**
-    * {@inheritDoc}
+   /* <p>
+    * Invoking start() on the SwingWorker causes a new Thread
+    * to be created that will call construct(), and then
+    * finished().  Note that finished() is called even if
+    * the worker is interrupted because we catch the
+    * InterruptedException in doWork().
+    * </p>
+    * <p>
+    * <b>Attention:</b> Before this thread is started it is required to
+    * freeze the MainWindow via
+    * {@code
+    * mediator().stopInterface(true);
+    *   mediator().setInteractive(false);
+    * }. The thread itself unfreezes the UI when it is finished.
+    * </p>
     */
-   @Override
-   public void removeAutoModeListener(AutoModeListener p) {
-      getMediator().removeAutoModeListener(p);
-   }
+   private class AutoModeWorker extends SwingWorker<ApplyStrategyInfo, Object> {
+       private final Proof proof;
+       
+       private final ImmutableList<Goal> goals;
 
-   /**
-    * these methods are called immediately before automode is started to ensure that
-    * the GUI can respond in a reasonable way, e.g., change the cursor to a waiting cursor
-    */
-   public void notifyAutoModeBeingStarted() {
-   }
+       private final ApplyStrategy applyStrategy;
+       
+       public AutoModeWorker(final Proof proof,
+                             final ImmutableList<Goal> goals,
+                             ProverTaskListener ptl) {
+           this.proof = proof;
+           this.goals = goals;
+           this.applyStrategy = new ApplyStrategy(proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
+           if (ptl != null) {
+              applyStrategy.addProverTaskObserver(ptl);
+           }
+           applyStrategy.addProverTaskObserver(getListener());
 
-   /**
-    * these methods are called when automode has been stopped to ensure that
-    * the GUI can respond in a reasonable way, e.g., change the cursor to the default
-    */
-   public void notifyAutomodeStopped() {
-   }
+           if (getMediator().getAutoSaver() != null) {
+               applyStrategy.addProverTaskObserver(getMediator().getAutoSaver());
+           }
+       }
 
-   public abstract void notify(NotificationEvent event);
+       @Override
+       protected void done() {
+           try {
+               get();
+           } catch (final InterruptedException exception) {
+               notifyException(exception);
+           } catch (final ExecutionException exception) {
+               notifyException(exception);
+           } catch (final CancellationException exception) {
+               // when the user canceled it's not an error
+           }
+           finally {
+              // make it possible to free memory and falsify the isAutoMode() property
+              worker = null;
+              // Clear strategy
+              applyStrategy.removeProverTaskObserver(AbstractMediatorUserInterface.this);
+              applyStrategy.clear();
+              // wait for apply Strategy to terminate
+              getMediator().setInteractive(true);
+              getMediator().startInterface(true);
+           }
+       }
 
-   /**
-    * asks if removal of a task is completed. This is useful to display a dialog to the user and asking her or
-    * if on command line to allow it always.
-    * @param message
-    * @return true if removal has been granted
-    */
-   public boolean confirmTaskRemoval(String string) {
-       return true;
+       private void notifyException(final Exception exception) {
+           AbstractMediatorUserInterface.this.notify(new GeneralFailureEvent("An exception occurred during"
+                   + " strategy execution.\n Exception:" + exception));
+       }
+
+       @Override
+       protected ApplyStrategyInfo doInBackground() throws Exception {
+           boolean stopMode = proof.getSettings().getStrategySettings()
+                   .getActiveStrategyProperties().getProperty(
+                           StrategyProperties.STOPMODE_OPTIONS_KEY)
+                   .equals(StrategyProperties.STOPMODE_NONCLOSE);
+           return applyStrategy.start(proof, goals, getMediator().getMaxAutomaticSteps(),
+                 getMediator().getAutomaticApplicationTimeout(), stopMode);
+       }
    }
 }

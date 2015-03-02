@@ -121,7 +121,7 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
      */
     private void selectOpenGoalBelow() {
         Node selectedNode = mediator.getSelectedNode();
-        for (Goal g : mediator.getInteractiveProver().getProof().openEnabledGoals()) {
+        for (Goal g : selectedNode.proof().openEnabledGoals()) {
             Node n = g.node();
             while(n != null) {
                 if(n == selectedNode) {

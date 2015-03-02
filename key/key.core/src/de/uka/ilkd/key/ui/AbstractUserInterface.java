@@ -35,6 +35,7 @@ import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
@@ -58,6 +59,8 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
+import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.util.Debug;
 
 public abstract class AbstractUserInterface implements UserInterface {
@@ -70,6 +73,11 @@ public abstract class AbstractUserInterface implements UserInterface {
     private int numOfInvokedMacros = 0;
     
     private boolean minimizeInteraction; // minimize user interaction
+    
+    /**
+     * Contains all available {@link AutoModeListener}.
+     */
+    private final List<AutoModeListener> autoModeListener = new LinkedList<AutoModeListener>();
 
     @Override
     public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
@@ -350,8 +358,7 @@ public abstract class AbstractUserInterface implements UserInterface {
 
 
     @Override
-    public boolean selectedTaclet(Taclet taclet, Goal goal,
-              PosInOccurrence pos) {
+    public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos) {
    final Services services = goal.proof().getServices();
    ImmutableSet<TacletApp> applics =
          getAppsForName(goal, taclet.name().toString(), pos);
@@ -628,5 +635,128 @@ public abstract class AbstractUserInterface implements UserInterface {
         }
 
         return result;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addAutoModeListener(AutoModeListener p) {
+       if (p != null) {
+          autoModeListener.add(p);
+       }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAutoModeListener(AutoModeListener p) {
+       if (p != null) {
+          autoModeListener.remove(p);
+       }
+    }
+
+    /**
+     * fires the event that automatic execution has started
+     */
+    protected void fireAutoModeStarted(ProofEvent e) {
+       AutoModeListener[] listener = autoModeListener.toArray(new AutoModeListener[autoModeListener.size()]);
+       for (AutoModeListener aListenerList : listener) {
+          aListenerList.autoModeStarted(e);
+       }
+    }
+
+    /**
+     * fires the event that automatic execution has stopped
+     */
+    protected void fireAutoModeStopped(ProofEvent e) {
+       AutoModeListener[] listener = autoModeListener.toArray(new AutoModeListener[autoModeListener.size()]);
+       for (AutoModeListener aListenerList : listener) {
+          aListenerList.autoModeStopped(e);
+       }
+    }
+    
+    
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void startAutoMode(Proof proof) {
+       startAutoMode(proof, proof.openGoals());
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void startAutoMode(Proof proof, ImmutableList<Goal> goals) {
+       startAutoMode(proof, goals, null);
+    }
+
+    protected abstract void startAutoMode(Proof proof, ImmutableList<Goal> goals, ProverTaskListener ptl);
+
+    /**
+     * starts the execution of rules with active strategy. Restrict the
+     * application of rules to a particular goal and (for
+     * <code>focus!=null</code>) to a particular subterm or subformula of that
+     * goal
+     */
+    public void startFocussedAutoMode(PosInOccurrence focus, Goal goal) {
+        if (focus != null) {
+            // exchange the rule app manager of that goal to filter rule apps
+
+            final AutomatedRuleApplicationManager realManager = goal.getRuleAppManager();
+            goal.setRuleAppManager(null);
+            final AutomatedRuleApplicationManager focusManager
+                    = new FocussedRuleApplicationManager(realManager, goal, focus);
+            goal.setRuleAppManager(focusManager);
+        }
+
+        startAutoMode(goal.proof(), ImmutableSLList.<Goal>nil().prepend(goal), new FocussedAutoModeTaskListener(goal.proof()));
+    }
+
+    private final class FocussedAutoModeTaskListener implements ProverTaskListener {
+        private final Proof proof;
+        
+        public FocussedAutoModeTaskListener(Proof proof) {
+           this.proof = proof;
+        }
+
+        @Override
+        public void taskStarted(String message, int size) {
+        }
+
+        @Override
+        public void taskProgress(int position) {
+        }
+
+        @Override
+        public void taskFinished(TaskFinishedInfo info) {
+           for (final Goal goal : proof.openGoals()) {
+              // remove any filtering rule app managers that are left in the proof
+              // goals
+              if (goal.getRuleAppManager() instanceof FocussedRuleApplicationManager) {
+                  final AutomatedRuleApplicationManager focusManager
+                          = (AutomatedRuleApplicationManager) goal.getRuleAppManager();
+                  goal.setRuleAppManager(null);
+                  final AutomatedRuleApplicationManager realManager
+                          = focusManager.getDelegate();
+                  realManager.clearCache();
+                  goal.setRuleAppManager(realManager);
+              }
+          }
+        }
     }
 }

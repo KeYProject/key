@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
-import de.uka.ilkd.key.proof.GoalChooserBuilder;
+import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -64,12 +64,9 @@ public class JavaProfile extends AbstractProfile {
 
     private OneStepSimplifier oneStepSimpilifier;
 
-    protected JavaProfile(String standardRules, ImmutableSet<GoalChooserBuilder> gcb) {
-        super(standardRules, gcb);
-    }
-
     protected JavaProfile(String standardRules) {
         super(standardRules);
+        setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
     }
 
     public JavaProfile() {
