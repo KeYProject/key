@@ -594,8 +594,13 @@ public class Node  {
     }
 
     /**
-     * Sets the node that this goal is linked to.
-     *
+     * Sets the node that this goal is linked to; also sets this for
+     * all parents.
+     * 
+     * TODO: Check whether it is problematic when multiple child nodes
+     * of a node are linked; in this case, the linkedNode field would
+     * be overwritten.
+     * 
      * @param linkedNode The node that this goal is linked to.
      */
     public void setLinkedNode(final Node linkedNode) {
@@ -603,7 +608,7 @@ public class Node  {
         
         Node current = parent();
         while (current != null && current.childrenCount() == 1) {
-           current.setLinkedNode(linkedNode);
+           current.linkedNode = linkedNode;
            current = current.parent();
         }
     }
