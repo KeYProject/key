@@ -287,7 +287,7 @@ public class MonKeYProof extends Bean {
                 KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof); // Run auto mode without result dialog
              }
              else {
-                environment.getUi().startAndWaitForAutoMode(proof); // Run auto mode outside of MainWindow where no result dialog exist
+                environment.getProofControl().startAndWaitForAutoMode(proof); // Run auto mode outside of MainWindow where no result dialog exist
              }
              // Update statistics
              updateStatistics();

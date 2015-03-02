@@ -34,8 +34,8 @@ public class StopAutoModeHandler extends AbstractSaveExecutionHandler {
       IEditorPart editorPart = HandlerUtil.getActiveEditor(event);
       if (editorPart != null) {
          IProofProvider proofProvider = (IProofProvider)editorPart.getAdapter(IProofProvider.class);
-         if (proofProvider != null && proofProvider.getUI().isInAutoMode()) {
-            proofProvider.getUI().stopAutoMode();
+         if (proofProvider != null && proofProvider.getProofControl().isInAutoMode()) {
+            proofProvider.getProofControl().stopAutoMode();
          }
       }
       return null;

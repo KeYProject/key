@@ -97,7 +97,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
       this.environment = environment;
       this.selectionModel = selectionModel;
       selectionModel.addKeYSelectionListener(listener);
-      environment.getUi().addAutoModeListener(autoModeListener);
+      environment.getProofControl().addAutoModeListener(autoModeListener);
    }
 
    /**
@@ -106,7 +106,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
    @Override
    public void dispose(){
       selectionModel.removeKeYSelectionListener(listener);
-      environment.getUi().removeAutoModeListener(autoModeListener);
+      environment.getProofControl().removeAutoModeListener(autoModeListener);
       if (contentProvider != null) {
          contentProvider.dispose();
       }

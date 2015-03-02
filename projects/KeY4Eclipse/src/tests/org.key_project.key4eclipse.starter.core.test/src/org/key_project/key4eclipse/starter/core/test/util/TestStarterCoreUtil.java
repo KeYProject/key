@@ -71,7 +71,7 @@ public final class TestStarterCoreUtil {
       assertNotNull(proof);
       assertFalse(proof.closed());
       if (startAutoMode) {
-         environment.getUi().startAndWaitForAutoMode(proof);
+         environment.getProofControl().startAndWaitForAutoMode(proof);
       }
       return proof;
       

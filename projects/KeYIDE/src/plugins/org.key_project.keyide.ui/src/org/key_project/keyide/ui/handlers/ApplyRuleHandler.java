@@ -45,7 +45,7 @@ public class ApplyRuleHandler extends AbstractHandler {
             TacletApp app = item.getTacletApp();
             UserInterface ui = item.getUi();
             PosInSequent pos = item.getPosInSequent();
-            if (!ui.selectedTaclet(app.taclet(), item.getGoal(), pos.getPosInOccurrence())) {
+            if (!ui.getProofControl().selectedTaclet(app.taclet(), item.getGoal(), pos.getPosInOccurrence())) {
                throw new IllegalStateException("Taclet application failed." + app.rule().name());
             }
          }
@@ -54,7 +54,7 @@ public class ApplyRuleHandler extends AbstractHandler {
             BuiltInRule rule = item.getRule();
             UserInterface ui = item.getUi();
             PosInSequent pos = item.getPosInSequent();
-            ui.selectedBuiltInRule(item.getGoal(), rule, pos.getPosInOccurrence(), false);
+            ui.getProofControl().selectedBuiltInRule(item.getGoal(), rule, pos.getPosInOccurrence(), false);
          }
       }
       return null;

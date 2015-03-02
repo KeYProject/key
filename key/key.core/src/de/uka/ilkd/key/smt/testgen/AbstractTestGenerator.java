@@ -106,7 +106,7 @@ public abstract class AbstractTestGenerator {
           log.write(".");
           final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
           TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
-          final ProverTaskListener ptl = ui.getListener();
+          final ProverTaskListener ptl = ui.getProofControl().getDefaultProverTaskListener();
           try {
              if (stopRequest != null && stopRequest.shouldStop()) {
                 return;

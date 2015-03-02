@@ -51,6 +51,7 @@ import de.hentschel.visualdbc.interactive.proving.ui.util.event.InteractiveConne
 import de.hentschel.visualdbc.key.ui.util.LogUtil;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.ProofControl;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -214,6 +215,15 @@ public class ProofProviderAdapterFactory implements IAdapterFactory {
             }
          }
          return result;
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ProofControl getProofControl() {
+         UserInterface ui = getUI();
+         return ui != null ? ui.getProofControl() : null;
       }
 
       /**

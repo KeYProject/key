@@ -34,6 +34,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.removegenerics.Main;
 
 /**
@@ -204,7 +205,7 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
        // setInteractive(false) has to be called because the ruleAppIndex
        // has to be notified that we work in auto mode (CS)
        mediator.setInteractive(false);
-       startAndWaitForAutoMode(proof);
+       getProofControl().startAndWaitForAutoMode(proof);
        if (verbosity >= Verbosity.HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
            System.out.println(proof.statistics());
        }
@@ -344,5 +345,10 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
       if(verbosity >= Verbosity.DEBUG) {
          System.out.println(event);
       }
+   }
+
+   @Override
+   public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
+      return AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, forced);
    }
 }

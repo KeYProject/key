@@ -209,7 +209,7 @@ public class ProofReferenceModelCreatorTest extends AbstractProofReferenceModelC
          // Start auto mode
          StrategyProperties sp = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, useContracts, false, false, false);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-         environment.getUi().startAndWaitForAutoMode(proof);
+         environment.getProofControl().startAndWaitForAutoMode(proof);
          // Compare final model
          creator.updateModel(ProofReferenceUtil.computeProofReferences(proof), new NullProgressMonitor());
          compareWithOracle(oracleDirectory, creator.getModel(), Activator.PLUGIN_ID, finalOracleFileInBundle);

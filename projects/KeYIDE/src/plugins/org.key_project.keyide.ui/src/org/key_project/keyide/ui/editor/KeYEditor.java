@@ -87,6 +87,7 @@ import de.uka.ilkd.key.symbolic_execution.util.ProofUserManager;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
 import de.uka.ilkd.key.ui.AutoModeListener;
+import de.uka.ilkd.key.ui.ProofControl;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -296,8 +297,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       if(breakpointManager!=null){
          DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(breakpointManager);
       }
-      if (getUI() != null) {
-         getUI().removeAutoModeListener(autoModeListener);
+      if (getProofControl() != null) {
+         getProofControl().removeAutoModeListener(autoModeListener);
       }
       if (selectionModel != null) {
          selectionModel.removeKeYSelectionListener(keySelectionListener);
@@ -380,7 +381,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             breakpointManager = new KeYBreakpointManager(currentProof);
             DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(breakpointManager);
             ProofUserManager.getInstance().addUser(currentProof, environment, this);
-            getUI().setMinimizeInteraction(true);
+            getUI().getProofControl().setMinimizeInteraction(true);
             if (selectionModel == null) {
                selectionModel.setSelectedNode(currentProof.root());
             }
@@ -406,7 +407,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    public void createPartControl(Composite parent) {
       super.createPartControl(parent);
       selectionModel.addKeYSelectionListener(keySelectionListener);
-      getUI().addAutoModeListener(autoModeListener);
+      getProofControl().addAutoModeListener(autoModeListener);
       ISourceViewer sourceViewer = getSourceViewer();
       viewerDecorator = new ProofSourceViewerDecorator(sourceViewer);
       viewerDecorator.addPropertyChangeListener(ProofSourceViewerDecorator.PROP_SELECTED_POS_IN_SEQUENT, new PropertyChangeListener() {
@@ -621,7 +622,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    public void setCurrentNode(Node currentNode) {
       this.currentNode = currentNode;
-      getUI().setMinimizeInteraction(true);
+      getUI().getProofControl().setMinimizeInteraction(true);
       viewerDecorator.showNode(currentNode, SymbolicExecutionUtil.createNotationInfo(currentProof));
    }
    
@@ -728,6 +729,15 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    public UserInterface getUI() {
       KeYEnvironment<?> environment = getEnvironment();
       return environment != null ? environment.getUi() : null;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ProofControl getProofControl() {
+      KeYEnvironment<?> environment = getEnvironment();
+      return environment != null ? environment.getProofControl() : null;
    }
    
    /**

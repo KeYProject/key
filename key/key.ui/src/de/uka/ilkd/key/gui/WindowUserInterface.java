@@ -47,6 +47,8 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
+import de.uka.ilkd.key.ui.AbstractProofControl;
+import de.uka.ilkd.key.ui.MediatorProofControl;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -75,6 +77,19 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
         completions.add(new DependencyContractCompletion());
         completions.add(new LoopInvariantRuleCompletion());
         completions.add(new BlockContractCompletion(mainWindow));
+    }
+
+    protected MediatorProofControl createProofControl() {
+       return new MediatorProofControl(this) {
+          /**
+           * {@inheritDoc}
+           */
+          @Override
+          public boolean isAutoModeSupported(Proof proof) {
+             return super.isAutoModeSupported(proof) &&
+                    mainWindow.getProofList().containsProof(proof);
+          }          
+       };
     }
 
     /**
@@ -255,7 +270,7 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
     @Override
     public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
         if (mainWindow.getMediator().isInAutoMode()) {
-            return super.completeBuiltInRuleApp(app, goal, forced);
+            return AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, forced);
         }
         IBuiltInRuleApp result = app;
         for (InteractiveRuleApplicationCompletion compl : completions ) {
@@ -296,16 +311,6 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
       finally {
          getMediator().startInterface(true);
       }
-   }
-
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isAutoModeSupported(Proof proof) {
-      return super.isAutoModeSupported(proof) &&
-             mainWindow.getProofList().containsProof(proof);
    }
 
    /**

@@ -927,7 +927,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      ui.startAndWaitForAutoMode(proof);
+      ui.getProofControl().startAndWaitForAutoMode(proof);
       // Update symbolic execution tree 
       builder.analyse();
       // Test result
@@ -964,7 +964,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       stopCondition.addChildren(lineBreakpoints);
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      ui.startAndWaitForAutoMode(proof);
+      ui.getProofControl().startAndWaitForAutoMode(proof);
       // Update symbolic execution tree 
       builder.analyse();
       // Test result
@@ -997,7 +997,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      ui.startAndWaitForAutoMode(proof);
+      ui.getProofControl().startAndWaitForAutoMode(proof);
       // Update symbolic execution tree 
       builder.analyse();
       // Test result
@@ -1029,7 +1029,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP);
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      ui.startAndWaitForAutoMode(proof);
+      ui.getProofControl().startAndWaitForAutoMode(proof);
       // Update symbolic execution tree 
       SymbolicExecutionCompletions completions = builder.analyse();
       // Test result
@@ -1059,7 +1059,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      ui.startAndWaitForAutoMode(proof);
+      ui.getProofControl().startAndWaitForAutoMode(proof);
       // Update symbolic execution tree 
       builder.analyse();
       // Test result
@@ -1869,7 +1869,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          // Store the number of nodes before start of the auto mode 
          nodeCount = env.getProof().countNodes();
          // Run proof
-         env.getUi().startAndWaitForAutoMode(env.getProof());
+         env.getProofControl().startAndWaitForAutoMode(env.getProof());
          // Update symbolic execution tree 
          env.getBuilder().analyse();
          // Make sure that not to many set nodes are executed

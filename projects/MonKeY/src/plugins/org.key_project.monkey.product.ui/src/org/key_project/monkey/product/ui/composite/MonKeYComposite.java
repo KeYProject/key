@@ -74,6 +74,7 @@ import org.key_project.util.java.XMLUtil;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.ProofControl;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -1101,6 +1102,15 @@ public class MonKeYComposite extends Composite implements IProofProvider {
    public UserInterface getUI() {
       KeYEnvironment<?> environment = getEnvironment();
       return environment != null ? environment.getUi() : null;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ProofControl getProofControl() {
+      KeYEnvironment<?> environment = getEnvironment();
+      return environment != null ? environment.getProofControl() : null;
    }
 
    /**

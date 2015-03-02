@@ -17,12 +17,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
-import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProverTaskListener;
@@ -38,21 +33,9 @@ import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor, ProofEnvironmentListener {
-    /**
-     * called to complete and apply a taclet instantiations
-     * @param models the partial models with all different possible instantiations found automatically
-     * @param goal the Goal where to apply
-     */
-    void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal);
-    
+public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor, ProofEnvironmentListener {    
     void loadingStarted();
     
     void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer, ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException;
@@ -65,20 +48,6 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
 
     // TODO: Required?
     boolean macroChosen();
-
-    // TODO: REmove me
-    public ProverTaskListener getListener();
-
-    /**
-     * completes rule applications of built in rules
-     * @param app the DefaultBuiltInRuleApp to be completed
-     * @param goal the Goal where the app will later be applied to
-     * @param forced a boolean indicating if the rule should be applied without any 
-     * additional interaction from the user provided that the application object can be 
-     * made complete automatically
-     * @return a complete app or null if no completion was possible
-     */
-    IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced);    
 
     /**
      * <p>
@@ -123,57 +92,7 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      */
     Proof createProof(InitConfig initConfig, ProofOblInput input) throws ProofInputException;
     
-    
-    public void addAutoModeListener(AutoModeListener p);
-
-    public void removeAutoModeListener(AutoModeListener p);
-    
-    /**
-     * Checks if the auto mode of this {@link UserInterface} supports the given {@link Proof}.
-     * @param proof The {@link Proof} to check.
-     * @return {@code true} auto mode support proofs, {@code false} auto mode don't support proof.
-     */
-    boolean isAutoModeSupported(Proof proof);
-
-    /**
-     * Checks if the auto mode is currently running.
-     * @return {@code true} auto mode is running, {@code false} auto mode is not running.
-     */
-    boolean isInAutoMode();
-
-    /**
-     * Starts the auto mode for the given {@link Proof}.
-     * @param proof The {@link Proof} to start auto mode of.
-     */
-    void startAutoMode(Proof proof);
-    
-    /**
-     * Starts the auto mode for the given {@link Proof} and the given {@link Goal}s. 
-     * @param proof The {@link Proof} to start auto mode of.
-     * @param goals The {@link Goal}s to close.
-     */
-    void startAutoMode(Proof proof, ImmutableList<Goal> goals);
-    
-    /**
-     * Stops the currently running auto mode.
-     */
-    void stopAutoMode();
-    
-    /**
-     * Blocks the current {@link Thread} while the auto mode of this
-     * {@link UserInterface} is active.
-     */
-    void waitWhileAutoMode();
-    
-    /**
-     * Starts the auto mode for the given proof which must be contained
-     * in this user interface and blocks the current thread until it
-     * has finished.
-     * @param proof The {@link Proof} to start auto mode and to wait for.
-     */
-    void startAndWaitForAutoMode(Proof proof);
-    
-    public void startFocussedAutoMode(PosInOccurrence focus, Goal goal);
+    public ProofControl getProofControl();
     
     /**
      * Removes the given {@link Proof} from this {@link UserInterface}.
@@ -198,60 +117,4 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @return the new {@link ProofEnvironment} where the {@link ProofAggregate} has been registered
      */
      ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, ProofAggregate proofList, InitConfig initConfig);
-
-     boolean isMinimizeInteraction();
-     
-     void setMinimizeInteraction(boolean minimizeInteraction);
-
-     /**
-      * collects all applicable RewriteTaclets of the current goal (called by the
-      * SequentViewer)
-      *
-      * @return a list of Taclets with all applicable RewriteTaclets
-      */
-   public abstract ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal, PosInOccurrence pos);
-
-   /**
-    * collects all applicable FindTaclets of the current goal (called by the
-    * SequentViewer)
-    *
-    * @return a list of Taclets with all applicable FindTaclets
-    */
-   public abstract ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal, PosInOccurrence pos);
-
-   /**
-    * collects all applicable NoFindTaclets of the current goal (called by the
-    * SequentViewer)
-    *
-    * @return a list of Taclets with all applicable NoFindTaclets
-    */
-   public abstract ImmutableList<TacletApp> getNoFindTaclet(Goal focusedGoal);
-
-   /**
-    * collects all built-in rules that are applicable at the given sequent
-    * position 'pos'.
-    *
-    * @param pos the PosInSequent where to look for applicable rules
-    */
-   public abstract ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos);
-   
-   public boolean selectedTaclet(Taclet taclet, Goal goal, PosInOccurrence pos);
-   
-   /**
-    * Apply a RuleApp and continue with update simplification or strategy
-    * application according to current settings.
-    * @param app
-    * @param goal
-    */
-   public void applyInteractive(RuleApp app, Goal goal);
-   
-   /** selected rule to apply
-    * @param rule the selected built-in rule
-    * @param pos the PosInSequent describes the position where to apply the
-    * rule
-    * @param forced a boolean indicating that if the rule is complete or can be made complete
-    * automatically then the rule should be applied automatically without asking the user at all
-    * (e.g. if a loop invariant is available do not ask the user to provide one)
-    */
-   public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos, boolean forced);
 }

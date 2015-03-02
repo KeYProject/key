@@ -424,7 +424,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
       StrategyProperties sp = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, useContracts, false, false, false);
       proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
       proof.getSettings().getStrategySettings().setMaxSteps(1000);
-      environment.getUi().startAndWaitForAutoMode(proof);
+      environment.getProofControl().startAndWaitForAutoMode(proof);
       // Do test
       tester.doTest(environment, proof);
    }

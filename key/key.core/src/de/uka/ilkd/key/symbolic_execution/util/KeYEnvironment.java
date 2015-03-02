@@ -28,7 +28,8 @@ import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.ui.CustomUserInterface;
-import de.uka.ilkd.key.ui.CustomUserInterface.IUserInterfaceCustomization;
+import de.uka.ilkd.key.ui.ProofControl;
+import de.uka.ilkd.key.ui.RuleCompletionHandler;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -83,6 +84,14 @@ public class KeYEnvironment<U extends UserInterface> {
     */
    public U getUi() {
       return ui;
+   }
+   
+   /**
+    * Returns the {@link ProofControl} of {@link #getUi()}.
+    * @return The {@link ProofControl} of {@link #getUi()}.
+    */
+   public ProofControl getProofControl() {
+      return ui != null ? ui.getProofControl() : null;
    }
 
    /**
@@ -160,15 +169,15 @@ public class KeYEnvironment<U extends UserInterface> {
     * @param location The location to load.
     * @param classPaths The class path entries to use.
     * @param bootClassPath The boot class path to use.
-    * @param customization An optional {@link IUserInterfaceCustomization}.
+    * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
    public static KeYEnvironment<CustomUserInterface> load(File location,
                                                           List<File> classPaths,
                                                           File bootClassPath,
-                                                          IUserInterfaceCustomization customization) throws ProblemLoaderException {
-      return load(null, location, classPaths, bootClassPath, null, customization, false);
+                                                          RuleCompletionHandler ruleCompletionHandler) throws ProblemLoaderException {
+      return load(null, location, classPaths, bootClassPath, null, ruleCompletionHandler, false);
    }
    
    /**
@@ -198,7 +207,7 @@ public class KeYEnvironment<U extends UserInterface> {
     * @param classPaths The class path entries to use.
     * @param bootClassPath The boot class path to use.
     * @param poPropertiesToForce Some optional PO {@link Properties} to force.
-    * @param customization An optional {@link IUserInterfaceCustomization}.
+    * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
@@ -208,9 +217,9 @@ public class KeYEnvironment<U extends UserInterface> {
                                                           List<File> classPaths,
                                                           File bootClassPath,
                                                           Properties poPropertiesToForce,
-                                                          IUserInterfaceCustomization customization,
+                                                          RuleCompletionHandler ruleCompletionHandler,
                                                           boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
-      CustomUserInterface ui = new CustomUserInterface(customization);
+      CustomUserInterface ui = new CustomUserInterface(ruleCompletionHandler);
       AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, poPropertiesToForce, forceNewProfileOfNewProofs); 
       InitConfig initConfig = loader.getInitConfig();
       return new KeYEnvironment<CustomUserInterface>(ui, initConfig, loader.getProof());

@@ -56,6 +56,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.AutoModeListener;
+import de.uka.ilkd.key.ui.ProofControl;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -128,7 +129,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
       super(target, true);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
-      getUi().addAutoModeListener(autoModeListener);
+      getProofControl().addAutoModeListener(autoModeListener);
       target.registerDebugNode(this);
       initializeAnnotations();
    }
@@ -233,6 +234,10 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
       return getEnvironment().getUi();
    }
    
+   public ProofControl getProofControl() {
+      return getEnvironment().getProofControl();
+   }
+   
    public Proof getProof() {
       return getBuilder().getProof();
    }
@@ -250,7 +255,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStarted(ProofEvent e) {
-      if (e.getSource() == getProof() && getUi().isInAutoMode()) { // Sadly auto mode started events are misused and do not really indicate that a auto mode is running
+      if (e.getSource() == getProof() && getProofControl().isInAutoMode()) { // Sadly auto mode started events are misused and do not really indicate that a auto mode is running
          try {
             // Inform UI that the process is resumed
             super.resume();
@@ -266,7 +271,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      if (e.getSource() == getProof() && !getUi().isInAutoMode()) { // Sadly auto mode stopped events are misused and do not really indicate that a auto mode has stopped
+      if (e.getSource() == getProof() && !getProofControl().isInAutoMode()) { // Sadly auto mode stopped events are misused and do not really indicate that a auto mode has stopped
          try {
             updateExecutionTree(getBuilder());
          }
@@ -333,7 +338,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @throws DebugException Occurred Exception
     */
    public void disconnect() throws DebugException {
-      getUi().removeAutoModeListener(autoModeListener);
+      getProofControl().removeAutoModeListener(autoModeListener);
    }
    
    /**
@@ -341,7 +346,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     */
    @Override
    public void terminate() throws DebugException {
-      getUi().removeAutoModeListener(autoModeListener);
+      getProofControl().removeAutoModeListener(autoModeListener);
       super.terminate();
    }
    
@@ -351,8 +356,8 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    @Override
    public boolean canResume() {
       return super.canResume() && 
-             !getUi().isInAutoMode() && // Only one proof completion per time is possible
-             getUi().isAutoModeSupported(getProof()); // Otherwise Auto Mode is not available.
+             !getProofControl().isInAutoMode() && // Only one proof completion per time is possible
+             getProofControl().isAutoModeSupported(getProof()); // Otherwise Auto Mode is not available.
    }
    
    /**
@@ -422,7 +427,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
       }
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      getUi().startAutoMode(proof, goals);
+      getProofControl().startAutoMode(proof, goals);
    }
 
 
@@ -447,8 +452,8 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    public boolean canSuspend() {
       
       return super.canSuspend() && 
-             getUi().isInAutoMode() && // Only if the auto mode is in progress
-             getUi().isAutoModeSupported(getProof()); // And the auto mode handles this proof
+             getProofControl().isInAutoMode() && // Only if the auto mode is in progress
+             getProofControl().isAutoModeSupported(getProof()); // And the auto mode handles this proof
    }
    
    /**
@@ -475,7 +480,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     */
    public void suspend(IKeYSEDDebugNode<?> keyNode) throws DebugException {
       if (canSuspend()) {
-         getUi().stopAutoMode();
+         getProofControl().stopAutoMode();
          super.suspend();
       }
    }

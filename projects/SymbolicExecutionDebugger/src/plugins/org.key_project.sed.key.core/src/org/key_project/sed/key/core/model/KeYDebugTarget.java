@@ -225,7 +225,7 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
          // Suspend first to stop the automatic mode
          if (!isSuspended()) {
             suspend();
-            environment.getUi().waitWhileAutoMode();
+            environment.getProofControl().waitWhileAutoMode();
          }
          // Remove proof from user interface
          environment.getProof().removeProofDisposedListener(proofDisposedListener);

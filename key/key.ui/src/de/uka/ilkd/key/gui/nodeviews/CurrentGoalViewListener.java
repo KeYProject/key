@@ -82,7 +82,7 @@ class CurrentGoalViewListener
                 boolean macroActive = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isRightClickMacro();
                 if (mediator != null && mousePos != null) {
                     if (me.isShiftDown()) {
-                        mediator.getUI().
+                        mediator.getUI().getProofControl().
                                 startFocussedAutoMode(mousePos.getPosInOccurrence(),
                                 mediator.getSelectedGoal());
                     } else if (macroActive && SwingUtilities.isRightMouseButton(me)) {

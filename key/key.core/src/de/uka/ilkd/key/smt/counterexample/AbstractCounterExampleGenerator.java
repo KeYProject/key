@@ -59,7 +59,7 @@ public abstract class AbstractCounterExampleGenerator {
       final Proof proof = createProof(ui, oldProof, oldSequent, "Semantics Blasting: " + oldProof.name());
       final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
       TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
-      final ProverTaskListener ptl = ui.getListener();
+      final ProverTaskListener ptl = ui.getProofControl().getDefaultProverTaskListener();
       ptl.taskStarted(macro.getName(), 0);
 
       try {

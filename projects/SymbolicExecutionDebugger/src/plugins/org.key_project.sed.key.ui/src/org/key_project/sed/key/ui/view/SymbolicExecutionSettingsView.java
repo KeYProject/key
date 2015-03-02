@@ -42,6 +42,7 @@ import org.key_project.util.java.CollectionUtil;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.ProofControl;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -281,6 +282,15 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView impleme
    @Override
    public UserInterface getUI() {
       return environment != null ? environment.getUi() : null;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ProofControl getProofControl() {
+      KeYEnvironment<?> environment = getEnvironment();
+      return environment != null ? environment.getProofControl() : null;
    }
 
    /**

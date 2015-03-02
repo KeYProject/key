@@ -17,6 +17,7 @@ import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListene
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.ProofControl;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -42,6 +43,12 @@ public interface IProofProvider {
     * @return The {@link UserInterface} in which all of {@link #getCurrentProofs()} lives or {@code null} if not available.
     */
    public UserInterface getUI();
+   
+   /**
+    * Return the {@link ProofControl} of {@link #getUI()}.
+    * @return The {@link ProofControl} of {@link #getUI()}.
+    */
+   public ProofControl getProofControl();
    
    /**
     * The optional {@link KeYEnvironment} in which all of {@link #getCurrentProofs()} lives.

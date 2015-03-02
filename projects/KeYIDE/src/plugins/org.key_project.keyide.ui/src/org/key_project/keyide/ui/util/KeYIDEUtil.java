@@ -248,9 +248,9 @@ public final class KeYIDEUtil {
     */
    public static ImmutableList<TacletApp> findTaclets(UserInterface ui, Goal goal, PosInOccurrence pos) {
       if (pos != null) {
-         ImmutableList<TacletApp> findList = ui.getFindTaclet(goal, pos);
-         ImmutableList<TacletApp> rewriteList = ui.getRewriteTaclet(goal, pos);
-         ImmutableList<TacletApp> noFindList = ui.getNoFindTaclet(goal);
+         ImmutableList<TacletApp> findList = ui.getProofControl().getFindTaclet(goal, pos);
+         ImmutableList<TacletApp> rewriteList = ui.getProofControl().getRewriteTaclet(goal, pos);
+         ImmutableList<TacletApp> noFindList = ui.getProofControl().getNoFindTaclet(goal);
          
          ImmutableList<TacletApp> find = TacletMenu.removeRewrites(findList).prepend(rewriteList);
          
@@ -277,7 +277,7 @@ public final class KeYIDEUtil {
     */
    public static ImmutableList<BuiltInRule> findBuiltInRules(UserInterface ui, Goal goal, PosInSequent pos) {
       if (pos != null) {
-         return ui.getBuiltInRule(goal, pos.getPosInOccurrence());
+         return ui.getProofControl().getBuiltInRule(goal, pos.getPosInOccurrence());
       }
       else {
          return ImmutableSLList.<BuiltInRule>nil();

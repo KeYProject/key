@@ -8,11 +8,10 @@ import org.key_project.key4eclipse.common.ui.wizard.page.CompleteAndApplyTacletM
 
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.ui.CustomUserInterface.IUserInterfaceCustomization;
 
 /**
  * The {@link Wizard} used in {@link EclipseUserInterfaceCustomization} to
- * treat {@link IUserInterfaceCustomization#completeAndApplyTacletMatch(ApplyTacletDialogModel[], Goal)}.
+ * treat {@link EclipseUserInterfaceCustomization#completeAndApplyTacletMatch(ApplyTacletDialogModel[], Goal)}.
  * @author Martin Hentschel
  */
 public class CompleteAndApplyTacletMatchWizard extends Wizard {

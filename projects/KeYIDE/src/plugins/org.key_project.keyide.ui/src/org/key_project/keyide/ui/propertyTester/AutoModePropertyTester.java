@@ -17,7 +17,7 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
-import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.ui.ProofControl;
 
 /**
  * A class to test for properties of the {@link KeYEditor} to set the correct GUI states.
@@ -50,13 +50,13 @@ public class AutoModePropertyTester extends PropertyTester {
                        final Object expectedValue) {
       if (receiver instanceof KeYEditor) {
          KeYEditor editor = (KeYEditor) receiver;
-         UserInterface userInterface = editor.getUI();
-         if (userInterface != null) {
+         ProofControl proofControl = editor.getProofControl();
+         if (proofControl != null) {
             if (PROPERTY_IS_NOT_AUTO_MODE.equals(property)) {
-               return !userInterface.isInAutoMode();
+               return !proofControl.isInAutoMode();
             }
             if (PROPERTY_IS_AUTO_MODE.equals(property)) {
-               return userInterface.isInAutoMode();
+               return proofControl.isInAutoMode();
             }
          }
          else {

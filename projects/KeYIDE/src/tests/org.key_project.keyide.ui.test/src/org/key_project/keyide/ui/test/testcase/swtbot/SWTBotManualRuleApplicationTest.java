@@ -689,7 +689,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, useBlockContracts ? StrategyProperties.BLOCK_CONTRACT : StrategyProperties.BLOCK_EXPAND);
                SymbolicExecutionUtil.updateStrategySettings(proof, sp);
                proof.setActiveStrategy(proof.getInitConfig().getProfile().getDefaultStrategyFactory().create(proof, sp));
-               keyEditor.getUI().startAndWaitForAutoMode(keyEditor.getCurrentProof());
+               keyEditor.getProofControl().startAndWaitForAutoMode(keyEditor.getCurrentProof());
             }
 
             // Get node to apply rule on

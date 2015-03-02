@@ -368,7 +368,7 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
       }
       // Remove old listener
       if (userInterface != null) {
-         userInterface.removeAutoModeListener(autoModeListener);
+         userInterface.getProofControl().removeAutoModeListener(autoModeListener);
       }
       if (proofs != null) {
          for (Proof proof : proofs) {
@@ -386,7 +386,7 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
       }
       // Add new listeners
       if (userInterface != null && !ArrayUtil.isEmpty(proofs)) {
-         userInterface.addAutoModeListener(autoModeListener);
+         userInterface.getProofControl().addAutoModeListener(autoModeListener);
          for (Proof proof : proofs) {
             proof.addProofTreeListener(proofTreeListener);
          }
@@ -536,7 +536,7 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
          proofProvider.removeProofProviderListener(proofProviderListener);
       }
       if (userInterface != null) {
-         userInterface.removeAutoModeListener(autoModeListener);
+         userInterface.getProofControl().removeAutoModeListener(autoModeListener);
       }
       if (proofs != null) {
          for (Proof proof : proofs) {

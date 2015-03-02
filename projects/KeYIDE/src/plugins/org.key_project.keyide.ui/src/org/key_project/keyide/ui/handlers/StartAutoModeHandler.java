@@ -43,8 +43,8 @@ public class StartAutoModeHandler extends AbstractSaveExecutionHandler {
       if (editorPart != null && editorPart instanceof KeYEditor) {
          final IProofProvider proofProvider = (IProofProvider)editorPart.getAdapter(IProofProvider.class);
          if (proofProvider != null && 
-             proofProvider.getUI().isAutoModeSupported(proofProvider.getCurrentProof()) && 
-             !proofProvider.getUI() .isInAutoMode()) {
+             proofProvider.getProofControl().isAutoModeSupported(proofProvider.getCurrentProof()) && 
+             !proofProvider.getProofControl() .isInAutoMode()) {
             new AbstractKeYEnvironmentJob("Auto Mode", proofProvider.getEnvironment()) {
                // job that starts the automode in KeY
                @Override
@@ -52,7 +52,7 @@ public class StartAutoModeHandler extends AbstractSaveExecutionHandler {
                   monitor.beginTask("Proving with KeY", IProgressMonitor.UNKNOWN);
                   Proof proof = proofProvider.getCurrentProof();
                   proof.getActiveStrategy(); // Make sure that the strategy is initialized correctly, otherwise the used settings are different to the one defined by the strategysettings which are shown in the UI.
-                  proofProvider.getEnvironment().getUi().startAndWaitForAutoMode(proof);
+                  proofProvider.getProofControl().startAndWaitForAutoMode(proof);
                   monitor.done();
                   return Status.OK_STATUS;
                }

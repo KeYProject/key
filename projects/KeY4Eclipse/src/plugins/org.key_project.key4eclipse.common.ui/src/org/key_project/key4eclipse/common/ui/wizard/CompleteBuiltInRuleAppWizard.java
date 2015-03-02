@@ -10,11 +10,10 @@ import org.key_project.key4eclipse.common.ui.wizard.page.CompleteBuiltInRuleAppW
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.ui.CustomUserInterface.IUserInterfaceCustomization;
 
 /**
  * The {@link Wizard} used in {@link EclipseUserInterfaceCustomization} to
- * treat {@link IUserInterfaceCustomization#completeBuiltInRuleApp(IBuiltInRuleApp, Goal, boolean)}.
+ * treat {@link EclipseUserInterfaceCustomization#completeBuiltInRuleApp(IBuiltInRuleApp, Goal, boolean)}.
  * @author Martin Hentschel
  */
 public class CompleteBuiltInRuleAppWizard extends Wizard {

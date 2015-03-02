@@ -78,7 +78,7 @@ public abstract class AbstractSWTBotKeYEditorPropertiesTest extends AbstractSWTB
             selectionModel.setSelectedNode(proof.root());
             pSteps.assertNodeTab(editor, keyEditor, propertiesView, selectionModel.getSelectedNode());
             // Finish proof
-            environment.getUi().waitWhileAutoMode();
+            environment.getProofControl().waitWhileAutoMode();
             pSteps.assertNodeTab(editor, keyEditor, propertiesView, selectionModel.getSelectedNode());
          }
       };

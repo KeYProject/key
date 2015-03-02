@@ -14,13 +14,13 @@ import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.ui.CustomUserInterface.IUserInterfaceCustomization;
+import de.uka.ilkd.key.ui.RuleCompletionHandler;
 
 /**
- * An {@link IUserInterfaceCustomization} which gets user input directly within eclipse.
+ * An {@link RuleCompletionHandler} which gets user input directly within Eclipse.
  * @author Martin Hentschel
  */
-public final class EclipseUserInterfaceCustomization implements IUserInterfaceCustomization {
+public final class EclipseUserInterfaceCustomization implements RuleCompletionHandler {
    /**
     * The singleton instance of this class.
     */

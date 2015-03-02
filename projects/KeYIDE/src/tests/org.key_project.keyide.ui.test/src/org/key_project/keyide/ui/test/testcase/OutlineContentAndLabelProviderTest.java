@@ -68,7 +68,7 @@ public class OutlineContentAndLabelProviderTest extends AbstractSetupTestCase {
       Proof proof = environment.createProof(foc.createProofObl(environment.getInitConfig(), foc));
       assertNotNull(proof);
       // Close proof automatically
-      environment.getUi().startAndWaitForAutoMode(proof);
+      environment.getProofControl().startAndWaitForAutoMode(proof);
       // Create viewer to show proof in
       Shell shell = new Shell();
       try {

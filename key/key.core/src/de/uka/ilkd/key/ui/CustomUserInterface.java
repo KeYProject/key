@@ -13,21 +13,13 @@
 
 package de.uka.ilkd.key.ui;
 
-import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.util.ProofStarter;
 
 /**
  * <p>
@@ -55,78 +47,31 @@ import de.uka.ilkd.key.util.ProofStarter;
  */
 public class CustomUserInterface extends AbstractUserInterface {
    /**
-    * An optional {@link IUserInterfaceCustomization}.
+    * The used {@link DefaultProofControl}.
     */
-   private final IUserInterfaceCustomization customiaztion;
-
-   /**
-    * The currently running {@link AutoModeThread}.
-    */
-   private AutoModeThread autoModeThread;
+   private final DefaultProofControl proofControl;
    
    /**
     * Constructor.
     */
    public CustomUserInterface() {
-      this(null);
+      proofControl = new DefaultProofControl(getListener());
    }
-   
+
    /**
     * Constructor.
-    * @param customiaztion An optional {@link IUserInterfaceCustomization}.
+    * @param customization An optional {@link RuleCompletionHandler}.
     */
-   public CustomUserInterface(IUserInterfaceCustomization customiaztion) {
-      this.customiaztion = customiaztion;
+   public CustomUserInterface(RuleCompletionHandler customization) {
+      proofControl = new DefaultProofControl(getListener(), customization);
    }
    
    /**
     * {@inheritDoc}
-    */   
-   @Override
-   public void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal) {
-      if (customiaztion != null) {
-         customiaztion.completeAndApplyTacletMatch(models, goal);
-      }
-   }
-
-   /**
-    * {@inheritDoc}
     */
    @Override
-   public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
-      if (customiaztion == null) {
-         return super.completeBuiltInRuleApp(app, goal, forced);
-      }
-      else {
-         IBuiltInRuleApp result = customiaztion.completeBuiltInRuleApp(app, goal, forced);
-         if (result != null) {
-            if (result.complete()) {
-               return result;
-            }
-            else {
-               return super.completeBuiltInRuleApp(result, goal, forced);
-            }
-         }
-         else {
-            return super.completeBuiltInRuleApp(app, goal, forced);
-         }
-      }
-   }
-
-   /**
-    * Instances of this class can be used to customize the behavior of a {@link CustomUserInterface}.
-    * @author Martin Hentschel
-    */
-   public static interface IUserInterfaceCustomization {
-      /**
-       * This method will be called to treat {@link UserInterface#completeAndApplyTacletMatch(ApplyTacletDialogModel[], Goal)}.
-       */
-      public void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal);
-
-      /**
-       * This method will be called to treat {@link UserInterface#completeBuiltInRuleApp(IBuiltInRuleApp, Goal, boolean)}.
-       */
-      public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced);
+   public DefaultProofControl getProofControl() {
+      return proofControl;
    }
    
    /**
@@ -153,86 +98,6 @@ public class CustomUserInterface extends AbstractUserInterface {
    @Override
    public void removeProof(Proof proof) {
       proof.dispose();
-   }
-
-   @Override
-   public synchronized void startAndWaitForAutoMode(Proof proof) {
-      if (!isInAutoMode()) {
-         autoModeThread = new AutoModeThread(proof, proof.openEnabledGoals(), null);
-         autoModeThread.run();
-      }
-   }
-
-   @Override
-   public synchronized void startAutoMode(Proof proof, ImmutableList<Goal> goals, ProverTaskListener ptl) {
-      if (!isInAutoMode()) {
-         autoModeThread = new AutoModeThread(proof, goals, ptl);
-         autoModeThread.start();
-      }
-   }
-
-   @Override
-   public synchronized void stopAutoMode() {
-      if (isInAutoMode()) {
-         autoModeThread.cancel();
-      }
-   }
-
-   @Override
-   public void waitWhileAutoMode() {
-      while (isInAutoMode()) { // Wait until auto mode has stopped.
-         try {
-            Thread.sleep(100);
-         }
-         catch (InterruptedException e) {
-         }
-      }
-   }
-   
-   @Override
-   public boolean isInAutoMode() {
-      return autoModeThread != null;
-   }
-
-   private class AutoModeThread extends Thread {
-      private final Proof proof;
-      
-      private final ImmutableList<Goal> goals;
-      
-      private final ProverTaskListener ptl;
-
-      public AutoModeThread(Proof proof, ImmutableList<Goal> goals, ProverTaskListener ptl) {
-         this.proof = proof;
-         this.goals = goals;
-         this.ptl = ptl;
-      }
-
-      @Override
-      public void run() {
-         try {
-            fireAutoModeStarted(new ProofEvent(proof));
-            ProofStarter starter = ptl != null ?
-                                   new ProofStarter(new CompositePTListener(getListener(), ptl), false) :
-                                   new ProofStarter(getListener(), false);
-            starter.init(proof);
-            if (goals != null) {
-               starter.start(goals);
-            }
-            else {
-               starter.start();
-            }
-         }
-         finally {
-            autoModeThread = null;
-            fireAutoModeStopped(new ProofEvent(proof));
-         }
-      }
-      
-      public void cancel() {
-         stop(); // Stop the currently running thread // TODO: Find better solution (REFACTORING_FIX_ME)
-         autoModeThread = null;
-         fireAutoModeStopped(new ProofEvent(proof));
-      }
    }
 
    @Override

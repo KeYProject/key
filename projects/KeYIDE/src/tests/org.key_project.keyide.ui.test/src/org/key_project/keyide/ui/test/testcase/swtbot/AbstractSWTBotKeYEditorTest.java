@@ -136,7 +136,7 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
             assertNotNull(proof);
          }
          if (startAutoMode) {
-            environment.getUi().startAndWaitForAutoMode(proof);
+            environment.getProofControl().startAndWaitForAutoMode(proof);
          }
          openProof(bot, environment, proof);
          editor = bot.activeEditor();
@@ -236,6 +236,6 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
          }
       });
       assertNotNull(tacletApp);
-      ui.selectedTaclet(tacletApp.taclet(), goal, pio);
+      ui.getProofControl().selectedTaclet(tacletApp.taclet(), goal, pio);
    }
 }

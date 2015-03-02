@@ -273,7 +273,7 @@ public final class TestKeY4EclipseUtil {
       bot.waitUntil(new ICondition() {
          @Override
          public boolean test() throws Exception {
-            return ui.isInAutoMode();
+            return ui.getProofControl().isInAutoMode();
          }
          
          @Override
@@ -295,7 +295,7 @@ public final class TestKeY4EclipseUtil {
       bot.waitUntil(new ICondition() {
          @Override
          public boolean test() throws Exception {
-            return !ui.isInAutoMode();
+            return !ui.getProofControl().isInAutoMode();
          }
          
          @Override

@@ -111,7 +111,7 @@ public class KeYMediator {
 	proofTreeListener   = new KeYMediatorProofTreeListener();
 	keySelectionModel   = new KeYSelectionModel();
 
-	ui.addAutoModeListener(proofListener);
+	ui.getProofControl().addAutoModeListener(proofListener);
     }
 
 
@@ -200,11 +200,11 @@ public class KeYMediator {
 
     /** simplified user interface? */
     public boolean isMinimizeInteraction() {
-       return ui.isMinimizeInteraction();
+       return ui.getProofControl().isMinimizeInteraction();
     }
 
     public void setMinimizeInteraction(boolean minimizeInteraction) {
-       ui.setMinimizeInteraction(minimizeInteraction);
+       ui.getProofControl().setMinimizeInteraction(minimizeInteraction);
     }
     
     public void setAutoSave(int interval) {
@@ -357,7 +357,7 @@ public class KeYMediator {
         // No functionality is allowed in this method body!
         Goal goal = getSelectedGoal();
         Debug.assertTrue(goal != null);
-        getUI().selectedTaclet(tacletApp.taclet(), goal, pos.getPosInOccurrence());
+        getUI().getProofControl().selectedTaclet(tacletApp.taclet(), goal, pos.getPosInOccurrence());
     }
 
 
@@ -372,7 +372,7 @@ public class KeYMediator {
     public void selectedBuiltInRule(BuiltInRule rule, PosInOccurrence pos, boolean forced) {
        // This method delegates the request only to the UserInterface which implements the functionality.
        // No functionality is allowed in this method body!
-    	 getUI().selectedBuiltInRule(getSelectedGoal(), rule, pos, forced);
+    	 getUI().getProofControl().selectedBuiltInRule(getSelectedGoal(), rule, pos, forced);
     }
 
 
@@ -383,7 +383,7 @@ public class KeYMediator {
      * @param goal
      */
     public void applyInteractive(RuleApp app, Goal goal) {
-        getUI().applyInteractive(app, goal);
+        getUI().getProofControl().applyInteractive(app, goal);
     }
 
 
@@ -394,7 +394,7 @@ public class KeYMediator {
      */
 
     public ImmutableList<TacletApp> getFindTaclet(PosInSequent pos) {
-    	return getUI().getFindTaclet(getSelectedGoal(), pos.getPosInOccurrence());
+    	return getUI().getProofControl().getFindTaclet(getSelectedGoal(), pos.getPosInOccurrence());
     }
 
     /** collects all applicable RewriteTaclets of the current goal
@@ -402,7 +402,7 @@ public class KeYMediator {
      * @return a list of Taclets with all applicable RewriteTaclets
      */
     public ImmutableList<TacletApp> getRewriteTaclet(PosInSequent pos) {
-    	return getUI().getRewriteTaclet(getSelectedGoal(), pos.getPosInOccurrence());
+    	return getUI().getProofControl().getRewriteTaclet(getSelectedGoal(), pos.getPosInOccurrence());
     }
 
     /** collects all applicable NoFindTaclets of the current goal
@@ -410,14 +410,14 @@ public class KeYMediator {
      * @return a list of Taclets with all applicable NoFindTaclets
      */
     public ImmutableList<TacletApp> getNoFindTaclet() {
-    	return getUI().getNoFindTaclet(getSelectedGoal());
+    	return getUI().getProofControl().getNoFindTaclet(getSelectedGoal());
     }
 
     /** collects all built-in rules
      * @return a list of all applicable built-in rules
      */
     public ImmutableList<BuiltInRule> getBuiltInRule(PosInOccurrence pos) {
-	return getUI().getBuiltInRule
+	return getUI().getProofControl().getBuiltInRule
 	    (getSelectedGoal(), pos);
     }
 
@@ -616,7 +616,7 @@ public class KeYMediator {
             ui.notifyAutoModeBeingStarted();
             if (b) {
                inAutoMode = true;
-               getUI().fireAutoModeStarted(
+               getUI().getProofControl().fireAutoModeStarted(
                   new ProofEvent(getSelectedProof())); // TODO: Is this wrong use of auto mode really required?
             }
          }
@@ -630,7 +630,7 @@ public class KeYMediator {
          public void run() {
             if ( b ) {
                inAutoMode = false;
-               getUI().fireAutoModeStopped (new ProofEvent(getSelectedProof())); // TODO: Is this wrong use of auto mode really required?
+               getUI().getProofControl().fireAutoModeStopped (new ProofEvent(getSelectedProof())); // TODO: Is this wrong use of auto mode really required?
             }
             ui.notifyAutomodeStopped();
             if (getSelectedProof() != null)
@@ -932,24 +932,24 @@ public class KeYMediator {
    public void startAutoMode(ImmutableList<Goal> goals) {
       // This method delegates the request only to the UserInterface which implements the functionality.
       // No functionality is allowed in this method body!
-      getUI().startAutoMode(getSelectedProof(), goals);
+      getUI().getProofControl().startAutoMode(getSelectedProof(), goals);
    }
 
    public void stopAutoMode() {
       // This method delegates the request only to the UserInterface which implements the functionality.
       // No functionality is allowed in this method body!
-      getUI().stopAutoMode();
+      getUI().getProofControl().stopAutoMode();
    }
    
    public void addAutoModeListener(AutoModeListener p) {
       // This method delegates the request only to the UserInterface which implements the functionality.
       // No functionality is allowed in this method body!
-      getUI().addAutoModeListener(p);
+      getUI().getProofControl().addAutoModeListener(p);
    }
 
    public void removeAutoModeListener(AutoModeListener p) {
       // This method delegates the request only to the UserInterface which implements the functionality.
       // No functionality is allowed in this method body!
-      getUI().removeAutoModeListener(p);
+      getUI().getProofControl().removeAutoModeListener(p);
    }
 }
