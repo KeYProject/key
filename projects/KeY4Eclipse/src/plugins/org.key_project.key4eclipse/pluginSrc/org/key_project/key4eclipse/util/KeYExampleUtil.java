@@ -66,7 +66,7 @@ public class KeYExampleUtil {
     public static String getLocalExampleDirectory() {
         String localKeyHome = getLocalKeYHomeDirectory();
         return localKeyHome != null ? 
-               localKeyHome + File.separator + "key" + File.separator + "key.core" + File.separator + ExampleChooser.EXAMPLES_PATH : 
+               localKeyHome + File.separator + "key" + File.separator + "key.ui" + File.separator + ExampleChooser.EXAMPLES_PATH : 
                null;
     }
 
