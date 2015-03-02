@@ -15,7 +15,6 @@ package org.key_project.utils.java;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.StringTokenizer;
 
 /**
  * Provides static methods to work with strings.
@@ -192,15 +191,47 @@ public final class StringUtil {
    public static boolean equalIgnoreWhiteSpace(String first, String second) {
       if (first != null) {
          if (second != null) {
-            StringTokenizer firstTokenizer = new StringTokenizer(first);
-            StringTokenizer secondTokenizer = new StringTokenizer(second);
-            boolean equal = true;
-            while (equal && firstTokenizer.hasMoreTokens() && secondTokenizer.hasMoreTokens()) {
-               String firstNext = firstTokenizer.nextToken();
-               String secondNext = secondTokenizer.nextToken();
-               equal = firstNext.equals(secondNext);
+            char[] firstContent = first.toCharArray();
+            char[] secondContent = second.toCharArray();
+            int firstIndex = 0;
+            int secondIndex = 0;
+            // Skip initial whitespace
+            while (firstIndex < firstContent.length &&
+                   contains(WHITESPACE, firstContent[firstIndex] + EMPTY_STRING)) {
+               firstIndex++;
             }
-            return equal && !firstTokenizer.hasMoreElements() && !secondTokenizer.hasMoreElements();
+            while (secondIndex < secondContent.length &&
+                   contains(WHITESPACE, secondContent[secondIndex] + EMPTY_STRING)) {
+               secondIndex++;
+            }
+            // Start to compare content
+            boolean equal = true;
+            while (equal && firstIndex < firstContent.length && secondIndex < secondContent.length) {
+               // Compare content
+               if (firstIndex < firstContent.length && secondIndex < secondContent.length) {
+                  if (firstContent[firstIndex] != secondContent[secondIndex]) {
+                     equal = false;
+                  }
+               }
+               else {
+                  if (firstIndex < firstContent.length - 1 || secondIndex < secondContent.length - 1) {
+                     equal = false;
+                  }
+               }
+               firstIndex++;
+               secondIndex++;
+               // Skip whitespace
+               while (firstIndex < firstContent.length &&
+                      contains(WHITESPACE, firstContent[firstIndex] + EMPTY_STRING)) {
+                  firstIndex++;
+               }
+               while (secondIndex < secondContent.length &&
+                      contains(WHITESPACE, secondContent[secondIndex] + EMPTY_STRING)) {
+                  secondIndex++;
+               }
+            }
+            return equal &&
+                   firstIndex >= firstContent.length && secondIndex >= secondContent.length; // Complete content of both texts compared
          }
          else {
             return false;
@@ -210,7 +241,7 @@ public final class StringUtil {
          return second == null;
       }
    }
-   
+
    /**
     * Fills the given text with the leading character until it has the defined length.
     * @param text The text to fill.

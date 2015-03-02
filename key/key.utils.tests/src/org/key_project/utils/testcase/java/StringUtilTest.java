@@ -106,14 +106,25 @@ public class StringUtilTest extends TestCase {
    public void testEqualIgnoreWhiteSpace() {
       assertTrue(StringUtil.equalIgnoreWhiteSpace(null, null));
       assertFalse(StringUtil.equalIgnoreWhiteSpace("A", null));
-      assertFalse(StringUtil.equalIgnoreWhiteSpace("B", null));
+      assertFalse(StringUtil.equalIgnoreWhiteSpace(null, "A"));
+      assertTrue(StringUtil.equalIgnoreWhiteSpace("", ""));
+      assertFalse(StringUtil.equalIgnoreWhiteSpace("A", ""));
+      assertFalse(StringUtil.equalIgnoreWhiteSpace("", "A"));
       assertTrue(StringUtil.equalIgnoreWhiteSpace("A", "A"));
+      assertTrue(StringUtil.equalIgnoreWhiteSpace(" A", "A"));
+      assertTrue(StringUtil.equalIgnoreWhiteSpace("A", "A "));
+      assertTrue(StringUtil.equalIgnoreWhiteSpace("A", " A "));
+      assertFalse(StringUtil.equalIgnoreWhiteSpace("A", "B"));
+      assertTrue(StringUtil.equalIgnoreWhiteSpace("AA", "A A"));
+      assertFalse(StringUtil.equalIgnoreWhiteSpace("AA", "AB"));
+      assertFalse(StringUtil.equalIgnoreWhiteSpace("A", "AB"));
       assertTrue(StringUtil.equalIgnoreWhiteSpace("A B", "A B"));
       assertTrue(StringUtil.equalIgnoreWhiteSpace("A B C", "A B C"));
       assertTrue(StringUtil.equalIgnoreWhiteSpace("A    B    C", "A\nB\r\tC"));
       assertFalse(StringUtil.equalIgnoreWhiteSpace("A B C", "A B C D"));
       assertFalse(StringUtil.equalIgnoreWhiteSpace("A B C D", "A B C"));
       assertTrue(StringUtil.equalIgnoreWhiteSpace("  A B C", "A B C\t\n"));
+      assertTrue(StringUtil.equalIgnoreWhiteSpace("{result=self.doubleValue(_value)@ExistingContractTest; }", "{\n  result=self.doubleValue(_value)@ExistingContractTest;\n}"));
    }
    
    /**
