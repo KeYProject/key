@@ -160,7 +160,7 @@ public class TacletIfSelectionDialog extends JPanel{
     private void updateInputField(JPanel parent, JComboBox cb) {
 	IfChoiceModel icm = (IfChoiceModel)cb.getModel();
 	int nr = parent.getComponentCount();
-	if (cb.getSelectedItem() == icm.manualText() && (nr==2)) {
+	if (icm.isManualInputSelected() && (nr==2)) {
             JTextField inp = new JTextField(40);
             inp.addFocusListener(new FocusAdapter() {
                 public void focusLost(FocusEvent e) {
@@ -178,7 +178,7 @@ public class TacletIfSelectionDialog extends JPanel{
 	    parent.add(inp);
 	    inp.setEnabled(true);
 	}
-	if (cb.getSelectedItem() != icm.manualText() && nr == 3) {
+	if (!icm.isManualInputSelected() && nr == 3) {
 	    parent.remove(parent.getComponent(2));
 	}
 	parent.revalidate();

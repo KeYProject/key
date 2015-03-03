@@ -35,8 +35,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 
-
-public class IfChoiceModel extends DefaultComboBoxModel {
+public class IfChoiceModel extends DefaultComboBoxModel<IfFormulaInstantiation> {
 
 
     /**
@@ -45,9 +44,20 @@ public class IfChoiceModel extends DefaultComboBoxModel {
     private static final long serialVersionUID = -5388696072469119661L;
     
     
-    private static final String manualText="Manual Input";
+    private static final IfFormulaInstantiation manualTextIF = new IfFormulaInstantiation() {
+        
+        @Override
+        public String toString(Services services) {
+            return "Manual Input";
+        }
+        
+        @Override
+        public SequentFormula getConstrainedFormula() {
+            return null;
+        }
+    };
+    
     private String manualInput;
-    //    private RuleApp app;
     private final Term ifFma;
 
 
@@ -69,13 +79,9 @@ public class IfChoiceModel extends DefaultComboBoxModel {
 	this.nss    = nss;
 	this.scm    = scm;
 
-	addElement(manualText);
+	
+    addElement(manualTextIF);
 	manualInput = "";
-    }
-
-
-    public String manualText() {
-	return manualText;
     }
 
     public void setInput(String s) {
@@ -129,9 +135,8 @@ public class IfChoiceModel extends DefaultComboBoxModel {
      */
     public IfFormulaInstantiation getSelection(int pos) 
 	throws SVInstantiationParserException, MissingInstantiationException {
-        Object o = getSelectedItem();
-        if (o != manualText) {
-            return (IfFormulaInstantiation) o;
+        if (!isManualInputSelected()) {
+            return (IfFormulaInstantiation) getSelectedItem();
         }
         try {
             if (manualInput == null || "".equals(manualInput)) {
@@ -146,6 +151,11 @@ public class IfChoiceModel extends DefaultComboBoxModel {
                     "Problem occured parsing a manual input"
                     + " of an '\\assumes'-sequent.\n" + e.getMessage(), true);
         }
+    }
+
+
+    public boolean isManualInputSelected() {
+        return getSelectedItem() == manualTextIF;
     }
 
 }
