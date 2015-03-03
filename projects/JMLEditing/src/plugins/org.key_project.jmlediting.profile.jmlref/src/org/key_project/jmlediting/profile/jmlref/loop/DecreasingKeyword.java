@@ -9,7 +9,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.SemicolonClosedKey
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.SpecExpressionParser;
 
 /**
- * The implementation of the descreasing keyword for loop invariants.
+ * The implementation of the decreasing keyword for loop invariants.
  *
  * @author Moritz Lichter
  *
@@ -18,10 +18,10 @@ public class DecreasingKeyword extends AbstractKeyword implements
       IToplevelKeyword {
 
    /**
-    * Creates a new instance of the descresing keyword.
+    * Creates a new instance of the decreasing keyword.
     */
    public DecreasingKeyword() {
-      super("decreasing", "descreases");
+      super("decreasing", "decreases");
    }
 
    @Override
