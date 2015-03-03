@@ -134,6 +134,10 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
     */
    private final ProofDisposedListener proofDisposedListener = new ProofDisposedListener() {
       @Override
+      public void proofDisposing(ProofDisposedEvent e) {
+      }
+
+      @Override
       public void proofDisposed(ProofDisposedEvent e) {
          handleProofDisposed(e);
       }

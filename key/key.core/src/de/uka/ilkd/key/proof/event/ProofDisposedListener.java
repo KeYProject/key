@@ -8,6 +8,12 @@ import de.uka.ilkd.key.proof.Proof;
  */
 public interface ProofDisposedListener {
    /**
+    * When a {@link Proof} is going to be disposed.
+    * @param e The event.
+    */
+   public void proofDisposing(ProofDisposedEvent e);
+   
+   /**
     * When a {@link Proof} was disposed via {@link Proof#dispose()}.
     * @param e The event.
     */

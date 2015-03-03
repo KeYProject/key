@@ -244,6 +244,7 @@ public class Proof implements Named {
         if (isDisposed()) {
             return;
         }
+        fireProofDisposing(new ProofDisposedEvent(this));
         clearAndDetachRuleAppIndexes();
 
         // Do required cleanup
@@ -1029,6 +1030,17 @@ public class Proof implements Named {
         ProofDisposedListener[] listener = getProofDisposedListeners();
         for (ProofDisposedListener l : listener) {
             l.proofDisposed(e);
+        }
+    }
+
+    /**
+     * Fires the event {@link ProofDisposedListener#proofDisposing(ProofDisposedEvent)} to all listener.
+     * @param e The event to fire.
+     */
+    protected void fireProofDisposing(ProofDisposedEvent e) {
+        ProofDisposedListener[] listener = getProofDisposedListeners();
+        for (ProofDisposedListener l : listener) {
+            l.proofDisposing(e);
         }
     }
 

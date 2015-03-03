@@ -26,14 +26,15 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.removegenerics.Main;
 
@@ -196,9 +197,10 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
     }
 
     @Override
-    public void proofRegistered(ProofEnvironmentEvent event) {
-        mediator.setProof(event.getProofList().getFirstProof());
-        proofStack = proofStack.prepend(event.getProofList().getFirstProof());
+    public void registerProofAggregate(ProofAggregate pa) {
+        super.registerProofAggregate(pa);
+        mediator.setProof(pa.getFirstProof());
+        proofStack = proofStack.prepend(pa.getFirstProof());
     }
     
     void finish(Proof proof) {
@@ -308,20 +310,18 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
      * {@inheritDoc}
      */
     @Override
-    final public void removeProof(Proof proof) {
-        if (proof != null) {
-            if (!proofStack.isEmpty()) {
-                Proof p = proofStack.head();
-                proofStack = proofStack.removeAll(p);
-                assert p.name().equals(proof.name());
-                mediator.setProof(proofStack.head());
-            } else {
-                // proofStack might be empty, though proof != null. This can
-                // happen for symbolic execution tests, if proofCreated was not
-                // called by the test setup.
-            }
-            proof.dispose();
-        }
+    public void proofDisposing(ProofDisposedEvent e) {
+       super.proofDisposing(e);
+       if (!proofStack.isEmpty()) {
+          Proof p = proofStack.head();
+          proofStack = proofStack.removeAll(p);
+          assert p.name().equals(e.getSource().name());
+          mediator.setProof(proofStack.head());
+      } else {
+          // proofStack might be empty, though proof != null. This can
+          // happen for symbolic execution tests, if proofCreated was not
+          // called by the test setup.
+      }
     }
 
     @Override

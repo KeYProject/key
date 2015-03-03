@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.ui;
 
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -89,14 +88,6 @@ public class CustomUserInterface extends AbstractUserInterface {
    @Override
    public boolean selectProofObligation(InitConfig initConfig) {
       return false; // Not supported.
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void removeProof(Proof proof) {
-      proof.dispose();
    }
 
    @Override
@@ -180,6 +171,14 @@ public class CustomUserInterface extends AbstractUserInterface {
     */
    @Override
    public void setMaximum(int maximum) {
+      // Nothing to do
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void registerProofAggregate(ProofAggregate pa) {
       // Nothing to do
    }
 }

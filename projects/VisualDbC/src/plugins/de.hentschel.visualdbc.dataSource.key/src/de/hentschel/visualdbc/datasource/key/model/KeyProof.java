@@ -252,6 +252,6 @@ public class KeyProof extends MemoryProof implements IDisposable {
    public void dispose() {
       proof.removeProofTreeListener(proofTreeListener);
       MainWindow.getInstance().getUserInterface().getProofControl().removeAutoModeListener(autoModeListener);
-      MainWindow.getInstance().getUserInterface().removeProof(proof);
+      proof.dispose();
    }
 }

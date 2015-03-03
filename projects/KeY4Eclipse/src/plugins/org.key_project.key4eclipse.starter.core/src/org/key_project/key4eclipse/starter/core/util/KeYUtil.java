@@ -613,14 +613,14 @@ public final class KeYUtil {
           if (child instanceof EnvNode) {
              EnvNode envChild = (EnvNode)child;
              for (Proof proof : envChild.allProofs()) {
-                main.getUserInterface().removeProof(proof);
+                proof.dispose();
              }
              for (int j = 0; j < envChild.getChildCount(); j++) {
                 Object envTaskChild = envChild.getChildAt(j);
                 if (envTaskChild instanceof TaskTreeNode) {
                    TaskTreeNode ttn = (TaskTreeNode)envTaskChild;
                    for (Proof proof : ttn.allProofs()) {
-                      main.getUserInterface().removeProof(proof);
+                      proof.dispose();
                    }
                 }
              }

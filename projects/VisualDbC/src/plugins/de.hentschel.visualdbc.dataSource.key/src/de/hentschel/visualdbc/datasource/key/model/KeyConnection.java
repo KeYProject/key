@@ -1772,7 +1772,7 @@ public class KeyConnection extends MemoryConnection {
     * @param proof The {@link KeyProof} to close.
     */
    public void closeTaskWithoutInteraction(KeyProof proof) {
-      environment.getUi().removeProof(proof.getProof());
+      proof.getProof().dispose();
    }
    
    /**

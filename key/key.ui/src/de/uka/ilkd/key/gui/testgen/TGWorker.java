@@ -71,7 +71,6 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
             }
             for (final Proof p : proofs) {
                if (MainWindow.getInstance().getProofList().containsProof(p)) {
-                  getUI().removeProof(p);
                   p.dispose();
                }
             }
@@ -99,8 +98,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
             SpecificationRepository spec = services.getSpecificationRepository();
             spec.registerProof(spec.getProofOblInput(oldProof), proof);
             final ProofAggregate pa = new SingleProof(proof, "XXX");
-            final MainWindow mw = MainWindow.getInstance();
-            mw.addProblem(pa);
+            ui.registerProofAggregate(pa);
             return proof;
          }
          else {

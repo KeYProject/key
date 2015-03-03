@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -62,14 +63,14 @@ public interface UserInterface {
                       ProofOblInput input) throws ProofInputException;
 
     /**
+     * Registers an already created {@link ProofAggregate} in this {@link UserInterface}.
+     * @param pa The {@link ProofAggregate} to register.
+     */
+    void registerProofAggregate(ProofAggregate pa);
+
+    /**
      * Returns the used {@link ProofControl}.
      * @return The used {@link ProofControl}.
      */
     public ProofControl getProofControl();
-    
-    /**
-     * Removes the given {@link Proof} from this {@link UserInterface}.
-     * @param proof The {@link Proof} to remove.
-     */
-    void removeProof(Proof proof);
 }

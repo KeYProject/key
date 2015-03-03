@@ -20,6 +20,8 @@ import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -33,7 +35,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 
-public abstract class AbstractMediatorUserInterface extends AbstractUserInterface implements RuleCompletionHandler, ProofEnvironmentListener {
+public abstract class AbstractMediatorUserInterface extends AbstractUserInterface implements RuleCompletionHandler, ProofEnvironmentListener, ProofDisposedListener {
    private final MediatorProofControl proofControl = createProofControl();
 
    private ProofMacro autoMacro = new SkipMacro();
@@ -135,7 +137,7 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
              initiatingProof.addSideProof(sideProof);
              // make everyone listen to the proof remove
              getMediator().startInterface(true);
-             getMediator().getUI().removeProof(sideProof);
+             sideProof.dispose();
              getMediator().getSelectionModel().setSelectedGoal(info.getGoals().head());
              // go into automode again
              getMediator().stopInterface(true);
@@ -232,5 +234,39 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
     */
    public boolean confirmTaskRemoval(String string) {
        return true;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void proofDisposing(ProofDisposedEvent e) {
+      e.getSource().removeProofDisposedListener(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void proofDisposed(ProofDisposedEvent e) {
+      // Nothing to do
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void proofRegistered(ProofEnvironmentEvent event) {
+      registerProofAggregate(event.getProofList());
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void registerProofAggregate(ProofAggregate pa) {
+      for (Proof proof : pa.getProofs()) {
+         proof.addProofDisposedListener(this);
+      }
    }
 }

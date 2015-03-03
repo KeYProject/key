@@ -25,7 +25,6 @@ import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -185,11 +184,9 @@ public class CounterExampleAction extends MainWindowAction {
 
           ProofAggregate pa = new SingleProof(proof, "XXX");
 
-          MainWindow mw = MainWindow.getInstance();
-          mw.addProblem(pa);
+          ui.registerProofAggregate(pa);
 
-          Services services = mw.getMediator().getServices();
-          SpecificationRepository spec = services.getSpecificationRepository();
+          SpecificationRepository spec = proof.getServices().getSpecificationRepository();
           spec.registerProof(spec.getProofOblInput(oldProof), proof);
           
           mediator.goalChosen(proof.getGoal(proof.root()));

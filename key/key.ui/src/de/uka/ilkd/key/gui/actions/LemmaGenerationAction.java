@@ -131,7 +131,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                             getMediator().startInterface(true);
                             if (p != null) {
 
-                                mainWindow.addProblem(p);
+                               mainWindow.getUserInterface().registerProofAggregate(p);
                             }
                             
                         }
@@ -216,7 +216,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                         getMediator().startInterface(true);
                         if (p != null) {
 
-                            mainWindow.addProblem(p);
+                           mainWindow.getUserInterface().registerProofAggregate(p);
                         }                        
                     }
 
@@ -292,7 +292,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                                 ImmutableSet<Taclet> taclets, boolean addAxioms) {
                         getMediator().startInterface(true);
                         if (p != null) {
-                            mainWindow.addProblem(p);
+                            mainWindow.getUserInterface().registerProofAggregate(p);
                         }
 
                         if(p != null || addAxioms){

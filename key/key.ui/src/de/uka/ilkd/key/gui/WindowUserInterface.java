@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
@@ -42,7 +43,6 @@ import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
@@ -381,16 +381,13 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
     * {@inheritDoc}
     */
    @Override
-   public void removeProof(Proof proof) {
-       if (!proof.isDisposed()) {
-          // The original code of this method. Neccessary?
-           mainWindow.getProofList().removeProof(proof);
-
-
-           // Run the garbage collector.
-           Runtime r = Runtime.getRuntime();
-           r.gc();
-        }
+   public void proofDisposing(ProofDisposedEvent e) {
+      super.proofDisposing(e);
+      // Remove proof from user interface
+      mainWindow.getProofList().removeProof(e.getSource());
+      // Run the garbage collector.
+      Runtime r = Runtime.getRuntime();
+      r.gc();
     }
 
    @Override
@@ -399,8 +396,9 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
    }
 
    @Override
-   public void proofRegistered(ProofEnvironmentEvent event) {
-      mainWindow.addProblem(event.getProofList());
+   public void registerProofAggregate(ProofAggregate pa) {
+      super.registerProofAggregate(pa);
+      mainWindow.addProblem(pa);
       mainWindow.setStandardStatusLine();
    }
 

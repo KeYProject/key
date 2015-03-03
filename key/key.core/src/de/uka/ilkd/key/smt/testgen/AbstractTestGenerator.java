@@ -188,7 +188,6 @@ public abstract class AbstractTestGenerator {
    public void dispose() {
       if (proofs != null) {
          for (final Proof p : proofs) {
-            ui.removeProof(p);
             p.dispose();
          }
       }

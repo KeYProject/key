@@ -107,7 +107,7 @@ public final class ProofUserManager {
                proofUsers.remove(proof);
                KeYEnvironment<?> environment = proofEnvironments.remove(proof);
                if (environment != null) {
-                  environment.getUi().removeProof(proof);
+                  proof.dispose();
                   Set<Proof> proofs = environmentProofs.get(environment);
                   if (proofs != null) {
                      proofs.remove(proof);

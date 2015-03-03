@@ -126,9 +126,6 @@ public class TaskTree extends JPanel {
        } else {
           mediator.setProof(null);
        }
-       for (int i=0; i<tn.allProofs().length; i++) {
-          tn.allProofs()[i].dispose();
-       }
     }
     
     public void updateUI() {
