@@ -18,9 +18,7 @@ import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProverTaskListener;
@@ -33,13 +31,12 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
+import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 
-public abstract class AbstractUserInterface implements UserInterface {
-
-    private ProofMacro autoMacro = new SkipMacro();
+public abstract class AbstractUserInterface implements UserInterface, ProblemLoaderControl, ProverTaskListener {
     protected boolean saveOnly = false;
 
     private ProverTaskListener pml = null;
@@ -52,19 +49,6 @@ public abstract class AbstractUserInterface implements UserInterface {
     
     public boolean isSaveOnly() {
         return this.saveOnly;
-    }
-
-    public void setMacro(ProofMacro macro) {
-        assert macro != null;
-        this.autoMacro = macro;
-    }
-
-    public ProofMacro getMacro() {
-        return this.autoMacro;
-    }
-
-    public boolean macroChosen() {
-        return !(getMacro() instanceof SkipMacro);
     }
 
     public final ProverTaskListener getListener() {
@@ -86,18 +70,21 @@ public abstract class AbstractUserInterface implements UserInterface {
     }
 
     /**
+     * registers the proof aggregate at the UI
+     * 
+     * @param proofOblInput the {@link ProofOblInput}
+     * @param proofList the {@link ProofAggregate} 
+     * @param initConfig the {@link InitConfig} to be used
+     * @return the new {@link ProofEnvironment} where the {@link ProofAggregate} has been registered
+     */
+    protected abstract ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, ProofAggregate proofList, InitConfig initConfig);
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate) {
        // Nothing to do
-    }
-
-    @Override
-    public void proofUnregistered(ProofEnvironmentEvent event) {
-       if (event.getSource().getProofs().isEmpty()) {
-          event.getSource().removeProofEnvironmentListener(this);
-       }
     }
     
     public boolean isAtLeastOneMacroRunning() {
@@ -164,14 +151,25 @@ public abstract class AbstractUserInterface implements UserInterface {
        }
     }
 
-    @Override
-    public ProblemInitializer createProblemInitializer(Profile profile) {
+    /**
+     * <p>
+     * Creates a new {@link ProblemInitializer} instance which is configured
+     * for this {@link UserInterface}.
+     * </p>
+     * <p>
+     * This method is used by nearly all Eclipse based product that
+     * uses KeY.
+     * </p>
+     * @param profile The {@link Profile} to use.
+     * @return The instantiated {@link ProblemInitializer}.
+     */
+    protected ProblemInitializer createProblemInitializer(Profile profile) {
         ProblemInitializer pi = new ProblemInitializer(this, new Services(profile), this);
         return pi;
     }
 
     @Override
-    public void loadingStarted() {
+    public void loadingStarted(AbstractProblemLoader loader) {
     }
 
     @Override

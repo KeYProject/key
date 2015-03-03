@@ -16,6 +16,7 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.macros.IFProofMacroConstants;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProverTaskListener;
@@ -26,12 +27,16 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 
-public abstract class AbstractMediatorUserInterface extends AbstractUserInterface implements RuleCompletionHandler {
+public abstract class AbstractMediatorUserInterface extends AbstractUserInterface implements RuleCompletionHandler, ProofEnvironmentListener {
    private final MediatorProofControl proofControl = createProofControl();
+
+   private ProofMacro autoMacro = new SkipMacro();
    
    @Override
    public MediatorProofControl getProofControl() {
@@ -40,6 +45,20 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
 
    protected MediatorProofControl createProofControl() {
       return new MediatorProofControl(this);
+   }
+
+
+   public void setMacro(ProofMacro macro) {
+       assert macro != null;
+       this.autoMacro = macro;
+   }
+
+   public ProofMacro getMacro() {
+       return this.autoMacro;
+   }
+
+   public boolean macroChosen() {
+       return !(getMacro() instanceof SkipMacro);
    }
 
    /** 
@@ -171,13 +190,22 @@ public abstract class AbstractMediatorUserInterface extends AbstractUserInterfac
        }
    }
 
+   /**
+    * {@inheritDoc}
+    */
    @Override
-   public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput,
-         ProofAggregate proofList, InitConfig initConfig) {
+   public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, ProofAggregate proofList, InitConfig initConfig) {
       final ProofEnvironment env = new ProofEnvironment(initConfig);
       env.addProofEnvironmentListener(this);
       env.registerProof(proofOblInput, proofList);
       return env;
+   }
+
+   @Override
+   public void proofUnregistered(ProofEnvironmentEvent event) {
+      if (event.getSource().getProofs().isEmpty()) {
+         event.getSource().removeProofEnvironmentListener(this);
+      }
    }
 
    /**

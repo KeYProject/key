@@ -19,7 +19,6 @@ import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 
 /**
  * <p>
@@ -110,14 +109,6 @@ public class CustomUserInterface extends AbstractUserInterface {
     */
    @Override
    public void taskStarted(String message, int size) {
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void proofRegistered(ProofEnvironmentEvent event) {
-      // Nothing to do  
    }
 
    /**

@@ -405,9 +405,9 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
    }
 
    @Override
-   public void loadingStarted() {
+   public void loadingStarted(AbstractProblemLoader loader) {
       getMediator().stopInterface(true);
-      super.loadingStarted();
+      super.loadingStarted(loader);
    }
 
    @Override

@@ -17,52 +17,15 @@ import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
-import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.ProverTaskListener;
-import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
-import de.uka.ilkd.key.util.ProgressMonitor;
 
-public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor, ProofEnvironmentListener {    
-    void loadingStarted();
-    
-    void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer, ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException;
-
-    // TODO: SHould not be required
-    void setMacro(ProofMacro macro);
-
-    // TODO: SHould not be required
-    ProofMacro getMacro();
-
-    // TODO: Required?
-    boolean macroChosen();
-
-    /**
-     * <p>
-     * Creates a new {@link ProblemInitializer} instance which is configured
-     * for this {@link UserInterface}.
-     * </p>
-     * <p>
-     * This method is used by nearly all Eclipse based product that
-     * uses KeY.
-     * </p>
-     * @param profile The {@link Profile} to use.
-    * @return The instantiated {@link ProblemInitializer}.
-     */
-    ProblemInitializer createProblemInitializer(Profile profile);
-    
+public interface UserInterface {  
     /**
      * <p>
      * Opens a java file in this {@link UserInterface} and returns the instantiated {@link AbstractProblemLoader}
@@ -80,7 +43,12 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @return The opened {@link AbstractProblemLoader}.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    AbstractProblemLoader load(Profile profile, File file, List<File> classPaths, File bootClassPath, Properties poPropertiesToForce, boolean forceNewProfileOfNewProofs) throws ProblemLoaderException;
+    AbstractProblemLoader load(Profile profile, 
+                               File file, 
+                               List<File> classPaths, 
+                               File bootClassPath, 
+                               Properties poPropertiesToForce, 
+                               boolean forceNewProfileOfNewProofs) throws ProblemLoaderException;
     
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterface} for the given
@@ -90,8 +58,13 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @return The instantiated {@link Proof}.
      * @throws ProofInputException Occurred Exception.
      */
-    Proof createProof(InitConfig initConfig, ProofOblInput input) throws ProofInputException;
-    
+    Proof createProof(InitConfig initConfig, 
+                      ProofOblInput input) throws ProofInputException;
+
+    /**
+     * Returns the used {@link ProofControl}.
+     * @return The used {@link ProofControl}.
+     */
     public ProofControl getProofControl();
     
     /**
@@ -99,22 +72,4 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @param proof The {@link Proof} to remove.
      */
     void removeProof(Proof proof);
-    
-    /**
-     * This method is called if no {@link LoadedPOContainer} was created
-     * via {@link #createProofObligationContainer()} and can be overwritten
-     * for instance to open the proof management dialog as done by {@link ProblemLoader}.
-     * @return true if the proof obligation was selected, and false if action was aborted
-     */
-     boolean selectProofObligation(InitConfig initConfig);
-
-    /**
-     * registers the proof aggregate at the UI
-     * 
-     * @param proofOblInput the {@link ProofOblInput}
-     * @param proofList the {@link ProofAggregate} 
-     * @param initConfig the {@link InitConfig} to be used
-     * @return the new {@link ProofEnvironment} where the {@link ProofAggregate} has been registered
-     */
-     ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, ProofAggregate proofList, InitConfig initConfig);
 }

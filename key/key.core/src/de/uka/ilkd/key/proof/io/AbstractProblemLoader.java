@@ -111,9 +111,9 @@ public abstract class AbstractProblemLoader {
     private final File bootClassPath;
 
     /**
-     * The {@link UserInterface} to use.
+     * The {@link ProblemLoaderControl} to use.
      */
-    private final UserInterface ui;
+    private final ProblemLoaderControl control;
 
     /**
      * The {@link Profile} to use for new {@link Proof}s.
@@ -184,7 +184,7 @@ public abstract class AbstractProblemLoader {
      * @param bootClassPath An optional boot class path.
      * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
      * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
-     * @param ui The {@link UserInterface} to use.
+     * @param control The {@link ProblemLoaderControl} to use.
      * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call {@link UserInterface#selectProofObligation(InitConfig)} if no {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
      */
     public AbstractProblemLoader(File file, 
@@ -192,13 +192,13 @@ public abstract class AbstractProblemLoader {
                                  File bootClassPath,
                                  Profile profileOfNewProofs, 
                                  boolean forceNewProfileOfNewProofs,
-                                 UserInterface ui,
+                                 ProblemLoaderControl control,
                                  boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
                                  Properties poPropertiesToForce) {
         this.file = file;
         this.classPath = classPath;
         this.bootClassPath = bootClassPath;
-        this.ui = ui;
+        this.control = control;
         this.profileOfNewProofs = profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile();
         this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
         this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile = askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
@@ -213,7 +213,7 @@ public abstract class AbstractProblemLoader {
      * @throws ProblemLoaderException Occurred Exception.
      */
     public void load() throws ProofInputException, IOException, ProblemLoaderException {
-            ui.loadingStarted();
+            control.loadingStarted(this);
             // Read environment
             envInput = createEnvInput();
             problemInitializer = createProblemInitializer();
@@ -225,7 +225,7 @@ public abstract class AbstractProblemLoader {
             try {
                 if (poContainer == null) {
                     if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
-                        if (ui.selectProofObligation(initConfig)) {
+                        if (control.selectProofObligation(initConfig)) {
                             return;
                         } else {
                             // That message would be reported otherwise. Undesired.
@@ -255,7 +255,7 @@ public abstract class AbstractProblemLoader {
                 return; // Everything fine
             }
             finally {
-               ui.loadingFinished(this, poContainer, proofList, result);
+               control.loadingFinished(this, poContainer, proofList, result);
             }
     }
 
@@ -329,7 +329,7 @@ public abstract class AbstractProblemLoader {
         }
         else if (filename.endsWith(".key") || filename.endsWith(".proof")) {
             // KeY problem specification or saved proof
-            return new KeYUserProblemFile(filename, file, ui, profileOfNewProofs);
+            return new KeYUserProblemFile(filename, file, control, profileOfNewProofs);
 
         }
         else if (file.isDirectory()) {
@@ -359,7 +359,7 @@ public abstract class AbstractProblemLoader {
      */
     protected ProblemInitializer createProblemInitializer() {
         Profile profile = forceNewProfileOfNewProofs ? profileOfNewProofs : envInput.getProfile();
-        return new ProblemInitializer(ui, new Services(profile), ui);
+        return new ProblemInitializer(control, new Services(profile), control);
     }
 
     /**
