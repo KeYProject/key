@@ -56,7 +56,8 @@ public class DefaultProofControl extends AbstractProofControl {
    @Override
    public synchronized void stopAutoMode() {
       if (isInAutoMode()) {
-         autoModeThread.cancel();
+         autoModeThread.interrupt();
+         waitWhileAutoMode();
       }
    }
 
@@ -108,12 +109,6 @@ public class DefaultProofControl extends AbstractProofControl {
             autoModeThread = null;
             fireAutoModeStopped(new ProofEvent(proof));
          }
-      }
-      
-      public void cancel() {
-         stop(); // Stop the currently running thread // TODO: Find better solution (REFACTORING_FIX_ME)
-         autoModeThread = null;
-         fireAutoModeStopped(new ProofEvent(proof));
       }
    }
 }
