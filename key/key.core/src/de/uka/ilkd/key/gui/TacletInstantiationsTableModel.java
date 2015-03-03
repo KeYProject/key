@@ -21,6 +21,7 @@ import javax.swing.table.AbstractTableModel;
 
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -60,8 +61,10 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
+import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.RigidnessException;
 import de.uka.ilkd.key.rule.inst.SortException;
+import de.uka.ilkd.key.util.Pair;
 
 
 public class TacletInstantiationsTableModel extends AbstractTableModel {
@@ -71,7 +74,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
      */
     private static final long serialVersionUID = 5285420522875326156L;
     /** the instantiations entries */
-    private ArrayList<Object[]> entries;
+    private ArrayList<Pair<SchemaVariable, String>> entries;
     /** the related rule application */
     private final TacletApp originalApp;
     /** the integer defines the row until which no editing is possible */
@@ -80,7 +83,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     private NamespaceSet nss;
     /** the java service object */
     private Services services;
-    /** the abbreviationmap */
+    /** the abbreviation map */
     private AbbrevMap scm;
     /** the current goal */
     private Goal goal;
@@ -116,38 +119,30 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     /**
      * returns the set of namespaces
      */
-    public NamespaceSet namespaces() {
+    private NamespaceSet namespaces() {
         return nss;
     }
 
     /** creates a Vector with the row entries of the table
     */
-    private ArrayList<Object[]> createEntryArray(TacletApp tacletApp) {
-        ArrayList<Object[]> rowVec = new ArrayList<Object[]>();
-        Iterator<SchemaVariable> it = tacletApp.instantiations().svIterator();
+    private ArrayList<Pair<SchemaVariable, String>> createEntryArray(TacletApp tacletApp) {
+        ArrayList<Pair<SchemaVariable, String>> rowVec = new ArrayList<>();
+        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it = tacletApp.instantiations().pairIterator();
         int count = 0;
 
         while (it.hasNext()) {
-            SchemaVariable sv = it.next();
-            final Object[] column = new Object[] {
-                    sv, 
-                    ProofSaver.printAnything(tacletApp.instantiations().getInstantiation(sv), services)};
-            rowVec.add(column);
+            final ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> entry = it.next();            
+            rowVec.add(new Pair<SchemaVariable, String>(entry.key(), ProofSaver.printAnything(entry.value(), services)));
             count++;
         }
 
         noEditRow = count - 1;
 
-        Iterator<SchemaVariable> varIt = tacletApp.uninstantiatedVars().iterator();
         ImmutableList<String> proposals = ImmutableSLList.<String>nil();
 
-        while (varIt.hasNext()) {
-            Object[] column = new Object[2];
-            SchemaVariable var = varIt.next();
+        for (SchemaVariable var: tacletApp.uninstantiatedVars()) {
 
             if (!tacletApp.taclet ().getIfFindVariables ().contains(var)) {
-                column[0] = var;
-
                 // create an appropriate and unique proposal for the name ...
                 String proposal
                         = instantiationProposers.getProposal(tacletApp,
@@ -156,31 +151,21 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
                                                              goal.node(),
                                                              proposals);
 
+
+                Pair<SchemaVariable, String> pair = new Pair<>(var, proposal);
+
                 if(proposal != null) {
                     // A proposal is available ...
-                    column[1] = proposal;
                     proposals = proposals.append(proposal);
                 }
-
-                rowVec.add(column);
+                
+                rowVec.add(pair);
             }
         }
 
         return rowVec;
     }
 
-
-    /** adds an instantiation of a schemavariable */
-    public void addInstantiationEntry(int row, Term instantiation) {
-	entries.get(row)[1] = instantiation;
-    }
-
-    /** return the rule application which is the table models base
-     *  @return the Ruleapp
-     */
-    public TacletApp application() {
-        return originalApp;
-    }
 
     /** 
      * number of columns
@@ -215,7 +200,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
      * @param varNS the variable namespace
      * @param functNS the function namespace
      */
-    public Term parseTerm(String s, Namespace varNS, Namespace functNS)
+    private Term parseTerm(String s, Namespace varNS, Namespace functNS)
         throws ParserException
     {
         NamespaceSet copy = nss.copy();
@@ -230,7 +215,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
      * Parse the declaration of an identifier (i.e. the declaration of
      * a variable or skolem function)
      */
-    public IdDeclaration parseIdDeclaration ( String s )
+    private IdDeclaration parseIdDeclaration ( String s )
         throws ParserException {
         KeYParserF parser = null;
         try {
@@ -517,7 +502,10 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     @Override
     public void setValueAt(Object instantiation, int rowIndex,
                            int columnIndex) {
-	entries.get(rowIndex)[columnIndex] = instantiation;
+        if (columnIndex == 0)
+            entries.set(rowIndex, new Pair<>((SchemaVariable) instantiation, entries.get(rowIndex).second));
+        else
+            entries.set(rowIndex, new Pair<>(entries.get(rowIndex).first, (String) instantiation));
     }
 
     /** get value at the specified row and col
@@ -525,18 +513,20 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
      */
     @Override
     public Object getValueAt(int row, int col) {
-        return  entries.get(row)[col];
+        return  col == 0 ? entries.get(row).first : entries.get(row).second;
     }
 
     /** returns the index of the row the given Schemavariable stands
      *@return the index of the row the given Schemavariable stands (-1
      * if not found)
      */
-    public int getSVRow(SchemaVariable sv) {
-        for (int i = 0; i < entries.size(); i++) {
-            if (getValueAt(i, 0).equals(sv)) {
-                return i;
+    private int getSVRow(SchemaVariable sv) {
+        int rowIndex = 0;
+        for (Pair<SchemaVariable, String> pair: entries) {
+            if (pair.first.equals(sv)) {
+                return rowIndex;
             }
+            ++rowIndex;
         }
         return -1;
     }
