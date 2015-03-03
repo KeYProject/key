@@ -17,10 +17,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.key_project.util.collection.ImmutableSet;
+
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.speclang.PositionedString;
 
 
 /** 
@@ -71,8 +74,9 @@ public interface EnvInput {
      * Reads the input using the given modification strategy, i.e.,
      * parts of the input do not modify the initial configuration while
      * others do.
+     * @return The found warnings or an empty {@link ImmutableSet} if no warnings occurred.
      */
-    void read() throws ProofInputException;
+    ImmutableSet<PositionedString> read() throws ProofInputException;
     
     /**
      * Returns the {@link Profile} to use.

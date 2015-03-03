@@ -218,6 +218,9 @@ public abstract class AbstractProblemLoader {
             envInput = createEnvInput();
             problemInitializer = createProblemInitializer();
             initConfig = createInitConfig();
+            if (!problemInitializer.getWarnings().isEmpty()) {
+               control.reportWarnings(problemInitializer.getWarnings());
+            }
             // Read proof obligation settings
             LoadedPOContainer poContainer = createProofObligationContainer();
             ProofAggregate proofList = null;

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.antlr.runtime.RecognitionException;
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -37,6 +38,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -315,7 +317,7 @@ public class KeYFile implements EnvInput {
     
     
     @Override
-    public void read() throws ProofInputException {
+    public ImmutableSet<PositionedString> read() throws ProofInputException {
 	if(initConfig == null) {
 	    throw new IllegalStateException("KeYFile: InitConfig not set.");
 	}
@@ -354,6 +356,7 @@ public class KeYFile implements EnvInput {
                 chooseContract = problemParser.getChooseContract();
                 proofObligation = problemParser.getProofObligation();
                 Debug.out("Read KeY file   ", file);
+                return DefaultImmutableSet.nil();
             } finally {
                 cinp.close();
             }

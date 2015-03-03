@@ -1,10 +1,13 @@
 package de.uka.ilkd.key.proof.io;
 
+import org.key_project.util.collection.ImmutableSet;
+
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
+import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 /**
@@ -38,4 +41,10 @@ public interface ProblemLoaderControl extends ProblemInitializerListener, Progre
     * @return true if the proof obligation was selected, and false if action was aborted
     */
     boolean selectProofObligation(InitConfig initConfig);
+
+    /**
+     * Report the occurred warnings.
+     * @param warnings The occurred warnings.
+     */
+    void reportWarnings(ImmutableSet<PositionedString> warnings);
 }

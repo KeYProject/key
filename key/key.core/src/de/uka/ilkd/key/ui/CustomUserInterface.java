@@ -13,11 +13,14 @@
 
 package de.uka.ilkd.key.ui;
 
+import org.key_project.util.collection.ImmutableSet;
+
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.speclang.PositionedString;
 
 /**
  * <p>
@@ -179,6 +182,14 @@ public class CustomUserInterface extends AbstractUserInterface {
     */
    @Override
    public void registerProofAggregate(ProofAggregate pa) {
+      // Nothing to do
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void reportWarnings(ImmutableSet<PositionedString> warnings) {
       // Nothing to do
    }
 }

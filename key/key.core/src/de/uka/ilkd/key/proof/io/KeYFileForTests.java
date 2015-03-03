@@ -16,6 +16,9 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.io.IOException;
 
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
@@ -23,6 +26,7 @@ import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.speclang.PositionedString;
 
 /**
  * Used for TESTS ONLY as we allow there to declare program variables global
@@ -44,7 +48,7 @@ public class KeYFileForTests extends KeYFile {
      * Throws an exception if no initial configuration has been set yet.
      */
     @Override
-    public void read() throws ProofInputException {
+    public ImmutableSet<PositionedString> read() throws ProofInputException {
 	if (initConfig==null) {
 	    throw new IllegalStateException("KeYFile: InitConfig not set.");
 	}
@@ -61,6 +65,7 @@ public class KeYFileForTests extends KeYFile {
             problemParser.problem(); 
 	    initConfig.setTaclets(problemParser.getTaclets()); 
 	    variables = problemParser.namespaces().variables().copy();
+	    return DefaultImmutableSet.nil();
 	} catch (Exception e) {
 	    throw new ProofInputException(e);
 	} finally {

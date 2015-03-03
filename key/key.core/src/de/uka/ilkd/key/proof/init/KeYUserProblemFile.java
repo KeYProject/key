@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.antlr.runtime.RecognitionException;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.KeYLexerF;
@@ -30,6 +32,7 @@ import de.uka.ilkd.key.proof.io.CountingBufferedReader;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -70,7 +73,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     //-------------------------------------------------------------------------
         
     @Override
-    public void read() throws ProofInputException {
+    public ImmutableSet<PositionedString> read() throws ProofInputException {
         if(initConfig == null) {
             throw new IllegalStateException("InitConfig not set.");
         }	
@@ -105,19 +108,21 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         }     
 	
         //read in-code specifications
+        ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
         try {
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), 
         				       readClassPath(), 
         				       readBootClassPath(), getProfile());        
         
         slEnvInput.setInitConfig(initConfig);
-        slEnvInput.read();
+        warnings = warnings.union(slEnvInput.read());
         } catch (IOException ioe) {
             throw new ProofInputException(ioe);
         }
                 
         //read key file itself
-        super.read();        
+        warnings = warnings.union(super.read());
+        return warnings;
     }    
 
 

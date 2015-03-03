@@ -21,6 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Vector;
 
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -64,6 +65,7 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -86,6 +88,9 @@ public final class ProblemInitializer {
     private final ProgressMonitor progMon;
     private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
     private final ProblemInitializerListener listener;
+    
+    private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
+    
     //-------------------------------------------------------------------------
     //constructors
     //------------------------------------------------------------------------- 
@@ -358,7 +363,7 @@ public final class ProblemInitializer {
             // read envInput itself
             reportStatus("Reading "+envInput.name());
             envInput.setInitConfig(initConfig);
-            envInput.read();
+            warnings = warnings.union(envInput.read());
 
             // reset the variables namespace
             initConfig.namespaces().setVariables(new Namespace());
@@ -588,4 +593,12 @@ public final class ProblemInitializer {
            setProgress(kupf.getNumberOfChars());
         }
     }
+
+   /**
+    * Returns the found warnings.
+    * @return The found warnings.
+    */
+   public ImmutableSet<PositionedString> getWarnings() {
+      return warnings;
+   }
 }

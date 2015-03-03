@@ -17,6 +17,7 @@ import java.io.File;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
@@ -36,6 +37,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.removegenerics.Main;
 
 /**
@@ -350,5 +352,13 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
    @Override
    public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
       return AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, forced);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void reportWarnings(ImmutableSet<PositionedString> warnings) {
+      // Nothing to do
    }
 }

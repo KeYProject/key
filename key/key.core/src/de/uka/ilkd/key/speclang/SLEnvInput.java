@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -81,7 +82,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private static String getLanguage() {      
+    public static String getLanguage() {      
     	GeneralSettings gs 
         = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
         if(gs.useJML()) {
@@ -104,73 +105,11 @@ public final class SLEnvInput extends AbstractEnvInput {
         return kjts;
     }
     
-    // TODO : move GUI stuff somewhere else
     
-    private void showWarningDialog(ImmutableSet<PositionedString> warnings) {
-       throw new UnsupportedOperationException(); // TODO: Give warnings back to probleminitializer (REFACTORING_FIX_ME)
-//        if(java.awt.GraphicsEnvironment.isHeadless()) {
-//            return;
-//        }
-//                
-//        final JDialog dialog = new JDialog(MainWindow.getInstance(), 
-//                                           getLanguage() + " warning", 
-//                                           true);
-//        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-//        Container pane = dialog.getContentPane();
-//        pane.setLayout(new BorderLayout());
-//        
-//        //top label
-//        JLabel label = new JLabel("The following non-fatal "
-//                                  + "problems occurred when translating your " 
-//                                  + getLanguage() + " specifications:");
-//        label.setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 5));
-//        pane.add(label, BorderLayout.NORTH);
-//          
-//        //scrollable warning list
-//        JScrollPane scrollpane = new JScrollPane();
-//        scrollpane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-//        JList list = new JList(warnings.toArray(new PositionedString[warnings.size()]));
-//        list.setBorder(BorderFactory.createLoweredBevelBorder());
-//        scrollpane.setViewportView(list);
-//        pane.add(scrollpane, BorderLayout.CENTER);
-//    
-//        //ok button
-//        final JButton button = new JButton("OK");
-//        button.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                dialog.setVisible(false);
-//            }
-//        });
-//        Dimension buttonDim = new Dimension(100, 27);
-//        button.setPreferredSize(buttonDim);
-//        button.setMinimumSize(buttonDim);
-//        JPanel panel = new JPanel();
-//        panel.add(button);
-//        pane.add(panel, BorderLayout.SOUTH);
-//        dialog.getRootPane().setDefaultButton(button);
-//        
-//        button.registerKeyboardAction(
-//            new ActionListener() {
-//                public void actionPerformed(ActionEvent event) {
-//                    if(event.getActionCommand().equals("ESC")) {
-//                        button.doClick();
-//                    }
-//                }
-//            },
-//            "ESC",
-//            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-//            JComponent.WHEN_IN_FOCUSED_WINDOW);
-//        
-//        dialog.setSize(700, 300);
-//        dialog.setLocationRelativeTo(MainWindow.getInstance());
-//        dialog.setVisible(true);
-//        dialog.dispose();
-    }
-    
-    
-    private void createDLLibrarySpecsHelper(Set<KeYJavaType> allKJTs,
+    private ImmutableSet<PositionedString> createDLLibrarySpecsHelper(Set<KeYJavaType> allKJTs,
 	                                    String path) 
     		throws ProofInputException {
+        ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
         for(KeYJavaType kjt : allKJTs) {
             if(kjt.getJavaType() instanceof TypeDeclaration
                && ((TypeDeclaration)kjt.getJavaType()).isLibraryClass()) {
@@ -196,10 +135,11 @@ public final class SLEnvInput extends AbstractEnvInput {
                 if(rs != null) {
                     final KeYFile keyFile = new KeYFile(path, rs, null, getProfile());
                     keyFile.setInitConfig(initConfig);
-                    keyFile.read();
+                    warnings = warnings.union(keyFile.read());
                 }
             }
         }	
+        return warnings;
     }
     
     
@@ -207,40 +147,42 @@ public final class SLEnvInput extends AbstractEnvInput {
      * For all library classes C, look for file C.key in same 
      * directory; if found, read specifications from this file.
      */
-    private void createDLLibrarySpecs() throws ProofInputException {
+    private ImmutableSet<PositionedString> createDLLibrarySpecs() throws ProofInputException {
         final Set<KeYJavaType> allKJTs 
 		= initConfig.getServices().getJavaInfo().getAllKeYJavaTypes();			
-	
+        ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
 	//either boot class path or JavaRedux
 	if(bootClassPath != null) {
-	    createDLLibrarySpecsHelper(allKJTs, 
-		                       bootClassPath.getAbsolutePath());	    
+	    warnings = warnings.union(createDLLibrarySpecsHelper(allKJTs, 
+		                       bootClassPath.getAbsolutePath()));	    
 	} else {
             String path = JavaReduxFileCollection.JAVA_SRC_DIR;
             if (!initConfig.getProfile().getInternalClassDirectory().isEmpty()) { 
         	path += "/" + initConfig.getProfile().getInternalClassDirectory();
             }
-            createDLLibrarySpecsHelper(allKJTs, path);
+            warnings = warnings.union(createDLLibrarySpecsHelper(allKJTs, path));
 	}
         
         //if applicable: class path
         if(classPath != null) {
             for(File file : classPath) {
-        	createDLLibrarySpecsHelper(allKJTs, file.getAbsolutePath());
+               warnings = warnings.union(createDLLibrarySpecsHelper(allKJTs, file.getAbsolutePath()));
             }
         }
+        return warnings;
     }
     
     
-    private void createSpecs(SpecExtractor specExtractor) 
+    private ImmutableSet<PositionedString> createSpecs(SpecExtractor specExtractor) 
             throws ProofInputException {
         final JavaInfo javaInfo 
             = initConfig.getServices().getJavaInfo();
         final SpecificationRepository specRepos 
             = initConfig.getServices().getSpecificationRepository();
 
+        
         //read DL library specs before any other specs
-        createDLLibrarySpecs();
+        ImmutableSet<PositionedString> warnings = createDLLibrarySpecs();
        
         //sort types alphabetically (necessary for deterministic names)
         final Set<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
@@ -331,11 +273,9 @@ public final class SLEnvInput extends AbstractEnvInput {
         //add initially clauses to constructor contracts
         specRepos.createContractsFromInitiallyClauses();
 
-        //show warnings to user
-        ImmutableSet<PositionedString> warnings = specExtractor.getWarnings();
-        if(warnings != null && warnings.size() > 0) {
-            showWarningDialog(warnings);
-        }
+        //update warnings to user
+        warnings = warnings.union(specExtractor.getWarnings());
+        return warnings;
     }
 
     
@@ -345,7 +285,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     //-------------------------------------------------------------------------
 
     @Override
-    public void read() throws ProofInputException {
+    public ImmutableSet<PositionedString> read() throws ProofInputException {
         if(initConfig == null) {
             throw new IllegalStateException("InitConfig not set.");
         }
@@ -354,7 +294,10 @@ public final class SLEnvInput extends AbstractEnvInput {
         = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
         if(gs.useJML()) {
-            createSpecs(new JMLSpecExtractor(initConfig.getServices()));
+            return createSpecs(new JMLSpecExtractor(initConfig.getServices()));
+        }
+        else {
+           return null;
         }
     }
 

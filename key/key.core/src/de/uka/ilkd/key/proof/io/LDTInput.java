@@ -16,10 +16,14 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.util.List;
 
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.speclang.PositionedString;
 
 
 /** Represents the LDT .key files as a whole. Special treatment of these
@@ -117,7 +121,7 @@ public class LDTInput implements EnvInput {
      * sorts in all rules, e.g.
      */
     @Override
-    public void read() throws ProofInputException {
+    public ImmutableSet<PositionedString> read() throws ProofInputException {
 	if (initConfig==null) {
 	    throw new IllegalStateException("LDTInput: InitConfig not set.");
 	}
@@ -138,6 +142,7 @@ public class LDTInput implements EnvInput {
 
         //create LDT objects
         initConfig.getServices().getTypeConverter().init();
+        return DefaultImmutableSet.nil();
     }
 
     @Override
