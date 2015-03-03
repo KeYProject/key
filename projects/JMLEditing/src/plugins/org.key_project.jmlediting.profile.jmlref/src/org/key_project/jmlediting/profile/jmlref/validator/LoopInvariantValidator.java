@@ -94,6 +94,12 @@ public class LoopInvariantValidator extends JMLKeywordValidator {
       }
       // If Java Code is found between the Loop invariant and
       // the next Loops offset, the invariant is invalid
+      for (final CommentRange r : context.getJMLComments()) {
+         if (r.getBeginOffset() <= node.getStartOffset()
+               && node.getEndOffset() <= r.getEndOffset()) {
+            this.containingComment = r;
+         }
+      }
       if (this.javaFoundBetweenAST(this.containingComment.getEndOffset(),
             loopNode.getStartPosition(), context.getJavaAST())) {
          return new JMLValidationError(
