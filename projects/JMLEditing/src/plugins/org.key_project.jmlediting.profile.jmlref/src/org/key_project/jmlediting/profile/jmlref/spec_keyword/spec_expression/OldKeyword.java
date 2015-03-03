@@ -5,8 +5,7 @@ import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.util.JavaBasicsParser;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IJMLPrimaryKeyword;
+import org.key_project.jmlediting.core.profile.syntax.AbstractJMLPrimaryKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.ParseFunctionKeywordParser;
 
@@ -16,7 +15,7 @@ import org.key_project.jmlediting.core.profile.syntax.ParseFunctionKeywordParser
  * @author Moritz Lichter
  *
  */
-public class OldKeyword extends AbstractKeyword implements IJMLPrimaryKeyword {
+public class OldKeyword extends AbstractJMLPrimaryKeyword {
 
    /**
     * Creates a new instance of the old keyword.

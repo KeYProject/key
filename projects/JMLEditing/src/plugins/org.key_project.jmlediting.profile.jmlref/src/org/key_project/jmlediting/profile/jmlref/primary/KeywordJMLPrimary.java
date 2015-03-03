@@ -8,17 +8,26 @@ import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
-import org.key_project.jmlediting.core.profile.syntax.IJMLPrimaryKeyword;
+import org.key_project.jmlediting.core.profile.syntax.JMLPrimaryKeywordSort;
 
+/**
+ * The primary which allows all keywords of sort {@link JMLPrimaryKeywordSort}
+ * to be parsed as a primary.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public class KeywordJMLPrimary implements IJMLPrimary {
 
+   /**
+    * The parser for all primaries.
+    */
    private ParseFunction keywordPrimaryParser;
 
    @Override
    public void setProfile(final IJMLProfile profile) {
-      this.keywordPrimaryParser = keywords(
-            JMLProfileHelper.filterKeywords(profile, IJMLPrimaryKeyword.class),
-            profile);
+      this.keywordPrimaryParser = keywords(JMLProfileHelper.filterKeywords(
+            profile, JMLPrimaryKeywordSort.INSTANCE), profile);
    }
 
    @Override

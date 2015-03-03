@@ -15,6 +15,8 @@ import org.key_project.jmlediting.core.profile.DerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 
 public class BasicDerivedProfileTest {
 
@@ -32,6 +34,11 @@ public class BasicDerivedProfileTest {
       @Override
       public String toString() {
          return this.getKeywords().iterator().next();
+      }
+
+      @Override
+      public IKeywortSort getSort() {
+         return ToplevelKeywordSort.INSTANCE;
       }
 
    }

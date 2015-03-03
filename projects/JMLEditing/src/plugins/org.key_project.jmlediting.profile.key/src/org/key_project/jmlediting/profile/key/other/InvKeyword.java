@@ -1,7 +1,8 @@
 package org.key_project.jmlediting.profile.key.other;
 
-import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IJMLPrimaryKeyword;
+import org.key_project.jmlediting.core.profile.syntax.AbstractJMLPrimaryKeyword;
+import org.key_project.jmlediting.core.profile.syntax.EmptyKeywordParser;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.profile.key.KeyProfile;
 
 /**
@@ -13,8 +14,7 @@ import org.key_project.jmlediting.profile.key.KeyProfile;
  * @author Moritz Lichter
  *
  */
-public class InvKeyword extends AbstractEmptyKeyword implements
-      IJMLPrimaryKeyword {
+public class InvKeyword extends AbstractJMLPrimaryKeyword {
    /**
     * Create s a new instance of the keyword.
     */
@@ -25,6 +25,11 @@ public class InvKeyword extends AbstractEmptyKeyword implements
    @Override
    public String getDescription() {
       return "The \\inv operator returns true just when the invariant of the object where \\inv is accessed for is valid.";
+   }
+
+   @Override
+   public IKeywordParser createParser() {
+      return EmptyKeywordParser.getInstance();
    }
 
 }

@@ -41,23 +41,40 @@ public class KeywortSortTest {
    }
 
    @Test
-   public void testSubSortIsSubSort() {
-      assertTrue("SubSort is a sub sort of TopSort",
-            SubSort.INSTANCE.isSubSortOf(TopSort.INSTANCE));
+   public void testSortCoversSubSort() {
+      assertTrue("SubSort is covered by TopSort",
+            TopSort.INSTANCE.covers(SubSort.INSTANCE));
    }
 
    @Test
-   public void testOtherSortIsNotSubSort() {
+   public void testSortCoversItseld() {
+      assertTrue("Sort covers not itself",
+            TopSort.INSTANCE.covers(TopSort.INSTANCE));
+   }
+
+   @Test
+   public void testOtherSortNotCoversSort() {
       assertFalse("OtherSort is sub sort of TopSort",
-            OtherSort.INSTANCE.isSubSortOf(TopSort.INSTANCE));
+            OtherSort.INSTANCE.covers(TopSort.INSTANCE));
       assertFalse("TopSort is sub sort of OtherSort",
-            TopSort.INSTANCE.isSubSortOf(OtherSort.INSTANCE));
+            TopSort.INSTANCE.covers(OtherSort.INSTANCE));
+   }
+
+   @Test
+   public void testNotCoversNull() {
+      assertFalse("A null sort is never covered", TopSort.INSTANCE.covers(null));
    }
 
    @Test
    public void testGetDescription() {
       assertEquals("Wrong description", "Sub",
             SubSort.INSTANCE.getDescription());
+   }
+
+   @Test(expected = IllegalArgumentException.class)
+   public void testNullDescription() {
+      new AbstractKeywordSort(null) {
+      };
    }
 
    private static interface IKeywortSortGetter {

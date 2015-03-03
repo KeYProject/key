@@ -6,9 +6,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.key_project.jmlediting.core.profile.syntax.EmptyKeywordParser;
+import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordAutoProposer;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
-import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
 
 /**
@@ -18,7 +20,7 @@ import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
  * @author Moritz Lichter
  *
  */
-public abstract class AbstractBehaviorKeyword implements IToplevelKeyword {
+public abstract class AbstractBehaviorKeyword implements IKeyword {
 
    /**
     * The keywords, which are available.
@@ -66,6 +68,11 @@ public abstract class AbstractBehaviorKeyword implements IToplevelKeyword {
    @Override
    public IKeywordAutoProposer createAutoProposer() {
       return null;
+   }
+
+   @Override
+   public IKeywortSort getSort() {
+      return ToplevelKeywordSort.INSTANCE;
    }
 
 }

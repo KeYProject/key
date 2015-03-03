@@ -9,7 +9,7 @@ import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.parser.util.JavaBasicsParser;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
-import org.key_project.jmlediting.profile.jmlref.bound_mod.IBoundVarModifierKeyword;
+import org.key_project.jmlediting.profile.jmlref.bound_mod.BoundVarModifierKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.PredicateParser;
 
@@ -38,11 +38,11 @@ public class QuantifierPrimary implements IJMLPrimary {
        * | \max | \min<br>
        * | \num_of | \product | \sum
        */
-      final ParseFunction quantifier = keywords(IQuantifierKeyword.class,
+      final ParseFunction quantifier = keywords(QuantifierKeywordSort.INSTANCE,
             profile);
 
       final ParseFunction boundVarModifier = keywords(
-            IBoundVarModifierKeyword.class, profile);
+            BoundVarModifierKeywordSort.INSTANCE, profile);
       /**
        * quantified-var-declarator ::= ident [ dims ]
        */

@@ -20,6 +20,14 @@ public interface IKeyword {
    Set<String> getKeywords();
 
    /**
+    * Returns the sort of this keyword.
+    *
+    * @return the keyword sort. May be null if the keyword does not belong to a
+    *         sort.
+    */
+   IKeywortSort getSort();
+
+   /**
     * Returns the description for this keyword. The description may be null to
     * indicate that no description is available.
     *

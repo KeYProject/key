@@ -7,6 +7,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordAutoProposer;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.core.profile.syntax.ParseFunctionKeywordParser;
 
 /**
@@ -92,6 +93,13 @@ public class UserDefinedKeyword extends AbstractKeyword implements
    @Override
    public Character getClosingCharacter() {
       return this.closingCharacter;
+   }
+
+   @Override
+   public IKeywortSort getSort() {
+      // TODO Auto-generated method stub
+      // TODO implement sorts
+      return null;
    }
 
 }

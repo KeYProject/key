@@ -1,10 +1,8 @@
 package org.key_project.jmlediting.profile.key.other;
 
-import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
+import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyToplevelKeyword;
 
-public class StrictlyPureKeyword extends AbstractEmptyKeyword implements
-      IToplevelKeyword {
+public class StrictlyPureKeyword extends AbstractEmptyToplevelKeyword {
 
    public StrictlyPureKeyword() {
       super("strictly_pure");

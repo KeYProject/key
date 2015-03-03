@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref;
 
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 
 /**
  * The \nothing keyword.
@@ -8,8 +9,7 @@ import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
  * @author Moritz Lichter
  *
  */
-public class NothingKeyword extends AbstractEmptyKeyword implements
-IStoreRefKeyword {
+public class NothingKeyword extends AbstractEmptyKeyword {
 
    /**
     * A new instance for the \nothing keyword.
@@ -21,5 +21,10 @@ IStoreRefKeyword {
    @Override
    public String getDescription() {
       return "Specifies that a method cannot assign to any locations.";
+   }
+
+   @Override
+   public IKeywortSort getSort() {
+      return StoreRefKeywordSort.INSTANCE;
    }
 }

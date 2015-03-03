@@ -6,9 +6,10 @@ import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.core.profile.syntax.ParseFunctionKeywordParser;
 
-public class SeqConcatKeyword extends AbstractKeyword implements SeqPrimitiveKeyword {
+public class SeqConcatKeyword extends AbstractKeyword {
 
    public SeqConcatKeyword() {
       super("\\seq_concat");
@@ -33,6 +34,11 @@ public class SeqConcatKeyword extends AbstractKeyword implements SeqPrimitiveKey
             return brackets(seq(seqExpr, constant(","), seqExpr));
          }
       };
+   }
+
+   @Override
+   public IKeywortSort getSort() {
+      return SeqPrimitiveKeywordSort.INSTANCE;
    }
 
 }

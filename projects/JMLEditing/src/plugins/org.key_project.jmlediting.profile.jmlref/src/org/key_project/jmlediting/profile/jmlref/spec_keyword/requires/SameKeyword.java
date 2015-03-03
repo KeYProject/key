@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword.requires;
 
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 
 /**
  * Implementation for the \same keyword.
@@ -8,8 +9,7 @@ import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
  * @author Moritz Lichter
  *
  */
-public class SameKeyword extends AbstractEmptyKeyword implements
-      IRequiresValueKeyword {
+public class SameKeyword extends AbstractEmptyKeyword {
 
    /**
     * Creates a new instance of the same keyword.
@@ -21,6 +21,11 @@ public class SameKeyword extends AbstractEmptyKeyword implements
    @Override
    public String getDescription() {
       return null;
+   }
+
+   @Override
+   public IKeywortSort getSort() {
+      return RequiresValueKeywordSort.INSTANCE;
    }
 
 }

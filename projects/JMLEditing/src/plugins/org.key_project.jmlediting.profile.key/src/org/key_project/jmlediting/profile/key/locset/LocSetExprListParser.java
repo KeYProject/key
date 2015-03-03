@@ -9,7 +9,7 @@ import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.IStoreRefKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefListParser;
 
 public class LocSetExprListParser implements ParseFunction {
@@ -40,12 +40,12 @@ public class LocSetExprListParser implements ParseFunction {
        */
       final IRecursiveParseFunction locSetExpr = recursiveInit();
 
-      final ParseFunction locSetOp = keywords(ILocSetOperatorKeyword.class,
-            profile);
+      final ParseFunction locSetOp = keywords(
+            LocSetOperatorKeywordSort.INSTANCE, profile);
       final ParseFunction locSetOpExpr = seq(locSetOp,
             brackets(seq(locSetExpr, constant(","), locSetExpr)));
 
-      final ParseFunction otherKeywords = keywords(ILocSetKeyword.class,
+      final ParseFunction otherKeywords = keywords(LocSetKeywordSort.INSTANCE,
             profile);
 
       locSetExpr
@@ -53,7 +53,7 @@ public class LocSetExprListParser implements ParseFunction {
 
       final ParseFunction locSetExprList = typed(
             STORE_REF_LIST,
-            alt(keywords(IStoreRefKeyword.class, profile),
+            alt(keywords(StoreRefKeywordSort.INSTANCE, profile),
                   separatedNonEmptyListErrorRecovery(',', locSetExpr,
                         "Expected a Loc Set Expr")));
 

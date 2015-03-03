@@ -11,7 +11,7 @@ import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.internal.ParserUtils;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
-import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
+import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 
 /**
@@ -78,7 +78,7 @@ public class DefaultJMLParser implements IJMLParser {
             keywordNode = ParserUtils.parseKeyword(text, position,
 
             end, JMLProfileHelper.filterKeywords(this.profile,
-                  IToplevelKeyword.class), this.profile);
+                  ToplevelKeywordSort.INSTANCE), this.profile);
 
             error = false;
          }

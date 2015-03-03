@@ -3,17 +3,37 @@ package org.key_project.jmlediting.core.profile.syntax;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+/**
+ * Abstract implementation of the {@link IKeywortSort}. Typically implementing
+ * classes only need to define the description. Subclasses are needed because
+ * the define the subsort relation of sorts.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public abstract class AbstractKeywordSort implements IKeywortSort {
 
+   /**
+    * The description of the sort.
+    */
    private final String description;
 
+   /**
+    * Creates a new sort with the given description. The constructor validated
+    * that the concrete class contains a valid INSTANCE field.
+    *
+    * @param description
+    *           the description, not allowed to be null
+    * @throws MalformedKeywortSortException
+    *            if no valid INSTANCE field was found
+    */
    protected AbstractKeywordSort(final String description) {
       if (description == null) {
          throw new IllegalArgumentException(
                "Need to give a non null description");
       }
       this.description = description;
-      this.validateInstanceField();
+      validateInstanceField(this);
    }
 
    @Override
@@ -22,17 +42,20 @@ public abstract class AbstractKeywordSort implements IKeywortSort {
    }
 
    @Override
-   public final boolean isSubSortOf(final IKeywortSort other) {
-      return other.getClass().isAssignableFrom(this.getClass());
+   public final boolean covers(final IKeywortSort other) {
+      if (other == null) {
+         return false;
+      }
+      return this.getClass().isAssignableFrom(other.getClass());
    }
 
    /**
     * Validates that concrete classes have a public static final INSTANCE field
     * declared which is of type of the subclass.
     */
-   private void validateInstanceField() {
-      final Class<? extends AbstractKeywordSort> concreteClass = this
-            .getClass();
+   private static void validateInstanceField(final IKeywortSort sort)
+         throws MalformedKeywortSortException {
+      final Class<? extends IKeywortSort> concreteClass = sort.getClass();
       // Need to have a public static final INSTANCE field
       try {
          final Field instanceField = concreteClass.getField("INSTANCE");
@@ -62,7 +85,17 @@ public abstract class AbstractKeywordSort implements IKeywortSort {
 
    }
 
-   public static void validateContentOfInstanceField(final IKeywortSort sort) {
+   /**
+    * Validates that the given sort has a valid INSTANCE field.
+    *
+    * @param sort
+    *           the sort to validate
+    * @throws MalformedKeywortSortException
+    *            if the INSTANCE field is not valid or not found
+    */
+   public static void validateContentOfInstanceField(final IKeywortSort sort)
+         throws MalformedKeywortSortException {
+      validateInstanceField(sort);
       final Class<? extends IKeywortSort> concreteClass = sort.getClass();
       try {
          // Check that the value of the sort is really of this type and not of a

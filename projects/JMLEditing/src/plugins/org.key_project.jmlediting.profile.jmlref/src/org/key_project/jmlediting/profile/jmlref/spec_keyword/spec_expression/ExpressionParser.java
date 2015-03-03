@@ -12,7 +12,7 @@ import org.key_project.jmlediting.core.parser.IRecursiveParseFunction;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.profile.jmlref.type.ITypeKeyword;
+import org.key_project.jmlediting.profile.jmlref.type.TypeKeywordSort;
 
 /**
  * The Expression Parser parses expressions as defined in the JML Reference
@@ -167,8 +167,9 @@ public class ExpressionParser implements ParseFunction {
       /**
        * type ::= reference-type | built-in-type
        */
-      final ParseFunction type = alt(keywords(ITypeKeyword.class, profile),
-            referenceType, builtInType);
+      final ParseFunction type = alt(
+            keywords(TypeKeywordSort.INSTANCE, profile), referenceType,
+            builtInType);
       /**
        * type-spec ::= [ ownership-modifiers ] type [ dims ]<br>
        * | \TYPE [ dims ]

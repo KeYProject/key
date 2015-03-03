@@ -176,7 +176,7 @@ public class JMLStoreRefProposer {
       if (allowKeywords) {
          result.addAll(JMLCompletionUtil.getKeywordProposals(this.context,
                prefix, JMLCompletionProposalComputer.getJMLImg(),
-               IStoreRefKeyword.class));
+               StoreRefKeywordSort.INSTANCE));
       }
 
       // propose all (visible)fields

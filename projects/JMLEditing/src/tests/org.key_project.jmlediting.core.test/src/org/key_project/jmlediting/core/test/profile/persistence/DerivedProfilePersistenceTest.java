@@ -18,6 +18,8 @@ import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceExc
 import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceFactory;
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription.ClosingCharacterLaw;
@@ -94,6 +96,11 @@ public class DerivedProfilePersistenceTest {
       public String getDescription() {
          return null;
       }
+
+      @Override
+      public IKeywortSort getSort() {
+         return ToplevelKeywordSort.INSTANCE;
+      }
    }
 
    // Illegal for persistence because the keyword has a non nullary constructor
@@ -105,6 +112,11 @@ public class DerivedProfilePersistenceTest {
 
       @Override
       public String getDescription() {
+         return null;
+      }
+
+      @Override
+      public IKeywortSort getSort() {
          return null;
       }
 

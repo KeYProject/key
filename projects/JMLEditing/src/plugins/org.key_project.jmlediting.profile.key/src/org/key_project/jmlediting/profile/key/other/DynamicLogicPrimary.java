@@ -8,6 +8,7 @@ import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 
 public class DynamicLogicPrimary implements IJMLPrimary {
 
@@ -19,6 +20,11 @@ public class DynamicLogicPrimary implements IJMLPrimary {
 
       @Override
       public String getDescription() {
+         return null;
+      }
+
+      @Override
+      public IKeywortSort getSort() {
          return null;
       }
 

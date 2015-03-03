@@ -16,7 +16,6 @@ import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.EverythingKeyword;
 import org.key_project.jmlediting.profile.key.locset.EmptyKeywod;
 import org.key_project.jmlediting.profile.key.locset.InfiniteUnionKeyword;
 import org.key_project.jmlediting.profile.key.locset.IntersetOperatorKeyword;
@@ -63,8 +62,9 @@ public class KeyProfile extends JMLReferenceProfile {
       supportedPrimaries.add(new DynamicLogicPrimary());
 
       // Support for LocSetExpressions
-      replace(supportedKeywords, EverythingKeyword.class,
-            new LocSetEverythingKeyword());
+      // Add everything for a different sort
+      supportedKeywords.add(new LocSetEverythingKeyword());
+      // All other keywords
       supportedKeywords.addAll(Arrays.asList(new EmptyKeywod(),
             new InfiniteUnionKeyword(), new IntersetOperatorKeyword(),
             new ReachLocsParser(), new SetMinusOperatorKeyword(),

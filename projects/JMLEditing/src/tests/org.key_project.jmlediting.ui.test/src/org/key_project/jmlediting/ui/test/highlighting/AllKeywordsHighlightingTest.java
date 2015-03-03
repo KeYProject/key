@@ -24,7 +24,7 @@ import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
+import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.ui.test.UITestUtils;
 import org.key_project.jmlediting.ui.test.UITestUtils.TestProject;
@@ -75,7 +75,8 @@ public class AllKeywordsHighlightingTest {
       if (missingKeywords.size() != 0) {
          String message = "The following keywords are missing: ";
          for (final IKeyword keyword : missingKeywords) {
-            message += keyword.getKeywords().iterator().next() + ", ";
+            message += keyword.getKeywords().iterator().next() + "("
+                  + keyword.getClass().getName() + "), ";
          }
          fail(message);
       }
@@ -89,7 +90,8 @@ public class AllKeywordsHighlightingTest {
          final int end = keywordNode.getEndOffset();
          final IKeyword keyword = keywordNode.getKeyword();
          final RGB desiredColor = JMLUiPreferencesHelper
-               .getWorkspaceJMLColor(keyword instanceof IToplevelKeyword ? ColorProperty.TOPLEVEL_KEYWORD
+               .getWorkspaceJMLColor(ToplevelKeywordSort.INSTANCE
+                     .covers(keyword.getSort()) ? ColorProperty.TOPLEVEL_KEYWORD
                      : ColorProperty.KEYWORD);
          final Position startInEditor = UITestUtils.getLineAndColumn(start,
                this.editor);

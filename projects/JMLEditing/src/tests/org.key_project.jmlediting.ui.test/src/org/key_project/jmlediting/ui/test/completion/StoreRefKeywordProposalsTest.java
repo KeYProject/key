@@ -22,7 +22,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.IStoreRefKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefKeywordSort;
 import org.key_project.jmlediting.ui.test.UITestUtils;
 import org.key_project.jmlediting.ui.test.UITestUtils.TestProject;
 import org.key_project.jmlediting.ui.test.UITestUtils.TestProject.SaveGuarantee;
@@ -221,8 +222,8 @@ public class StoreRefKeywordProposalsTest {
 
    private static List<String> appendStoreRefKeywords(final String... others) {
       final List<String> storeRefKeywords = new ArrayList<String>();
-      for (final IStoreRefKeyword keyword : JMLProfileHelper.filterKeywords(
-            UITestUtils.findReferenceProfile(), IStoreRefKeyword.class)) {
+      for (final IKeyword keyword : JMLProfileHelper.filterKeywords(
+            UITestUtils.findReferenceProfile(), StoreRefKeywordSort.INSTANCE)) {
          storeRefKeywords.addAll(keyword.getKeywords());
       }
       storeRefKeywords.addAll(Arrays.asList(others));

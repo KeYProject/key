@@ -63,8 +63,8 @@ public class SeqExpressionParser implements ParseFunction {
       final ParseFunction seqSuffix = seq(squareBrackets(seq(expr,
             constant(".."), expr)));
 
-      final ParseFunction seqPrim = alt(keywords(SeqPrimitiveKeyword.class,
-            profile));
+      final ParseFunction seqPrim = alt(keywords(
+            SeqPrimitiveKeywordSort.INSTANCE, profile));
       final ParseFunction seqExpr = seq(seqPrim, list(seqSuffix));
 
       this.seqExprParser = seqExpr;

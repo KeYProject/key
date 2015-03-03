@@ -21,7 +21,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
+import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.ui.test.Activator;
 import org.key_project.jmlediting.ui.test.UITestUtils;
 import org.key_project.util.eclipse.BundleUtil;
@@ -106,8 +106,8 @@ public class JMLCompletionProposalComputerTest {
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(), profile);
 
       // count MAX_KEYWORDS
-      final Set<IToplevelKeyword> keywordSet = JMLProfileHelper.filterKeywords(
-            profile, IToplevelKeyword.class);
+      final Set<IKeyword> keywordSet = JMLProfileHelper.filterKeywords(profile,
+            ToplevelKeywordSort.INSTANCE);
       for (final IKeyword iKeyword : keywordSet) {
          MAX_KEYWORDS += iKeyword.getKeywords().size();
       }
@@ -148,7 +148,7 @@ public class JMLCompletionProposalComputerTest {
    /*
     * Should lead to a TimeoutException not solved via expected, because
     * inputText must be deleted from caller after this method
-    * 
+    *
     * Also can have one Proposal containing "No Default Proposals"
     */
    private void testWithTimeout(final Position pos, final String insertText) {

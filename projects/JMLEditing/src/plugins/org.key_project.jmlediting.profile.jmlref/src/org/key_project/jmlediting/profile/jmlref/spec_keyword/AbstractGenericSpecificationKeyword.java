@@ -1,7 +1,6 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword;
 
-import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
+import org.key_project.jmlediting.core.profile.syntax.AbstractToplevelKeyword;
 
 /**
  * Superclass for method specification keywords (called generic specification
@@ -11,7 +10,7 @@ import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
  *
  */
 public abstract class AbstractGenericSpecificationKeyword extends
-AbstractKeyword implements IToplevelKeyword {
+      AbstractToplevelKeyword {
 
    /**
     * Creates a new keyword.

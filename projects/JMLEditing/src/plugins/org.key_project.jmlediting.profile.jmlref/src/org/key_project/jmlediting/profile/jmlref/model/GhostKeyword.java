@@ -1,6 +1,5 @@
 package org.key_project.jmlediting.profile.jmlref.model;
 
-import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
 
 /**
  * The implementation of the ghost keyword.
@@ -8,8 +7,7 @@ import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
  * @author Moritz Lichter
  *
  */
-public class GhostKeyword extends VariableDeclarationKeyword implements
-      IToplevelKeyword {
+public class GhostKeyword extends VariableDeclarationKeyword {
 
    /**
     * Creates a new instance of this keyword.

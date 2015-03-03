@@ -7,10 +7,11 @@ import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.core.profile.syntax.ParseFunctionKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
 
-public class ReachLocsParser extends AbstractKeyword implements ILocSetKeyword {
+public class ReachLocsParser extends AbstractKeyword {
 
    public ReachLocsParser() {
       super("\\reachLocs");
@@ -18,7 +19,6 @@ public class ReachLocsParser extends AbstractKeyword implements ILocSetKeyword {
 
    @Override
    public String getDescription() {
-      // TODO Auto-generated method stub
       return null;
    }
 
@@ -36,6 +36,11 @@ public class ReachLocsParser extends AbstractKeyword implements ILocSetKeyword {
                   opt(seq(constant(","), expr))));
          }
       };
+   }
+
+   @Override
+   public IKeywortSort getSort() {
+      return LocSetKeywordSort.INSTANCE;
    }
 
 }

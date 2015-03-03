@@ -17,7 +17,7 @@ import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqDefKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqKeyword;
-import org.key_project.jmlediting.profile.key.seq.SeqPrimitiveKeyword;
+import org.key_project.jmlediting.profile.key.seq.SeqPrimitiveKeywordSort;
 import org.key_project.jmlediting.profile.key.test.KeyProfileTestUtils;
 
 public class SeqExprTest {
@@ -45,7 +45,7 @@ public class SeqExprTest {
 
       final Set<IKeyword> expectedKeywords = new HashSet<IKeyword>();
       expectedKeywords.addAll(JMLProfileHelper.filterKeywords(keyProfile,
-            SeqPrimitiveKeyword.class));
+            SeqPrimitiveKeywordSort.INSTANCE));
       expectedKeywords.addAll(JMLProfileHelper.filterKeywords(keyProfile,
             SeqDefKeyword.class));
       expectedKeywords.addAll(JMLProfileHelper.filterKeywords(keyProfile,

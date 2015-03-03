@@ -1,7 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref;
 
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.requires.IRequiresValueKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 
 /**
  * The \not_specified keyword.
@@ -9,8 +9,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.requires.IRequires
  * @author Moritz Lichter
  *
  */
-public class NotSpecifiedKeyword extends AbstractEmptyKeyword implements
-      IStoreRefKeyword, IRequiresValueKeyword {
+public class NotSpecifiedKeyword extends AbstractEmptyKeyword {
 
    /**
     * Creates a new instance for the \not_specified keyword.
@@ -23,6 +22,11 @@ public class NotSpecifiedKeyword extends AbstractEmptyKeyword implements
    public String getDescription() {
       return "The form \\not_specified denotes a unspecified set of locations, "
             + "whose usage is determined by a particular tool";
+   }
+
+   @Override
+   public IKeywortSort getSort() {
+      return StoreRefKeywordSort.INSTANCE;
    }
 
 }

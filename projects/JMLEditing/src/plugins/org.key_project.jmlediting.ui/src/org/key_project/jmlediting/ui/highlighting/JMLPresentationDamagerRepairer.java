@@ -26,7 +26,7 @@ import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
-import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
+import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
@@ -246,7 +246,7 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
       for (final IKeywordNode kNode : allKeywords) {
          // Determine color for keyword
          final Color color;
-         if (kNode.getKeyword() instanceof IToplevelKeyword) {
+         if (ToplevelKeywordSort.INSTANCE.covers(kNode.getKeyword().getSort())) {
             color = toplevelKeywordColor;
          }
          else {

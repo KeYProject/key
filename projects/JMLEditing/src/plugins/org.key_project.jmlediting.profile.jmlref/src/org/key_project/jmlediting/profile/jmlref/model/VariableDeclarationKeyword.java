@@ -5,7 +5,7 @@ import static org.key_project.jmlediting.core.parser.util.JavaBasicsParser.ident
 
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
+import org.key_project.jmlediting.core.profile.syntax.AbstractToplevelKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.SemicolonClosedKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
@@ -17,7 +17,8 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Ex
  * @author Moritz Lichter
  *
  */
-public abstract class VariableDeclarationKeyword extends AbstractKeyword {
+public abstract class VariableDeclarationKeyword extends
+      AbstractToplevelKeyword {
 
    /**
     * Creates a new {@link VariableDeclarationKeyword}.

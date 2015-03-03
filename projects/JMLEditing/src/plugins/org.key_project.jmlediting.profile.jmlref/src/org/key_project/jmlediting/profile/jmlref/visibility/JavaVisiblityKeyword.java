@@ -1,7 +1,6 @@
 package org.key_project.jmlediting.profile.jmlref.visibility;
 
-import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
+import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyToplevelKeyword;
 
 /**
  * Base class for all Java visibility keywords (which are not special to JML).
@@ -9,8 +8,7 @@ import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
  * @author Moritz Lichter
  *
  */
-public abstract class JavaVisiblityKeyword extends AbstractEmptyKeyword
-implements IToplevelKeyword {
+public abstract class JavaVisiblityKeyword extends AbstractEmptyToplevelKeyword {
 
    /**
     * Creates a new keyword instance.

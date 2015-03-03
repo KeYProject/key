@@ -105,6 +105,7 @@ public abstract class AllKeywordsHighlightingTest {
      @ protected normal_behavior
      @   requires \not_specified;   
      @   requires \same;
+     @   assignable \not_specified;
      @*/
    protected /*@helper*/ void tryBreakEverything(/*@ non_null */ String s) {
       

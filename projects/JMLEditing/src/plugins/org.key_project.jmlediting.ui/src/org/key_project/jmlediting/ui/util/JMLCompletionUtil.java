@@ -15,7 +15,8 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 
 public class JMLCompletionUtil {
    private JMLCompletionUtil() {
@@ -32,24 +33,22 @@ public class JMLCompletionUtil {
     * @param context
     *           the {@link JavaContentAssistInvocationContext} to get the
     *           standardProposals for
-    * @param prefix
+    * @param proposalPrefix
     *           the prefix to compute the proposals for, null for the
     *           standardProposals
     * @param proposalImage
     *           the Image to be displayed in front of the proposal, null for no
     *           Image
-    * @param filter
-    *           the Class extending {@link IKeyword} to filter the proposals
-    * @param <T>
-    *           the type of the keywords to propose
+    * @param sort
+    *           the {@link IKeywortSort} of which all proposals have to be
     * @return List<{@link ICompletionProposal}> the computed standardProposals
     */
-   public static <T extends IKeyword> List<ICompletionProposal> getKeywordProposals(
+   public static List<ICompletionProposal> getKeywordProposals(
          final JavaContentAssistInvocationContext context,
          final String proposalPrefix, final Image proposalImage,
-         final Class<T> filter) {
-      if (filter == null) {
-         throw new IllegalArgumentException("filter may not be null!");
+         final IKeywortSort sort) {
+      if (sort == null) {
+         throw new IllegalArgumentException("Sort may not be null!");
       }
       final List<ICompletionProposal> result = new LinkedList<ICompletionProposal>();
 
@@ -72,8 +71,8 @@ public class JMLCompletionUtil {
                - prefixLength;
 
          // get only the Keywords that match the filter
-         final Set<T> filteredKeywordList = JMLProfileHelper.filterKeywords(
-               currentJMLProfile, filter);
+         final Set<IKeyword> filteredKeywordList = JMLProfileHelper
+               .filterKeywords(currentJMLProfile, sort);
 
          // Iterate through the supported Keywords defined in JMLProfile
          for (final IKeyword keywordContainer : filteredKeywordList) {
@@ -116,7 +115,7 @@ public class JMLCompletionUtil {
          final JavaContentAssistInvocationContext context,
          final Image proposalImage) {
       return getKeywordProposals(context, null, proposalImage,
-            IToplevelKeyword.class);
+            ToplevelKeywordSort.INSTANCE);
    }
 
    public static String computePrefix(
@@ -136,7 +135,7 @@ public class JMLCompletionUtil {
       else if (node.getStartOffset() >= context.getInvocationOffset()) {
          // the node is after the cursor => empty prefix and break the
          // recursion
-         System.out.println("zu spät...");
+         System.out.println("zu spï¿½t...");
          prefix = "";
       }
 

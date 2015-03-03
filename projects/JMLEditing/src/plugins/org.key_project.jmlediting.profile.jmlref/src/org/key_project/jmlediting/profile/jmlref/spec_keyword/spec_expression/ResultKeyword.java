@@ -1,7 +1,8 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression;
 
-import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IJMLPrimaryKeyword;
+import org.key_project.jmlediting.core.profile.syntax.AbstractJMLPrimaryKeyword;
+import org.key_project.jmlediting.core.profile.syntax.EmptyKeywordParser;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 
 /**
  * Implementation of the result keyword.
@@ -9,8 +10,7 @@ import org.key_project.jmlediting.core.profile.syntax.IJMLPrimaryKeyword;
  * @author Moritz Lichter
  *
  */
-public class ResultKeyword extends AbstractEmptyKeyword implements
-      IJMLPrimaryKeyword {
+public class ResultKeyword extends AbstractJMLPrimaryKeyword {
 
    /**
     * Creates a new instance for the result keyword.
@@ -24,6 +24,11 @@ public class ResultKeyword extends AbstractEmptyKeyword implements
       return "The primary \result can only be used in ensures, duration, "
             + "and workingspace clauses of a non-void method. Its value "
             + "is the value returned by the method.";
+   }
+
+   @Override
+   public IKeywordParser createParser() {
+      return EmptyKeywordParser.getInstance();
    }
 
 }

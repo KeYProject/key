@@ -47,7 +47,7 @@ public class RequiresKeyword extends AbstractGenericSpecificationKeyword {
             return alt(
                   new PredicateOrNotParser(profile),
                   keywords(JMLProfileHelper.filterKeywords(profile,
-                        IRequiresValueKeyword.class), profile));
+                        RequiresValueKeywordSort.INSTANCE), profile));
          }
       };
    }
