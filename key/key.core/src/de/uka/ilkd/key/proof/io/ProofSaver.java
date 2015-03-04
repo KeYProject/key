@@ -20,10 +20,10 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
-
-import javax.swing.event.EventListenerList;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
@@ -90,7 +90,7 @@ public class ProofSaver {
     * workspace when a proof file was saved.
     * </p>.
     */
-   private static final EventListenerList listeners = new EventListenerList();
+   private static final List<ProofSaverListener> listeners = new LinkedList<ProofSaverListener>();
    
    public ProofSaver(Proof proof, String filename, String internalVersion) {
       this.filename = filename;
@@ -610,7 +610,7 @@ public class ProofSaver {
      */
     public static void addProofSaverListener(ProofSaverListener l) {
        if (l != null) {
-          listeners.add(ProofSaverListener.class, l);
+          listeners.add(l);
        }
     }
     
@@ -620,7 +620,7 @@ public class ProofSaver {
      */
     public static void removeProofSaverListener(ProofSaverListener l) {
        if (l != null) {
-          listeners.remove(ProofSaverListener.class, l);
+          listeners.remove(l);
        }
     }
     
@@ -629,7 +629,7 @@ public class ProofSaver {
      * @param e The event.
      */
     protected static void fireProofSaved(ProofSaverEvent e) {
-       ProofSaverListener[] toInform = listeners.getListeners(ProofSaverListener.class);
+       ProofSaverListener[] toInform = listeners.toArray(new ProofSaverListener[listeners.size()]);
        for (ProofSaverListener l : toInform) {
           l.proofSaved(e);
        }

@@ -406,10 +406,6 @@ public final class Debug implements DebugMBean {
 	return "";
     }
 
-    public static void waitForClick() {
-	JOptionPane.showMessageDialog(null, "Click to continue in " + getClassAndMethod(2), "Click to continue", JOptionPane.INFORMATION_MESSAGE);
-    }
-
     //	
     // Management functionality. Allows to set debug parameters dynamically using the JMX interface
     //
