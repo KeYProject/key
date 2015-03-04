@@ -1,12 +1,12 @@
 package org.key_project.jmlediting.core.profile.persistence.internal;
 
-import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.BUNDLE;
-import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.CLASS;
+import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.CLASS_REFERENCE;
 import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.CLOSING_CHARACTER;
 import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.CODED_KEYWORD;
 import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.CONTENT_DESCRIPTION_ID;
 import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.DESCRIPTION;
 import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.KEYWORD;
+import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.SORT;
 import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.USER_DEFINED_KEYWORD;
 
 import java.util.HashSet;
@@ -15,12 +15,12 @@ import java.util.Set;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceException;
+import org.key_project.jmlediting.core.profile.syntax.AbstractKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.core.profile.syntax.user.UserDefinedKeyword;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -48,13 +48,9 @@ public abstract class KeywordPersistence {
          this.validateKeywordToPersist(keyword);
          final Element codedKeywordElem = doc.createElement(CODED_KEYWORD);
 
-         final Bundle keywordBundle = FrameworkUtil.getBundle(keyword
-               .getClass());
-         if (keywordBundle != null && keywordBundle.getSymbolicName() != null) {
-            codedKeywordElem.setAttribute(BUNDLE,
-                  keywordBundle.getSymbolicName());
-         }
-         codedKeywordElem.setAttribute(CLASS, keyword.getClass().getName());
+         final Element keywordClassElement = new ClassReferencePersistence()
+               .persistClassReference(keyword.getClass(), doc);
+         codedKeywordElem.appendChild(keywordClassElement);
 
          return codedKeywordElem;
       }
@@ -63,7 +59,8 @@ public abstract class KeywordPersistence {
    protected abstract void validateKeywordToPersist(IKeyword keyword)
          throws ProfilePersistenceException;
 
-   protected abstract IKeyword loadKeyword(String className, String bundleName)
+   protected abstract IKeyword loadKeyword(
+         Class<? extends IKeyword> keywordClass)
          throws ProfilePersistenceException;
 
    public IKeyword readKeyword(final Element elem)
@@ -73,13 +70,18 @@ public abstract class KeywordPersistence {
          return this.loadUserDefinedKeyword(elem);
       }
       else if (CODED_KEYWORD.equals(name)) {
-         final String keywordClassName = elem.getAttribute(CLASS);
-         if ("".equals(keywordClassName)) {
+
+         final NodeList keywordElems = elem
+               .getElementsByTagName(CLASS_REFERENCE);
+         if (keywordElems.getLength() != 1) {
             throw new ProfilePersistenceException(
-                  "No keyword class specified for the coded keyword node");
+                  "Expected excatly one class reference for a coded keyword");
          }
-         final String bundleId = elem.getAttribute(BUNDLE);
-         return this.loadKeyword(keywordClassName, bundleId);
+         final Element classElem = (Element) keywordElems.item(0);
+
+         final Class<? extends IKeyword> keywordClass = new ClassReferencePersistence()
+               .loadClassReference(classElem, IKeyword.class);
+         return this.loadKeyword(keywordClass);
       }
       else {
          throw new ProfilePersistenceException(
@@ -108,6 +110,13 @@ public abstract class KeywordPersistence {
          keywordElement.appendChild(doc.createTextNode(keywordString));
          userDefinedKeywordElem.appendChild(keywordElement);
       }
+
+      final Element keywordSortElement = doc.createElement(SORT);
+      keywordSortElement.appendChild(new ClassReferencePersistence()
+            .persistClassReference(userKeyword.getSort().getClass(), doc));
+
+      userDefinedKeywordElem.appendChild(keywordSortElement);
+
       return userDefinedKeywordElem;
    }
 
@@ -121,6 +130,7 @@ public abstract class KeywordPersistence {
 
       String description = null;
       final Set<String> keywords = new HashSet<String>();
+      IKeywortSort sort = null;
 
       final NodeList children = elem.getChildNodes();
       System.err.println("Num children: " + children.getLength());
@@ -144,6 +154,20 @@ public abstract class KeywordPersistence {
          else if (cElem.getNodeName().equals(KEYWORD)) {
             keywords.add(cElem.getFirstChild().getTextContent());
          }
+         else if (cElem.getNodeName().equals(SORT)) {
+            if (sort == null) {
+               final NodeList classNodes = cElem
+                     .getElementsByTagName(CLASS_REFERENCE);
+               if (classNodes.getLength() != 1) {
+                  throw new ProfilePersistenceException(
+                        "Expected one class reference for a sort");
+               }
+               final Class<? extends IKeywortSort> sortClass = new ClassReferencePersistence()
+                     .loadClassReference((Element) classNodes.item(0),
+                           IKeywortSort.class);
+               sort = AbstractKeywordSort.getSortObject(sortClass);
+            }
+         }
          else {
             throw new ProfilePersistenceException("Unsupported element: "
                   + cElem.getNodeName());
@@ -157,6 +181,10 @@ public abstract class KeywordPersistence {
       if (description == null) {
          throw new ProfilePersistenceException(
                "No description found for UserDefinedKeyword");
+      }
+      if (sort == null) {
+         throw new ProfilePersistenceException(
+               "No sort found for UserDefinedKeyword");
       }
 
       Character closingCharacter = null;
@@ -177,8 +205,8 @@ public abstract class KeywordPersistence {
                "Content for UserDefinedKeyword with id \"" + descriptionID
                      + "\" was not found.");
       }
-      return new UserDefinedKeyword(keywords, descr, description,
+
+      return new UserDefinedKeyword(keywords, sort, descr, description,
             closingCharacter);
    }
-
 }

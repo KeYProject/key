@@ -30,6 +30,8 @@ public class DerivedProfilePersistence implements IDerivedProfilePersistence {
    protected static final String CONTENT_DESCRIPTION_ID = "contentdescriptionid";
    protected static final String DESCRIPTION = "description";
    protected static final String CLOSING_CHARACTER = "closingcharacter";
+   protected static final String CLASS_REFERENCE = "classreference";
+   protected static final String SORT = "sort";
 
    @Override
    public Document persist(final IDerivedProfile profile)

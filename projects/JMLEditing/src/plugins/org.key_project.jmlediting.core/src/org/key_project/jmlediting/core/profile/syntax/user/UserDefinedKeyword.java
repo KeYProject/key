@@ -31,6 +31,7 @@ public class UserDefinedKeyword extends AbstractKeyword implements
     * The closing character.
     */
    private final char closingCharacter;
+   private final IKeywortSort sort;
 
    /**
     * Creates a new {@link UserDefinedKeyword}.
@@ -45,6 +46,7 @@ public class UserDefinedKeyword extends AbstractKeyword implements
     *           the closing character for this keyword, may be null
     */
    public UserDefinedKeyword(final Set<String> keywords,
+         final IKeywortSort sort,
          final IUserDefinedKeywordContentDescription contentDescription,
          final String description, final Character closingCharacter) {
       super(keywords);
@@ -56,9 +58,14 @@ public class UserDefinedKeyword extends AbstractKeyword implements
          throw new IllegalArgumentException(
                "Description is not allowed to be null");
       }
+      if (sort == null) {
+         throw new IllegalArgumentException(
+               "The sort is not allowed to be null");
+      }
       this.contentDescription = contentDescription;
       this.description = description;
       this.closingCharacter = closingCharacter;
+      this.sort = sort;
    }
 
    @Override
@@ -97,9 +104,7 @@ public class UserDefinedKeyword extends AbstractKeyword implements
 
    @Override
    public IKeywortSort getSort() {
-      // TODO Auto-generated method stub
-      // TODO implement sorts
-      return null;
+      return this.sort;
    }
 
 }

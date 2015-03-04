@@ -14,6 +14,8 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
+import org.key_project.jmlediting.core.profile.syntax.AbstractKeywordSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 
 /**
  * This class helps managing the available JML profiles.
@@ -63,6 +65,7 @@ public final class JMLProfileManagement {
                if (profileO instanceof IJMLProfile) {
                   final IJMLProfile profile = (IJMLProfile) profileO;
                   if (!profileCache.containsKey(profile.getIdentifier())) {
+                     validateProfile(profile);
                      profileCache.put(profile.getIdentifier(), profile);
                      availableProfiles.add(profile);
                   }
@@ -85,6 +88,24 @@ public final class JMLProfileManagement {
       }
 
       return Collections.unmodifiableSet(availableProfiles);
+   }
+
+   /**
+    * Does some validations on the given profile to catch exceptions early on
+    * not on runtime later. If validation is not successful, this method throws
+    * an exception.
+    *
+    * @param profile
+    *           the profile to validate
+    */
+   private static void validateProfile(final IJMLProfile profile) {
+      // Do some validations on the profile:
+      for (final IKeyword keywort : profile.getSupportedKeywords()) {
+         if (keywort.getSort() != null) {
+            AbstractKeywordSort.validateContentOfInstanceField(keywort
+                  .getSort());
+         }
+      }
    }
 
    /**

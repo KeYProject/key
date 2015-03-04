@@ -1,6 +1,5 @@
 package org.key_project.jmlediting.core.profile.persistence.internal;
 
-import org.eclipse.core.runtime.Platform;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceException;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
@@ -34,21 +33,10 @@ public class InstantiateKeywordsPersistence extends KeywordPersistence {
    }
 
    @Override
-   protected IKeyword loadKeyword(final String keywordClassName,
-         final String bundleId) throws ProfilePersistenceException {
-      final boolean hasBundle = !"".equals(bundleId);
+   protected IKeyword loadKeyword(final Class<? extends IKeyword> keywordClass)
+         throws ProfilePersistenceException {
       // Need to instantiate the class
       try {
-
-         final Class<?> keywordClass;
-         if (hasBundle) {
-            keywordClass = Platform.getBundle(bundleId).loadClass(
-                  keywordClassName);
-         }
-         else {
-            throw new ProfilePersistenceException(
-                  "Cannot instatiate a keyworword without a bundle");
-         }
 
          final Object newInstance = keywordClass.getConstructor().newInstance();
          if (!(newInstance instanceof IKeyword)) {
@@ -56,11 +44,6 @@ public class InstantiateKeywordsPersistence extends KeywordPersistence {
                   "Class of keyword does not implement IKeyword");
          }
          return (IKeyword) newInstance;
-      }
-      catch (final ClassNotFoundException e) {
-         throw new ProfilePersistenceException(
-               "Failed to load keyword class \"" + keywordClassName
-                     + "\" from bundle \"" + bundleId + "\"", e);
       }
       catch (final NoSuchMethodException e) {
          throw new ProfilePersistenceException(

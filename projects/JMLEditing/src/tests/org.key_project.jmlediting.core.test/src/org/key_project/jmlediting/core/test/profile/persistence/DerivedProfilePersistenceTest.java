@@ -166,7 +166,8 @@ public class DerivedProfilePersistenceTest {
       final String keyword = "mykeyword";
       final String keywrodDescription = "My own keyword.";
       profile.addKeyword(new UserDefinedKeyword(Collections.singleton(keyword),
-            contentDescription, keywrodDescription, closingChar));
+            ToplevelKeywordSort.INSTANCE, contentDescription,
+            keywrodDescription, closingChar));
 
       final Document doc = this.persistence.persist(profile);
       final IDerivedProfile readProfile = this.persistence.read(doc);
@@ -188,6 +189,8 @@ public class DerivedProfilePersistenceTest {
             newUserKeyword.getContentDescription());
       assertEquals("Wrong closing character", closingChar,
             newUserKeyword.getClosingCharacter());
+      assertEquals("Wrong sort", ToplevelKeywordSort.INSTANCE,
+            newUserKeyword.getSort());
 
    }
 

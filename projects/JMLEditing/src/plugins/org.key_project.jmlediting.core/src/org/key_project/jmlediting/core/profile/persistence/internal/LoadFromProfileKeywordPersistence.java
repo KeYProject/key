@@ -4,7 +4,6 @@ import org.key_project.jmlediting.core.profile.IDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceException;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.osgi.framework.FrameworkUtil;
 
 public class LoadFromProfileKeywordPersistence extends KeywordPersistence {
 
@@ -25,23 +24,16 @@ public class LoadFromProfileKeywordPersistence extends KeywordPersistence {
    }
 
    @Override
-   protected IKeyword loadKeyword(final String keywordClassName,
-         final String bundleId) throws ProfilePersistenceException {
-      final boolean hasBundle = !"".equals(bundleId);
+   protected IKeyword loadKeyword(final Class<? extends IKeyword> keywordClass)
+         throws ProfilePersistenceException {
       for (final IKeyword keyword : this.parentProfile.getSupportedKeywords()) {
-         if (keyword.getClass().getName().equals(keywordClassName)) {
-            if (!hasBundle
-                  || FrameworkUtil.getBundle(keyword.getClass())
-                        .getSymbolicName().equals(bundleId)) {
-               return keyword;
-            }
+         if (keyword.getClass() == keywordClass) {
+            return keyword;
          }
       }
 
       throw new ProfilePersistenceException(
-            "No keyword with the given class \"" + keywordClassName + "\""
-                  + (hasBundle ? "and bundle \"" + bundleId + "\"" : "")
-                  + " was found");
+            "No keyword with the given class \"" + keywordClass.getName()
+                  + "\" final was found");
    }
-
 }

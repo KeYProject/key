@@ -125,4 +125,16 @@ public abstract class AbstractKeywordSort implements IKeywortSort {
       }
    }
 
+   public static <T extends IKeywortSort> T getSortObject(
+         final Class<T> sortClass) {
+      try {
+         final Object sortObject = sortClass.getField("INSTANCE").get(null);
+         return sortClass.cast(sortObject);
+      }
+      catch (final Exception e) {
+         throw new MalformedKeywortSortException(
+               "Unable to access INSTANCE field", e);
+      }
+   }
+
 }
