@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.ui;
+package de.uka.ilkd.key.control;
 
 import java.io.File;
 import java.util.List;
@@ -36,7 +36,11 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 
-public abstract class AbstractUserInterface implements UserInterface, ProblemLoaderControl, ProverTaskListener {
+/**
+ * Provides a basic implementation of {@link UserInterfaceControl}.
+ * @author Martin Hentschel
+ */
+public abstract class AbstractUserInterfaceControl implements UserInterfaceControl, ProblemLoaderControl, ProverTaskListener {
     protected boolean saveOnly = false;
 
     private ProverTaskListener pml = null;
@@ -154,7 +158,7 @@ public abstract class AbstractUserInterface implements UserInterface, ProblemLoa
     /**
      * <p>
      * Creates a new {@link ProblemInitializer} instance which is configured
-     * for this {@link UserInterface}.
+     * for this {@link UserInterfaceControl}.
      * </p>
      * <p>
      * This method is used by nearly all Eclipse based product that

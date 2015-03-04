@@ -38,6 +38,7 @@ import org.key_project.util.java.IFilter;
 import org.key_project.util.java.StringUtil;
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Position;
@@ -99,7 +100,6 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.KeYConstants;
 
@@ -903,7 +903,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    
    /**
     * Executes an "step return" global on all goals on the given {@link SymbolicExecutionTreeBuilder}.
-    * @param ui The {@link CustomUserInterface} to use.
+    * @param ui The {@link DefaultUserInterfaceControl} to use.
     * @param builder The {@link SymbolicExecutionGoalChooser} to do step on.
     * @param oraclePathInBaseDirFile The oracle path.
     * @param oracleIndex The index of the current step.
@@ -914,7 +914,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     */
-   protected static void stepReturn(CustomUserInterface ui, 
+   protected static void stepReturn(DefaultUserInterfaceControl ui, 
                                     SymbolicExecutionTreeBuilder builder, 
                                     String oraclePathInBaseDirFile, 
                                     int oracleIndex, 
@@ -938,7 +938,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    
    /**
     * Executes an "step return" global on all goals on the given {@link SymbolicExecutionTreeBuilder}.
-    * @param ui The {@link CustomUserInterface} to use.
+    * @param ui The {@link DefaultUserInterfaceControl} to use.
     * @param builder The {@link SymbolicExecutionGoalChooser} to do step on.
     * @param oraclePathInBaseDirFile The oracle path.
     * @param oracleIndex The index of the current step.
@@ -949,7 +949,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     */
-   protected static void stepReturnWithBreakpoints(CustomUserInterface ui, 
+   protected static void stepReturnWithBreakpoints(DefaultUserInterfaceControl ui, 
                                     SymbolicExecutionTreeBuilder builder, 
                                     String oraclePathInBaseDirFile, 
                                     int oracleIndex, 
@@ -973,7 +973,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    
    /**
     * Executes an "step over" global on all goals on the given {@link SymbolicExecutionTreeBuilder}.
-    * @param ui The {@link CustomUserInterface} to use.
+    * @param ui The {@link DefaultUserInterfaceControl} to use.
     * @param builder The {@link SymbolicExecutionGoalChooser} to do step on.
     * @param oraclePathInBaseDirFile The oracle path.
     * @param oracleIndex The index of the current step.
@@ -984,7 +984,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     */
-   protected static void stepOver(CustomUserInterface ui, 
+   protected static void stepOver(DefaultUserInterfaceControl ui, 
                                   SymbolicExecutionTreeBuilder builder, 
                                   String oraclePathInBaseDirFile, 
                                   int oracleIndex, 
@@ -1006,7 +1006,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    
    /**
     * Executes an "step into" global on all goals on the given {@link SymbolicExecutionTreeBuilder}.
-    * @param ui The {@link CustomUserInterface} to use.
+    * @param ui The {@link DefaultUserInterfaceControl} to use.
     * @param builder The {@link SymbolicExecutionGoalChooser} to do step on.
     * @param oraclePathInBaseDirFile The oracle path.
     * @param oracleIndex The index of the current step.
@@ -1018,7 +1018,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     */
-   protected static SymbolicExecutionCompletions stepInto(CustomUserInterface ui, 
+   protected static SymbolicExecutionCompletions stepInto(DefaultUserInterfaceControl ui, 
                                                           SymbolicExecutionTreeBuilder builder, 
                                                           String oraclePathInBaseDirFile, 
                                                           int oracleIndex, 
@@ -1039,7 +1039,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    
    /**
     * Executes an "step into" global on all goals on the given {@link SymbolicExecutionTreeBuilder}.
-    * @param ui The {@link CustomUserInterface} to use.
+    * @param ui The {@link DefaultUserInterfaceControl} to use.
     * @param builder The {@link SymbolicExecutionGoalChooser} to do step on.
     * @param oraclePathInBaseDirFile The oracle path.
     * @param oracleIndex The index of the current step.
@@ -1050,7 +1050,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     */
-   protected static void resume(CustomUserInterface ui, 
+   protected static void resume(DefaultUserInterfaceControl ui, 
                                 SymbolicExecutionTreeBuilder builder, 
                                 String oraclePathInBaseDirFile, 
                                 File baseDir) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
@@ -1168,7 +1168,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
-   protected static SymbolicExecutionEnvironment<CustomUserInterface> createSymbolicExecutionEnvironment(File baseDir, 
+   protected static SymbolicExecutionEnvironment<DefaultUserInterfaceControl> createSymbolicExecutionEnvironment(File baseDir, 
                                                                                                          String javaPathInBaseDir, 
                                                                                                          String baseContractName,
                                                                                                          boolean mergeBranchConditions,
@@ -1184,7 +1184,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
       // Load java file
-      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), javaFile, null, null, true);
+      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), javaFile, null, null, true);
       // Start proof
       final Contract contract = environment.getServices().getSpecificationRepository().getContractByName(baseContractName);
       assertTrue(contract instanceof FunctionalOperationContract);
@@ -1197,7 +1197,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
       builder.analyse();
       assertNotNull(builder.getStartNode());
-      return new SymbolicExecutionEnvironment<CustomUserInterface>(environment, builder);
+      return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
    }
    
    /**
@@ -1221,7 +1221,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
-   protected static SymbolicExecutionEnvironment<CustomUserInterface> createSymbolicExecutionEnvironment(File baseDir, 
+   protected static SymbolicExecutionEnvironment<DefaultUserInterfaceControl> createSymbolicExecutionEnvironment(File baseDir, 
                                                                                                          String javaPathInBaseDir, 
                                                                                                          String containerTypeName, 
                                                                                                          String methodFullName,
@@ -1238,7 +1238,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
       // Load java file
-      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, true);
+      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, true);
       // Search method to proof
       IProgramMethod pm = searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
       // Start proof
@@ -1251,7 +1251,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
       builder.analyse();
       assertNotNull(builder.getStartNode());
-      return new SymbolicExecutionEnvironment<CustomUserInterface>(environment, builder);
+      return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
    }
    
    /**
@@ -1271,7 +1271,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProblemLoaderException Occurred Exception.
     */
-   protected static SymbolicExecutionEnvironment<CustomUserInterface> createSymbolicExecutionEnvironment(File baseDir, 
+   protected static SymbolicExecutionEnvironment<DefaultUserInterfaceControl> createSymbolicExecutionEnvironment(File baseDir, 
                                                                                                          String proofPathInBaseDir, 
                                                                                                          boolean mergeBranchConditions,
                                                                                                          boolean useOperationContracts,
@@ -1286,7 +1286,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       File proofFile = new File(baseDir, proofPathInBaseDir);
       assertTrue(proofFile.exists());
       // Load java file
-      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), proofFile, null, null, SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), null, true);
+      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), proofFile, null, null, SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), null, true);
       Proof proof = environment.getLoadedProof();
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
@@ -1295,7 +1295,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
       builder.analyse();
       assertNotNull(builder.getStartNode());
-      return new SymbolicExecutionEnvironment<CustomUserInterface>(environment, builder);
+      return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
    }
    
    /**
@@ -1321,7 +1321,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ProblemLoaderException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
-   protected static SymbolicExecutionEnvironment<CustomUserInterface> createSymbolicExecutionEnvironment(File baseDir, 
+   protected static SymbolicExecutionEnvironment<DefaultUserInterfaceControl> createSymbolicExecutionEnvironment(File baseDir, 
                                                                                                                 String javaPathInBaseDir, 
                                                                                                                 String containerTypeName, 
                                                                                                                 String methodFullName,
@@ -1340,7 +1340,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
       // Load java file
-      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, true);
+      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, true);
       // Search method to proof
       IProgramMethod pm = searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
       // Start proof
@@ -1353,7 +1353,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
       builder.analyse();
       assertNotNull(builder.getStartNode());
-      return new SymbolicExecutionEnvironment<CustomUserInterface>(environment, builder);
+      return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
    }
    
    /**
@@ -1399,7 +1399,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
       File tempFile = File.createTempFile("TestProgramMethodSubsetPO", ".proof", javaFile.getParentFile());
-      KeYEnvironment<CustomUserInterface> reloadedEnv = null;
+      KeYEnvironment<DefaultUserInterfaceControl> reloadedEnv = null;
       SymbolicExecutionTreeBuilder reloadedBuilder = null;
       try {
          ProofSaver saver = new ProofSaver(env.getProof(), tempFile.getAbsolutePath(), KeYConstants.INTERNAL_VERSION);
@@ -1484,7 +1484,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                             boolean variablesAreOnlyComputedFromUpdates) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       assertNotNull(maximalNumberOfExecutedSetNodesPerRun);
       for (int i = 0; i < maximalNumberOfExecutedSetNodesPerRun.length; i++) {
-         SymbolicExecutionEnvironment<CustomUserInterface> env = doSETTest(baseDir, 
+         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(baseDir, 
                                                                            javaPathInBaseDir, 
                                                                            containerTypeName, 
                                                                            methodFullName, 
@@ -1554,7 +1554,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                       boolean useUnicode,
                                       boolean usePrettyPrinting,
                                       boolean variablesAreOnlyComputedFromUpdates) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      SymbolicExecutionEnvironment<CustomUserInterface> env = doSETTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack, includeReturnValues, maximalNumberOfExecutedSetNodes, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack, includeReturnValues, maximalNumberOfExecutedSetNodes, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
       env.dispose();
    }
 
@@ -1606,7 +1606,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                       boolean useUnicode,
                                       boolean usePrettyPrinting,
                                       boolean variablesAreOnlyComputedFromUpdates) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      SymbolicExecutionEnvironment<CustomUserInterface> env = doSETTest(baseDir, proofFilePathInBaseDir, oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack, includeReturnValues, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, false);
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(baseDir, proofFilePathInBaseDir, oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack, includeReturnValues, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, false);
       if (env != null) {
          env.dispose();
       }
@@ -1646,7 +1646,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws SAXException Occurred Exception
     * @throws ProblemLoaderException Occurred Exception
     */
-   protected SymbolicExecutionEnvironment<CustomUserInterface> doSETTest(File baseDir,
+   protected SymbolicExecutionEnvironment<DefaultUserInterfaceControl> doSETTest(File baseDir,
                                                                          String proofFilePathInBaseDir,
                                                                          String oraclePathInBaseDirFile,
                                                                          boolean includeConstraints,
@@ -1663,7 +1663,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                          boolean variablesAreOnlyComputedFromUpdates,
                                                                          boolean truthValueEvaluationEnabled) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
-      SymbolicExecutionEnvironment<CustomUserInterface> env = null;
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
       try {
          // Make sure that parameter are valid.
          assertNotNull(proofFilePathInBaseDir);
@@ -1729,7 +1729,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws SAXException Occurred Exception
     * @throws ProblemLoaderException Occurred Exception
     */
-   protected SymbolicExecutionEnvironment<CustomUserInterface> doSETTest(File baseDir,
+   protected SymbolicExecutionEnvironment<DefaultUserInterfaceControl> doSETTest(File baseDir,
                                                                                 String javaPathInBaseDir,
                                                                                 String containerTypeName,
                                                                                 final String methodFullName,
@@ -1765,7 +1765,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, containerTypeName, methodFullName);
          setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
-         SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
+         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
          internalDoSETTest(oracleFile, env, oraclePathInBaseDirFile, maximalNumberOfExecutedSetNodes, includeConstraints, includeVariables, includeCallStack, includeReturnValues);
          return env;
       }
@@ -1812,7 +1812,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws SAXException Occurred Exception
     * @throws ProblemLoaderException Occurred Exception
     */
-   protected SymbolicExecutionEnvironment<CustomUserInterface> doSETTest(File baseDir,
+   protected SymbolicExecutionEnvironment<DefaultUserInterfaceControl> doSETTest(File baseDir,
                                                                          String javaPathInBaseDir,
                                                                          String baseContractName,
                                                                          String oraclePathInBaseDirFile,
@@ -1844,7 +1844,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, baseContractName);
          // Create proof environment for symbolic execution
-         SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, baseContractName, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, truthValueEvaluationEnabled);
+         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, baseContractName, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates, truthValueEvaluationEnabled);
          internalDoSETTest(oracleFile, env, oraclePathInBaseDirFile, maximalNumberOfExecutedSetNodes, includeConstraints, includeVariables, includeCallStack, includeReturnValues);
          return env;
       }
@@ -1859,7 +1859,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * {@link #doSETTest(File, String, String, String, boolean, boolean, boolean, int, boolean, boolean, boolean, boolean, boolean)} and
     * {@link #doSETTest(File, String, String, String, String, String, boolean, boolean, boolean, int, boolean, boolean, boolean, boolean, boolean)}.
     */
-   private void internalDoSETTest(File oracleFile, SymbolicExecutionEnvironment<CustomUserInterface> env, String oraclePathInBaseDirFile, int maximalNumberOfExecutedSetNodes, boolean includeConstraints, boolean includeVariables, boolean includeCallStack, boolean includeReturnValues) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   private void internalDoSETTest(File oracleFile, SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env, String oraclePathInBaseDirFile, int maximalNumberOfExecutedSetNodes, boolean includeConstraints, boolean includeVariables, boolean includeCallStack, boolean includeReturnValues) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
       // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
       ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
       env.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
@@ -1902,7 +1902,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                  String javaPathInBaseDir,
                                                                  String baseContractName) throws ProblemLoaderException, ProofInputException {
       if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-         SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInBaseDir, baseContractName, false, false, false, false, false, false, false, false, false);
+         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInBaseDir, baseContractName, false, false, false, false, false, false, false, false, false);
          env.dispose();
       }
       return setDefaultTacletOptions();
@@ -1923,7 +1923,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                  String containerTypeName,
                                                                  String methodFullName) throws ProblemLoaderException, ProofInputException {
       if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-         SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false);
+         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false);
          env.dispose();
       }
       return setDefaultTacletOptions();

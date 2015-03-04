@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
@@ -7,7 +8,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Tests the conditional values provided by {@link IExecutionNode#getVariables(de.uka.ilkd.key.logic.Term)}.
@@ -19,7 +19,7 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
     * @throws Exception Occurred Exception.
     */
    public void testVariablesUnderMethodReturnCondition() throws Exception {
-      SymbolicExecutionEnvironment<CustomUserInterface> env = doSETTest(testCaseDirectory, 
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(testCaseDirectory, 
                                                                         "/set/conditionalVariables/test/Number.java", 
                                                                         "Number", 
                                                                         "equals", 

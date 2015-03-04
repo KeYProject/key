@@ -70,6 +70,9 @@ import org.key_project.util.bean.IBean;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
 
+import de.uka.ilkd.key.control.AutoModeListener;
+import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -85,10 +88,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.ProofUserManager;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
-import de.uka.ilkd.key.ui.AutoModeListener;
-import de.uka.ilkd.key.ui.ProofControl;
-import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 
 /**
  * This class represents the Editor for viewing KeY-Proofs
@@ -369,8 +369,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             else {
                throw new CoreException(LogUtil.getLogger().createErrorStatus("Unsupported editor input \"" + input + "\"."));
             }
-            if (getUI() instanceof AbstractMediatorUserInterface) {
-               KeYMediator mediator = ((AbstractMediatorUserInterface) getUI()).getMediator();
+            if (getUI() instanceof AbstractMediatorUserInterfaceControl) {
+               KeYMediator mediator = ((AbstractMediatorUserInterfaceControl) getUI()).getMediator();
                selectionModel = mediator.getSelectionModel();
                mediator.setProof(currentProof);
             }
@@ -701,7 +701,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       else if (KeYEnvironment.class.equals(adapter)) {
          return getEnvironment();
       }
-      else if (UserInterface.class.equals(adapter)) {
+      else if (UserInterfaceControl.class.equals(adapter)) {
          return getUI();
       }
       else if (IProofProvider.class.equals(adapter)) {
@@ -726,7 +726,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * {@inheritDoc}
     */
    @Override
-   public UserInterface getUI() {
+   public UserInterfaceControl getUI() {
       KeYEnvironment<?> environment = getEnvironment();
       return environment != null ? environment.getUi() : null;
    }

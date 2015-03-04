@@ -49,10 +49,10 @@ import de.hentschel.visualdbc.interactive.proving.ui.util.InteractiveConnectionU
 import de.hentschel.visualdbc.interactive.proving.ui.util.event.IInteractiveConnectionUtilListener;
 import de.hentschel.visualdbc.interactive.proving.ui.util.event.InteractiveConnectionUtilEvent;
 import de.hentschel.visualdbc.key.ui.util.LogUtil;
+import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.ProofControl;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * This {@link IAdapterFactory} allows to convert {@link DbCDiagramEditor}
@@ -202,9 +202,9 @@ public class ProofProviderAdapterFactory implements IAdapterFactory {
        * {@inheritDoc}
        */
       @Override
-      public UserInterface getUI() {
+      public UserInterfaceControl getUI() {
          List<DbcProof> dbcProofs = getSelectedDbcProofs();
-         UserInterface result = null;
+         UserInterfaceControl result = null;
          if (!dbcProofs.isEmpty()) {
             DbcModel dbcModel = DbcModelUtil.getModelRoot(dbcProofs.get(0));
             if (dbcModel != null) {
@@ -222,7 +222,7 @@ public class ProofProviderAdapterFactory implements IAdapterFactory {
        */
       @Override
       public ProofControl getProofControl() {
-         UserInterface ui = getUI();
+         UserInterfaceControl ui = getUI();
          return ui != null ? ui.getProofControl() : null;
       }
 

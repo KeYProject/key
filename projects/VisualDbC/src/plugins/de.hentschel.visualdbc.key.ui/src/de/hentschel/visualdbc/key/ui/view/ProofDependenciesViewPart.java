@@ -51,6 +51,8 @@ import de.hentschel.visualdbc.key.ui.editor.DbcModelEditorInput;
 import de.hentschel.visualdbc.key.ui.editor.NothingActionBarContributor;
 import de.hentschel.visualdbc.key.ui.util.LogUtil;
 import de.hentschel.visualdbc.key.ui.util.ProofReferenceModelCreator;
+import de.uka.ilkd.key.control.AutoModeListener;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -59,8 +61,6 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
-import de.uka.ilkd.key.ui.AutoModeListener;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * This {@link IViewPart} shows the dependencies of the {@link Proof} provided
@@ -117,9 +117,9 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
    private IWorkbenchPart activeWorkbenchPart;
 
    /**
-    * The currently observed {@link UserInterface} in which {@link #proof} lives.
+    * The currently observed {@link UserInterfaceControl} in which {@link #proof} lives.
     */
-   private UserInterface userInterface;
+   private UserInterfaceControl userInterfaceControl;
    
    /**
     * The currently observed {@link Proof}s.
@@ -127,7 +127,7 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
    private Proof[] proofs;
    
    /**
-    * The currently observed {@link IProofProvider} which provides {@link #proof} and {@link #userInterface}.
+    * The currently observed {@link IProofProvider} which provides {@link #proof} and {@link #userInterfaceControl}.
     */
    private IProofProvider proofProvider;
 
@@ -367,8 +367,8 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
          activeJob = null;
       }
       // Remove old listener
-      if (userInterface != null) {
-         userInterface.getProofControl().removeAutoModeListener(autoModeListener);
+      if (userInterfaceControl != null) {
+         userInterfaceControl.getProofControl().removeAutoModeListener(autoModeListener);
       }
       if (proofs != null) {
          for (Proof proof : proofs) {
@@ -377,16 +377,16 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
       }
       //  Request new proof
       if (proofProvider != null) {
-         userInterface = proofProvider.getUI();
+         userInterfaceControl = proofProvider.getUI();
          proofs = proofProvider.getCurrentProofs();
       }
       else {
-         userInterface = null;
+         userInterfaceControl = null;
          proofs = null;
       }
       // Add new listeners
-      if (userInterface != null && !ArrayUtil.isEmpty(proofs)) {
-         userInterface.getProofControl().addAutoModeListener(autoModeListener);
+      if (userInterfaceControl != null && !ArrayUtil.isEmpty(proofs)) {
+         userInterfaceControl.getProofControl().addAutoModeListener(autoModeListener);
          for (Proof proof : proofs) {
             proof.addProofTreeListener(proofTreeListener);
          }
@@ -400,7 +400,7 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
     * @param node Analyze references only of this {@link Node} or analyze the whole proof it is {@code null}.
     */
    protected void updateShownContent(final Node node) {
-      if (userInterface != null && !ArrayUtil.isEmpty(proofs)) {
+      if (userInterfaceControl != null && !ArrayUtil.isEmpty(proofs)) {
          activeJob = new Job("Visualizing Proof References") {
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
@@ -535,8 +535,8 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
       if (proofProvider != null) {
          proofProvider.removeProofProviderListener(proofProviderListener);
       }
-      if (userInterface != null) {
-         userInterface.getProofControl().removeAutoModeListener(autoModeListener);
+      if (userInterfaceControl != null) {
+         userInterfaceControl.getProofControl().removeAutoModeListener(autoModeListener);
       }
       if (proofs != null) {
          for (Proof proof : proofs) {

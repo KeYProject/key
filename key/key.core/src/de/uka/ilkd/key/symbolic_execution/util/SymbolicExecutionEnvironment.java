@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.util;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -21,7 +22,6 @@ import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * Instances of this class are used to collect and access all
@@ -29,7 +29,7 @@ import de.uka.ilkd.key.ui.UserInterface;
  * via an {@link SymbolicExecutionTreeBuilder}.
  * @author Martin Hentschel
  */
-public class SymbolicExecutionEnvironment<U extends UserInterface> extends KeYEnvironment<U> {
+public class SymbolicExecutionEnvironment<U extends UserInterfaceControl> extends KeYEnvironment<U> {
    /**
     * The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
     */
@@ -48,7 +48,7 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> extends KeYEn
 
    /**
     * Constructor.
-    * @param ui The {@link UserInterface} in which the {@link Proof} is loaded.
+    * @param ui The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
     * @param initConfig The loaded project.
     * @param builder The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
     */

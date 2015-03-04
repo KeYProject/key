@@ -48,6 +48,8 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.jdt.JDTUtil;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.nodeviews.TacletMenu;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -63,8 +65,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * Provides utility method for the KeYIDE.
@@ -96,7 +96,7 @@ public final class KeYIDEUtil {
                        try {
                           SWTUtil.checkCanceled(monitor);
                           monitor.beginTask("Loading Proof Environment", IProgressMonitor.UNKNOWN);
-                          final KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath, EclipseUserInterfaceCustomization.getInstance());
+                          final KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, classPaths, bootClassPath, EclipseUserInterfaceCustomization.getInstance());
                           if (environment.getInitConfig() != null) {
                              // Get method to proof in KeY
                              final IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getJavaInfo());
@@ -236,17 +236,17 @@ public final class KeYIDEUtil {
 
    /**
     * <p>
-    * Collects all applicable {@link TacletApp}s for a given {@link PosInOccurrence} and {@link UserInterface}.
+    * Collects all applicable {@link TacletApp}s for a given {@link PosInOccurrence} and {@link UserInterfaceControl}.
     * </p>
     * <p>
     * The code behaves like the {@link TacletMenu}.
     * </p>
-    * @param ui - the {@link UserInterface} of the current {@link Proof}.
+    * @param ui - the {@link UserInterfaceControl} of the current {@link Proof}.
     * @param goal - the current {@link Goal}
     * @param pos - the {@link PosInOccurrence} to find the {@link TacletApp}s for.
     * @return {@link ImmutableList} - the {@link ImmutableList} with all applicable {@link TacletApp}s.
     */
-   public static ImmutableList<TacletApp> findTaclets(UserInterface ui, Goal goal, PosInOccurrence pos) {
+   public static ImmutableList<TacletApp> findTaclets(UserInterfaceControl ui, Goal goal, PosInOccurrence pos) {
       if (pos != null) {
          ImmutableList<TacletApp> findList = ui.getProofControl().getFindTaclet(goal, pos);
          ImmutableList<TacletApp> rewriteList = ui.getProofControl().getRewriteTaclet(goal, pos);
@@ -275,7 +275,7 @@ public final class KeYIDEUtil {
     * @param pos The {@link PosInSequent} to find the {@link TacletApp}s for.
     * @return The {@link ImmutableList} with all applicable {@link BuiltInRule}s.
     */
-   public static ImmutableList<BuiltInRule> findBuiltInRules(UserInterface ui, Goal goal, PosInSequent pos) {
+   public static ImmutableList<BuiltInRule> findBuiltInRules(UserInterfaceControl ui, Goal goal, PosInSequent pos) {
       if (pos != null) {
          return ui.getProofControl().getBuiltInRule(goal, pos.getPosInOccurrence());
       }

@@ -99,7 +99,7 @@ public class JoinMenuItem extends JMenuItem {
                    @Override
                    public void run() {
                        mediator.startInterface(true);
-                       // This method delegates the request only to the UserInterface which implements the functionality.
+                       // This method delegates the request only to the UserInterfaceControl which implements the functionality.
                      // No functionality is allowed in this method body!
                      mediator.getUI().getProofControl().startAutoMode(mediator.getSelectedProof(), goals);
 

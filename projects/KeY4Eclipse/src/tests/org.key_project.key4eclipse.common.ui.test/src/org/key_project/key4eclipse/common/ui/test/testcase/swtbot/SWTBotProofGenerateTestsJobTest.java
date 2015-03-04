@@ -14,7 +14,7 @@ import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.WindowUserInterface;
+import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -37,7 +37,7 @@ public class SWTBotProofGenerateTestsJobTest extends AbstractGenerateTestsJobTes
    @Test
    public void testTestGeneration() throws Exception {
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
-      KeYEnvironment<WindowUserInterface> env = null;
+      KeYEnvironment<WindowUserInterfaceControl> env = null;
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          bot.closeAllEditors();
@@ -56,7 +56,7 @@ public class SWTBotProofGenerateTestsJobTest extends AbstractGenerateTestsJobTes
          IFile proofFile = src.getFile("IntegerUtil.proof");
          assertTrue(proofFile.exists());
          // Open Proof
-         env = WindowUserInterface.loadInMainWindow(ResourceUtil.getLocation(proofFile), null, null, false);
+         env = WindowUserInterfaceControl.loadInMainWindow(ResourceUtil.getLocation(proofFile), null, null, false);
          KeYMediator mediator = env.getUi().getMediator();
          assertNotNull(mediator);
          Proof proof = env.getLoadedProof();

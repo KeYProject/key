@@ -20,10 +20,10 @@ import org.eclipse.swt.widgets.Event;
 import org.key_project.keyide.ui.editor.BuiltInRuleCommandContributionItem;
 import org.key_project.keyide.ui.editor.TacletCommandContributionItem;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * A {@link AbstractHandler} to handle the manual appliance of a {@link TacletApp}.
@@ -43,7 +43,7 @@ public class ApplyRuleHandler extends AbstractHandler {
          if (data instanceof TacletCommandContributionItem) {
             TacletCommandContributionItem item = (TacletCommandContributionItem)data;
             TacletApp app = item.getTacletApp();
-            UserInterface ui = item.getUi();
+            UserInterfaceControl ui = item.getUi();
             PosInSequent pos = item.getPosInSequent();
             if (!ui.getProofControl().selectedTaclet(app.taclet(), item.getGoal(), pos.getPosInOccurrence())) {
                throw new IllegalStateException("Taclet application failed." + app.rule().name());
@@ -52,7 +52,7 @@ public class ApplyRuleHandler extends AbstractHandler {
          else if (data instanceof BuiltInRuleCommandContributionItem) {
             BuiltInRuleCommandContributionItem item = (BuiltInRuleCommandContributionItem)data;
             BuiltInRule rule = item.getRule();
-            UserInterface ui = item.getUi();
+            UserInterfaceControl ui = item.getUi();
             PosInSequent pos = item.getPosInSequent();
             ui.getProofControl().selectedBuiltInRule(item.getGoal(), rule, pos.getPosInOccurrence(), false);
          }

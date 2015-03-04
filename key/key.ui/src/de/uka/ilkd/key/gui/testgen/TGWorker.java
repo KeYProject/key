@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -18,7 +19,6 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.testgen.AbstractTestGenerator;
 import de.uka.ilkd.key.smt.testgen.StopRequest;
-import de.uka.ilkd.key.ui.UserInterface;
 
 public class TGWorker extends SwingWorker<Void, Void> implements InterruptListener, StopRequest {
 	private final TGInfoDialog tgInfoDialog;
@@ -85,7 +85,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
        * {@inheritDoc}
        */
       @Override
-      protected Proof createProof(UserInterface ui, Proof oldProof, String newName, Sequent newSequent) throws ProofInputException {
+      protected Proof createProof(UserInterfaceControl ui, Proof oldProof, String newName, Sequent newSequent) throws ProofInputException {
          if (showInMainWindow) {
             InitConfig initConfig = oldProof.getInitConfig().deepCopy();
             final Proof proof = new Proof(newName, newSequent, "", initConfig.createTacletIndex(), 
@@ -110,7 +110,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
        * {@inheritDoc}
        */
       @Override
-      protected void handleAllProofsPerformed(UserInterface ui) {
+      protected void handleAllProofsPerformed(UserInterfaceControl ui) {
          mediator.setInteractive(true);
          mediator.startInterface(true);
       }
@@ -119,7 +119,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
        * {@inheritDoc}
        */
       @Override
-      protected void selectProof(UserInterface ui, Proof proof) {
+      protected void selectProof(UserInterfaceControl ui, Proof proof) {
          if (showInMainWindow) {
             mediator.setProof(proof);
          }

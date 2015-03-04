@@ -7,8 +7,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * A {@link Job} which generates test for a given proof file.
@@ -26,17 +26,17 @@ public class ProofGenerateTestsJob extends AbstractGenerateTestsJob {
    private final Proof proof;
    
    /**
-    * The {@link UserInterface} to use.
+    * The {@link UserInterfaceControl} to use.
     */
-   private final UserInterface ui;
+   private final UserInterfaceControl ui;
    
    /**
     * Constructor.
     * @param sourceProject The {@link IProject} which provides the source code.
     * @param proof The {@link Proof} to generate test cases for.
-    * @param ui The {@link UserInterface} to use.
+    * @param ui The {@link UserInterfaceControl} to use.
     */
-   public ProofGenerateTestsJob(IProject sourceProject, Proof proof, UserInterface ui) {
+   public ProofGenerateTestsJob(IProject sourceProject, Proof proof, UserInterfaceControl ui) {
       super();
       this.sourceProject = sourceProject;
       this.proof = proof;

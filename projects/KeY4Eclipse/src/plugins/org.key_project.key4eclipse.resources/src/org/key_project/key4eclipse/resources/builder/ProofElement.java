@@ -25,12 +25,12 @@ import org.key_project.key4eclipse.resources.io.ProofMetaFileTypeElement;
 import org.key_project.key4eclipse.resources.marker.MarkerUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Object that represents a proof and provides all the required stuff for the build process.
@@ -53,7 +53,7 @@ public class ProofElement {
    private List<IMarker> recursionMarker;
    private String markerMsg;
    
-   private KeYEnvironment<CustomUserInterface> environment;
+   private KeYEnvironment<DefaultUserInterfaceControl> environment;
    private Contract contract;
    private ProofOblInput proofObl;
    private boolean proofClosed;
@@ -65,7 +65,7 @@ public class ProofElement {
    
    private final SpecificationRepository specificationRepository;
    
-   public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<CustomUserInterface> environment, IFolder proofFolder, IFile proofFile, IFile metaFile, IMarker proofMarker, List<IMarker> recursionMarker, Contract contract){
+   public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<DefaultUserInterfaceControl> environment, IFolder proofFolder, IFile proofFile, IFile metaFile, IMarker proofMarker, List<IMarker> recursionMarker, Contract contract){
       this.javaFile = javaFile;
       this.scl = scl;
 
@@ -178,10 +178,10 @@ public class ProofElement {
    }
    
    
-   public KeYEnvironment<CustomUserInterface> getKeYEnvironment(){
+   public KeYEnvironment<DefaultUserInterfaceControl> getKeYEnvironment(){
       return environment;
    }
-   public void setKeYEnvironment(KeYEnvironment<CustomUserInterface> environment){
+   public void setKeYEnvironment(KeYEnvironment<DefaultUserInterfaceControl> environment){
       this.environment = environment;
    }
    public Contract getContract(){

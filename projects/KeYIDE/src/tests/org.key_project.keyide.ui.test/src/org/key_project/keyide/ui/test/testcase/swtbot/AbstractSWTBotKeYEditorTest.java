@@ -41,6 +41,8 @@ import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -52,8 +54,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * Provides the basic functionality to test the {@link KeYEditor}.
@@ -120,7 +120,7 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
       IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
       IFolder src = project.getProject().getFolder("src");
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToSourceFilesInBundle, src);
-      KeYEnvironment<CustomUserInterface> environment = null;
+      KeYEnvironment<DefaultUserInterfaceControl> environment = null;
       Proof proof = null;
       SWTBotEditor editor = null;
       try {
@@ -177,7 +177,7 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
        * @throws Exception Occurred Exception.
        */
       public void test(IJavaProject project, 
-                       KeYEnvironment<CustomUserInterface> environment, 
+                       KeYEnvironment<DefaultUserInterfaceControl> environment, 
                        Proof proof, 
                        SWTWorkbenchBot bot,
                        SWTBotEditor editor,
@@ -192,7 +192,7 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
     * @throws Exception Occurred Exception.
     */
    protected void openProof(final SWTWorkbenchBot bot, 
-                            final KeYEnvironment<CustomUserInterface> environment, 
+                            final KeYEnvironment<DefaultUserInterfaceControl> environment, 
                             final Proof proof) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
@@ -220,7 +220,7 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
     * @param pit The {@link PosInTerm}.
     * @param tacletName The name of the {@link Taclet} to apply.
     */
-   protected void applyTaclet(UserInterface ui, 
+   protected void applyTaclet(UserInterfaceControl ui, 
                               Goal goal, 
                               Sequent sequent, 
                               boolean inAntecedent, 

@@ -17,11 +17,11 @@ import junit.framework.TestCase;
 
 import org.key_project.util.java.ArrayUtil;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Tests for {@link ProofUserManager}.
@@ -43,9 +43,9 @@ public class TestProofUserManager extends TestCase {
       Object firstUser = new Object();
       Object secondUser = new Object();
       Object thirdUser = new Object();
-      CustomUserInterface ui = new CustomUserInterface();
-      KeYEnvironment<?> firstEnv = new KeYEnvironment<CustomUserInterface>(ui, null);
-      KeYEnvironment<?> secondEnv = new KeYEnvironment<CustomUserInterface>(ui, null);
+      DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();
+      KeYEnvironment<?> firstEnv = new KeYEnvironment<DefaultUserInterfaceControl>(ui, null);
+      KeYEnvironment<?> secondEnv = new KeYEnvironment<DefaultUserInterfaceControl>(ui, null);
       // Add firstProof with firstEnv
       ProofUserManager.getInstance().addUser(firstProof, firstEnv, firstUser);
       assertProofsAndEnvironments(firstProof, secondProof, thirdProof, false, false, false, new Object[] {firstUser}, new Object[] {}, new Object[] {}, firstEnv, false, new Proof[] {firstProof}, secondEnv, false, new Proof[] {});

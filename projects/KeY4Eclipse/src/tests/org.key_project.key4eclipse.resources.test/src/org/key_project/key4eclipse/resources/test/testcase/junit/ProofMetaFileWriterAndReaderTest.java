@@ -21,11 +21,11 @@ import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Tests for {@link ProofMetaFileWriter} and {@link ProofMetaFileReader}.
@@ -170,7 +170,7 @@ public class ProofMetaFileWriterAndReaderTest extends TestCase {
       IFile metaFile = mainProofs.getFile("Main[Main__magic(A)]_JML_normal_behavior_operation_contract_0.proofmeta");
       IFile anotherProofFile = aProofs.getFile("A[A__contractMagic()]_JML_normal_behavior_operation_contract_0.proof");
       // Load existing proof
-      KeYEnvironment<CustomUserInterface> env = KeYEnvironment.load(ResourceUtil.getLocation(proofFile), null, null);
+      KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(ResourceUtil.getLocation(proofFile), null, null);
       try {
          // Create ProofElement
          Proof proof = env.getLoadedProof();

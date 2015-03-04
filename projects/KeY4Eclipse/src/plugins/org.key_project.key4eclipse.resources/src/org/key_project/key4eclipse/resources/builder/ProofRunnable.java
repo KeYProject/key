@@ -20,6 +20,7 @@ import org.key_project.util.java.StringUtil;
 
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SingleProof;
@@ -32,7 +33,6 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -41,10 +41,10 @@ public class ProofRunnable implements Runnable {
    
    private List<ProofElement> proofElements;
    private List<ProofElement> proofsToDo;
-   private final KeYEnvironment<CustomUserInterface> environment;
+   private final KeYEnvironment<DefaultUserInterfaceControl> environment;
    private final IProgressMonitor monitor;
    
-   public ProofRunnable(IProject project, List<ProofElement> proofElements, List<ProofElement> proofsToDo, KeYEnvironment<CustomUserInterface> environment, IProgressMonitor monitor){
+   public ProofRunnable(IProject project, List<ProofElement> proofElements, List<ProofElement> proofsToDo, KeYEnvironment<DefaultUserInterfaceControl> environment, IProgressMonitor monitor){
       this.proofsToDo = Collections.synchronizedList(proofsToDo);
       this.proofElements = proofElements;
       this.environment = environment;
@@ -157,7 +157,7 @@ public class ProofRunnable implements Runnable {
       Proof proof = null;
       File file = pe.getProofFile().getLocation().toFile();
       Profile profile = pe.getKeYEnvironment().getInitConfig().getProfile();
-      KeYEnvironment<CustomUserInterface> loadEnv = null;
+      KeYEnvironment<DefaultUserInterfaceControl> loadEnv = null;
       boolean error = false;
       try{
          loadEnv = KeYEnvironment.load(profile, file, null, null, false);

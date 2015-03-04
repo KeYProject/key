@@ -37,6 +37,7 @@ import org.key_project.util.java.IFilter;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -48,7 +49,6 @@ import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
-import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
@@ -267,9 +267,9 @@ public final class TestKeY4EclipseUtil {
 
    /**
     * Blocks the current thread until the auto mode has started.
-    * @param ui The {@link UserInterface} to wait for its auto mode.
+    * @param ui The {@link UserInterfaceControl} to wait for its auto mode.
     */
-   public static void waitUntilAutoMode(SWTBot bot, final UserInterface ui) {
+   public static void waitUntilAutoMode(SWTBot bot, final UserInterfaceControl ui) {
       bot.waitUntil(new ICondition() {
          @Override
          public boolean test() throws Exception {
@@ -282,16 +282,16 @@ public final class TestKeY4EclipseUtil {
          
          @Override
          public String getFailureMessage() {
-            return "UserInterface \"" + ui + "\" is not in automode.";
+            return "UserInterfaceControl \"" + ui + "\" is not in automode.";
          }
       });
    }
 
    /**
     * Blocks the current thread while the auto mode is running.
-    * @param ui The {@link UserInterface} to wait for its auto mode.
+    * @param ui The {@link UserInterfaceControl} to wait for its auto mode.
     */
-   public static void waitWhileAutoMode(SWTBot bot, final UserInterface ui) {
+   public static void waitWhileAutoMode(SWTBot bot, final UserInterfaceControl ui) {
       bot.waitUntil(new ICondition() {
          @Override
          public boolean test() throws Exception {
@@ -304,7 +304,7 @@ public final class TestKeY4EclipseUtil {
          
          @Override
          public String getFailureMessage() {
-            return "UserInterface \"" + ui + "\" is still in automode.";
+            return "UserInterfaceControl \"" + ui + "\" is still in automode.";
          }
       });
    }

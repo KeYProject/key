@@ -71,7 +71,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.Pair;
 
 public final class ProofManagementDialog extends JDialog {
@@ -469,7 +469,7 @@ public final class ProofManagementDialog extends JDialog {
     private void findOrStartProof(ProofOblInput po) {
         Proof proof = findPreferablyClosedProof(po);
         if (proof == null) {
-            AbstractMediatorUserInterface ui = mediator.getUI();  
+            AbstractMediatorUserInterfaceControl ui = mediator.getUI();  
             
             ProblemInitializer pi =
                     new ProblemInitializer(ui, initConfig.getServices(), ui);

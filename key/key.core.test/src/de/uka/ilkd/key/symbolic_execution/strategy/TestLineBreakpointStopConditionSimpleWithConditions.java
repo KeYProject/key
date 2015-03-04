@@ -20,19 +20,19 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.LineBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 
 public class TestLineBreakpointStopConditionSimpleWithConditions extends AbstractSymbolicExecutionTestCase {
    public void testBreakpointStopCondition() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      SymbolicExecutionEnvironment<CustomUserInterface> envMain=null;
-      SymbolicExecutionEnvironment<CustomUserInterface> envSomethingMain=null;
-      SymbolicExecutionEnvironment<CustomUserInterface> envSomethingLocalMain=null;
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> envMain=null;
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> envSomethingMain=null;
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> envSomethingLocalMain=null;
       HashMap<String, String> originalTacletOptions = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try{

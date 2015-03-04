@@ -83,12 +83,13 @@ import de.hentschel.visualdbc.datasource.model.memory.MemoryInterface;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryInvariant;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryMethod;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryPackage;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.WindowUserInterface;
+import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
@@ -121,8 +122,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
-import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 
 /**
  * Implementation for {@link IDSConnection} to analyze code files with KeY.
@@ -286,7 +286,7 @@ public class KeyConnection extends MemoryConnection {
          
          // Establish connection
          if (interactive) {
-            environment = WindowUserInterface.loadInMainWindow(location, classPathEntries, bootClassPath, true);
+            environment = WindowUserInterfaceControl.loadInMainWindow(location, classPathEntries, bootClassPath, true);
             getMediator().addGUIListener(mainGuiListener);
          }
          else {
@@ -310,8 +310,8 @@ public class KeyConnection extends MemoryConnection {
     * @return The {@link KeYMediator} if available and {@code null} otherwise.
     */
    public KeYMediator getMediator() {
-      if (environment.getUi() instanceof AbstractMediatorUserInterface) {
-         return ((AbstractMediatorUserInterface) environment.getUi()).getMediator();
+      if (environment.getUi() instanceof AbstractMediatorUserInterfaceControl) {
+         return ((AbstractMediatorUserInterfaceControl) environment.getUi()).getMediator();
       }
       else {
          return null;
@@ -1760,10 +1760,10 @@ public class KeyConnection extends MemoryConnection {
    }
 
    /**
-    * Returns the used {@link UserInterface}.
-    * @return The used {@link UserInterface}.
+    * Returns the used {@link UserInterfaceControl}.
+    * @return The used {@link UserInterfaceControl}.
     */
-   public UserInterface getUserInterface() {
+   public UserInterfaceControl getUserInterface() {
       return environment != null ? environment.getUi() : null;
    }
 

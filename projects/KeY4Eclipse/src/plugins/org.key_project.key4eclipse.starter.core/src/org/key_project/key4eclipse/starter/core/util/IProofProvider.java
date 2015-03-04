@@ -15,10 +15,10 @@ package org.key_project.key4eclipse.starter.core.util;
 
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 
+import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.ProofControl;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * Implementations of this class does something with one {@link Proof}
@@ -39,10 +39,10 @@ public interface IProofProvider {
    public Proof[] getCurrentProofs();
    
    /**
-    * The optional {@link UserInterface} in which all of {@link #getCurrentProofs()} lives.
-    * @return The {@link UserInterface} in which all of {@link #getCurrentProofs()} lives or {@code null} if not available.
+    * The optional {@link UserInterfaceControl} in which all of {@link #getCurrentProofs()} lives.
+    * @return The {@link UserInterfaceControl} in which all of {@link #getCurrentProofs()} lives or {@code null} if not available.
     */
-   public UserInterface getUI();
+   public UserInterfaceControl getUI();
    
    /**
     * Return the {@link ProofControl} of {@link #getUI()}.

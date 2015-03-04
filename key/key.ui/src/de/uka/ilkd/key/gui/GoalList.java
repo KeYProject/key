@@ -40,6 +40,7 @@ import javax.swing.event.ListSelectionListener;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -53,7 +54,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.ui.AutoModeListener;
 import de.uka.ilkd.key.util.Debug;
 
 public class GoalList extends JList<Goal> {
@@ -272,7 +272,7 @@ public class GoalList extends JList<Goal> {
 
     private void register() {	
 	mediator().addKeYSelectionListener(selectionListener);
-	// This method delegates the request only to the UserInterface which implements the functionality.
+	// This method delegates the request only to the UserInterfaceControl which implements the functionality.
    // No functionality is allowed in this method body!
    mediator().getUI().getProofControl().addAutoModeListener(interactiveListener);
 	mediator().addGUIListener(guiListener);
@@ -280,7 +280,7 @@ public class GoalList extends JList<Goal> {
 
     private void unregister() {
 	mediator().removeKeYSelectionListener(selectionListener);
-	// This method delegates the request only to the UserInterface which implements the functionality.
+	// This method delegates the request only to the UserInterfaceControl which implements the functionality.
    // No functionality is allowed in this method body!
    mediator().getUI().getProofControl().removeAutoModeListener(interactiveListener);
 	mediator().removeGUIListener(guiListener);

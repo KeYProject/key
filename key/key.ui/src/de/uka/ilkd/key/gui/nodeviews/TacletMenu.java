@@ -518,7 +518,7 @@ public class TacletMenu extends JMenu {
 
                 final BuiltInRuleMenuItem birmi = (BuiltInRuleMenuItem) e
                         .getSource();
-                // This method delegates the request only to the UserInterface which implements the functionality.
+                // This method delegates the request only to the UserInterfaceControl which implements the functionality.
                 // No functionality is allowed in this method body!
                 mediator.getUI().getProofControl().selectedBuiltInRule(mediator.getSelectedGoal(), birmi.connectedTo(), pos.getPosInOccurrence(), birmi.forcedApplication());
 

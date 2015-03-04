@@ -17,9 +17,9 @@ import java.util.EventObject;
 
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * An event thrown by an {@link IProofProvider} observed via an {@link IProofProviderListener}.
@@ -42,9 +42,9 @@ public class ProofProviderEvent extends EventObject {
    private Proof currentProof;
    
    /**
-    * The optional {@link UserInterface} in which {@link #currentProofs} lives.
+    * The optional {@link UserInterfaceControl} in which {@link #currentProofs} lives.
     */
-   private UserInterface userInterface;
+   private UserInterfaceControl userInterfaceControl;
    
    /**
     * The optional {@link KeYEnvironment} in which {@link #currentProofs} lives.
@@ -56,18 +56,18 @@ public class ProofProviderEvent extends EventObject {
     * @param source The source {@link IProofProvider} which throws this event.
     * @param currentProofs The current {@link Proof}s.
     * @param currentProof The current {@link Proof}, e.g. the first one of {@link #getCurrentProofs()}.
-    * @param userInterface The optional {@link UserInterface} in which {@link #getCurrentProofs()} lives.
+    * @param userInterfaceControl The optional {@link UserInterfaceControl} in which {@link #getCurrentProofs()} lives.
     * @param environment The optional {@link KeYEnvironment} in which {@link #getCurrentProofs()} lives.
     */
    public ProofProviderEvent(IProofProvider source, 
                              Proof[] currentProofs,
                              Proof currentProof,
-                             UserInterface userInterface,
+                             UserInterfaceControl userInterfaceControl,
                              KeYEnvironment<?> environment) {
       super(source);
       this.currentProofs = currentProofs;
       this.currentProof = currentProof;
-      this.userInterface = userInterface;
+      this.userInterfaceControl = userInterfaceControl;
       this.environment = environment;
    }
 
@@ -88,11 +88,11 @@ public class ProofProviderEvent extends EventObject {
    }
 
    /**
-    * Returns the optional {@link UserInterface} in which {@link #getCurrentProofs()} lives.
-    * @return The {@link UserInterface} in which {@link #getCurrentProofs()} lives or {@code null} if not available.
+    * Returns the optional {@link UserInterfaceControl} in which {@link #getCurrentProofs()} lives.
+    * @return The {@link UserInterfaceControl} in which {@link #getCurrentProofs()} lives or {@code null} if not available.
     */
-   public UserInterface getUserInterface() {
-      return userInterface;
+   public UserInterfaceControl getUserInterface() {
+      return userInterfaceControl;
    }
 
    /**

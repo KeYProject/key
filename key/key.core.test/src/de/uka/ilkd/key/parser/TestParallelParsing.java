@@ -18,11 +18,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * This {@link TestCase} tests the parallel usage of {@link KeYParser}
@@ -120,7 +120,7 @@ public class TestParallelParsing extends AbstractSymbolicExecutionTestCase {
       @Override
       public void run() {
          try {
-            KeYEnvironment<CustomUserInterface> env = KeYEnvironment.load(new JavaProfile(), location, null, null, false);
+            KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(new JavaProfile(), location, null, null, false);
             env.dispose();
          }
          catch (Exception e) {

@@ -16,11 +16,11 @@ package org.key_project.keyide.ui.editor;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * A customized {@link CommandContributionItem} which contains a {@link BuiltInRule}, a {@link KeYMediator} and a {@link PosInSequent}.
@@ -39,9 +39,9 @@ public class BuiltInRuleCommandContributionItem extends CommandContributionItem 
    private final BuiltInRule rule;
    
    /**
-    * The {@link UserInterface} to use.
+    * The {@link UserInterfaceControl} to use.
     */
-   private final UserInterface ui;
+   private final UserInterfaceControl ui;
    
    /**
     * The {@link PosInSequent} to apply {@link BuiltInRule} on.
@@ -53,10 +53,10 @@ public class BuiltInRuleCommandContributionItem extends CommandContributionItem 
     * @param contributionParameters - the {@link CommandContributionItemParameter}.
     * @param rule - the {@link BuiltInRule}.
     * @param goal - the {@link Goal}.
-    * @param ui - the {@link UserInterface}.
+    * @param ui - the {@link UserInterfaceControl}.
     * @param pos - the {@link PosInSequent}.
     */
-   public BuiltInRuleCommandContributionItem(CommandContributionItemParameter contributionParameters, Goal goal, BuiltInRule rule, UserInterface ui, PosInSequent pos) {
+   public BuiltInRuleCommandContributionItem(CommandContributionItemParameter contributionParameters, Goal goal, BuiltInRule rule, UserInterfaceControl ui, PosInSequent pos) {
       super(contributionParameters);
       this.goal = goal;
       this.rule = rule;
@@ -73,10 +73,10 @@ public class BuiltInRuleCommandContributionItem extends CommandContributionItem 
    }
    
    /**
-    * Returns the {@link UserInterface} to use.
-    * @return The {@link UserInterface} to use.
+    * Returns the {@link UserInterfaceControl} to use.
+    * @return The {@link UserInterfaceControl} to use.
     */
-   public UserInterface getUi() {
+   public UserInterfaceControl getUi() {
       return ui;
    }
    

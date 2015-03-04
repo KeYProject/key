@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.ui;
+package de.uka.ilkd.key.control;
 
 import de.uka.ilkd.key.proof.ProofEvent;
 

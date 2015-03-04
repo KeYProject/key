@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.ui;
+package de.uka.ilkd.key.control;
 
 import java.io.File;
 import java.util.List;
@@ -26,10 +26,20 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
-public interface UserInterface {  
+/**
+ * Provides the user interface independent logic to manage multiple proofs. This inclusdes:
+ * <ul>
+ *    <li>Functionality to load files via {@link #load(Profile, File, List, File, Properties, boolean)}.</li>
+ *    <li>Functionality to instantiate new {@link Proof}s via {@link #createProof(InitConfig, ProofOblInput)}.</li>
+ *    <li>Functionality to register existing {@link Proof}s in the user interface via {@link #registerProofAggregate(ProofAggregate)}.</li>
+ *    <li>Access to the {@link ProofControl} via {@link #getProofControl()}.</li>
+ * </ul>
+ * @author Martin Hentschel
+ */
+public interface UserInterfaceControl {  
     /**
      * <p>
-     * Opens a java file in this {@link UserInterface} and returns the instantiated {@link AbstractProblemLoader}
+     * Opens a java file in this {@link UserInterfaceControl} and returns the instantiated {@link AbstractProblemLoader}
      * which can be used to instantiated proofs programmatically.
      * </p>
      * <p>
@@ -52,7 +62,7 @@ public interface UserInterface {
                                boolean forceNewProfileOfNewProofs) throws ProblemLoaderException;
     
     /**
-     * Instantiates a new {@link Proof} in this {@link UserInterface} for the given
+     * Instantiates a new {@link Proof} in this {@link UserInterfaceControl} for the given
      * {@link ProofOblInput} based on the {@link InitConfig}.
      * @param initConfig The {@link InitConfig} which provides the source code.
      * @param input The description of the {@link Proof} to instantiate.
@@ -63,7 +73,7 @@ public interface UserInterface {
                       ProofOblInput input) throws ProofInputException;
 
     /**
-     * Registers an already created {@link ProofAggregate} in this {@link UserInterface}.
+     * Registers an already created {@link ProofAggregate} in this {@link UserInterfaceControl}.
      * @param pa The {@link ProofAggregate} to register.
      */
     void registerProofAggregate(ProofAggregate pa);

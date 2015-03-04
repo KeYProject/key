@@ -3,6 +3,7 @@ package de.uka.ilkd.key.smt.counterexample;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
@@ -16,7 +17,6 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.SolverType;
-import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -44,12 +44,12 @@ public abstract class AbstractCounterExampleGenerator {
    
    /**
     * Searches a counter example for the given {@link Sequent}.
-    * @param ui The {@link UserInterface} to use.
+    * @param ui The {@link UserInterfaceControl} to use.
     * @param oldProof The old {@link Proof} used as template to instantiate a new one.
     * @param oldSequent The {@link Sequent} to find a counter example for.
     * @throws ProofInputException Occurred Exception.
     */
-   public void searchCounterExample(UserInterface ui, 
+   public void searchCounterExample(UserInterfaceControl ui, 
                                     Proof oldProof, 
                                     Sequent oldSequent) throws ProofInputException {
       if (!isSolverAvailable()) {
@@ -91,14 +91,14 @@ public abstract class AbstractCounterExampleGenerator {
    
    /**
     * Creates a new {@link Proof}.
-    * @param ui The {@link UserInterface} to use.
+    * @param ui The {@link UserInterfaceControl} to use.
     * @param oldProof The old {@link Proof} used as template to instantiate a new one.
     * @param oldSequent The {@link Sequent} to find a counter example for.
     * @param proofName The name for the new proof.
     * @return The created {@link Proof}.
     * @throws ProofInputException Ocurred Exception
     */
-   protected abstract Proof createProof(UserInterface ui, 
+   protected abstract Proof createProof(UserInterfaceControl ui, 
                                         Proof oldProof, 
                                         Sequent oldSequent,
                                         String proofName) throws ProofInputException;
@@ -116,9 +116,9 @@ public abstract class AbstractCounterExampleGenerator {
    
    /**
     * This method is called after the {@link SemanticsBlastingMacro} has been executed.
-    * @param ui The {@link UserInterface} to use.
+    * @param ui The {@link UserInterfaceControl} to use.
     */
-   protected void semanticsBlastingCompleted(UserInterface ui) {
+   protected void semanticsBlastingCompleted(UserInterfaceControl ui) {
    }
    
    /**

@@ -20,11 +20,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Tests for {@link StepOverSymbolicExecutionTreeNodesStopCondition} and
@@ -40,7 +40,7 @@ public class TestStepOverSymbolicExecutionTreeNodesStopCondition extends Abstrac
     */
    public void testStepOverOnTwoBranches() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       HashMap<String, String> originalTacletOptions = null;
-      SymbolicExecutionEnvironment<CustomUserInterface> env = null;
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       // Define test settings
       String javaPathInkeyRepDirectory = "/set/stepOverOnTwoBranches/test/StepOverOnTwoBranches.java";

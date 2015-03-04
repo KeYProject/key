@@ -19,6 +19,7 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.KeyStroke;
 
+import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.IconFactory;
@@ -27,7 +28,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.ui.AutoModeListener;
 
 /**
  * This action is one part of the previous UndoLastStepAction: Only enabled when the last node is selected
@@ -88,7 +88,7 @@ public final class GoalBackAction extends MainWindowAction {
         
         getMediator().addKeYSelectionListener(selListener);
         
-        // This method delegates the request only to the UserInterface which implements the functionality.
+        // This method delegates the request only to the UserInterfaceControl which implements the functionality.
       // No functionality is allowed in this method body!
       getMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
                   public void autoModeStarted(ProofEvent e) {

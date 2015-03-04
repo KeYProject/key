@@ -40,10 +40,10 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.view.AbstractViewBasedView;
 import org.key_project.util.java.CollectionUtil;
 
+import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.ProofControl;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * This view edits the proof search strategy settings in context of
@@ -280,7 +280,7 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView impleme
     * {@inheritDoc}
     */
    @Override
-   public UserInterface getUI() {
+   public UserInterfaceControl getUI() {
       return environment != null ? environment.getUi() : null;
    }
    

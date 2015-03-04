@@ -27,6 +27,7 @@ import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -38,7 +39,6 @@ import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -129,7 +129,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
          
          @Override
          public void test(IJavaProject project,
-               KeYEnvironment<CustomUserInterface> environment, Proof proof,
+               KeYEnvironment<DefaultUserInterfaceControl> environment, Proof proof,
                SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor,
                Node nodeOnWhichRuleIsApplied) {
             SWTBotShell shell = bot.shell("Contracts for charge");
@@ -203,7 +203,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
          
          @Override
          public void test(IJavaProject project,
-               KeYEnvironment<CustomUserInterface> environment, Proof proof,
+               KeYEnvironment<DefaultUserInterfaceControl> environment, Proof proof,
                SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor,
                Node nodeOnWhichRuleIsApplied) {
             SWTBotShell shell = bot.shell("Contracts for charge");
@@ -275,7 +275,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
    public void testUseOperationContract_Cancel() throws Exception {
       IAppliedRuleTest appliedRuleTest =  new IAppliedRuleTest() {
          @Override
-         public void test(IJavaProject project, KeYEnvironment<CustomUserInterface> environment, Proof proof, SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor, Node nodeOnWhichRuleIsApplied) {
+         public void test(IJavaProject project, KeYEnvironment<DefaultUserInterfaceControl> environment, Proof proof, SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor, Node nodeOnWhichRuleIsApplied) {
             SWTBotShell shell = bot.shell("Contracts for charge");
             TestUtilsUtil.clickDirectly(shell.bot().button("Cancel"));
          }
@@ -334,7 +334,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
    public void testBlockContract_Cancel() throws Exception{
       IAppliedRuleTest appliedRuleTest =  new IAppliedRuleTest() {
          @Override
-         public void test(IJavaProject project, KeYEnvironment<CustomUserInterface> environment, Proof proof, SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor, Node nodeOnWhichRuleIsApplied) {
+         public void test(IJavaProject project, KeYEnvironment<DefaultUserInterfaceControl> environment, Proof proof, SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor, Node nodeOnWhichRuleIsApplied) {
             SWTBotShell shell = bot.shell("Contracts for Block: {x=42;}");
             TestUtilsUtil.clickDirectly(shell.bot().button("Cancel"));
          }
@@ -388,7 +388,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
    public void testBlockContract_ApplyOneContract() throws Exception{
       IAppliedRuleTest appliedRuleTest =  new IAppliedRuleTest() {
          @Override
-         public void test(IJavaProject project, KeYEnvironment<CustomUserInterface> environment, Proof proof, SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor, Node nodeOnWhichRuleIsApplied) {
+         public void test(IJavaProject project, KeYEnvironment<DefaultUserInterfaceControl> environment, Proof proof, SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor, Node nodeOnWhichRuleIsApplied) {
             SWTBotShell shell = bot.shell("Contracts for Block: {x=42;}");
             shell.bot().table().select(0);
             TestUtilsUtil.clickDirectly(shell.bot().button("Finish"));
@@ -445,7 +445,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
    public void testBlockContract_ApplyMultipleContracts() throws Exception {
       IAppliedRuleTest appliedRuleTest =  new IAppliedRuleTest() {
          @Override
-         public void test(IJavaProject project, KeYEnvironment<CustomUserInterface> environment, Proof proof, SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor, Node nodeOnWhichRuleIsApplied) {
+         public void test(IJavaProject project, KeYEnvironment<DefaultUserInterfaceControl> environment, Proof proof, SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor, Node nodeOnWhichRuleIsApplied) {
             SWTBotShell shell = bot.shell("Contracts for Block: {x=42;}");
             shell.bot().table().select(0,1);
             TestUtilsUtil.clickDirectly(shell.bot().button("Finish"));
@@ -510,7 +510,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
          
          @Override
          public void test(IJavaProject project,
-               KeYEnvironment<CustomUserInterface> environment, Proof proof,
+               KeYEnvironment<DefaultUserInterfaceControl> environment, Proof proof,
                SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor,
                Node nodeOnWhichRuleIsApplied) {
             SWTBotShell shell = bot.shell("Instantiation");
@@ -574,7 +574,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
          
          @Override
          public void test(IJavaProject project,
-               KeYEnvironment<CustomUserInterface> environment, Proof proof,
+               KeYEnvironment<DefaultUserInterfaceControl> environment, Proof proof,
                SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor,
                Node nodeOnWhichRuleIsApplied) {
             SWTBotShell shell = bot.shell("Instantiation");
@@ -669,7 +669,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       IKeYEditorTestSteps steps = new IKeYEditorTestSteps() {
          @Override
          public void test(IJavaProject project, 
-                          KeYEnvironment<CustomUserInterface> environment, 
+                          KeYEnvironment<DefaultUserInterfaceControl> environment, 
                           Proof proof, 
                           SWTWorkbenchBot bot, 
                           SWTBotEditor editor, 
@@ -748,7 +748,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
        * @param nodeOnWhichRuleIsApplied The {@link Node} on which the rule is applied.
        */
       public void test(IJavaProject project, 
-                       KeYEnvironment<CustomUserInterface> environment, 
+                       KeYEnvironment<DefaultUserInterfaceControl> environment, 
                        Proof proof, 
                        SWTWorkbenchBot bot, 
                        SWTBotEditor editor, 

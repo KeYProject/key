@@ -21,13 +21,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * This test class makes sure that parallel site proofs are working. It is only
@@ -47,7 +47,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
       final String methodFullName = "compute";
       String oraclePathInBaseDirFile = "/set/magic42/oracle/Magic42.xml";
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false);
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false);
       try {
          // Resume
          resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, testCaseDirectory);
@@ -66,7 +66,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
       // Define test settings
       String javaPathInkeyRepDirectory = "/set/magic42/test/Magic42.proof";
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, false, false, false, false, false, false, false, false, false);
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, false, false, false, false, false, false, false, false, false);
       try {
          // Do test steps
          doParallelSiteProofTest(env);
@@ -81,7 +81,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
     * without thrown {@link Exception}s. 
     * @param env The {@link SymbolicExecutionEnvironment} to use.
     */
-   protected void doParallelSiteProofTest(SymbolicExecutionEnvironment<CustomUserInterface> env) {
+   protected void doParallelSiteProofTest(SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env) {
       // Create threads
       List<SiteProofThread<?>> threads = new LinkedList<SiteProofThread<?>>();
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(env.getBuilder().getStartNode());

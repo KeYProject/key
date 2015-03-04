@@ -10,6 +10,7 @@ import junit.framework.TestCase;
 
 import org.key_project.util.java.ArrayUtil;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -18,7 +19,6 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofStore.Entry;
 import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -108,9 +108,9 @@ public class TestSideProofStore extends TestCase {
          assertEquals(entries[i].getDescription(), expectedEntries[i].first);
          assertSame(entries[i].getProof(), expectedEntries[i].second);
          assertSame(entries[i], SideProofStore.DEFAULT_INSTANCE.getEntryAt(i));
-         KeYEnvironment<CustomUserInterface> ui = entries[i].getEnvironment();
+         KeYEnvironment<DefaultUserInterfaceControl> ui = entries[i].getEnvironment();
          assertNotNull(ui);
-         KeYEnvironment<CustomUserInterface> uiAgain = entries[i].getEnvironment();
+         KeYEnvironment<DefaultUserInterfaceControl> uiAgain = entries[i].getEnvironment();
          assertSame(ui, uiAgain);
          containedProofs.add(expectedEntries[i].second);
          assertFalse(entries[i].getProof().isDisposed());

@@ -27,8 +27,8 @@ import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.ui.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * This {@link IHandler} opens a save as dialog to save the {@link Proof}
@@ -53,7 +53,7 @@ public class OpenProofHandler extends AbstractHandler {
                IDebugTarget target = ((IDebugElement)element).getDebugTarget();
                if (target instanceof KeYDebugTarget) {
                   KeYDebugTarget keyTarget = (KeYDebugTarget)target;
-                  if (keyTarget.getEnvironment().getUi() instanceof CustomUserInterface) {
+                  if (keyTarget.getEnvironment().getUi() instanceof DefaultUserInterfaceControl) {
                      StarterUtil.openProofStarter(HandlerUtil.getActiveShell(event), 
                                                   keyTarget.getProof(), 
                                                   keyTarget.getEnvironment(), 

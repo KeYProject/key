@@ -17,6 +17,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.Icon;
 import javax.swing.SwingWorker;
 
+import de.uka.ilkd.key.control.AutoModeListener;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -39,8 +41,6 @@ import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.counterexample.AbstractCounterExampleGenerator;
 import de.uka.ilkd.key.smt.counterexample.AbstractSideProofCounterExampleGenerator;
-import de.uka.ilkd.key.ui.AutoModeListener;
-import de.uka.ilkd.key.ui.UserInterface;
 
 @SuppressWarnings("serial")
 public class CounterExampleAction extends MainWindowAction {
@@ -91,7 +91,7 @@ public class CounterExampleAction extends MainWindowAction {
             }
         };
         getMediator().addKeYSelectionListener(selListener);
-        // This method delegates the request only to the UserInterface which implements the functionality.
+        // This method delegates the request only to the UserInterfaceControl which implements the functionality.
       // No functionality is allowed in this method body!
       getMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
                   @Override
@@ -170,7 +170,7 @@ public class CounterExampleAction extends MainWindowAction {
         * {@inheritDoc}
         */
        @Override
-       protected Proof createProof(UserInterface ui, Proof oldProof, Sequent oldSequent, String proofName) {
+       protected Proof createProof(UserInterfaceControl ui, Proof oldProof, Sequent oldSequent, String proofName) {
           Sequent newSequent = createNewSequent(oldSequent);
           InitConfig newInitConfig = oldProof.getInitConfig().deepCopy();
           Proof proof = new Proof(proofName,
@@ -198,7 +198,7 @@ public class CounterExampleAction extends MainWindowAction {
         * {@inheritDoc}
         */
        @Override
-       protected void semanticsBlastingCompleted(UserInterface ui) {
+       protected void semanticsBlastingCompleted(UserInterfaceControl ui) {
           mediator.setInteractive(true);
           mediator.startInterface(true);
        }

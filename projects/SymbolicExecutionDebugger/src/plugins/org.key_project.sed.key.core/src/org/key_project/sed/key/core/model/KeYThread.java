@@ -32,6 +32,9 @@ import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.eclipse.ResourceUtil;
 
+import de.uka.ilkd.key.control.AutoModeListener;
+import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.proof.Goal;
@@ -55,9 +58,6 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointSt
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.ui.AutoModeListener;
-import de.uka.ilkd.key.ui.ProofControl;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * Implementation of {@link ISEDThread} for the symbolic execution debugger (SED)
@@ -230,7 +230,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
       return getEnvironment().getBuilder();
    }
    
-   public UserInterface getUi() {
+   public UserInterfaceControl getUi() {
       return getEnvironment().getUi();
    }
    

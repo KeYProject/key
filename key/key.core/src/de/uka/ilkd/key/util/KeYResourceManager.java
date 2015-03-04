@@ -258,7 +258,7 @@ public class KeYResourceManager {
     }
 
     /**
-     * All KeY {@link de.uka.ilkd.key.ui.UserInterface}s should use a common
+     * All KeY {@link de.uka.ilkd.key.control.UserInterfaceControl}s should use a common
      * title string when they require one, for instance for a GUI window title
      * bar.
      * 

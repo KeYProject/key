@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.ui;
+package de.uka.ilkd.key.control;
 
 import org.key_project.util.collection.ImmutableList;
 

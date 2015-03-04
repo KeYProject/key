@@ -44,6 +44,8 @@ import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.jdt.JDTUtil;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -61,8 +63,6 @@ import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * This {@link LaunchConfigurationDelegate} is responsible to start
@@ -213,7 +213,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
     
     protected SymbolicExecutionEnvironment<?> instantiateProofWithoutUserInterface(String launchConfigurationName,
                                                                                    KeYLaunchSettings settings) throws Exception {
-       UserInterface ui = new CustomUserInterface();
+       UserInterfaceControl ui = new DefaultUserInterfaceControl();
        return instantiateProof(ui, launchConfigurationName, settings);
     }
     
@@ -246,7 +246,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
        return run.getResult();
     }
     
-    protected SymbolicExecutionEnvironment<?> instantiateProof(UserInterface ui, 
+    protected SymbolicExecutionEnvironment<?> instantiateProof(UserInterfaceControl ui, 
                                                                String launchConfigurationName, 
                                                                KeYLaunchSettings settings) throws Exception {
        // Load location
@@ -264,7 +264,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
        SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, settings.isMergeBranchConditions(), settings.isUseUnicode(), settings.isUsePrettyPrinting(), settings.isVariablesAreOnlyComputedFromUpdates());
        builder.analyse();
        // Create environment used for symbolic execution
-       return new SymbolicExecutionEnvironment<UserInterface>(ui, initConfig, builder);
+       return new SymbolicExecutionEnvironment<UserInterfaceControl>(ui, initConfig, builder);
     }
     
     /**

@@ -16,11 +16,11 @@ package org.key_project.keyide.ui.editor;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.ui.UserInterface;
 
 
 /**
@@ -40,9 +40,9 @@ public class TacletCommandContributionItem extends CommandContributionItem {
    private final TacletApp app;
    
    /**
-    * The {@link UserInterface} to use.
+    * The {@link UserInterfaceControl} to use.
     */
-   private final UserInterface ui;
+   private final UserInterfaceControl ui;
    
    /**
     * The {@link PosInSequent} to apply {@link TacletApp} on.
@@ -53,10 +53,10 @@ public class TacletCommandContributionItem extends CommandContributionItem {
     * The constructor with the additional parameters.
     * @param contributionParameters - the {@link CommandContributionItemParameter}.
     * @param app - the {@link TacletApp}.
-    * @param ui - the {@link UserInterface}.
+    * @param ui - the {@link UserInterfaceControl}.
     * @param pos - the {@link PosInSequent}.
     */
-   public TacletCommandContributionItem(CommandContributionItemParameter contributionParameters, Goal goal, TacletApp app, UserInterface ui, PosInSequent pos) {
+   public TacletCommandContributionItem(CommandContributionItemParameter contributionParameters, Goal goal, TacletApp app, UserInterfaceControl ui, PosInSequent pos) {
       super(contributionParameters);
       this.goal = goal;
       this.app = app;
@@ -73,10 +73,10 @@ public class TacletCommandContributionItem extends CommandContributionItem {
    }
    
    /**
-    * Returns the {@link UserInterface} to use.
+    * Returns the {@link UserInterfaceControl} to use.
     * @return The {@link KeYMediator} to use.
     */
-   public UserInterface getUi() {
+   public UserInterfaceControl getUi() {
       return ui;
    }
    

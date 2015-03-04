@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.ui;
+package de.uka.ilkd.key.control;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.proof.Goal;

@@ -20,9 +20,10 @@ import java.util.ServiceLoader;
 
 import org.key_project.util.java.IOUtil;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.RecentFileMenu.RecentFileEntry;
-import de.uka.ilkd.key.gui.WindowUserInterface;
+import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
@@ -33,9 +34,8 @@ import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
-import de.uka.ilkd.key.ui.ConsoleUserInterface;
-import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
+import de.uka.ilkd.key.ui.ConsoleUserInterfaceControl;
 import de.uka.ilkd.key.ui.Verbosity;
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
@@ -102,7 +102,7 @@ public final class Main {
     private static String examplesDir = null;
 
     /**
-     * Determines which {@link UserInterface} is to be used.
+     * Determines which {@link UserInterfaceControl} is to be used.
      *
      * By specifying <code>AUTO</code> as command line argument this will be set
      * to {@link UiMode#AUTO}, but {@link UiMode#INTERACTIVE} is the default.
@@ -171,7 +171,7 @@ public final class Main {
             cl.parse(args);
             evaluateOptions(cl);
             fileArguments = cl.getFileArguments();
-            AbstractMediatorUserInterface userInterface = createUserInterface(fileArguments);
+            AbstractMediatorUserInterfaceControl userInterface = createUserInterface(fileArguments);
             loadCommandLineFiles(userInterface, fileArguments);
         } catch (ExceptionInInitializerError e) {
             System.err.println("D'oh! It seems that KeY was not built properly!");
@@ -186,7 +186,7 @@ public final class Main {
 
     }
 
-    public static void loadCommandLineFiles(AbstractMediatorUserInterface ui, List<File> fileArguments) {
+    public static void loadCommandLineFiles(AbstractMediatorUserInterfaceControl ui, List<File> fileArguments) {
         if (!fileArguments.isEmpty()) {
             ui.setMacro(autoMacro);
             ui.setSaveOnly(saveAllContracts);
@@ -194,8 +194,8 @@ public final class Main {
                 File f = fileArguments.get(i);
                 ui.loadProblem(f);
             }
-            if (ui instanceof ConsoleUserInterface) {
-                System.exit(((ConsoleUserInterface) ui).allProofsSuccessful ? 0 : 1);
+            if (ui instanceof ConsoleUserInterfaceControl) {
+                System.exit(((ConsoleUserInterfaceControl) ui).allProofsSuccessful ? 0 : 1);
             }
         } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
             ui.openExamples();
@@ -413,15 +413,15 @@ public final class Main {
     }
 
     /**
-     * Initializes the {@link UserInterface} to be used by KeY.
+     * Initializes the {@link UserInterfaceControl} to be used by KeY.
      *
-     * {@link ConsoleUserInterface} will be used if {@link Main#uiMode} is
-     * {@link UiMode#AUTO} and {@link WindowUserInterface} otherwise.
+     * {@link ConsoleUserInterfaceControl} will be used if {@link Main#uiMode} is
+     * {@link UiMode#AUTO} and {@link WindowUserInterfaceControl} otherwise.
      *
-     * @return a <code>UserInterface</code> based on the value of
+     * @return a <code>UserInterfaceControl</code> based on the value of
      *         <code>uiMode</code>
      */
-    private static AbstractMediatorUserInterface createUserInterface(List<File> fileArguments) {
+    private static AbstractMediatorUserInterfaceControl createUserInterface(List<File> fileArguments) {
 
         if (uiMode == UiMode.AUTO) {
             // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see bug #1216
@@ -441,7 +441,7 @@ public final class Main {
             if (fileArguments.isEmpty())
                 printUsageAndExit(true, "Error: No file to load from.", -4);
 
-            return new ConsoleUserInterface(verbosity, loadOnly);
+            return new ConsoleUserInterfaceControl(verbosity, loadOnly);
         } else {
             updateSplashScreen();
             MainWindow mainWindow = MainWindow.getInstance();

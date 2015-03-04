@@ -17,6 +17,10 @@ import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.control.RuleCompletionHandler;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
@@ -27,19 +31,15 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.ui.CustomUserInterface;
-import de.uka.ilkd.key.ui.ProofControl;
-import de.uka.ilkd.key.ui.RuleCompletionHandler;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * Instances of this class are used to collect and access all
  * relevant information for verification with KeY.
  * @author Martin Hentschel
  */
-public class KeYEnvironment<U extends UserInterface> {
+public class KeYEnvironment<U extends UserInterfaceControl> {
    /**
-    * The {@link UserInterface} in which the {@link Proof} is loaded.
+    * The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
     */
    private U ui;
    
@@ -60,7 +60,7 @@ public class KeYEnvironment<U extends UserInterface> {
 
    /**
     * Constructor
-    * @param ui The {@link UserInterface} in which the {@link Proof} is loaded.
+    * @param ui The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
     * @param initConfig The loaded project.
     */
    public KeYEnvironment(U ui, InitConfig initConfig) {
@@ -69,7 +69,7 @@ public class KeYEnvironment<U extends UserInterface> {
 
    /**
     * Constructor
-    * @param ui The {@link UserInterface} in which the {@link Proof} is loaded.
+    * @param ui The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
     * @param initConfig The loaded project.
     */
    public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof) {
@@ -79,8 +79,8 @@ public class KeYEnvironment<U extends UserInterface> {
    }
 
    /**
-    * Returns the {@link UserInterface} in which the {@link Proof} is loaded.
-    * @return The {@link UserInterface} in which the {@link Proof} is loaded.
+    * Returns the {@link UserInterfaceControl} in which the {@link Proof} is loaded.
+    * @return The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
     */
    public U getUi() {
       return ui;
@@ -139,7 +139,7 @@ public class KeYEnvironment<U extends UserInterface> {
    }
 
    /**
-    * Creates a new {@link Proof} with help of the {@link UserInterface}.
+    * Creates a new {@link Proof} with help of the {@link UserInterfaceControl}.
     * @param input The {@link ProofOblInput} to instantiate {@link Proof} from.
     * @return The instantiated {@link Proof}.
     * @throws ProofInputException Occurred Exception.
@@ -157,7 +157,7 @@ public class KeYEnvironment<U extends UserInterface> {
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
-   public static KeYEnvironment<CustomUserInterface> load(File location,
+   public static KeYEnvironment<DefaultUserInterfaceControl> load(File location,
                                                           List<File> classPaths,
                                                           File bootClassPath) throws ProblemLoaderException {
       return load(null, location, classPaths, bootClassPath, false);
@@ -173,7 +173,7 @@ public class KeYEnvironment<U extends UserInterface> {
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
-   public static KeYEnvironment<CustomUserInterface> load(File location,
+   public static KeYEnvironment<DefaultUserInterfaceControl> load(File location,
                                                           List<File> classPaths,
                                                           File bootClassPath,
                                                           RuleCompletionHandler ruleCompletionHandler) throws ProblemLoaderException {
@@ -191,7 +191,7 @@ public class KeYEnvironment<U extends UserInterface> {
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
-   public static KeYEnvironment<CustomUserInterface> load(Profile profile,
+   public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile,
                                                           File location,
                                                           List<File> classPaths,
                                                           File bootClassPath,
@@ -212,17 +212,17 @@ public class KeYEnvironment<U extends UserInterface> {
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
-   public static KeYEnvironment<CustomUserInterface> load(Profile profile,
+   public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile,
                                                           File location,
                                                           List<File> classPaths,
                                                           File bootClassPath,
                                                           Properties poPropertiesToForce,
                                                           RuleCompletionHandler ruleCompletionHandler,
                                                           boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
-      CustomUserInterface ui = new CustomUserInterface(ruleCompletionHandler);
+      DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(ruleCompletionHandler);
       AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, poPropertiesToForce, forceNewProfileOfNewProofs); 
       InitConfig initConfig = loader.getInitConfig();
-      return new KeYEnvironment<CustomUserInterface>(ui, initConfig, loader.getProof());
+      return new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig, loader.getProof());
    }
 
    /**

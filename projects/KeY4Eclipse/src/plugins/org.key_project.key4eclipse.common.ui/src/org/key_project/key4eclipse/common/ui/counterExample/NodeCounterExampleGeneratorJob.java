@@ -6,8 +6,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * A {@link Job} which generates counter examples for a given {@link Node}.
@@ -15,9 +15,9 @@ import de.uka.ilkd.key.ui.UserInterface;
  */
 public class NodeCounterExampleGeneratorJob extends Job {
    /**
-    * The {@link UserInterface} to use.
+    * The {@link UserInterfaceControl} to use.
     */
-   private final UserInterface ui;
+   private final UserInterfaceControl ui;
    
    /**
     * The {@link Node} to find a counterexample for.
@@ -26,10 +26,10 @@ public class NodeCounterExampleGeneratorJob extends Job {
    
    /**
     * Constructor.
-    * @param ui The {@link UserInterface} to use.
+    * @param ui The {@link UserInterfaceControl} to use.
     * @param node The {@link Node} to find a counterexample for.
     */
-   public NodeCounterExampleGeneratorJob(UserInterface ui, Node node) {
+   public NodeCounterExampleGeneratorJob(UserInterfaceControl ui, Node node) {
       super("Generating counterexamples");
       this.ui = ui;
       this.node = node;

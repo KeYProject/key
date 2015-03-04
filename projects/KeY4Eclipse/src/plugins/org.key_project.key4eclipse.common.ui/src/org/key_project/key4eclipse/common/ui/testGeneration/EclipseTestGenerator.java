@@ -27,13 +27,13 @@ import org.key_project.util.eclipse.swt.dialog.TextFieldMessageDialog;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.testgen.AbstractTestGenerator;
 import de.uka.ilkd.key.smt.testgen.TestGenerationLog;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * Implementation of {@link AbstractTestGenerator} which stores the generated
@@ -80,12 +80,12 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
     * Constructor.
     * @param sourceProject The {@link IProject} which provides the source files to generate test cases for.
     * @param testFileName The name of the test file to generate without file extension.
-    * @param ui The {@link UserInterface} to use.
+    * @param ui The {@link UserInterfaceControl} to use.
     * @param originalProof The {@link Proof} to generate test cases for.
     */
    public EclipseTestGenerator(IProject sourceProject, 
                                String testFileName,
-                               UserInterface ui, 
+                               UserInterfaceControl ui, 
                                Proof originalProof) {
       super(ui, originalProof);
       this.sourceProject = sourceProject;

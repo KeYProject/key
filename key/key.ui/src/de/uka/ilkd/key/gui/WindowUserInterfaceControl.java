@@ -39,6 +39,8 @@ import javax.swing.WindowConstants;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.control.AbstractProofControl;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
@@ -67,32 +69,25 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
-import de.uka.ilkd.key.ui.AbstractProofControl;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * This class is the starting point for the extraction of a unified
- * Userinterface for a GUI refactoring.
- *
- * It gathers all present interfaces and redirects action to the mainWindow.
- *
- * It is subject to change a lot at the moment.
- *
- * @author mattias ulbrich
+ * Implementation of {@link UserInterfaceControl} which controls the {@link MainWindow}
+ * with the typical user interface of KeY.
+ * @author Mattias Ulbrich
  */
-
-public class WindowUserInterface extends AbstractMediatorUserInterface {
+public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceControl {
 
     private final MainWindow mainWindow;
 
     private final LinkedList<InteractiveRuleApplicationCompletion> completions =
             new LinkedList<InteractiveRuleApplicationCompletion>();
 
-    public WindowUserInterface(MainWindow mainWindow) {
+    public WindowUserInterfaceControl(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
         completions.add(new FunctionalOperationContractCompletion());
         completions.add(new DependencyContractCompletion());
@@ -474,7 +469,7 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
-   public static KeYEnvironment<WindowUserInterface> loadInMainWindow(File location,
+   public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(File location,
                                                                       List<File> classPaths,
                                                                       File bootClassPath,
                                                                       boolean makeMainWindowVisible) throws ProblemLoaderException {
@@ -493,7 +488,7 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
-   public static KeYEnvironment<WindowUserInterface> loadInMainWindow(Profile profile,
+   public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(Profile profile,
                                                                       File location,
                                                                       List<File> classPaths,
                                                                       File bootClassPath,
@@ -505,7 +500,7 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
       }
       AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, null, forceNewProfileOfNewProofs);
       InitConfig initConfig = loader.getInitConfig();
-      return new KeYEnvironment<WindowUserInterface>(main.getUserInterface(), initConfig, loader.getProof());
+      return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig, loader.getProof());
    }
 
    @Override

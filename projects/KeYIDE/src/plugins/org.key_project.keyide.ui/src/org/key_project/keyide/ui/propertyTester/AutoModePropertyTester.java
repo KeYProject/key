@@ -17,7 +17,7 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
-import de.uka.ilkd.key.ui.ProofControl;
+import de.uka.ilkd.key.control.ProofControl;
 
 /**
  * A class to test for properties of the {@link KeYEditor} to set the correct GUI states.

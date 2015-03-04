@@ -51,6 +51,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
+import de.uka.ilkd.key.control.InstantiationFileHandler;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.utilities.BracketMatchingTextArea;
@@ -59,7 +60,6 @@ import de.uka.ilkd.key.proof.ModelChangeListener;
 import de.uka.ilkd.key.proof.ModelEvent;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.ui.InstantiationFileHandler;
 import de.uka.ilkd.key.util.Debug;
 
 public class TacletMatchCompletionDialog extends ApplyTacletDialog {

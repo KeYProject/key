@@ -9,6 +9,7 @@ import java.util.Vector;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -40,7 +41,6 @@ import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
-import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProofStarter;
 
@@ -51,17 +51,17 @@ import de.uka.ilkd.key.util.ProofStarter;
  * Subclasses are used to realize the user interface specific functionality.
  */
 public abstract class AbstractTestGenerator {
-   private final UserInterface ui;
+   private final UserInterfaceControl ui;
    private final Proof originalProof;
    private SolverLauncher launcher;
    private List<Proof> proofs;
    
    /**
     * Constructor.
-    * @param ui The {@link UserInterface} to use.
+    * @param ui The {@link UserInterfaceControl} to use.
     * @param originalProof The {@link Proof} to generate test cases for.
     */
-   public AbstractTestGenerator(UserInterface ui, Proof originalProof) {
+   public AbstractTestGenerator(UserInterfaceControl ui, Proof originalProof) {
       this.ui = ui;
       this.originalProof = originalProof;
    }
@@ -178,7 +178,7 @@ public abstract class AbstractTestGenerator {
     return;
    }
 
-   protected void handleAllProofsPerformed(UserInterface ui) {
+   protected void handleAllProofsPerformed(UserInterfaceControl ui) {
       // Work has only to be done in the MainWindow implementation.
    }
 
@@ -193,7 +193,7 @@ public abstract class AbstractTestGenerator {
       }
    }
 
-   protected void selectProof(UserInterface ui, Proof proof) {
+   protected void selectProof(UserInterfaceControl ui, Proof proof) {
       // Work has only to be done in the MainWindow implementation.
    }
 
@@ -302,7 +302,7 @@ public abstract class AbstractTestGenerator {
       return createProof(ui, oldProof, "Test Case for NodeNr: " + node.serialNr(), newSequent);
    }
    
-   protected Proof createProof(UserInterface ui, Proof oldProof, String newName, Sequent newSequent) throws ProofInputException {
+   protected Proof createProof(UserInterfaceControl ui, Proof oldProof, String newName, Sequent newSequent) throws ProofInputException {
       ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(oldProof, false);
       ProofStarter starter = SideProofUtil.createSideProof(env, newSequent, newName);
       Proof proof = starter.getProof();
@@ -426,7 +426,7 @@ public abstract class AbstractTestGenerator {
       return proofs;
    }
    
-   protected UserInterface getUI () {
+   protected UserInterfaceControl getUI () {
       return ui;
    }
 

@@ -19,6 +19,7 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.KeyStroke;
 
+import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.IconFactory;
@@ -27,7 +28,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.ui.AutoModeListener;
 
 /**
  * This action undoes the last rule application on the currently selected
@@ -90,7 +90,7 @@ public final class PruneProofAction extends MainWindowAction {
         
         getMediator().addKeYSelectionListener(selListener);
         
-        // This method delegates the request only to the UserInterface which implements the functionality.
+        // This method delegates the request only to the UserInterfaceControl which implements the functionality.
       // No functionality is allowed in this method body!
       getMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
                   public void autoModeStarted(ProofEvent e) {

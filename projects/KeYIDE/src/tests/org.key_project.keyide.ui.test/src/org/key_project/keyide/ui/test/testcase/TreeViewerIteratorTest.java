@@ -36,11 +36,11 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 
 // TODO: Tests LazyProofTreeContentProvider#getParent() on each possible node (visible structure not proof tree structure!)
 // TODO: Tests LazyProofTreeContentProvider#getIndexOf(Object, Object) on each possible parent child combinations (visible structure not proof tree structure!)
@@ -60,7 +60,7 @@ public class TreeViewerIteratorTest extends AbstractSetupTestCase {
       // Get local file in operating system of folder src 
       File location = ResourceUtil.getLocation(src);
       // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
-      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(location, null, null);
+      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, null, null);
       IProgramMethod pm = TestKeY4EclipseUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
       ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
       FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);

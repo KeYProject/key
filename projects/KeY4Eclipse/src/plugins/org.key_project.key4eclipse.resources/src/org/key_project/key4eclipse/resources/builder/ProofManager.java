@@ -76,6 +76,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ObjectUtil;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -94,7 +95,6 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -111,7 +111,7 @@ public class ProofManager {
    private KeYProjectDelta keyDelta;
    private Set<IFile> changedJavaFiles;
    private EditorSelection editorSelection;
-   private final KeYEnvironment<CustomUserInterface> environment;
+   private final KeYEnvironment<DefaultUserInterfaceControl> environment;
    private List<ProofElement> proofQueue = Collections.synchronizedList(new LinkedList<ProofElement>());
    public static final List<Pair<ProofElement, InputStream>> proofsToSave = Collections.synchronizedList(new LinkedList<Pair<ProofElement, InputStream>>());
 
@@ -822,7 +822,7 @@ public class ProofManager {
     * Clones the global {@link KeYEnvironment}.
     * @return the cloned {@link KeYEnvironment}
     */
-   private KeYEnvironment<CustomUserInterface> cloneEnvironment() {
+   private KeYEnvironment<DefaultUserInterfaceControl> cloneEnvironment() {
       InitConfig sourceInitConfig = environment.getInitConfig();
       // Create new profile which has separate OneStepSimplifier instance
       JavaProfile profile = new JavaProfile();
@@ -835,7 +835,7 @@ public class ProofManager {
       initConfig.setTaclets(sourceInitConfig.getTaclets());
       // Create new ProofEnvironment and initialize it with values from initial one.
       initConfig.getServices().setJavaModel(sourceInitConfig.getServices().getJavaModel());
-      KeYEnvironment<CustomUserInterface> keyEnv = new KeYEnvironment<CustomUserInterface>(new CustomUserInterface(), initConfig);
+      KeYEnvironment<DefaultUserInterfaceControl> keyEnv = new KeYEnvironment<DefaultUserInterfaceControl>(new DefaultUserInterfaceControl(), initConfig);
       return keyEnv;
    }
    
@@ -1085,7 +1085,7 @@ public class ProofManager {
     * @param type - the types full name
     * @return the {@link KeYJavaType}
     */
-   private KeYJavaType getkeYJavaType(KeYEnvironment<CustomUserInterface> env, String type){
+   private KeYJavaType getkeYJavaType(KeYEnvironment<DefaultUserInterfaceControl> env, String type){
       Set<KeYJavaType> envKjts = env.getServices().getJavaInfo().getAllKeYJavaTypes();
       for(KeYJavaType kjt : envKjts){
          if(type.equals(kjt.getFullName())){

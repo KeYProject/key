@@ -10,11 +10,11 @@ import org.key_project.key4eclipse.common.ui.completion.LoopInvariantRuleComplet
 import org.key_project.key4eclipse.common.ui.wizard.CompleteAndApplyTacletMatchWizard;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
+import de.uka.ilkd.key.control.RuleCompletionHandler;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.ui.RuleCompletionHandler;
 
 /**
  * An {@link RuleCompletionHandler} which gets user input directly within Eclipse.

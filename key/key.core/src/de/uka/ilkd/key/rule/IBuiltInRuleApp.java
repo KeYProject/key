@@ -31,7 +31,7 @@ public interface IBuiltInRuleApp extends RuleApp {
     /**
      * Tries to complete the rule application from the available information.
      * Attention: Do neither add GUI code to the rules nor use this method directly 
-     * Instead ask the implementation of the {@link de.uka.ilkd.key.ui.UserInterface} to complete a built-in rule.
+     * Instead ask the implementation of the {@link de.uka.ilkd.key.control.UserInterfaceControl} to complete a built-in rule.
      * Returns a complete app only if there is exactly one contract.
      * If you want a complete app for combined contracts, use <code>forceInstantiate</code> instead.
      * For an example implementation see e.g. {@link UseOperationContractRule} or {@link UseDependencyContractRule}.    

@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.ui;
+package de.uka.ilkd.key.control;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -93,7 +93,7 @@ public interface ProofControl {
    public void removeAutoModeListener(AutoModeListener p);
    
    /**
-    * Checks if the auto mode of this {@link UserInterface} supports the given {@link Proof}.
+    * Checks if the auto mode of this {@link UserInterfaceControl} supports the given {@link Proof}.
     * @param proof The {@link Proof} to check.
     * @return {@code true} auto mode support proofs, {@code false} auto mode don't support proof.
     */
@@ -125,7 +125,7 @@ public interface ProofControl {
    
    /**
     * Blocks the current {@link Thread} while the auto mode of this
-    * {@link UserInterface} is active.
+    * {@link UserInterfaceControl} is active.
     */
    void waitWhileAutoMode();
    

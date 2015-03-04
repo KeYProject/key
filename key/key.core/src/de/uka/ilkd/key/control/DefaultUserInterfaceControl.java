@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.ui;
+package de.uka.ilkd.key.control;
 
 import org.key_project.util.collection.ImmutableSet;
 
@@ -21,32 +21,19 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
+ * The {@link DefaultUserInterfaceControl} which allows proving in case
+ * that no specific user interface is available.
  * <p>
- * An extended version of {@link AbstractConsoleUserInterface} which can be used
- * to prove manually instantiated proofs.
- * </p>
- * <p>
- * The basic usage is like:
- * <code><pre>
- * // Create user interface
- * CustomUserInterface ui = new CustomUserInterface(false);
- * // Load java file
- * InitConfig initConfig = ui.load(javaFile, null, null);
- * // Find operation contract to proof in services
- * Services services = initConfig.getServices();
- * FunctionalOperationContract contract ...
- * // Start proof
- * ProofOblInput input = new FunctionalOperationContractPO(initConfig, contract);
- * Proof proof = ui.createProof(initConfig, input);
- * // Run proof in auto mode
- * ui.startAndWaitForProof(proof);
- * </pre></code>
- * </p>
+ * In case that no user interface should be used see also {@link KeYEnvironment}
+ * which provides static methods to load source code and to instantiate this
+ * class.
  * @author Martin Hentschel
+ * @see KeYEnvironment
  */
-public class CustomUserInterface extends AbstractUserInterface {
+public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
    /**
     * The used {@link DefaultProofControl}.
     */
@@ -55,7 +42,7 @@ public class CustomUserInterface extends AbstractUserInterface {
    /**
     * Constructor.
     */
-   public CustomUserInterface() {
+   public DefaultUserInterfaceControl() {
       proofControl = new DefaultProofControl(getListener());
    }
 
@@ -63,7 +50,7 @@ public class CustomUserInterface extends AbstractUserInterface {
     * Constructor.
     * @param customization An optional {@link RuleCompletionHandler}.
     */
-   public CustomUserInterface(RuleCompletionHandler customization) {
+   public DefaultUserInterfaceControl(RuleCompletionHandler customization) {
       proofControl = new DefaultProofControl(getListener(), customization);
    }
    

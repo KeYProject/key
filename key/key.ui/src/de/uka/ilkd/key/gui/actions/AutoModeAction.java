@@ -23,6 +23,7 @@ import javax.swing.KeyStroke;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -34,7 +35,6 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.ui.AutoModeListener;
 
 public final class AutoModeAction extends MainWindowAction {
 
@@ -115,7 +115,7 @@ public final class AutoModeAction extends MainWindowAction {
             }
         });
     
-        // This method delegates the request only to the UserInterface which implements the functionality.
+        // This method delegates the request only to the UserInterfaceControl which implements the functionality.
       // No functionality is allowed in this method body!
       getMediator().getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
           
@@ -169,7 +169,7 @@ public final class AutoModeAction extends MainWindowAction {
       KeYMediator r = getMediator();
       Proof proof = r.getSelectedProof();
       if (r.getUI().getProofControl().isAutoModeSupported(proof)) {
-          // This method delegates the request only to the UserInterface which implements the functionality.
+          // This method delegates the request only to the UserInterfaceControl which implements the functionality.
          // No functionality is allowed in this method body!
          r.getUI().getProofControl().startAutoMode(proof, proof.openEnabledGoals());
       }
@@ -177,7 +177,7 @@ public final class AutoModeAction extends MainWindowAction {
    else {
 	    // this interface is no longer used (MU)
 //	    getMediator().interrupted(e);
-	    // This method delegates the request only to the UserInterface which implements the functionality.
+	    // This method delegates the request only to the UserInterfaceControl which implements the functionality.
       // No functionality is allowed in this method body!
       getMediator().getUI().getProofControl().stopAutoMode();
 	}

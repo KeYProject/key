@@ -7,6 +7,8 @@ import javax.swing.SwingWorker;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.control.AbstractProofControl;
+import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -23,11 +25,11 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
  * A {@link ProofControl} which performs the automode in a {@link SwingWorker}.
  * @author Martin Hentschel
  */
-// TODO: This class should not know/use the AbstractMediatorUserInterface and the KeYMediator. Refactor the implementation and use events to update the user interface.
+// TODO: This class should not know/use the AbstractMediatorUserInterfaceControl and the KeYMediator. Refactor the implementation and use events to update the user interface.
 public class MediatorProofControl extends AbstractProofControl {
-   private final AbstractMediatorUserInterface ui;
+   private final AbstractMediatorUserInterfaceControl ui;
 
-   public MediatorProofControl(AbstractMediatorUserInterface ui) {
+   public MediatorProofControl(AbstractMediatorUserInterfaceControl ui) {
       super(ui.getListener(), ui);
       this.ui = ui;
    }

@@ -20,13 +20,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.LineBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Tests for {@link LineBreakpoint}. Tests if execution stops at {@link JavaLineBreakpoint} correctly.
@@ -37,7 +37,7 @@ public class TestLineBreakpointStopConditionSimpleWithHitCount extends AbstractS
    public void testBreakpointStopCondition() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       HashMap<String, String> originalTacletOptions = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
-      SymbolicExecutionEnvironment<CustomUserInterface> env=null;
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env=null;
       try{
          // Define test settings
          String javaPathInkeyRepDirectory = "/set/lineBreakpointsWithHitcountTest/test/BreakpointStopCallerAndLoop.java";

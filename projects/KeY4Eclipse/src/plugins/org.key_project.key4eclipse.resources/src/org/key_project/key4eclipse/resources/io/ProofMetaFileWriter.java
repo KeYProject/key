@@ -33,6 +33,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.XMLUtil;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -42,7 +43,6 @@ import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
@@ -314,7 +314,7 @@ public class ProofMetaFileWriter {
     * @param environment - the {@link KeYEnvironment} to use
     * @return the {@link KeYJavaType} form the {@link KeYEnvironment}
     */
-   private static KeYJavaType getKeYJavaTypeFromEnv(KeYJavaType kjt, KeYEnvironment<CustomUserInterface> environment){
+   private static KeYJavaType getKeYJavaTypeFromEnv(KeYJavaType kjt, KeYEnvironment<DefaultUserInterfaceControl> environment){
       Set<KeYJavaType> envKjts = environment.getJavaInfo().getAllKeYJavaTypes();
       for(KeYJavaType envKjt : envKjts){
          if(envKjt.getFullName().equals(kjt.getFullName())){

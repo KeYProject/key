@@ -16,6 +16,7 @@ package de.uka.ilkd.key.symbolic_execution;
 import java.io.File;
 import java.util.HashMap;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicExecutionCompletions;
@@ -29,7 +30,6 @@ import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTree
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Tests for {@link SymbolicExecutionTreeBuilder},
@@ -44,7 +44,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * and ensures that no rules are applied forever.
     */
    public void testInstanceOfNotInEndlessLoop() throws Exception {
-      SymbolicExecutionEnvironment<CustomUserInterface> env = doSETTest(testCaseDirectory, 
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(testCaseDirectory, 
                                                                         "/set/instanceOfNotInEndlessLoop/test/Number.java", 
                                                                         "Number", 
                                                                         "equals", 
@@ -100,7 +100,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests example: /set/symbolicExecutionCompletionsTest
     */
    public void testSymbolicExecutionCompletionsTest() throws Exception {
-      SymbolicExecutionEnvironment<CustomUserInterface> env = null;
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
       HashMap<String, String> originalTacletOptions = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
@@ -2501,7 +2501,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     */
    public void testIdenticalTermsDuringProof() throws Exception {
       // Make sure that correct symbolic execution tree is created.
-      SymbolicExecutionEnvironment<CustomUserInterface> env = doSETTest(testCaseDirectory, 
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(testCaseDirectory, 
                                                                                "/set/identicalTermsDuringProof/test/IdenticalTermsDuringProof.java", 
                                                                                "IdenticalTermsDuringProof", 
                                                                                "mid", 

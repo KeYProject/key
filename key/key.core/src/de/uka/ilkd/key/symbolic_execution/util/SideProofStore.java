@@ -9,11 +9,11 @@ import java.util.List;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * <p>
@@ -282,7 +282,7 @@ public final class SideProofStore {
       /**
        * The {@link KeYEnvironment}.
        */
-      private final KeYEnvironment<CustomUserInterface> environment;
+      private final KeYEnvironment<DefaultUserInterfaceControl> environment;
 
       /**
        * Constructor.
@@ -292,8 +292,8 @@ public final class SideProofStore {
       public Entry(String description, Proof proof) {
          this.description = description;
          this.proof = proof;
-         CustomUserInterface ui = new CustomUserInterface();
-         this.environment = new KeYEnvironment<CustomUserInterface>(ui, proof.getInitConfig(), proof);
+         DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();
+         this.environment = new KeYEnvironment<DefaultUserInterfaceControl>(ui, proof.getInitConfig(), proof);
       }
 
       /**
@@ -316,7 +316,7 @@ public final class SideProofStore {
        * Returns the {@link KeYEnvironment}.
        * @return The {@link KeYEnvironment}.
        */
-      public KeYEnvironment<CustomUserInterface> getEnvironment() {
+      public KeYEnvironment<DefaultUserInterfaceControl> getEnvironment() {
          return environment;
       }
 

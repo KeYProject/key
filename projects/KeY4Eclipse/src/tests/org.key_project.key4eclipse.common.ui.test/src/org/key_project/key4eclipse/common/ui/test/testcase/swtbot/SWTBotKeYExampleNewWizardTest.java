@@ -39,10 +39,10 @@ import org.key_project.util.java.IOUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * SWTBot tests for {@link KeYExampleNewWizard}.
@@ -216,7 +216,7 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
                   Assert.isTrue(location.exists());
                   try {
                      if (!BROKEN_PROOF_FILE_PATHES.contains(resource.getFullPath().toString())) {
-                        KeYEnvironment<CustomUserInterface> env = KeYEnvironment.load(location, classPaths, bootClassPath);
+                        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(location, classPaths, bootClassPath);
                         env.dispose();
                      }
                   }

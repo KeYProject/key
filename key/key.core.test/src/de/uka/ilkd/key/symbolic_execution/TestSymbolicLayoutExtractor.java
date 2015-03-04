@@ -23,6 +23,7 @@ import java.util.List;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -34,7 +35,6 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Tests {@link SymbolicLayoutExtractor}.
@@ -690,7 +690,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
                          boolean useOperationContracts,
                          boolean onReturnStatementNode) throws Exception {
       HashMap<String, String> originalTacletOptions = null;
-      SymbolicExecutionEnvironment<CustomUserInterface> env = null;
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
          // Define test settings

@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.control.RuleCompletionHandler;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
@@ -35,7 +38,12 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 
-public abstract class AbstractMediatorUserInterface extends AbstractUserInterface implements RuleCompletionHandler, ProofEnvironmentListener, ProofDisposedListener {
+/**
+ * Provides a basic implementation of {@link UserInterfaceControl} for 
+ * user interfaces in which a {@link KeYMediator} is available.
+ * @author Martin Hentschel
+ */
+public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserInterfaceControl implements RuleCompletionHandler, ProofEnvironmentListener, ProofDisposedListener {
    private final MediatorProofControl proofControl = createProofControl();
 
    private ProofMacro autoMacro = new SkipMacro();

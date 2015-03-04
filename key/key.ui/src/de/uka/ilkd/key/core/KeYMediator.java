@@ -21,6 +21,8 @@ import javax.swing.event.EventListenerList;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.control.AutoModeListener;
+import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
@@ -54,9 +56,7 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
-import de.uka.ilkd.key.ui.AutoModeListener;
-import de.uka.ilkd.key.ui.ProofControl;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
 /**
@@ -67,7 +67,7 @@ import de.uka.ilkd.key.util.ThreadUtilities;
 public class KeYMediator {
 
     /** The user interface */
-    private AbstractMediatorUserInterface ui;
+    private AbstractMediatorUserInterfaceControl ui;
 
     /** the notation info used to print sequents */
     private final NotationInfo notationInfo;
@@ -102,7 +102,7 @@ public class KeYMediator {
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
      */
-    public KeYMediator(AbstractMediatorUserInterface ui) {
+    public KeYMediator(AbstractMediatorUserInterfaceControl ui) {
 	this.ui             = ui;
 
 	notationInfo        = new NotationInfo();
@@ -385,7 +385,7 @@ public class KeYMediator {
     /** returns the user interface
      * @return the user interface
      */
-    public AbstractMediatorUserInterface getUI() {
+    public AbstractMediatorUserInterfaceControl getUI() {
         return ui;
     }
 

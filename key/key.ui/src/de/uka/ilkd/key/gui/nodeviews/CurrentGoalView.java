@@ -275,7 +275,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
      */
     void selectedTaclet(TacletApp taclet, PosInSequent pos) {
         KeYMediator r = getMediator();
-      // This method delegates the request only to the UserInterface which implements the functionality.
+      // This method delegates the request only to the UserInterfaceControl which implements the functionality.
         // No functionality is allowed in this method body!
         Goal goal = r.getSelectedGoal();
         Debug.assertTrue(goal != null);

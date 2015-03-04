@@ -19,6 +19,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.control.AbstractProofControl;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
@@ -41,10 +43,9 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.removegenerics.Main;
 
 /**
- * Implementation of {@link UserInterface} used by command line interface of
- * KeY.
+ * Implementation of {@link UserInterfaceControl} used by command line interface of KeY.
  */
-public class ConsoleUserInterface extends AbstractMediatorUserInterface {
+public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceControl {
    private static final int PROGRESS_BAR_STEPS = 50;
    private static final String PROGRESS_MARK = ">";
 
@@ -77,13 +78,13 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
      */
     public boolean allProofsSuccessful = true;
     
-    public ConsoleUserInterface(byte verbosity, boolean loadOnly) {
+    public ConsoleUserInterfaceControl(byte verbosity, boolean loadOnly) {
         this.verbosity = verbosity;
         this.mediator  = new KeYMediator(this);
         this.loadOnly = loadOnly;
     }
 
-    public ConsoleUserInterface(boolean verbose, boolean loadOnly) {
+    public ConsoleUserInterfaceControl(boolean verbose, boolean loadOnly) {
         this(verbose? Verbosity.DEBUG: Verbosity.NORMAL, loadOnly);
     }
 
@@ -219,14 +220,14 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
     final public void progressStarted(Object sender) {
         // TODO Implement ProblemInitializerListener.progressStarted
         if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("ConsoleUserInterface.progressStarted(" + sender + ")");
+            System.out.println("ConsoleUserInterfaceControl.progressStarted(" + sender + ")");
         }
     }
 
     @Override
     final public void progressStopped(Object sender) {
         if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("ConsoleUserInterface.progressStopped(" + sender + ")");
+            System.out.println("ConsoleUserInterfaceControl.progressStopped(" + sender + ")");
         }
     }
 
@@ -234,7 +235,7 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
     final public void reportException(Object sender, ProofOblInput input, Exception e) {
         // TODO Implement ProblemInitializerListener.reportException
         if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("ConsoleUserInterface.reportException(" + sender + "," + input + "," + e + ")");
+            System.out.println("ConsoleUserInterfaceControl.reportException(" + sender + "," + input + "," + e + ")");
             e.printStackTrace();
         }
     }
@@ -243,7 +244,7 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
     final public void reportStatus(Object sender, String status, int progress) {
         // TODO Implement ProblemInitializerListener.reportStatus
         if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("ConsoleUserInterface.reportStatus(" + sender + "," + status + "," + progress + ")");
+            System.out.println("ConsoleUserInterfaceControl.reportStatus(" + sender + "," + status + "," + progress + ")");
         }
     }
 
@@ -251,7 +252,7 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
     final public void reportStatus(Object sender, String status) {
         // TODO Implement ProblemInitializerListener.reportStatus
         if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("ConsoleUserInterface.reportStatus(" + sender + "," + status + ")");
+            System.out.println("ConsoleUserInterfaceControl.reportStatus(" + sender + "," + status + ")");
         }
     }
 
@@ -259,7 +260,7 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
     final public void resetStatus(Object sender) {
         // TODO Implement ProblemInitializerListener.resetStatus
         if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("ConsoleUserInterface.resetStatus(" + sender + ")");
+            System.out.println("ConsoleUserInterfaceControl.resetStatus(" + sender + ")");
         }
     }
 
@@ -276,7 +277,7 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
     final public void setMaximum(int maximum) {
         // TODO Implement ProgressMonitor.setMaximum
         if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("ConsoleUserInterface.setMaximum(" + maximum + ")");
+            System.out.println("ConsoleUserInterfaceControl.setMaximum(" + maximum + ")");
         }
     }
 
@@ -284,7 +285,7 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
     final public void setProgress(int progress) {
         // TODO Implement ProgressMonitor.setProgress
         if(verbosity >= Verbosity.DEBUG) {
-            System.out.println("ConsoleUserInterface.setProgress(" + progress + ")");
+            System.out.println("ConsoleUserInterfaceControl.setProgress(" + progress + ")");
         }
     }
 

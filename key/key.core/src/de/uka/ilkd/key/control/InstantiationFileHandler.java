@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.ui;
+package de.uka.ilkd.key.control;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

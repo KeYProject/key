@@ -44,7 +44,7 @@ public class TGInfoDialog extends JDialog implements TestGenerationLog {
 		stopButton = new JButton(new AbstractAction("Stop") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// This method delegates the request only to the UserInterface which implements the functionality.
+				// This method delegates the request only to the UserInterfaceControl which implements the functionality.
             // No functionality is allowed in this method body!
             MainWindow.getInstance().getMediator().getUI().getProofControl().stopAutoMode();
 				exitButton.setEnabled(true);

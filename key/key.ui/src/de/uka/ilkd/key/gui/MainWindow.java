@@ -69,6 +69,7 @@ import javax.swing.event.MouseInputAdapter;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -141,8 +142,7 @@ import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
-import de.uka.ilkd.key.ui.AbstractMediatorUserInterface;
-import de.uka.ilkd.key.ui.AutoModeListener;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -188,7 +188,7 @@ public final class MainWindow extends JFrame  {
     private final KeYMediator mediator;
 
     /** the user interface which direct all notifications to this window */
-    private final WindowUserInterface userInterface;
+    private final WindowUserInterfaceControl userInterface;
 
     /** the status line */
     private MainStatusLine statusLine;
@@ -273,7 +273,7 @@ public final class MainWindow extends JFrame  {
         setIconImage(IconFactory.keyLogo());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         proofListener = new MainProofListener();
-        userInterface = new WindowUserInterface(this);
+        userInterface = new WindowUserInterfaceControl(this);
         mediator = getMainWindowMediator(userInterface);
         currentGoalView = new CurrentGoalView(this);
         emptySequent = new EmptySequent(this);
@@ -361,12 +361,12 @@ public final class MainWindow extends JFrame  {
     /**
      * Returns the MainWindow KeyMediator.
      *
-     * @param userInterface The UserInterface.
+     * @param userInterface The UserInterfaceControl.
      */
-    private KeYMediator getMainWindowMediator(AbstractMediatorUserInterface userInterface) {
+    private KeYMediator getMainWindowMediator(AbstractMediatorUserInterfaceControl userInterface) {
         KeYMediator result = new KeYMediator(userInterface);
         result.addKeYSelectionListener(proofListener);
-        // This method delegates the request only to the UserInterface which implements the functionality.
+        // This method delegates the request only to the UserInterfaceControl which implements the functionality.
       // No functionality is allowed in this method body!
       result.getUI().getProofControl().addAutoModeListener(proofListener);
         result.addGUIListener(new MainGUIListener());
@@ -1420,7 +1420,7 @@ public final class MainWindow extends JFrame  {
 	return recentFileMenu;
     }
 
-    public WindowUserInterface getUserInterface() {
+    public WindowUserInterfaceControl getUserInterface() {
         return userInterface;
     }
 

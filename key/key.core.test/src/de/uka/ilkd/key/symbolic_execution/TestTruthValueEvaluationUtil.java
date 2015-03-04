@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil.BranchResult;
@@ -18,7 +19,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Tests for {@link TruthValueEvaluationUtil}.
@@ -330,7 +330,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                             boolean useOperationContracts,
                                             boolean useLoopInvariants,
                                             ExpectedTruthValueEvaluationResult... expectedResults) throws Exception {
-      SymbolicExecutionEnvironment<CustomUserInterface> env = null;
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
       try {
          // Perform symbolic execution
          env = doSETTest(testCaseDirectory, 
@@ -376,7 +376,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
                                             boolean useOperationContracts,
                                             boolean useLoopInvariants,
                                             ExpectedTruthValueEvaluationResult... expectedResults) throws Exception {
-      SymbolicExecutionEnvironment<CustomUserInterface> env = null;
+      SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
       try {
          // Perform symbolic execution
          env = doSETTest(testCaseDirectory, 
@@ -413,7 +413,7 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     * @param expectedResults The expected results.
     * @throws Exception Occurred Exception.
     */
-   protected void doTruthValueEvaluationTest(SymbolicExecutionEnvironment<CustomUserInterface> env, 
+   protected void doTruthValueEvaluationTest(SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env, 
                                              ExpectedTruthValueEvaluationResult... expectedResults) throws Exception {
       // Compute current results
       List<TruthValueEvaluationResult> currentResults = new LinkedList<TruthValueEvaluationResult>();

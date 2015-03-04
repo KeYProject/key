@@ -26,6 +26,7 @@ import java.util.Properties;
 
 import org.antlr.runtime.MismatchedTokenException;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.proof.Node;
@@ -44,7 +45,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
-import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.Pair;
 
@@ -121,7 +121,7 @@ public abstract class AbstractProblemLoader {
     private final Profile profileOfNewProofs;
 
     /**
-     * {@code true} to call {@link UserInterface#selectProofObligation(InitConfig)}
+     * {@code true} to call {@link UserInterfaceControl#selectProofObligation(InitConfig)}
      * if no {@link Proof} is defined by the loaded proof or 
      * {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
      */
@@ -185,7 +185,7 @@ public abstract class AbstractProblemLoader {
      * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
      * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
      * @param control The {@link ProblemLoaderControl} to use.
-     * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call {@link UserInterface#selectProofObligation(InitConfig)} if no {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
+     * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call {@link UserInterfaceControl#selectProofObligation(InitConfig)} if no {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
      */
     public AbstractProblemLoader(File file, 
                                  List<File> classPath, 
