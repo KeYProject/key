@@ -19,7 +19,6 @@ package de.uka.ilkd.key.util;
 import java.lang.management.ManagementFactory;
 
 import javax.management.ObjectName;
-import javax.swing.JOptionPane;
 
 public final class Debug implements DebugMBean {
 

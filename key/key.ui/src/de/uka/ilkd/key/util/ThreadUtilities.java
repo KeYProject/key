@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.SwingUtilities;
 
-
 public final class ThreadUtilities {
 
     /**
