@@ -1,13 +1,13 @@
 package org.key_project.jmlediting.core.profile.persistence.internal;
 
-import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.CLASS_REFERENCE;
-import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.CLOSING_CHARACTER;
-import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.CODED_KEYWORD;
-import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.CONTENT_DESCRIPTION_ID;
-import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.DESCRIPTION;
-import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.KEYWORD;
-import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.SORT;
-import static org.key_project.jmlediting.core.profile.persistence.internal.DerivedProfilePersistence.USER_DEFINED_KEYWORD;
+import static org.key_project.jmlediting.core.profile.persistence.internal.XMLConstants.CLASS_REFERENCE;
+import static org.key_project.jmlediting.core.profile.persistence.internal.XMLConstants.CLOSING_CHARACTER;
+import static org.key_project.jmlediting.core.profile.persistence.internal.XMLConstants.CODED_KEYWORD;
+import static org.key_project.jmlediting.core.profile.persistence.internal.XMLConstants.CONTENT_DESCRIPTION_ID;
+import static org.key_project.jmlediting.core.profile.persistence.internal.XMLConstants.DESCRIPTION;
+import static org.key_project.jmlediting.core.profile.persistence.internal.XMLConstants.KEYWORD;
+import static org.key_project.jmlediting.core.profile.persistence.internal.XMLConstants.SORT;
+import static org.key_project.jmlediting.core.profile.persistence.internal.XMLConstants.USER_DEFINED_KEYWORD;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,30 +25,83 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+/**
+ * An abstract class for persisting keywords. @{link IUserDefinedKeyword} are
+ * persistent different from other keywords. Other keywords are referenced by
+ * their class name which for {@link IUserDefinedKeyword} their content is
+ * stored.<br>
+ * The way other keywords are loaded from the class is open to subclasses.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public abstract class KeywordPersistence {
 
+   /**
+    * The profile in which the keywords to persist are.
+    */
    private final IJMLProfile profile;
 
+   /**
+    * Creates a new {@link KeywordPersistence} for the given profile.
+    *
+    * @param profile
+    *           the profile containing the keywords
+    */
    public KeywordPersistence(final IJMLProfile profile) {
       super();
       this.profile = profile;
    }
 
-   protected IJMLProfile getProfile() {
-      return this.profile;
-   }
+   /**
+    * Validates that the given coded keyword can be persisted.
+    *
+    * @param keyword
+    *           the keyword to validate
+    * @throws ProfilePersistenceException
+    *            if the keyword cannot be persisted
+    */
+   protected abstract void validateCodedKeywordToPersist(IKeyword keyword)
+         throws ProfilePersistenceException;
 
+   /**
+    * Loads the coded keyword from its class.
+    * 
+    * @param keywordClass
+    *           the keyword class to load
+    * @return the loaded keyword
+    * @throws ProfilePersistenceException
+    *            if loading is not possible
+    */
+   protected abstract IKeyword loadCodedKeywordFromClass(
+         Class<? extends IKeyword> keywordClass)
+         throws ProfilePersistenceException;
+
+   /**
+    * Persists a keyword to an element.
+    *
+    * @param keyword
+    *           the keyword to persist
+    * @param doc
+    *           the parent document of the generated element
+    * @return the element, its name may depend on the keyword
+    * @throws ProfilePersistenceException
+    *            if the keyword cannot be persisted
+    */
    public Element persist(final IKeyword keyword, final Document doc)
          throws ProfilePersistenceException {
+      // UserDefinedKeywords are persisted differently
       if (keyword instanceof IUserDefinedKeyword) {
          return this.persistUserDefinedKeyword((IUserDefinedKeyword) keyword,
                doc);
       }
       else {
-         this.validateKeywordToPersist(keyword);
-         final Element codedKeywordElem = doc.createElement(CODED_KEYWORD);
+         // Check whether the coded keyword can be persisted
+         this.validateCodedKeywordToPersist(keyword);
 
-         final Element keywordClassElement = new ClassReferencePersistence()
+         // Then write a reference to the class of the keyword
+         final Element codedKeywordElem = doc.createElement(CODED_KEYWORD);
+         final Element keywordClassElement = ClassReferencePersistence
                .persistClassReference(keyword.getClass(), doc);
          codedKeywordElem.appendChild(keywordClassElement);
 
@@ -56,21 +109,25 @@ public abstract class KeywordPersistence {
       }
    }
 
-   protected abstract void validateKeywordToPersist(IKeyword keyword)
-         throws ProfilePersistenceException;
-
-   protected abstract IKeyword loadKeyword(
-         Class<? extends IKeyword> keywordClass)
-         throws ProfilePersistenceException;
-
+   /**
+    * Reads a keyword from an element generated by
+    * {@link #persist(IKeyword, Document)}.
+    *
+    * @param elem
+    *           the element containing the keyword
+    * @return the loaded keyword
+    * @throws ProfilePersistenceException
+    *            if the profile cannot be read
+    */
    public IKeyword readKeyword(final Element elem)
          throws ProfilePersistenceException {
       final String name = elem.getNodeName();
+      // User defined keywords are loaded differently
       if (USER_DEFINED_KEYWORD.equals(name)) {
          return this.loadUserDefinedKeyword(elem);
       }
       else if (CODED_KEYWORD.equals(name)) {
-
+         // Ensure that there is exaclty one class reference
          final NodeList keywordElems = elem
                .getElementsByTagName(CLASS_REFERENCE);
          if (keywordElems.getLength() != 1) {
@@ -78,10 +135,10 @@ public abstract class KeywordPersistence {
                   "Expected excatly one class reference for a coded keyword");
          }
          final Element classElem = (Element) keywordElems.item(0);
-
-         final Class<? extends IKeyword> keywordClass = new ClassReferencePersistence()
+         // Load that class and then the keyword from the class
+         final Class<? extends IKeyword> keywordClass = ClassReferencePersistence
                .loadClassReference(classElem, IKeyword.class);
-         return this.loadKeyword(keywordClass);
+         return this.loadCodedKeywordFromClass(keywordClass);
       }
       else {
          throw new ProfilePersistenceException(
@@ -89,30 +146,45 @@ public abstract class KeywordPersistence {
       }
    }
 
+   /**
+    * Persists a {@link IUserDefinedKeyword} to an XML element.
+    *
+    * @param userKeyword
+    *           the keyword to persist
+    * @param doc
+    *           the parent document of the element to create
+    * @return the created element with name {@link #USER_DEFINED_KEYWORD}.
+    */
    private Element persistUserDefinedKeyword(
          final IUserDefinedKeyword userKeyword, final Document doc) {
       final Element userDefinedKeywordElem = doc
             .createElement(USER_DEFINED_KEYWORD);
-
+      // Content description is identified by ID
       userDefinedKeywordElem.setAttribute(CONTENT_DESCRIPTION_ID, userKeyword
             .getContentDescription().getId());
+
+      // An optional closing character
       if (userKeyword.getClosingCharacter() != null) {
          userDefinedKeywordElem.setAttribute(CLOSING_CHARACTER, userKeyword
                .getClosingCharacter().toString());
       }
+
+      // Put the description as text
       final Element descriptionElement = doc.createElement(DESCRIPTION);
       descriptionElement.appendChild(doc.createTextNode(userKeyword
             .getDescription()));
       userDefinedKeywordElem.appendChild(descriptionElement);
 
+      // Then write the keyword strings
       for (final String keywordString : userKeyword.getKeywords()) {
          final Element keywordElement = doc.createElement(KEYWORD);
          keywordElement.appendChild(doc.createTextNode(keywordString));
          userDefinedKeywordElem.appendChild(keywordElement);
       }
 
+      // At least the sort identified by class
       final Element keywordSortElement = doc.createElement(SORT);
-      keywordSortElement.appendChild(new ClassReferencePersistence()
+      keywordSortElement.appendChild(ClassReferencePersistence
             .persistClassReference(userKeyword.getSort().getClass(), doc));
 
       userDefinedKeywordElem.appendChild(keywordSortElement);
@@ -120,52 +192,74 @@ public abstract class KeywordPersistence {
       return userDefinedKeywordElem;
    }
 
-   private IKeyword loadUserDefinedKeyword(final Element elem)
+   /**
+    * Loads a {@link IUserDefinedKeyword} from the given XML element.
+    *
+    * @param elem
+    *           the element to load from
+    * @return the keyword read
+    * @throws ProfilePersistenceException
+    *            if the keyword cannot be read
+    */
+   private IUserDefinedKeyword loadUserDefinedKeyword(final Element elem)
          throws ProfilePersistenceException {
+
+      // Assert that there is an ID of the description
       final String descriptionID = elem.getAttribute(CONTENT_DESCRIPTION_ID);
       if ("".equals(descriptionID)) {
          throw new ProfilePersistenceException(
                "No content description of for user defined keyword");
       }
 
+      // Load description, keywords and sort by iterating through the children
+      // of the elem
       String description = null;
       final Set<String> keywords = new HashSet<String>();
       IKeywortSort sort = null;
 
       final NodeList children = elem.getChildNodes();
-      System.err.println("Num children: " + children.getLength());
       for (int i = 0; i < children.getLength(); i++) {
+         // Only elements are expected
          if (!(children.item(i) instanceof Element)) {
             throw new ProfilePersistenceException("Unexpected content "
                   + children.item(i).getNodeName());
          }
          final Element cElem = (Element) children.item(i);
 
-         System.err.println(elem.getTagName());
+         // Branch over the name of the element
          if (cElem.getNodeName().equals(DESCRIPTION)) {
             if (description == null) {
-               description = cElem.getFirstChild().getTextContent();// .getNodeValue();
+               description = cElem.getFirstChild().getTextContent();
             }
             else {
+               // Only allow one description
                throw new ProfilePersistenceException(
                      "Duplicate description node");
             }
          }
          else if (cElem.getNodeName().equals(KEYWORD)) {
+            // But allow multiple keywords
             keywords.add(cElem.getFirstChild().getTextContent());
          }
          else if (cElem.getNodeName().equals(SORT)) {
             if (sort == null) {
+               // Assert that there is one class reference
                final NodeList classNodes = cElem
                      .getElementsByTagName(CLASS_REFERENCE);
                if (classNodes.getLength() != 1) {
                   throw new ProfilePersistenceException(
                         "Expected one class reference for a sort");
                }
-               final Class<? extends IKeywortSort> sortClass = new ClassReferencePersistence()
+               // Load the class and instantiate the sort from it
+               final Class<? extends IKeywortSort> sortClass = ClassReferencePersistence
                      .loadClassReference((Element) classNodes.item(0),
                            IKeywortSort.class);
                sort = AbstractKeywordSort.getSortObject(sortClass);
+            }
+            else {
+               // Only one sort
+               throw new ProfilePersistenceException(
+                     "Got multiple sorts for profile");
             }
          }
          else {
@@ -174,6 +268,7 @@ public abstract class KeywordPersistence {
          }
       }
 
+      // Check that we got everything
       if (keywords.isEmpty()) {
          throw new ProfilePersistenceException(
                "Found no keyword UserDefinedKeyword");
@@ -187,6 +282,7 @@ public abstract class KeywordPersistence {
                "No sort found for UserDefinedKeyword");
       }
 
+      // Read the closing character
       Character closingCharacter = null;
       if (elem.hasAttribute(CLOSING_CHARACTER)) {
          final String closingCharacterString = elem
@@ -198,6 +294,7 @@ public abstract class KeywordPersistence {
          closingCharacter = closingCharacterString.charAt(0);
       }
 
+      // Find the contentdescription by id
       final IUserDefinedKeywordContentDescription descr = JMLProfileHelper
             .getDescriptionById(descriptionID, this.profile);
       if (descr == null) {
@@ -206,6 +303,7 @@ public abstract class KeywordPersistence {
                      + "\" was not found.");
       }
 
+      // Finally create the keyword
       return new UserDefinedKeyword(keywords, sort, descr, description,
             closingCharacter);
    }
