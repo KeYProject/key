@@ -21,6 +21,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.Image;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
+import java.net.URL;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -28,6 +29,7 @@ import javax.swing.plaf.metal.MetalIconFactory.FolderIcon16;
 import javax.swing.plaf.metal.MetalIconFactory.TreeControlIcon;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
+import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 public class IconFactory {
@@ -99,8 +101,48 @@ public class IconFactory {
     private static Image testgenerationImage = getImage("images/toolbar/tg.png");
 
     public static Image getImage(String s) {
-	ImageIcon ii=resManager.createImageIcon(IconFactory.class, s);
+	ImageIcon ii=createImageIcon(IconFactory.class, s);
 	return ii.getImage();
+    }
+
+    /**
+     * Creates an icon from an image contained in a resource.
+     * The resource is fist search using the package name of the calling Object
+     * and if it is not found there the package name of its superclass is used
+     * recursively.
+     * @param o the Object reference to the calling object
+     * @param filename String the name of the file to search (only relative
+     * pathname to the path of the calling class)
+     * @return the newly created image
+     */
+    public static ImageIcon createImageIcon(Object o, String filename) {
+   return createImageIcon(o.getClass(), filename);
+    }
+
+    /**
+     * Creates an icon from an image contained in a resource.
+     * The resource is fist search using the package name of the given class
+     * and if the resource is not found the packagename of its superclass is used
+     * recursively.
+     * @param cl the Class the resource is looked for
+     * @param filename String the name of the file to search  (only relative
+     * pathname to the path of the calling class)
+     * @return the newly created image
+     */
+    public static ImageIcon createImageIcon(Class<?> cl, String filename) {
+   URL iconURL = cl.getResource(filename);
+   Debug.out("Load Resource:" + filename + " of class "+cl);
+   if (iconURL == null && cl.getSuperclass() != null) {
+       return createImageIcon(cl.getSuperclass(),
+               filename);
+   } else if (iconURL == null && cl.getSuperclass() == null) {
+       // error message Resource not found
+       System.out.println("No image resource "+ filename + " found");
+       return null;
+   } else { 
+       Debug.out("Done.");
+       return new ImageIcon(iconURL); 
+   }
     }
 
     public static ImageIcon scaleIcon(Image im, int x, int y) {
