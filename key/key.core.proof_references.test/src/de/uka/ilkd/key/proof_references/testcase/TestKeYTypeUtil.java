@@ -11,26 +11,25 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof_references;
+package de.uka.ilkd.key.proof_references.testcase;
 
 import java.io.File;
 
-import junit.framework.TestCase;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.util.HelperClassForTests;
+import de.uka.ilkd.key.util.KeYTypeUtil;
 
 /**
  * Tests {@link KeYTypeUtil}.
  * @author Martin Hentschel
  */
-public class TestKeYTypeUtil extends TestCase {
+public class TestKeYTypeUtil extends AbstractProofReferenceTestCase {
    /**
     * Tests {@link KeYTypeUtil#isInnerType(Services, KeYJavaType)}.
     */
    public void testIsInnerType() throws Exception {
-      KeYEnvironment<?> environment = KeYEnvironment.load(new File(HelperClassForTests.TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null);
+      KeYEnvironment<?> environment = KeYEnvironment.load(new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null);
       try {
          Services services = environment.getServices();
          assertNotNull(services);
@@ -65,7 +64,7 @@ public class TestKeYTypeUtil extends TestCase {
     * Tests {@link KeYTypeUtil#getParentName(Services, KeYJavaType)}.
     */
    public void testGetParentName() throws Exception {
-      KeYEnvironment<?> environment = KeYEnvironment.load(new File(HelperClassForTests.TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null);
+      KeYEnvironment<?> environment = KeYEnvironment.load(new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null);
       try {
          Services services = environment.getServices();
          assertNotNull(services);
@@ -100,7 +99,7 @@ public class TestKeYTypeUtil extends TestCase {
     * Tests {@link KeYTypeUtil#isType(Services, String)}.
     */
    public void testIsType() throws Exception {
-      KeYEnvironment<?> environment = KeYEnvironment.load(new File(HelperClassForTests.TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null);
+      KeYEnvironment<?> environment = KeYEnvironment.load(new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null);
       try {
          Services services = environment.getServices();
          assertNotNull(services);
@@ -132,7 +131,7 @@ public class TestKeYTypeUtil extends TestCase {
     * Tests {@link KeYTypeUtil#getType(de.uka.ilkd.key.java.Services, String)}.
     */
    public void testGetType() throws Exception {
-      KeYEnvironment<?> environment = KeYEnvironment.load(new File(HelperClassForTests.TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null);
+      KeYEnvironment<?> environment = KeYEnvironment.load(new File(TESTCASE_DIRECTORY, "/proofReferences/InnerAndAnonymousTypeTest"), null, null);
       try {
          Services services = environment.getServices();
          assertNotNull(services);

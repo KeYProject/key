@@ -11,13 +11,13 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof_references.analyst;
+package de.uka.ilkd.key.proof_references.testcase.analyst;
 
 import org.key_project.util.java.IFilter;
 
-import de.uka.ilkd.key.proof_references.AbstractProofReferenceTestCase;
+import de.uka.ilkd.key.proof_references.analyst.ClassAxiomAndInvariantProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
-import de.uka.ilkd.key.util.HelperClassForTests;
+import de.uka.ilkd.key.proof_references.testcase.AbstractProofReferenceTestCase;
 
 /**
  * Tests for {@link ClassAxiomAndInvariantProofReferencesAnalyst}.
@@ -28,7 +28,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
     * Tests "InvariantInOperationContractOfArgument".
     */
    public void testInvariantInOperationContractOfArgument() throws Exception {
-      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
+      doReferenceMethodTest(TESTCASE_DIRECTORY, 
                             "/proofReferences/InvariantInOperationContractOfArgument/InvariantInOperationContractOfArgument.java", 
                             "InvariantInOperationContractOfArgument",
                             "main", 
@@ -47,7 +47,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
     * Tests "InvariantInOperationContract".
     */
    public void testInvariantInOperationContract() throws Exception {
-      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
+      doReferenceMethodTest(TESTCASE_DIRECTORY, 
                             "/proofReferences/InvariantInOperationContract/InvariantInOperationContract.java", 
                             "InvariantInOperationContract",
                             "main", 
@@ -66,7 +66,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
     * Tests "NestedInvariantInOperationContract".
     */
    public void testNestedInvariantInOperationContract() throws Exception {
-      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
+      doReferenceMethodTest(TESTCASE_DIRECTORY, 
                             "/proofReferences/NestedInvariantInOperationContract/NestedInvariantInOperationContract.java", 
                             "NestedInvariantInOperationContract",
                             "main", 
@@ -85,7 +85,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
     * Tests "ModelFieldTest#doubleX".
     */
    public void testModelFieldTest_doubleX() throws Exception {
-      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
+      doReferenceMethodTest(TESTCASE_DIRECTORY, 
                             "/proofReferences/ModelFieldTest/ModelFieldTest.java", 
                             "test.ModelFieldTest",
                             "doubleX", 
@@ -99,7 +99,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
     * Tests "ModelFieldTest#test.ModelFieldTest::$f".
     */
    public void testModelFieldTest_f() throws Exception {
-      doReferenceFunctionTest(HelperClassForTests.TESTCASE_DIRECTORY, 
+      doReferenceFunctionTest(TESTCASE_DIRECTORY, 
                               "/proofReferences/ModelFieldTest/ModelFieldTest.java", 
                               "test.ModelFieldTest",
                               "test.ModelFieldTest::$f", 
@@ -113,7 +113,7 @@ public class TestClassAxiomAndInvariantProofReferencesAnalyst extends AbstractPr
     * Tests "AccessibleTest".
     */
    public void testAccessibleTest() throws Exception {
-      doReferenceFunctionTest(HelperClassForTests.TESTCASE_DIRECTORY, 
+      doReferenceFunctionTest(TESTCASE_DIRECTORY, 
                               "/proofReferences/AccessibleTest/AccessibleTest.java", 
                               "test.B",
                               "java.lang.Object::<inv>", 

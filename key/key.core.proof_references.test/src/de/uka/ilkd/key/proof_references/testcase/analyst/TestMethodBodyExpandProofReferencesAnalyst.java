@@ -11,11 +11,11 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof_references.analyst;
+package de.uka.ilkd.key.proof_references.testcase.analyst;
 
-import de.uka.ilkd.key.proof_references.AbstractProofReferenceTestCase;
+import de.uka.ilkd.key.proof_references.analyst.MethodBodyExpandProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
-import de.uka.ilkd.key.util.HelperClassForTests;
+import de.uka.ilkd.key.proof_references.testcase.AbstractProofReferenceTestCase;
 
 /**
  * Tests for {@link MethodBodyExpandProofReferencesAnalyst}.
@@ -26,7 +26,7 @@ public class TestMethodBodyExpandProofReferencesAnalyst extends AbstractProofRef
     * Tests "MethodBodyExpand".
     */
    public void testMethodBodyExpand() throws Exception {
-      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
+      doReferenceMethodTest(TESTCASE_DIRECTORY, 
                             "/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
                             "MethodBodyExpand", 
                             "main", 

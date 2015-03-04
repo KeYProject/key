@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof_references;
+package de.uka.ilkd.key.util;
 
 import java.util.Iterator;
 

@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof_references;
+package de.uka.ilkd.key.proof_references.testcase;
 
 import java.io.File;
 import java.util.HashMap;
@@ -25,6 +25,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
+import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -32,6 +33,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -46,6 +48,8 @@ import de.uka.ilkd.key.util.HelperClassForTests;
  * @author Martin Hentschel
  */
 public abstract class AbstractProofReferenceTestCase extends TestCase {
+   public static final String TESTCASE_DIRECTORY = IOUtil.getProjectRoot(AbstractProofReferenceTestCase.class) + File.separator + "resources"+  File.separator + "testcase";
+   
    /**
     * Executes the test steps of test methods. 
     * @param baseDir The base directory which contains test and oracle file.

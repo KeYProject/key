@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="pluginSrc"/>
+	<classpathentry kind="src" path="key.core.proof_references.test/src"/>
+	<classpathentry kind="src" path="key.core.proof_references/src"/>
 	<classpathentry kind="src" path="key.core.se.test/src"/>
 	<classpathentry kind="src" path="key.core.se/src"/>
 	<classpathentry kind="src" path="key.core.tests/src"/>

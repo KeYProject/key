@@ -11,11 +11,11 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof_references.analyst;
+package de.uka.ilkd.key.proof_references.testcase.analyst;
 
-import de.uka.ilkd.key.proof_references.AbstractProofReferenceTestCase;
+import de.uka.ilkd.key.proof_references.analyst.ContractProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
-import de.uka.ilkd.key.util.HelperClassForTests;
+import de.uka.ilkd.key.proof_references.testcase.AbstractProofReferenceTestCase;
 
 /**
  * Tests for {@link ContractProofReferencesAnalyst}.
@@ -26,7 +26,7 @@ public class TestContractProofReferencesAnalyst extends AbstractProofReferenceTe
     * Tests "UseOperationContractTest".
     */
    public void testUseOperationContracts() throws Exception {
-      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
+      doReferenceMethodTest(TESTCASE_DIRECTORY, 
                             "/proofReferences/UseOperationContractTest/UseOperationContractTest.java", 
                             "UseOperationContractTest", 
                             "main", 

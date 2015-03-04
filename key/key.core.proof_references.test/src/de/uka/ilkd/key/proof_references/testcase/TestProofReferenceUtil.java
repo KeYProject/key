@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof_references;
+package de.uka.ilkd.key.proof_references.testcase;
 
 import java.util.LinkedHashSet;
 
@@ -22,11 +22,11 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
+import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.proof_references.analyst.ContractProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.MethodBodyExpandProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
-import de.uka.ilkd.key.util.HelperClassForTests;
 
 /**
  * Tests for {@link ProofReferenceUtil}.
@@ -38,7 +38,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
     */
    public void testReferenceComputation_ExpandAndContract() throws Exception {
-      doAPITest(HelperClassForTests.TESTCASE_DIRECTORY, 
+      doAPITest(TESTCASE_DIRECTORY, 
                 "/proofReferences/UseOperationContractTest/UseOperationContractTest.java", 
                 "UseOperationContractTest", 
                 "main", 
@@ -53,7 +53,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
     */
    public void testReferenceComputation_NoAnalysts() throws Exception {
-      doAPITest(HelperClassForTests.TESTCASE_DIRECTORY, 
+      doAPITest(TESTCASE_DIRECTORY, 
                 "/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
                 "MethodBodyExpand", 
                 "main", 
@@ -66,7 +66,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
     */
    public void testReferenceComputation_ContractOnly() throws Exception {
-      doAPITest(HelperClassForTests.TESTCASE_DIRECTORY, 
+      doAPITest(TESTCASE_DIRECTORY, 
                 "/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
                 "MethodBodyExpand", 
                 "main", 
@@ -79,7 +79,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     * {@link ProofReferenceUtil#computeProofReferences(Node, ImmutableList)}.
     */
    public void testReferenceComputation_ExpandOnly() throws Exception {
-      doAPITest(HelperClassForTests.TESTCASE_DIRECTORY, 
+      doAPITest(TESTCASE_DIRECTORY, 
                 "/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
                 "MethodBodyExpand", 
                 "main", 
@@ -94,7 +94,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     * {@link ProofReferenceUtil#computeProofReferences(Node)}.
     */
    public void testReferenceComputation_DefaultAnalysts() throws Exception {
-      doAPITest(HelperClassForTests.TESTCASE_DIRECTORY, 
+      doAPITest(TESTCASE_DIRECTORY, 
                 "/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
                 "MethodBodyExpand", 
                 "main",
