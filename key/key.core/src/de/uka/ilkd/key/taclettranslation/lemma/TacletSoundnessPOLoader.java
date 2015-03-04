@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import javax.swing.SwingUtilities;
-
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -50,7 +48,7 @@ public class TacletSoundnessPOLoader {
          */
         private final InitConfig originalConfig;
 
-        private LinkedList<LoaderListener> listeners = new LinkedList<LoaderListener>();
+        private List<LoaderListener> listeners = new LinkedList<LoaderListener>();
         private ProofAggregate resultingProof;
         private ImmutableSet<Taclet> resultingTaclets = DefaultImmutableSet
                         .nil();
@@ -191,28 +189,17 @@ public class TacletSoundnessPOLoader {
                         try {
                                 doWork();
                         } catch (final Throwable exception) {
-                                SwingUtilities.invokeLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                                for (LoaderListener listener : listeners) {
-                                                        listener.stopped(exception);
-                                                }
-                                        }
-                                });
+                           for (LoaderListener listener : listeners) {
+                              listener.stopped(exception);
+                           }
                         } finally {
-                                SwingUtilities.invokeLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-
-                                                for (LoaderListener listener : listeners) {
-                                                        listener.stopped(
-                                                                        resultingProof,
-                                                                        isUsedOnlyForProvingTaclets() ?
-                                                                        getResultingTaclets() : getResultingTacletsForOriginalProof(),
-                                                                        !loadAsLemmata);
-                                                }
-                                        }
-                                });
+                           for (LoaderListener listener : listeners) {
+                              listener.stopped(
+                                              resultingProof,
+                                              isUsedOnlyForProvingTaclets() ?
+                                              getResultingTaclets() : getResultingTacletsForOriginalProof(),
+                                              !loadAsLemmata);
+                           }
                         }
                 }
         }
