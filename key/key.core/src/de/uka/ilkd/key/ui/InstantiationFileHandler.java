@@ -12,8 +12,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
-import de.uka.ilkd.key.gui.TacletInstantiationsTableModel;
+import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
+import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.PathConfig;
 
@@ -117,9 +117,9 @@ public class InstantiationFileHandler {
          hm.put(taclet.name().toString(), instList);
      }
 
-     public static void saveListFor(ApplyTacletDialogModel model) {
+     public static void saveListFor(TacletInstantiationModel model) {
          Taclet taclet = model.taclet();
-         TacletInstantiationsTableModel tableModel = model.tableModel();
+         TacletFindModel tableModel = model.tableModel();
          int start = model.tacletApp().instantiations().size();
          java.util.List<List<String>> instList = getInstantiationListsFor(taclet);
          BufferedWriter bw = null;

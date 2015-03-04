@@ -39,6 +39,7 @@ import javax.swing.WindowConstants;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
@@ -269,7 +270,7 @@ public class WindowUserInterface extends AbstractMediatorUserInterface {
     }
 
     @Override
-    public void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models,
+    public void completeAndApplyTacletMatch(TacletInstantiationModel[] models,
                                             Goal goal) {
         new TacletMatchCompletionDialog(mainWindow, models, goal, mainWindow.getMediator());
     }

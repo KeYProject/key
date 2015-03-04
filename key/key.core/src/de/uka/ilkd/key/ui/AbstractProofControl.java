@@ -9,7 +9,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
+import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -210,7 +210,7 @@ public abstract class AbstractProofControl implements ProofControl {
        if (ifSeqInteraction || !firstApp.complete()) {
          LinkedList<TacletApp> l = new LinkedList<TacletApp>();
          l.add(firstApp);
-            ApplyTacletDialogModel[] models = completeAndApplyApp(l, goal);
+            TacletInstantiationModel[] models = completeAndApplyApp(l, goal);
          completeAndApplyTacletMatch(models, goal);
        } else {
           applyInteractive(firstApp, goal);
@@ -228,7 +228,7 @@ public abstract class AbstractProofControl implements ProofControl {
                  return false;
             }
 
-            ApplyTacletDialogModel[] models = completeAndApplyApp(
+            TacletInstantiationModel[] models = completeAndApplyApp(
                     appList, goal);
 
             completeAndApplyTacletMatch(models, goal);
@@ -302,9 +302,9 @@ public abstract class AbstractProofControl implements ProofControl {
         return result;
     }
     
-    public ApplyTacletDialogModel[] completeAndApplyApp(java.util.List<TacletApp> apps, Goal goal) {
-        ApplyTacletDialogModel[] origInstModels = new ApplyTacletDialogModel[apps.size()];
-        LinkedList<ApplyTacletDialogModel> recentInstModels = new LinkedList<ApplyTacletDialogModel>();
+    public TacletInstantiationModel[] completeAndApplyApp(java.util.List<TacletApp> apps, Goal goal) {
+        TacletInstantiationModel[] origInstModels = new TacletInstantiationModel[apps.size()];
+        LinkedList<TacletInstantiationModel> recentInstModels = new LinkedList<TacletInstantiationModel>();
 
         int appCounter = 0;
         for (final TacletApp tA : apps) {            
@@ -318,7 +318,7 @@ public abstract class AbstractProofControl implements ProofControl {
 
                     if (origInstModels[appCounter].tableModel().getRowCount() - start ==
                             instantiations.size()) {
-                        ApplyTacletDialogModel m = createModel(tA,
+                        TacletInstantiationModel m = createModel(tA,
                                 goal);
                         recentInstModels.add(m);
                         for (final String inst : instantiations) {
@@ -330,28 +330,28 @@ public abstract class AbstractProofControl implements ProofControl {
             appCounter++;
         }
 
-        ApplyTacletDialogModel[] models = new ApplyTacletDialogModel[
+        TacletInstantiationModel[] models = new TacletInstantiationModel[
                 origInstModels.length + recentInstModels.size()];
         int i;
         for (i = 0; i < origInstModels.length; i++) {
             models[i] = origInstModels[i];
         }
 
-        for (final ApplyTacletDialogModel model : recentInstModels) {
+        for (final TacletInstantiationModel model : recentInstModels) {
             models[i++] = model;
         }
 
         return models;
     }
 
-    public ApplyTacletDialogModel createModel(TacletApp app, Goal goal) {
+    public TacletInstantiationModel createModel(TacletApp app, Goal goal) {
        final Proof proof = goal.proof();
        
        final Namespace progVars = new Namespace(); 
        final NamespaceSet ns = proof.getNamespaces();
        progVars.add(goal.getGlobalProgVars());
        
-       return new ApplyTacletDialogModel(
+       return new TacletInstantiationModel(
             app, goal.sequent(), proof.getServices(),
        new NamespaceSet(ns.variables(),
               ns.functions(),
@@ -454,7 +454,7 @@ public abstract class AbstractProofControl implements ProofControl {
     /**
      * {@inheritDoc}
      */
-    protected void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal) {
+    protected void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal) {
        if (ruleCompletionHandler != null) {
           ruleCompletionHandler.completeAndApplyTacletMatch(models, goal);
        }

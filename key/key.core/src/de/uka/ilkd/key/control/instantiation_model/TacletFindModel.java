@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.control.instantiation_model;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -67,7 +67,7 @@ import de.uka.ilkd.key.rule.inst.SortException;
 import de.uka.ilkd.key.util.Pair;
 
 
-public class TacletInstantiationsTableModel extends AbstractTableModel {
+public class TacletFindModel extends AbstractTableModel {
 
     /**
      * 
@@ -96,7 +96,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     /** create new data model for tree
      * @param app the TacletApp where to get the necessary entries
      */
-    public TacletInstantiationsTableModel(TacletApp    app, 
+    public TacletFindModel(TacletApp    app, 
 					  Services     services,
 					  NamespaceSet nss,
 					  AbbrevMap    scm,

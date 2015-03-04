@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Label;
 import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.key_project.key4eclipse.common.ui.wizard.CompleteAndApplyTacletMatchWizard;
 
-import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
+import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.proof.Goal;
 
 /**
@@ -19,7 +19,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
    /**
     * The partial models with all different possible instantiations found automatically.
     */
-   private final ApplyTacletDialogModel[] models; 
+   private final TacletInstantiationModel[] models; 
    
    /**
     * The Goal where to apply.
@@ -32,7 +32,7 @@ public class CompleteAndApplyTacletMatchWizardPage extends WizardPage {
     * @param models The partial models with all different possible instantiations found automatically.
     * @param goal The Goal where to apply.
     */
-   public CompleteAndApplyTacletMatchWizardPage(String pageName, ApplyTacletDialogModel[] models, Goal goal) {
+   public CompleteAndApplyTacletMatchWizardPage(String pageName, TacletInstantiationModel[] models, Goal goal) {
       super(pageName);
       this.models = models;
       this.goal = goal;

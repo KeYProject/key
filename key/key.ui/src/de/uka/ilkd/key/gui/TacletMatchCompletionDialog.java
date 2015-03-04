@@ -51,6 +51,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
+import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.utilities.BracketMatchingTextArea;
 import de.uka.ilkd.key.proof.Goal;
@@ -85,7 +86,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
     private MainWindow mainWindow;
  
-    public TacletMatchCompletionDialog(MainWindow parent, ApplyTacletDialogModel[] model,
+    public TacletMatchCompletionDialog(MainWindow parent, TacletInstantiationModel[] model,
 				       Goal goal, KeYMediator mediator) { 
 	super(parent, model, mediator);
 	setName("tacletMatchDlg");
@@ -94,7 +95,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	this.current = 0;
 	dataTable = new DataTable[model.length];
 
-        for (ApplyTacletDialogModel aModel : model) {
+        for (TacletInstantiationModel aModel : model) {
             aModel.prepareUnmatchedInstantiation();
         }
         
@@ -484,8 +485,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	}
 
 	public void modelChanged(ModelEvent me) {
-	    if (me.getSource() instanceof ApplyTacletDialogModel) {
-		setModel(((ApplyTacletDialogModel)me.getSource()).tableModel());
+	    if (me.getSource() instanceof TacletInstantiationModel) {
+		setModel(((TacletInstantiationModel)me.getSource()).tableModel());
 		repaint();
 	    }
 	}

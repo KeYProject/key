@@ -19,8 +19,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -289,7 +289,7 @@ public class ConsoleUserInterface extends AbstractMediatorUserInterface {
     }
 
     @Override
-    public void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal) {
+    public void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal) {
         if(verbosity >= Verbosity.DEBUG) {
          System.out.println("Taclet match completion not supported by console.");
         }

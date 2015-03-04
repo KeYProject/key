@@ -28,6 +28,8 @@ import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.border.TitledBorder;
 
+import de.uka.ilkd.key.control.instantiation_model.TacletAssumesModel;
+import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
@@ -45,14 +47,14 @@ public class TacletIfSelectionDialog extends JPanel{
      */
     private static final long serialVersionUID = -7456635942609535650L;
     private JPanel ifPanel = new JPanel();
-    private ApplyTacletDialogModel model;
+    private TacletInstantiationModel model;
     private TacletMatchCompletionDialog owner;
     
 
     /** creates a new dialog
      * @param model the model to be displayed
      */
-    public TacletIfSelectionDialog(ApplyTacletDialogModel model,
+    public TacletIfSelectionDialog(TacletInstantiationModel model,
                                    TacletMatchCompletionDialog owner) { 
 
 	this.model = model;
@@ -158,7 +160,7 @@ public class TacletIfSelectionDialog extends JPanel{
 
 
     private void updateInputField(JPanel parent, JComboBox cb) {
-	IfChoiceModel icm = (IfChoiceModel)cb.getModel();
+	TacletAssumesModel icm = (TacletAssumesModel)cb.getModel();
 	int nr = parent.getComponentCount();
 	if (icm.isManualInputSelected() && (nr==2)) {
             JTextField inp = new JTextField(40);

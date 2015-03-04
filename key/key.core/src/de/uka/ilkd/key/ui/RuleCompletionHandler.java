@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.ui;
 
-import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
+import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.Rule;
@@ -15,7 +15,7 @@ public interface RuleCompletionHandler {
     * @param models the partial models with all different possible instantiations found automatically
     * @param goal the Goal where to apply
     */
-   public void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal);
+   public void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal);
 
    /**
     * completes rule applications of built in rules

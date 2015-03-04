@@ -10,7 +10,7 @@ import org.key_project.key4eclipse.common.ui.completion.LoopInvariantRuleComplet
 import org.key_project.key4eclipse.common.ui.wizard.CompleteAndApplyTacletMatchWizard;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
-import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
+import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -42,7 +42,7 @@ public final class EclipseUserInterfaceCustomization implements RuleCompletionHa
     * {@inheritDoc}
     */
    @Override
-   public void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal) {
+   public void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal) {
       CompleteAndApplyTacletMatchWizard.openWizard(WorkbenchUtil.getActiveShell(), models, goal);
    }
 

@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.control.instantiation_model;
 
 import java.util.Iterator;
 import java.util.Vector;
@@ -42,13 +42,13 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SortException;
 
-public class ApplyTacletDialogModel {
+public class TacletInstantiationModel {
 	
     /** the model used for the instantiation of the if-sequent */
-    private IfChoiceModel[] ifChoiceModel;
-    private static final IfChoiceModel[] EMPTY_IF_CHOICES = new IfChoiceModel [ 0 ];
+    private TacletAssumesModel[] ifChoiceModel;
+    private static final TacletAssumesModel[] EMPTY_IF_CHOICES = new TacletAssumesModel [ 0 ];
     /** the model used for the instantiation of the schemavariables */
-    private TacletInstantiationsTableModel tableModel;
+    private TacletFindModel tableModel;
 
     /** 
      * the application of the Taclet of which this model is used to
@@ -76,7 +76,7 @@ public class ApplyTacletDialogModel {
      * create new data model for the apply Taclet dialog wrapping a combo box
      * model and a table model
      */
-    public ApplyTacletDialogModel(TacletApp app, Sequent seq,
+    public TacletInstantiationModel(TacletApp app, Sequent seq,
 				  Services services,
 				  NamespaceSet nss,
 				  AbbrevMap scm, Goal goal) {
@@ -89,7 +89,7 @@ public class ApplyTacletDialogModel {
 	initIfChoiceModels();
 
 	tableModel =
-	    new TacletInstantiationsTableModel(app, services, nss, scm, goal);
+	    new TacletFindModel(app, services, nss, scm, goal);
     }
 
     public void addModelChangeListener(ModelChangeListener l) {
@@ -100,7 +100,7 @@ public class ApplyTacletDialogModel {
 	listeners.remove(l);
     }
 	
-    public IfChoiceModel ifChoiceModel(int i) {
+    public TacletAssumesModel ifChoiceModel(int i) {
 	return ifChoiceModel[i];
     }
 
@@ -108,7 +108,7 @@ public class ApplyTacletDialogModel {
 	return ifChoiceModel.length;
     }
 
-    public TacletInstantiationsTableModel tableModel() {
+    public TacletFindModel tableModel() {
 	return tableModel;
     }
 
@@ -148,12 +148,12 @@ public class ApplyTacletDialogModel {
 	    Term                         ifFma;
 	    MatchConditions              matchCond = app.matchConditions ();
 
-	    ifChoiceModel                          = new IfChoiceModel[size];
+	    ifChoiceModel                          = new TacletAssumesModel[size];
 
 	    for (int i=0; i<size; i++) {
 		ifFma            = it.next ().formula ();
 		ifChoiceModel[i] = 
-		    new IfChoiceModel ( ifFma,
+		    new TacletAssumesModel ( ifFma,
 					taclet ().matchIf ( ( i < asize ?
 							      antecCand.iterator () :
 							      succCand .iterator () ),

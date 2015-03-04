@@ -38,6 +38,7 @@ import javax.swing.border.TitledBorder;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -64,10 +65,10 @@ public abstract class ApplyTacletDialog extends JDialog {
     private KeYMediator mediator;
     protected boolean checkAfterEachInput=true;
 
-    protected ApplyTacletDialogModel[] model; 
+    protected TacletInstantiationModel[] model; 
     private JTextArea statusArea;
 
-    public ApplyTacletDialog(Frame parent, ApplyTacletDialogModel[] model,
+    public ApplyTacletDialog(Frame parent, TacletInstantiationModel[] model,
 			     KeYMediator mediator) { 
 
         super(parent, "Choose Taclet Instantiation", false);

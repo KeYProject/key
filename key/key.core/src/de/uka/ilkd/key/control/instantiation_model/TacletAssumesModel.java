@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.control.instantiation_model;
 
 import java.util.Iterator;
 
@@ -35,7 +35,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 
-public class IfChoiceModel extends DefaultComboBoxModel<IfFormulaInstantiation> {
+public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiation> {
 
 
     /**
@@ -67,7 +67,7 @@ public class IfChoiceModel extends DefaultComboBoxModel<IfFormulaInstantiation> 
     private final Services services;
 
 
-    public IfChoiceModel ( Term                         p_ifFma,
+    public TacletAssumesModel ( Term                         p_ifFma,
 			   ImmutableList<IfFormulaInstantiation> p_candidates,
 			   Services                     p_services,
 			   NamespaceSet                 nss,

@@ -18,7 +18,7 @@
 package de.uka.ilkd.key.rule;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.gui.TacletInstantiationsTableModel;
+import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -202,8 +202,8 @@ public class TestCollisionResolving extends TestCase {
 			                      services);
 	TacletApp app1=app.prepareUserInstantiation(services);
 	assertSame(app, app1);
-	TacletInstantiationsTableModel instModel
-	    = new TacletInstantiationsTableModel(app, TacletForTests.services(),
+	TacletFindModel instModel
+	    = new TacletFindModel(app, TacletForTests.services(),
 						 TacletForTests.getNamespaces(),
 						 TacletForTests.getAbbrevs(),
 						 goal);
@@ -236,8 +236,8 @@ public class TestCollisionResolving extends TestCase {
         TacletApp app1=app.prepareUserInstantiation(services);
         assertSame(app, app1);
 
-        TacletInstantiationsTableModel instModel
-        = new TacletInstantiationsTableModel(app, services,
+        TacletFindModel instModel
+        = new TacletFindModel(app, services,
                 TacletForTests.getNamespaces(),
                 TacletForTests.getAbbrevs(),
                 goal);
@@ -317,8 +317,8 @@ public class TestCollisionResolving extends TestCase {
 	TacletApp app1=app.prepareUserInstantiation(services);
 	assertSame(app, app1);
 
-	TacletInstantiationsTableModel instModel
-	    = new TacletInstantiationsTableModel(app, services,
+	TacletFindModel instModel
+	    = new TacletFindModel(app, services,
 						 TacletForTests.getNamespaces(),
 						 TacletForTests.getAbbrevs(),
 						 goal);
@@ -427,8 +427,8 @@ public class TestCollisionResolving extends TestCase {
 	    = PosTacletApp.createPosTacletApp(taclet, mc, pos, services);
 	TacletApp app1=app.prepareUserInstantiation(services);
 	assertSame("Actually there are no conflicts yet.", app, app1);
-	TacletInstantiationsTableModel instModel
-	    = new TacletInstantiationsTableModel(app, services,
+	TacletFindModel instModel
+	    = new TacletFindModel(app, services,
 						 TacletForTests.getNamespaces(),
 						 TacletForTests.getAbbrevs(),
 						 goal);
