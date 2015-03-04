@@ -3,6 +3,7 @@ package de.uka.ilkd.key.smt.ce;
 import java.io.File;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
@@ -10,7 +11,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.test.TestCommons;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 public class TestCE extends TestCommons {

@@ -362,4 +362,12 @@ public final class DependencyContractPO extends AbstractPO
     protected InitConfig getCreatedInitConfigForSingleProof() {
        return proofConfig;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public KeYJavaType getContainerType() {
+       return getContract().getKJT();
+    }
 }

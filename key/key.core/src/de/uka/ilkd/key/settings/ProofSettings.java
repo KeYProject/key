@@ -273,4 +273,12 @@ public class ProofSettings {
 	    saveSettings();
 	}
     }
+
+    /**
+     * Checks if the choice settings are initialized.
+     * @return {@code true} settings are initialized, {@code false} settings are not initialized.
+     */
+    public static boolean isChoiceSettingInitialised() {
+       return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getChoices().isEmpty();
+    }
 }

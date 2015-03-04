@@ -26,9 +26,9 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Tests for {@code org.key_project.key4eclipse.event.RefreshProofSaverListener}.

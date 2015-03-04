@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.EventObject;
 import java.util.Properties;
 
+import de.uka.ilkd.key.pp.NotationInfo;
+
 
 
 public class ProofIndependentSettings implements SettingsListener {
@@ -129,4 +131,21 @@ public class ProofIndependentSettings implements SettingsListener {
 
 
 
+        
+        /**
+         * Checks if pretty printing is enabled or not.
+         * @return {@code true} pretty printing is enabled, {@code false} pretty printing is disabled.
+         */
+        public static boolean isUsePrettyPrinting() {
+           return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
+        }
+
+        /**
+         * Defines if pretty printing is enabled or not.
+         * @param usePrettyPrinting {@code true} pretty printing is enabled, {@code false} pretty printing is disabled.
+         */
+        public static void setUsePrettyPrinting(boolean usePrettyPrinting) {
+           ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
+           NotationInfo.DEFAULT_PRETTY_SYNTAX = usePrettyPrinting;
+        }
 }

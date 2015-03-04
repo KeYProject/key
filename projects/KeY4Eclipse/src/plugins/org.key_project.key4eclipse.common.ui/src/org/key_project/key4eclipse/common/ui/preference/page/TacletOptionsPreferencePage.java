@@ -22,10 +22,10 @@ import org.eclipse.ui.IWorkbench;
 import org.key_project.key4eclipse.util.KeYExampleUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**

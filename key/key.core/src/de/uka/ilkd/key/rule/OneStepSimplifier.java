@@ -748,4 +748,12 @@ public final class OneStepSimplifier implements BuiltInRule {
          return term.toString();
       }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isApplicableOnSubTerms() {
+       return false;
+    }
 }

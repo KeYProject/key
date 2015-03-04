@@ -40,10 +40,10 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.view.AbstractViewBasedView;
 import org.key_project.util.java.CollectionUtil;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * This view edits the proof search strategy settings in context of

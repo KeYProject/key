@@ -383,4 +383,12 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
    protected InitConfig getCreatedInitConfigForSingleProof() {
       return proofConfig;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYJavaType getContainerType() {
+      return getContract().getKJT();
+   }
 }

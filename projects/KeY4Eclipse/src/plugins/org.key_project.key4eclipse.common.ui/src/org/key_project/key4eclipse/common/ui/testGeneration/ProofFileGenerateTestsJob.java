@@ -10,7 +10,7 @@ import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.util.eclipse.ResourceUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.control.KeYEnvironment;
 
 /**
  * A {@link Job} which generates test for a given proof file.

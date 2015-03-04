@@ -691,4 +691,28 @@ public final class MiscTools {
         }
         return result;
     }
+
+    /**
+     * Returns the default taclet options.
+     * @return The default taclet options.
+     */
+    public static HashMap<String, String> getDefaultTacletOptions() {
+       HashMap<String, String> result = new HashMap<String, String>();
+       result.put("Strings", "Strings:on");
+       result.put("reach", "reach:on");
+       result.put("JavaCard", "JavaCard:off");
+       result.put("assertions", "assertions:on");
+       result.put("bigint", "bigint:on");
+       result.put("intRules", "intRules:arithmeticSemanticsIgnoringOF");
+       result.put("programRules", "programRules:Java");
+       result.put("modelFields", "modelFields:showSatisfiability");
+       result.put("initialisation", "initialisation:disableStaticInitialisation");
+       result.put("sequences", "sequences:on");
+       result.put("runtimeExceptions", "runtimeExceptions:allow");
+       result.put("integerSimplificationRules", "integerSimplificationRules:full");
+       result.put("optimisedSelectRules", "optimisedSelectRules:on");
+       result.put("wdChecks", "wdChecks:off");
+       result.put("wdOperator", "wdOperator:L");
+       return result;
+    }
 }

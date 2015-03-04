@@ -18,8 +18,8 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.ui.IEditorInput;
 import org.key_project.util.java.ObjectUtil;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * This {@link IEditorInput} is used to open an existing {@link Proof}.

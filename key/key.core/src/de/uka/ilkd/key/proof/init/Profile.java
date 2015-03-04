@@ -23,7 +23,6 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
-import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 
 /**
  *<p>
@@ -53,7 +52,7 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
  * to have only one instance of each {@link Profile}. The default instances
  * for usage in the {@link Thread} of the user interface
  * are available via {@link JavaProfile#getDefaultInstance()} and
- * {@link SymbolicExecutionJavaProfile#getDefaultInstance()}.
+ * {@code SymbolicExecutionJavaProfile#getDefaultInstance()}.
  * It is possible to get the default instance for a given name via
  * {@link AbstractProfile#getDefaultInstanceForName(String)}. Multiple instances
  * are only required if {@link Proof}s are done in parallel (in different {@link Thread}s),

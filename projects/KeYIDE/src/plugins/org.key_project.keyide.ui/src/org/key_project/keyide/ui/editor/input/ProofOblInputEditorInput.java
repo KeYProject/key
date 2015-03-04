@@ -16,9 +16,9 @@ package org.key_project.keyide.ui.editor.input;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jdt.core.IMethod;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * This class is used to define an input to display in the editor

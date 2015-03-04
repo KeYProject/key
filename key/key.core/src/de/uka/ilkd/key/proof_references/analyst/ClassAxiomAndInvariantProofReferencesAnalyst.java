@@ -25,7 +25,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof_references.reference.DefaultProofReference;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
@@ -34,7 +33,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
-import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
@@ -108,14 +106,12 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
     */
    protected KeYJavaType findProofsKeYJavaType(Services services) {
       ProofOblInput problem = services.getSpecificationRepository().getProofOblInput(services.getProof());
-      if (problem instanceof ContractPO) {
-         return ((ContractPO)problem).getContract().getKJT();
-      }
-      else if (problem instanceof ProgramMethodPO) {
-         return ((ProgramMethodPO)problem).getProgramMethod().getContainerType();
-      }
-      else if (problem != null) {
-         throw new IllegalStateException("Problem \"" + problem + "\" is not supported.");
+      if (problem != null) {
+         KeYJavaType type = problem.getContainerType();
+         if (type == null) {
+            throw new IllegalStateException("Problem \"" + problem + "\" is not supported.");
+         }
+         return type;
       }
       else {
          return null; // Proof might be disposed.

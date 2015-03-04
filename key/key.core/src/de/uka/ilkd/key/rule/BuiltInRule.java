@@ -32,6 +32,8 @@ public interface BuiltInRule extends Rule {
      * reasons)
      */
     boolean isApplicable(Goal goal, PosInOccurrence pio);
+    
+    boolean isApplicableOnSubTerms();
 
     IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services);
 }

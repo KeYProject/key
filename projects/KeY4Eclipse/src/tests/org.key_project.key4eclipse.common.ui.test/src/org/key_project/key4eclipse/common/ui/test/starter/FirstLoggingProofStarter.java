@@ -18,8 +18,8 @@ import org.key_project.key4eclipse.common.ui.starter.IProofStarter;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * {@link IProofStarter} which logs the calls of {@link #open(Proof, KeYEnvironment, IMethod)}.

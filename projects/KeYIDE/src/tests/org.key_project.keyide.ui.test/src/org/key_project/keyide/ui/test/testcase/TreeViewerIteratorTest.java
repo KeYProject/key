@@ -37,10 +37,10 @@ import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 // TODO: Tests LazyProofTreeContentProvider#getParent() on each possible node (visible structure not proof tree structure!)
 // TODO: Tests LazyProofTreeContentProvider#getIndexOf(Object, Object) on each possible parent child combinations (visible structure not proof tree structure!)

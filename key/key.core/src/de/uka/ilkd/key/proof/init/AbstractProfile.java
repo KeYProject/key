@@ -32,8 +32,6 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
-import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooserBuilder;
 
 public abstract class AbstractProfile implements Profile {
     /**
@@ -65,25 +63,21 @@ public abstract class AbstractProfile implements Profile {
         return result;
     }
 
-    protected AbstractProfile(String standardRuleFilename,
-            ImmutableSet<GoalChooserBuilder> supportedGCB) {
+    protected AbstractProfile(String standardRuleFilename) {
         standardRules = new RuleCollection(RuleSourceFactory
                 .fromBuildInRule(standardRuleFilename),
                 initBuiltInRules());
         strategies = getStrategyFactories();
-        this.supportedGCB = supportedGCB;
+        this.supportedGCB = computeSupportedGoalChooserBuilder();
         this.supportedGC = extractNames(supportedGCB);
         this.prototype = getDefaultGoalChooserBuilder();
         assert( this.prototype!=null );
         initTermLabelManager();
     }
-
-    public AbstractProfile(String standardRuleFilename) {
-        this(standardRuleFilename,
-                DefaultImmutableSet.<GoalChooserBuilder>nil().
-                add(new DefaultGoalChooserBuilder()).
-                add(new DepthFirstGoalChooserBuilder()).
-                add(new SymbolicExecutionGoalChooserBuilder()));
+    
+    protected ImmutableSet<GoalChooserBuilder> computeSupportedGoalChooserBuilder() {
+       return DefaultImmutableSet.<GoalChooserBuilder>nil().add(new DefaultGoalChooserBuilder())
+                                                           .add(new DepthFirstGoalChooserBuilder());
     }
 
     /**
@@ -222,32 +216,6 @@ public abstract class AbstractProfile implements Profile {
      public String getInternalClasslistFilename() {
 	 return "JAVALANG.TXT";
      }
-
-   /**
-    * <p>
-    * Returns the {@link Profile} for the given name.
-    * </p>
-    * <p>
-    * It is typically used in the {@link Thread} of the user interface.
-    * Other instances of this class are typically only required to 
-    * use them in different {@link Thread}s (not the UI {@link Thread}).
-    * </p>
-    * @param name The name of the requested {@link Profile}.
-    * @return The {@link Profile} with the given name for usage in the {@link Thread} of the user interface or {@code null} if not available.
-    */
-   public static Profile getDefaultInstanceForName(String name) {
-      if (JavaProfile.NAME.equals(name)) {
-         return JavaProfile.getDefaultInstance();
-      }else if (JavaProfile.NAME_WITH_PERMISSIONS.equals(name)) {
-         return JavaProfile.getDefaultInstance(true);
-      }
-      else if (SymbolicExecutionJavaProfile.NAME.equals(name)) {
-         return SymbolicExecutionJavaProfile.getDefaultInstance();
-      }
-      else {
-         return null;
-      }
-   }
 
    /**
     * Returns the default profile which is used if no profile is defined in custom problem files (loaded via {@link KeYUserProblemFile}).

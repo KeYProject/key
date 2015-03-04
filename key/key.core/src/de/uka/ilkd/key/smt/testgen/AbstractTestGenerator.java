@@ -39,10 +39,10 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.model.Model;
-import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProofStarter;
+import de.uka.ilkd.key.util.SideProofUtil;
 
 /**
  * Implementations of this class are used generate test cases or a given {@link Proof}.
@@ -303,7 +303,7 @@ public abstract class AbstractTestGenerator {
    }
    
    protected Proof createProof(UserInterfaceControl ui, Proof oldProof, String newName, Sequent newSequent) throws ProofInputException {
-      ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(oldProof, false);
+      ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(oldProof);
       ProofStarter starter = SideProofUtil.createSideProof(env, newSequent, newName);
       Proof proof = starter.getProof();
       proof.getServices().getSpecificationRepository().registerProof(proof.getServices().getSpecificationRepository().getProofOblInput(oldProof), proof);

@@ -639,4 +639,12 @@ public final class UseDependencyContractRule implements BuiltInRule {
     public UseDependencyContractApp createApp(PosInOccurrence pos, TermServices services) {
 		return new UseDependencyContractApp(this, pos);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isApplicableOnSubTerms() {
+       return true;
+    }
 }

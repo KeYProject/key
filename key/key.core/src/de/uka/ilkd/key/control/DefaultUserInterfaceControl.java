@@ -21,7 +21,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * The {@link DefaultUserInterfaceControl} which allows proving in case

@@ -21,8 +21,8 @@ import org.key_project.keyide.ui.editor.input.ProofEditorInput;
 import org.key_project.keyide.ui.util.KeYIDEUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Starts a proof in the KeYIDE user interface integrated in Eclipse.

@@ -83,6 +83,7 @@ import de.hentschel.visualdbc.datasource.model.memory.MemoryInterface;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryInvariant;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryMethod;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryPackage;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
@@ -121,7 +122,6 @@ import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 
 /**

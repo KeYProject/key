@@ -18,12 +18,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
+import junit.framework.TestCase;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -31,20 +34,18 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.util.HelperClassForTests;
 
 /**
  * Provides the basic functionality to test the proof reference API.
  * @author Martin Hentschel
  */
-public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExecutionTestCase {
+public abstract class AbstractProofReferenceTestCase extends TestCase {
    /**
     * Executes the test steps of test methods. 
     * @param baseDir The base directory which contains test and oracle file.
@@ -56,7 +57,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
     * @param expectedReferences The expected proof references.
     * @throws Exception Occurred Exception.
     */
-   protected void doReferenceFunctionTest(File baseDir, 
+   protected void doReferenceFunctionTest(String baseDir, 
                                           String javaPathInBaseDir, 
                                           String containerTypeName, 
                                           String targetName,
@@ -78,7 +79,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
     * @param expectedReferences The expected proof references.
     * @throws Exception Occurred Exception.
     */
-   protected void doReferenceFunctionTest(File baseDir, 
+   protected void doReferenceFunctionTest(String baseDir, 
                                           String javaPathInBaseDir, 
                                           String containerTypeName, 
                                           String targetName,
@@ -101,7 +102,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
     * @param expectedReferences The expected proof references.
     * @throws Exception Occurred Exception.
     */
-   protected void doReferenceMethodTest(File baseDir, 
+   protected void doReferenceMethodTest(String baseDir, 
                                         String javaPathInBaseDir, 
                                         String containerTypeName, 
                                         String methodFullName,
@@ -123,7 +124,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
     * @param expectedReferences The expected proof references.
     * @throws Exception Occurred Exception.
     */
-   protected void doReferenceMethodTest(File baseDir, 
+   protected void doReferenceMethodTest(String baseDir, 
                                         String javaPathInBaseDir, 
                                         String containerTypeName, 
                                         String methodFullName,
@@ -290,7 +291,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
     * @param tester The {@link IProofTester} which executes the test steps.
     * @throws Exception Occurred Exception.
     */
-   protected void doProofFunctionTest(File baseDir, 
+   protected void doProofFunctionTest(String baseDir, 
                                       String javaPathInBaseDir, 
                                       String containerTypeName, 
                                       final String targetName,
@@ -300,15 +301,15 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
       KeYEnvironment<?> environment = null;
       Proof proof = null;
       HashMap<String, String> originalTacletOptions = null;
-      boolean usePrettyPrinting = SymbolicExecutionUtil.isUsePrettyPrinting();
+      boolean usePrettyPrinting = ProofIndependentSettings.isUsePrettyPrinting();
       try {
          // Disable pretty printing to make tests more robust against different term representations
-         SymbolicExecutionUtil.setUsePrettyPrinting(false);
+         ProofIndependentSettings.setUsePrettyPrinting(false);
          // Make sure that required files exists
          File javaFile = new File(baseDir, javaPathInBaseDir);
          assertTrue(javaFile.exists());
          // Make sure that the correct taclet options are defined.
-         originalTacletOptions = setDefaultTacletOptionsForTarget(javaFile, containerTypeName, targetName);
+         originalTacletOptions = HelperClassForTests.setDefaultTacletOptionsForTarget(javaFile, containerTypeName, targetName);
          // Load java file
          environment = KeYEnvironment.load(javaFile, null, null);
          // Search type
@@ -334,9 +335,9 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          doProofTest(environment, proof, useContracts, tester);
       }
       finally {
-         SymbolicExecutionUtil.setUsePrettyPrinting(usePrettyPrinting);
+         ProofIndependentSettings.setUsePrettyPrinting(usePrettyPrinting);
          // Restore taclet options
-         restoreTacletOptions(originalTacletOptions);
+         HelperClassForTests.restoreTacletOptions(originalTacletOptions);
          // Dispose proof and environment
          if (proof != null) {
             proof.dispose();
@@ -357,7 +358,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
     * @param tester The {@link IProofTester} which executes the test steps.
     * @throws Exception Occurred Exception.
     */
-   protected void doProofMethodTest(File baseDir, 
+   protected void doProofMethodTest(String baseDir, 
                                     String javaPathInBaseDir, 
                                     String containerTypeName, 
                                     String methodFullName,
@@ -367,19 +368,19 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
       KeYEnvironment<?> environment = null;
       Proof proof = null;
       HashMap<String, String> originalTacletOptions = null;
-      boolean usePrettyPrinting = SymbolicExecutionUtil.isUsePrettyPrinting();
+      boolean usePrettyPrinting = ProofIndependentSettings.isUsePrettyPrinting();
       try {
          // Disable pretty printing to make tests more robust against different term representations
-         SymbolicExecutionUtil.setUsePrettyPrinting(false);
+         ProofIndependentSettings.setUsePrettyPrinting(false);
          // Make sure that required files exists
          File javaFile = new File(baseDir, javaPathInBaseDir);
          assertTrue(javaFile.exists());
          // Make sure that the correct taclet options are defined.
-         originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir, containerTypeName, methodFullName);
+         originalTacletOptions = HelperClassForTests.setDefaultTacletOptions(baseDir, javaPathInBaseDir);
          // Load java file
          environment = KeYEnvironment.load(javaFile, null, null);
          // Search method to proof
-         IProgramMethod pm = searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
+         IProgramMethod pm = HelperClassForTests.searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
          // Find first contract.
          ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
          assertFalse(operationContracts.isEmpty());
@@ -391,9 +392,9 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          doProofTest(environment, proof, useContracts, tester);
       }
       finally {
-         SymbolicExecutionUtil.setUsePrettyPrinting(usePrettyPrinting);
+         ProofIndependentSettings.setUsePrettyPrinting(usePrettyPrinting);
          // Restore taclet options
-         restoreTacletOptions(originalTacletOptions);
+         HelperClassForTests.restoreTacletOptions(originalTacletOptions);
          // Dispose proof and environment
          if (proof != null) {
             proof.dispose();
@@ -421,7 +422,8 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
       assertNotNull(proof);
       assertNotNull(tester);
       // Start auto mode
-      StrategyProperties sp = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, useContracts, false, false, false);
+      StrategyProperties sp = new StrategyProperties();
+      StrategyProperties.setDefaultStrategyProperties(sp, true, useContracts, false, false, false);
       proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
       proof.getSettings().getStrategySettings().setMaxSteps(1000);
       environment.getProofControl().startAndWaitForAutoMode(proof);

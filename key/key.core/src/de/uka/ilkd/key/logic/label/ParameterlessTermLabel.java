@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 
 /**
  * The Class {@link ParameterlessTermLabel} can be used to define labels without parameters.
@@ -49,33 +48,6 @@ public final class ParameterlessTermLabel implements TermLabel {
     */
    public static final TermLabel SELECT_SKOLEM_LABEL =
            new ParameterlessTermLabel(SELECT_SKOLEM_LABEL_NAME);
-
-   /**
-    * Name of {@link #LOOP_BODY_LABEL}.
-    */
-   public static final Name LOOP_BODY_LABEL_NAME = new Name("LoopBody");
-
-   /**
-    * Label attached to the modality which executes a loop body in branch
-    * "Body Preserves Invariant" of applied "Loop Invariant" rules.
-    */
-   public static final TermLabel LOOP_BODY_LABEL =
-           new ParameterlessTermLabel(LOOP_BODY_LABEL_NAME);
-
-   /**
-    * Name of {@link #LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL}.
-    */
-   public static final Name LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME =
-           new Name("LoopInvariantNormalBehavior");
-
-   /**
-    * Label attached to the implication when a loop body execution terminated
-    * normally without any exceptions, returns or breaks in branch
-    * "Body Preserves Invariant" of applied "Loop Invariant" rules to show the
-    * loop invariant.
-    */
-   public static final TermLabel LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL =
-           new ParameterlessTermLabel(LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME);
 
    /**
     * Name of {@link #IMPLICIT_SPECIFICATION_LABEL}.
@@ -132,17 +104,6 @@ public final class ParameterlessTermLabel implements TermLabel {
 
    public static final TermLabel POST_CONDITION_LABEL =
            new ParameterlessTermLabel(POST_CONDITION_LABEL_NAME);
-
-   /**
-    * Name of {@link #RESULT_LABEL}.
-    */
-   public static final Name RESULT_LABEL_NAME = new Name("RES");
-
-   /**
-    * Label attached to a {@link Term} to evaluate in a side proof.
-    */
-   public static final TermLabel RESULT_LABEL =
-           new ParameterlessTermLabel(RESULT_LABEL_NAME);
 
     /**
      * The unique name of this label.

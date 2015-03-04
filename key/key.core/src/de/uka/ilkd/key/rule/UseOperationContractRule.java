@@ -1098,4 +1098,12 @@ public final class UseOperationContractRule implements BuiltInRule {
             this.anonHeap = anonHeap;
         }
     }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isApplicableOnSubTerms() {
+      return false;
+   }
 }

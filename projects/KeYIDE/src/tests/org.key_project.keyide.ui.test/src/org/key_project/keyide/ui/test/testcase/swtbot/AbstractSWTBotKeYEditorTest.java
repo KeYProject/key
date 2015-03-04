@@ -42,6 +42,7 @@ import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -53,7 +54,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Provides the basic functionality to test the {@link KeYEditor}.

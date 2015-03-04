@@ -15,6 +15,7 @@ package de.uka.ilkd.key.proof_references.analyst;
 
 import de.uka.ilkd.key.proof_references.AbstractProofReferenceTestCase;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+import de.uka.ilkd.key.util.HelperClassForTests;
 
 /**
  * Tests for {@link MethodBodyExpandProofReferencesAnalyst}.
@@ -25,7 +26,7 @@ public class TestMethodBodyExpandProofReferencesAnalyst extends AbstractProofRef
     * Tests "MethodBodyExpand".
     */
    public void testMethodBodyExpand() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/MethodBodyExpand/MethodBodyExpand.java", 
                             "MethodBodyExpand", 
                             "main", 

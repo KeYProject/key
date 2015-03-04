@@ -40,6 +40,7 @@ import javax.swing.WindowConstants;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -68,7 +69,6 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 import de.uka.ilkd.key.util.KeYConstants;

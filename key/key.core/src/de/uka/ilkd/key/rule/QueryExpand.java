@@ -667,5 +667,11 @@ public class QueryExpand implements BuiltInRule {
 	    return new DefaultBuiltInRuleApp(this, pos);
     }
 
-
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isApplicableOnSubTerms() {
+      return true;
+   }
 }

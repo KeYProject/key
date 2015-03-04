@@ -80,13 +80,13 @@ import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.thread.AbstractRunnableWithProgressAndResult;
 import org.key_project.util.thread.IRunnableWithProgressAndResult;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Contains the controls to define a project, type, method and a contract to debug.

@@ -26,6 +26,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -59,8 +60,7 @@ import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
-import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.util.HelperClassForTests;
 
 /**
  * Tests {@link TermLabelManager}
@@ -610,7 +610,7 @@ public class TestTermLabelManager extends TestCase {
    throws ProblemLoaderException {
       KeYEnvironment<?> env = null;
       try {
-         env = KeYEnvironment.load(new File(AbstractSymbolicExecutionTestCase.testCaseDirectory, "set/statements/test/FlatSteps.java"), null, null);
+         env = KeYEnvironment.load(new File(HelperClassForTests.TESTCASE_DIRECTORY, "termLabels/flatSteps/FlatSteps.java"), null, null);
          Profile profile = new JavaProfile() {
             @Override
             protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {

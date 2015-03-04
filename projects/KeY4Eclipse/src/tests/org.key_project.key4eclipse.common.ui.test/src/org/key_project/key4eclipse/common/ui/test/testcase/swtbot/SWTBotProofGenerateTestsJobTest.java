@@ -13,6 +13,7 @@ import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
@@ -21,7 +22,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.test.TestZ3;
 import de.uka.ilkd.key.smt.testgen.AbstractTestGenerator;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * SWTBot tests for {@link ProofGenerateTestsJob}.

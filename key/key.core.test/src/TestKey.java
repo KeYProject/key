@@ -27,7 +27,8 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.util.TestVersionStringComparator.class,
         de.uka.ilkd.key.util.TestMiscTools.class,
         de.uka.ilkd.key.util.pp.TestLayouter.class,
-        de.uka.ilkd.key.util.TestProofStarter.class
+        de.uka.ilkd.key.util.TestProofStarter.class,
+        de.uka.ilkd.key.util.TestNodePreorderIterator.class
     }; 
 
 
@@ -103,47 +104,6 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.smt.test.TestCvc3.class
         //, de.uka.ilkd.key.smt.test.TestCvc4.class  //commented out as test take too long
     };
-
-    static Class<? extends TestCase>[] setTests = new Class[] {
-        de.uka.ilkd.key.util.TestNodePreorderIterator.class,
-        de.uka.ilkd.key.symbolic_execution.TestConditionalVariables.class,
-        de.uka.ilkd.key.symbolic_execution.TestExecutionNodePreorderIterator.class,
-        de.uka.ilkd.key.symbolic_execution.TestExecutionNodeWriterAndReader.class,
-        de.uka.ilkd.key.symbolic_execution.TestExecutionVariableExtractor.class,
-        de.uka.ilkd.key.symbolic_execution.TestParallelSiteProofs.class,
-        de.uka.ilkd.key.symbolic_execution.TestTruthValueEvaluationUtil.class,
-        de.uka.ilkd.key.symbolic_execution.TestTruthValueValue.class,
-        de.uka.ilkd.key.symbolic_execution.TestSymbolicLayoutExtractor.class,
-        de.uka.ilkd.key.symbolic_execution.TestSymbolicLayoutWriterAndReader.class,
-        de.uka.ilkd.key.symbolic_execution.TestSymbolicExecutionTreeBuilder.class,
-        de.uka.ilkd.key.symbolic_execution.po.TestFunctionalOperationContractPO.class,
-        de.uka.ilkd.key.symbolic_execution.po.TestProgramMethodPO.class,
-        de.uka.ilkd.key.symbolic_execution.po.TestProgramMethodSubsetPO.class,
-        de.uka.ilkd.key.symbolic_execution.strategy.TestStepOverSymbolicExecutionTreeNodesStopCondition.class,
-        de.uka.ilkd.key.symbolic_execution.strategy.TestStepReturnSymbolicExecutionTreeNodesStopCondition.class,
-        de.uka.ilkd.key.symbolic_execution.strategy.TestSymbolicExecutionStrategy.class,
-        de.uka.ilkd.key.symbolic_execution.util.TestDefaultEntry.class,
-        de.uka.ilkd.key.symbolic_execution.util.TestEqualsHashCodeResetter.class,
-        de.uka.ilkd.key.symbolic_execution.util.TestProofUserManager.class,
-        de.uka.ilkd.key.symbolic_execution.util.TestSideProofStore.class,
-        de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class,
-        de.uka.ilkd.key.symbolic_execution.slicing.TestThinBackwardSlicer.class
-        
-    };
-    
-    static Class<? extends TestCase>[] breakpointTests = new Class[] {
-       de.uka.ilkd.key.symbolic_execution.strategy.TestExceptionBreakpointStopConditionCaughtOrUncaught.class,
-       de.uka.ilkd.key.symbolic_execution.strategy.TestExceptionBreakpointStopConditionWithHitCount.class,
-       de.uka.ilkd.key.symbolic_execution.strategy.TestExceptionBreakpointStopConditionWithSubclasses.class,
-       de.uka.ilkd.key.symbolic_execution.strategy.TestJavaWatchpointStopConditionWithHitCount.class,
-       de.uka.ilkd.key.symbolic_execution.strategy.TestLineBreakpointStopConditionSimpleWithConditions.class,
-       de.uka.ilkd.key.symbolic_execution.strategy.TestLineBreakpointStopConditionSimpleWithHitCount.class,
-       de.uka.ilkd.key.symbolic_execution.strategy.TestMethodBreakpointWithConditions.class,
-       de.uka.ilkd.key.symbolic_execution.strategy.TestKeYWatchpointGlobalVariablesOnSatisfiable.class,
-       de.uka.ilkd.key.symbolic_execution.strategy.TestKeYWatchpointGlobalVariablesOnTrueWithHitCount.class,
-       de.uka.ilkd.key.symbolic_execution.strategy.TestKeYWatchpointMethodsOnSatisfiable.class,
-       de.uka.ilkd.key.symbolic_execution.strategy.TestMethodBreakpointWithHitCount.class
-    };
     
     static Class<? extends TestCase>[] proofReferencesTests = new Class[] {
         de.uka.ilkd.key.proof_references.TestKeYTypeUtil.class,
@@ -186,8 +146,6 @@ public class TestKey extends TestSuite {
         suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
         suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
         suite.addTest(createSuite(smtTests, "Testing SMT backend"));
-        suite.addTest(createSuite(breakpointTests, "Testing breakpoints"));
-        suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
         suite.addTest(createSuite(proofReferencesTests, "Testing Proof References"));
         suite.addTest(createSuite(new Class[]{de.uka.ilkd.key.util.DesignTests.class}, "Test Design Constraints"));
 

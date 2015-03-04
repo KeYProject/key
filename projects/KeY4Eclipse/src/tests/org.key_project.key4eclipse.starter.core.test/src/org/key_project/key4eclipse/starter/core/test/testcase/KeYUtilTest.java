@@ -44,10 +44,10 @@ import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Tests for {@link KeYUtil}

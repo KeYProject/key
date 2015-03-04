@@ -323,4 +323,12 @@ public class InfFlowContractPO extends AbstractInfFlowPO
         throw new UnsupportedOperationException("Not supported any more. " +
                                                 "Please use the POSnippetFactory instead.");
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public KeYJavaType getContainerType() {
+       return getContract().getKJT();
+    }
 }

@@ -77,6 +77,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -93,7 +94,6 @@ import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 

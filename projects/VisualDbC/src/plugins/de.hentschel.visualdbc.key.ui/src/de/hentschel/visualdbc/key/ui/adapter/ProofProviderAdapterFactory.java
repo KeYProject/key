@@ -49,10 +49,10 @@ import de.hentschel.visualdbc.interactive.proving.ui.util.InteractiveConnectionU
 import de.hentschel.visualdbc.interactive.proving.ui.util.event.IInteractiveConnectionUtilListener;
 import de.hentschel.visualdbc.interactive.proving.ui.util.event.InteractiveConnectionUtilEvent;
 import de.hentschel.visualdbc.key.ui.util.LogUtil;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * This {@link IAdapterFactory} allows to convert {@link DbCDiagramEditor}

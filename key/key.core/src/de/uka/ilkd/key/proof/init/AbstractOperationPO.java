@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -47,10 +46,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -63,8 +59,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.symbolic_execution.TruthValueEvaluationUtil;
-import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 
 /**
  * <p>
@@ -374,7 +368,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
          Term frameTerm = buildFrameClause(modHeaps, heapToAtPre, selfVar, paramVars, proofServices);
 
-         final Term post = tb.and(postTerm, frameTerm);
+         Term post = tb.and(postTerm, frameTerm);
+         post = modifyPostTerm(proofServices, post);
+         
          final LocationVariable baseHeap = proofServices.getTypeConverter().getHeapLDT().getHeap();
          final Term selfVarTerm = selfVar==null? null: tb.var(selfVar);
          final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm,
@@ -399,6 +395,20 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
       // for JML annotation statements
       generateWdTaclets(proofConfig);
+   }
+
+   /**
+    * Modifies the post condition with help of {@link POExtension#modifyPostTerm(InitConfig, Services, Term)}.
+    * @param proofServices The {@link Services} to use.
+    * @param post The post condition to modify.
+    * @return The modified post condition or the original one if no modifications were performed.
+    */
+   protected Term modifyPostTerm(Services proofServices, Term post) {
+      ImmutableList<POExtension> extensions = ProofInitServiceUtil.getOperationPOExtension(this);
+      for (POExtension extension : extensions) {
+         post = extension.modifyPostTerm(proofConfig, proofServices, post);
+      }
+      return post;
    }
 
    /**
@@ -736,9 +746,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                           atPreVars.keySet().contains(getSavedHeap(services)), sb);
 
       // create program term
-      if (SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(proofConfig)) {
-         postTerm = labelPostTerm(services, postTerm);
-      }
       Term programTerm = tb.prog(getTerminationMarker(), jb, postTerm);
 
       // label modality if required
@@ -751,43 +758,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
       Term update = buildUpdate(paramVars, formalParamVars, atPreVars, services);
 
       return tb.apply(update, programTerm, null);
-   }
-
-   /**
-    * Labels all predicates in the given {@link Term} and its children with
-    * a {@link FormulaTermLabel}.
-    * @param services The {@link Services} to use.
-    * @param term The {@link Term} to label.
-    * @return The labeled {@link Term}.
-    */
-   protected Term labelPostTerm(Services services, Term term) {
-      if (term != null) {
-         final TermFactory tf = services.getTermFactory();
-         // Label children of operator
-         if (TruthValueEvaluationUtil.isLogicOperator(term)) {
-            Term[] newSubs = new Term[term.arity()];
-            boolean subsChanged = false;
-            for (int i = 0; i < newSubs.length; i++) {
-               Term oldTerm = term.sub(i);
-               newSubs[i] = labelPostTerm(services, oldTerm);
-               if (oldTerm != newSubs[i]) {
-                  subsChanged = true;
-               }
-            }
-            term = subsChanged ?
-                   tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), term.getLabels()) :
-                   term;
-         }
-         ImmutableArray<TermLabel> oldLabels = term.getLabels();
-         TermLabel[] newLabels = oldLabels.toArray(new TermLabel[oldLabels.size() + 1]);
-         int labelID = services.getCounter(FormulaTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
-         int labelSubID = FormulaTermLabel.newLabelSubID(services, labelID);
-         newLabels[oldLabels.size()] = new FormulaTermLabel(labelID, labelSubID);
-         return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(), new ImmutableArray<TermLabel>(newLabels));
-      }
-      else {
-         return null;
-      }
    }
 
    /**

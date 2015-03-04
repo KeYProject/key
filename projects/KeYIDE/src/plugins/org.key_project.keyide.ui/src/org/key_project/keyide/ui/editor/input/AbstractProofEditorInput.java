@@ -25,9 +25,9 @@ import org.eclipse.ui.editors.text.TextEditor;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.util.java.StringUtil;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Defines the basic functionality for {@link IEditorInput}s used for the {@link KeYEditor}.

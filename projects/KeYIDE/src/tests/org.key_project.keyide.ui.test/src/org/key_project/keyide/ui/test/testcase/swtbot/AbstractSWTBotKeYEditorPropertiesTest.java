@@ -25,12 +25,12 @@ import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionModel;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Provides the basic functionality to test a properties tab of the {@link KeYEditor}.

@@ -16,7 +16,7 @@ package org.key_project.keyide.ui.job;
 import org.eclipse.core.runtime.jobs.Job;
 import org.key_project.util.eclipse.job.ObjectsSchedulingRule;
 
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.control.KeYEnvironment;
 
 /**
  * A job that does something with KeY

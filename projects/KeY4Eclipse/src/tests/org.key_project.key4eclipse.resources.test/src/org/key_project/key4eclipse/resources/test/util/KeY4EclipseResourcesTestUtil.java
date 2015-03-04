@@ -57,9 +57,9 @@ import org.key_project.util.java.IFilter;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 public class KeY4EclipseResourcesTestUtil {
 

@@ -49,6 +49,7 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.nodeviews.TacletMenu;
@@ -64,7 +65,6 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Provides utility method for the KeYIDE.

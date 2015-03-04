@@ -408,4 +408,12 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
            return new LoadedPOContainer(po, proofNum);
        }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public KeYJavaType getContainerType() {
+       return getContract().getKJT();
+    }
 }

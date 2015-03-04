@@ -115,6 +115,14 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
 		return newGoals;
 	}
 
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isApplicableOnSubTerms() {
+      return false;
+   }
+
 	@Override
 	public String displayName() {
 	    return "SMT";

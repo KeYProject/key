@@ -40,8 +40,8 @@ import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Provides utility method to work with starts registered via extension points.

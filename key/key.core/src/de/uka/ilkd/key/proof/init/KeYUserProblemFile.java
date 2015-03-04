@@ -21,6 +21,7 @@ import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
@@ -271,7 +272,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
 
 		   if (profileName != null && !profileName.isEmpty()) {
-			   return AbstractProfile.getDefaultInstanceForName(profileName);
+			   return ProofInitServiceUtil.getDefaultProfile(profileName);
 		   }
 		   else {
 			   return null;
@@ -289,5 +290,13 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     */
    protected Profile getDefaultProfile() {
       return super.getProfile();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYJavaType getContainerType() {
+      return null;
    }
 }

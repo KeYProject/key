@@ -19,24 +19,24 @@ import java.util.List;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.util.HelperClassForTests;
 
 /**
  * This {@link TestCase} tests the parallel usage of {@link KeYParser}
  * and {@link SchemaJavaParser}.
  * @author Martin Hentschel
  */
-public class TestParallelParsing extends AbstractSymbolicExecutionTestCase {
+public class TestParallelParsing extends TestCase {
    /**
     * Loads both proof files contained in {@code "examples/_testcase/parser/MultipleRecursion"}
     * in parallel using {@code 4} {@link Thread}s in total.
     * @throws Exception Occurred Exception.
     */
    public void testLoadingOfTwoDifferentProofFiles() throws Exception {
-      doParallelTest(testCaseDirectory,
+      doParallelTest(HelperClassForTests.TESTCASE_DIRECTORY,
                      2,
                      "examples/_testcase/parser/MultipleRecursion/MultipleRecursion[MultipleRecursion__a()]_JML_normal_behavior_operation_contract_0.proof",
                      "examples/_testcase/parser/MultipleRecursion/MultipleRecursion[MultipleRecursion__b()]_JML_normal_behavior_operation_contract_0.proof");
@@ -49,12 +49,12 @@ public class TestParallelParsing extends AbstractSymbolicExecutionTestCase {
     * @param locations The locations to load.
     * @throws Exception Occurred Exception.
     */
-   protected void doParallelTest(File baseDir, 
+   protected void doParallelTest(String baseDir, 
                                  int numOfThreadsPerLocation,
                                  String... locations) throws Exception {
-      boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
+      boolean originalOneStepSimplification = HelperClassForTests.isOneStepSimplificationEnabled(null);
       try {
-         setOneStepSimplificationEnabled(null, true);
+         HelperClassForTests.setOneStepSimplificationEnabled(null, true);
          // Create threads
          List<LoadThread> threads = new LinkedList<LoadThread>();
          for (String path : locations) {
@@ -86,7 +86,7 @@ public class TestParallelParsing extends AbstractSymbolicExecutionTestCase {
       }
       finally {
          // Restore original options
-         setOneStepSimplificationEnabled(null, originalOneStepSimplification);
+         HelperClassForTests.setOneStepSimplificationEnabled(null, originalOneStepSimplification);
       }
    }
    

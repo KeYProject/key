@@ -15,8 +15,8 @@ package org.key_project.key4eclipse.common.ui.starter;
 
 import org.eclipse.jdt.core.IMethod;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Instances of this class are used to start an application

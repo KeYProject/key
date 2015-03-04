@@ -15,6 +15,7 @@ package de.uka.ilkd.key.proof_references.analyst;
 
 import de.uka.ilkd.key.proof_references.AbstractProofReferenceTestCase;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+import de.uka.ilkd.key.util.HelperClassForTests;
 
 /**
  * Tests for {@link ProgramVariableReferencesAnalyst}.
@@ -25,7 +26,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#forEquals".
     */
    public void testConditionalsAndOther_forEquals() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "forEquals", 
@@ -39,7 +40,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#forBoolean".
     */
    public void testConditionalsAndOther_forBoolean() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "forBoolean", 
@@ -52,7 +53,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#doWhileEquals".
     */
    public void testConditionalsAndOther_doWhileEquals() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "doWhileEquals", 
@@ -66,7 +67,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#doWhileBoolean".
     */
    public void testConditionalsAndOther_doWhileBoolean() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "doWhileBoolean", 
@@ -79,7 +80,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#whileEquals".
     */
    public void testConditionalsAndOther_whileEquals() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "whileEquals", 
@@ -93,7 +94,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#whileBoolean".
     */
    public void testConditionalsAndOther_whileBoolean() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "whileBoolean", 
@@ -106,7 +107,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#throwsNestedException".
     */
    public void testConditionalsAndOther_throwsNestedException() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "throwsNestedException", 
@@ -120,7 +121,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#throwsException".
     */
    public void testConditionalsAndOther_throwsException() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "throwsException", 
@@ -133,7 +134,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#methodCallCondtional".
     */
    public void testConditionalsAndOther_methodCallCondtional() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "methodCallCondtional", 
@@ -148,7 +149,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#methodCallAssignment".
     */
    public void testConditionalsAndOther_methodCallAssignment() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "methodCallAssignment", 
@@ -163,7 +164,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#methodCall".
     */
    public void testConditionalsAndOther_methodCall() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "methodCall", 
@@ -177,7 +178,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#returnComplex".
     */
    public void testConditionalsAndOther_returnComplex() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "returnComplex", 
@@ -192,7 +193,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#returnEquals".
     */
    public void testConditionalsAndOther_returnEquals() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "returnEquals", 
@@ -206,7 +207,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#returnBoolean".
     */
    public void testConditionalsAndOther_returnBoolean() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "returnBoolean", 
@@ -219,7 +220,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#questionIncrementsAndDecrements".
     */
    public void testConditionalsAndOther_questionIncrementsAndDecrements() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "questionIncrementsAndDecrements", 
@@ -233,7 +234,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#ifIncrementsAndDecrements".
     */
    public void testConditionalsAndOther_ifIncrementsAndDecrements() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "ifIncrementsAndDecrements", 
@@ -247,7 +248,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#questionGreater".
     */
    public void testConditionalsAndOther_questionGreater() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "questionGreater", 
@@ -261,7 +262,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#questionGreaterEquals".
     */
    public void testConditionalsAndOther_questionGreaterEquals() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "questionGreaterEquals", 
@@ -275,7 +276,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#questionNotEquals".
     */
    public void testConditionalsAndOther_questionNotEquals() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "questionNotEquals", 
@@ -289,7 +290,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#questionEquals".
     */
    public void testConditionalsAndOther_questionEquals() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "questionEquals", 
@@ -303,7 +304,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#questionLessEquals".
     */
    public void testConditionalsAndOther_questionLessEquals() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "questionLessEquals", 
@@ -317,7 +318,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#questionLess".
     */
    public void testConditionalsAndOther_questionLess() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "questionLess", 
@@ -331,7 +332,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#questionBoolean".
     */
    public void testConditionalsAndOther_questionBoolean() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "questionBoolean", 
@@ -344,7 +345,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#ifGreater".
     */
    public void testConditionalsAndOther_ifGreater() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "ifGreater", 
@@ -358,7 +359,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#ifGreaterEquals".
     */
    public void testConditionalsAndOther_ifGreaterEquals() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "ifGreaterEquals", 
@@ -372,7 +373,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#ifNotEquals".
     */
    public void testConditionalsAndOther_ifNotEquals() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "ifNotEquals", 
@@ -386,7 +387,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#ifEquals".
     */
    public void testConditionalsAndOther_ifEquals() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "ifEquals", 
@@ -400,7 +401,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#ifLessEquals".
     */
    public void testConditionalsAndOther_ifLessEquals() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "ifLessEquals", 
@@ -414,7 +415,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#ifLess".
     */
    public void testConditionalsAndOther_ifLess() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "ifLess", 
@@ -428,7 +429,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#ifBoolean".
     */
    public void testConditionalsAndOther_ifBoolean() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "ifBoolean", 
@@ -441,7 +442,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ConditionalsAndOther#switchInt".
     */
    public void testConditionalsAndOther_switchInt() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ConditionalsAndOther/ConditionalsAndOther.java", 
                             "ConditionalsAndOther", 
                             "switchInt", 
@@ -454,7 +455,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "ArrayLength".
     */
    public void testArrayLength() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/ArrayLength/ArrayLength.java", 
                             "ArrayLength", 
                             "main", 
@@ -471,7 +472,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#assignmentWithSelf".
     */
    public void testAssignments_assignmentWithSelf() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "assignmentWithSelf", 
@@ -484,7 +485,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#nestedArray".
     */
    public void testAssignments_nestedArray() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "nestedArray", 
@@ -499,7 +500,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#nestedValueAdd".
     */
    public void testAssignments_nestedValueAdd() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "nestedValueAdd", 
@@ -516,7 +517,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#nestedValue".
     */
    public void testAssignments_nestedValue() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "nestedValue", 
@@ -532,7 +533,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#assign".
     */
    public void testAssignments_assign() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "assign", 
@@ -546,7 +547,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#mod".
     */
    public void testAssignments_mod() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "mod", 
@@ -560,7 +561,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#div".
     */
    public void testAssignments_div() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "div", 
@@ -574,7 +575,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#mul".
     */
    public void testAssignments_mul() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "mul", 
@@ -588,7 +589,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#sub".
     */
    public void testAssignments_sub() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "sub", 
@@ -602,7 +603,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#add".
     */
    public void testAssignments_add() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "add", 
@@ -616,7 +617,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#decrementArrayBegin".
     */
    public void testAssignments_decrementArrayBegin() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "decrementArrayBegin", 
@@ -630,7 +631,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#decrementArrayEnd".
     */
    public void testAssignments_decrementArrayEnd() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "decrementArrayEnd", 
@@ -644,7 +645,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#incrementArrayBegin".
     */
    public void testAssignments_incrementArrayBegin() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "incrementArrayBegin", 
@@ -657,7 +658,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#incrementArrayEnd".
     */
    public void testAssignments_incrementArrayEnd() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "incrementArrayEnd", 
@@ -670,7 +671,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#decrementBegin".
     */
    public void testAssignments_decrementBegin() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "decrementBegin", 
@@ -683,7 +684,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#decrementEnd".
     */
    public void testAssignments_decrementEnd() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "decrementEnd", 
@@ -696,7 +697,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#incrementBegin".
     */
    public void testAssignments_incrementBegin() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "incrementBegin", 
@@ -709,7 +710,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "Assignments#incrementEnd".
     */
    public void testAssignments_incrementEnd() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/Assignments/Assignments.java", 
                             "Assignments", 
                             "incrementEnd", 
@@ -722,7 +723,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "assignment".
     */
    public void testAssignment() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/assignment/Assignment.java", 
                             "assignment.Assignment",
                             "caller", 
@@ -736,7 +737,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "assignment_array2".
     */
    public void testAssignment_array2() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/assignment_array2/Assignment_array2.java", 
                             "assignment_array2.Assignment_array2",
                             "caller", 
@@ -751,7 +752,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "assignment_read_attribute".
     */
    public void testAssignment_read_attribute() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/assignment_read_attribute/Assignment_read_attribute.java", 
                             "assignment_read_attribute.Assignment_read_attribute",
                             "caller", 
@@ -765,7 +766,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "assignment_read_length".
     */
    public void testAssignment_read_length() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/assignment_read_length/Assignment_read_length.java", 
                             "assignment_read_length.Assignment_read_length",
                             "caller", 
@@ -778,7 +779,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "assignment_to_primitive_array_component".
     */
    public void testAssignment_to_primitive_array_component() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/assignment_to_primitive_array_component/Assignment_to_primitive_array_component.java",
                             "assignment_to_primitive_array_component.Assignment_to_primitive_array_component",
                             "caller",
@@ -792,7 +793,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "assignment_to_reference_array_component".
     */
    public void testAssignment_to_reference_array_component() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/assignment_to_reference_array_component/Assignment_to_reference_array_component.java", 
                             "assignment_to_reference_array_component.Assignment_to_reference_array_component",
                             "caller",
@@ -805,7 +806,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "assignment_write_attribute".
     */
    public void testAssignment_write_attribute() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/assignment_write_attribute/Assignment_write_attribute.java", 
                             "assignment_write_attribute.Assignment_write_attribute",
                             "caller", 
@@ -818,7 +819,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "assignment_write_static_attribute".
     */
    public void testAssignment_write_static_attribute() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/assignment_write_static_attribute/Assignment_write_static_attribute.java", 
                             "assignment_write_static_attribute.Assignment_write_static_attribute",
                             "caller", 
@@ -831,7 +832,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "activeUseStaticFieldReadAccess2".
     */
    public void testActiveUseStaticFieldReadAccess2() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/activeUseStaticFieldReadAccess2/ActiveUseStaticFieldReadAccess2.java", 
                             "activeUseStaticFieldReadAccess2.ActiveUseStaticFieldReadAccess2",
                             "caller", 
@@ -844,7 +845,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "activeUseStaticFieldWriteAccess2".
     */
    public void testActiveUseStaticFieldWriteAccess2() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/activeUseStaticFieldWriteAccess2/ActiveUseStaticFieldWriteAccess2.java", 
                             "activeUseStaticFieldWriteAccess2.ActiveUseStaticFieldWriteAccess2",
                             "caller", 
@@ -857,7 +858,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "eval_order_access4".
     */
    public void testEval_order_access4() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/eval_order_access4/Eval_order_access4.java", 
                             "eval_order_access4.Eval_order_access4",
                             "caller", 
@@ -870,7 +871,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "eval_order_array_access5".
     */
    public void testEval_order_array_access5() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/eval_order_array_access5/Eval_order_array_access5.java",
                             "eval_order_array_access5.Eval_order_array_access5",
                             "caller", 
@@ -883,7 +884,7 @@ public class TestProgramVariableReferencesAnalyst extends AbstractProofReference
     * Tests "variableDeclarationAssign".
     */
    public void testVariableDeclarationAssign() throws Exception {
-      doReferenceMethodTest(testCaseDirectory, 
+      doReferenceMethodTest(HelperClassForTests.TESTCASE_DIRECTORY, 
                             "/proofReferences/variableDeclarationAssign/VariableDeclarationAssign.java",
                             "variableDeclarationAssign.VariableDeclarationAssign",
                             "caller", 

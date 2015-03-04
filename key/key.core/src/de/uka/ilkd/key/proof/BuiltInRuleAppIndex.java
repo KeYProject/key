@@ -24,9 +24,6 @@ import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.QueryExpand;
-import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.symbolic_execution.rule.QuerySideProofRule;
 
 public class BuiltInRuleAppIndex {
 
@@ -125,9 +122,7 @@ public class BuiltInRuleAppIndex {
                                           SequentFormula cfma, 
                                           NewRuleListener listener ) {
         final PosInOccurrence pos = new PosInOccurrence( cfma, PosInTerm.getTopLevel(), antec );
-        if(rule instanceof UseDependencyContractRule
-                || rule instanceof QueryExpand
-                || rule instanceof QuerySideProofRule) {//HACK
+        if(rule.isApplicableOnSubTerms()) {
             scanSimplificationRule(rule, goal, pos, listener);
         } else if (rule.isApplicable ( goal, pos ) ) {
             IBuiltInRuleApp app = rule.createApp( pos, goal.proof().getServices() );

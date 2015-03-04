@@ -17,9 +17,9 @@ import java.util.EventObject;
 
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * An event thrown by an {@link IProofProvider} observed via an {@link IProofProviderListener}.

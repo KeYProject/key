@@ -416,4 +416,12 @@ public abstract class AbstractPO implements IPersistablePO {
     public static String getName(Properties properties) {
        return properties.getProperty(IPersistablePO.PROPERTY_NAME);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public KeYJavaType getContainerType() {
+       return null;
+    }
 }

@@ -27,6 +27,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.hentschel.visualdbc.key.ui.test.Activator;
 import de.hentschel.visualdbc.key.ui.util.ProofReferenceModelCreator;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Proof;
@@ -34,7 +35,6 @@ import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Tests {@link ProofReferenceModelCreator}.

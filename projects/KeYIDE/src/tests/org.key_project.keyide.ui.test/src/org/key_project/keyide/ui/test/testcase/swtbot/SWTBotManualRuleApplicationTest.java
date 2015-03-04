@@ -28,6 +28,7 @@ import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -37,7 +38,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 

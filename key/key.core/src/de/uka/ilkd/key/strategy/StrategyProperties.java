@@ -17,9 +17,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
-
-
 public final class StrategyProperties extends Properties {
     
     /**
@@ -106,32 +103,32 @@ public final class StrategyProperties extends Properties {
     public final static String USER_TACLETS_HIGH = "USER_TACLETS_HIGH";
 
     /**
-     * Key used in {@link StrategyProperties} to configure alias checks in a {@link SymbolicExecutionStrategy}.
+     * Key used in {@link StrategyProperties} to configure alias checks in a {@code} SymbolicExecutionStrategy}.
      */
     public static final String SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY = "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY";
     
     /**
-     * Value of key {@link #SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY} in {@link StrategyProperties} to disable alias checks in a {@link SymbolicExecutionStrategy}.
+     * Value of key {@link #SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY} in {@link StrategyProperties} to disable alias checks in a {@code SymbolicExecutionStrategy}.
      */
     public static final String SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER = "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER";
     
     /**
-     * Value of key {@link #SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY} in {@link StrategyProperties} to enable immediately alias checks in a {@link SymbolicExecutionStrategy}.
+     * Value of key {@link #SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY} in {@link StrategyProperties} to enable immediately alias checks in a {@code SymbolicExecutionStrategy}.
      */
     public static final String SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY = "SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY";
 
     /**
-     * Key used in {@link StrategyProperties} to avoid branches caused by modalities not part of main execution branch in a {@link SymbolicExecutionStrategy}.
+     * Key used in {@link StrategyProperties} to avoid branches caused by modalities not part of main execution branch in a {@code SymbolicExecutionStrategy}.
      */
     public static final String SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY = "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY";
     
     /**
-     * Value of key {@link #SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY} in {@link StrategyProperties} to disable branch avoiding caused by modalities not part of main execution in a {@link SymbolicExecutionStrategy}.
+     * Value of key {@link #SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY} in {@link StrategyProperties} to disable branch avoiding caused by modalities not part of main execution in a {@code SymbolicExecutionStrategy}.
      */
     public static final String SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF = "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF";
     
     /**
-     * Value of key {@link #SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY} in {@link StrategyProperties} to avoid branches caused by modalities not part of main execution by using site proofs in a {@link SymbolicExecutionStrategy}.
+     * Value of key {@link #SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY} in {@link StrategyProperties} to avoid branches caused by modalities not part of main execution by using site proofs in a {@code SymbolicExecutionStrategy}.
      */
     public static final String SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF = "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF";
     
@@ -303,5 +300,36 @@ public final class StrategyProperties extends Properties {
     	}
     	System.err.println("The string \""+in+"\" is not registered in the string pool of StrategyProperties. Update the string pool!");
     	return null;
+    }
+    
+    /**
+     * Sets the default settings for symbolic execution on the given {@link StrategyProperties}.
+     * @param sp The {@link StrategyProperties} to modify.
+     * @param quantifierInstantiationWithSplitting Instantiate quantifiers?
+     * @param methodTreatmentContract Use method contracts or inline method bodies otherwise?
+     * @param loopTreatmentInvariant Use loop invariants or unrole loops otherwise?
+     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
+     * @param aliasChecks Do alias checks?
+     */
+    public static void setDefaultStrategyProperties(StrategyProperties sp, 
+                                                    boolean quantifierInstantiationWithSplitting,
+                                                    boolean methodTreatmentContract, 
+                                                    boolean loopTreatmentInvariant,
+                                                    boolean nonExecutionBranchHidingSideProofs,
+                                                    boolean aliasChecks) {
+       sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT : StrategyProperties.LOOP_EXPAND);
+       sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_EXPAND);
+       sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatmentContract ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
+       sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_RESTRICTED);
+       sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+       sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, StrategyProperties.AUTO_INDUCTION_OFF);
+       sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
+       sp.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_ON);
+       sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_DELAYED);
+       sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
+       sp.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY, StrategyProperties.CLASS_AXIOM_FREE);
+       sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, quantifierInstantiationWithSplitting ? StrategyProperties.QUANTIFIERS_INSTANTIATE : StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
+       sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, aliasChecks ? StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY : StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
+       sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY, nonExecutionBranchHidingSideProofs ? StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF : StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
     }
 }

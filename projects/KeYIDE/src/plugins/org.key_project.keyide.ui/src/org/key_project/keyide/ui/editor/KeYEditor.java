@@ -71,6 +71,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.control.AutoModeListener;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -85,7 +86,6 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.ProofUserManager;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;

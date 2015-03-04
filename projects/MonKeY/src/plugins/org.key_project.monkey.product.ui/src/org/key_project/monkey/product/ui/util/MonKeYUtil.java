@@ -28,6 +28,7 @@ import org.key_project.monkey.product.ui.model.MonKeYProofResult;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
@@ -37,7 +38,6 @@ import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Provides static utility methods for MonKeY.

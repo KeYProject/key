@@ -1112,4 +1112,12 @@ public final class WhileInvariantRule implements BuiltInRule {
             assert infFlowApp != null;
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isApplicableOnSubTerms() {
+       return false;
+    }
 }

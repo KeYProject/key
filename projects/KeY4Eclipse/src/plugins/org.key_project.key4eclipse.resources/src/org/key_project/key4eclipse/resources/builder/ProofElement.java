@@ -26,11 +26,11 @@ import org.key_project.key4eclipse.resources.marker.MarkerUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Object that represents a proof and provides all the required stuff for the build process.

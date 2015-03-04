@@ -71,11 +71,11 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.XMLUtil;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Content in the {@link MonKeYView} that contains the whole

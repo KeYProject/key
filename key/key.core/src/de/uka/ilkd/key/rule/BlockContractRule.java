@@ -1392,4 +1392,12 @@ public class BlockContractRule implements BuiltInRule {
             this.taclet = taclet;
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isApplicableOnSubTerms() {
+       return false;
+    }
 }

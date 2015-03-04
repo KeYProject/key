@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.proof.ProofAggregate;
 
 
@@ -41,4 +42,10 @@ public interface ProofOblInput {
      * If true, then this PO implies the passed one.
      */
     boolean implies(ProofOblInput po);
+    
+    /**
+     * Returns the {@link KeYJavaType} in which the proven element is contained in.
+     * @return The {@link KeYJavaType} in which the proven element is contained in or {@code null} if not available.
+     */
+    KeYJavaType getContainerType();
  }

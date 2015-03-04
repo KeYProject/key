@@ -27,11 +27,11 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Provides static methods that makes testing easier.
