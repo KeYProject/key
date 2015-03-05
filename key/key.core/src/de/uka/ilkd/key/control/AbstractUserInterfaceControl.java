@@ -16,9 +16,11 @@ package de.uka.ilkd.key.control;
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProverTaskListener;
@@ -100,14 +102,21 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
     }
 
     protected void macroFinished(ProofMacroFinishedInfo info) {
-        numOfInvokedMacros--;
+        if (numOfInvokedMacros > 0) {
+            numOfInvokedMacros--;
+        }
+        else { 
+            Logger.getLogger(this.getClass().getName(), "Number of running macros became negative.");
+        }
     }
 
     private class ProofMacroListenerAdapter implements ProverTaskListener {
 
         @Override
         public void taskStarted(String message, int size) {
-            macroStarted(message, size);
+            if (!ApplyStrategy.PROCESSING_STRATEGY.equals(message)) {//TODO: have a source object that make clear I am not a macro
+                macroStarted(message, size);
+            }
         }
 
         @Override

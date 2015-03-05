@@ -179,9 +179,10 @@ public class MediatorProofControl extends AbstractProofControl {
               // make it possible to free memory and falsify the isAutoMode() property
               worker = null;
               // Clear strategy
-              applyStrategy.removeProverTaskObserver(ui);
-              applyStrategy.clear();
-              // wait for apply Strategy to terminate
+              synchronized(applyStrategy) {// wait for apply Strategy to terminate
+                  applyStrategy.removeProverTaskObserver(ui);
+                  applyStrategy.clear();
+              }
               ui.getMediator().setInteractive(true);
               ui.getMediator().startInterface(true);
            }
