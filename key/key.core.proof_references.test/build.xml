@@ -8,8 +8,7 @@
 
 	<target name="runTestsXML" depends="compile">
 	    	<mkdir dir="${test.reports}" />
-		<junit printsummary="withOutAndErr" haltonfailure="yes"
-		       fork="yes" forkMode="once" haltonerror="yes" enableTestListenerEvents="false" showoutput="yes" dir="${basedir}">
+		<junit printsummary="withOutAndErr" haltonfailure="yes" fork="yes" forkMode="once" haltonerror="yes" enableTestListenerEvents="false" showoutput="yes" dir="${basedir}">
 			<jvmarg value="-Xmx2048m"/>
 			<jvmarg value="-XX:MaxPermSize=256m"/>
 			<jvmarg value="-ea"/>
