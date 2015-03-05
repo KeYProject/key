@@ -5,7 +5,6 @@
 	<property name="dist.dir"  value="${basedir}/../deployment" />
 
 	<path id="key.ui.class.path">
-	  <pathelement path="${basedir}/../key.ui/bin"/>
 	  <pathelement path="${basedir}/../key.util/bin"/>
 	  <pathelement path="${basedir}/../key.core/bin"/>
 	  <pathelement path="${basedir}/../key.core.testgen/bin"/>
@@ -13,9 +12,15 @@
 	  <pathelement location="${basedir}/../key.core/lib/recoderKey.jar"/>
 	</path>
 
+	<path id="key.ui.run.class.path">
+	  <pathelement path="${basedir}/../key.ui/bin"/>
+	  <path refid="key.ui.class.path"/>
+	</path>
+
+	  
 	<target name="start" depends="compile" description="Starts KeY.">
 		<java classname="de.uka.ilkd.key.core.Main"
-		      classpathref="key.ui.class.path" fork="true" jvmargs="-Xmx2048m -XX:MaxPermSize=256m -ea" />
+		      classpathref="key.ui.run.class.path" fork="true" jvmargs="-Xmx2048m -XX:MaxPermSize=256m -ea" />
 	</target>
 
 	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
