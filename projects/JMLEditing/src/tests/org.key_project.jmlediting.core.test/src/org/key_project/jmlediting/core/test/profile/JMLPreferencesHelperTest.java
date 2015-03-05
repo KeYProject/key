@@ -22,7 +22,8 @@ public class JMLPreferencesHelperTest {
 
    @BeforeClass
    public static void initializeProfiles() {
-      profiles = JMLProfileManagement.getAvailableProfilesSortedByName();
+      profiles = JMLProfileManagement.instance()
+            .getAvailableProfilesSortedByName();
    }
 
    @BeforeClass
@@ -55,8 +56,10 @@ public class JMLPreferencesHelperTest {
    }
 
    @Test
-   public void testSetProjectProfile() throws CoreException, InterruptedException {
-      final IJavaProject javaProject = TestUtilsUtil.createJavaProject("JMLPreferencesHelperTest_testSetProjectProfile");
+   public void testSetProjectProfile() throws CoreException,
+         InterruptedException {
+      final IJavaProject javaProject = TestUtilsUtil
+            .createJavaProject("JMLPreferencesHelperTest_testSetProjectProfile");
       final IProject project = javaProject.getProject();
       assertTrue("New profile has no project specific profile",
             !JMLPreferencesHelper.hasProjectJMLProfile(project));

@@ -6,7 +6,7 @@ import org.key_project.jmlediting.profile.jmlref.JMLReferenceProfileAE;
 
 public class ProfileWrapper {
 
-   public static IJMLProfile testProfile = JMLProfileManagement
+   public static IJMLProfile testProfile = JMLProfileManagement.instance()
          .getProfileFromIdentifier(new JMLReferenceProfileAE().getIdentifier());
 
 }

@@ -97,7 +97,7 @@ public class DerivedProfilePersistence implements IDerivedProfilePersistence {
       }
 
       // Load the parent profile from the profile Management
-      final IJMLProfile parentProfile = JMLProfileManagement
+      final IJMLProfile parentProfile = JMLProfileManagement.instance()
             .getProfileFromIdentifier(parentIdentifer);
       if (parentProfile == null) {
          throw new ProfilePersistenceException("The parent profile with id \""

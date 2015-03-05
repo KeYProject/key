@@ -59,7 +59,7 @@ public final class JMLPreferencesHelper {
          // Try to find the reference profile, it is not required to be
          // installed
          IJMLProfile profile = null;
-         final List<IJMLProfile> allProfiles = JMLProfileManagement
+         final List<IJMLProfile> allProfiles = JMLProfileManagement.instance()
                .getAvailableProfilesSortedByName();
          if (allProfiles.isEmpty()) {
 
@@ -79,8 +79,8 @@ public final class JMLPreferencesHelper {
          setDefaultJMLProfile(profile);
          return profile;
       }
-      return JMLProfileManagement
-            .getProfileFromIdentifier(currentProfileIdentifier);
+      return JMLProfileManagement.instance().getProfileFromIdentifier(
+            currentProfileIdentifier);
    }
 
    /**
@@ -118,7 +118,8 @@ public final class JMLPreferencesHelper {
       catch (final CoreException e) {
          return null;
       }
-      return JMLProfileManagement.getProfileFromIdentifier(currentProfileName);
+      return JMLProfileManagement.instance().getProfileFromIdentifier(
+            currentProfileName);
    }
 
    /**

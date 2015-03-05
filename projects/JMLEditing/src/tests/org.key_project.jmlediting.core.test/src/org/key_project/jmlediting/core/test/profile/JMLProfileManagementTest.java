@@ -14,6 +14,7 @@ import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.core.validation.IJMLValidator;
+
 public class JMLProfileManagementTest {
 
    private static class DummyProfile implements IJMLProfile {
@@ -87,9 +88,9 @@ public class JMLProfileManagementTest {
    }
 
    @Test
-   public void test() {
+   public void testLoadProfiles() {
       final Set<IJMLProfile> availablesProfiles = JMLProfileManagement
-            .getAvailableProfiles();
+            .instance().getAvailableProfiles();
       assertTrue(
             "Found no available profiles " + availablesProfiles.getClass(),
             !availablesProfiles.isEmpty());
