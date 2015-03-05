@@ -369,20 +369,30 @@ public class IOUtilTest extends TestCase {
          List<File> result = IOUtil.search(null, filter);
          assertEquals(0, result.size());
          // Test no filter
-         result = IOUtil.search(tempDir, null);
-         Collections.sort(result); // Ensure same order in all operating systems
+         result = IOUtil.search(tempDir, null); 
+         Collections.sort(result, new Comparator<File>() {
+             @Override
+             public int compare(File o1, File o2) {
+                 return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());
+             }
+          });  // Ensure same order in all operating systems
          assertEquals(8, result.size());
          assertEquals(tempDir, result.get(0));
-         assertEquals(emptyFolder, result.get(1));
-         assertEquals(subDir, result.get(2));
-         assertEquals(subFile, result.get(3));
-         assertEquals(subSubDir, result.get(4));
-         assertEquals(subSubA, result.get(5));
-         assertEquals(subSubB, result.get(6));
-         assertEquals(text, result.get(7));
+         assertEquals(text, result.get(1));
+         assertEquals(emptyFolder, result.get(2));
+         assertEquals(subDir, result.get(3));
+         assertEquals(subFile, result.get(4));
+         assertEquals(subSubDir, result.get(5));
+         assertEquals(subSubA, result.get(6));
+         assertEquals(subSubB, result.get(7));
          // Test with filter
          result = IOUtil.search(tempDir, filter);
-         Collections.sort(result); // Ensure same order in all operating systems
+         Collections.sort(result,new Comparator<File>() {
+             @Override
+             public int compare(File o1, File o2) {
+                 return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());
+             }
+          }); // Ensure same order in all operating systems
          assertEquals(4, result.size());
          assertEquals(subFile, result.get(0));
          assertEquals(subSubDir, result.get(1));
