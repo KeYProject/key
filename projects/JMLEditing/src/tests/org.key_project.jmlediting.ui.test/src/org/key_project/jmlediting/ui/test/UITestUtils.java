@@ -163,7 +163,7 @@ public class UITestUtils {
    }
 
    public static IJMLProfile findReferenceProfile() {
-      for (final IJMLProfile profile : JMLProfileManagement
+      for (final IJMLProfile profile : JMLProfileManagement.instance()
             .getAvailableProfiles()) {
          if (profile.getIdentifier().equals(
                "org.key_project.jmlediting.profile.jmlref")) {

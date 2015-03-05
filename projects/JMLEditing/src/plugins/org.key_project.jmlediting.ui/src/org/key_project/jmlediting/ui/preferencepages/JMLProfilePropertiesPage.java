@@ -196,7 +196,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     */
    private void initUI() {
       // Get all profiles and set them to the list
-      this.allProfiles = JMLProfileManagement
+      this.allProfiles = JMLProfileManagement.instance()
             .getAvailableProfilesSortedByName();
       final TableColumn nameColumn = new TableColumn(this.profilesList,
             SWT.LEFT);
