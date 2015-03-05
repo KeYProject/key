@@ -148,7 +148,7 @@ public class RunAllProofsTest {
         String keyBinaries = KEY_HOME + File.separator + "system" + File.separator + "binary";
         // Start process
         ProcessBuilder pb = new ProcessBuilder("java", 
-                "-cp", keyBinaries + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "antlr.jar" + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "javacc.jar" + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "junit.jar" + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "recoderKey.jar",
+                "-cp", keyBinaries + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "antlr.jar" + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "javacc.jar" + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "junit.jar" + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "recoderKey.jar" + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "hamcrest.jar",
                 "de.uka.ilkd.key.core.Main", "--auto",
                 fileToTest.getAbsolutePath());
         System.out.println("Starting process: " + pb.command());

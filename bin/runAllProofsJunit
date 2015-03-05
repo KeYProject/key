@@ -69,7 +69,7 @@ export PATH
 # KeY CLASSPATH
 #
 
-key_ext_jars="antlr.jar recoderKey.jar junit.jar"
+key_ext_jars="antlr.jar recoderKey.jar junit.jar hamcrest.jar"
 keyclasspath="$KEY_HOME/system/binary/"
 
 for i in $key_ext_jars ; do
