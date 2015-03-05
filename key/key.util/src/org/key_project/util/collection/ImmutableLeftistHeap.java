@@ -229,7 +229,8 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
 	/**
 	 * Use this element to construct new heaps
 	 */
-	private static final ImmutableLeftistHeap<?> EMPTY_HEAP = new Empty<>();
+	@SuppressWarnings("rawtypes")
+   private static final ImmutableLeftistHeap<?> EMPTY_HEAP = new Empty();
 	
 	/**
 	 * Length of the right spine, i.e. the length of the path from the

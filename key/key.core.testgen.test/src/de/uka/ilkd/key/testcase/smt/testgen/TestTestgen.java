@@ -23,7 +23,6 @@ public class TestTestgen extends TestCommons{
 	private static boolean isInstalled = false;
 	private static boolean installChecked = false;
 
-	@Override
 	public boolean toolNotInstalled() {
 		if (!installChecked) {
 			isInstalled = getSolverType().isInstalled(true);

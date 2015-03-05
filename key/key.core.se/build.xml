@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<project name="key.core.se" default="deploy" basedir=".">
+	<property name="src.dir"   value="${basedir}/src" />
+	<property name="build.dir" value="${basedir}/bin" />
+	<property name="dist.dir"  value="${basedir}/../deployment" />
+
+	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
+		<mkdir dir="${dist.dir}"/>
+		<jar destfile="${dist.dir}/key.core.se.jar" basedir="${build.dir}" manifest="${basedir}/META-INF/MANIFEST.MF" />
+	</target>
+
+	<target name="compile" description="Compile all source files into the build directory.">
+		<mkdir dir="${build.dir}"/>
+		<javac srcdir= "${src.dir}" 
+		       destdir="${build.dir}" 
+		       sourcepath="${src.dir}" 
+		       includeantruntime="false" 
+		       source="1.7" 
+		       deprecation="off" 
+		       debug="on" 
+		       depend="${build.depend}" 
+		       optimize="off">
+			<classpath>
+				<pathelement location="${dist.dir}/key.core.jar"/>
+				<pathelement location="${dist.dir}/antlr.jar"/>
+				<pathelement location="${dist.dir}/recoderKey.jar"/>
+				<pathelement location="${dist.dir}/key.util.jar"/>
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="clean" description="Deletes all generated files and folders.">
+		<delete failonerror="false" includeemptydirs="true"> 
+			<fileset dir="${build.dir}" includes="**/*" />
+			<fileset file="${dist.dir}/key.core.se.jar" />
+		</delete>
+	</target>
+</project>

@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<project name="key" default="deployAll" basedir=".">
+	<!-- The following tasks are for KeY -->
+	<target name="startKeY" depends="deployAll" description="Starts the deployed KeY.">
+		<ant antfile="${basedir}/../key.ui/build.xml" target="start" dir="${basedir}/../key.ui" inheritall="false"/>
+	</target>
+	
+	<target name="deployAll">
+		<ant antfile="${basedir}/../key.util/build.xml" target="deploy" dir="${basedir}/../key.util" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core/build.xml" target="deploy" dir="${basedir}/../key.core" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.testgen/build.xml" target="deploy" dir="${basedir}/../key.core.testgen" inheritall="false"/>
+		<ant antfile="${basedir}/../key.ui/build.xml" target="deploy" dir="${basedir}/../key.ui" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.se/build.xml" target="deploy" dir="${basedir}/../key.core.se" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.proof_references/build.xml" target="deploy" dir="${basedir}/../key.core.proof_references" inheritall="false"/>
+	</target>
+
+	<target name="cleanAll">
+		<ant antfile="${basedir}/../key.util/build.xml" target="clean" dir="${basedir}/../key.util" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core/build.xml" target="clean" dir="${basedir}/../key.core" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.testgen/build.xml" target="clean" dir="${basedir}/../key.core.testgen" inheritall="false"/>
+		<ant antfile="${basedir}/../key.ui/build.xml" target="clean" dir="${basedir}/../key.ui" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.se/build.xml" target="clean" dir="${basedir}/../key.core.se" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.proof_references/build.xml" target="clean" dir="${basedir}/../key.core.proof_references" inheritall="false"/>
+	</target>
+
+	<!-- The following tasks are for KeY's Tests -->
+	<target name="runAllTests" depends="compileAllTests">
+		<ant antfile="${basedir}/../key.util.test/build.xml" target="runTests" dir="${basedir}/../key.util.test" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.test/build.xml" target="runTests" dir="${basedir}/../key.core.test" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.testgen.test/build.xml" target="runTests" dir="${basedir}/../key.core.testgen.test" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.proof_references/build.xml" target="runTests" dir="${basedir}/../key.core.proof_references" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.se.test/build.xml" target="runTests" dir="${basedir}/../key.core.se.test" inheritall="false"/>
+	</target>
+
+	<target name="compileAllTests" depends="deployAll">
+		<ant antfile="${basedir}/../key.util.test/build.xml" target="compile" dir="${basedir}/../key.util.test" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.test/build.xml" target="compile" dir="${basedir}/../key.core.test" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.testgen.test/build.xml" target="compile" dir="${basedir}/../key.core.testgen.test" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.proof_references/build.xml" target="compile" dir="${basedir}/../key.core.proof_references" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.se.test/build.xml" target="compile" dir="${basedir}/../key.core.se.test" inheritall="false"/>
+	</target>
+
+	<target name="cleanAllTests">
+		<ant antfile="${basedir}/../key.util.test/build.xml" target="clean" dir="${basedir}/../key.util.test" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.test/build.xml" target="clean" dir="${basedir}/../key.core.test" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.testgen.test/build.xml" target="clean" dir="${basedir}/../key.core.testgen.test" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.proof_references/build.xml" target="clean" dir="${basedir}/../key.core.proof_references" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.se.test/build.xml" target="clean" dir="${basedir}/../key.core.se.test" inheritall="false"/>
+	</target>
+</project>

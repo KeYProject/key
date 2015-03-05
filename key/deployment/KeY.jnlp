@@ -15,12 +15,15 @@
 <all-permissions/> 
 </security> 
 <resources> 
-<j2se version="1.6+" initial-heap-size="128m" max-heap-size="1024m"/> 
+<j2se version="1.7+" initial-heap-size="128m" max-heap-size="1024m"/> 
 
-<jar href="key.jar"/> 
-<jar href="lib/antlr.jar" /> 
-<jar href="lib/recoderKey.jar" /> 
+<jar href="key.ui.jar" /> 
+<jar href="key.core.testgen.jar" /> 
+<jar href="key.core.jar" /> 
+<jar href="key.util.jar" /> 
+<jar href="antlr.jar" /> 
+<jar href="recoderKey.jar" /> 
 </resources> 
 
-<application-desc main-class="de.uka.ilkd.key.gui.WebstartMain"/> 
+<application-desc main-class="de.uka.ilkd.key.core.WebstartMain"/> 
 </jnlp> 
