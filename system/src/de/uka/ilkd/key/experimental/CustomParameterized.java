@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.key4eclipse.test.suite;
+package de.uka.ilkd.key.experimental;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

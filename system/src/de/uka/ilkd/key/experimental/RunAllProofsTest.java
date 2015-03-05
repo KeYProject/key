@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.key4eclipse.test.testcase;
+package de.uka.ilkd.key.experimental;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,17 +25,18 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.key_project.key4eclipse.test.suite.CustomParameterized;
-import org.key_project.key4eclipse.test.suite.CustomParameterized.CustomParameters;
-import org.key_project.key4eclipse.util.KeYExampleUtil;
-import org.key_project.util.java.IOUtil;
+import de.uka.ilkd.key.experimental.CustomParameterized.CustomParameters;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.core.Main;
+import java.util.concurrent.TimeUnit;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 
 /**
  * <p>
@@ -66,7 +67,7 @@ import de.uka.ilkd.key.core.Main;
  * @author Martin Hentschel
  */
 @RunWith(CustomParameterized.class)
-public class RunAllProofsTest extends TestCase {
+public class RunAllProofsTest {
     /**
      * The path to the KeY repository. 
      * Configurable via system property {@code key.home}.
@@ -83,18 +84,17 @@ public class RunAllProofsTest extends TestCase {
      * Computes the constant values.
      */
     static {
-        // Compute path to the KeY repository.
-        String keyHome = System.getProperty("key.home");
-        if (StringUtil.isEmpty(keyHome)) {
-            keyHome = KeYExampleUtil.getLocalKeYHomeDirectory();
+        KEY_HOME = System.getenv("KEY_HOME");
+        if (KEY_HOME == null) {
+            throw new RuntimeException("Environment variable KEY_HOME not set. "
+                    + "Cannot test proofs.");
         }
-        KEY_HOME = keyHome;
-        // Compute path to the KeY external libraries.
-        String libDir = System.getProperty("key.lib");
-        if (StringUtil.isEmpty(libDir)) {
-            libDir = KeYExampleUtil.getLocalKeYExtraLibsDirectory();
+
+        KEY_LIB_DIR = System.getenv("KEY_LIB");
+        if (KEY_HOME == null) {
+            throw new RuntimeException("Environment variable KEY_LIB not set. "
+                    + "Cannot test proofs.");
         }
-        KEY_LIB_DIR = libDir;
     }
     
     /**
@@ -147,20 +147,17 @@ public class RunAllProofsTest extends TestCase {
         // Compute directory that contains the compiled KeY classes
         String keyBinaries = KEY_HOME + File.separator + "system" + File.separator + "binary";
         // Start process
-        ProcessBuilder sb = new ProcessBuilder("java", 
-                                               "-cp", "\"" + keyBinaries + "\";\"" + KEY_LIB_DIR + File.separator + "antlr.jar\";\"" + KEY_LIB_DIR + File.separator + "javacc.jar\";\"" + KEY_LIB_DIR + File.separator + "junit.jar\";\"" + KEY_LIB_DIR + File.separator + "objenesis.jar\";\"" + KEY_LIB_DIR + File.separator + "recoderKey.jar\"", 
-                                               "de.uka.ilkd.key.gui.Main",
-                                               fileToTest.getAbsolutePath(), 
-                                               "auto");
-        System.out.println("Starting process: " + sb.command());
-        Process process = sb.start();
-        InputStream in = process.getInputStream();
-        InputStream err = process.getErrorStream();
-        while (isAlive(process)) {
-            copyStream(in, System.out);
-            copyStream(err, System.err);
-            Thread.sleep(100);
-        }
+        ProcessBuilder pb = new ProcessBuilder("java", 
+                "-cp", keyBinaries + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "antlr.jar" + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "javacc.jar" + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "junit.jar" + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "recoderKey.jar",
+                "de.uka.ilkd.key.core.Main", "--auto",
+                fileToTest.getAbsolutePath());
+        System.out.println("Starting process: " + pb.command());
+        Process process = pb.inheritIO().start();
+        process.waitFor();
+//        process.waitFor(5, TimeUnit.SECONDS); // wait until subprocess has finished
+//        if(process.isAlive()){
+//            process.destroy();
+//        }
         if (successExpected) {
             assertSame(0, process.exitValue());
         }
@@ -251,7 +248,6 @@ public class RunAllProofsTest extends TestCase {
      * @param defaultHeader The default header to use.
      * @param exampleDir The example directory to use.
      * @param indexFile The index file to read test files from.
-     * @param successExpected Expected system exit value in a test.
      * @return The created parameters.
      * @throws IOException Occurred Exception.
      */
