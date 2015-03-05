@@ -9,11 +9,17 @@ Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
 The KeY system is protected by the GNU General
 Public License. See LICENSE.TXT for details.
 
-system 		  contains sources of all software.
+deployment        Folder which will be filled during deploying KeY.
 
-examples 	contains some programming examples
-		to illustrate use of various packages.
+doc               Additional documentation of KeY.
 
-LICENSE.TXT       information on how KeY is protected
+key.*             A component of KeY. It contains source code and all required 
+                  resources and libraries. A component is defined by a ready
+                  to use Eclipse project. Import all components into your
+                  Ecipse workspace to develop KeY.
 
-README.install.*  installation information
+scripts           Scripts to deploy KeY.
+
+LICENSE.TXT       Information on how KeY is protected
+
+README.install.*  Installation information
