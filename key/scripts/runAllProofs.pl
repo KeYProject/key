@@ -11,9 +11,9 @@ use POSIX qw(strftime);
 #
 # Configuration variables
 my $orig_path = &getcwd;
-my $path_to_key = realpath(dirname($0) . "/../key.core");
+my $path_to_key = realpath(dirname($0) . "/../key.ui/");
 my $path_to_examples = $path_to_key . "/examples/";
-my $path_to_automated = "index/";
+my $path_to_automated = "/index/";
 my $path_to_header = $path_to_examples . $path_to_automated . "headerJavaDL.txt";
 my $path_to_index = $path_to_examples . $path_to_automated . "automaticJAVADL.txt";
 #my $path_to_index = $path_to_examples . $path_to_automated . "big.txt";

@@ -45,10 +45,11 @@ use Getopt::Long;
 
 #
 # Configuration variables
-my $path_to_key = realpath(dirname($0) . "/..");
-my $path_to_examples = $path_to_key . "/examples/";
-my $path_to_proofs = $path_to_examples . "taclets/";
-my $path_to_rules = $path_to_key . "/system/resources/de/uka/ilkd/key/proof/rules";
+my $path_to_key = realpath(dirname($0) . "/../key.ui");
+my $path_to_key_core = realpath(dirname($0) . "/../key.core");
+my $path_to_examples = $path_to_key . "/examples";
+my $path_to_proofs = $path_to_examples . "/taclets";
+my $path_to_rules = $path_to_key_core . "/resources/de/uka/ilkd/key/proof/rules";
 my $iso8601now = strftime("%Y-%m-%dT%H:%M:%S", localtime(time()));
 # time out set to 30 minutes
 my $time_limit = 30*60; 

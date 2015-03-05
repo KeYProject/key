@@ -124,7 +124,7 @@ public class TestKey extends TestSuite {
 	de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
 
         TestSuite suite = new TestSuite();
-        suite.addTest(createSuite(utilityTests, "Testing Utilities and Collections"));
+        suite.addTest(createSuite(utilityTests, "Testing KeY specific Utilities"));
         suite.addTest(createSuite(logicModelTests, "Testing Logic Engine"));	
         suite.addTest(createSuite(parserTests, "Testing Parsers"));
         suite.addTest(createSuite(ruleTests, "Testing Rule Engine"));

@@ -41,10 +41,6 @@ fi
 
 # For debugging reasons disable JIT (otherwise strace doesn't work)
 JAVA_OPTIONS=""
-#JAVA_OPTIONS=-classic
-
-# Uncomment the following definition for remote debugging on port 1234
-#JAVA_OPTIONS='-DKeyDebugFlag=on -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1234'
 
 #
 # Now $KEY_HOME
@@ -68,7 +64,7 @@ KEY_LIB="$KEY_HOME/key.core/lib"
 
 key_ext_jars="antlr.jar recoderKey.jar"
 
-keyclasspath="$KEY_HOME/key.core/bin:$KEY_HOME/key.ui/bin:$KEY_HOME/key.util/bin"
+keyclasspath="$KEY_HOME/key.core/bin:$KEY_HOME/key.ui/bin:$KEY_HOME/key.util/bin:$KEY_HOME/key.core.proof_reference/bin:$KEY_HOME/key.core.symbolic_execution/bin:$KEY_HOME/key.core.testgen/bin"
 
 
 for i in $key_ext_jars ; do
@@ -227,24 +223,8 @@ then
 mkdir "$HOME/.key"
 fi
 
-
-# Fallback for KeY-specific binaries
-PATH=${PATH}:$KEY_LIB
-export PATH
-
-
-
-#
-# This command actually runs KeY
-#
-#-server \
-#-XX:CompileThreshold=1500 \
-# -ea:de.uka.ilkd.key... -Xms64m -Xmx2048m \
-
-
 $JAVA $JAVA_OPTIONS $keysysprops \
 -ea:de.uka.ilkd.key... $javaOptionXms $javaOptionXmx \
--Dkey.home="$KEY_HOME" \
 -Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler \
 -splash:"$KEY_HOME/system/resources/de/uka/ilkd/key/gui/images/key22.gif" \
 -classpath "$keyclasspath" de.uka.ilkd.key.core.Main "$@"
