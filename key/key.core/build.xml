@@ -6,6 +6,11 @@
 	<property name="dist.dir"  value="${basedir}/../deployment" />
 	<property name="ext.dir" value="${basedir}/lib" />
 
+	<property environment="env"/>
+	 <condition property="key.version" value="${env.KEY_VERSION}" else="2.5">
+	   <isset property="env.KEY_VERSION"/>
+	 </condition>
+
 	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
 		<mkdir dir="${dist.dir}"/>
 		<copy todir="${dist.dir}">
@@ -30,9 +35,15 @@
 			<classpath>
 				<pathelement location="${ext.dir}/antlr.jar"/>
 				<pathelement location="${ext.dir}/recoderKey.jar"/>
-				<pathelement location="${dist.dir}/key.util.jar"/>
+				<pathelement location="${basedir}/../key.util/bin/"/>
 			</classpath>
 		</javac>
+		<exec executable="git" outputproperty="git.revision">
+		  <arg value="rev-parse"/>
+		  <arg value="HEAD"/>
+		</exec>		
+		<echo file="${build.dir}/de/uka/ilkd/key/util/sha1">${git.revision}</echo> 
+		<echo file="${build.dir}/de/uka/ilkd/key/util/version">${key.version}</echo> 
 	</target>
 
   <target name="prepare">
@@ -43,7 +54,8 @@
    <mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/proofjava"/>
    <mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation"/>
    <mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation"/>
-   
+   <property name="lib.dir" value="${basedir}/../key.core/lib"/>
+
    <mkdir dir="${build.dir}"/>
 
    <uptodate property="keylexer.notRequired"

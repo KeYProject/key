@@ -4,8 +4,18 @@
 	<property name="build.dir" value="${basedir}/bin" />
 	<property name="dist.dir"  value="${basedir}/../deployment" />
 
-	<target name="start" depends="deploy" description="Starts the deployed KeY.">
-		<java jar="${dist.dir}/key.ui.jar" fork="true" jvmargs="-Xmx2048m -XX:MaxPermSize=256m -ea" />
+	<path id="key.ui.class.path">
+	  <pathelement path="${basedir}/../key.ui/bin"/>
+	  <pathelement path="${basedir}/../key.util/bin"/>
+	  <pathelement path="${basedir}/../key.core/bin"/>
+	  <pathelement path="${basedir}/../key.core.testgen/bin"/>
+	  <pathelement location="${basedir}/../key.core/lib/antlr.jar"/>
+	  <pathelement location="${basedir}/../key.core/lib/recoderKey.jar"/>
+	</path>
+
+	<target name="start" depends="compile" description="Starts KeY.">
+		<java classname="de.uka.ilkd.key.core.Main"
+		      classpathref="key.ui.class.path" fork="true" jvmargs="-Xmx2048m -XX:MaxPermSize=256m -ea" />
 	</target>
 
 	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
@@ -24,13 +34,7 @@
 		       debug="on" 
 		       depend="${build.depend}" 
 		       optimize="off">
-			<classpath>
-				<pathelement location="${dist.dir}/key.core.testgen.jar"/>
-				<pathelement location="${dist.dir}/key.core.jar"/>
-				<pathelement location="${dist.dir}/antlr.jar"/>
-				<pathelement location="${dist.dir}/recoderKey.jar"/>
-				<pathelement location="${dist.dir}/key.util.jar"/>
-			</classpath>
+		  <classpath refid="key.ui.class.path"/>
 		</javac>
 	</target>
 

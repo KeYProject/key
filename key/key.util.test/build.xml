@@ -31,7 +31,7 @@
 			<jvmarg value="-XX:MaxPermSize=256m"/>
 			<jvmarg value="-ea"/>
 			<classpath>
-				<pathelement location="${dist.dir}/key.util.jar"/>
+				<pathelement path="${basedir}/../key.util/bin"/>
 				<pathelement location="${ext.dir}/junit-4.12.jar"/>
 				<pathelement location="${ext.dir}/hamcrest-core-1.3.jar"/>
 				<pathelement path="${build.dir}"/>
@@ -54,7 +54,7 @@
 		       depend="${build.depend}" 
 		       optimize="off">
 			<classpath>
-				<pathelement location="${dist.dir}/key.util.jar"/>
+				<pathelement path="${basedir}/../key.util/bin"/>
 				<pathelement location="${ext.dir}/junit-4.12.jar"/>
 				<pathelement location="${ext.dir}/hamcrest-core-1.3.jar"/>
 			</classpath>

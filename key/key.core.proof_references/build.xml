@@ -2,6 +2,7 @@
 <project name="key.core.proof_references" default="deploy" basedir=".">
 	<property name="src.dir"   value="${basedir}/src" />
 	<property name="build.dir" value="${basedir}/bin" />
+	<property name="lib.dir" value="${basedir}/../key.core/lib"/>
 	<property name="dist.dir"  value="${basedir}/../deployment" />
 
 	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
@@ -21,10 +22,10 @@
 		       depend="${build.depend}" 
 		       optimize="off">
 			<classpath>
-				<pathelement location="${dist.dir}/key.core.jar"/>
-				<pathelement location="${dist.dir}/antlr.jar"/>
-				<pathelement location="${dist.dir}/recoderKey.jar"/>
-				<pathelement location="${dist.dir}/key.util.jar"/>
+				<pathelement path="${basedir}/../key.core/bin"/>
+				<pathelement path="${basedir}/../key.util/bin"/>
+				<pathelement location="${lib.dir}/antlr.jar"/>
+				<pathelement location="${lib.dir}/recoderKey.jar"/>
 			</classpath>
 		</javac>
 	</target>
