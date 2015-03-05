@@ -9,6 +9,8 @@
   	        <mkdir dir="${test.reports}" />
 		<junit printsummary="withOutAndErr" haltonfailure="yes"
 		       fork="yes" forkMode="once" haltonerror="yes"
+		       failureproperty="test.failedOrError"
+		       errorproperty="test.failedOrError"
 		       enableTestListenerEvents="false"
 		       showoutput="yes" dir="${basedir}">
 			<jvmarg value="-Xmx2048m"/>
@@ -27,6 +29,7 @@
 			<formatter type="xml"/>
 			<test name="de.uka.ilkd.key.symbolic_execution.suite.AllSETests" todir="${test.reports}"/>
 		</junit>
+		<fail message="Test failure detected, check test results." if="test.failedOrError" />
 	</target>
 
 	<target name="runTests" depends="compile">
