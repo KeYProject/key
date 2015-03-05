@@ -44,9 +44,10 @@ public class ProfileEditorDialog extends StatusDialog {
       label.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
 
       GridData data = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
+      data.heightHint = 350;
 
       this.supportedGenericSpecifications = new Table(myComposite, SWT.V_SCROLL
-            | SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION);
+            | SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION | SWT.CHECK);
       this.supportedGenericSpecifications.setLayoutData(data);
       this.supportedGenericSpecifications.setHeaderVisible(true);
       this.supportedGenericSpecifications.setLinesVisible(true);
