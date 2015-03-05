@@ -61,14 +61,14 @@
 			<locationURI>$%7BPARENT-5-PROJECT_LOC%7D/key/key.core.proof_references.test</locationURI>
 		</link>
 		<link>
-			<name>key.core.se</name>
+			<name>key.core.symbolic_execution</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-5-PROJECT_LOC%7D/key/key.core.se</locationURI>
+			<locationURI>$%7BPARENT-5-PROJECT_LOC%7D/key/key.core.symbolic_execution</locationURI>
 		</link>
 		<link>
-			<name>key.core.se.test</name>
+			<name>key.core.symbolic_execution.test</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-5-PROJECT_LOC%7D/key/key.core.se.test</locationURI>
+			<locationURI>$%7BPARENT-5-PROJECT_LOC%7D/key/key.core.symbolic_execution.test</locationURI>
 		</link>
 		<link>
 			<name>key.core.testgen</name>

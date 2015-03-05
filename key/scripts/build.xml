@@ -10,8 +10,11 @@
 		<ant antfile="${basedir}/../key.core/build.xml" target="deploy" dir="${basedir}/../key.core" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.testgen/build.xml" target="deploy" dir="${basedir}/../key.core.testgen" inheritall="false"/>
 		<ant antfile="${basedir}/../key.ui/build.xml" target="deploy" dir="${basedir}/../key.ui" inheritall="false"/>
-		<ant antfile="${basedir}/../key.core.se/build.xml" target="deploy" dir="${basedir}/../key.core.se" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.symbolic_execution/build.xml" target="deploy" dir="${basedir}/../key.core.symbolic_execution" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.proof_references/build.xml" target="deploy" dir="${basedir}/../key.core.proof_references" inheritall="false"/>
+		<copy todir="${basedir}/../deployment">
+			<fileset file="${basedir}/../LICENSE.TXT"/>
+		</copy>
 	</target>
 
 	<target name="cleanAll">
@@ -19,7 +22,7 @@
 		<ant antfile="${basedir}/../key.core/build.xml" target="clean" dir="${basedir}/../key.core" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.testgen/build.xml" target="clean" dir="${basedir}/../key.core.testgen" inheritall="false"/>
 		<ant antfile="${basedir}/../key.ui/build.xml" target="clean" dir="${basedir}/../key.ui" inheritall="false"/>
-		<ant antfile="${basedir}/../key.core.se/build.xml" target="clean" dir="${basedir}/../key.core.se" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.symbolic_execution/build.xml" target="clean" dir="${basedir}/../key.core.symbolic_execution" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.proof_references/build.xml" target="clean" dir="${basedir}/../key.core.proof_references" inheritall="false"/>
 	</target>
 
@@ -29,7 +32,7 @@
 		<ant antfile="${basedir}/../key.core.test/build.xml" target="runTests" dir="${basedir}/../key.core.test" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.testgen.test/build.xml" target="runTests" dir="${basedir}/../key.core.testgen.test" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.proof_references/build.xml" target="runTests" dir="${basedir}/../key.core.proof_references" inheritall="false"/>
-		<ant antfile="${basedir}/../key.core.se.test/build.xml" target="runTests" dir="${basedir}/../key.core.se.test" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.symbolic_execution.test/build.xml" target="runTests" dir="${basedir}/../key.core.symbolic_execution.test" inheritall="false"/>
 	</target>
 
 	<target name="compileAllTests" depends="deployAll">
@@ -37,7 +40,7 @@
 		<ant antfile="${basedir}/../key.core.test/build.xml" target="compile" dir="${basedir}/../key.core.test" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.testgen.test/build.xml" target="compile" dir="${basedir}/../key.core.testgen.test" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.proof_references/build.xml" target="compile" dir="${basedir}/../key.core.proof_references" inheritall="false"/>
-		<ant antfile="${basedir}/../key.core.se.test/build.xml" target="compile" dir="${basedir}/../key.core.se.test" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.symbolic_execution.test/build.xml" target="compile" dir="${basedir}/../key.core.symbolic_execution.test" inheritall="false"/>
 	</target>
 
 	<target name="cleanAllTests">
@@ -45,6 +48,6 @@
 		<ant antfile="${basedir}/../key.core.test/build.xml" target="clean" dir="${basedir}/../key.core.test" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.testgen.test/build.xml" target="clean" dir="${basedir}/../key.core.testgen.test" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.proof_references/build.xml" target="clean" dir="${basedir}/../key.core.proof_references" inheritall="false"/>
-		<ant antfile="${basedir}/../key.core.se.test/build.xml" target="clean" dir="${basedir}/../key.core.se.test" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.symbolic_execution.test/build.xml" target="clean" dir="${basedir}/../key.core.symbolic_execution.test" inheritall="false"/>
 	</target>
 </project>

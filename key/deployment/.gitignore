@@ -6,5 +6,6 @@
 /Antlr.License.txt
 /key.core.jar
 /key.core.proof_references.jar
-/key.core.se.jar
+/key.core.symbolic_execution.jar
 /key.core.testgen.jar
+/LICENSE.TXT

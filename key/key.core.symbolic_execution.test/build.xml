@@ -11,7 +11,7 @@
 			<jvmarg value="-ea"/>
 			<classpath>
 				<pathelement path="${build.dir}"/>
-				<pathelement location="${dist.dir}/key.core.se.jar"/>
+				<pathelement location="${dist.dir}/key.core.symbolic_execution.jar"/>
 				<pathelement path="${basedir}/../key.core.test/bin"/>
 				<pathelement location="${dist.dir}/key.core.jar"/>
 				<pathelement path="${basedir}/../key.util.test/bin"/>
@@ -35,7 +35,7 @@
 		       depend="${build.depend}" 
 		       optimize="off">
 			<classpath>
-				<pathelement location="${dist.dir}/key.core.se.jar"/>
+				<pathelement location="${dist.dir}/key.core.symbolic_execution.jar"/>
 				<pathelement path="${basedir}/../key.core.test/bin"/>
 				<pathelement location="${dist.dir}/key.core.jar"/>
 				<pathelement path="${basedir}/../key.util.test/bin"/>
