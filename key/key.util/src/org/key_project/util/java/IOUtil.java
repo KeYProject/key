@@ -676,11 +676,15 @@ public final class IOUtil {
    public static boolean exists(File file) {
       return file != null && file.exists();
    }
-
+   
+   public static final URL getClassLocationURL(Class<?> classInstance) {
+      CodeSource cs = classInstance.getProtectionDomain().getCodeSource();
+      return cs != null ? cs.getLocation() : null;
+   }
+   
    public static final File getClassLocation(Class<?> classInstance) {
       if (classInstance != null) {
-         CodeSource cs = classInstance.getProtectionDomain().getCodeSource();
-         return cs != null ? toFile(cs.getLocation()) : null;
+         return toFile(getClassLocationURL(classInstance));
       }
       else {
          return null;

@@ -369,7 +369,7 @@ public final class ExampleChooser extends JDialog {
     //internal methods
     //-------------------------------------------------------------------------
 
-    private static File lookForExamples() {
+    public static File lookForExamples() {
         // greatly simplified version without parent path lookup.
         return new File(IOUtil.getProjectRoot(ExampleChooser.class), EXAMPLES_PATH);
     }

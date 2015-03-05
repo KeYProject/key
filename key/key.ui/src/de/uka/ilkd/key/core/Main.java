@@ -21,6 +21,7 @@ import java.util.ServiceLoader;
 import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.RecentFileMenu.RecentFileEntry;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
@@ -459,9 +460,19 @@ public final class Main {
                     }
                 }
             }
+            ensureExamplesAvailable();
             return mainWindow.getUserInterface();
         }
 
+    }
+    
+    public static void ensureExamplesAvailable() {
+       File examplesDir = getExamplesDir() == null ? 
+                          ExampleChooser.lookForExamples() : 
+                          new File(getExamplesDir());
+       if (!examplesDir.exists()) {
+          setExamplesDir(WebstartMain.setupExamples().getAbsolutePath());
+       }
     }
 
     private static void updateSplashScreen() {

@@ -5,11 +5,12 @@
 	<property name="dist.dir"  value="${basedir}/../deployment" />
 
 	<target name="start" depends="deploy" description="Starts the deployed KeY.">
-		<java jar="${dist.dir}/key.ui.jar" fork="true" jvmargs="-Xmx2048m -XX:MaxPermSize=256m"/>
+		<java jar="${dist.dir}/key.ui.jar" fork="true" jvmargs="-Xmx2048m -XX:MaxPermSize=256m -ea" />
 	</target>
 
 	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
 		<mkdir dir="${dist.dir}"/>
+		<zip destfile="${build.dir}/examples.zip" basedir="${basedir}/examples" />
 		<jar destfile="${dist.dir}/key.ui.jar" basedir="${build.dir}" manifest="${basedir}/META-INF/MANIFEST.MF" />
 	</target>
 

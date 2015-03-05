@@ -17,8 +17,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.jar.JarInputStream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import org.key_project.util.java.IOUtil;
 
 
 public class WebstartMain {
@@ -26,27 +28,17 @@ public class WebstartMain {
     private static final int BUFFER_SIZE = 4096;
 
 
-    private static void delete(File f) {
-        if(f.isDirectory()) {
-            for(File c : f.listFiles()) {
-                delete(c);
-            }
-        }
-        f.delete();
-    } 
-
-
     public static File setupExamples() {
         try {
-            URL examplesURL = WebstartMain.class.getResource("/examples.jar");	
+            URL examplesURL = WebstartMain.class.getResource("/examples.zip");	
             if(examplesURL == null) {
-                throw new IOException("Missing examples.jar in resources");
+                throw new IOException("Missing examples.zip in resources");
             }
 
             File tempDir = createTempDirectory();
             System.out.println(tempDir);
 
-            JarInputStream zis = new JarInputStream(examplesURL.openStream());
+            ZipInputStream zis = new ZipInputStream(examplesURL.openStream());
 
             try {
                 byte[] buffer = new byte[BUFFER_SIZE];
@@ -100,7 +92,7 @@ public class WebstartMain {
         }
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
-                delete(tempDir);
+                IOUtil.delete(tempDir);
             }
         });
         return tempDir;
