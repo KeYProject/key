@@ -52,7 +52,6 @@ import de.uka.ilkd.key.smt.lang.SMTTermMultOp;
 import de.uka.ilkd.key.smt.lang.SMTTermNumber;
 import de.uka.ilkd.key.smt.lang.SMTTermVariable;
 import de.uka.ilkd.key.smt.lang.Util;
-import de.uka.ilkd.key.testgen.ProofInfo;
 import de.uka.ilkd.key.util.Debug;
 
 public class SMTObjTranslator implements SMTTranslator {
@@ -94,7 +93,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	/**
 	 * Info regarding the selected proof.
 	 */
-	private ProofInfo proofInfo;
+	private final KeYJavaType typeOfClassUnderTest;
 	/**
 	 * Assertions regarding Any2Object, Any2BInt, Object2Any, etc. functions.
 	 */
@@ -216,11 +215,11 @@ public class SMTObjTranslator implements SMTTranslator {
 	 */
 	private static boolean guardOverflow = true;
 
-	public SMTObjTranslator(SMTSettings settings, Services services, ProofInfo proofInfo) {
+	public SMTObjTranslator(SMTSettings settings, Services services, KeYJavaType typeOfClassUnderTest) {
 		super();
 		this.settings = settings;
 		this.services = services;
-		this.proofInfo = proofInfo;
+		this.typeOfClassUnderTest = typeOfClassUnderTest;
 		types = new ProblemTypeInformation(services);
 		initSorts();
 		initOpTable();
@@ -294,8 +293,8 @@ public class SMTObjTranslator implements SMTTranslator {
 		        sorts.get(OBJECT_SORT));
 		def.setComment("The self object");
 		
-		if(proofInfo.getTypeOfClassUnderTest()!=null){
-			     Sort sort = proofInfo.getTypeOfClassUnderTest().getSort();
+		if(typeOfClassUnderTest!=null){
+			     Sort sort = typeOfClassUnderTest.getSort();
 			     //System.out.println("Sort: "+sort);
 			     forceAddTypePredicate(sort);
 			     SMTFunction tp = getTypePredicate(sort.name().toString());

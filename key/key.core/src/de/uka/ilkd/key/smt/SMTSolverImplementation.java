@@ -19,10 +19,11 @@ import java.util.LinkedList;
 import java.util.concurrent.locks.ReentrantLock;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
-import de.uka.ilkd.key.testgen.ProofInfo;
 
 interface SolverListener {
         void processStarted(SMTSolver solver, SMTProblem problem);
@@ -344,8 +345,9 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
 
         	if(getType() == SolverType.Z3_CE_SOLVER){
-        		ProofInfo info = new ProofInfo(problem.getGoal().proof());
-        		SMTObjTranslator objTrans = new SMTObjTranslator(smtSettings, services,info);
+        	   Proof proof = problem.getGoal().proof();
+        	   KeYJavaType typeOfClassUnderTest = proof.getServices().getSpecificationRepository().getProofOblInput(proof).getContainerType();
+        		SMTObjTranslator objTrans = new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
         		problemString = objTrans.translateProblem(term, services, smtSettings).toString();
         		problemTypeInformation = objTrans.getTypes();
         		ModelExtractor query = objTrans.getQuery();

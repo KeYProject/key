@@ -1,6 +1,9 @@
-package de.uka.ilkd.key.smt.testgen;
+package de.uka.ilkd.key.testcase.smt.testgen;
 
 import java.io.File;
+
+import org.junit.Test;
+import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -8,10 +11,13 @@ import de.uka.ilkd.key.macros.TestGenMacro;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.test.TestCommons;
-import de.uka.ilkd.key.util.HelperClassForTests;
 
 public class TestTestgen extends TestCommons{
-	public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY
+   public static final String TESTCASE_DIRECTORY = IOUtil.getProjectRoot(TestTestgen.class) + 
+                                                   File.separator + "resources" + 
+                                                   File.separator + "testcase";
+   
+	public static final String testFile = TESTCASE_DIRECTORY
 	        + File.separator + "smt" + File.separator + "tg" + File.separator;
 	private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
 	private static boolean isInstalled = false;
@@ -54,8 +60,10 @@ public class TestTestgen extends TestCommons{
 		return type;
 	}
 	
+	@Test
 	public void testMiddle() throws Exception {
 		File file = new File(testFile + "middle.key");
+		assertTrue(file.exists());
 		KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file, null, null);
 		try {
 		   Proof proof = env.getLoadedProof();

@@ -196,6 +196,7 @@ public abstract class TestCommons extends TestCase {
 	 * @return ProofAggregate of the problem file.
 	 */
 	protected ProofAggregate parse(File file, Profile pro) {
+	   assertTrue(file.exists());
 		ProofAggregate result = null;
 		try {
 			KeYUserProblemFile po = new KeYUserProblemFile(file.getName(),

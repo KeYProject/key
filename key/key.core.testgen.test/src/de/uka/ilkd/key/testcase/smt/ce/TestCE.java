@@ -1,6 +1,9 @@
-package de.uka.ilkd.key.smt.ce;
+package de.uka.ilkd.key.testcase.smt.ce;
 
 import java.io.File;
+
+import org.junit.Test;
+import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -11,10 +14,13 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.test.TestCommons;
-import de.uka.ilkd.key.util.HelperClassForTests;
 
 public class TestCE extends TestCommons {
-	public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY
+   public static final String TESTCASE_DIRECTORY = IOUtil.getProjectRoot(TestCE.class) + 
+                                                   File.separator + "resources" + 
+                                                   File.separator + "testcase";
+   
+	public static final String testFile = TESTCASE_DIRECTORY
 	        + File.separator + "smt" + File.separator + "ce" + File.separator;
 	private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
 	private static boolean isInstalled = false;
@@ -56,51 +62,62 @@ public class TestCE extends TestCommons {
 		}
 		return type;
 	}
-
+	@Test
 	public void testOverFlow1() {
 		assertTrue(this.correctResult(testFile + "overflow1.key", true));
 	}
 
+   @Test
 	public void testOverFlow2() {
 		assertTrue(this.correctResult(testFile + "overflow2.key", true));
 	}
 
+   @Test
 	public void testTypes1() {
 		assertTrue(this.correctResult(testFile + "types1.key", true));
 	}
 
+   @Test
 	public void testTypes2() {
 		assertTrue(this.correctResult(testFile + "types2.key", true));
 	}
 
+   @Test
 	public void testTypes3() {
 		assertTrue(this.correctResult(testFile + "types3.key", false));
 	}
 
+   @Test
 	public void testTypes4() {
 		assertTrue(this.correctResult(testFile + "types4.key", true));
 	}
 
+   @Test
 	public void testTypes5() {
 		assertTrue(this.correctResult(testFile + "types5.key", false));
 	}
 
+   @Test
 	public void testTypes6() {
 		assertTrue(this.correctResult(testFile + "types6.key", true));
 	}
 
+   @Test
 	public void testTypes7() {
 		assertTrue(this.correctResult(testFile + "types7.key", true));
 	}
 
+   @Test
 	public void testTypes8() {
 		assertTrue(this.correctResult(testFile + "types8.key", true));
 	}
 
+   @Test
 	public void testTypes9() {
 		assertTrue(this.correctResult(testFile + "types9.key", true));
 	}
 
+   @Test
 	public void testMiddle() throws Exception {
 		File file = new File(testFile + "middle.key");
 		KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file, null, null);
