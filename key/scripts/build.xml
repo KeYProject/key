@@ -18,6 +18,7 @@
 		<ant antfile="${basedir}/../key.ui/build.xml" target="compile" dir="${basedir}/../key.ui" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.symbolic_execution/build.xml" target="compile" dir="${basedir}/../key.core.symbolic_execution" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.proof_references/build.xml" target="compile" dir="${basedir}/../key.core.proof_references" inheritall="false"/>
+      <ant antfile="${basedir}/../key.core.example/build.xml" target="compile" dir="${basedir}/../key.core.example" inheritall="false"/>
 	</target>
 
 	<target name="deployAll">
@@ -38,6 +39,7 @@
 		<ant antfile="${basedir}/../key.ui/build.xml" target="deploy" dir="${basedir}/../key.ui" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.symbolic_execution/build.xml" target="deploy" dir="${basedir}/../key.core.symbolic_execution" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.proof_references/build.xml" target="deploy" dir="${basedir}/../key.core.proof_references" inheritall="false"/>
+      <ant antfile="${basedir}/../key.core.example/build.xml" target="deploy" dir="${basedir}/../key.core.example" inheritall="false"/>
 		<!-- Deploy license -->
 		<copy todir="${basedir}/../deployment">
 			<fileset file="${basedir}/../LICENSE.TXT"/>
@@ -61,6 +63,7 @@
 		<ant antfile="${basedir}/../key.ui/build.xml" target="clean" dir="${basedir}/../key.ui" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.symbolic_execution/build.xml" target="clean" dir="${basedir}/../key.core.symbolic_execution" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.proof_references/build.xml" target="clean" dir="${basedir}/../key.core.proof_references" inheritall="false"/>
+      <ant antfile="${basedir}/../key.core.example/build.xml" target="clean" dir="${basedir}/../key.core.example" inheritall="false"/>
 		<!-- Delete deployed files -->
 		<delete file="${basedir}/../deployment/LICENSE.TXT" failonerror="false" />
       <delete file="${basedir}/../deployment/KeY.jar" failonerror="false" />

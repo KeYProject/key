@@ -63,6 +63,9 @@ LICENSE.TXT       Information on how KeY is licensed.
 	   	* key.ui
 	   	* key.util
 	   	* key.util.test
+	      (* key.core.example   Shows how to programmatically verify all proof 
+	                            obligations of the source code and is not used by 
+	                            KeY itself.)
 
 	   Attention: The Java projects are not used by the KeY-Based Eclipse 
 	              Projects. Instead the Plug-in projects of '../KeY4Eclipse' have
