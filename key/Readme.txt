@@ -7,7 +7,7 @@ This is the KeY project - Integrated Deductive Software Design
 Copyright (C) 2001-2011 Universität Karlsruhe, Germany
                         Universität Koblenz-Landau, Germany
                         and Chalmers University of Technology, Sweden
-Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+Copyright (C) 2011-2015 Karlsruhe Institute of Technology, Germany
                         Technical University Darmstadt, Germany
                         Chalmers University of Technology, Sweden
 
