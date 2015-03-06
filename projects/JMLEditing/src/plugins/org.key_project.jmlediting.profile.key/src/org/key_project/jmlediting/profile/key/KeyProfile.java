@@ -25,6 +25,7 @@ import org.key_project.jmlediting.profile.key.locset.ReachLocsParser;
 import org.key_project.jmlediting.profile.key.locset.SetMinusOperatorKeyword;
 import org.key_project.jmlediting.profile.key.locset.SetUnionOperatorKeyword;
 import org.key_project.jmlediting.profile.key.other.DynamicLogicPrimary;
+import org.key_project.jmlediting.profile.key.other.IndexKeyword;
 import org.key_project.jmlediting.profile.key.other.InvKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAccessibleKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAssignableKeyword;
@@ -82,6 +83,9 @@ public class KeyProfile extends JMLReferenceProfile {
       supportedPrimaries.add(new SeqPrimary());
       this.putExtension(ExpressionParser.CONDITONAL_EXPR_SUFFIXES,
             SeqExpressionParser.seqExpressionSuffix(this), ParseFunction.class);
+
+      // Other keywords
+      supportedKeywords.addAll(Arrays.asList(new IndexKeyword()));
    }
 
    private static void replace(final Set<IKeyword> keywords,

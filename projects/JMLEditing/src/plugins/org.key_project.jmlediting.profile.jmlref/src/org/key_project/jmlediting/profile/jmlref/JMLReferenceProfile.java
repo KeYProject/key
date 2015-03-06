@@ -38,7 +38,10 @@ import org.key_project.jmlediting.profile.jmlref.quantifier.QuantifierPrimary;
 import org.key_project.jmlediting.profile.jmlref.quantifier.SumQuantifierKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.DivergesKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.EnsuresKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.MeasuredByKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.SignalsKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.requires.RequiresKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.requires.SameKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.OldKeyword;
@@ -73,33 +76,30 @@ public class JMLReferenceProfile extends AbstractJMLProfile {
     *           the keyword locale for AE/BE
     */
    public JMLReferenceProfile(final KeywordLocale lang) {
-      this.getSupportedKeywordsInternal()
-            .addAll(
-                  Arrays.asList(new EnsuresKeyword(), new AssignableKeyword(),
-                        new AccessibleKeyword(), new RequiresKeyword(),
-                        new BehaviorKeyword(lang),
-                        new ExceptionalBehaviorKeyword(lang),
-                        new NormalBehaviorKeyword(lang), new AlsoKeyword(),
-                        new HelperKeyword(), new PureKeyword(),
-                        new PrivateKeyword(), new ProtectedKeyword(),
-                        new PublicKeyword(), new SpecProtectedKeyword(),
-                        new SpecPublicKeyword(), new EverythingKeyword(),
-                        new NothingKeyword(), new NotSpecifiedKeyword(),
-                        new ResultKeyword(), new OldKeyword(),
-                        new SameKeyword(), new ForallQuantifierKeyword(),
-                        new ExistentialQuantifierKeyword(),
-                        new MinQuantifierKeyword(), new MaxQuantifierKeyword(),
-                        new ProductQuantifierKeyword(),
-                        new SumQuantifierKeyword(),
-                        new NumOfQuantifierKeyword(),
-                        new NonNullBoundModKeyword(),
-                        new NullableBoundModKeyword(), new InvariantKeyword(),
-                        new LoopInvariantKeyword(), new DecreasingKeyword(),
-                        new InvariantForKeyword(), new SuchThatKeyword(),
-                        new SetKeyword(), new ModelKeyword(),
-                        new GhostKeyword(), new RepresentsKeyword(),
-                        new NonNullKeyword(), new NullableKeyword(),
-                        new RealKeyword(), new BigIntKeyword()));
+      this.getSupportedKeywordsInternal().addAll(
+            Arrays.asList(new EnsuresKeyword(), new AssignableKeyword(),
+                  new AccessibleKeyword(), new RequiresKeyword(),
+                  new BehaviorKeyword(lang), new ExceptionalBehaviorKeyword(
+                        lang), new NormalBehaviorKeyword(lang),
+                  new AlsoKeyword(), new HelperKeyword(), new PureKeyword(),
+                  new PrivateKeyword(), new ProtectedKeyword(),
+                  new PublicKeyword(), new SpecProtectedKeyword(),
+                  new SpecPublicKeyword(), new EverythingKeyword(),
+                  new NothingKeyword(), new NotSpecifiedKeyword(),
+                  new ResultKeyword(), new OldKeyword(), new SameKeyword(),
+                  new ForallQuantifierKeyword(),
+                  new ExistentialQuantifierKeyword(),
+                  new MinQuantifierKeyword(), new MaxQuantifierKeyword(),
+                  new ProductQuantifierKeyword(), new SumQuantifierKeyword(),
+                  new NumOfQuantifierKeyword(), new NonNullBoundModKeyword(),
+                  new NullableBoundModKeyword(), new InvariantKeyword(),
+                  new LoopInvariantKeyword(), new DecreasingKeyword(),
+                  new InvariantForKeyword(), new SuchThatKeyword(),
+                  new SetKeyword(), new ModelKeyword(), new GhostKeyword(),
+                  new RepresentsKeyword(), new NonNullKeyword(),
+                  new NullableKeyword(), new RealKeyword(),
+                  new BigIntKeyword(), new DivergesKeyword(),
+                  new MeasuredByKeyword(), new SignalsKeyword()));
 
       this.getSupportedPrimariesInternal().addAll(
             Arrays.asList(new KeywordJMLPrimary(), new QuantifierPrimary()));

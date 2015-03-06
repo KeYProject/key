@@ -45,6 +45,7 @@ public class ExpressionParser implements ParseFunction {
     * The parser for typeSpec.
     */
    private final ParseFunction typeSpecParser;
+   private final ParseFunction referenceType;
 
    private final ParseFunction assignmentExprParser;
 
@@ -64,6 +65,15 @@ public class ExpressionParser implements ParseFunction {
     */
    public ParseFunction typeSpec() {
       return this.typeSpecParser;
+   }
+
+   /**
+    * Returns the parser which parses reference types.
+    * 
+    * @return
+    */
+   public ParseFunction referenceType() {
+      return this.referenceType;
    }
 
    public ParseFunction assignmentExpr() {
@@ -445,5 +455,6 @@ public class ExpressionParser implements ParseFunction {
       this.dimsParser = dims;
       this.typeSpecParser = typeSpec;
       this.assignmentExprParser = assignmentExpr;
+      this.referenceType = referenceType;
    }
 }
