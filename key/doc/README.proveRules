@@ -16,8 +16,8 @@ taclets are sound in every (master) version of KeY.
 How it works
 ------------
 
-The script scans all .proof-files under "examples/taclets" and runs
-them. If any of them fails, a failed test case points to that problem.
+The script scans all .proof-files under "examples/taclets" in "key/key.ui" and
+runs them. If any of them fails, a failed test case points to that problem.
 
 Additionally it checks that for every taclet which is labelled as
 proved, there exists a loadable proof file. If a labelled taclet has no
@@ -32,7 +32,7 @@ and the rule name.
 
 Spurious labels are also reported by the script.
 
-The script is located at "bin/proveRules.pl". Use "-help" to get more
+The script is located at "key/scripts/proveRules.pl". Use "-help" to get more
 infos. It is invoked by Mr. Marvin Jenkins when the regression tests
 on the master branch are performed. Consider adding it to your side
 project in Jenkins.

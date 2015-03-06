@@ -13,15 +13,15 @@ source code is loaded, but needs to be run on the sources beforehand.
 2. Removing Generics from a Program
 -----------------------------------
 
-If you have the sources installed, the program is invoked from the KeY
+If you have the sources installed, the program is invoked from the key/key.core
 directory via: 
 
-    java -cp key-ext-jars/recoderKey.jar:system/binary/ \
+    java -cp lib/recoderKey.jar:bin/ \
         de.uka.ilkd.key.util.removegenerics.Main
 
 or, if the binaries have been installed:
 
-    java -cp key.jar:$HOME/local/keylib/recoderKey.jar \
+    java -cp <DIR_OF_KeY.jar>/components/key.core.jar:<DIR_OF_KeY.jar>/libs/recoderKey.jar \
         de.uka.ilkd.key.util.removegenerics.Main
 
 If you provide no parameters, a usage information is printed.

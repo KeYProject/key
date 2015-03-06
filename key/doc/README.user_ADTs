@@ -19,7 +19,7 @@ as either axiomatic or lemma. In order to prove lemma rules in KeY, axiomatic
 rules need to syntactically appear before others in the file. 
 
 The theory must be defined in file
-$key_maindir/system/resources/de/uka/ilkd/key/proof/rules/freeADT.key.  
-Example theories can be found under $key_maindir/examples/theories. 
-Copy one of these files to this location and run 'make copy' or 'ant copy' in
-$key_maindir/system.
+key/key.core/resources/de/uka/ilkd/key/proof/rules/freeADT.key.  
+Example theories can be found under key/key.ui/examples/theories. 
+Copy one of these files to this location and run 'ant compile' in
+key/key.core

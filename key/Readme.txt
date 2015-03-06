@@ -64,7 +64,7 @@ LICENSE.TXT       Information on how KeY is licensed.
 	   	  	* Import 'doc/KeYCodeStyle.xml' and select active profile 
 	   	  	  'KeY Code Style'
 
-	4) Import the following existing Eclipse Java projects
+	4) Import the following existing Eclipse Java projects (simply select the folder "key" in the import-dialog)
 	   	* key.core (no GUI components allowed; can only access key.util)
 	   	* key.core.proof_references (no GUI components allowed; can only access key.util, key.core)
 	   	* key.core.proof_references.test
@@ -104,6 +104,8 @@ Assuming you are in directory "key" (if you are in directory
 	3) Start KeY via ant script 'scripts/build.xml'
 
 	   	ant -buildfile scripts/build.xml start
+
+	   [[Linux users: the "key" shell script can also be used]]
 
 	3) Compile Tests via ant script 'scripts/build.xml'
 
