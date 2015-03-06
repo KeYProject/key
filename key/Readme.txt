@@ -1,6 +1,6 @@
 		********************************
 		*             KeY              * 
-		*        Version 2.4.0         *
+		*        Version 2.5           *
 		********************************
 
 This is the KeY project - Integrated Deductive Software Design
