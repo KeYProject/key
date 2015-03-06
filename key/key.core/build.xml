@@ -8,7 +8,7 @@
 
 	<property environment="env"/>
 	 <condition property="key.version" value="${env.KEY_VERSION}" else="2.5">
-	   <isset property="env.KEY_VERSION"/>
+	 	<isset property="env.KEY_VERSION"/>
 	 </condition>
 
 	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
@@ -38,9 +38,9 @@
 				<pathelement location="${basedir}/../key.util/bin/"/>
 			</classpath>
 		</javac>
-		<exec executable="git" outputproperty="git.revision">
-		  <arg value="rev-parse"/>
-		  <arg value="HEAD"/>
+		<exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
+			<arg value="rev-parse"/>
+			<arg value="HEAD"/>
 		</exec>		
 		<echo file="${build.dir}/de/uka/ilkd/key/util/sha1">${git.revision}</echo> 
 		<echo file="${build.dir}/de/uka/ilkd/key/util/version">${key.version}</echo> 
@@ -48,7 +48,7 @@
 
   <target name="prepare">
    <echo message="Please set (if you have not yet done so)  the environment variable ANT_OPTS to -Xms512m -Xmx512m" />
-   
+
    <mkdir dir="${gen.dir}/de/uka/ilkd/key/parser"/>
    <mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/schemajava"/>
    <mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/proofjava"/>

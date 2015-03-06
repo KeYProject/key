@@ -3,7 +3,7 @@
 	<property environment="env"/>
 
 	<condition property="key.version" value="${env.KEY_VERSION}" else="2.5">
-	   <isset property="env.KEY_VERSION"/>
+		<isset property="env.KEY_VERSION"/>
 	</condition>
 
 	 <!-- The following tasks are for KeY -->
@@ -21,36 +21,44 @@
 	</target>
 
 	<target name="deployAll">
-		<exec executable="git" outputproperty="git.revision">
-		  <arg value="rev-parse"/>
-		  <arg value="HEAD"/>
+		<!-- Update GIT revision s-->
+		<exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
+			<arg value="rev-parse"/>
+			<arg value="HEAD"/>
 		</exec>	
+		<!-- Zip source code -->
 		<zip destfile="${basedir}/../deployment/key-src-${key.version}_${git.revision}.zip"
-		       basedir="${basedir}/../"
-		       excludes="*-src-*,*.jnlp,**/deployment/**,**/bin/**,*~,**/oldStuff/**"
+		     basedir="${basedir}/../"
+		     excludes="*-src-*,*.jnlp,**/deployment/**,**/bin/**,*~,**/oldStuff/**"
 		 />
+		<!-- Create Jar archives -->
 		<ant antfile="${basedir}/../key.util/build.xml" target="deploy" dir="${basedir}/../key.util" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core/build.xml" target="deploy" dir="${basedir}/../key.core" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.testgen/build.xml" target="deploy" dir="${basedir}/../key.core.testgen" inheritall="false"/>
 		<ant antfile="${basedir}/../key.ui/build.xml" target="deploy" dir="${basedir}/../key.ui" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.symbolic_execution/build.xml" target="deploy" dir="${basedir}/../key.core.symbolic_execution" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.proof_references/build.xml" target="deploy" dir="${basedir}/../key.core.proof_references" inheritall="false"/>
+		<!-- Deploy license -->
 		<copy todir="${basedir}/../deployment">
 			<fileset file="${basedir}/../LICENSE.TXT"/>
 		</copy>
+		<!-- Zip binary release -->
 		<zip destfile="${basedir}/../deployment/key-${key.version}_${git.revision}.zip"
-		       basedir="${basedir}/../deployment"
-		       excludes="*-src-*,**/key*-*.zip,*.jnlp"
+		     basedir="${basedir}/../deployment"
+		     excludes="*-src-*,**/key*-*.zip,*.jnlp"
 		 />
 	</target>
 
 	<target name="cleanAll">
+		<!-- Clean components -->
 		<ant antfile="${basedir}/../key.util/build.xml" target="clean" dir="${basedir}/../key.util" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core/build.xml" target="clean" dir="${basedir}/../key.core" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.testgen/build.xml" target="clean" dir="${basedir}/../key.core.testgen" inheritall="false"/>
 		<ant antfile="${basedir}/../key.ui/build.xml" target="clean" dir="${basedir}/../key.ui" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.symbolic_execution/build.xml" target="clean" dir="${basedir}/../key.core.symbolic_execution" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.proof_references/build.xml" target="clean" dir="${basedir}/../key.core.proof_references" inheritall="false"/>
+		<!-- Delete deployed License Inforation -->
+		<delete file="${basedir}/../deployment/LICENSE.TXT" failonerror="false" />
 	</target>
 
 	<!-- The following tasks are for KeY's Tests -->
