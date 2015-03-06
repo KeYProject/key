@@ -2,8 +2,9 @@
 <!-- JNLP file for KeY -->
 <jnlp spec="1.0+" codebase="http://i12www.ira.uka.de/~bubel/nightly/webstart/" href="KeY.jnlp">
 <information> 
-<title>KeY 1.7 Nightly Build</title>
-<vendor>KeY Project, Karlsruhe Institute of Technology, Chalmers University, Universität Koblenz</vendor> 
+<title>KeY 2.5 Nightly Build</title>
+<vendor>KeY Project, Karlsruhe Institute of Technology, Chalmers
+University, TU Darmstadt</vendor> 
 <homepage href="http://www.key-project.org"/> 
 <description>
   The KeY tool.
@@ -15,7 +16,7 @@
 <all-permissions/> 
 </security> 
 <resources> 
-<j2se version="1.7+" initial-heap-size="128m" max-heap-size="1024m"/> 
+<j2se version="1.7+" initial-heap-size="128m" max-heap-size="2048m"/> 
 
 <jar href="components/key.ui.jar" /> 
 <jar href="components/key.core.testgen.jar" /> 
