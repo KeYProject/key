@@ -46,7 +46,7 @@ import de.hentschel.visualdbc.dbcmodel.DbcModel;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 import de.hentschel.visualdbc.generation.operation.CreateOperation;
 import de.hentschel.visualdbc.generation.test.util.TestGenerationUtil;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
  * Provides the basic functionality for tests testing a {@link KeyConnection}.
@@ -153,10 +153,10 @@ public class AbstractKeYTest extends AbstractSetupTestCase {
       IDSConnection currentConnection = null;
       IDSConnection expectedConnection = null;
       ConnectionLogger logger = new ConnectionLogger();
-      boolean usePrettyPrinting = SymbolicExecutionUtil.isUsePrettyPrinting();
+      boolean usePrettyPrinting = ProofIndependentSettings.isUsePrettyPrinting();
       try {
          // Disable pretty printing to make tests more robust against different term representations
-         SymbolicExecutionUtil.setUsePrettyPrinting(false);
+         ProofIndependentSettings.setUsePrettyPrinting(false);
          // Create project and fill it with test data
          IProject project = TestUtilsUtil.createProject(projectName);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, testDataInBundle, project);
@@ -198,7 +198,7 @@ public class AbstractKeYTest extends AbstractSetupTestCase {
          TestKeyUtil.compareModels(expectedConnection, currentConnection, modelFile, diagramFile);
       }
       finally {
-         SymbolicExecutionUtil.setUsePrettyPrinting(usePrettyPrinting);
+         ProofIndependentSettings.setUsePrettyPrinting(usePrettyPrinting);
          try {
             if (currentConnection != null) {
                TestGenerationUtil.closeConnection(currentConnection);

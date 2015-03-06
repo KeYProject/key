@@ -24,13 +24,21 @@ import org.key_project.sed.ui.test.suite.AllSEDUITests;
 import org.key_project.sed.ui.visualization.test.suite.AllSEDUIVisualizationTests;
 import org.key_project.util.test.suite.AllUtilTests;
 
+import de.uka.ilkd.key.proof_references.suite.AllProofReferencesTests;
+import de.uka.ilkd.key.suite.AllTestGenTests;
+import de.uka.ilkd.key.symbolic_execution.suite.AllSymbolicExecutionTests;
+
 /**
  * Run all contained JUnit 4 test cases.
  * @author Martin Hentschel
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    AllKeY4EclipseTests.class,
+    AllProofReferencesTests.class,
+    AllSymbolicExecutionTests.class,
+    //TestKeY.class,
+    AllTestGenTests.class,
+    
     AllUtilTests.class,
     AllSEDCoreTests.class,
     AllStarterCoreTests.class,

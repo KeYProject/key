@@ -371,7 +371,11 @@ public final class ExampleChooser extends JDialog {
 
     public static File lookForExamples() {
         // greatly simplified version without parent path lookup.
-        return new File(IOUtil.getProjectRoot(ExampleChooser.class), EXAMPLES_PATH);
+        File folder = new File(IOUtil.getProjectRoot(ExampleChooser.class), EXAMPLES_PATH);
+        if (!folder.exists()) {
+           folder = new File(IOUtil.getClassLocation(ExampleChooser.class), EXAMPLES_PATH);
+        }
+        return folder;
     }
 
     private static String fileAsString(File f) {

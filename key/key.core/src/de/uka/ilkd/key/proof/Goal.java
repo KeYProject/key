@@ -640,4 +640,13 @@ public final class Goal  {
     public void undoStrategyInfoAdd(StrategyInfoUndoMethod undoMethod) {
         undoMethod.undo(strategyInfos);
     }
+
+    /**
+     * Checks if the {@link Goal} has applicable rules.
+     * @param goal The {@link Goal} to check.
+     * @return {@code true} has applicable rules, {@code false} no rules are applicable.
+     */
+    public static boolean hasApplicableRules(Goal goal) {
+       return goal.getRuleAppManager().peekNext() != null;
+    }
 }

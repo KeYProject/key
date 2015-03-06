@@ -16,7 +16,6 @@ package org.key_project.monkey.all.test.suite.swtbot;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.key4eclipse.starter.core.test.suite.swtbot.SWTBotAllStarterCoreTests;
-import org.key_project.key4eclipse.test.suite.swtbot.SWTBotAllKeY4EclipseTests;
 import org.key_project.util.test.suite.swtbot.SWTBotAllUtilTests;
 
 /**
@@ -34,7 +33,6 @@ import org.key_project.util.test.suite.swtbot.SWTBotAllUtilTests;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-   SWTBotAllKeY4EclipseTests.class,
    SWTBotAllUtilTests.class,
    SWTBotAllStarterCoreTests.class
 })

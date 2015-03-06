@@ -3454,17 +3454,7 @@ public final class SymbolicExecutionUtil {
     * @return The source file name or {@code null} if not available.
     */
    public static String getSourcePath(PositionInfo posInfo) {
-      String result = null;
-      if (posInfo.getFileName() != null) {
-         result = posInfo.getFileName(); // posInfo.getFileName() is a path to a file
-      }
-      else if (posInfo.getParentClass() != null) {
-         result = posInfo.getParentClass(); // posInfo.getParentClass() is a path to a file
-      }
-      if (result != null && result.startsWith("FILE:")) {
-         result = result.substring("FILE:".length());
-      }
-      return result;
+      return MiscTools.getSourcePath(posInfo);
    }
 
    /**
@@ -3578,7 +3568,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} has applicable rules, {@code false} no rules are applicable.
     */
    public static boolean hasApplicableRules(Goal goal) {
-      return goal.getRuleAppManager().peekNext() != null;
+      return Goal.hasApplicableRules(goal);
    }
 
    /**

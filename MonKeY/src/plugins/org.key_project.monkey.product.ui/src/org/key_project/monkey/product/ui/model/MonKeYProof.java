@@ -40,10 +40,9 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.util.ProofUserManager;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.ProofUserManager;
 
 /**
  * Represents a MonKeY proof which simplifies the automation of
@@ -316,7 +315,7 @@ public class MonKeYProof extends Bean {
         Iterator<Goal> iter = proof.openGoals().iterator();
         while ((!hasGoalWithApplicableRules || !hasGoalWithoutApplicableRules) && iter.hasNext()) {
            Goal next = iter.next();
-           if (SymbolicExecutionUtil.hasApplicableRules(next)) {
+           if (Goal.hasApplicableRules(next)) {
               hasGoalWithApplicableRules = true;
            }
            else {

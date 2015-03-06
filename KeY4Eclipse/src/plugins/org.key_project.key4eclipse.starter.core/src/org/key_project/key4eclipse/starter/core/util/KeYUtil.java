@@ -96,7 +96,6 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
@@ -1284,7 +1283,7 @@ public final class KeYUtil {
       try {
          if (posInfo != null && posInfo != PositionInfo.UNDEFINED) {
             // Try to find the source file.
-            String path = SymbolicExecutionUtil.getSourcePath(posInfo);
+            String path = MiscTools.getSourcePath(posInfo);
             File file = path != null ? new File(path) : null;
             // Check if a source file is available
             int charStart = -1;

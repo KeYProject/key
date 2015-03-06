@@ -93,8 +93,8 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.KeYTypeUtil;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -420,7 +420,7 @@ public class ProofManager {
     */
    protected IFile searchFile(PositionInfo positionInfo) {
       if (positionInfo != null && !PositionInfo.UNDEFINED.equals(positionInfo)) {
-         String fileName = SymbolicExecutionUtil.getSourcePath(positionInfo);
+         String fileName = MiscTools.getSourcePath(positionInfo);
          IPath location = new Path(fileName);
          IPath relatviePath = location.makeRelativeTo(project.getLocation().removeLastSegments(1));
          return ResourcesPlugin.getWorkspace().getRoot().getFile(relatviePath);

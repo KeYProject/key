@@ -32,7 +32,6 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
@@ -192,7 +191,7 @@ public class ProofRunnable implements Runnable {
          OneStepSimplifier.refreshOSS(proof);
          for(Goal goal : proof.openGoals()){
             
-            if(!SymbolicExecutionUtil.hasApplicableRules(goal)){
+            if(!Goal.hasApplicableRules(goal)){
                uncloseable = true;
                break;
             }

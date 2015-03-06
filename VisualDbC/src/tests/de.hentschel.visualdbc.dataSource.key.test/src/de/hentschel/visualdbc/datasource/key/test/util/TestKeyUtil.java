@@ -110,7 +110,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
@@ -419,10 +419,10 @@ public final class TestKeyUtil {
       ConnectionLogger logger = new ConnectionLogger();
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       LoggingKeYConnectionListener listener = new LoggingKeYConnectionListener();
-      boolean usePrettyPrinting = SymbolicExecutionUtil.isUsePrettyPrinting();
+      boolean usePrettyPrinting = ProofIndependentSettings.isUsePrettyPrinting();
       try {
          // Disable pretty printing to make tests more robust against different term representations
-         SymbolicExecutionUtil.setUsePrettyPrinting(false);
+         ProofIndependentSettings.setUsePrettyPrinting(false);
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 2;
          // Create project and fill it with test data
          IProject project = TestUtilsUtil.createProject(projectName);
@@ -544,7 +544,7 @@ public final class TestKeyUtil {
          fail(e.getMessage());
       }
       finally {
-         SymbolicExecutionUtil.setUsePrettyPrinting(usePrettyPrinting);
+         ProofIndependentSettings.setUsePrettyPrinting(usePrettyPrinting);
          SWTBotPreferences.TIMEOUT = originalTimeout;
          try {
             if (connection != null) {

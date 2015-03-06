@@ -28,6 +28,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -713,6 +714,25 @@ public final class MiscTools {
        result.put("optimisedSelectRules", "optimisedSelectRules:on");
        result.put("wdChecks", "wdChecks:off");
        result.put("wdOperator", "wdOperator:L");
+       return result;
+    }
+    
+    /**
+     * Returns the path to the source file defined by the given {@link PositionInfo}.
+     * @param posInfo The {@link PositionInfo} to extract source file from.
+     * @return The source file name or {@code null} if not available.
+     */
+    public static String getSourcePath(PositionInfo posInfo) {
+       String result = null;
+       if (posInfo.getFileName() != null) {
+          result = posInfo.getFileName(); // posInfo.getFileName() is a path to a file
+       }
+       else if (posInfo.getParentClass() != null) {
+          result = posInfo.getParentClass(); // posInfo.getParentClass() is a path to a file
+       }
+       if (result != null && result.startsWith("FILE:")) {
+          result = result.substring("FILE:".length());
+       }
        return result;
     }
 }

@@ -32,7 +32,6 @@ import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector.ChoiceEntry;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * SWTBot tests for {@link TacletOptionsPreferencePage}.
@@ -64,10 +63,10 @@ public class SWTBotTacletOptionsPreferencePageTest extends AbstractSetupTestCase
     */
    protected void doTestShownValuesAndModification(boolean approve) throws Exception{
       // Make sure that runtime options are available
-      if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
+      if (!ProofSettings.isChoiceSettingInitialised()) {
          TacletOptionsPreferencePage.loadChoiceSettings();
       }
-      assertTrue(SymbolicExecutionUtil.isChoiceSettingInitialised());
+      assertTrue(ProofSettings.isChoiceSettingInitialised());
       // Get original settings
       ChoiceSettings oldSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
       assertNotNull(oldSettings);
