@@ -13,6 +13,8 @@
 
 	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
 		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/components"/>
+		<mkdir dir="${dist.dir}/libs"/>
 		<copy todir="${dist.dir}/libs">
 			<fileset file="${ext.dir}/antlr.jar"/>
 			<fileset file="${ext.dir}/Antlr.License.txt"/>

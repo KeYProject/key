@@ -6,7 +6,8 @@
 	<property name="dist.dir"  value="${basedir}/../deployment" />
 
 	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
-		<mkdir dir="${dist.dir}"/>
+	        <mkdir dir="${dist.dir}"/>
+	  	<mkdir dir="${dist.dir}/components"/>
 		<jar destfile="${dist.dir}/components/key.core.testgen.jar" basedir="${build.dir}" manifest="${basedir}/META-INF/MANIFEST.MF" />
 	</target>
 
