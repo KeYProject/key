@@ -62,12 +62,12 @@
 		<ant antfile="${basedir}/../key.core.symbolic_execution.test/build.xml" target="runTests" dir="${basedir}/../key.core.symbolic_execution.test" inheritall="false"/>
 	</target>
 
-	<target name="runAllTestsXML" depends="deployAll, compileAllTests">
-		<ant antfile="${basedir}/../key.util.test/build.xml" target="runTestsXML" dir="${basedir}/../key.util.test" inheritall="false"/>
-		<ant antfile="${basedir}/../key.core.test/build.xml" target="runTestsXML" dir="${basedir}/../key.core.test" inheritall="false"/>
-		<ant antfile="${basedir}/../key.core.testgen.test/build.xml" target="runTestsXML" dir="${basedir}/../key.core.testgen.test" inheritall="false"/>
-		<ant antfile="${basedir}/../key.core.proof_references.test/build.xml" target="runTestsXML" dir="${basedir}/../key.core.proof_references.test" inheritall="false"/>
-		<ant antfile="${basedir}/../key.core.symbolic_execution.test/build.xml" target="runTestsXML" dir="${basedir}/../key.core.symbolic_execution.test" inheritall="false"/>
+	<target name="test-deploy-all" depends="deployAll, compileAllTests">
+		<ant antfile="${basedir}/../key.util.test/build.xml" target="test-deploy" dir="${basedir}/../key.util.test" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.test/build.xml" target="test-deploy" dir="${basedir}/../key.core.test" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.testgen.test/build.xml" target="test-deploy" dir="${basedir}/../key.core.testgen.test" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.proof_references.test/build.xml" target="test-deploy" dir="${basedir}/../key.core.proof_references.test" inheritall="false"/>
+		<ant antfile="${basedir}/../key.core.symbolic_execution.test/build.xml" target="test-deploy" dir="${basedir}/../key.core.symbolic_execution.test" inheritall="false"/>
 	</target>
 
 	<target name="compileAllTests">

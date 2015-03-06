@@ -7,7 +7,7 @@
 	<property name="test.reports"   value="${basedir}/testresults/" />
 
 
-	<target name="runTestsXML" depends="compile">
+	<target name="test-deploy" depends="compile">
   	  <mkdir dir="${test.reports}" />
 	  <junit printsummary="withOutAndErr" haltonfailure="yes" fork="yes" forkMode="once" haltonerror="yes" enableTestListenerEvents="false" showoutput="yes" dir="${basedir}">
 	                <jvmarg value="-Xmx2048m"/>
