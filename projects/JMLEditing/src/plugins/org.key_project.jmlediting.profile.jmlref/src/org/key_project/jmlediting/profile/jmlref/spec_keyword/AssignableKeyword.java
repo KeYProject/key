@@ -12,7 +12,8 @@ public class AssignableKeyword extends StoreRefContainerKeyword {
     * Creates a new assignable keyword instance.
     */
    public AssignableKeyword() {
-      super("assignable");
+      super("assignable", "assignable_redundantly", "modifiable",
+            "modifiable_redundantly", "modifies", "modifies_redundantly");
    }
 
    @Override
