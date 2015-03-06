@@ -18,7 +18,7 @@ Public License. See LICENSE.TXT for details.
 (1) Requirements: 
 -------------------------------------
 
-Hardware:	2 GB RAM
+Hardware:	>=2 GB RAM
 
 Operating System: Linux/Unix, MacOSX, Windows
 
@@ -38,7 +38,7 @@ doc               Additional documentation of KeY.
 
 key.*             A component of KeY. It contains source code and all required 
                   resources and libraries. A component is defined by a ready
-                  to use Eclipse project.
+                  to use Eclipse project.		  
 
 scripts           Scripts to compile, start and deploy KeY.
 
@@ -65,16 +65,16 @@ LICENSE.TXT       Information on how KeY is licensed.
 	   	  	  'KeY Code Style'
 
 	4) Import the following existing Eclipse Java projects
-	   	* key.core
-	   	* key.core.proof_references
+	   	* key.core (no GUI components allowed; can only access key.util)
+	   	* key.core.proof_references (no GUI components allowed; can only access key.util, key.core)
 	   	* key.core.proof_references.test
-	   	* key.core.symbolic_execution
+	   	* key.core.symbolic_execution (no GUI components allowed; can only access key.util, key.core)
 	   	* key.core.symbolic_execution.test
 	   	* key.core.test
-	   	* key.core.testgen
+	   	* key.core.testgen (no GUI components allowed; can only access key.util, key.core, key.core.*)
 	   	* key.core.testgen.test
-	   	* key.ui
-	   	* key.util
+	   	* key.ui (all GUI stuff goes here)
+	   	* key.util (only general utils cannot access any other KeY component)
 	   	* key.util.test
 	      (* key.core.example   Shows how to programmatically verify all proof 
 	                            obligations of the source code and is not used by 
@@ -93,6 +93,9 @@ LICENSE.TXT       Information on how KeY is licensed.
 
 (3) Compile and Start KeY using Ant
 -------------------------------------
+
+Assuming you are in directory "key" (if you are in directory
+"key/scripts" the "-buildfile scripts/build.xml" can be skipped)
 
 	1) Compile KeY via ant script 'scripts/build.xml'
 
@@ -118,10 +121,15 @@ LICENSE.TXT       Information on how KeY is licensed.
 
 	   	ant -buildfile scripts/build.xml deployAll
 
-	2) Start deployed KeY
+	2) Test deployed jar files
 
-	   	java -jar deployment/KeY.jar
+	   	ant -buildfile scripts/build.xml test-deploy-all
 
+	3) Start deployed KeY
+
+	   	java -Xmx2048m -jar deployment/KeY.jar
+
+	
 
 -------------------------------
 
