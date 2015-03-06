@@ -63,6 +63,7 @@ import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.inst.TermInstantiation;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -577,7 +578,9 @@ public class ProofSaver {
                 return printSequent((Sequent) val, services);
             } else if (val instanceof Name) {
                 return new StringBuffer(val.toString());
-            } else if (val==null){
+            } else if (val instanceof TermInstantiation) {
+                return printTerm(((TermInstantiation) val).getInstantiation(), services);
+            } else if (val==null){            
                     return null;
             }
             else {
