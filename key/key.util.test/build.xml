@@ -2,8 +2,8 @@
 <project name="key.util.test" default="compile" basedir=".">
 	<property name="src.dir"   value="${basedir}/src" />
 	<property name="build.dir" value="${basedir}/bin" />
-	<property name="dist.dir"  value="${basedir}/../deployment" />
-	<property name="ext.dir" value="${basedir}/lib" />
+	<property name="dist.dir"  value="${basedir}/../deployment/components" />
+	<property name="ext.dir"   value="${basedir}/lib" />
 	<property name="test.reports"   value="${basedir}/testresults/" />
 
 
