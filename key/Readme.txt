@@ -51,7 +51,17 @@ LICENSE.TXT       Information on how KeY is licensed.
 	1) Start Eclipse 4.4 (Luna) with a new workspace.
 	   (Older Eclipse versions are not tested.)
 
-	2) Import the following existing Eclipse Java projects
+	2) Optionally, set the following recommended preferences:
+	   	* General/Editors/Text Editors
+	   	  	* Set 'Displayed tab width' to 3
+	   	  	* Select 'Insert spaces for tabs'
+	   	* Java/Code Style/Code Templates
+	   	  	* Set your full name as @author of 'Comments/Types'
+	   	* Java/Code Style/Formatter
+	   	  	* Import 'doc/KeYCodeStyle.xml' and select active profile 
+	   	  	  'KeY Code Style'
+
+	3) Import the following existing Eclipse Java projects
 	   	* key.core
 	   	* key.core.proof_references
 	   	* key.core.proof_references.test
@@ -72,7 +82,7 @@ LICENSE.TXT       Information on how KeY is licensed.
 	              to be used. It is not recommended to have both in the same 
 	              workspace as they provide the same content.
 
-	3) Launch class 'de.uka.ilkd.key.core.Main' as Java Application to start KeY.
+	4) Launch class 'de.uka.ilkd.key.core.Main' as Java Application to start KeY.
 	   The following VM arguments are recommended: 
 
 	   	-Xmx2048m -XX:MaxPermSize=256m -ea
