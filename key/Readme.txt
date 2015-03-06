@@ -51,7 +51,7 @@ LICENSE.TXT       Information on how KeY is licensed.
 	1) Start Eclipse 4.4 (Luna) with a new workspace.
 	   (Older Eclipse versions are not tested.)
 
-	2) Import the following existing projects
+	2) Import the following existing Eclipse Java projects
 	   	* key.core
 	   	* key.core.proof_references
 	   	* key.core.proof_references.test
@@ -63,6 +63,11 @@ LICENSE.TXT       Information on how KeY is licensed.
 	   	* key.ui
 	   	* key.util
 	   	* key.util.test
+
+	   Attention: The Java projects are not used by the KeY-Based Eclipse 
+	              Projects. Instead the Plug-in projects of '../KeY4Eclipse' have
+	              to be used. It is not recommended to have both in the same 
+	              workspace as they provide the same content.
 
 	3) Launch class 'de.uka.ilkd.key.core.Main' as Java Application to start KeY.
 	   The following VM arguments are recommended: 
