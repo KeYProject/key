@@ -100,9 +100,6 @@
 
   <target name="copy" depends="prepare"
      description="Copy all resources into the binary directory.">
-    <copy todir="${build.dir}">
-      <fileset dir="${basedir}/resources/"/>
-    </copy>
    <copy todir="${build.dir}">
      <fileset dir="${basedir}/resources/"/>
    </copy>

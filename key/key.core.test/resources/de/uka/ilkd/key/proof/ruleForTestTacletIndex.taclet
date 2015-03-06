@@ -1,0 +1,46 @@
+// this file contains rules, that are used to test the matching
+// algorithm.
+// If the matching of a schema variable contains a free variable. The
+// schema variable is only allowed to appear in one instantiation area.
+// This is tested by using these rules
+
+\sorts {
+  nat;
+}
+
+\predicates {
+  p(nat, nat);
+}
+
+\functions {
+ nat zero;
+ nat one;
+ nat f(nat);
+}
+
+\schemaVariables {
+ \formula a, b;
+ \term nat x ;
+ \variables nat y, y0 ;
+}
+
+\heuristicsDecl {
+ h1; h2; h3;	
+}
+
+\rules {
+  rewrite_noninteractive_h1_h2 {\find (p(x,zero)) \closegoal
+	 \heuristics(h1, h2) \noninteractive};
+  nofind_noninteractive_h1_h2_h3 { \assumes (a ==>)  \closegoal
+	\heuristics(h1, h2, h3) \noninteractive};
+  rule_antec_h1 {\find (p(x,zero)==>) \closegoal \heuristics(h1)};
+  rule_succ {\find (==>p(x,zero)) \closegoal};
+
+  antec_mismatch {\find (==>p(x, zero)) \closegoal \heuristics(h1)};
+  not_free_conflict { \find (\forall y; p(x, y)) \varcond(\notFreeIn(y, x)) \closegoal };
+
+  remove_f { \find (f(x)) \replacewith(x) };
+  remove_ff { \find (f(f(x))) \replacewith(x) };
+  remove_zero { \find (zero) \replacewith(one) };
+  remove_one { \find (one) \replacewith(zero) };
+}
