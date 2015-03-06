@@ -61,58 +61,59 @@ public class TestCE extends TestCommons {
 		}
 		return type;
 	}
+	
 	@Test
-	public void testOverFlow1() {
+	public void testOverFlow1() throws Exception {
 		assertTrue(this.correctResult(testFile + "overflow1.key", true));
 	}
 
    @Test
-	public void testOverFlow2() {
+	public void testOverFlow2() throws Exception {
 		assertTrue(this.correctResult(testFile + "overflow2.key", true));
 	}
 
    @Test
-	public void testTypes1() {
+	public void testTypes1() throws Exception {
 		assertTrue(this.correctResult(testFile + "types1.key", true));
 	}
 
    @Test
-	public void testTypes2() {
+	public void testTypes2() throws Exception {
 		assertTrue(this.correctResult(testFile + "types2.key", true));
 	}
 
    @Test
-	public void testTypes3() {
+	public void testTypes3() throws Exception {
 		assertTrue(this.correctResult(testFile + "types3.key", false));
 	}
 
    @Test
-	public void testTypes4() {
+	public void testTypes4() throws Exception {
 		assertTrue(this.correctResult(testFile + "types4.key", true));
 	}
 
    @Test
-	public void testTypes5() {
+	public void testTypes5() throws Exception {
 		assertTrue(this.correctResult(testFile + "types5.key", false));
 	}
 
    @Test
-	public void testTypes6() {
+	public void testTypes6() throws Exception {
 		assertTrue(this.correctResult(testFile + "types6.key", true));
 	}
 
    @Test
-	public void testTypes7() {
+	public void testTypes7() throws Exception {
 		assertTrue(this.correctResult(testFile + "types7.key", true));
 	}
 
    @Test
-	public void testTypes8() {
+	public void testTypes8() throws Exception {
 		assertTrue(this.correctResult(testFile + "types8.key", true));
 	}
 
    @Test
-	public void testTypes9() {
+	public void testTypes9() throws Exception {
 		assertTrue(this.correctResult(testFile + "types9.key", true));
 	}
 

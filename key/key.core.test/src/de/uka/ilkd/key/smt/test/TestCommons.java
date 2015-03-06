@@ -15,12 +15,14 @@ package de.uka.ilkd.key.smt.test;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
+
+import org.junit.Assert;
+
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -30,6 +32,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolverResult;
@@ -45,7 +48,6 @@ import de.uka.ilkd.key.util.HelperClassForTests;
  * 
  */
 public abstract class TestCommons extends TestCase {
-	private static HashMap<String, ProofAggregate> proofs = new HashMap<String, ProofAggregate>();
 	protected static String folder = HelperClassForTests.TESTCASE_DIRECTORY
 	        + File.separator + "smt" + File.separator + "tacletTranslation"
 	        + File.separator;
@@ -75,21 +77,11 @@ public abstract class TestCommons extends TestCase {
 
 	public abstract boolean toolNotInstalled();
 
-	protected boolean correctResult(String filepath, boolean isValid) {
+	protected boolean correctResult(String filepath, boolean isValid) throws IOException, ProblemLoaderException {
 		if (toolNotInstalled()) {
 			return true;
 		}
-		SMTSolverResult result;
-		try {
-			result = checkFile(filepath);
-		} catch (IOException e) {
-			// must not happen!!
-			System.out.println("Warning: " + this.getSolverType().getName()
-			        + " produced error!!.");
-			e.printStackTrace();
-			// setToolNotInstalled(true);
-			return true;
-		}
+		SMTSolverResult result = checkFile(filepath);
 		// System.gc();
 		// unknown is always allowed. But wrong answers are not allowed
 		return correctResult(isValid, result);
@@ -114,14 +106,20 @@ public abstract class TestCommons extends TestCase {
 	 * @param filepath
 	 *            the path to the file
 	 * @return the resulttype of the external solver
+	 * @throws ProblemLoaderException 
 	 */
-	protected SMTSolverResult checkFile(String filepath) throws IOException {
-		ProofAggregate p = loadProof(filepath);
-		Assert.assertTrue(p.getProofs().length == 1);
-		Proof proof = p.getProofs()[0];
-		Assert.assertTrue(proof.openGoals().size() == 1);
-		Goal g = proof.openGoals().iterator().next();
-		return checkGoal(g);
+	protected SMTSolverResult checkFile(String filepath) throws IOException, ProblemLoaderException {
+	   KeYEnvironment<?> p = loadProof(filepath);
+	   try {
+	      Proof proof = p.getLoadedProof();
+	      Assert.assertNotNull(proof);
+	      Assert.assertTrue(proof.openGoals().size() == 1);
+	      Goal g = proof.openGoals().iterator().next();
+	      return checkGoal(g);
+	   }
+	   finally {
+	      p.dispose();
+	   }
 	}
 
 	private SMTSolverResult checkGoal(Goal g) {
@@ -133,16 +131,8 @@ public abstract class TestCommons extends TestCase {
 	
 	
 
-	protected ProofAggregate loadProof(String filepath) {
-	    ProofAggregate p;
-		if (!proofs.containsKey(filepath)) {
-			File file = new File(filepath);
-			p = parse(file);
-			proofs.put(filepath, p);
-		} else {
-			p = proofs.get(filepath);
-		}
-	    return p;
+	protected KeYEnvironment<?> loadProof(String filepath) throws ProblemLoaderException {
+	   return KeYEnvironment.load(new File(filepath), null, null);
     }
 
 	/**

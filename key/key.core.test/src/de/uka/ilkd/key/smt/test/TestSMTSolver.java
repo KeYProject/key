@@ -14,7 +14,8 @@ package de.uka.ilkd.key.smt.test;
 
 import java.io.File;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 public abstract class TestSMTSolver extends TestCommons {
@@ -28,126 +29,126 @@ public abstract class TestSMTSolver extends TestCommons {
 	protected void tearDown() throws Exception {
 	}
 
-	public void testAndnot() {
+	public void testAndnot() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "andnot.key", false));
 	}
 
-	public void testOrnot() {
+	public void testOrnot() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "ornot.key", true));
 	}
 
-	public void testAndornot() {
+	public void testAndornot() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "andornot.key", false));
 	}
 
-	public void testAndornot2() {
+	public void testAndornot2() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "andornot2.key", true));
 	}
 
-	public void testImply() {
+	public void testImply() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "imply.key", true));
 	}
 
-	public void testImply2() {
+	public void testImply2() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "imply2.key", true));
 	}
 
-	public void testImply3() {
+	public void testImply3() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "imply3.key", false));
 	}
 
-	public void testEqui1() {
+	public void testEqui1() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "equi1.key", true));
 	}
 
-	public void testEqui2() {
+	public void testEqui2() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "equi2.key", false));
 	}
 
-	public void testAllex1() {
+	public void testAllex1() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "allex1.key", true));
 	}
 
 	// LONG runtime with CVC3 (~300s)
-	public void testAllex2() {
+	public void testAllex2() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "allex2.key", false));
 	}
 
-	public void testAllex3() {
+	public void testAllex3() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "allex3.key", true));
 	}
 
-	public void testLogicalIte1() {
+	public void testLogicalIte1() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "logicalite1.key", true));
 	}
 
-	public void testLogicalIte2() {
+	public void testLogicalIte2() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "logicalite2.key", false));
 	}
 
-	public void testTermIte1() {
+	public void testTermIte1() throws Exception {
 		if (getSolverType().supportsIfThenElse())
 			Assert.assertTrue(correctResult(testFile + "termite1.key", true));
 	}
 
 	// LONG runtime in CVC3 (~300s)
-	public void testTermlIte2() {
+	public void testTermlIte2() throws Exception {
 		if (getSolverType().supportsIfThenElse())
 			Assert.assertTrue(correctResult(testFile + "termite2.key", false));
 	}
 
-	public void testEqual1() {
+	public void testEqual1() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "equal1.key", true));
 	}
 
-	public void testEqual2() {
+	public void testEqual2() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "equal2.key", false));
 	}
 
-	public void testSubsort1() {
+	public void testSubsort1() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "subsort1.key", true));
 	}
 
-	public void testSubsort2() {
+	public void testSubsort2() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "subsort2.key", false));
 	}
 
-	public void testAdd1() {
+	public void testAdd1() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "add1.key", true));
 	}
 
-	public void testBSum1() {
+	public void testBSum1() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "bsum1.key", true));
 	}
 
-	public void testBSum2() {
+	public void testBSum2() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "bsum2.key", true));
 	}
 
-	public void testBSum3() {
+	public void testBSum3() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "bsum3.key", false));
 	}
 
-	public void testBProd1() {
+	public void testBProd1() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "bprod1.key", true));
 	}
 
-	public void testBProd2() {
+	public void testBProd2() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "bprod2.key", true));
 	}
 
-	public void testBProd3() {
+	public void testBProd3() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "bprod3.key", false));
 	}
 
 	// public void testBinderPred1() {
 	// Assert.assertTrue(correctResult(testFile + "binder2.key", true));
 	// }
-	public void testBinderPred2() {
+	public void testBinderPred2() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "binder4.key", true));
 	}
 
-	public void testBinderPred3() {
+	public void testBinderPred3() throws Exception {
 		Assert.assertTrue(correctResult(testFile + "binder5.key", true));
 	}
 	/*
