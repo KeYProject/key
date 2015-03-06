@@ -48,10 +48,13 @@ LICENSE.TXT       Information on how KeY is licensed.
 (2) Develop KeY with Eclipse
 -------------------------------------
 
-	1) Start Eclipse 4.4 (Luna) with a new workspace.
-	   (Older Eclipse versions are not tested.)
+	1) Start Eclipse 4 (Newest version recommended) with a new workspace.
+	   (Eclipse 3.7 (Indigo) and older versions do not work.)
 
-	2) Optionally, set the following recommended preferences:
+	2) Ensure that a JRE/JDK 1.7 or newer is selected at preference page
+	   'Java/Installed JREs'
+
+	3) Optionally, set the following recommended preferences:
 	   	* General/Editors/Text Editors
 	   	  	* Set 'Displayed tab width' to 3
 	   	  	* Select 'Insert spaces for tabs'
@@ -61,7 +64,7 @@ LICENSE.TXT       Information on how KeY is licensed.
 	   	  	* Import 'doc/KeYCodeStyle.xml' and select active profile 
 	   	  	  'KeY Code Style'
 
-	3) Import the following existing Eclipse Java projects
+	4) Import the following existing Eclipse Java projects
 	   	* key.core
 	   	* key.core.proof_references
 	   	* key.core.proof_references.test
@@ -82,7 +85,7 @@ LICENSE.TXT       Information on how KeY is licensed.
 	              to be used. It is not recommended to have both in the same 
 	              workspace as they provide the same content.
 
-	4) Launch class 'de.uka.ilkd.key.core.Main' as Java Application to start KeY.
+	5) Launch class 'de.uka.ilkd.key.core.Main' as Java Application to start KeY.
 	   The following VM arguments are recommended: 
 
 	   	-Xmx2048m -XX:MaxPermSize=256m -ea
