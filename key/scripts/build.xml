@@ -20,7 +20,7 @@
 		<ant antfile="${basedir}/../key.core.proof_references/build.xml" target="compile" dir="${basedir}/../key.core.proof_references" inheritall="false"/>
 	</target>
 
-	<target name="deployAll" depends="cleanAll">
+	<target name="deployAll">
 		<exec executable="git" outputproperty="git.revision">
 		  <arg value="rev-parse"/>
 		  <arg value="HEAD"/>
@@ -62,7 +62,7 @@
 		<ant antfile="${basedir}/../key.core.symbolic_execution.test/build.xml" target="runTests" dir="${basedir}/../key.core.symbolic_execution.test" inheritall="false"/>
 	</target>
 
-	<target name="runAllTestsXML" depends="compileAllTests">
+	<target name="runAllTestsXML" depends="deployAll, compileAllTests">
 		<ant antfile="${basedir}/../key.util.test/build.xml" target="runTestsXML" dir="${basedir}/../key.util.test" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.test/build.xml" target="runTestsXML" dir="${basedir}/../key.core.test" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.testgen.test/build.xml" target="runTestsXML" dir="${basedir}/../key.core.testgen.test" inheritall="false"/>
@@ -70,7 +70,7 @@
 		<ant antfile="${basedir}/../key.core.symbolic_execution.test/build.xml" target="runTestsXML" dir="${basedir}/../key.core.symbolic_execution.test" inheritall="false"/>
 	</target>
 
-	<target name="compileAllTests" depends="deployAll">
+	<target name="compileAllTests">
 		<ant antfile="${basedir}/../key.util.test/build.xml" target="compile" dir="${basedir}/../key.util.test" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.test/build.xml" target="compile" dir="${basedir}/../key.core.test" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.testgen.test/build.xml" target="compile" dir="${basedir}/../key.core.testgen.test" inheritall="false"/>
