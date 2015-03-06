@@ -491,7 +491,7 @@ provable: ./standard_key/strings/substring4.key
 provable: ./standard_key/strings/substring5.key
 provable: ./standard_key/types/disjoint.key
 
-provable: ../../key.core.tests/resources/testcase/classpath/classpath.key
+provable: ../../key.core.test/resources/testcase/classpath/classpath.key
 
 notprovable: ./heap/inconsistent_represents/MyClass_m.key
 notprovable: ./heap/inconsistent_represents/MyClass_n.key
