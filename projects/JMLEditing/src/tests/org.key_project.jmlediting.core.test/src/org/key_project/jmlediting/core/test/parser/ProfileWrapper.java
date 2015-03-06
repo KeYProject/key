@@ -6,7 +6,16 @@ import org.key_project.jmlediting.profile.jmlref.JMLReferenceProfileAE;
 
 public class ProfileWrapper {
 
-   public static IJMLProfile testProfile = JMLProfileManagement.instance()
-         .getProfileFromIdentifier(new JMLReferenceProfileAE().getIdentifier());
+   private static IJMLProfile getReferenceProfile() {
+      try {
+         return JMLProfileManagement.instance().getProfileFromIdentifier(
+               new JMLReferenceProfileAE().getIdentifier());
+      }
+      catch (final NullPointerException e) {
+         return new JMLReferenceProfileAE();
+      }
+   }
+
+   public static IJMLProfile testProfile = getReferenceProfile();
 
 }

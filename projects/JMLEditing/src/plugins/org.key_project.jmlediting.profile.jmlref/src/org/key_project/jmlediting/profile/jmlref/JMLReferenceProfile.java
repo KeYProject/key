@@ -42,6 +42,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.DivergesKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.EnsuresKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.MeasuredByKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.SignalsKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.SignalsOnlyKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.requires.RequiresKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.requires.SameKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.OldKeyword;
@@ -99,7 +100,8 @@ public class JMLReferenceProfile extends AbstractJMLProfile {
                   new RepresentsKeyword(), new NonNullKeyword(),
                   new NullableKeyword(), new RealKeyword(),
                   new BigIntKeyword(), new DivergesKeyword(),
-                  new MeasuredByKeyword(), new SignalsKeyword()));
+                  new MeasuredByKeyword(), new SignalsKeyword(),
+                  new SignalsOnlyKeyword()));
 
       this.getSupportedPrimariesInternal().addAll(
             Arrays.asList(new KeywordJMLPrimary(), new QuantifierPrimary()));

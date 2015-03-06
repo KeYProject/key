@@ -47,6 +47,12 @@ public class ParserTestUtils {
       ParserBuilder.requireComplete(parser).parse(text, 0, text.length());
    }
 
+   public static void testParseComplete(final String test)
+         throws ParserException {
+      ParserBuilder.requireComplete(ProfileWrapper.testProfile.createParser())
+            .parse(test, 0, test.length());
+   }
+
    public static void testParseComplete(final String text,
          final ParseFunction parser, final String resultTerm)
          throws ParserException {

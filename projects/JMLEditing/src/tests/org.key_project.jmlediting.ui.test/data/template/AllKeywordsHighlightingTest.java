@@ -57,6 +57,7 @@ public abstract class AllKeywordsHighlightingTest {
    /*@
      @ private behavior
      @   ensures this.numCalls == \old(numCalls) +1;
+     @   signals_only IndexOutOfBoundsException, AssertionError;
      @*/
    private void increaseCalls() {
       this.numCalls ++;
@@ -67,6 +68,7 @@ public abstract class AllKeywordsHighlightingTest {
      @   requires numCalls > handledCalls;
      @   requires same;
      @   ensures \old(handledCalls) == 1 + this.handledCalls;
+     @   signals (NullPointerException e);
      @*/
    protected abstract void handleCall();
    
@@ -106,9 +108,11 @@ public abstract class AllKeywordsHighlightingTest {
      @   requires \not_specified;   
      @   requires \same;
      @   assignable \not_specified;
+     @   measured_by s.length;
+     @   diverges true;
      @*/
    protected /*@helper*/ void tryBreakEverything(/*@ non_null */ String s) {
-      
+      tryBreakEverything(s);
    }
 
 }
