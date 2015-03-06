@@ -38,8 +38,8 @@ public class TestParallelParsing extends TestCase {
    public void testLoadingOfTwoDifferentProofFiles() throws Exception {
       doParallelTest(HelperClassForTests.TESTCASE_DIRECTORY,
                      2,
-                     "examples/_testcase/parser/MultipleRecursion/MultipleRecursion[MultipleRecursion__a()]_JML_normal_behavior_operation_contract_0.proof",
-                     "examples/_testcase/parser/MultipleRecursion/MultipleRecursion[MultipleRecursion__b()]_JML_normal_behavior_operation_contract_0.proof");
+                     "parser/MultipleRecursion/MultipleRecursion[MultipleRecursion__a()]_JML_normal_behavior_operation_contract_0.proof",
+                     "parser/MultipleRecursion/MultipleRecursion[MultipleRecursion__b()]_JML_normal_behavior_operation_contract_0.proof");
    }
    
    /**
