@@ -42,6 +42,10 @@
 		<copy todir="${basedir}/../deployment">
 			<fileset file="${basedir}/../LICENSE.TXT"/>
 		</copy>
+		<!-- Deploy KeY.jar -->
+		<copy todir="${basedir}/KeY.jar" file="${basedir}/../key.ui/resources/de/uka/ilkd/key/gui/images/key-color.gif" />
+		<jar destfile="${basedir}/../deployment/KeY.jar" basedir="${basedir}/KeY.jar" manifest="${basedir}/KeY.jar/META-INF/MANIFEST.MF" />	
+		<delete file="${basedir}/KeY.jar/key-color.gif" />
 		<!-- Zip binary release -->
 		<zip destfile="${basedir}/../deployment/key-${key.version}_${git.revision}.zip"
 		     basedir="${basedir}/../deployment"
@@ -57,8 +61,9 @@
 		<ant antfile="${basedir}/../key.ui/build.xml" target="clean" dir="${basedir}/../key.ui" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.symbolic_execution/build.xml" target="clean" dir="${basedir}/../key.core.symbolic_execution" inheritall="false"/>
 		<ant antfile="${basedir}/../key.core.proof_references/build.xml" target="clean" dir="${basedir}/../key.core.proof_references" inheritall="false"/>
-		<!-- Delete deployed License Inforation -->
+		<!-- Delete deployed files -->
 		<delete file="${basedir}/../deployment/LICENSE.TXT" failonerror="false" />
+      <delete file="${basedir}/../deployment/KeY.jar" failonerror="false" />
 	</target>
 
 	<!-- The following tasks are for KeY's Tests -->

@@ -6,7 +6,7 @@
 
 	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
 		<mkdir dir="${dist.dir}"/>
-		<jar destfile="${dist.dir}/key.util.jar" basedir="${build.dir}" manifest="${basedir}/META-INF/MANIFEST.MF" />
+		<jar destfile="${dist.dir}/components/key.util.jar" basedir="${build.dir}" manifest="${basedir}/META-INF/MANIFEST.MF" />
 	</target>
 
 	<target name="compile" description="Compile all source files into the build directory.">
@@ -24,7 +24,7 @@
 	<target name="clean" description="Deletes all generated files and folders.">
 		<delete failonerror="false" includeemptydirs="true"> 
 			<fileset dir="${build.dir}" includes="**/*" />
-			<fileset file="${dist.dir}/key.util.jar" />
+			<fileset file="${dist.dir}/components/key.util.jar" />
 		</delete>
 	</target>
 </project>

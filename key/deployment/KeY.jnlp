@@ -17,12 +17,12 @@
 <resources> 
 <j2se version="1.7+" initial-heap-size="128m" max-heap-size="1024m"/> 
 
-<jar href="key.ui.jar" /> 
-<jar href="key.core.testgen.jar" /> 
-<jar href="key.core.jar" /> 
-<jar href="key.util.jar" /> 
-<jar href="antlr.jar" /> 
-<jar href="recoderKey.jar" /> 
+<jar href="components/key.ui.jar" /> 
+<jar href="components/key.core.testgen.jar" /> 
+<jar href="components/key.core.jar" /> 
+<jar href="components/key.util.jar" /> 
+<jar href="libs/antlr.jar" /> 
+<jar href="libs/recoderKey.jar" /> 
 </resources> 
 
 <application-desc main-class="de.uka.ilkd.key.core.WebstartMain"/> 
