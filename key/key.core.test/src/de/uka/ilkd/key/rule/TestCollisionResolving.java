@@ -105,9 +105,8 @@ public class TestCollisionResolving extends TestCase {
 	    ("TestCollisionResolving_coll_varSV").taclet();
 
 	TacletApp result = NoPosTacletApp.createNoPosTacletApp
-	    (coll_varSV, coll_varSV.match
+	    (coll_varSV, coll_varSV.getMatcher().matchFind
 	     (term, 
-	      coll_varSV.find(),
 	      MatchConditions.EMPTY_MATCHCONDITIONS,
 	      services),
 	      services);
@@ -164,9 +163,8 @@ public class TestCollisionResolving extends TestCase {
 						true);
 
 	TacletApp result 
-	    = PosTacletApp.createPosTacletApp(coll_varSV, coll_varSV.match
+	    = PosTacletApp.createPosTacletApp(coll_varSV, coll_varSV.getMatcher().matchFind
 					      (term.sub(0), 
-					       coll_varSV.find(),
 					       MatchConditions.EMPTY_MATCHCONDITIONS,
 					       services),pos, services);
 
@@ -195,7 +193,8 @@ public class TestCollisionResolving extends TestCase {
 						true);
 	TacletApp app 
 	    = PosTacletApp.createPosTacletApp(taclet, 
-					      taclet.match(term.sub(0), taclet.find(),
+					      taclet.getMatcher().
+					      matchFind(term.sub(0), 
 							   MatchConditions.EMPTY_MATCHCONDITIONS,
 							   null),
 			                      pos,
@@ -420,7 +419,7 @@ public class TestCollisionResolving extends TestCase {
 	PosInOccurrence pos=new PosInOccurrence(new SequentFormula(term),
 						PosInTerm.getTopLevel().down(0),
 						true);
-	MatchConditions mc=taclet.match(term.sub(0), taclet.find(),
+	MatchConditions mc=taclet.getMatcher().matchFind(term.sub(0),
 					MatchConditions.EMPTY_MATCHCONDITIONS,
 					null);
 	TacletApp app 

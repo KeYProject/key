@@ -7,21 +7,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 public interface TacletMatcher {
 
-   /** returns a SVInstantiations object with the needed SchemaVariable to Term
-    * mappings to match the given Term template to the Term term or
-    * null if no matching is possible.
-    * (marked as final to help the compiler inlining methods)
-    * @param term the Term the Template should match
-    * @param template the Term tried to be instantiated so that it matches term
-    * @param matchCond the MatchConditions to be obeyed by a
-    * successful match
-    * @return the new MatchConditions needed to match template with
-    * term, if possible, null otherwise
-    *
-    * PRECONDITION: matchCond.getConstraint ().isSatisfiable ()
-    */
-   public abstract MatchConditions match(Term term, Term template,
-         MatchConditions matchCond, Services services);
 
    /**
     * Match the given template (which is probably a formula of the if

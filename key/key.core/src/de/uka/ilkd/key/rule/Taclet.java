@@ -119,6 +119,7 @@ public abstract class Taclet implements Rule, Named {
      * the <tt>if</tt> sequent of the taclet
      */
     private final Sequent ifSequent;
+    
     /** 
      * Variables that have to be created each time the taclet is applied. 
      * Those variables occur in the varcond part of a taclet description.
@@ -167,10 +168,6 @@ public abstract class Taclet implements Rule, Named {
     private boolean contextInfoComputed = false;
     private boolean contextIsInPrefix   = false;
     
-    /** true if one of the goal descriptions is a replacewith */
-    private boolean hasReplaceWith      = false;
-     
-    
     protected String tacletAsString;
 
     /** Set of schemavariables of the if part */
@@ -178,8 +175,7 @@ public abstract class Taclet implements Rule, Named {
 
     /** This map contains (a, b) if there is a substitution {b a}
      * somewhere in this taclet */
-    private ImmutableMap<SchemaVariable,SchemaVariable>
-	svNameCorrespondences = null;
+    private ImmutableMap<SchemaVariable,SchemaVariable> svNameCorrespondences = null;
 	
     /** Integer to cache the hashcode */
     private int hashcode = 0;    
@@ -267,17 +263,7 @@ public abstract class Taclet implements Rule, Named {
     }
     
     protected void cacheMatchInfo() {
-        boundVariables = getBoundVariables();
-
-        final Iterator<TacletGoalTemplate> goalDescriptions = 
-                goalTemplates.iterator();
-
-        while (!hasReplaceWith && goalDescriptions.hasNext()) {
-            if (goalDescriptions.next().
-                    replaceWithExpressionAsObject() != null) {
-                hasReplaceWith = true;
-            }
-        }	        
+      
         this.matcher = DefaultTacletMatcher.createTacletMatcher(this);
     }
 
@@ -348,30 +334,7 @@ public abstract class Taclet implements Rule, Named {
 	return variableConditions;
     }
 
- 
-    /**
-     * returns a SVInstantiations object iff the given Term
-     * template can be instantiated to 
-     * match the given Term term using the known instantiations stored in
-     * svInst.  If a
-     * matching cannot be found null is returned.
-     * The not free in condition is checked in TacletApp. Collisions are
-     * resolved there as well, if necessary.
-     * @param term the Term that has to be matched
-     * @param template the Term that is checked if it can match term
-     * @param matchCond the SVInstantiations/Constraint that are
-     * required because of formerly matchings
-     * @param services the Services object encapsulating information
-     * about the java data structures like (static)types etc.
-     * @return the new MatchConditions needed to match template with
-     * term , if possible, null otherwise
-     */
-    protected MatchConditions match(Term            term,
-				    Term            template,
-				    MatchConditions matchCond,
-				    Services        services) {
-       return matcher.checkConditions(matcher.match(term, template, matchCond, services), services);
-    }
+
     
 
     /**
@@ -483,14 +446,6 @@ public abstract class Taclet implements Rule, Named {
 	return ruleSets;
     }
 
-//    /** 
-//     * returns true iff the Taclet is to be applied only noninteractive
-//     */
-//    public boolean noninteractive() {
-//	return noninteractive;
-//    }
-
-
     public ImmutableMap<SchemaVariable,TacletPrefix> prefixMap() {
 	return prefixMap;
     }
@@ -500,7 +455,17 @@ public abstract class Taclet implements Rule, Named {
      * computed and cached by method cacheMatchInfo
      */
     public boolean hasReplaceWith() {
-	return hasReplaceWith;
+        boolean hasReplaceWith = false;
+        final Iterator<TacletGoalTemplate> goalDescriptions = 
+                goalTemplates.iterator();
+
+        while (!hasReplaceWith && goalDescriptions.hasNext()) {
+            if (goalDescriptions.next().
+                    replaceWithExpressionAsObject() != null) {
+                hasReplaceWith = true;
+            }
+        }     
+        return hasReplaceWith;
     }
     
     /**

@@ -173,9 +173,8 @@ public final class Main {
         }
 
         // does no harm on non macs
-        // broken under Java 8 u40 when starting from jar files
-        // disabling the Apple Menu Bar support for the meantime
-        //System.setProperty("apple.laf.useScreenMenuBar","true");
+        // uncommented as Oracle seems to have broken that with 1.8_u40
+        //        System.setProperty("apple.laf.useScreenMenuBar","true");
 
         try {
             cl = createCommandLine();

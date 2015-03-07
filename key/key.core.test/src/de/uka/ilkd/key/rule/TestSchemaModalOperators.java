@@ -174,10 +174,9 @@ public class TestSchemaModalOperators extends TestCase {
 	    Modality.DIA, 
             JavaBlock.EMPTY_JAVABLOCK,
             TB.ff());
-         MatchConditions mc=(t.match                                                   
+         MatchConditions mc=t.getMatcher().matchFind                                                   
                             (goal,                                                        
-                             find,                                                
-                             MatchConditions.EMPTY_MATCHCONDITIONS, null));
+                             MatchConditions.EMPTY_MATCHCONDITIONS, null);
 	 assertNotNull(mc);
 	 assertNotNull(mc.getInstantiations().getInstantiation(osv));
 	 Debug.out("Match conditions: ", mc.getInstantiations());

@@ -60,7 +60,8 @@ public final class DefaultTacletMatcher implements TacletMatcher {
         boundVars = taclet.getBoundVariables();
         varsNotFreeIn = taclet.varsNotFreeIn();
     }
-
+    
+   
     /**
      * tries to match the bound variables of the given term against the one
      * described by the template
@@ -142,11 +143,21 @@ public final class DefaultTacletMatcher implements TacletMatcher {
         return matchCond;
     }
 
-    /** (non-Javadoc)
-     * @see de.uka.ilkd.key.rule.TacletMatcher#match(de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
+    /** returns a SVInstantiations object with the needed SchemaVariable to Term
+     * mappings to match the given Term template to the Term term or
+     * null if no matching is possible.
+     * (marked as final to help the compiler inlining methods)
+     * @param term the Term the Template should match
+     * @param template the Term tried to be instantiated so that it matches term
+     * @param matchCond the MatchConditions to be obeyed by a
+     * successful match
+     * @return the new MatchConditions needed to match template with
+     * term, if possible, null otherwise
+     *
+     * PRECONDITION: matchCond.getConstraint ().isSatisfiable ()
      */
-    @Override
-    public final MatchConditions match(final Term             term,
+
+    private MatchConditions match(final Term             term,
             final Term             template, 
             MatchConditions        matchCond,
             final Services         services) {
@@ -216,7 +227,7 @@ public final class DefaultTacletMatcher implements TacletMatcher {
                     .getUpdateContext(), p_template);
 
         for (IfFormulaInstantiation cf: p_toMatch) {
-            final MatchConditions newMC = match(cf.getConstrainedFormula().formula(), updateFormula, p_matchCond, p_services);
+            final MatchConditions newMC = checkConditions(match(cf.getConstrainedFormula().formula(), updateFormula, p_matchCond, p_services), p_services);
             if (newMC != null) {
                 resFormulas = resFormulas.prepend(cf);
                 resMC       = resMC.prepend(newMC);
@@ -315,25 +326,26 @@ public final class DefaultTacletMatcher implements TacletMatcher {
     public final MatchConditions checkVariableConditions(SchemaVariable var, 
             SVSubstitute instantiationCandidate,
             MatchConditions matchCond,
-            Services services) {
-        if (instantiationCandidate instanceof Term) {
-            final Term term = (Term) instantiationCandidate;
-            if (!(term.op() instanceof QuantifiableVariable)) {
-                if (varIsBound(var) || varDeclaredNotFree(var)) {
-                    // match(x) is not a variable, but the corresponding template variable is bound
-                    // or declared non free (so it has to be matched to a variable)       
+            Services services) {        
+        if (matchCond != null) {
+            if (instantiationCandidate instanceof Term) {
+                final Term term = (Term) instantiationCandidate;
+                if (!(term.op() instanceof QuantifiableVariable)) {
+                    if (varIsBound(var) || varDeclaredNotFree(var)) {
+                        // match(x) is not a variable, but the corresponding template variable is bound
+                        // or declared non free (so it has to be matched to a variable)       
+                        return null; // FAILED
+                    }
+                }
+            }
+            // check generic conditions
+            for (final VariableCondition vc : taclet.getVariableConditions()) {
+                matchCond = vc.check(var, instantiationCandidate, matchCond, services);       
+                if (matchCond == null) {       
                     return null; // FAILED
                 }
             }
         }
-        // check generic conditions
-        for (final VariableCondition vc : taclet.getVariableConditions()) {
-            matchCond = vc.check(var, instantiationCandidate, matchCond, services);       
-            if (matchCond == null) {       
-                return null; // FAILED
-            }
-        }
-
         return matchCond; 
     }
     
@@ -392,7 +404,7 @@ public final class DefaultTacletMatcher implements TacletMatcher {
                 term = resultUpdateMatch.first;
                 matchCond = resultUpdateMatch.second;
             }
-            matchCond = match(term, findExp, matchCond, services); 
+            matchCond = checkConditions(match(term, findExp, matchCond, services), services); 
         } else {
             matchCond = null;
         }
