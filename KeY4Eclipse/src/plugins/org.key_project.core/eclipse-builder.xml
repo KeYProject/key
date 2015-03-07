@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<project name="key" default="copyAndGenerate" basedir=".">
+	<target name="copyAndGenerate">
+		<!-- Call original ant file but with changed build.dir -->
+		<ant antfile="${basedir}/../../../../key/key.core/build.xml" target="copyAndGenerate" dir="${basedir}/../../../../key/key.core">
+			<property name="build.dir" value="${basedir}/bin" />
+		</ant>
+	</target>
+	
+	<target name="clean">
+		<!-- Call original ant file but with changed build.dir -->
+		<ant antfile="${basedir}/../../../../key/key.core/build.xml" target="clean" dir="${basedir}/../../../../key/key.core">
+			<property name="build.dir" value="${basedir}/bin" />
+		</ant>
+	</target>
+</project>

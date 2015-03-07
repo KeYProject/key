@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<model>
-   <state name="return obj.x;">
-      <association name="obj {true}" programVariable="obj" isArrayIndex="false" target="o1" condition="true"/>
-   </state>
-   <object xml:id="o1" name="obj" type="EmptyPathConditionAndNoUpdates">
-   </object>
-</model>

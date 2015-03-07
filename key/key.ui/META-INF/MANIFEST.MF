@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Permissions: all-permissions
+Class-Path: key.util.jar ../libs/antlr.jar ../libs/recoderKey.jar key.core.jar key.core.testgen.jar
+Main-Class: de.uka.ilkd.key.core.Main
+SplashScreen-Image: de/uka/ilkd/key/gui/images/key-color.gif

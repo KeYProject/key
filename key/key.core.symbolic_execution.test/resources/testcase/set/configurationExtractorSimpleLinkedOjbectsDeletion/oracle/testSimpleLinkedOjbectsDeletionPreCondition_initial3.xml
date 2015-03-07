@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <equivalenceClass representativeTerm="x">
+      <term term="x"/>
+      <term term="SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next)"/>
+      <term term="SimpleLinkedOjbectsDeletion::select(heap,SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),SimpleLinkedOjbectsDeletion::$next)"/>
+   </equivalenceClass>
+   <state name="One Step Simplification resulting in return x.value+x.next.value;">
+      <value name="exc" programVariable="exc" isArrayIndex="false" value="exc" type="java.lang.Throwable" condition="true"/>
+      <association name="x" programVariable="x" isArrayIndex="false" target="o1" condition="true"/>
+   </state>
+   <object xml:id="o1" name="x" type="SimpleLinkedOjbectsDeletion">
+      <association name="next" programVariable="next" isArrayIndex="false" target="o1" condition="true"/>
+   </object>
+</model>

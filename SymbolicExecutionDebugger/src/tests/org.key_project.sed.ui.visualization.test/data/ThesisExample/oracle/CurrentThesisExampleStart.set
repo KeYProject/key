@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_2f1500bb-733b-4101-a968-50708912bfc7" name="magic(example5.ThesisExample)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_706586fa-10ac-4a4a-9b24-1c22aa028b03" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\ThesisExample.java">
+      </sedThread>
+   </sedTarget>
+</launch>

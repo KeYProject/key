@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Permissions: all-permissions
+Class-Path: key.util.jar ../libs/antlr.jar ../libs/recoderKey.jar key.core.jar
+Main-Class: Main
