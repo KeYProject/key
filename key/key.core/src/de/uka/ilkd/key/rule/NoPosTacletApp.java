@@ -377,9 +377,7 @@ public class NoPosTacletApp extends TacletApp {
         MatchConditions res = null;
 	if (taclet() instanceof FindTaclet) {
 		res = ((FindTaclet)taclet())
-		    .matchFind ( t,
-				 mc,
-				 services );
+		    .getMatcher().matchFind ( t, mc, services );
 		// the following check will partly be repeated within the
 		// constructor; this could be optimised
 		if ( res == null ||

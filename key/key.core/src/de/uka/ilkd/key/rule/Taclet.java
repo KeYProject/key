@@ -147,7 +147,7 @@ public abstract class Taclet implements Rule, Named {
     private final ImmutableList<TacletGoalTemplate> goalTemplates;
 
     /**
-     * list of rulesets (formerly known as heuristica) the taclet belongs to
+     * list of rulesets (formerly known as heuristics) the taclet belongs to
      */
     protected final ImmutableList<RuleSet> ruleSets;
 
@@ -192,7 +192,7 @@ public abstract class Taclet implements Rule, Named {
     /** 
      * The taclet matcher
      */
-    private final TacletMatcher matcher;
+    protected TacletMatcher matcher;
 
     /**
      * creates a Schematic Theory Specific Rule (Taclet) with the given
@@ -229,7 +229,6 @@ public abstract class Taclet implements Rule, Named {
         this.surviveSymbExec = surviveSmbExec;
 
         this.trigger = attrs.getTrigger();
-        this.matcher = DefaultTacletMatcher.createTacletMatcher(this);
     }
 
     public boolean hasTrigger() {
@@ -268,17 +267,18 @@ public abstract class Taclet implements Rule, Named {
     }
     
     protected void cacheMatchInfo() {
-	boundVariables = getBoundVariables();
-        
-	final Iterator<TacletGoalTemplate> goalDescriptions = 
-	    goalTemplates.iterator();
-	
-	while (!hasReplaceWith && goalDescriptions.hasNext()) {
-	    if (goalDescriptions.next().
-		replaceWithExpressionAsObject() != null) {
-		hasReplaceWith = true;
-	    }
-	}	
+        boundVariables = getBoundVariables();
+
+        final Iterator<TacletGoalTemplate> goalDescriptions = 
+                goalTemplates.iterator();
+
+        while (!hasReplaceWith && goalDescriptions.hasNext()) {
+            if (goalDescriptions.next().
+                    replaceWithExpressionAsObject() != null) {
+                hasReplaceWith = true;
+            }
+        }	        
+        this.matcher = DefaultTacletMatcher.createTacletMatcher(this);
     }
 
     
@@ -317,20 +317,6 @@ public abstract class Taclet implements Rule, Named {
     protected abstract ImmutableSet<QuantifiableVariable> getBoundVariablesHelper(); 
 
     /**
-     * looks if a variable is declared as not free in
-     * @param var the SchemaVariable to look for
-     * @return true iff declared not free
-     */
-    boolean varDeclaredNotFree(SchemaVariable var) {
-       for (final NotFreeIn nfi : varsNotFreeIn) {
-          if (nfi.first() == var) {
-             return true;
-          }
-       }
-       return false;
-    }
-
-    /**
      * returns true iff the taclet contains a "close goal"-statement
      * @return true iff the taclet contains a "close goal"-statement
      */
@@ -360,16 +346,6 @@ public abstract class Taclet implements Rule, Named {
      */
     public ImmutableList<VariableCondition> getVariableConditions () {
 	return variableConditions;
-    }
-
-    /**
-     * returns true iff the given variable is bound either in the
-     * ifSequent or in 
-     * any part of the TacletGoalTemplates
-     * @param v the bound variable to be searched 
-     */
-    protected boolean varIsBound(SchemaVariable v) {
-        return (v instanceof QuantifiableVariable) && getBoundVariables().contains((QuantifiableVariable) v);
     }
 
  
@@ -479,12 +455,13 @@ public abstract class Taclet implements Rule, Named {
     /** returns an iterator over the variable pairs that indicate that are 
      * new in the Taclet. 
      */
-    public Iterator<NotFreeIn> varsNotFreeIn() { 
-	return varsNotFreeIn.iterator();
+    public ImmutableList<NotFreeIn> varsNotFreeIn() { 
+	return varsNotFreeIn;
     } 
+    
 
-    public Iterator<NewDependingOn> varsNewDependingOn() { 
-	return varsNewDependingOn.iterator();
+    public ImmutableList<NewDependingOn> varsNewDependingOn() { 
+	return varsNewDependingOn;
     } 
     
     /** returns an iterator over the goal descriptions.
@@ -1149,54 +1126,57 @@ public abstract class Taclet implements Rule, Named {
 
 
     StringBuffer toStringIf(StringBuffer sb) {
-	if (!ifSequent.isEmpty()) {
-	    sb = sb.append("\\assumes (").append(ifSequent).append(") ");
-	    sb = sb.append("\n");
-	}
-	return sb;
+        if (!ifSequent.isEmpty()) {
+            sb = sb.append("\\assumes (").append(ifSequent).append(") ");
+            sb = sb.append("\n");
+        }
+        return sb;
     }
 
     StringBuffer toStringVarCond(StringBuffer sb) {
-	Iterator<NewVarcond> itVarsNew=varsNew().iterator();
-	Iterator<NotFreeIn> itVarsNotFreeIn=varsNotFreeIn();
-	Iterator<VariableCondition> itVC=getVariableConditions().iterator();
-	if (itVarsNew.hasNext() ||
-	    itVarsNotFreeIn.hasNext() ||
-	    itVC.hasNext()) {
-	    sb = sb.append("\\varcond(");
-	    while (itVarsNew.hasNext()) {
-	    sb=sb.append(itVarsNew.next());
-		if (itVarsNew.hasNext() || itVarsNotFreeIn.hasNext())
-		    sb=sb.append(", "); 
-	    }
-	    while (itVarsNotFreeIn.hasNext()) {
-		NotFreeIn pair=itVarsNotFreeIn.next();
-                sb=sb.append("\\notFreeIn(").append(pair.first()).append
-		  (", ").append(pair.second()).append(")");	 
-		if (itVarsNotFreeIn.hasNext()) sb=sb.append(", ");
-	    }
-	    while (itVC.hasNext()) {
-		sb.append("" + itVC.next());
-		if (itVC.hasNext())
-		    sb.append(", ");
-	    }
-	    sb=sb.append(")\n");	    
-	}
-	return sb;
+
+        if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()) {
+            sb = sb.append("\\varcond(");
+
+            int countVarsNew = varsNew.size() - 1;
+            for (final NewVarcond nvc: varsNew) {
+                sb = sb.append(nvc);
+                if (countVarsNew > 0 || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()) {
+                    sb=sb.append(", "); 
+                }
+                --countVarsNew;
+            }
+
+            int countVarsNotFreeIn = varsNotFreeIn.size() - 1;
+            for (NotFreeIn pair: varsNotFreeIn) {
+                sb = sb.append("\\notFreeIn(").append(pair.first()).append(", ").append(pair.second()).append(")");	 
+                if (countVarsNotFreeIn > 0 || !variableConditions.isEmpty()) sb = sb.append(", ");
+                --countVarsNotFreeIn;
+            }
+
+            int countVariableConditions = variableConditions.size();
+            for (final VariableCondition vc: variableConditions) {
+                sb.append(vc);
+                if (countVariableConditions > 0) sb.append(", ");
+                --countVariableConditions;
+            }
+            sb = sb.append(")\n");	    
+        }
+        return sb;
     }
 
     StringBuffer toStringGoalTemplates(StringBuffer sb) {
-	if (goalTemplates.isEmpty()) {
-	    sb.append("\\closegoal");
-	} else {
-	    Iterator<TacletGoalTemplate> it=goalTemplates().iterator();
-	    while (it.hasNext()) {
-		sb=sb.append(it.next());
-		if (it.hasNext()) sb = sb.append(";");
-		sb = sb.append("\n");
-	    }
-	}
-	return sb;
+        if (goalTemplates.isEmpty()) {
+            sb.append("\\closegoal");
+        } else {
+            Iterator<TacletGoalTemplate> it=goalTemplates().iterator();
+            while (it.hasNext()) {
+                sb=sb.append(it.next());
+                if (it.hasNext()) sb = sb.append(";");
+                sb = sb.append("\n");
+            }
+        }
+        return sb;
     }
 
     StringBuffer toStringRuleSets(StringBuffer sb) {

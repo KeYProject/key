@@ -522,12 +522,12 @@ public class TestMatchTaclet extends TestCase {
 	assertTrue("Instantiations should be found as updates can be ignored if "+
 		   "only the term that is matched has an update and the "+
 		   "template it is matched to has none.",
-		   all_left.matchFind(match, MatchConditions.EMPTY_MATCHCONDITIONS, services)!=null);
+		   all_left.getMatcher().matchFind(match, MatchConditions.EMPTY_MATCHCONDITIONS, services)!=null);
 		
 	Term match2 = TacletForTests.parseTerm("\\<{int i;}\\>{i:=Z(2(#))} true");
 	match2 = match2.sub(0);
 	assertTrue("Instantiations should be found.",
-		   assign_n.matchFind(match2, MatchConditions.EMPTY_MATCHCONDITIONS, services)!=null);
+		   assign_n.getMatcher().matchFind(match2, MatchConditions.EMPTY_MATCHCONDITIONS, services)!=null);
     }
 
 
@@ -718,23 +718,23 @@ public class TestMatchTaclet extends TestCase {
                 (FindTaclet) TacletForTests.getTaclet("testInsequentState_2").taclet();
 
         Term match = TacletForTests.parseTerm("{ i := 0 } (i = 0)");
-	MatchConditions mc=(restrictedTaclet.matchFind(match,
+	MatchConditions mc=(restrictedTaclet.getMatcher().matchFind(match,
                                                        MatchConditions.EMPTY_MATCHCONDITIONS,
                                                        services));
 	assertNull("Test inSequentState failed: matched on term with update prefix", mc);
 
-        mc=(unrestrictedTaclet.matchFind(match,
+        mc=(unrestrictedTaclet.getMatcher().matchFind(match,
                                          MatchConditions.EMPTY_MATCHCONDITIONS,
                                          services));
         assertNotNull("Test inSequentState failed: did not match on term with update prefix", mc);
 
         match = TacletForTests.parseTerm("i = 0");
-	mc=(restrictedTaclet.matchFind(match,
+	mc=(restrictedTaclet.getMatcher().matchFind(match,
                                        MatchConditions.EMPTY_MATCHCONDITIONS,
                                        services));
 	assertNotNull("Test inSequentState failed: did not match on term with without update prefix", mc);
 
-        mc=(unrestrictedTaclet.matchFind(match,
+        mc=(unrestrictedTaclet.getMatcher().matchFind(match,
                                          MatchConditions.EMPTY_MATCHCONDITIONS,
                                          services));
         assertNotNull("Test inSequentState failed: did not match on term with without update prefix", mc);

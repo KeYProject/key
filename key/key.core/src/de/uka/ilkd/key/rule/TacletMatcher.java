@@ -81,4 +81,6 @@ public interface TacletMatcher {
    public abstract MatchConditions checkVariableConditions(SchemaVariable var, SVSubstitute instantiationCandidate,
          MatchConditions matchCond, Services services);
 
+public abstract MatchConditions matchFind(Term term, MatchConditions matchCond, Services services);
+
 }

@@ -406,44 +406,48 @@ public class LogicPrinter {
     }
 
     protected void printVarCond(Taclet taclet) throws IOException{
-        Iterator<NewVarcond> itVarsNew      = taclet.varsNew().iterator();
-        Iterator<NewDependingOn> itVarsNewDepOn = taclet.varsNewDependingOn();
-        Iterator<NotFreeIn> itVarsNotFreeIn = taclet.varsNotFreeIn();
-        ImmutableList<VariableCondition> itVC = taclet.getVariableConditions();
+        final ImmutableList<NewVarcond> varsNew      = taclet.varsNew();
+        final ImmutableList<NewDependingOn> varsNewDependingOn = taclet.varsNewDependingOn();
+        final ImmutableList<NotFreeIn> varsNotFreeIn = taclet.varsNotFreeIn();
+        final ImmutableList<VariableCondition> variableConditions = taclet.getVariableConditions();
 
-        if (itVarsNew.hasNext() ||
-                itVarsNotFreeIn.hasNext() ||
-                !itVC.isEmpty() || itVarsNewDepOn.hasNext()) {
+        if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty() || !varsNewDependingOn.isEmpty()) {
             layouter.brk().beginC(2).print("\\varcond (").brk();
-            while (itVarsNewDepOn.hasNext()) {
-                printNewVarDepOnCond(itVarsNewDepOn.next());
-                if (itVarsNewDepOn.hasNext() ||
-                        itVarsNew.hasNext() ||
-                        itVarsNotFreeIn.hasNext() ||
-                        !itVC.isEmpty()) {
-                        layouter.print(",").brk();
+            
+            int countNewDependingOn = varsNewDependingOn.size() - 1;
+            for (NewDependingOn ndo: varsNewDependingOn) {
+                printNewVarDepOnCond(ndo);
+                if (countNewDependingOn > 0 ||
+                        !varsNotFreeIn.isEmpty() ||
+                        !varsNotFreeIn.isEmpty() ||
+                        !variableConditions.isEmpty()) {
+                    layouter.print(",").brk();
                 }
+                --countNewDependingOn;
             }
-            while (itVarsNew.hasNext()) {
-            	printNewVarcond(itVarsNew.next());
-            	if (itVarsNew.hasNext() || itVarsNotFreeIn.hasNext()
-		    || !itVC.isEmpty()) {
-            		layouter.print(",").brk();
-            	}
-            }
-            while (itVarsNotFreeIn.hasNext()) {
-                NotFreeIn pair=itVarsNotFreeIn.next();
-                printNotFreeIn(pair);
-                if (itVarsNotFreeIn.hasNext() || !itVC.isEmpty()) {
-                        layouter.print(",").brk();
+            
+            int countVarsNew = varsNew.size() - 1;
+            for (final NewVarcond nvc: varsNew) {
+                printNewVarcond(nvc);
+                if (countVarsNew > 0 || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()) {
+                    layouter.print(",").brk();
                 }
             }
             
-            final int countVC = itVC.size() - 1;
-            for (final VariableCondition vc : itVC) {
+            int countNotFreeIn = varsNotFreeIn.size() - 1;
+            for (final NotFreeIn pair: varsNotFreeIn) {
+                printNotFreeIn(pair);
+                if (countNotFreeIn > 0 || !variableConditions.isEmpty()) {
+                    layouter.print(",").brk();
+                }
+                --countNotFreeIn;
+            }
+
+            final int countVC = variableConditions.size() - 1;
+            for (final VariableCondition vc : variableConditions) {
                 printVariableCondition(vc);
                 if (countVC > 0) { 
-                   layouter.print(",").brk();
+                    layouter.print(",").brk();
                 } 
             }
             layouter.brk(1,-2).print(")").end();

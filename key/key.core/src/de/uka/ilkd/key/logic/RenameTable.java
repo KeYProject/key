@@ -111,7 +111,7 @@ public class RenameTable {
     }
 
     /**
-     * creates a nested renaimg table with <code>this</code> 
+     * creates a nested renaming table with <code>this</code> 
      * as parent
      */
     public RenameTable extend() {	        

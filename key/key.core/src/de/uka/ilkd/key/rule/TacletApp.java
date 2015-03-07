@@ -693,10 +693,7 @@ public abstract class TacletApp implements RuleApp {
     private Collection<String> collectClashNames(SchemaVariable sv, TermServices services) {
         Collection<String> result = new LinkedHashSet<String>();
         VariableCollectVisitor vcv = new VariableCollectVisitor();
-        Iterator<NotFreeIn> it = taclet().varsNotFreeIn();
-        while(it.hasNext()) {
-            NotFreeIn nv;
-            nv = it.next();
+        for (final NotFreeIn nv: taclet().varsNotFreeIn()) {
             if(nv.first() == sv) {
                 Term term = (Term) instantiations.getInstantiation(nv.second());
                 if (term != null) {
