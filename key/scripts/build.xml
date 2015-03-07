@@ -68,7 +68,8 @@
       <ant antfile="${key.dir}/key.core.example/build.xml" target="clean" dir="${key.dir}/key.core.example" inheritall="false"/>
 		<!-- Delete deployed files -->
 		<delete file="${key.dir}/deployment/LICENSE.TXT" failonerror="false" />
-      <delete file="${key.dir}/deployment/KeY.jar" failonerror="false" />
+		<delete file="${key.dir}/deployment/KeY.jar" failonerror="false" />
+		<delete file="${key.dir}/deployment/LICENSE.TXT" failonerror="false" />
 	</target>
 
 	<!-- The following tasks are for KeY's Tests -->
@@ -105,13 +106,23 @@
 	</target>
 
 
-	<target name="generateDoc">
+	<target name="generateDoc" depends="compileAll">
    	  <mkdir dir="${javadoc.dir}"/>
-	  <javadoc destdir="${javadoc.dir}">
+  	  <!-- Update GIT revision s-->
+	  <exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
+	    <arg value="rev-parse"/>
+	    <arg value="HEAD"/>
+	  </exec>	
+
+	  <javadoc destdir="${javadoc.dir}" windowtitle="KeY API Documentation" doctitle="KeY API Documentation ${key.version}_${git.revision}"
+		   header="KeY ${key.version}_${git.revision}" access="private">
 	    <fileset dir="${key.dir}/key.util/src/">
 	      <include name="**/*.java"/>
 	    </fileset>
 	    <fileset dir="${key.dir}/key.core/src/">
+	      <include name="**/*.java"/>
+	    </fileset>
+	    <fileset dir="${key.dir}/key.core/genSrc/">
 	      <include name="**/*.java"/>
 	    </fileset>
 	    <fileset dir="${key.dir}/key.core.testgen/src/">
@@ -126,15 +137,20 @@
 	    <fileset dir="${key.dir}/key.core.proof_references/src/">
 	      <include name="**/*.java"/>
 	    </fileset>
+	    <classpath>
+	      <pathelement location="${key.dir}/key.core/lib/antlr.jar"/>
+	      <pathelement location="${key.dir}/key.core/lib/recoderKey.jar"/>
+	    </classpath>  
+
+
+	    <link href="http://recoder.sourceforge.net/doc/api/" />
+	    <link href="http://docs.oracle.com/javase/7/docs/api/" />
+	    <link href="http://www.antlr2.org/javadoc/" />
+	    <link href="http://www.antlr3.org/api/Java/" />
 	  </javadoc>
-	  <!-- Update GIT revision s-->
-	  <exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
-	    <arg value="rev-parse"/>
-	    <arg value="HEAD"/>
-	  </exec>	
 	  <!-- zip KeY-API documentation-->
 	  <zip destfile="${key.dir}/deployment/key-api-doc-${key.version}_${git.revision}.zip"
 		     basedir="${key.dir}/deployment/api"
-          />
+	  />
 	</target>
 </project>
