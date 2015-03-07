@@ -409,40 +409,42 @@ public class LogicPrinter {
         Iterator<NewVarcond> itVarsNew      = taclet.varsNew().iterator();
         Iterator<NewDependingOn> itVarsNewDepOn = taclet.varsNewDependingOn();
         Iterator<NotFreeIn> itVarsNotFreeIn = taclet.varsNotFreeIn();
-        Iterator<VariableCondition> itVC = taclet.getVariableConditions();
+        ImmutableList<VariableCondition> itVC = taclet.getVariableConditions();
 
         if (itVarsNew.hasNext() ||
                 itVarsNotFreeIn.hasNext() ||
-                itVC.hasNext() || itVarsNewDepOn.hasNext()) {
+                !itVC.isEmpty() || itVarsNewDepOn.hasNext()) {
             layouter.brk().beginC(2).print("\\varcond (").brk();
             while (itVarsNewDepOn.hasNext()) {
                 printNewVarDepOnCond(itVarsNewDepOn.next());
                 if (itVarsNewDepOn.hasNext() ||
                         itVarsNew.hasNext() ||
                         itVarsNotFreeIn.hasNext() ||
-                        itVC.hasNext()) {
+                        !itVC.isEmpty()) {
                         layouter.print(",").brk();
                 }
             }
             while (itVarsNew.hasNext()) {
             	printNewVarcond(itVarsNew.next());
             	if (itVarsNew.hasNext() || itVarsNotFreeIn.hasNext()
-		    || itVC.hasNext()) {
+		    || !itVC.isEmpty()) {
             		layouter.print(",").brk();
             	}
             }
             while (itVarsNotFreeIn.hasNext()) {
                 NotFreeIn pair=itVarsNotFreeIn.next();
                 printNotFreeIn(pair);
-                if (itVarsNotFreeIn.hasNext() || itVC.hasNext()) {
+                if (itVarsNotFreeIn.hasNext() || !itVC.isEmpty()) {
                         layouter.print(",").brk();
                 }
             }
-            while (itVC.hasNext()) {
-                printVariableCondition(itVC.next());
-                if (itVC.hasNext()){
-                        layouter.print(",").brk();
-                }
+            
+            final int countVC = itVC.size() - 1;
+            for (final VariableCondition vc : itVC) {
+                printVariableCondition(vc);
+                if (countVC > 0) { 
+                   layouter.print(",").brk();
+                } 
             }
             layouter.brk(1,-2).print(")").end();
         }

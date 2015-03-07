@@ -155,8 +155,7 @@ public class TacletInstantiationModel {
 		ifChoiceModel[i] = 
 		    new TacletAssumesModel ( ifFma,
 					taclet ().matchIf ( ( i < asize ?
-							      antecCand.iterator () :
-							      succCand .iterator () ),
+							      antecCand : succCand ),
 							    ifFma,
 							    matchCond,
 							    services ).getFormulas (),

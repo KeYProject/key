@@ -144,7 +144,7 @@ public class TestMatchTaclet extends TestCase {
 	FindTaclet break_while =  (FindTaclet)TacletForTests
 	    .getTaclet("TestMatchTaclet_break_while").taclet();   
 	
-	MatchConditions svi = break_while.matchJavaBlock
+	MatchConditions svi = ((DefaultTacletMatcher) break_while.getMatcher()).matchJavaBlock
 	    (match, break_while.find(), 
 	     MatchConditions.EMPTY_MATCHCONDITIONS, 
 	     services);
@@ -163,7 +163,7 @@ public class TestMatchTaclet extends TestCase {
 					      +"int k=1;}} }\\> true");
 	FindTaclet taclet=(FindTaclet)TacletForTests
 	    .getTaclet("TestMatchTaclet_whileright").taclet();   
-	MatchConditions svi = taclet.matchJavaBlock
+	MatchConditions svi = ((DefaultTacletMatcher) taclet.getMatcher()).matchJavaBlock
 	    (match, taclet.find(),
 	     MatchConditions.EMPTY_MATCHCONDITIONS, services); 
 
@@ -180,7 +180,7 @@ public class TestMatchTaclet extends TestCase {
 	FindTaclet tacletTwo=(FindTaclet)TacletForTests
 	    .getTaclet("TestMatchTaclet_whileright_labeled").taclet(); 
 	
-	svi = tacletTwo.matchJavaBlock
+	svi = ((DefaultTacletMatcher) tacletTwo.getMatcher()).matchJavaBlock
 	       (matchTwo, tacletTwo.find(),
 		MatchConditions.EMPTY_MATCHCONDITIONS, services); 
 	assertNotNull(svi);
@@ -197,7 +197,7 @@ public class TestMatchTaclet extends TestCase {
 	FindTaclet taclet3=(FindTaclet)TacletForTests
 	    .getTaclet("TestMatchTaclet_whileright_labeled").taclet(); 
 	
-	svi = taclet3.matchJavaBlock
+	svi = ((DefaultTacletMatcher) taclet3.getMatcher()).matchJavaBlock
 	       (match3, taclet3.find(),
 		MatchConditions.EMPTY_MATCHCONDITIONS, services); 
 	assertNull(svi);
@@ -207,7 +207,7 @@ public class TestMatchTaclet extends TestCase {
 	FindTaclet empty_block_taclet=(FindTaclet)TacletForTests
 	    .getTaclet("TestMatchTaclet_empty_block").taclet(); 
 	
- 	svi = empty_block_taclet.matchJavaBlock
+ 	svi = ((DefaultTacletMatcher) empty_block_taclet.getMatcher()).matchJavaBlock
 	       (emptyBlock, empty_block_taclet.find(),
 		MatchConditions.EMPTY_MATCHCONDITIONS, services); 
  	assertTrue(svi != null);
@@ -215,7 +215,7 @@ public class TestMatchTaclet extends TestCase {
 	Term emptyBlock2 = 
 	    TacletForTests.parseTerm("\\<{ { {} } }\\> true");
 
- 	svi = empty_block_taclet.matchJavaBlock
+ 	svi = ((DefaultTacletMatcher) empty_block_taclet.getMatcher()).matchJavaBlock
 	       (emptyBlock2, empty_block_taclet.find(),
 		MatchConditions.EMPTY_MATCHCONDITIONS, services); 
 
@@ -224,7 +224,7 @@ public class TestMatchTaclet extends TestCase {
 	Debug.out("%%%%%%%%%%%%");
 	Term emptyBlock3 = 
 	    TacletForTests.parseTerm("\\<{ { {} l1:{} } }\\> true");
- 	svi = empty_block_taclet.matchJavaBlock
+ 	svi = ((DefaultTacletMatcher) empty_block_taclet.getMatcher()).matchJavaBlock
 	       (emptyBlock3, empty_block_taclet.find(),
 		MatchConditions.EMPTY_MATCHCONDITIONS, services); 
 	assertNotNull(svi);
@@ -233,7 +233,7 @@ public class TestMatchTaclet extends TestCase {
 	FindTaclet var_decl_taclet=(FindTaclet)TacletForTests
 	    .getTaclet("TestMatchTaclet_variable_declaration").taclet(); 
 
-	svi = var_decl_taclet.matchJavaBlock
+	svi = ((DefaultTacletMatcher) var_decl_taclet.getMatcher()).matchJavaBlock
 	    (emptyBlock, var_decl_taclet.find(),
 	     MatchConditions.EMPTY_MATCHCONDITIONS, services); 
 	assertNull(svi);	
@@ -242,7 +242,7 @@ public class TestMatchTaclet extends TestCase {
 	    TacletForTests.parseTerm("\\<{ { l1:{} } }\\> true");
 	FindTaclet empty_label_taclet=(FindTaclet)TacletForTests
 	    .getTaclet("TestMatchTaclet_empty_label").taclet(); 
-	svi = empty_label_taclet.matchJavaBlock
+	svi = ((DefaultTacletMatcher) empty_label_taclet.getMatcher()).matchJavaBlock
 	    (emptyLabel, 
 	     empty_label_taclet.find(),
 	     MatchConditions.EMPTY_MATCHCONDITIONS, services); 
@@ -250,7 +250,7 @@ public class TestMatchTaclet extends TestCase {
 
 	Term emptyLabel2 = 
 	    TacletForTests.parseTerm("\\<{ l2:{ l1:{} } }\\> true");
-	svi = empty_label_taclet.matchJavaBlock
+	svi = ((DefaultTacletMatcher) empty_label_taclet.getMatcher()).matchJavaBlock
 	       (emptyLabel2, 
 		empty_label_taclet.find(),
 		MatchConditions.EMPTY_MATCHCONDITIONS, services); 
@@ -258,7 +258,7 @@ public class TestMatchTaclet extends TestCase {
 
 	Term emptyLabel3 = 
 	    TacletForTests.parseTerm("\\<{ {l3:{{l2:{l1:{}}}} int i = 0;} }\\> true");
-	svi = empty_label_taclet.matchJavaBlock
+	svi = ((DefaultTacletMatcher) empty_label_taclet.getMatcher()).matchJavaBlock
 	       (emptyLabel3, 
 		empty_label_taclet.find(),
 		MatchConditions.EMPTY_MATCHCONDITIONS, services); 
@@ -293,7 +293,7 @@ public class TestMatchTaclet extends TestCase {
 	    .getTaclet("TestMatchTaclet_preincrement").taclet();   
 
 	MatchConditions svi =
-	    taclet.matchJavaBlock
+	    ((DefaultTacletMatcher) taclet.getMatcher()).matchJavaBlock
 	    (match, taclet.find(), 
 	     MatchConditions.EMPTY_MATCHCONDITIONS, services); 
 
@@ -310,7 +310,7 @@ public class TestMatchTaclet extends TestCase {
 					      +"int k=1; }\\> true)");
 	FindTaclet taclet
 	    =(FindTaclet)TacletForTests.getTaclet("TestMatchTaclet_for_right").taclet();   
-	MatchConditions svi = taclet.matchJavaBlock
+	MatchConditions svi = ((DefaultTacletMatcher) taclet.getMatcher()).matchJavaBlock
 	    (match.sub(0), taclet.find(), 
 	     MatchConditions.EMPTY_MATCHCONDITIONS, services); 
 
