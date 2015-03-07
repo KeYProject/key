@@ -27,11 +27,12 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import de.uka.ilkd.key.experimental.CustomParameterized.CustomParameters;
+
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 
-import de.uka.ilkd.key.core.Main;
-import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
@@ -154,10 +155,6 @@ public class RunAllProofsTest {
         System.out.println("Starting process: " + pb.command());
         Process process = pb.inheritIO().start();
         process.waitFor();
-//        process.waitFor(5, TimeUnit.SECONDS); // wait until subprocess has finished
-//        if(process.isAlive()){
-//            process.destroy();
-//        }
         if (successExpected) {
             assertSame(0, process.exitValue());
         }
