@@ -6,7 +6,7 @@ package org.key_project.jmlediting.profile.jmlref.visibility;
  * @author Moritz Lichter
  *
  */
-public class SpecProtectedKeyword extends JMLVisibilityKeyword {
+public class SpecProtectedKeyword extends JMLModifierKeyword {
 
    /**
     * Creates a new spec_protected keyword.

@@ -8,7 +8,7 @@ import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyToplevelKeywo
  * @author Moritz Lichter
  *
  */
-public abstract class JMLVisibilityKeyword extends AbstractEmptyToplevelKeyword {
+public abstract class JMLModifierKeyword extends AbstractEmptyToplevelKeyword {
 
    /**
     * Creates a new keyword instance.
@@ -16,7 +16,7 @@ public abstract class JMLVisibilityKeyword extends AbstractEmptyToplevelKeyword 
     * @param keyword
     *           the keyword
     */
-   public JMLVisibilityKeyword(final String keyword) {
+   public JMLModifierKeyword(final String keyword) {
       super(keyword);
    }
 

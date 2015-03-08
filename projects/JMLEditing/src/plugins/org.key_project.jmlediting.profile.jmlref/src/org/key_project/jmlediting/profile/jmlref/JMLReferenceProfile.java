@@ -45,6 +45,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AxiomKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.DivergesKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.EnsuresKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.InitiallyKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.MeasuredByKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.SignalsKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.SignalsOnlyKeyword;
@@ -55,15 +56,20 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Re
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.EverythingKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.NotSpecifiedKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.NothingKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_statement.BreakClauseKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_statement.ContinuesClauseKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_statement.ReturnsClauseKeyword;
 import org.key_project.jmlediting.profile.jmlref.type.BigIntKeyword;
 import org.key_project.jmlediting.profile.jmlref.type.RealKeyword;
 import org.key_project.jmlediting.profile.jmlref.usercontent.SpecExpressionContentDescription;
 import org.key_project.jmlediting.profile.jmlref.validator.LoopInvariantValidator;
+import org.key_project.jmlediting.profile.jmlref.visibility.InstanceKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.PrivateKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.ProtectedKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.PublicKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.SpecProtectedKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.SpecPublicKeyword;
+import org.key_project.jmlediting.profile.jmlref.visibility.StaticKeyword;
 
 /**
  * Models JML with respect to the JML reference manual.
@@ -107,8 +113,11 @@ public class JMLReferenceProfile extends AbstractJMLProfile {
                   new BigIntKeyword(), new DivergesKeyword(),
                   new MeasuredByKeyword(), new SignalsKeyword(),
                   new SignalsOnlyKeyword(), new AxiomKeyword(),
-                  new TypeofKeyword(), new TypeKeyword(),
-                  new FreshKeyword(), new ReachKeyword()));
+                  new TypeofKeyword(), new TypeKeyword(), new FreshKeyword(),
+                  new ReachKeyword(), new InstanceKeyword(),
+                  new StaticKeyword(), new InitiallyKeyword(),
+                  new ContinuesClauseKeyword(), new BreakClauseKeyword(),
+                  new ReturnsClauseKeyword()));
 
       this.getSupportedPrimariesInternal().addAll(
             Arrays.asList(new KeywordJMLPrimary(), new QuantifierPrimary()));
