@@ -25,7 +25,9 @@ import org.key_project.jmlediting.core.profile.IDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
-import org.key_project.jmlediting.ui.preferencepages.profileEditor.ProfileEditorDialog;
+import org.key_project.jmlediting.ui.preferencepages.profileDialog.AbstractJMLProfileDialog;
+import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLProfileEditDialog;
+import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLProfileViewDialog;
 
 /**
  * The {@link JMLProfilePropertiesPage} implements a properties and preferences
@@ -51,7 +53,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    /**
     * The list which shows all profile names to the user.
     */
-   private Table profilesList;
+   private Table profilesListTable;
    /**
     * The list of the profiles, in the same order as shown in the list.
     */
@@ -85,7 +87,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
                .buildDefaultProfilePreferencesListener(new IPreferenceChangeListener() {
                   @Override
                   public void preferenceChange(final PreferenceChangeEvent event) {
-                     if (!JMLProfilePropertiesPage.this.profilesList
+                     if (!JMLProfilePropertiesPage.this.profilesListTable
                            .isDisposed()) {
                         JMLProfilePropertiesPage.this.updateSelection();
                      }
@@ -117,11 +119,11 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       data.verticalSpan = 4;
       data.heightHint = 300;
 
-      this.profilesList = new Table(myComposite, SWT.H_SCROLL | SWT.V_SCROLL
-            | SWT.BORDER | SWT.CHECK | SWT.FULL_SELECTION);
-      this.profilesList.setLayoutData(data);
-      this.profilesList.setLinesVisible(true);
-      this.profilesList.setHeaderVisible(true);
+      this.profilesListTable = new Table(myComposite, SWT.H_SCROLL
+            | SWT.V_SCROLL | SWT.BORDER | SWT.CHECK | SWT.FULL_SELECTION);
+      this.profilesListTable.setLayoutData(data);
+      this.profilesListTable.setLinesVisible(true);
+      this.profilesListTable.setHeaderVisible(true);
 
       this.initUI();
 
@@ -167,10 +169,19 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       this.editViewButton.addSelectionListener(new SelectionListener() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            final ProfileEditorDialog d = new ProfileEditorDialog(
-                  JMLProfilePropertiesPage.this.getShell());
-            d.setProfile(JMLProfilePropertiesPage.this.getSelectedProfile());
-            d.open();
+            final IJMLProfile profile = JMLProfilePropertiesPage.this
+                  .getSelectedProfile();
+            AbstractJMLProfileDialog dialog;
+            if (JMLProfilePropertiesPage.this.isProfileDerived(profile)) {
+               dialog = new JMLProfileEditDialog(JMLProfilePropertiesPage.this
+                     .getShell(), profile);
+            }
+            else {
+               dialog = new JMLProfileViewDialog(JMLProfilePropertiesPage.this
+                     .getShell(), profile);
+            }
+            dialog.setProfile(profile);
+            dialog.open();
          }
 
          @Override
@@ -198,18 +209,18 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       // Get all profiles and set them to the list
       this.allProfiles = JMLProfileManagement.instance()
             .getAvailableProfilesSortedByName();
-      final TableColumn nameColumn = new TableColumn(this.profilesList,
+      final TableColumn nameColumn = new TableColumn(this.profilesListTable,
             SWT.LEFT);
       nameColumn.setMoveable(false);
       nameColumn.setWidth(175);
       nameColumn.setText("Profile Name");
-      final TableColumn typeColumn = new TableColumn(this.profilesList,
+      final TableColumn typeColumn = new TableColumn(this.profilesListTable,
             SWT.LEFT);
       typeColumn.setMoveable(false);
       typeColumn.setWidth(175);
       typeColumn.setText("Profile Type");
       for (final IJMLProfile profile : this.allProfiles) {
-         final TableItem item = new TableItem(this.profilesList, 0);
+         final TableItem item = new TableItem(this.profilesListTable, 0);
          final String type;
          if (this.isProfileDerived(profile)) {
             type = "derived from "
@@ -223,18 +234,18 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       this.updateSelection();
 
       // Make sure that only one profile is available at a single time
-      this.profilesList.addListener(SWT.Selection, new Listener() {
+      this.profilesListTable.addListener(SWT.Selection, new Listener() {
          @Override
          public void handleEvent(final Event event) {
             if (event.detail == SWT.CHECK) {
                final TableItem item = (TableItem) event.item;
                if (item.getChecked()) {
                   final IJMLProfile profile = JMLProfilePropertiesPage.this.allProfiles
-                        .get(JMLProfilePropertiesPage.this.profilesList
+                        .get(JMLProfilePropertiesPage.this.profilesListTable
                               .indexOf(item));
                   JMLProfilePropertiesPage.this
                         .updateEditViewButtonLabel(profile);
-                  for (final TableItem item2 : JMLProfilePropertiesPage.this.profilesList
+                  for (final TableItem item2 : JMLProfilePropertiesPage.this.profilesListTable
                         .getItems()) {
                      if (item != item2) {
                         item2.setChecked(false);
@@ -244,7 +255,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
                }
                else {
                   boolean nothingChecked = true;
-                  for (final TableItem item2 : JMLProfilePropertiesPage.this.profilesList
+                  for (final TableItem item2 : JMLProfilePropertiesPage.this.profilesListTable
                         .getItems()) {
                      if (item2.getChecked()) {
                         nothingChecked = false;
@@ -269,7 +280,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
    private IJMLProfile getProfileForTableItem(final TableItem item) {
       return JMLProfilePropertiesPage.this.allProfiles
-            .get(JMLProfilePropertiesPage.this.profilesList.indexOf(item));
+            .get(JMLProfilePropertiesPage.this.profilesListTable.indexOf(item));
    }
 
    private void updateEditViewButtonLabel(final IJMLProfile profile) {
@@ -302,7 +313,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     *           whether to enable the list or not
     */
    private void setListEnabled(final boolean enabled) {
-      this.profilesList.setEnabled(enabled);
+      this.profilesListTable.setEnabled(enabled);
    }
 
    @Override
@@ -364,12 +375,12 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       }
       assert currentProfile != null;
       // Select profile in the list
-      for (final TableItem item : this.profilesList.getItems()) {
+      for (final TableItem item : this.profilesListTable.getItems()) {
          item.setChecked(false);
       }
       final int index = this.allProfiles.indexOf(currentProfile);
       if (index != -1) {
-         this.profilesList.getItem(index).setChecked(true);
+         this.profilesListTable.getItem(index).setChecked(true);
       }
       else {
 
@@ -380,7 +391,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       this.updateEditViewButtonLabel(currentProfile);
 
       // Redraw the list because selection is otherwise not always cleared
-      this.profilesList.redraw();
+      this.profilesListTable.redraw();
    }
 
    private void removePreferencesListener() {
@@ -399,9 +410,9 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    }
 
    private IJMLProfile getSelectedProfile() {
-      for (int i = 0; i < this.profilesList.getItemCount(); i++) {
+      for (int i = 0; i < this.profilesListTable.getItemCount(); i++) {
          // Can only have one selection
-         if (this.profilesList.getItem(i).getChecked()) {
+         if (this.profilesListTable.getItem(i).getChecked()) {
             return this.allProfiles.get(i);
          }
       }
