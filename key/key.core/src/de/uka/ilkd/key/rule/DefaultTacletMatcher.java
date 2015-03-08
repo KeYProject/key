@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.RenameTable;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -33,21 +34,22 @@ public final class DefaultTacletMatcher implements TacletMatcher {
         return new DefaultTacletMatcher(taclet);
     }
 
-    /**
-     * The taclet to be matched 
-     */
-    private final Taclet taclet;
+    private final ImmutableList<VariableCondition> varconditions;
+    private final Sequent assumesSequent;
     private final ImmutableSet<QuantifiableVariable> boundVars;
     private final ImmutableList<NotFreeIn> varsNotFreeIn;
     
     private final boolean ignoreTopLevelUpdates;
     private final Term findExp;
-
+   
     /**
      * @param taclet the Taclet matched by this matcher
      */
     private DefaultTacletMatcher(Taclet taclet) {
-        this.taclet = taclet;
+        varconditions = taclet.getVariableConditions();
+        assumesSequent = taclet.ifSequent();
+        boundVars = taclet.getBoundVariables();
+        varsNotFreeIn = taclet.varsNotFreeIn();
 
         if (taclet instanceof FindTaclet) {
             ignoreTopLevelUpdates = ((FindTaclet) taclet).ignoreTopLevelUpdates();
@@ -55,10 +57,7 @@ public final class DefaultTacletMatcher implements TacletMatcher {
         } else {
             ignoreTopLevelUpdates = false;
             findExp = null;
-        }
-        
-        boundVars = taclet.getBoundVariables();
-        varsNotFreeIn = taclet.varsNotFreeIn();
+        }     
     }
     
    
@@ -246,7 +245,7 @@ public final class DefaultTacletMatcher implements TacletMatcher {
             MatchConditions                  p_matchCond,
             Services                         p_services ) {
 
-        final Iterator<SequentFormula>     itIfSequent   = taclet.ifSequent () .iterator ();
+        final Iterator<SequentFormula>     itIfSequent   = assumesSequent .iterator ();
 
         ImmutableList<MatchConditions>            newMC;   
 
@@ -339,7 +338,7 @@ public final class DefaultTacletMatcher implements TacletMatcher {
                 }
             }
             // check generic conditions
-            for (final VariableCondition vc : taclet.getVariableConditions()) {
+            for (final VariableCondition vc : varconditions) {
                 matchCond = vc.check(var, instantiationCandidate, matchCond, services);       
                 if (matchCond == null) {       
                     return null; // FAILED
