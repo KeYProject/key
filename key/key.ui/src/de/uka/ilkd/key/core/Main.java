@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.core;
 
+import java.awt.EventQueue;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.List;
@@ -159,32 +160,35 @@ public final class Main {
      */
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         // this property overrides the default
         if (Boolean.getBoolean("key.verbose-ui")) verbosity = Verbosity.DEBUG;
 
         // does no harm on non macs
         System.setProperty("apple.laf.useScreenMenuBar","true");
 
-
-        try {
-            cl = createCommandLine();
-            cl.parse(args);
-            evaluateOptions(cl);
-            fileArguments = cl.getFileArguments();
-            AbstractMediatorUserInterfaceControl userInterface = createUserInterface(fileArguments);
-            loadCommandLineFiles(userInterface, fileArguments);
-        } catch (ExceptionInInitializerError e) {
-            System.err.println("D'oh! It seems that KeY was not built properly!");
-            System.exit(777);
-        } catch (CommandLineException e) {
-            printHeader(); // exception before verbosity option could be read
-            if (Debug.ENABLE_DEBUG) {
-                e.printStackTrace();
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    cl = createCommandLine();
+                    cl.parse(args);
+                    evaluateOptions(cl);
+                    fileArguments = cl.getFileArguments();
+                    AbstractMediatorUserInterfaceControl userInterface = createUserInterface(fileArguments);
+                    loadCommandLineFiles(userInterface, fileArguments);
+                } catch (ExceptionInInitializerError e) {
+                    System.err.println("D'oh! It seems that KeY was not built properly!");
+                    System.exit(777);
+                } catch (CommandLineException e) {
+                    printHeader(); // exception before verbosity option could be read
+                    if (Debug.ENABLE_DEBUG) {
+                        e.printStackTrace();
+                    }
+                    printUsageAndExit(true, e.getMessage(), -1);
+                }
             }
-            printUsageAndExit(true, e.getMessage(), -1);
-        }
-
+        });
     }
 
     public static void loadCommandLineFiles(AbstractMediatorUserInterfaceControl ui, List<File> fileArguments) {
