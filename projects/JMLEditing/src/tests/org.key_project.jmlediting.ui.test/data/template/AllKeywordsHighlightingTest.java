@@ -1,8 +1,8 @@
 package org.key_project.jmlediting.ui.test.highlighting;
 
 /*@
-  @ public invariant numCalls >= 0;
-  @ protected invariant numCalls >= handledCalls;
+  @ public instance invariant numCalls >= 0;
+  @ protected static invariant numCalls >= handledCalls;
   @ private invariant needsRefresh <==> numCalls != handlesCalls;
   @*/
 public abstract class AllKeywordsHighlightingTest {
@@ -122,11 +122,26 @@ public abstract class AllKeywordsHighlightingTest {
      @ ensures \fresh(a, b, c, d[5], x.get());
      @ ensures \type(Integer) == \typeof(x.get());
      @ requires \reach(x).empty();
+     @ initially false;
      @ 
      @ 
      @*/
    public void checkSomeOtherKeywords() {
       
+   }
+   
+   /*@
+     @ continues ->(x);
+     @ breaks ->(y) false;
+     @ returns;
+     @*/
+   public void checkSpecificationStatementKeywords() {
+      x: {
+      
+         }
+       y: {
+            
+         }
    }
 
 }
