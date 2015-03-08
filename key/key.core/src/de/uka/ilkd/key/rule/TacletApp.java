@@ -999,7 +999,7 @@ public abstract class TacletApp implements RuleApp {
 		&& ifInstantiations == null : "If instantiations list has wrong size or is null "
 		+ "or the if formulas have already been instantiated";
 
-	MatchConditions mc = taclet().matchIf(p_list,matchConditions(), p_services);
+	MatchConditions mc = taclet().getMatcher().matchIf(p_list, matchConditions(), p_services);
 
 	return mc == null ? null : setAllInstantiations(mc, p_list, p_services);
     }
@@ -1073,8 +1073,7 @@ public abstract class TacletApp implements RuleApp {
 	}
 
 	// Match the current formula
-	IfMatchResult mr = taclet().matchIf(p_toMatch,
-		p_ifSeqTail.head().formula(), p_matchCond, p_services);
+	IfMatchResult mr = taclet().getMatcher().matchIf(p_toMatch, p_ifSeqTail.head().formula(), p_matchCond, p_services);
 
 	// For each matching formula call the method again to match
 	// the remaining terms

@@ -573,10 +573,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             final ImmutableList<IfFormulaInstantiation> formulas =
                 getSequentFormulas ( antec,
                                      !lastIfFormula || p_alreadyMatchedNewFor );
-            final IfMatchResult mr = getTaclet ().matchIf ( formulas,
-                                                            p_ifSeqTail.head ().formula (),
-                                                            p_matchCond,
-                                                            getServices () );
+            final IfMatchResult mr = getTaclet ().getMatcher().matchIf(formulas, p_ifSeqTail.head ().formula (), p_matchCond, getServices ());
 
             // For each matching formula call the method again to match
             // the remaining terms

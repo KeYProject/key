@@ -235,7 +235,7 @@ public abstract class Taclet implements Rule, Named {
         return trigger;
     }
 
-    public TacletMatcher getMatcher() {
+    public final TacletMatcher getMatcher() {
        return matcher;
     }
     
@@ -331,54 +331,6 @@ public abstract class Taclet implements Rule, Named {
     public ImmutableList<VariableCondition> getVariableConditions () {
 	return variableConditions;
     }
-
-
-    
-
-    /**
-     * Match the given template (which is probably a formula of the if
-     * sequence) against a list of constraint formulas (probably the
-     * formulas of the antecedent or the succedent), starting with the
-     * given instantiations and constraint p_matchCond.
-     * @param p_toMatch list of constraint formulas to match p_template to
-     * @param p_template template formula as in "match"
-     * @param p_matchCond already performed instantiations
-     * @param p_services the Services object encapsulating information
-     * about the java datastructures like (static)types etc.
-     * @return Two lists (in an IfMatchResult object), containing the
-     * the elements of p_toMatch that could successfully be matched
-     * against p_template, and the corresponding MatchConditions.
-     */
-    public final IfMatchResult matchIf ( Iterable<IfFormulaInstantiation> p_toMatch,
-               Term                             p_template,
-               MatchConditions                  p_matchCond,
-               Services                         p_services ) {
-       return matcher.matchIf(p_toMatch, p_template, p_matchCond, p_services);
-    }
-    
-    /**
-     * matches all formulas in this taclet's <code>assumes</code> clause with the p_candidate 
-     * collection and returns the resulting match conditions or <code>null</code> if not all 
-     * candidates can be matched
-     * Note: the number of formulas in <code>p_candidates</code> must be identical to the
-     * size of {@link #ifSequent()}
-     * @param p_candidate the list of assumes formulas to match against the formulas in this 
-     * taclet's <code>assumes</code> clause 
-     * @param p_matchCond the match conditions found up to now
-     * @param p_services the services
-     * @return the resulting matches or <code>null</null> if the given candidate collection
-     * is no match for this taclet's <code>assumes</code> clause
-     */
-    public final MatchConditions matchIf(Iterable<IfFormulaInstantiation> p_candidate,
-          MatchConditions p_matchCond, Services p_services) {
-       return matcher.matchIf(p_candidate, p_matchCond, p_services);
-    }
-    
-
- 
-    
-
-
 
     /** returns the name of the Taclet
      */
