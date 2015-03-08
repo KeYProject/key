@@ -188,11 +188,10 @@ public abstract class Taclet implements Rule, Named {
     /** 
      * The taclet matcher
      */
-    protected TacletMatcher matcher;
+    private TacletMatcher matcher;
 
     /**
-     * creates a Schematic Theory Specific Rule (Taclet) with the given
-     * parameters.  
+     * creates a Taclet (originally known as Schematic Theory Specific Rules)
      * @param name the name of the Taclet 
      * @param applPart contains the application part of an Taclet that is
      * the if-sequence, the variable conditions
@@ -405,17 +404,12 @@ public abstract class Taclet implements Rule, Named {
      * computed and cached by method cacheMatchInfo
      */
     public boolean hasReplaceWith() {
-        boolean hasReplaceWith = false;
-        final Iterator<TacletGoalTemplate> goalDescriptions = 
-                goalTemplates.iterator();
-
-        while (!hasReplaceWith && goalDescriptions.hasNext()) {
-            if (goalDescriptions.next().
-                    replaceWithExpressionAsObject() != null) {
-                hasReplaceWith = true;
+        for (final TacletGoalTemplate goalDescr: goalTemplates) {
+            if (goalDescr.replaceWithExpressionAsObject() != null) {
+                return true;
             }
         }     
-        return hasReplaceWith;
+        return false;
     }
     
     /**
