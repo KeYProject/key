@@ -48,6 +48,7 @@ public class ExpressionParser implements ParseFunction {
    private final ParseFunction referenceType;
 
    private final ParseFunction assignmentExprParser;
+   private final ParseFunction exprListParser;
 
    /**
     * Returns the parser which parses array dimension declaration.
@@ -69,7 +70,7 @@ public class ExpressionParser implements ParseFunction {
 
    /**
     * Returns the parser which parses reference types.
-    * 
+    *
     * @return
     */
    public ParseFunction referenceType() {
@@ -78,6 +79,10 @@ public class ExpressionParser implements ParseFunction {
 
    public ParseFunction assignmentExpr() {
       return this.assignmentExprParser;
+   }
+
+   public ParseFunction exprList() {
+      return this.exprListParser;
    }
 
    @Override
@@ -456,5 +461,6 @@ public class ExpressionParser implements ParseFunction {
       this.typeSpecParser = typeSpec;
       this.assignmentExprParser = assignmentExpr;
       this.referenceType = referenceType;
+      this.exprListParser = expressionList;
    }
 }

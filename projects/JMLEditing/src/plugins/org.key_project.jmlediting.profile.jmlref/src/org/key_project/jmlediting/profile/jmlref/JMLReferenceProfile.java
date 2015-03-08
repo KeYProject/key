@@ -26,8 +26,12 @@ import org.key_project.jmlediting.profile.jmlref.other.InvariantKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.NonNullKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.NullableKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.PureKeyword;
+import org.key_project.jmlediting.profile.jmlref.primary.FreshKeyword;
 import org.key_project.jmlediting.profile.jmlref.primary.InvariantForKeyword;
 import org.key_project.jmlediting.profile.jmlref.primary.KeywordJMLPrimary;
+import org.key_project.jmlediting.profile.jmlref.primary.ReachKeyword;
+import org.key_project.jmlediting.profile.jmlref.primary.TypeKeyword;
+import org.key_project.jmlediting.profile.jmlref.primary.TypeofKeyword;
 import org.key_project.jmlediting.profile.jmlref.quantifier.ExistentialQuantifierKeyword;
 import org.key_project.jmlediting.profile.jmlref.quantifier.ForallQuantifierKeyword;
 import org.key_project.jmlediting.profile.jmlref.quantifier.MaxQuantifierKeyword;
@@ -38,6 +42,7 @@ import org.key_project.jmlediting.profile.jmlref.quantifier.QuantifierPrimary;
 import org.key_project.jmlediting.profile.jmlref.quantifier.SumQuantifierKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.AxiomKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.DivergesKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.EnsuresKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.MeasuredByKeyword;
@@ -101,7 +106,9 @@ public class JMLReferenceProfile extends AbstractJMLProfile {
                   new NullableKeyword(), new RealKeyword(),
                   new BigIntKeyword(), new DivergesKeyword(),
                   new MeasuredByKeyword(), new SignalsKeyword(),
-                  new SignalsOnlyKeyword()));
+                  new SignalsOnlyKeyword(), new AxiomKeyword(),
+                  new TypeofKeyword(), new TypeKeyword(),
+                  new FreshKeyword(), new ReachKeyword()));
 
       this.getSupportedPrimariesInternal().addAll(
             Arrays.asList(new KeywordJMLPrimary(), new QuantifierPrimary()));

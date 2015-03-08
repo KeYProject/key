@@ -114,5 +114,19 @@ public abstract class AllKeywordsHighlightingTest {
    protected /*@helper*/ void tryBreakEverything(/*@ non_null */ String s) {
       tryBreakEverything(s);
    }
+   
+   /*@
+     @ 
+     @ axiom true;
+     @ 
+     @ ensures \fresh(a, b, c, d[5], x.get());
+     @ ensures \type(Integer) == \typeof(x.get());
+     @ requires \reach(x).empty();
+     @ 
+     @ 
+     @*/
+   public void checkSomeOtherKeywords() {
+      
+   }
 
 }
