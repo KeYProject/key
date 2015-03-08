@@ -974,39 +974,6 @@ public abstract class Taclet implements Rule, Named {
     }
     
     /**
-     * checks if the conditions for a correct instantiation are satisfied
-     * @param var the SchemaVariable to be instantiated
-     * @param instantiationCandidate the SVSubstitute, which is a
-     * candidate for a possible instantiation of var
-     * @param matchCond the MatchConditions which have to be respected
-     * for the new match
-     * @param services the Services object encapsulating information
-     * about the Java type model
-     * @return the match conditions resulting from matching
-     * <code>var</code> with <code>instantiationCandidate</code> or
-     * <code>null</code> if a match was not possible
-     */
-    public MatchConditions checkVariableConditions(SchemaVariable sv, Term term,
-          MatchConditions cond, Services services) {
-       return matcher.checkVariableConditions(sv, term, cond, services);
-    }
-    
-    /**
-     * checks the provided matches against the variable conditions of this taclet
-     * It returns the resulting match conditions or <code>null</code> if the found matches
-     * do not satisfy the variable conditions. If the given matchconditions are <code>null</code>
-     * then <code>null</code> is returned
-     * @param p_matchconditions the matches to be checked
-     * @param services the {@link Services}
-     * @return the resulting match conditions or <code>null</code> if 
-     * given matches do not satisfy the taclet's variable conditions   
-     */
-    public MatchConditions checkConditions(MatchConditions p_matchconditions, Services services) {
-       return matcher.checkConditions(p_matchconditions, services);
-    }
-    
-    
-    /**
      * @return set of schemavariables of the if and the (optional)
      * find part
      */

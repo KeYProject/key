@@ -547,7 +547,7 @@ public abstract class TacletApp implements RuleApp {
 		    + " is not matched by " + sv);
 	}
 
-	cond = taclet().checkVariableConditions(sv, term, cond, services);
+	cond = taclet().getMatcher().checkVariableConditions(sv, term, cond, services);
 
 	if (cond == null) {
 	    throw new IllegalInstantiationException("Instantiation " + term
@@ -656,8 +656,7 @@ public abstract class TacletApp implements RuleApp {
 	}
 
 	if (app != this) {
-	    final MatchConditions appMC = app.taclet().checkConditions(
-		    app.matchConditions(), services);
+	    final MatchConditions appMC = app.taclet().getMatcher().checkConditions(app.matchConditions(), services);
 	    if (appMC == null) {
 		return null;
 	    } else {
@@ -920,7 +919,7 @@ public abstract class TacletApp implements RuleApp {
 		    + ") is not matched by " + sv);
 	}
 
-	cond = taclet().checkConditions(cond, services);
+	cond = taclet().getMatcher().checkConditions(cond, services);
 
 	if (cond == null) {
 	    throw new IllegalInstantiationException("Instantiation " + pe

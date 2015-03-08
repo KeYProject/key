@@ -7,7 +7,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 public interface TacletMatcher {
 
-
    /**
     * Match the given template (which is probably a formula of the if
     * sequence) against a list of constraint formulas (probably the
@@ -63,8 +62,9 @@ public interface TacletMatcher {
     * <code>var</code> with <code>instantiationCandidate</code> or
     * <code>null</code> if a match was not possible
     */
-   public abstract MatchConditions checkVariableConditions(SchemaVariable var, SVSubstitute instantiationCandidate,
-         MatchConditions matchCond, Services services);
+   public abstract MatchConditions checkVariableConditions(SchemaVariable var, 
+           SVSubstitute instantiationCandidate,
+           MatchConditions matchCond, Services services);
 
    /** 
     * matches the given term against the taclet's find term 

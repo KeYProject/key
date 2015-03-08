@@ -34,6 +34,7 @@ public final class DefaultTacletMatcher implements TacletMatcher {
         return new DefaultTacletMatcher(taclet);
     }
 
+    
     private final ImmutableList<VariableCondition> varconditions;
     private final Sequent assumesSequent;
     private final ImmutableSet<QuantifiableVariable> boundVars;
