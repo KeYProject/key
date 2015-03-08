@@ -66,6 +66,22 @@ public interface TacletMatcher {
    public abstract MatchConditions checkVariableConditions(SchemaVariable var, SVSubstitute instantiationCandidate,
          MatchConditions matchCond, Services services);
 
-public abstract MatchConditions matchFind(Term term, MatchConditions matchCond, Services services);
+   /** 
+    * matches the given term against the taclet's find term 
+    * if the taclet has no find term or the match is unsuccessful <code>null</null>
+    * is returned
+    * @param term the Term to be matched against the find expression 
+    * of the taclet
+    * @param matchCond the MatchConditions with side conditions to be 
+    * satisfied, eg. partial instantiations of schema variables; before
+    * calling this method the constraint contained in the match conditions
+    * must be ensured to be satisfiable, i.e.
+    *       <tt> matchCond.getConstraint ().isSatisfiable () </tt>
+    * must return true
+    * @param services the Services 
+    * @return the found schema variable mapping or <tt>null</tt> if 
+    * the matching failed
+    */
+   public abstract MatchConditions matchFind(Term term, MatchConditions matchCond, Services services);
 
 }

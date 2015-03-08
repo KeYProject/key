@@ -64,7 +64,7 @@ public class AntecTaclet extends FindTaclet{
 	super(name, applPart, goalTemplates, heuristics, attrs, 
 	      find, prefixMap, choices);
         this.ignoreTopLevelUpdates = ignoreTopLevelUpdates;
-	cacheMatchInfo();
+	createAndInitializeMatcher();
     }
 
    

@@ -378,19 +378,8 @@ public final class DefaultTacletMatcher implements TacletMatcher {
     }
 
 
-    /** 
-     * matches the given term against the taclet's find term and
-     * @param term the Term to be matched against the find expression 
-     * of the taclet
-     * @param matchCond the MatchConditions with side conditions to be 
-     * satisfied, eg. partial instantiations of schema variables; before
-     * calling this method the constraint contained in the match conditions
-     * must be ensured to be satisfiable, i.e.
-     *       <tt> matchCond.getConstraint ().isSatisfiable () </tt>
-     * must return true
-     * @param services the Services 
-     * @return the found schema variable mapping or <tt>null</tt> if 
-     * the matching failed
+    /**
+     * {@inheritDoc}
      */
     @Override
     public final MatchConditions matchFind(Term term, 

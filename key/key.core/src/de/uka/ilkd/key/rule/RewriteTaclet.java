@@ -144,7 +144,7 @@ public class RewriteTaclet extends FindTaclet {
 	      find, prefixMap, choices, surviveSymbExec);
 	applicationRestriction = p_applicationRestriction;
 	
-	cacheMatchInfo();
+	createAndInitializeMatcher();
     }	
 
       

@@ -258,12 +258,10 @@ public abstract class Taclet implements Rule, Named {
            TacletAttributes attrs,
            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
            ImmutableSet<Choice> choices) {
-        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
-             false);
+        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false);
     }
     
-    protected void cacheMatchInfo() {
-      
+    protected void createAndInitializeMatcher() {      
         this.matcher = DefaultTacletMatcher.createTacletMatcher(this);
     }
 
