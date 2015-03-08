@@ -127,12 +127,13 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
       this.initUI();
 
-      this.editViewButton = this.createTableSideButton(myComposite, "Edit");
+      this.editViewButton = this.createTableSideButton(myComposite, "Edit...");
       final Button exportButton = this.createTableSideButton(myComposite,
-            "Export");
+            "Export...");
       final Button importButton = this.createTableSideButton(myComposite,
-            "Import");
-      final Button newButton = this.createTableSideButton(myComposite, "New");
+            "Import...");
+      final Button newButton = this
+            .createTableSideButton(myComposite, "New...");
 
       this.updateSelection();
 
@@ -289,10 +290,10 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       }
 
       if (this.isProfileDerived(profile)) {
-         JMLProfilePropertiesPage.this.editViewButton.setText("Edit");
+         JMLProfilePropertiesPage.this.editViewButton.setText("Edit...");
       }
       else {
-         JMLProfilePropertiesPage.this.editViewButton.setText("View");
+         JMLProfilePropertiesPage.this.editViewButton.setText("View...");
       }
    }
 
