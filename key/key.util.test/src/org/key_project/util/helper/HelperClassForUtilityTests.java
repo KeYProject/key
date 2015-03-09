@@ -9,8 +9,17 @@ import junit.framework.TestCase;
 import org.key_project.util.java.IOUtil;
 
 public class HelperClassForUtilityTests {
-   public static final String RESOURCE_DIRECTORY = IOUtil.getProjectRoot(HelperClassForUtilityTests.class) + 
-                                                   File.separator + "resources";
+   public static final String RESOURCE_DIRECTORY;
+   
+   static {
+      File projetRoot = IOUtil.getProjectRoot(HelperClassForUtilityTests.class);
+      // Update path in Eclipse Plug-ins.
+      if ("org.key_project.util.test".equals(projetRoot.getName())) {
+         projetRoot = projetRoot.getParentFile().getParentFile().getParentFile().getParentFile();
+         projetRoot = new File(projetRoot, "key" + File.separator + "key.util.test");
+      }
+      RESOURCE_DIRECTORY = projetRoot + File.separator + "resources";
+   }
 
    /**
     * Creates a folder.

@@ -3,7 +3,6 @@ package de.uka.ilkd.key.testcase.smt.ce;
 import java.io.File;
 
 import org.junit.Test;
-import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -14,13 +13,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.test.TestCommons;
+import de.uka.ilkd.key.suite.util.HelperClassForTestgenTests;
 
 public class TestCE extends TestCommons {
-   public static final String TESTCASE_DIRECTORY = IOUtil.getProjectRoot(TestCE.class) + 
-                                                   File.separator + "resources" + 
-                                                   File.separator + "testcase";
-   
-	public static final String testFile = TESTCASE_DIRECTORY
+	public static final String testFile = HelperClassForTestgenTests.TESTCASE_DIRECTORY
 	        + File.separator + "smt" + File.separator + "ce" + File.separator;
 	private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
 	private static boolean isInstalled = false;
