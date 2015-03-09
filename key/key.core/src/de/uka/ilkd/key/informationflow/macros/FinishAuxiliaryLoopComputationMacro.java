@@ -3,7 +3,6 @@ package de.uka.ilkd.key.informationflow.macros;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
-import de.uka.ilkd.key.informationflow.po.InfFlowPO;
 import de.uka.ilkd.key.informationflow.po.LoopInvExecutionPO;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.LoopInfFlowUnfoldTacletBuilder;
@@ -79,7 +78,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
         initiatingProof.addLabeledIFSymbol(rwTaclet);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(initiatingGoal, proof);
-        initiatingProof.unionIFSymbols(((InfFlowPO) proof).getIFSymbols());
+        initiatingProof.unionIFSymbols(((InfFlowProof) proof).getIFSymbols());
         initiatingProof.getIFSymbols().useProofSymbols();
 
         final ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, initiatingGoal);

@@ -159,13 +159,14 @@ public final class Main {
      */
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         // this property overrides the default
         if (Boolean.getBoolean("key.verbose-ui")) verbosity = Verbosity.DEBUG;
 
         // does no harm on non macs
-        System.setProperty("apple.laf.useScreenMenuBar","true");
-
+        // broken under Java 8 u40 when starting from jar files
+        // disabling the Apple Menu Bar support for the meantime
+        //System.setProperty("apple.laf.useScreenMenuBar","true");
 
         try {
             cl = createCommandLine();
@@ -446,7 +447,7 @@ public final class Main {
         } else {
             updateSplashScreen();
             MainWindow mainWindow = MainWindow.getInstance();
-
+            
             if (loadRecentFile) {
                 RecentFileEntry mostRecent =
                         mainWindow.getRecentFiles().getMostRecent();

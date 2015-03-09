@@ -8,6 +8,7 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.control.RuleCompletionHandler;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.informationflow.macros.AbstractFinishAuxiliaryComputationMacro;
@@ -190,7 +191,13 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
            proofName = proofName.substring(0, proofName.lastIndexOf(".proof"));
        }
        final String filename = MiscTools.toValidFileName(proofName) + ".proof";
-       final File toSave = new File(proof.getProofFile().getParentFile(), filename);
+       final File proofFolder;
+       if (proof.getProofFile() != null) {
+          proofFolder = proof.getProofFile().getParentFile();
+       } else { // happens when a Java file is loaded
+          proofFolder = Main.getWorkingDir();
+       }
+       final File toSave = new File(proofFolder, filename);
        final KeYResourceManager krm = KeYResourceManager.getManager();
        final ProofSaver ps = new ProofSaver(proof, toSave.getAbsolutePath(), krm.getSHA1());
        try {
