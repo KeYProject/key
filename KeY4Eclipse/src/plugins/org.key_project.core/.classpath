@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="pluginSrc"/>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="key.genSrc"/>
 	<classpathentry kind="src" path="key.src"/>
 	<classpathentry exported="true" kind="lib" path="key.lib/antlr.jar"/>
