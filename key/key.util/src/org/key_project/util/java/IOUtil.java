@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.math.BigInteger;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.CodeSource;
@@ -707,7 +708,29 @@ public final class IOUtil {
    }
    
    public static URI toURI(URL url) {
-      return url != null ? URI.create(url.toString()) : null;
+      try {
+         if (url != null) {
+            String protocol = url.getProtocol();
+            String userInfo = url.getUserInfo();
+            String host = url.getHost();
+            String path = url.getPath();
+            String query = url.getQuery();
+            String ref = url.getRef();
+            return new URI(!StringUtil.isEmpty(protocol) ? protocol : null, 
+                           !StringUtil.isEmpty(userInfo) ? userInfo : null, 
+                           !StringUtil.isEmpty(host) ? host : null, 
+                           url.getPort(), 
+                           !StringUtil.isEmpty(path) ? path : null, 
+                           !StringUtil.isEmpty(query) ? query : null, 
+                           !StringUtil.isEmpty(ref) ? ref : null);
+         }
+         else {
+            return null;
+         }
+      }
+      catch (URISyntaxException e) {
+         return null;
+      }
    }
 
    /**

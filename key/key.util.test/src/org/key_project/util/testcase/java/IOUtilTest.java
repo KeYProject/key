@@ -543,18 +543,17 @@ public class IOUtilTest extends TestCase {
    /**
     * <p>
     * Creates a new text file with the given name which contains the
-    * content of the given source {@link IFile} but with the new defined
+    * content of the given source {@link File} but with the new defined
     * line breaks.
     * </p>
     * <p>
     * This method is required because GIT changes the line breaks. For this
     * reason it is not possible to commit/checkout the test data files directly.
     * </p>
-    * @param source The {@link IFile} with the source text.
+    * @param source The {@link File} with the source text.
     * @param newFileName The new file name.
     * @param lineBreak The line break to use.
-    * @return The created {@link IFile} with the same text but with new line breaks.
-    * @throws CoreException Occurred Exception
+    * @return The created {@link File} with the same text but with new line breaks.
     * @throws IOException Occurred Exception
     */
    protected File convertTextFile(File source, String newFileName, String lineBreak) throws IOException {
@@ -901,12 +900,24 @@ public class IOUtilTest extends TestCase {
     * @throws MalformedURLException Occurred Exception
     */
    @Test
-   public void testToURI() throws MalformedURLException {
+   public void testToURI() throws Exception {
+      // Test null
       assertNull(IOUtil.toURI(null));
+      // Test web URL
       URL url = new URL("https://www.google.de");
       URI uri = IOUtil.toURI(url);
       assertNotNull(uri);
-      assertEquals(URI.create("https://www.google.de"), uri);
+      assertEquals(url.toString(), uri.toString());
+      // Test web URL mit query
+      url = new URL("https://www.google.de/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=test");
+      uri = IOUtil.toURI(url);
+      assertNotNull(uri);
+      assertEquals(url.toString(), uri.toString());
+      // Test file URL
+      url = new URL("file:/D:/Forschung/Tools/eclipse 4.4 SR1 (64bit)/../../GIT/R/KeY4Eclipse/src/plugins/org.key_project.ui/");
+      uri = IOUtil.toURI(url);
+      assertNotNull(uri);
+      assertEquals("file:/D:/Forschung/Tools/eclipse%204.4%20SR1%20(64bit)/../../GIT/R/KeY4Eclipse/src/plugins/org.key_project.ui/", uri.toString());
    }
    
    /**

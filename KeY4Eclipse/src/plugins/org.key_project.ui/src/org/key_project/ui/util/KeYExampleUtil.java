@@ -17,15 +17,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Properties;
 
 import org.eclipse.core.runtime.CoreException;
-import org.key_project.core.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.java.IOUtil;
-import org.osgi.framework.Bundle;
 
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.ExampleChooser;
@@ -64,99 +60,13 @@ public class KeYExampleUtil {
      * @return The local example directory or {@code null} if it is not available.
      */
     public static String getLocalExampleDirectory() {
-        String localKeyHome = getLocalKeYHomeDirectory();
-        return localKeyHome != null ? 
-               localKeyHome + File.separator + "key" + File.separator + "key.ui" + File.separator + ExampleChooser.EXAMPLES_PATH : 
-               null;
-    }
-
-    /**
-     * Returns a specified KeY external library directory in bundle file "customTargets.xml".
-     * This file is only available if the plug-in was loaded in a started
-     * Eclipse product via the Eclipse development IDE. In a real deployed
-     * product it will return {@code null}.
-     * @return The local library directory or {@code null} if it is not available.
-     */
-    public static String getLocalKeYExtraLibsDirectory() {
-        return getLocalPropertyValue("ext.dir");
-    }
-
-    /**
-     * Returns a specified KeY repository home directory in bundle file "customTargets.xml".
-     * This file is only available if the plug-in was loaded in a started
-     * Eclipse product via the Eclipse development IDE. In a real deployed
-     * product it will return {@code null}.
-     * @return The local KeY repository directory or {@code null} if it is not available.
-     */
-    public static String getLocalKeYHomeDirectory() {
-        return getLocalPropertyValue("key.rep");
-    }
-
-    /**
-     * Returns a specified value in bundle file "customTargets.xml".
-     * This file is only available if the plug-in was loaded in a started
-     * Eclipse product via the Eclipse development IDE. In a real deployed
-     * product it will return {@code null}.
-     * @param key The key for that the value should be returned if possible.
-     * @return The value or {@code null} if it is not available.
-     */
-    public static String getLocalPropertyValue(String key) {
-        if (key != null) {
-            Properties props = getLocalProperties();
-            if (props != null) {
-                String dir = props.getProperty(key);
-                if (dir != null && dir.trim().length() >= 1) {
-                    return dir.trim();
-                }
-                else {
-                    return null;
-                }
-            }
-            else {
-                return null;
-            }
+        File home = IOUtil.getProjectRoot(KeYExampleUtil.class); // Should be KeY4Eclipse\src\plugins
+        if (home != null) {
+           home = home.getParentFile().getParentFile().getParentFile();
+           return home.getAbsolutePath() +  File.separator + "key" + File.separator + "key.ui" + File.separator + ExampleChooser.EXAMPLES_PATH;
         }
         else {
-            return null;
-        }
-    }
-
-    /**
-     * Returns the properties in bundle file "customTargets.xml".
-     * This file is only available if the plug-in was loaded in a started
-     * Eclipse product via the Eclipse development IDE. In a real deployed
-     * product it will return {@code null}.
-     * @return The properties or {@code null} if it is not available.
-     */
-    public static Properties getLocalProperties() {
-        try {
-            if (Activator.getDefault() != null) {
-                Bundle bundle = Activator.getDefault().getBundle();
-                URL customTargetsURL = bundle.getEntry("customTargets.properties");
-                if (customTargetsURL != null) {
-                    InputStream in = null;
-                    try {
-                        in = customTargetsURL.openStream();
-                        Properties props = new Properties();
-                        props.load(in);
-                        return props;
-                    }
-                    finally {
-                        if (in != null) {
-                            in.close();
-                        }
-                    }
-                }
-                else {
-                    return null;
-                }
-            }
-            else {
-                return null; // Plug-in is not loaded, may used in normal Java application
-            }
-        }
-        catch (IOException e) {
-            return null; // Nothing to do.
+           return null;
         }
     }
 
