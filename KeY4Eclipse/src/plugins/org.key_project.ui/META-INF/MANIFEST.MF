@@ -31,5 +31,4 @@ Export-Package: de.uka.ilkd.key.core,
  de.uka.ilkd.key.proof.mgt,
  de.uka.ilkd.key.ui,
  de.uka.ilkd.key.util,
- de.uka.ilkd.key.util.install,
  org.key_project.ui.util
