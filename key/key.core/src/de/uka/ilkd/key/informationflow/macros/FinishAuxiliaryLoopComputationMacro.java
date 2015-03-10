@@ -2,6 +2,7 @@ package de.uka.ilkd.key.informationflow.macros;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.LoopInvExecutionPO;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
@@ -9,7 +10,6 @@ import de.uka.ilkd.key.informationflow.rule.tacletbuilder.LoopInfFlowUnfoldTacle
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.macros.IFProofMacroConstants;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -45,7 +45,8 @@ public class FinishAuxiliaryLoopComputationMacro extends
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(final Proof proof,
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+                                          final Proof proof,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) {
@@ -83,7 +84,8 @@ public class FinishAuxiliaryLoopComputationMacro extends
 
         final ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, initiatingGoal);
         
-        info.addInfo(IFProofMacroConstants.SIDE_PROOF, proof);
+        // close auxiliary computation proof
+        proof.dispose();
         
         return info;
     }

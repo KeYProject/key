@@ -83,7 +83,7 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
         ptl.taskStarted(macro.getName(), 0);
         try {
             synchronized(macro) {
-                info = macro.applyTo(selectedNode, posInOcc, ptl);
+                info = macro.applyTo(mediator.getUI(), selectedNode, posInOcc, ptl);
             }
         } catch (final InterruptedException exception) {
             Debug.out("Proof macro has been interrupted:");

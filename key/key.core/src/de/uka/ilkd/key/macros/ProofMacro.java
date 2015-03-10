@@ -15,6 +15,7 @@ package de.uka.ilkd.key.macros;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -153,6 +154,8 @@ public interface ProofMacro {
      * this parameter. If more than one listener is needed, consider combining
      * them using a single listener object using the composite pattern.
      *
+     * @param uic
+     *            the {@link UserInterfaceControl} to use
      * @param proof
      *            the current {@link Proof} (not <code>null</code>)
      * @param goals
@@ -165,10 +168,11 @@ public interface ProofMacro {
      * @throws InterruptedException
      *             if the application of the macro has been interrupted.
      */
-    public ProofMacroFinishedInfo applyTo(Proof proof,
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+                                          Proof proof,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException;
+                                          ProverTaskListener listener) throws InterruptedException, Exception;
 
     /**
      * Apply this macro on the given node.
@@ -184,6 +188,8 @@ public interface ProofMacro {
      * this parameter. If more than one listener is needed, consider combining
      * them using a single listener object using the composite pattern.
      *
+     * @param uic
+     *            the {@link UserInterfaceControl} to use
      * @param node
      *            the node (not <code>null</code>)
      * @param posInOcc
@@ -194,9 +200,10 @@ public interface ProofMacro {
      * @throws InterruptedException
      *             if the application of the macro has been interrupted.
      */
-    public ProofMacroFinishedInfo applyTo(Node node,
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+                                          Node node,
                                           PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException;
+                                          ProverTaskListener listener) throws InterruptedException, Exception;
 
     /**
      * This observer acts as intermediate instance between the reports by the

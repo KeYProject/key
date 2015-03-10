@@ -2,16 +2,17 @@ package de.uka.ilkd.key.informationflow.macros;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.LoopInvExecutionPO;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
+import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
-import de.uka.ilkd.key.macros.IFProofMacroConstants;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -21,7 +22,7 @@ import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
-public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro {
+public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro implements StartSideProofMacro {
 
     @Override
     public String getName() {
@@ -79,10 +80,11 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro {
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(Proof proof,
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+                                          Proof proof,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) {
+                                          ProverTaskListener listener) throws Exception {
         final LoopInvariantBuiltInRuleApp loopInvRuleApp = (LoopInvariantBuiltInRuleApp) 
                 goals.head().node().parent().getAppliedRuleApp();
 
@@ -102,9 +104,14 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro {
                                        guardTerm,
                                        proof.getServices());
         
-        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, proof);
-        info.addInfo(IFProofMacroConstants.PO_FOR_NEW_SIDE_PROOF, loopInvExecPO);
-
+        final InfFlowProof p;
+        synchronized (loopInvExecPO) {
+            p = (InfFlowProof) uic.createProof(initConfig, loopInvExecPO);
+        }
+        p.unionIFSymbols(((InfFlowProof) proof).getIFSymbols());
+       
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, p);
+        info.addInfo(PROOF_MACRO_FINISHED_INFO_KEY_ORIGINAL_PROOF, proof);
         return info;
     }
 }

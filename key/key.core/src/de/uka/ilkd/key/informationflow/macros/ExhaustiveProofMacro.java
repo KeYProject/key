@@ -19,6 +19,7 @@ import java.util.Map;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
@@ -110,10 +111,11 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(Proof proof,
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+                                          Proof proof,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException {
+                                          ProverTaskListener listener) throws InterruptedException, Exception {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         final ProofMacro macro = getProofMacro();
         for (final Goal goal : goals) {
@@ -135,7 +137,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                 pml.taskStarted(getName(), 0);
                 synchronized(macro) {
                     // wait for macro to terminate
-                    info = macro.applyTo(proof, ImmutableSLList.<Goal>nil().prepend(goal),
+                    info = macro.applyTo(uic, proof, ImmutableSLList.<Goal>nil().prepend(goal),
                                          applicableAt, pml);
                 }
                 pml.taskFinished(info);

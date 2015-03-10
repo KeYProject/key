@@ -16,6 +16,7 @@ package de.uka.ilkd.key.macros;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -67,10 +68,11 @@ public abstract class AbstractProofMacro implements ProofMacro {
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(Node node,
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+                                          Node node,
                                           PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException {
-        return applyTo(node.proof(), getGoals(node), posInOcc, listener);
+                                          ProverTaskListener listener) throws InterruptedException, Exception {
+        return applyTo(uic, node.proof(), getGoals(node), posInOcc, listener);
     }
 
     @Override

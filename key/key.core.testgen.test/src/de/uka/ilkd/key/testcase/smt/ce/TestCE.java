@@ -121,15 +121,15 @@ public class TestCE extends TestCommons {
 		   Proof proof = env.getLoadedProof();
 		   assertNotNull(proof);
 			FinishSymbolicExecutionMacro se = new FinishSymbolicExecutionMacro();
-			se.applyTo(proof, proof.openEnabledGoals(), null, null);
+			se.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, null);
 			TryCloseMacro close = new TryCloseMacro();
-			close.applyTo(proof, proof.openEnabledGoals(), null, null);
+			close.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, null);
 			// should not be provable
 			assertTrue(proof.openGoals().size() > 0);
 			// there should be a counterexample for each goal...
 			for (Goal g : proof.openGoals()) {
 				SemanticsBlastingMacro sb = new SemanticsBlastingMacro();
-				sb.applyTo(g.node(), null, null);
+				sb.applyTo(env.getUi(), g.node(), null, null);
 				assertTrue(correctResult(g, false));
 			}
 		}

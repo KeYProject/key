@@ -74,6 +74,7 @@ import de.uka.ilkd.key.ui.MediatorProofControl;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 /**
  * Implementation of {@link UserInterfaceControl} which controls the {@link MainWindow}
@@ -397,10 +398,15 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     * {@inheritDoc}
     */
    @Override
-   public void proofDisposing(ProofDisposedEvent e) {
+   public void proofDisposing(final ProofDisposedEvent e) {
       super.proofDisposing(e);
       // Remove proof from user interface
-      mainWindow.getProofList().removeProof(e.getSource());
+      ThreadUtilities.invokeAndWait(new Runnable() {
+         @Override
+         public void run() {
+            mainWindow.getProofList().removeProof(e.getSource());
+         }
+      });
       // Run the garbage collector.
       Runtime r = Runtime.getRuntime();
       r.gc();

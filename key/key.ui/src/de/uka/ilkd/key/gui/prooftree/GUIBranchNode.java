@@ -156,4 +156,9 @@ class GUIBranchNode extends GUIAbstractTreeNode
         }
     	return res;
     }
+
+   public boolean isClosed() {
+      Node node = getNode();
+      return node != null && node.isClosed();
+   }
 }

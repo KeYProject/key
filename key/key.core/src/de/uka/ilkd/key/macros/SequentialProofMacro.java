@@ -21,6 +21,7 @@ import java.util.List;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -88,10 +89,11 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      *             if one of the wrapped macros is interrupted.
      */
     @Override
-    public ProofMacroFinishedInfo applyTo(Proof proof,
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+                                          Proof proof,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException {
+                                          ProverTaskListener listener) throws InterruptedException, Exception {
         final List<Node> initNodes = new ArrayList<Node>(goals.size());
         for (Goal goal : goals) {
             initNodes.add(goal.node());
@@ -108,7 +110,7 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
                     pml.taskStarted(macro.getName(), 0);
                     synchronized(macro) {
                         // wait for macro to terminate
-                        info = macro.applyTo(initNode, posInOcc, pml);
+                        info = macro.applyTo(uic, initNode, posInOcc, pml);
                     }
                     pml.taskFinished(info);
                     info = new ProofMacroFinishedInfo(this, info);

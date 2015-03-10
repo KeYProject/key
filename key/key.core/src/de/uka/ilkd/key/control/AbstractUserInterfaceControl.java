@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import de.uka.ilkd.key.informationflow.macros.StartSideProofMacro;
+import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.ApplyStrategy;
@@ -25,6 +27,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -101,13 +105,34 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
         numOfInvokedMacros++;
     }
 
-    protected void macroFinished(ProofMacroFinishedInfo info) {
+    protected void macroFinished(final ProofMacroFinishedInfo info) {
         if (numOfInvokedMacros > 0) {
             numOfInvokedMacros--;
         }
         else { 
             Logger.getLogger(this.getClass().getName(), "Number of running macros became negative.");
         }
+        if (info.getMacro() instanceof StartSideProofMacro) {
+           final Proof initiatingProof = (Proof) info.getValueFor(StartSideProofMacro.PROOF_MACRO_FINISHED_INFO_KEY_ORIGINAL_PROOF);
+           info.getProof().addProofDisposedListener(new ProofDisposedListener() {
+              @Override
+              public void proofDisposing(final ProofDisposedEvent e) {
+                 e.getSource().removeProofDisposedListener(this);
+                 macroSideProofDisposing(info, initiatingProof, e.getSource());
+              }
+              
+              @Override
+              public void proofDisposed(ProofDisposedEvent e) {
+                 // Nothing to do
+              }
+           });
+        }
+    }
+    
+    protected void macroSideProofDisposing(ProofMacroFinishedInfo initiatingInfo, Proof initiatingProof, Proof sideProof) {
+       if (initiatingProof instanceof InfFlowProof) {
+          ((InfFlowProof) initiatingProof).addSideProof((InfFlowProof) sideProof);
+       }
     }
 
     private class ProofMacroListenerAdapter implements ProverTaskListener {

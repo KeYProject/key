@@ -115,7 +115,7 @@ public abstract class AbstractTestGenerator {
 
              ptl.taskStarted(macro.getName(), 0);
              synchronized(macro) {
-                          info = macro.applyTo(proof, proof.openEnabledGoals(), null, ptl);
+                          info = macro.applyTo(ui, proof, proof.openEnabledGoals(), null, ptl);
              }
              problems.addAll(SMTProblem.createSMTProblems(proof));
           } catch (final InterruptedException e) {

@@ -64,7 +64,7 @@ public abstract class AbstractCounterExampleGenerator {
 
       try {
           synchronized(macro) { // TODO: Useless? No other thread has access to macro wait for macro to terminate
-              info = macro.applyTo(proof, proof.openEnabledGoals(), null, ptl);
+              info = macro.applyTo(ui, proof, proof.openEnabledGoals(), null, ptl);
           }
       } catch (InterruptedException e) {
           Debug.out("Semantics blasting interrupted");

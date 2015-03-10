@@ -64,7 +64,7 @@ public class TestTestgen extends TestCommons{
 		   Proof proof = env.getLoadedProof();
 		   assertNotNull(proof);
 			TestGenMacro macro = new TestGenMacro();
-			macro.applyTo(proof, proof.openEnabledGoals(), null, null);
+			macro.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, null);
 			assertEquals(proof.openGoals().size(), 5);
 		}
 		finally {
