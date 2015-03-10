@@ -1,9 +1,12 @@
 package org.key_project.jmlediting.core.profile;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
+import org.eclipse.swt.widgets.Combo;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
@@ -89,5 +92,52 @@ public class JMLProfileHelper {
          }
       }
       return null;
+   }
+
+   public static String[] getProfiles4Combo() {
+      final Set<IJMLProfile> allProfiles = JMLProfileManagement.instance()
+            .getAvailableProfiles();
+
+      final StringBuilder resultBuilder = new StringBuilder();
+
+      final Iterator<IJMLProfile> iterator = allProfiles.iterator();
+      while (iterator.hasNext()) {
+         final IJMLProfile profile = iterator.next();
+         if (!(profile instanceof IDerivedProfile)) {
+            resultBuilder.append(profile.getName() + ";");
+         }
+      }
+
+      resultBuilder.deleteCharAt(resultBuilder.length() - 1);
+
+      final String[] result = resultBuilder.toString().split(";");
+
+      Arrays.sort(result);
+
+      return result;
+   }
+
+   public static void fillComboWithParentProfilesAndDate(final Combo combo) {
+      final Set<IJMLProfile> allProfiles = JMLProfileManagement.instance()
+            .getAvailableProfiles();
+
+      final StringBuilder resultBuilder = new StringBuilder();
+
+      final Iterator<IJMLProfile> iterator = allProfiles.iterator();
+      while (iterator.hasNext()) {
+         final IJMLProfile profile = iterator.next();
+         if (!(profile instanceof IDerivedProfile)) {
+            resultBuilder.append(profile.getName() + ";");
+            combo.setData(profile.getName(), profile);
+         }
+      }
+
+      resultBuilder.deleteCharAt(resultBuilder.length() - 1);
+
+      final String[] result = resultBuilder.toString().split(";");
+
+      Arrays.sort(result);
+
+      combo.setItems(result);
    }
 }
