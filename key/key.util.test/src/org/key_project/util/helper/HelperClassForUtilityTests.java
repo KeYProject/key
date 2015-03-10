@@ -12,13 +12,18 @@ public class HelperClassForUtilityTests {
    public static final String RESOURCE_DIRECTORY;
    
    static {
-      File projetRoot = IOUtil.getProjectRoot(HelperClassForUtilityTests.class);
-      // Update path in Eclipse Plug-ins.
-      if ("org.key_project.util.test".equals(projetRoot.getName())) {
-         projetRoot = projetRoot.getParentFile().getParentFile().getParentFile().getParentFile();
-         projetRoot = new File(projetRoot, "key" + File.separator + "key.util.test");
+      File projectRoot = IOUtil.getProjectRoot(HelperClassForUtilityTests.class);
+      // Update path in Eclipse Plug-ins executed as JUnit Test.
+      if ("org.key_project.util.test".equals(projectRoot.getName())) {
+         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile().getParentFile();
+         projectRoot = new File(projectRoot, "key" + File.separator + "key.util.test");
       }
-      RESOURCE_DIRECTORY = projetRoot + File.separator + "resources";
+      // Update path in Eclipse Plug-ins executed as JUnit Plug-in Test.
+      else if ("tests".equals(projectRoot.getName())) {
+         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile();
+         projectRoot = new File(projectRoot, "key" + File.separator + "key.util.test");
+      }
+      RESOURCE_DIRECTORY = projectRoot + File.separator + "resources";
    }
 
    /**

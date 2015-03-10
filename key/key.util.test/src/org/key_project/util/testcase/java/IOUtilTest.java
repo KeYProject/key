@@ -529,7 +529,7 @@ public class IOUtilTest extends TestCase {
    public void testComputeLineInformation_File() throws IOException {
       // Get test file
       File textFile = new File(HelperClassForUtilityTests.RESOURCE_DIRECTORY + File.separator + "lineIndicesTest" + File.separator + "Text.txt");
-      assertTrue(textFile.isFile());
+      assertTrue("File '" + textFile + "' does not exist.", textFile.isFile());
       // Test null
       assertLineInformation((File)null);
       // Test unix file

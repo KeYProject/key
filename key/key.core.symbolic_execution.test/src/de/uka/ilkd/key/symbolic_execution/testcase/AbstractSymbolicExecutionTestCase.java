@@ -153,13 +153,18 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    public static final File testCaseDirectory;
    
    static {
-      File projetRoot = IOUtil.getProjectRoot(AbstractSymbolicExecutionTestCase.class);
-      // Update path in Eclipse Plug-ins.
-      if ("org.key_project.core.symbolic_execution.test".equals(projetRoot.getName())) {
-         projetRoot = projetRoot.getParentFile().getParentFile().getParentFile().getParentFile();
-         projetRoot = new File(projetRoot, "key" + File.separator + "key.core.symbolic_execution.test");
+      File projectRoot = IOUtil.getProjectRoot(AbstractSymbolicExecutionTestCase.class);
+      // Update path in Eclipse Plug-ins executed as JUnit Test.
+      if ("org.key_project.core.symbolic_execution.test".equals(projectRoot.getName())) {
+         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile().getParentFile();
+         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.symbolic_execution.test");
       }
-      testCaseDirectory = new File(projetRoot + File.separator + "resources"+ File.separator + "testcase");
+      // Update path in Eclipse Plug-ins executed as JUnit Plug-in Test.
+      else if ("tests".equals(projectRoot.getName())) {
+         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile();
+         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.symbolic_execution.test");
+      }
+      testCaseDirectory = new File(projectRoot + File.separator + "resources"+ File.separator + "testcase");
    }
    
    /**
