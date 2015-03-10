@@ -1,115 +1,84 @@
-KeY 4 Eclipse
-=============
-This folder contains all content of the KeY integration into Eclipse.
+		**************************
+		*         KeYIDE         *
+		**************************
 
-For more details about this project feel free to contact the following persons:
-- Martin Hentschel (hentschel@cs.tu-darmstadt.de)
-- Niklas Bunzel (niklas.bunzel@gmx.de)
-- Marco Drebing (marcodrebing@gmail.com)
-- Christoph Schneider (scneider.christoph@gmx.de)
-- Stefan Käsdorf (stefan.kaesdorf@web.de)
+This folder contains all content of the KeYIDE.
+
+Fore more details about this project visit 
+http://www.key-project.org/eclipse/KeYIDE
+or contact Martin Hentschel (hentschel@cs.tu-darmstadt.de).
 
 
 (1) Project Description
 -----------------------
-The aim of this project is to provide the KeY functionality in Eclipse.
-
-The Eclipse Plug-In has the following user relevant features:
-- Start proof for a Java method/constructor via context menu or main menu
-- Start and stop the auto mode
-- View the Proof Tree
-- Setting Proof Search Strategy Properties
+The goal of the KeYIDE is to provide an alternative user interface for KeY
+which is directly integrated into Eclipse.
 
 
-
-(2) File Structure
-------------------
-It provides the following file structure:
-- src: Contains the whole source code
-  - features: Contains the eclipse features
-  - plugins: Contains the plug-ins required to use the tool
-  - tests: Contains all plug-ins which contains automated tests
-- Readme.txt: This file
-
-
-(3) Provided Eclipse features and plug-ins
-------------------------------------------
-
-- org.key_project.keyide.feature 
-  // Provides UI integration of KeY into Eclipse
-  - org.key_project.keyide.product.ui // Product and branding
-- <tests>
-  // Extends SWTBot for Swing
-  - org.key_project.keyide.ui.test // Allows to execute ui tests
-  
+(2) Repository File Structure
+-----------------------------
+The project folder is structured as follows:
+- src          // Contains the whole source code
+  - features   // Contains the specified Eclipse features
+  - plugins    // Contains the developed Eclipse plug-ins with application logic
+  - tests      // Contains the developed Eclipse plug-ins with tests for the 
+                  application logic
+- Readme.txt:  // This file
 
 
-(4) Setup development IDE
+(3) Setup Development IDE
 -------------------------
-1. Download Eclipse 4.4 Luna as bundle 
-   "Eclipse Modeling Tools" from
-   https://eclipse.org/downloads/packages/eclipse-modeling-tools/lunar
-2. Install SWTBot
-   => Help -> Eclipse Marketplace...
-   => Type in Field "Find:" the value "swtbot" and press enter.
-   => Install "SWTBot" with all features.
-3. Install SWTBot IDE
-   => Help -> Install New Software...
-   => Select "--All Available Sites--" in field "Work with:"
-   => Select "SWTBot IDE Support (incubation)/SWTBot IDE Features (incubation)" 
-      (Version 2.0.4...)
-   => Install it by finishing the wizard
+Follow the steps in the sub sections precisely. Notice that you have to use
+the mentioned Eclipse version!
 
 
-(5) Development (Workspace configuration)
------------------------------------------
-To develop the project it is recommended to use an empty Eclipse workspace
-which can be stored in any directory. It is recommend to store it outside
-of the checkout of the KeY repository. The workspace should be configured
-with the settings described at:
-http://i12www.ira.uka.de/~klebanov/keywiki/index.cgi?KeYDevelopmentInEclipse
+(3.1) Setup required KeY-Based Eclipse Projects
+-----------------------------------------------
+1. KeY4Eclipse - Follow the instructions of Section (3) in 
+   '../KeY4Eclipse/Readme.txt' carefully
 
-To add the required Eclipse projects follow these steps:
-1. Import all projects from "src" into the workspace. Use the import wizard
-   "Existing Projects into Workspace" for the import.
-2. Follow the steps src/plugins/org.key_project.keyide/Readme.txt to
-   fix the compiler failures and to make that the product is deployable.
-   
-   
-(6) Important notice
+
+(3.2) Import Eclipse Projects from GIT Repository
+-------------------------------------------------
+1. Select main menu item 'File, Import...'
+2. Select 'General, Existing Projects into Workspace' and press 'Next >'
+3. Set root directory to '<root>/GIT/KeY/KeYIDE/src'
+4. Ensure that 'Copy projects into workspace' is NOT selected.
+5. Finish the wizard
+
+
+(4) Start KeYIDE as Eclipse Product
+-----------------------------------
+1. Open 'org.key_project.keyide.product.ui/KeYIDE.product'
+2. Click on 'Launch an Eclipse application'
+   (From now on the created launch configuration can be used)
+
+
+(5) Run JUnit Tests
+-------------------
+1. Open class 'org.key_project.keyide.ui.test.suite.AllKeYIDEUITests'
+2. Select main menu item 'Run, Run As, JUnit Plug-in Test'
+   (Terminate the launched JUnit Plug-in Test.)
+3. Select main menu item 'Run, Run Configurations...'
+4. Select tab 'Arguments' and add the following 'VM arguments':
+   -Xmx2048m -XX:MaxPermSize=256m -ea
+
+
+(6) Run SWTBot Tests
 --------------------
-SWT and Swing runs both in his own UI thread. For synchronization it is
-required to use Display#syncExec(Runnable) and SwingUtil#invokeAndWait(Runnable)
-or Display#asyncExec(Runnable) and SwingUtil#invokeLater(Runnable). Keep
-always in mind that a synchronous call is not possible from SWT or Swing thread.
-In this case only an asynchronous method call is possible. If you don't
-respect this knowledge Mac OS will cause deadlocks!   
-   
-   
-(7) Start the product from development IDE
-------------------------------------------
-1. Open file org.key_project.keyide.product.ui/KeYIDE.product
-2. Click on "Launch an Eclipse application" in tab "Overview" of the
-   opened "Product Configuration Editor"
+1. Open class 
+   'org.key_project.keyide.ui.test.suite.swtbot.SWTBotAllKeYIDEUITests'
+2. Select main menu item 'Run, Run As, SWTBot Test'
+   (Terminate the launched SWTBot Test'.)
+3. Select main menu item 'Run, Run Configurations...'
+4. Select tab 'Arguments' and add the following 'VM arguments':
+   -Xmx2048m -XX:MaxPermSize=256m -ea -Dorg.eclipse.swtbot.search.timeout=10000
 
 
-(8) Start automated tests
--------------------------
-- Start JUnit tests:
-  Run class org.key_project.keyide.all.test.suite.AllTests as 
-  "JUnit Plug-in Test". 
-   
-- Start SWTBot tests:
-  Run class org.key_project.keyide.all.test.suite.swtbot.SWTBotAllTests
-  as "SWTBot Test". Use the JVM settings defined in the JavaDoc comment of 
-  this class.
-
-
-(9) Deploy the product
-----------------------
-1. Open file org.key_project.keyide.product.ui/KeYIDE.product
-2. Click on "Eclipse Product export wizard" in tab "Overview" of the
-   opened "Product Configuration Editor"
-3. Define "Root directory" e.g. "KeYIDE" and "Destination Directory"
-   e.g. "C:\Temp".
-4. Finish the wizard.
+(7) Deploy KeYIDE as Eclipse product
+------------------------------------
+1. Open 'org.key_project.keyide.product.ui/KeYIDE.product'
+2. Click on 'Eclipse Product export wizard'
+3. Set 'Root directory' to 'KeYIDE'
+4. Define target 'Directory', e.g. 'C:\Temp'.
+5. Finish the wizard.
