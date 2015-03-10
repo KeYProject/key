@@ -25,9 +25,9 @@ import org.eclipse.swt.widgets.Text;
 import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.InvalidProfileException;
-import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.ui.util.JMLSWTUtil;
 
 public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
 
@@ -270,7 +270,7 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
       data.widthHint = 200;
       this.derivedFromCombo = new Combo(myComposite, SWT.BORDER | SWT.READ_ONLY);
       this.derivedFromCombo.setLayoutData(data);
-      this.derivedFromCombo.setItems(JMLProfileHelper.getProfiles4Combo());
+      this.derivedFromCombo.setItems(JMLSWTUtil.getProfiles4Combo());
    }
 
    private void addProfileId(final Composite myComposite) {

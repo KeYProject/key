@@ -13,8 +13,8 @@ import org.eclipse.swt.widgets.Text;
 import org.key_project.jmlediting.core.profile.DerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.InvalidProfileException;
-import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
+import org.key_project.jmlediting.ui.util.JMLSWTUtil;
 
 public class JMLNewProfileDialog extends StatusDialog {
 
@@ -25,41 +25,43 @@ public class JMLNewProfileDialog extends StatusDialog {
    public JMLNewProfileDialog(final Shell parent) {
       super(parent);
       this.setTitle("New JML Profile");
+      this.setShellStyle(super.getShellStyle() | SWT.RESIZE | SWT.FILL);
    }
 
    @Override
    protected Control createDialogArea(final Composite parent) {
       final Composite composite = (Composite) super.createDialogArea(parent);
 
-      GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
       final Composite myComposite = new Composite(composite, SWT.NONE);
-      myComposite.setLayoutData(data);
+      myComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
       myComposite.setLayout(new GridLayout(2, false));
 
-      data = new GridData(SWT.FILL, SWT.FILL, false, true);
+      final GridData labelData = new GridData(SWT.FILL, SWT.CENTER, false, true);
+      final GridData textData = new GridData(SWT.FILL, SWT.CENTER, false, true);
 
       final Label profileNameLabel = new Label(myComposite, SWT.NONE);
       profileNameLabel.setText("Profile Name: ");
-      profileNameLabel.setLayoutData(data);
+      profileNameLabel.setLayoutData(labelData);
 
       this.profileNameText = new Text(myComposite, SWT.SINGLE | SWT.BORDER);
-      this.profileNameText.setLayoutData(data);
+      this.profileNameText.setLayoutData(textData);
 
       final Label profileIdLabel = new Label(myComposite, SWT.NONE);
       profileIdLabel.setText("Profile ID: ");
-      profileIdLabel.setLayoutData(data);
+      profileIdLabel.setLayoutData(labelData);
 
       this.profileIdText = new Text(myComposite, SWT.SINGLE | SWT.BORDER);
-      this.profileIdText.setLayoutData(data);
+      this.profileIdText.setLayoutData(textData);
 
       final Label derivedFromLabel = new Label(myComposite, SWT.NONE);
       derivedFromLabel.setText("Derived from: ");
-      derivedFromLabel.setLayoutData(data);
+      derivedFromLabel.setLayoutData(labelData);
 
       this.derivedFromCombo = new Combo(myComposite, SWT.READ_ONLY | SWT.BORDER);
-      JMLProfileHelper
-            .fillComboWithParentProfilesAndDate(this.derivedFromCombo);
-      this.derivedFromCombo.setLayoutData(data);
+      JMLSWTUtil.fillComboWithParentProfilesAndDate(this.derivedFromCombo);
+      this.derivedFromCombo.setLayoutData(textData);
+
+      // TODO validate
 
       return composite;
    }
