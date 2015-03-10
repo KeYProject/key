@@ -36,6 +36,8 @@ the mentioned Eclipse version!
 -----------------------------------------------
 1. KeY4Eclipse - Follow the instructions of Section (3) in 
    '../KeY4Eclipse/Readme.txt' carefully
+2. Visual DbC - Follow the instructions of Section (3) in 
+   '../VisualDbC/Readme.txt' carefully
 
 
 (3.2) Import Eclipse Projects from GIT Repository
