@@ -8,7 +8,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.SemicolonClosedKeywordParser;
-import org.key_project.jmlediting.profile.key.locset.LocSetExprListParser;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
 
 public class KeyAccessibleKeyword extends AccessibleKeyword {
 
@@ -23,11 +23,10 @@ public class KeyAccessibleKeyword extends AccessibleKeyword {
          @Override
          protected ParseFunction createContentParseFunction(
                final IJMLProfile profile) {
-            final LocSetExprListParser locSetExprList = new LocSetExprListParser(
-                  profile);
+            final ExpressionParser expr = new ExpressionParser(profile);
             return alt(
                   seq(alt(ident(), keywords(InvKeyword.class, profile)),
-                        constant(":"), locSetExprList), locSetExprList);
+                        constant(":"), expr.exprList()), expr.exprList());
          }
 
       };

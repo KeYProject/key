@@ -1,9 +1,6 @@
 package org.key_project.jmlediting.profile.key.locset;
 
-import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
-
-public class IntersetOperatorKeyword extends AbstractEmptyKeyword {
+public class IntersetOperatorKeyword extends LocSetOperatorKeyword {
 
    public IntersetOperatorKeyword() {
       super("\\intersect");
@@ -12,11 +9,6 @@ public class IntersetOperatorKeyword extends AbstractEmptyKeyword {
    @Override
    public String getDescription() {
       return null;
-   }
-
-   @Override
-   public IKeywortSort getSort() {
-      return LocSetOperatorKeywordSort.INSTANCE;
    }
 
 }
