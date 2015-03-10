@@ -20,7 +20,7 @@ import org.key_project.jmlediting.profile.key.locset.EmptyKeywod;
 import org.key_project.jmlediting.profile.key.locset.InfiniteUnionKeyword;
 import org.key_project.jmlediting.profile.key.locset.IntersetOperatorKeyword;
 import org.key_project.jmlediting.profile.key.locset.LocSetEverythingKeyword;
-import org.key_project.jmlediting.profile.key.locset.LocSetExprListParser;
+import org.key_project.jmlediting.profile.key.locset.LocSetSuffix;
 import org.key_project.jmlediting.profile.key.locset.LocSetKeyword;
 import org.key_project.jmlediting.profile.key.locset.ReachLocsKeyword;
 import org.key_project.jmlediting.profile.key.locset.SetMinusOperatorKeyword;
@@ -72,7 +72,7 @@ public class KeyProfile extends JMLReferenceProfile {
             new ReachLocsKeyword(), new SetMinusOperatorKeyword(),
             new SetUnionOperatorKeyword(), new LocSetKeyword()));
       this.putExtension(ExpressionParser.ADDITIONAL_PRIMARY_SUFFIXES,
-            LocSetExprListParser.locSetSuffixes(), ParseFunction.class);
+            LocSetSuffix.locSetSuffixes(), ParseFunction.class);
 
       // Allows \inv as access on a not toplevel object just as for x[3].\inv
       this.putExtension(ExpressionParser.ADDITIONAL_PRIMARY_SUFFIXES,
