@@ -94,6 +94,7 @@ public class FinishAuxiliaryBlockComputationMacro
         initiatingProof.getIFSymbols().useProofSymbols();
 
         // close auxiliary computation proof
+        initiatingProof.addSideProof((InfFlowProof) proof);
         proof.dispose();
         
         return new ProofMacroFinishedInfo(this, initiatingGoal);

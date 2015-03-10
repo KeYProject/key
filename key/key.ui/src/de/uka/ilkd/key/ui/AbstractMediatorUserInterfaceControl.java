@@ -128,6 +128,19 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
    protected void macroFinished(final ProofMacroFinishedInfo info) {
       super.macroFinished(info);
       if (info.getMacro() instanceof StartSideProofMacro) {
+         final Proof initiatingProof = (Proof) info.getValueFor(StartSideProofMacro.PROOF_MACRO_FINISHED_INFO_KEY_ORIGINAL_PROOF);
+         info.getProof().addProofDisposedListener(new ProofDisposedListener() {
+            @Override
+            public void proofDisposing(final ProofDisposedEvent e) {
+               e.getSource().removeProofDisposedListener(this);
+               macroSideProofDisposing(info, initiatingProof, e.getSource());
+            }
+            
+            @Override
+            public void proofDisposed(ProofDisposedEvent e) {
+               // Nothing to do
+            }
+         });
          // stop interface again, because it is activated by the proof
          // change through startProver; the ProofMacroWorker will activate
          // it again at the right time
@@ -141,9 +154,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
       }
    }
    
-   @Override
    protected void macroSideProofDisposing(final ProofMacroFinishedInfo initiatingInfo, final Proof initiatingProof, final Proof sideProof) {
-      super.macroSideProofDisposing(initiatingInfo, initiatingProof, sideProof);
       ThreadUtilities.invokeAndWait(new Runnable() {
          @Override
          public void run() {

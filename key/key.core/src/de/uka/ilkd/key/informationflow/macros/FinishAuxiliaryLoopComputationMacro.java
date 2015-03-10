@@ -85,6 +85,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
         final ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, initiatingGoal);
         
         // close auxiliary computation proof
+        initiatingProof.addSideProof((InfFlowProof) proof);
         proof.dispose();
         
         return info;
