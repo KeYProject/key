@@ -16,15 +16,18 @@ import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
+import org.key_project.jmlediting.profile.key.locset.AllFieldsKeyword;
+import org.key_project.jmlediting.profile.key.locset.DisjointKeyword;
 import org.key_project.jmlediting.profile.key.locset.EmptyKeywod;
 import org.key_project.jmlediting.profile.key.locset.InfiniteUnionKeyword;
 import org.key_project.jmlediting.profile.key.locset.IntersetOperatorKeyword;
 import org.key_project.jmlediting.profile.key.locset.LocSetEverythingKeyword;
-import org.key_project.jmlediting.profile.key.locset.LocSetSuffix;
 import org.key_project.jmlediting.profile.key.locset.LocSetKeyword;
+import org.key_project.jmlediting.profile.key.locset.LocSetSuffix;
 import org.key_project.jmlediting.profile.key.locset.ReachLocsKeyword;
 import org.key_project.jmlediting.profile.key.locset.SetMinusOperatorKeyword;
 import org.key_project.jmlediting.profile.key.locset.SetUnionOperatorKeyword;
+import org.key_project.jmlediting.profile.key.locset.SubsetKeyword;
 import org.key_project.jmlediting.profile.key.other.DynamicLogicPrimary;
 import org.key_project.jmlediting.profile.key.other.IndexKeyword;
 import org.key_project.jmlediting.profile.key.other.InvKeyword;
@@ -67,10 +70,13 @@ public class KeyProfile extends JMLReferenceProfile {
       // Add everything for a different sort
       supportedKeywords.add(new LocSetEverythingKeyword());
       // All other keywords
-      supportedKeywords.addAll(Arrays.asList(new EmptyKeywod(),
-            new InfiniteUnionKeyword(), new IntersetOperatorKeyword(),
-            new ReachLocsKeyword(), new SetMinusOperatorKeyword(),
-            new SetUnionOperatorKeyword(), new LocSetKeyword()));
+      supportedKeywords
+            .addAll(Arrays.asList(new EmptyKeywod(),
+                  new InfiniteUnionKeyword(), new IntersetOperatorKeyword(),
+                  new ReachLocsKeyword(), new SetMinusOperatorKeyword(),
+                  new SetUnionOperatorKeyword(), new LocSetKeyword(),
+                  new AllFieldsKeyword(), new DisjointKeyword(),
+                  new SubsetKeyword()));
       this.putExtension(ExpressionParser.ADDITIONAL_PRIMARY_SUFFIXES,
             LocSetSuffix.locSetSuffixes(), ParseFunction.class);
 

@@ -1,7 +1,7 @@
 package org.key_project.jmlediting.profile.key.locset;
 
 
-public class SetMinusOperatorKeyword extends LocSetOperatorKeyword {
+public class SetMinusOperatorKeyword extends LocSetBinaryOperatorKeyword {
 
    public SetMinusOperatorKeyword() {
       super("\\set_minus");

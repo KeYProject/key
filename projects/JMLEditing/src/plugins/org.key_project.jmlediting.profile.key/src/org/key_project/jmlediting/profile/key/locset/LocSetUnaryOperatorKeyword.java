@@ -4,11 +4,12 @@ import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.core.profile.syntax.JMLPrimaryKeywordSort;
-import org.key_project.jmlediting.profile.jmlref.parser.BinarySpecExpressionParser;
+import org.key_project.jmlediting.profile.jmlref.parser.BracketSpecExpressionParser;
 
-public abstract class LocSetOperatorKeyword extends AbstractKeyword {
+public abstract class LocSetUnaryOperatorKeyword extends AbstractKeyword {
 
-   public LocSetOperatorKeyword(final String keyword, final String... keywords) {
+   public LocSetUnaryOperatorKeyword(final String keyword,
+         final String... keywords) {
       super(keyword, keywords);
    }
 
@@ -19,7 +20,7 @@ public abstract class LocSetOperatorKeyword extends AbstractKeyword {
 
    @Override
    public IKeywordParser createParser() {
-      return new BinarySpecExpressionParser();
+      return new BracketSpecExpressionParser();
    }
 
 }

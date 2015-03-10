@@ -1,7 +1,7 @@
 package org.key_project.jmlediting.profile.key.locset;
 
 
-public class SetUnionOperatorKeyword extends LocSetOperatorKeyword {
+public class SetUnionOperatorKeyword extends LocSetBinaryOperatorKeyword {
 
    public SetUnionOperatorKeyword() {
       super("\\set_union");
