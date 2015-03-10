@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.key_project.jmlediting.core.profile.IDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.IProfileManagementListener;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.ui.preferencepages.profileDialog.AbstractJMLProfileDialog;
@@ -67,6 +68,8 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     */
    private IPreferenceChangeListener currentPreferenceListener;
 
+   private IProfileManagementListener profileManagementListener;
+
    /**
     * needs to be global to change label-text
     */
@@ -78,22 +81,42 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    public JMLProfilePropertiesPage() {
    }
 
+   private void uninstallListener() {
+      JMLPreferencesHelper
+            .removeDefaultProfilePreferencesListener(this.currentPreferenceListener);
+      JMLProfileManagement.instance().removeListener(
+            this.profileManagementListener);
+   }
+
+   private void installListener() {
+      this.currentPreferenceListener = JMLPreferencesHelper
+            .buildDefaultProfilePreferencesListener(new IPreferenceChangeListener() {
+               @Override
+               public void preferenceChange(final PreferenceChangeEvent event) {
+                  if (!JMLProfilePropertiesPage.this.profilesListTable
+                        .isDisposed()) {
+                     JMLProfilePropertiesPage.this.updateSelection();
+                  }
+               }
+            });
+      this.profileManagementListener = new IProfileManagementListener() {
+
+         @Override
+         public void newProfileAdded(final IJMLProfile newProfile) {
+            JMLProfilePropertiesPage.this.fillTable();
+         }
+      };
+      JMLProfileManagement.instance().addListener(
+            this.profileManagementListener);
+   }
+
    @Override
    public void setVisible(final boolean visible) {
       // Register the preference listener if the dialog is visible
       // do not generate memory leaks, listener are removed in
       // performOK and performCancel, here is too late
       if (visible) {
-         this.currentPreferenceListener = JMLPreferencesHelper
-               .buildDefaultProfilePreferencesListener(new IPreferenceChangeListener() {
-                  @Override
-                  public void preferenceChange(final PreferenceChangeEvent event) {
-                     if (!JMLProfilePropertiesPage.this.profilesListTable
-                           .isDisposed()) {
-                        JMLProfilePropertiesPage.this.updateSelection();
-                     }
-                  }
-               });
+         this.installListener();
       }
       super.setVisible(visible);
    }
@@ -209,9 +232,6 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     * profiles in the list and selects the current profile.
     */
    private void initUI() {
-      // Get all profiles and set them to the list
-      this.allProfiles = JMLProfileManagement.instance()
-            .getAvailableProfilesSortedByName();
       final TableColumn nameColumn = new TableColumn(this.profilesListTable,
             SWT.LEFT);
       nameColumn.setMoveable(false);
@@ -222,19 +242,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       typeColumn.setMoveable(false);
       typeColumn.setWidth(175);
       typeColumn.setText("Profile Type");
-      for (final IJMLProfile profile : this.allProfiles) {
-         final TableItem item = new TableItem(this.profilesListTable, 0);
-         final String type;
-         if (this.isProfileDerived(profile)) {
-            type = "derived from "
-                  + ((IDerivedProfile) profile).getParentProfile().getName();
-         }
-         else {
-            type = "standalone";
-         }
-         item.setText(new String[] { profile.getName(), type });
-      }
-      this.updateSelection();
+      this.fillTable();
 
       // Make sure that only one profile is available at a single time
       this.profilesListTable.addListener(SWT.Selection, new Listener() {
@@ -275,6 +283,26 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          }
       });
 
+   }
+
+   private void fillTable() {
+      // Get all profiles and set them to the list
+      this.allProfiles = JMLProfileManagement.instance()
+            .getAvailableProfilesSortedByName();
+      this.profilesListTable.removeAll();
+      for (final IJMLProfile profile : this.allProfiles) {
+         final TableItem item = new TableItem(this.profilesListTable, 0);
+         final String type;
+         if (this.isProfileDerived(profile)) {
+            type = "derived from "
+                  + ((IDerivedProfile) profile).getParentProfile().getName();
+         }
+         else {
+            type = "standalone";
+         }
+         item.setText(new String[] { profile.getName(), type });
+      }
+      this.updateSelection();
    }
 
    private boolean isProfileDerived(final IJMLProfile profile) {
@@ -397,17 +425,12 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       this.profilesListTable.redraw();
    }
 
-   private void removePreferencesListener() {
-      JMLPreferencesHelper
-            .removeDefaultProfilePreferencesListener(this.currentPreferenceListener);
-   }
-
    @Override
    public boolean performCancel() {
       final boolean cancel = super.performCancel();
       if (cancel) {
          // Remove preferences listener
-         this.removePreferencesListener();
+         this.uninstallListener();
       }
       return cancel;
    }
@@ -464,7 +487,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       final boolean ok = super.performOk();
       if (ok) {
          // Window is closed, remove listener
-         this.removePreferencesListener();
+         this.uninstallListener();
       }
       return ok;
    }

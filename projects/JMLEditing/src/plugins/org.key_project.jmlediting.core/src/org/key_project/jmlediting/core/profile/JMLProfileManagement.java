@@ -48,18 +48,23 @@ import org.xml.sax.SAXException;
  */
 public final class JMLProfileManagement {
 
+   /**
+    * Constant node name for preferences.
+    */
    private static final String JML_DERIVED_PROFILES = "JMLDerivedProfiles";
-   private static final JMLProfileManagement INSTANCE = new JMLProfileManagement();
-
-   public static JMLProfileManagement instance() {
-      return INSTANCE;
-   }
 
    /**
-    * Private constructor to prohibit creating objects of this class.
+    * Shared instance.
     */
-   private JMLProfileManagement() {
+   private static final JMLProfileManagement INSTANCE = new JMLProfileManagement();
 
+   /**
+    * Returns the default instance of the {@link JMLProfileManagement}.
+    *
+    * @return the shared instance.
+    */
+   public static JMLProfileManagement instance() {
+      return INSTANCE;
    }
 
    /**
@@ -68,6 +73,50 @@ public final class JMLProfileManagement {
     * objects exists for an identifier.
     */
    private final Map<String, IJMLProfile> profileCache = new HashMap<String, IJMLProfile>();
+
+   /**
+    * List for all listeners.
+    */
+   private final List<IProfileManagementListener> listeners;
+
+   /**
+    * Private constructor to prohibit creating objects of this class.
+    */
+   private JMLProfileManagement() {
+      this.listeners = new ArrayList<IProfileManagementListener>();
+   }
+
+   /**
+    * Adds the given listener.
+    *
+    * @param listener
+    *           the new listener, not allowed to be null
+    */
+   public void addListener(final IProfileManagementListener listener) {
+      this.listeners.add(listener);
+   }
+
+   /**
+    * Removed the given listener.
+    *
+    * @param listener
+    *           the listener to remove
+    */
+   public void removeListener(final IProfileManagementListener listener) {
+      this.listeners.remove(listener);
+   }
+
+   /**
+    * Fires a new profile added event to all listeners.
+    *
+    * @param newProfile
+    *           the new profile
+    */
+   private void fireNewProfileAddedEvent(final IJMLProfile newProfile) {
+      for (final IProfileManagementListener listener : this.listeners) {
+         listener.newProfileAdded(newProfile);
+      }
+   }
 
    /**
     * Returns a set of all JML profiles which are available. The set may be
@@ -227,7 +276,13 @@ public final class JMLProfileManagement {
 
    public void addDerivedProfile(final IDerivedProfile newProfile)
          throws InvalidProfileException {
+      if (this.getProfileFromIdentifier(newProfile.getIdentifier()) != null) {
+         throw new IllegalArgumentException(
+               "A profile with the given id is already known.");
+      }
       this.cacheProfile(newProfile);
+      this.writeDerivedProfiles();
+      this.fireNewProfileAddedEvent(newProfile);
    }
 
    /**
