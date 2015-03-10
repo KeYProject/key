@@ -18,6 +18,8 @@ import org.junit.runners.Suite;
 import org.key_project.key4eclipse.test.testcase.KeYExampleUtilTest;
 import org.key_project.key4eclipse.test.testcase.RefreshProofSaverListenerTest;
 
+import de.uka.ilkd.key.suite.TestKey;
+
 /**
  * Run all contained JUnit 4 test cases.
  * @author Martin Hentschel
@@ -25,8 +27,9 @@ import org.key_project.key4eclipse.test.testcase.RefreshProofSaverListenerTest;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
    KeYExampleUtilTest.class,
-   RefreshProofSaverListenerTest.class
+   RefreshProofSaverListenerTest.class,
+   TestKey.class
    //RunAllProofsTest.class // This class is not listed because it takes to much time.
 })
-public class AllKeY4EclipseTests {
+public class AllKeYCoreTests {
 }

@@ -1,3 +1,4 @@
+package de.uka.ilkd.key.suite;
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
