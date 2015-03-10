@@ -8,6 +8,7 @@ import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.core.profile.syntax.ParseFunctionKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
 
 public class SeqConcatKeyword extends AbstractKeyword {
 
@@ -28,10 +29,10 @@ public class SeqConcatKeyword extends AbstractKeyword {
          protected ParseFunction createParseFunction(final IJMLProfile profile) {
             /**
              * seq-expr ::= ...| <br>
-             * \seq_concat ( seq-expr , seq-expr ) | ...
+             * \seq_concat ( expr , expr ) | ...
              */
-            final SeqExpressionParser seqExpr = new SeqExpressionParser(profile);
-            return brackets(seq(seqExpr, constant(","), seqExpr));
+            final ExpressionParser expr = new ExpressionParser(profile);
+            return brackets(seq(expr, constant(","), expr));
          }
       };
    }

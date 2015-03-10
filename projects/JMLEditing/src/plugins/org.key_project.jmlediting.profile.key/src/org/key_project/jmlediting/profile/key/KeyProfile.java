@@ -34,6 +34,7 @@ import org.key_project.jmlediting.profile.key.other.StrictlyPureKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqConcatKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqDefKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqEmptyKeyword;
+import org.key_project.jmlediting.profile.key.seq.SeqExpressionParser;
 import org.key_project.jmlediting.profile.key.seq.SeqKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqPrimary;
 import org.key_project.jmlediting.profile.key.seq.SeqSingletonKeyword;
@@ -80,6 +81,8 @@ public class KeyProfile extends JMLReferenceProfile {
             new SeqConcatKeyword(), new SeqDefKeyword(), new SeqEmptyKeyword(),
             new SeqSingletonKeyword(), new ValuesKeyword()));
       supportedPrimaries.add(new SeqPrimary());
+      this.putExtension(ExpressionParser.ADDITIONAL_PRIMARY_SUFFIXES,
+            SeqExpressionParser.seqSuffix(this), ParseFunction.class);
 
       // Other keywords
       supportedKeywords.addAll(Arrays.asList(new IndexKeyword()));

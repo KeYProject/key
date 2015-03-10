@@ -57,12 +57,16 @@ public class SeqExpressionParser implements ParseFunction {
       final ParseFunction seqPrim = alt(
             keywords(SeqPrimitiveKeywordSort.INSTANCE, profile), seqDefExpr);
 
-      final ParseFunction seqSuffix = seq(squareBrackets(seq(expr,
-            constant(".."), expr)));
-
-      final ParseFunction seqExpr = seq(seqPrim, list(seqSuffix));
+      final ParseFunction seqExpr = seqPrim; // , list(seqSuffix));
 
       this.seqExprParser = seqExpr;
+   }
+
+   public static ParseFunction seqSuffix(final IJMLProfile profile) {
+      final ExpressionParser expr = new ExpressionParser(profile);
+      final ParseFunction seqSuffix = seq(squareBrackets(seq(expr,
+            constant(".."), expr)));
+      return seqSuffix;
    }
 
 }
