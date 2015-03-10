@@ -26,7 +26,7 @@ public class SeqExprTest {
          + " @ requires x == \\seq_empty; \n"
          + " @ requires y == \\values [2 .. 5] [3..4]; \n"
          + " @ ensures x == \\seq_singleton (1); \n"
-         + " @ ensures y == hallo.get() (\\seq_def int x; a;b;c); \n" + " @ \n"
+         + " @ ensures y == (\\seq_def int x; a;b;c); \n" + " @ \n"
          + " @ set x = \\seq_concat(\\seq_singleton(1), \\seq_empty); \n"
          + " @ ";
 

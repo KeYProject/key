@@ -11,15 +11,6 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Ex
 
 public class SeqExpressionParser implements ParseFunction {
 
-   public static final ParseFunction seqExpressionSuffix(
-         final IJMLProfile profile) {
-      final ExpressionParser expr = new ExpressionParser(profile);
-      final ParseFunction seqExpressionSuffix = brackets(seq(
-            keywords(SeqDefKeyword.class, profile), expr.typeSpec(), ident(),
-            separateBy(';', expr), separateBy(';', expr), separateBy(';', expr)));
-      return seqExpressionSuffix;
-   }
-
    private final ParseFunction seqExprParser;
 
    @Override
@@ -31,40 +22,44 @@ public class SeqExpressionParser implements ParseFunction {
    public SeqExpressionParser(final IJMLProfile profile) {
       /**
        * seq-expr ::= <br>
-       * \seq_empty | (1)<br>
-       * \seq_singleton ( expr ) | (1) <br>
-       * \values | (1)<br>
-       * \seq_concat ( seq-expr , seq-expr ) | (1)<br>
-       * seq-expr [ expr .. expr ] (2) | <br>
-       * expr ( \seq_def type id ; expr ; expr ; expr ) (3)
+       * \seq_empty | <br>
+       * \seq_singleton ( expr ) | <br>
+       * \values | <br>
+       * \seq_concat ( seq-expr , seq-expr ) | <br>
+       * seq-expr [ expr .. expr ] | <br>
+       * gen-expr | <br>
+       * (\seq_def type id ; expr ; expr ; expr )
        *
        */
       // need to rewrite this grammar to avoid infinite recursion
       /**
+       *
        * seq-prim ::= <br>
        * \seq_empty |<br>
        * \seq_singleton ( expr ) | <br>
        * \values | <br>
-       * \seq_concat ( seq-expr , seq-expr )<br>
+       * \seq_concat ( seq-expr , seq-expr ) |<br>
+       * (\seq_def type id ; expr ; expr; expr)
        *
-       * seq-suffix ::= '[' expr .. expr ']' seq-expr ::= seq-prim seq-suffix
+       * seq-suffix ::= '[' expr .. expr ']'
        *
-       * condition-expression-suffix = ( \seq_def type id ; expr ; expr ; expr )
-       * |<br>
-       * conditional-expression-suffix
+       * seq-expr ::= seq-prim seq-suffix
+       *
        *
        */
-      // the suffix is creates by the static function in this class and
-      // registered in the key profile
 
-      // final IRecursiveParseFunction seqExpr = recursiveInit();
       final ExpressionParser expr = new ExpressionParser(profile);
+
+      final ParseFunction seqDefExpr = seq(brackets(seq(
+            keywords(SeqDefKeyword.class, profile), expr.typeSpec(), ident(),
+            separateBy(';', expr), separateBy(';', expr), separateBy(';', expr))));
+
+      final ParseFunction seqPrim = alt(
+            keywords(SeqPrimitiveKeywordSort.INSTANCE, profile), seqDefExpr);
 
       final ParseFunction seqSuffix = seq(squareBrackets(seq(expr,
             constant(".."), expr)));
 
-      final ParseFunction seqPrim = alt(keywords(
-            SeqPrimitiveKeywordSort.INSTANCE, profile));
       final ParseFunction seqExpr = seq(seqPrim, list(seqSuffix));
 
       this.seqExprParser = seqExpr;
