@@ -3,7 +3,8 @@ package org.key_project.jmlediting.core.utilities;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.text.IDocument;
+import javax.swing.text.BadLocationException;
+
 import org.key_project.jmlediting.core.utilities.CommentRange.CommentType;
 
 /**
@@ -30,16 +31,6 @@ public class CommentLocator {
          throw new IllegalArgumentException("text must not be null!");
       }
       this.text = text;
-   }
-
-   /**
-    * Creates a new Comment Locator on the content of the given document.
-    *
-    * @param doc
-    *           the document to locate comments in
-    */
-   public CommentLocator(final IDocument doc) {
-      this(doc.get());
    }
 
    /**
