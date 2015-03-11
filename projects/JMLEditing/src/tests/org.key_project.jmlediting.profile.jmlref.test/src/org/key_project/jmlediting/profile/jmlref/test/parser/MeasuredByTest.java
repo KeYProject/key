@@ -1,9 +1,9 @@
-package org.key_project.jmlediting.core.test.parser;
-
-import static org.key_project.jmlediting.core.test.parser.ParserTestUtils.testParseComplete;
+package org.key_project.jmlediting.profile.jmlref.test.parser;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.parser.ParserException;
+
+import static org.key_project.jmlediting.profile.jmlref.test.parser.JMLRefParserTestUtils.*;
 
 public class MeasuredByTest {
 

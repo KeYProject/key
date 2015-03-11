@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.core.test.parser;
+package org.key_project.jmlediting.profile.jmlref.test.parser;
 
 import static org.junit.Assert.fail;
 

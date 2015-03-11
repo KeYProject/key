@@ -1,10 +1,11 @@
-package org.key_project.jmlediting.core.test.parser;
+package org.key_project.jmlediting.profile.jmlref.test.parser;
 
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
+import org.key_project.jmlediting.core.test.parser.ParserTestUtils;
 
 public class InvariantForTest {
 

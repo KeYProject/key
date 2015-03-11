@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.core.test.parser;
+package org.key_project.jmlediting.profile.jmlref.test.parser;
 
 import static org.junit.Assert.fail;
 
@@ -6,6 +6,7 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.test.parser.DomCompareUtils;
 
 public class DomBuildUtils {
 

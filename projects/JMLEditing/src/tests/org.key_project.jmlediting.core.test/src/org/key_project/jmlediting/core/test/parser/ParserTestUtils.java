@@ -9,16 +9,6 @@ import org.key_project.jmlediting.core.parser.ParserException;
 
 public class ParserTestUtils {
 
-   public static void testParse(final String content,
-         final IASTNode expectedResult) throws ParserException {
-      testParse(content, ProfileWrapper.testProfile.createParser(),
-            expectedResult);
-   }
-
-   public static void testParseFail(final String content) {
-      testParseFail(content, ProfileWrapper.testProfile.createParser());
-   }
-
    public static void testParse(final String text, final ParseFunction parser,
          final IASTNode expectedResult) throws ParserException {
       if (expectedResult == null) {
@@ -47,12 +37,6 @@ public class ParserTestUtils {
       ParserBuilder.requireComplete(parser).parse(text, 0, text.length());
    }
 
-   public static void testParseComplete(final String test)
-         throws ParserException {
-      ParserBuilder.requireComplete(ProfileWrapper.testProfile.createParser())
-            .parse(test, 0, test.length());
-   }
-
    public static void testParseComplete(final String text,
          final ParseFunction parser, final String resultTerm)
          throws ParserException {
@@ -67,12 +51,6 @@ public class ParserTestUtils {
       final IASTNode result = ParserBuilder.requireComplete(parser).parse(text,
             0, text.length());
       assertEquals(resultPPTerm, result.prettyPrintAST());
-   }
-
-   public static void testParsePPComplete(final String text,
-         final String resultPPTerm) throws ParserException {
-      testParsePPComplete(text, ProfileWrapper.testProfile.createParser(),
-            resultPPTerm);
    }
 
    private static void testRecovery(final String text,
@@ -101,12 +79,6 @@ public class ParserTestUtils {
    }
 
    public static void testRecovery(final String text,
-         final IASTNode expectedErrorNode) {
-      testRecovery(text, ProfileWrapper.testProfile.createParser(),
-            expectedErrorNode);
-   }
-
-   public static void testRecovery(final String text,
          final ParseFunction function, final IASTNode expectedErrorNode) {
       testRecovery(text, function, (Object) expectedErrorNode);
    }
@@ -114,12 +86,6 @@ public class ParserTestUtils {
    public static void testRecovery(final String text,
          final ParseFunction function, final String expectedErrorNode) {
       testRecovery(text, function, (Object) expectedErrorNode);
-   }
-
-   public static void testRecovery(final String text,
-         final String expectedErrorNode) {
-      testRecovery(text, ProfileWrapper.testProfile.createParser(),
-            expectedErrorNode);
    }
 
 }

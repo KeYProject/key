@@ -9,6 +9,9 @@
       <profile
             class="org.key_project.jmlediting.core.test.profile.JMLProfileManagementTest$DummyJMLProfile2">
       </profile>
+      <profile
+            class="org.key_project.jmlediting.core.test.profile.persistence.PersistenceParentProfile">
+      </profile>
    </extension>
 
 </plugin>

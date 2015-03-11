@@ -13,6 +13,7 @@ import org.key_project.jmlediting.core.profile.DerivedProfile;
 import org.key_project.jmlediting.core.profile.IDerivedProfile;
 import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.core.profile.persistence.IDerivedProfilePersistence;
 import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceException;
 import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceFactory;
@@ -24,12 +25,12 @@ import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription.ClosingCharacterLaw;
 import org.key_project.jmlediting.core.profile.syntax.user.UserDefinedKeyword;
-import org.key_project.jmlediting.core.test.parser.ProfileWrapper;
 import org.w3c.dom.Document;
 
 public class DerivedProfilePersistenceTest {
 
-   private final IJMLProfile availableProfile = ProfileWrapper.testProfile;
+   private final IJMLProfile availableProfile = JMLProfileManagement.instance()
+         .getProfileFromIdentifier(PersistenceParentProfile.class.getName());
    private final IDerivedProfilePersistence persistence = ProfilePersistenceFactory
          .createDerivedProfilePersistence();
 

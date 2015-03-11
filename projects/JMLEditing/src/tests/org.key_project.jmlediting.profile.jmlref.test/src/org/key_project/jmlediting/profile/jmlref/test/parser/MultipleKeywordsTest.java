@@ -1,6 +1,7 @@
-package org.key_project.jmlediting.core.test.parser;
+package org.key_project.jmlediting.profile.jmlref.test.parser;
 
-import static org.key_project.jmlediting.core.test.parser.ParserTestUtils.*;
+import static org.key_project.jmlediting.profile.jmlref.test.parser.JMLRefParserTestUtils.testParse;
+import static org.key_project.jmlediting.profile.jmlref.test.parser.JMLRefParserTestUtils.testParseFail;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.dom.IASTNode;
