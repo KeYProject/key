@@ -16,12 +16,13 @@
  */
 package de.uka.ilkd.key.rule;
 
+import java.io.File;
+
 import junit.framework.TestCase;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -52,7 +53,7 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.HelperClassForTests;
 
 
 public class TestMatchTaclet extends TestCase {
@@ -81,7 +82,9 @@ public class TestMatchTaclet extends TestCase {
     }
 
     public void setUp() {
-        TacletForTests.setStandardFile(IOUtil.toFileString(KeYResourceManager.getManager().getResourceFile(getClass(), "testRuleMatch.txt")));
+        File ruleFile = new File(HelperClassForTests.TESTCASE_DIRECTORY + "/../de/uka/ilkd/key/rule/testRuleMatch.txt");
+        assertTrue("File '" + ruleFile + "' does not exist.", ruleFile.exists());
+        TacletForTests.setStandardFile(ruleFile.getAbsolutePath());
         TacletForTests.parse();
     
         services = TacletForTests.services();
