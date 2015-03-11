@@ -8,6 +8,7 @@ import java.util.Set;
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
+import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.validation.IJMLValidator;
 import org.key_project.jmlediting.profile.jmlref.behavior.BehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.ExceptionalBehaviorKeyword;
@@ -177,5 +178,10 @@ public class JMLReferenceProfile extends AbstractJMLProfile implements
       final Set<IJMLValidator> validator = new HashSet<IJMLValidator>(
             Arrays.asList(new LoopInvariantValidator()));
       return validator;
+   }
+
+   @Override
+   public IEditableDerivedProfile derive(final String id, final String name) {
+      return new DerivedExpressionProfile(id, name, this);
    }
 }

@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.key_project.jmlediting.core.profile.DerivedProfile;
+import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.InvalidProfileException;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
@@ -74,8 +74,8 @@ public class JMLNewProfileDialog extends StatusDialog {
             .getData(this.derivedFromCombo.getItem(this.derivedFromCombo
                   .getSelectionIndex()));
 
-      final DerivedProfile newProfile = new DerivedProfile(profileName,
-            profileId, parentProfile);
+      final IEditableDerivedProfile newProfile = parentProfile.derive(
+            profileId, profileName);
 
       try {
          JMLProfileManagement.instance().addDerivedProfile(newProfile);

@@ -8,6 +8,8 @@ import java.util.Set;
 import org.junit.Test;
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
+import org.key_project.jmlediting.core.profile.DerivedProfile;
+import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
@@ -61,6 +63,12 @@ public class JMLProfileManagementTest {
       public Set<IJMLValidator> getValidators() {
          // TODO Auto-generated method stub
          return Collections.emptySet();
+      }
+
+      @Override
+      public IEditableDerivedProfile derive(final String id, final String name) {
+         return new DerivedProfile<IJMLProfile>(id, name, this) {
+         };
       }
 
    }

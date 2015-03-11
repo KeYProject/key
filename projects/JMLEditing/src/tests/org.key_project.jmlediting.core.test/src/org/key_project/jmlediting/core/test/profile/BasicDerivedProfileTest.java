@@ -12,6 +12,7 @@ import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
 import org.key_project.jmlediting.core.profile.DerivedProfile;
+import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
@@ -77,6 +78,12 @@ public class BasicDerivedProfileTest {
 
       public void putExtension() {
          this.putExtension(key, baseValue, Object.class);
+      }
+
+      @Override
+      public IEditableDerivedProfile derive(final String id, final String name) {
+         return new DerivedProfile<IJMLProfile>(id, name, this) {
+         };
       }
 
    }
@@ -261,17 +268,17 @@ public class BasicDerivedProfileTest {
 
    @Test(expected = IllegalArgumentException.class)
    public void testInitializeWithoutParent() {
-      new DerivedProfile("a", "b", null);
+      new TestDerivedProfile("a", "b", null);
    }
 
    @Test(expected = IllegalArgumentException.class)
    public void testInitializeWithoutName() {
-      new DerivedProfile(null, "a", this.parentProfile);
+      this.parentProfile.derive("a", null);
    }
 
    @Test(expected = IllegalArgumentException.class)
    public void testInitializeWithoutIdentifier() {
-      new DerivedProfile("a", null, this.parentProfile);
+      this.parentProfile.derive(null, "a");
    }
 
    private static <T> Set<T> set(final T... keywords) {

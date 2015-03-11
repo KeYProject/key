@@ -5,6 +5,9 @@ import java.util.Set;
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
+import org.key_project.jmlediting.core.profile.DerivedProfile;
+import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
@@ -46,6 +49,12 @@ public class PersistenceParentProfile extends AbstractJMLProfile {
    @Override
    public IJMLParser createParser() {
       return new DefaultJMLParser(this);
+   }
+
+   @Override
+   public IEditableDerivedProfile derive(final String id, final String name) {
+      return new DerivedProfile<IJMLProfile>(name, id, this) {
+      };
    }
 
 }

@@ -15,8 +15,8 @@ import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordCo
  * @author Moritz Lichter
  *
  */
-public class DerivedProfile extends AbstractJMLProfile implements
-      IDerivedProfile, IEditableDerivedProfile {
+public abstract class DerivedProfile<P extends IJMLProfile> extends
+      AbstractJMLProfile implements IDerivedProfile, IEditableDerivedProfile {
 
    /**
     * The name of the profile.
@@ -30,7 +30,7 @@ public class DerivedProfile extends AbstractJMLProfile implements
    /**
     * The constant parent profile of this profile.
     */
-   private final IJMLProfile parentProfile;
+   private final P parentProfile;
 
    /**
     * A set holding all keywords of the parent which are disabled.
@@ -59,7 +59,7 @@ public class DerivedProfile extends AbstractJMLProfile implements
     *           the parent profile, not allowed to be null
     */
    public DerivedProfile(final String name, final String identifier,
-         final IJMLProfile parentProfile) {
+         final P parentProfile) {
       super();
       if (identifier == null) {
          throw new IllegalArgumentException(
@@ -178,7 +178,7 @@ public class DerivedProfile extends AbstractJMLProfile implements
    }
 
    @Override
-   public IJMLProfile getParentProfile() {
+   public P getParentProfile() {
       return this.parentProfile;
    }
 
@@ -213,6 +213,12 @@ public class DerivedProfile extends AbstractJMLProfile implements
    @Override
    public Set<IUserDefinedKeywordContentDescription> getSupportedContentDescriptions() {
       return this.parentProfile.getSupportedContentDescriptions();
+   }
+
+   @Override
+   public IEditableDerivedProfile derive(final String id, final String name) {
+      throw new UnsupportedOperationException(
+            "Cannot derive from a derived profile");
    }
 
 }

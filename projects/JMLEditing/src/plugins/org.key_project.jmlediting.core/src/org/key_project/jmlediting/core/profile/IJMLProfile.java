@@ -78,4 +78,6 @@ public interface IJMLProfile {
     */
    Set<IJMLValidator> getValidators();
 
+   IEditableDerivedProfile derive(String id, String name);
+
 }

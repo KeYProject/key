@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
-import org.key_project.jmlediting.core.profile.DerivedProfile;
 import org.key_project.jmlediting.core.profile.IDerivedProfile;
 import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
@@ -37,8 +36,8 @@ public class DerivedProfilePersistenceTest {
    @Test
    public void testPersistEmptyDerivedProfile()
          throws ProfilePersistenceException {
-      final IDerivedProfile profile = new DerivedProfile("Test",
-            "org.test.test", this.availableProfile);
+      final IDerivedProfile profile = this.availableProfile.derive(
+            "org.test.test", "Test");
       final Document doc = this.persistence.persist(profile);
       final IDerivedProfile readProfile = this.persistence.read(doc);
 
@@ -53,8 +52,8 @@ public class DerivedProfilePersistenceTest {
    @Test
    public void testPersistParentDisablesKeywords()
          throws ProfilePersistenceException {
-      final IEditableDerivedProfile profile = new DerivedProfile("Test",
-            "org.test.test", this.availableProfile);
+      final IEditableDerivedProfile profile = this.availableProfile.derive(
+            "org.test.test", "Test");
       // Pick some parent keywords
       final List<IKeyword> parentKeywords = new ArrayList<IKeyword>(
             this.availableProfile.getSupportedKeywords());
@@ -126,8 +125,8 @@ public class DerivedProfilePersistenceTest {
    @Test
    public void testPersistAdditionalKeywordsFromUserClass()
          throws ProfilePersistenceException {
-      final IEditableDerivedProfile profile = new DerivedProfile("Test",
-            "org.test.test", this.availableProfile);
+      final IEditableDerivedProfile profile = this.availableProfile.derive(
+            "org.test.test", "Test");
       profile.addKeyword(new TestKeyword());
 
       final Document doc = this.persistence.persist(profile);
@@ -142,8 +141,8 @@ public class DerivedProfilePersistenceTest {
    @Test(expected = ProfilePersistenceException.class)
    public void testPersitKeywordWithNonNullaryConstructor()
          throws ProfilePersistenceException {
-      final IEditableDerivedProfile profile = new DerivedProfile("IllegalTest",
-            "org.test.illegal", this.availableProfile);
+      final IEditableDerivedProfile profile = this.availableProfile.derive(
+            "org.test.illegal", "IllegalTest");
       profile.addKeyword(new IllegalTestKeyword("illegal_keyword"));
 
       // Should throw an exception
@@ -153,8 +152,8 @@ public class DerivedProfilePersistenceTest {
    @Test
    public void testPersistUserDefinedKeyword()
          throws ProfilePersistenceException {
-      final IEditableDerivedProfile profile = new DerivedProfile("IllegalTest",
-            "org.test.userdef", this.availableProfile);
+      final IEditableDerivedProfile profile = this.availableProfile.derive(
+            "org.test.userdef", "IllegalTest");
       final IUserDefinedKeywordContentDescription contentDescription = this.availableProfile
             .getSupportedContentDescriptions().iterator().next();
       Character closingChar;
