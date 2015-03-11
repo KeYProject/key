@@ -156,6 +156,11 @@ public abstract class AbstractProblemLoader {
      * The instantiate proof or {@code null} if no proof was instantiated during loading process.
      */
     private Proof proof;
+    
+    /**
+     * The {@link ReplayResult} if available or {@code null} otherwise.
+     */
+    private ReplayResult result;
 
     /**
      * Maps internal error codes of the parser to human readable strings.
@@ -224,7 +229,6 @@ public abstract class AbstractProblemLoader {
             // Read proof obligation settings
             LoadedPOContainer poContainer = createProofObligationContainer();
             ProofAggregate proofList = null;
-            ReplayResult result = null;
             try {
                 if (poContainer == null) {
                     if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
@@ -550,5 +554,13 @@ public abstract class AbstractProblemLoader {
      */
     public Proof getProof() {
         return proof;
+    }
+
+    /**
+     * Returns the {@link ReplayResult} if available.
+     * @return The {@link ReplayResult} or {@code null} if not available.
+     */
+    public ReplayResult getResult() {
+       return result;
     }
 }

@@ -38,6 +38,8 @@ import de.uka.ilkd.key.util.ThreadUtilities;
  * @author Martin Hentschel
  */
 public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserInterfaceControl implements RuleCompletionHandler, ProofEnvironmentListener, ProofDisposedListener {
+   protected boolean saveOnly = false;
+
    private final MediatorProofControl proofControl = createProofControl();
 
    private ProofMacro autoMacro = new SkipMacro();
@@ -51,6 +53,13 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
       return new MediatorProofControl(this);
    }
 
+   public void setSaveOnly(boolean s) {
+       this.saveOnly = s;
+   }
+   
+   public boolean isSaveOnly() {
+       return this.saveOnly;
+   }
 
    public void setMacro(ProofMacro macro) {
        assert macro != null;
@@ -97,7 +106,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
           Debug.out("[ APPLY " + getMacro().getClass().getSimpleName() + " ]");
           Proof proof = getMediator().getSelectedProof();
           ProofMacroFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
-          ProverTaskListener ptl = getListener();
+          ProverTaskListener ptl = this;
           try {
               getMediator().stopInterface(true);
               getMediator().setInteractive(false);

@@ -132,6 +132,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     @Override
    public void taskFinished(TaskFinishedInfo info) {
+       super.taskFinished(info);
        progressMax = 0; // reset progress bar marker
        final Proof proof = info.getProof();
        if (proof==null) {
@@ -178,6 +179,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     @Override
     public void taskStarted(String message, int size) {
+        super.taskStarted(message, size);
         progressMax = size;
         if (verbosity >= Verbosity.HIGH) {
             if (ApplyStrategy.PROCESSING_STRATEGY.equals(message)) {
@@ -266,6 +268,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
     @Override
     final public void taskProgress(int position) {
+        super.taskProgress(position);
         if (verbosity >= Verbosity.HIGH && progressMax > 0) {
             if ((position*PROGRESS_BAR_STEPS) % progressMax == 0) {
                 System.out.print(PROGRESS_MARK);

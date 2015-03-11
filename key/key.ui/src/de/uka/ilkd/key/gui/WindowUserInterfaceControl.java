@@ -82,7 +82,6 @@ import de.uka.ilkd.key.util.ThreadUtilities;
  * @author Mattias Ulbrich
  */
 public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceControl {
-
     private final MainWindow mainWindow;
 
     private final LinkedList<InteractiveRuleApplicationCompletion> completions =
@@ -108,7 +107,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
           }          
        };
     }
-
+    
     /**
      * loads the problem or proof from the given file
      *
@@ -159,6 +158,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void taskFinished(TaskFinishedInfo info) {
+        super.taskFinished(info);
         if (info.getSource() instanceof ApplyStrategy) {
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
@@ -234,12 +234,14 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void taskProgress(int position) {
+        super.taskProgress(position);
         mainWindow.getStatusLine().setProgress(position);
 
     }
 
     @Override
     public void taskStarted(String message, int size) {
+        super.taskStarted(message, size);
         mainWindow.setStatusLine(message, size);
     }
 
@@ -506,7 +508,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       }
       AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, null, forceNewProfileOfNewProofs);
       InitConfig initConfig = loader.getInitConfig();
-      return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig, loader.getProof());
+      return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig, loader.getProof(), loader.getResult());
    }
 
    @Override

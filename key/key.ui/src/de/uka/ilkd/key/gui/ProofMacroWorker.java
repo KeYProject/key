@@ -75,7 +75,7 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
 
     @Override
     protected Void doInBackground() throws Exception {
-        final ProverTaskListener ptl = mediator.getUI().getListener();
+        final ProverTaskListener ptl = mediator.getUI();
         Node selectedNode = mediator.getSelectedNode();
         Proof selectedProof = selectedNode.proof();
         TaskFinishedInfo info =

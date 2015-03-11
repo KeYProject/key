@@ -119,9 +119,14 @@ public interface ProofControl {
    void startAutoMode(Proof proof, ImmutableList<Goal> goals);
    
    /**
-    * Stops the currently running auto mode.
+    * Requests to stop the current auto mode without blocking the current {@link Thread} until the auto mode has stopped.
     */
    void stopAutoMode();
+   
+   /**
+    * Stops the currently running auto mode and blocks the current {@link Thread} until auto mode has stopped.
+    */
+   void stopAndWaitAutoMode();
    
    /**
     * Blocks the current {@link Thread} while the auto mode of this

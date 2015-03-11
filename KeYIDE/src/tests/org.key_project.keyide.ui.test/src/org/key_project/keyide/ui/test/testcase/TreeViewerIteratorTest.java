@@ -77,7 +77,7 @@ public class TreeViewerIteratorTest extends AbstractSetupTestCase {
          TreeViewer viewer = new TreeViewer(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
          viewer.setUseHashlookup(true);
          viewer.setContentProvider(new LazyProofTreeContentProvider());
-         viewer.setLabelProvider(new ProofTreeLabelProvider(viewer, proof));
+         viewer.setLabelProvider(new ProofTreeLabelProvider(viewer, environment.getProofControl(), proof));
          viewer.setInput(proof);
          shell.setVisible(true);
          viewer.expandAll();

@@ -30,7 +30,7 @@ public class MediatorProofControl extends AbstractProofControl {
    private final AbstractMediatorUserInterfaceControl ui;
 
    public MediatorProofControl(AbstractMediatorUserInterfaceControl ui) {
-      super(ui.getListener(), ui);
+      super(ui, ui);
       this.ui = ui;
    }
 
@@ -56,15 +56,6 @@ public class MediatorProofControl extends AbstractProofControl {
    @Override
    public void fireAutoModeStopped(ProofEvent e) {
       super.fireAutoModeStopped(e);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void startAndWaitForAutoMode(Proof proof) {
-      startAutoMode(proof);
-      waitWhileAutoMode();
    }
 
    /**
@@ -167,7 +158,7 @@ public class MediatorProofControl extends AbstractProofControl {
        @Override
        protected void done() {
            try {
-               get();
+              ApplyStrategyInfo result = get();
            } catch (final InterruptedException exception) {
                notifyException(exception);
            } catch (final ExecutionException exception) {

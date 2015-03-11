@@ -3,6 +3,7 @@ package de.uka.ilkd.key.control;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.proof.ApplyStrategy;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -38,14 +39,6 @@ public class DefaultProofControl extends AbstractProofControl {
    }
 
    @Override
-   public synchronized void startAndWaitForAutoMode(Proof proof) {
-      if (!isInAutoMode()) {
-         autoModeThread = new AutoModeThread(proof, proof.openEnabledGoals(), null);
-         autoModeThread.run();
-      }
-   }
-
-   @Override
    public synchronized void startAutoMode(Proof proof, ImmutableList<Goal> goals, ProverTaskListener ptl) {
       if (!isInAutoMode()) {
          autoModeThread = new AutoModeThread(proof, goals, ptl);
@@ -57,7 +50,6 @@ public class DefaultProofControl extends AbstractProofControl {
    public synchronized void stopAutoMode() {
       if (isInAutoMode()) {
          autoModeThread.interrupt();
-         waitWhileAutoMode();
       }
    }
 

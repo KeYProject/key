@@ -547,6 +547,24 @@ public abstract class AbstractProofControl implements ProofControl {
     public void startAutoMode(Proof proof) {
        startAutoMode(proof, proof.openGoals());
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void startAndWaitForAutoMode(Proof proof) {
+       startAutoMode(proof);
+       waitWhileAutoMode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void stopAndWaitAutoMode() {
+       stopAutoMode();
+       waitWhileAutoMode();
+    }
     
     /**
      * {@inheritDoc}

@@ -37,6 +37,7 @@ import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -480,7 +481,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     */
    public void suspend(IKeYSEDDebugNode<?> keyNode) throws DebugException {
       if (canSuspend()) {
-         getProofControl().stopAutoMode();
+         getProofControl().stopAndWaitAutoMode();
          super.suspend();
       }
    }
