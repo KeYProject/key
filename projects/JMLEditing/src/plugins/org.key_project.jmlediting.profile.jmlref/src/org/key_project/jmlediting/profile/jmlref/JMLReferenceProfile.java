@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,6 +28,7 @@ import org.key_project.jmlediting.profile.jmlref.other.NonNullKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.NullableKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.PureKeyword;
 import org.key_project.jmlediting.profile.jmlref.primary.FreshKeyword;
+import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
 import org.key_project.jmlediting.profile.jmlref.primary.InvariantForKeyword;
 import org.key_project.jmlediting.profile.jmlref.primary.KeywordJMLPrimary;
 import org.key_project.jmlediting.profile.jmlref.primary.ReachKeyword;
@@ -61,7 +63,6 @@ import org.key_project.jmlediting.profile.jmlref.spec_statement.ContinuesClauseK
 import org.key_project.jmlediting.profile.jmlref.spec_statement.ReturnsClauseKeyword;
 import org.key_project.jmlediting.profile.jmlref.type.BigIntKeyword;
 import org.key_project.jmlediting.profile.jmlref.type.RealKeyword;
-import org.key_project.jmlediting.profile.jmlref.usercontent.SpecExpressionContentDescription;
 import org.key_project.jmlediting.profile.jmlref.validator.LoopInvariantValidator;
 import org.key_project.jmlediting.profile.jmlref.visibility.InstanceKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.PrivateKeyword;
@@ -79,7 +80,13 @@ import org.key_project.jmlediting.profile.jmlref.visibility.StaticKeyword;
  * @author Moritz Lichter
  *
  */
-public class JMLReferenceProfile extends AbstractJMLProfile {
+public class JMLReferenceProfile extends AbstractJMLProfile implements
+      IJMLExpressionProfile {
+
+   /**
+    * The set containing all supported keywords.
+    */
+   private final Set<IJMLPrimary> supportedPrimaries = new HashSet<IJMLPrimary>();
 
    /**
     * Creates a new profile instance with the given supported keyword.
@@ -122,8 +129,8 @@ public class JMLReferenceProfile extends AbstractJMLProfile {
       this.getSupportedPrimariesInternal().addAll(
             Arrays.asList(new KeywordJMLPrimary(), new QuantifierPrimary()));
 
-      this.getSupportedContentDescriptionsInternal().addAll(
-            Arrays.asList(new SpecExpressionContentDescription()));
+      // this.getSupportedContentDescriptionsInternal().addAll(
+      // Arrays.asList(new SpecExpressionContentDescription()));
 
    }
 
@@ -133,6 +140,21 @@ public class JMLReferenceProfile extends AbstractJMLProfile {
     */
    public JMLReferenceProfile() {
       this(KeywordLocale.BOTH);
+   }
+
+   @Override
+   public Set<IJMLPrimary> getSupportedPrimaries() {
+      return Collections.unmodifiableSet(this.supportedPrimaries);
+   }
+
+   /**
+    * Returns the modifiable version of the primaries set to allow subclasses to
+    * access them.
+    *
+    * @return the modifiable primaries set
+    */
+   protected final Set<IJMLPrimary> getSupportedPrimariesInternal() {
+      return this.supportedPrimaries;
    }
 
    @Override

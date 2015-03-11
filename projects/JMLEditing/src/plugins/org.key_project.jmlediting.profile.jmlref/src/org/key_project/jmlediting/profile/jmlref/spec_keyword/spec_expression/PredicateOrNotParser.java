@@ -5,7 +5,7 @@ import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.NotSpecifiedKeyword;
 
 /**
@@ -24,11 +24,11 @@ public class PredicateOrNotParser implements ParseFunction {
 
    /**
     * Creates a new {@link PredicateOrNotParser} for the given profile.
-    * 
+    *
     * @param profile
     *           the profile
     */
-   public PredicateOrNotParser(final IJMLProfile profile) {
+   public PredicateOrNotParser(final IJMLExpressionProfile profile) {
       this.parser = alt(new PredicateParser(profile),
             keywords(NotSpecifiedKeyword.class, profile));
    }

@@ -5,10 +5,10 @@ import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.LexicalHelper;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
+import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
 
 public class DynamicLogicPrimary implements IJMLPrimary {
 
@@ -78,7 +78,7 @@ public class DynamicLogicPrimary implements IJMLPrimary {
    }
 
    @Override
-   public void setProfile(final IJMLProfile profile) {
+   public void setProfile(final IJMLExpressionProfile profile) {
    }
 
 }

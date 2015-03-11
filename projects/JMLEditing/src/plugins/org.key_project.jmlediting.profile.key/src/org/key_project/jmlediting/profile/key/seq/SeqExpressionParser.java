@@ -6,7 +6,7 @@ import static org.key_project.jmlediting.core.parser.util.JavaBasicsParser.ident
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
 
 public class SeqExpressionParser implements ParseFunction {
@@ -19,7 +19,7 @@ public class SeqExpressionParser implements ParseFunction {
       return this.seqExprParser.parse(text, start, end);
    }
 
-   public SeqExpressionParser(final IJMLProfile profile) {
+   public SeqExpressionParser(final IJMLExpressionProfile profile) {
       /**
        * seq-expr ::= <br>
        * \seq_empty | <br>
@@ -62,7 +62,7 @@ public class SeqExpressionParser implements ParseFunction {
       this.seqExprParser = seqExpr;
    }
 
-   public static ParseFunction seqSuffix(final IJMLProfile profile) {
+   public static ParseFunction seqSuffix(final IJMLExpressionProfile profile) {
       final ExpressionParser expr = new ExpressionParser(profile);
       final ParseFunction seqSuffix = seq(squareBrackets(seq(expr,
             constant(".."), expr)));

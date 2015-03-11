@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.key_project.jmlediting.core.validation.IJMLValidator;
-import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
+
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
+import org.key_project.jmlediting.core.validation.IJMLValidator;
 
 /**
  * This class implements some methods of the {@link IJMLProfile} in a generic
@@ -83,10 +83,7 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
     * A set containing all supported keywords.
     */
    private final Set<IKeyword> supportedKeywords = new HashSet<IKeyword>();
-   /**
-    * The set containing all supported keywords.
-    */
-   private final Set<IJMLPrimary> supportedPrimaries = new HashSet<IJMLPrimary>();
+
    /**
     * The set containing all keyword content descriptions.
     */
@@ -115,11 +112,6 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
    }
 
    @Override
-   public Set<IJMLPrimary> getSupportedPrimaries() {
-      return Collections.unmodifiableSet(this.supportedPrimaries);
-   }
-
-   @Override
    public Set<IUserDefinedKeywordContentDescription> getSupportedContentDescriptions() {
       return Collections.unmodifiableSet(this.supportedContentDescriptions);
    }
@@ -132,16 +124,6 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
     */
    protected final Set<IKeyword> getSupportedKeywordsInternal() {
       return this.supportedKeywords;
-   }
-
-   /**
-    * Returns the modifiable version of the primaries set to allow subclasses to
-    * access them.
-    *
-    * @return the modifiable primaries set
-    */
-   protected final Set<IJMLPrimary> getSupportedPrimariesInternal() {
-      return this.supportedPrimaries;
    }
 
    /**

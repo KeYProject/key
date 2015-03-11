@@ -13,21 +13,28 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
  * @author Moritz Lichter
  *
  */
-public abstract class ParseFunctionKeywordParser implements IKeywordParser {
+public abstract class ParseFunctionKeywordParser<P extends IJMLProfile>
+      implements IKeywordParser {
 
    /**
     * The parser used to parse.
     */
    private ParseFunction mainParser;
 
+   private final Class<P> clazz;
+
+   public ParseFunctionKeywordParser(final Class<P> clazz) {
+      this.clazz = clazz;
+   }
+
    /**
     * Creates the profile specific parse function.
-    * 
+    *
     * @param profile
     *           the profile for which to parse
     * @return the parse function to use for the given profile
     */
-   protected abstract ParseFunction createParseFunction(IJMLProfile profile);
+   protected abstract ParseFunction createParseFunction(P profile);
 
    @Override
    public IASTNode parse(final String text, final int start, final int end)
@@ -39,9 +46,15 @@ public abstract class ParseFunctionKeywordParser implements IKeywordParser {
       return this.mainParser.parse(text, start, end);
    }
 
+   @SuppressWarnings("unchecked")
    @Override
    public void setProfile(final IJMLProfile profile) {
-      this.mainParser = this.createParseFunction(profile);
+      if (!this.clazz.isAssignableFrom(profile.getClass())) {
+         throw new IllegalArgumentException(
+               "Cannot handle this profile but expected a "
+                     + this.clazz.getSimpleName());
+      }
+      this.mainParser = this.createParseFunction((P) profile);
       if (this.mainParser == null) {
          throw new NullPointerException(
                "createParseFunction returned a null parser");

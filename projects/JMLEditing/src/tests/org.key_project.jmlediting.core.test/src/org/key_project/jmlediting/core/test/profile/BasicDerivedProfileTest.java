@@ -134,13 +134,6 @@ public class BasicDerivedProfileTest {
    }
 
    @Test
-   public void testDerivedProfilesSupportsParentPrimaries() {
-      assertEquals("Derived profile does not support primaries of parent",
-            this.parentProfile.getSupportedPrimaries(),
-            this.derivedProfile.getSupportedPrimaries());
-   }
-
-   @Test
    public void testAddNewKeywordsToDerived() {
       this.derivedProfile.addKeyword(derivedKeyword1);
       assertEquals("Additional keywords does not contains first",

@@ -1,7 +1,10 @@
-package org.key_project.jmlediting.core.profile.syntax;
+package org.key_project.jmlediting.profile.jmlref.primary;
 
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 
 /**
  * A {@link IJMLProfile} is a special parse function which is injected into JML
@@ -23,6 +26,6 @@ public interface IJMLPrimary extends ParseFunction {
     * @param profile
     *           the profile for which it is parsed
     */
-   void setProfile(IJMLProfile profile);
+   void setProfile(IJMLExpressionProfile profile);
 
 }

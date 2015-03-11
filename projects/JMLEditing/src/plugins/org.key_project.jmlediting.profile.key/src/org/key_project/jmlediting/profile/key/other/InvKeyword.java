@@ -1,8 +1,8 @@
 package org.key_project.jmlediting.profile.key.other;
 
-import org.key_project.jmlediting.core.profile.syntax.AbstractJMLPrimaryKeyword;
 import org.key_project.jmlediting.core.profile.syntax.EmptyKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.primary.AbstractJMLPrimaryKeyword;
 import org.key_project.jmlediting.profile.key.KeyProfile;
 
 /**

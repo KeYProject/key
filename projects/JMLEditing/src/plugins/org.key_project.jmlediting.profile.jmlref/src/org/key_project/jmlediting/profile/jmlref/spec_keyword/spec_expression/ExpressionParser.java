@@ -11,7 +11,7 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.IRecursiveParseFunction;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 import org.key_project.jmlediting.profile.jmlref.type.TypeKeywordSort;
 
 /**
@@ -103,7 +103,7 @@ public class ExpressionParser implements ParseFunction {
     * @param profile
     *           the profile to parse according to
     */
-   public ExpressionParser(final IJMLProfile profile) {
+   public ExpressionParser(final IJMLExpressionProfile profile) {
 
       // Initially create some parse function which refer recursively to
       // themselves

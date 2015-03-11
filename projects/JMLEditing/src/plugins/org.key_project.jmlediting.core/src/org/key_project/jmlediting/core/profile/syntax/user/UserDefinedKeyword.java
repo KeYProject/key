@@ -76,7 +76,7 @@ public class UserDefinedKeyword extends AbstractKeyword implements
    @Override
    public IKeywordParser createParser() {
       // Get the parse function from the content description.
-      return new ParseFunctionKeywordParser() {
+      return new ParseFunctionKeywordParser<IJMLProfile>(IJMLProfile.class) {
 
          @Override
          protected ParseFunction createParseFunction(final IJMLProfile profile) {

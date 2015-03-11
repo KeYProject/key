@@ -1,14 +1,14 @@
 package org.key_project.jmlediting.profile.jmlref.test.parser;
 
-import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 import org.key_project.jmlediting.profile.jmlref.JMLReferenceProfileAE;
 
 public class ProfileWrapper {
 
-   private static IJMLProfile getReferenceProfile() {
+   private static IJMLExpressionProfile getReferenceProfile() {
       return new JMLReferenceProfileAE();
    }
 
-   public static IJMLProfile testProfile = getReferenceProfile();
+   public static IJMLExpressionProfile testProfile = getReferenceProfile();
 
 }

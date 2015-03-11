@@ -2,10 +2,10 @@ package org.key_project.jmlediting.profile.jmlref.spec_statement;
 
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserBuilder;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
+import org.key_project.jmlediting.profile.jmlref.parser.SemicolonClosedKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AbstractGenericSpecificationKeyword;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.SemicolonClosedKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.PredicateOrNotParser;
 
 /**
@@ -38,7 +38,7 @@ public class ReturnsClauseKeyword extends AbstractGenericSpecificationKeyword {
 
          @Override
          protected ParseFunction createContentParseFunction(
-               final IJMLProfile profile) {
+               final IJMLExpressionProfile profile) {
             return ParserBuilder.opt(new PredicateOrNotParser(profile));
          }
       };

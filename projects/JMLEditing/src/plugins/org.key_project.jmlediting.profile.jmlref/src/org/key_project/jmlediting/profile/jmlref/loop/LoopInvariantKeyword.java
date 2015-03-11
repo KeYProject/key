@@ -1,10 +1,10 @@
 package org.key_project.jmlediting.profile.jmlref.loop;
 
 import org.key_project.jmlediting.core.parser.ParseFunction;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractToplevelKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.SemicolonClosedKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
+import org.key_project.jmlediting.profile.jmlref.parser.SemicolonClosedKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.PredicateParser;
 
 /**
@@ -35,7 +35,7 @@ public class LoopInvariantKeyword extends AbstractToplevelKeyword {
 
          @Override
          protected ParseFunction createContentParseFunction(
-               final IJMLProfile profile) {
+               final IJMLExpressionProfile profile) {
             return new PredicateParser(profile);
          }
       };

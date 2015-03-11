@@ -3,7 +3,6 @@ package org.key_project.jmlediting.core.profile;
 import java.util.Set;
 
 import org.key_project.jmlediting.core.parser.IJMLParser;
-import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.core.validation.IJMLValidator;
@@ -36,14 +35,6 @@ public interface IJMLProfile {
     * @return the set of supported behaviors
     */
    Set<IKeyword> getSupportedKeywords();
-
-   /**
-    * Returns a set of all supported JML primaries in expression. The returned
-    * set is not allowed to be modified and is guaranteed not to be null.
-    *
-    * @return the set of all supported primaries
-    */
-   Set<IJMLPrimary> getSupportedPrimaries();
 
    /**
     * Returns a set of supported content descriptions which the user may use to

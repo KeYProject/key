@@ -1,6 +1,9 @@
-package org.key_project.jmlediting.core.profile.syntax;
+package org.key_project.jmlediting.profile.jmlref.primary;
 
 import java.util.Set;
+
+import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 
 public abstract class AbstractJMLPrimaryKeyword extends AbstractKeyword {
 

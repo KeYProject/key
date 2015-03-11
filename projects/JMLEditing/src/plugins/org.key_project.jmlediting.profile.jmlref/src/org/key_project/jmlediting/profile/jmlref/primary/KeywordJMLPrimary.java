@@ -5,10 +5,8 @@ import static org.key_project.jmlediting.core.parser.ParserBuilder.keywords;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
-import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
-import org.key_project.jmlediting.core.profile.syntax.JMLPrimaryKeywordSort;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 
 /**
  * The primary which allows all keywords of sort {@link JMLPrimaryKeywordSort}
@@ -25,7 +23,7 @@ public class KeywordJMLPrimary implements IJMLPrimary {
    private ParseFunction keywordPrimaryParser;
 
    @Override
-   public void setProfile(final IJMLProfile profile) {
+   public void setProfile(final IJMLExpressionProfile profile) {
       this.keywordPrimaryParser = keywords(JMLProfileHelper.filterKeywords(
             profile, JMLPrimaryKeywordSort.INSTANCE), profile);
    }

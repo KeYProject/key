@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
-import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 
@@ -209,12 +208,6 @@ public class DerivedProfile extends AbstractJMLProfile implements
          final Class<T> clazz) {
       throw new UnsupportedOperationException(
             "A derived profile is not allowed to define extensions");
-   }
-
-   @Override
-   public Set<IJMLPrimary> getSupportedPrimaries() {
-      // Derived profiles cannot define new primaries
-      return this.parentProfile.getSupportedPrimaries();
    }
 
    @Override

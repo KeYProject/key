@@ -1,8 +1,8 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression;
 
-import org.key_project.jmlediting.core.profile.syntax.AbstractJMLPrimaryKeyword;
 import org.key_project.jmlediting.core.profile.syntax.EmptyKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.primary.AbstractJMLPrimaryKeyword;
 
 /**
  * Implementation of the result keyword.

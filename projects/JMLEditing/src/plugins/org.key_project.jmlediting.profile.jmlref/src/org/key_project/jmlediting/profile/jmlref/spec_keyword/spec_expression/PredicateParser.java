@@ -1,6 +1,6 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression;
 
-import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 
 /**
  * A predicate parser parses a predicate e.g. for an requires clause. A
@@ -18,7 +18,7 @@ public class PredicateParser extends SpecExpressionParser {
     * @param profile
     *           the profile that defines the supported JML primaries.
     */
-   public PredicateParser(final IJMLProfile profile) {
+   public PredicateParser(final IJMLExpressionProfile profile) {
       super(profile);
    }
 

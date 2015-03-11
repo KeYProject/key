@@ -1,4 +1,6 @@
-package org.key_project.jmlediting.core.profile.syntax;
+package org.key_project.jmlediting.profile.jmlref.primary;
+
+import org.key_project.jmlediting.core.profile.syntax.AbstractKeywordSort;
 
 /**
  * The sort of a keyword which introduces a JML primary expression.

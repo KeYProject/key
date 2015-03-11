@@ -4,10 +4,10 @@ import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
 
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.util.JavaBasicsParser;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.syntax.AbstractJMLPrimaryKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
-import org.key_project.jmlediting.core.profile.syntax.ParseFunctionKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
+import org.key_project.jmlediting.profile.jmlref.parser.JMLRefParseFunctionKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.primary.AbstractJMLPrimaryKeyword;
 
 /**
  * The implementation of the {@link OldKeyword}.
@@ -34,10 +34,11 @@ public class OldKeyword extends AbstractJMLPrimaryKeyword {
 
    @Override
    public IKeywordParser createParser() {
-      return new ParseFunctionKeywordParser() {
+      return new JMLRefParseFunctionKeywordParser() {
 
          @Override
-         protected ParseFunction createParseFunction(final IJMLProfile profile) {
+         protected ParseFunction createParseFunction(
+               final IJMLExpressionProfile profile) {
             /**
              * old-expression ::= \old ( spec-expression [ , ident ] )<br>
              * | \pre ( spec-expression )

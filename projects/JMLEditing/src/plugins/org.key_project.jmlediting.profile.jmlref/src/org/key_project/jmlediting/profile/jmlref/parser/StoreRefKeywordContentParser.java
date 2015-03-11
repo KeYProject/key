@@ -1,8 +1,8 @@
-package org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref;
+package org.key_project.jmlediting.profile.jmlref.parser;
 
 import org.key_project.jmlediting.core.parser.ParseFunction;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.SemicolonClosedKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefListParser;
 
 /**
  * Parses the content after a keyword which requires a storage location (or
@@ -11,8 +11,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.SemicolonClosedKey
  * @author Moritz Lichter
  *
  */
-public class StoreRefKeywordContentParser extends
-      SemicolonClosedKeywordParser {
+public class StoreRefKeywordContentParser extends SemicolonClosedKeywordParser {
 
    /**
     * Stores whether informal descriptions are allowed as storage locations.
@@ -31,7 +30,8 @@ public class StoreRefKeywordContentParser extends
    }
 
    @Override
-   protected ParseFunction createContentParseFunction(final IJMLProfile profile) {
+   protected ParseFunction createContentParseFunction(
+         final IJMLExpressionProfile profile) {
       return new StoreRefListParser(profile, this.allowInformalDescription);
    }
 

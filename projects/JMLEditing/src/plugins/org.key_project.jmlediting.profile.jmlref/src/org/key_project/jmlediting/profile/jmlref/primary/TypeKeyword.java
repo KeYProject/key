@@ -1,15 +1,9 @@
 package org.key_project.jmlediting.profile.jmlref.primary;
 
-import static org.key_project.jmlediting.core.parser.ParserBuilder.brackets;
-
-import org.key_project.jmlediting.core.parser.ParseFunction;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
-import org.key_project.jmlediting.core.profile.syntax.JMLPrimaryKeywordSort;
-import org.key_project.jmlediting.core.profile.syntax.ParseFunctionKeywordParser;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.SpecExpressionParser;
+import org.key_project.jmlediting.profile.jmlref.parser.BracketsTypeParser;
 
 /**
  * The implementation of the \type primary.
@@ -40,15 +34,7 @@ public class TypeKeyword extends AbstractKeyword {
 
    @Override
    public IKeywordParser createParser() {
-      return new ParseFunctionKeywordParser() {
-
-         @Override
-         protected ParseFunction createParseFunction(final IJMLProfile profile) {
-            final SpecExpressionParser parser = new SpecExpressionParser(
-                  profile);
-            return brackets(parser.typeSpec());
-         }
-      };
+      return new BracketsTypeParser();
    }
 
 }
