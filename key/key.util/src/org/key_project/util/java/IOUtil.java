@@ -21,10 +21,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.security.CodeSource;
 import java.security.MessageDigest;
@@ -713,7 +715,7 @@ public final class IOUtil {
             String protocol = url.getProtocol();
             String userInfo = url.getUserInfo();
             String host = url.getHost();
-            String path = url.getPath();
+            String path = URLDecoder.decode(url.getPath(), "UTF-8");
             String query = url.getQuery();
             String ref = url.getRef();
             return new URI(!StringUtil.isEmpty(protocol) ? protocol : null, 
@@ -728,7 +730,7 @@ public final class IOUtil {
             return null;
          }
       }
-      catch (URISyntaxException e) {
+      catch (URISyntaxException | UnsupportedEncodingException e) {
          return null;
       }
    }
