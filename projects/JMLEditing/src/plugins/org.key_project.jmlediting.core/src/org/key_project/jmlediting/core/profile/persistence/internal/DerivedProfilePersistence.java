@@ -12,6 +12,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.key_project.jmlediting.core.profile.DerivedProfile;
 import org.key_project.jmlediting.core.profile.IDerivedProfile;
+import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.core.profile.persistence.IDerivedProfilePersistence;
@@ -105,8 +106,8 @@ public class DerivedProfilePersistence implements IDerivedProfilePersistence {
       }
 
       // Create a new derived profile
-      final DerivedProfile profile = new DerivedProfile(name, identifier,
-            parentProfile);
+      final IEditableDerivedProfile profile = parentProfile.derive(name,
+            identifier);
 
       // And load additional and disabled keywords
       this.readAdditonalKeywords(profileNode, profile);
@@ -127,7 +128,8 @@ public class DerivedProfilePersistence implements IDerivedProfilePersistence {
     *            if a keyword cannot be loaded
     */
    private void readAdditonalKeywords(final Element profileNode,
-         final DerivedProfile profile) throws ProfilePersistenceException {
+         final IEditableDerivedProfile profile)
+         throws ProfilePersistenceException {
       // Additional keywords need to be instantiated
       final InstantiateKeywordsPersistence keywordPersistence = new InstantiateKeywordsPersistence(
             profile);
@@ -230,7 +232,8 @@ public class DerivedProfilePersistence implements IDerivedProfilePersistence {
     *            if a keyword could not be loaded
     */
    private void readDisabledKeywords(final Element profileNode,
-         final DerivedProfile profile) throws ProfilePersistenceException {
+         final IEditableDerivedProfile profile)
+         throws ProfilePersistenceException {
       // The disabled keyword already exists in the parent profile
       final LoadFromProfileKeywordPersistence keywordPersistence = new LoadFromProfileKeywordPersistence(
             profile);
