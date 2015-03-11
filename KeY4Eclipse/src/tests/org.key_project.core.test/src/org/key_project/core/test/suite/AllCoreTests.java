@@ -11,12 +11,11 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.key4eclipse.test.suite;
+package org.key_project.core.test.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.key_project.key4eclipse.test.testcase.KeYExampleUtilTest;
-import org.key_project.key4eclipse.test.testcase.RefreshProofSaverListenerTest;
+import org.key_project.core.test.testcase.RefreshProofSaverListenerTest;
 
 import de.uka.ilkd.key.suite.TestKey;
 
@@ -26,10 +25,9 @@ import de.uka.ilkd.key.suite.TestKey;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-   KeYExampleUtilTest.class,
    RefreshProofSaverListenerTest.class,
    TestKey.class
    //RunAllProofsTest.class // This class is not listed because it takes to much time.
 })
-public class AllKeYCoreTests {
+public class AllCoreTests {
 }

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: KeY Project UI
+Bundle-Name: KeY UI
 Bundle-SymbolicName: org.key_project.ui
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.ui.Activator

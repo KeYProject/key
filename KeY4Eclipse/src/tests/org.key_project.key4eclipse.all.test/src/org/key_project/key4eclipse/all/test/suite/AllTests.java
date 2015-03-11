@@ -15,10 +15,11 @@ package org.key_project.key4eclipse.all.test.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.key_project.core.test.suite.AllCoreTests;
 import org.key_project.key4eclipse.common.ui.test.suite.AllCommonUiTests;
 import org.key_project.key4eclipse.starter.core.test.suite.AllStarterCoreTests;
 import org.key_project.key4eclipse.starter.ui.test.suite.AllStarterUITests;
-import org.key_project.key4eclipse.test.suite.AllKeYCoreTests;
+import org.key_project.ui.test.suite.AllUITests;
 import org.key_project.util.test.suite.AllUtilTests;
 
 import de.uka.ilkd.key.proof_references.suite.AllProofReferencesTests;
@@ -31,12 +32,12 @@ import de.uka.ilkd.key.symbolic_execution.suite.AllSymbolicExecutionTests;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+   AllUtilTests.class,
+   AllCoreTests.class,
    AllProofReferencesTests.class,
    AllSymbolicExecutionTests.class,
    AllTestGenTests.class,
-   
-   AllKeYCoreTests.class,
-   AllUtilTests.class,
+   AllUITests.class,
    AllStarterCoreTests.class,
    AllCommonUiTests.class,
    AllStarterUITests.class

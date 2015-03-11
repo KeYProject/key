@@ -23,8 +23,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.junit.Test;
-import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
+import org.key_project.ui.test.util.TestKeYUIUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -55,7 +55,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       doStartProofTest("SWTBotManualRuleApplicationTest_testCloseFalse_ProofClosed", 
                        "data/paycard",
                        true,
-                       TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "isValid()", "0", "normal_behavior"),
+                       TestKeYUIUtil.createOperationContractId("PayCard", "PayCard", "isValid()", "0", "normal_behavior"),
                        new IStopCondition() {
                           @Override
                           public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
@@ -103,7 +103,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       doStartProofTest("SWTBotManualRuleApplicationTest_testAssignment_ProofStillOpen", 
                        "data/paycard",
                        true,
-                       TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "isValid()", "0", "normal_behavior"),
+                       TestKeYUIUtil.createOperationContractId("PayCard", "PayCard", "isValid()", "0", "normal_behavior"),
                        null,
                        false,
                        false,
@@ -146,7 +146,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       doStartProofTest("SWTBotManualRuleApplicationTest_testUseOperationContract_applyOneContract",
             "data/paycard",
             true,
-            TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"), 
+            TestKeYUIUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"), 
             new IStopCondition() {
                
                @Override
@@ -220,7 +220,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       doStartProofTest("SWTBotManualRuleApplicationTest_testUseOperationContract_applyMultipleContracts",
             "data/paycard",
             true,
-            TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"), 
+            TestKeYUIUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"), 
             new IStopCondition() {
                
                @Override
@@ -283,7 +283,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       doStartProofTest("SWTBotManualRuleApplicationTest_testUseOperationContract_Cancel",
                         "data/paycard",
                         true,
-                        TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"),
+                        TestKeYUIUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"),
                         new IStopCondition() {
                            @Override
                            public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
@@ -342,7 +342,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       doStartProofTest("SWTBotManualRuleApplicationTest_testBlockContract_Cancel",
             "data/blockContract",
             true,
-            TestKeY4EclipseUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
+            TestKeYUIUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
             new IStopCondition() {
                @Override
                public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
@@ -399,7 +399,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       doStartProofTest("SWTBotManualRuleApplicationTest_testBlockContract_ApplyOneContract",
             "data/blockContract",
             true,
-            TestKeY4EclipseUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
+            TestKeYUIUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
             new IStopCondition() {
                @Override
                public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
@@ -456,7 +456,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       doStartProofTest("SWTBotManualRuleApplicationTest_testBlockContract_ApplyMultipleContracts",
             "data/blockContract",
             true,
-            TestKeY4EclipseUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
+            TestKeYUIUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
             new IStopCondition() {
                @Override
                public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {

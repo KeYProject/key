@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.key4eclipse.test.testcase;
+package org.key_project.ui.test.testcase;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,13 +22,14 @@ import java.util.Properties;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
-import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.key4eclipse.test.Activator;
+import org.key_project.ui.test.Activator;
 import org.key_project.ui.util.KeYExampleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
+
+import de.uka.ilkd.key.control.KeYEnvironment;
 
 /**
  * Contains tests for {@link KeYExampleUtil}.
@@ -39,14 +40,16 @@ public class KeYExampleUtilTest extends AbstractSetupTestCase {
      * Tests {@link KeYExampleUtil#getExampleProof()}.
      */
     @Test
-    public void testGetExampleProof() throws IOException {
+    public void testGetExampleProof() throws Exception {
        // Get value
        File file = KeYExampleUtil.getExampleProof();
-       // Compare value
+       // Test file
        assertNotNull(file);
        assertTrue(file.exists());
        assertTrue(file.isFile());
-       assertTrue(KeYUtil.isFileExtensionSupported(IOUtil.getFileExtension(file)));
+       // Load file
+       KeYEnvironment<?> env = KeYEnvironment.load(file, null, null);
+       env.dispose();
     }
 
     /**

@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.key4eclipse.test.util;
+package org.key_project.core.test.util;
 
 import org.key_project.util.test.util.TestUtilsUtil;
 

@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.key4eclipse.test.testcase.swtbot;
+package org.key_project.key4eclipse.starter.core.test.testcase.swtbot;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -20,12 +20,12 @@ import junit.framework.TestCase;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.swtbot.swing.bot.SwingBotJButton;
 import org.key_project.swtbot.swing.bot.SwingBotJDialog;
 import org.key_project.swtbot.swing.bot.SwingBotJFrame;
 import org.key_project.swtbot.swing.bot.SwingBotJMenu;
 import org.key_project.swtbot.swing.bot.SwingBotJTree;
+import org.key_project.ui.test.util.TestKeYUIUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
 
@@ -48,7 +48,7 @@ public class SWTBotExampleTest extends AbstractSetupTestCase {
             // Open KeY
             KeYUtil.openMainWindowAsync();
             // Get KeY window
-            SwingBotJFrame frame = TestKeY4EclipseUtil.keyGetMainWindow();
+            SwingBotJFrame frame = TestKeYUIUtil.keyGetMainWindow();
             // Open example dialog.
             SwingBotJMenu fileMenu = frame.bot().jMenuBar().menu("File");
             fileMenu.item("Load Example").click();
@@ -60,15 +60,15 @@ public class SWTBotExampleTest extends AbstractSetupTestCase {
             SwingBotJButton loadButton = dialog.bot().jButton("Load Example");
             loadButton.clickAndWait();
             // Start proof
-            TestKeY4EclipseUtil.keyStartSelectedProofInProofManagementDiaolog();
-            TestKeY4EclipseUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("Cell", "Cell", "Cell()", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("Cell", "Cell", "Cell()", "0", "normal_behavior"));
+            TestKeYUIUtil.keyStartSelectedProofInProofManagementDiaolog();
+            TestKeYUIUtil.keyCheckProofs(TestKeYUIUtil.createOperationContractId("Cell", "Cell", "Cell()", "0", "normal_behavior"), TestKeYUIUtil.createOperationContractId("Cell", "Cell", "Cell()", "0", "normal_behavior"));
             // Finish proof automatically
-            TestKeY4EclipseUtil.keyFinishSelectedProofAutomatically(frame, MethodTreatment.EXPAND);
+            TestKeYUIUtil.keyFinishSelectedProofAutomatically(frame, MethodTreatment.EXPAND);
             // Clear proof list
             KeYUtil.clearProofList(MainWindow.getInstance());
             TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
             // Close main window
-            TestKeY4EclipseUtil.keyCloseMainWindow();
+            TestKeYUIUtil.keyCloseMainWindow();
         }
         finally {
             SWTBotPreferences.TIMEOUT = originalTimeout;

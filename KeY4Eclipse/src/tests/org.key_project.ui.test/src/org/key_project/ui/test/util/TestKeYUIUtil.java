@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.key4eclipse.test.util;
+package org.key_project.ui.test.util;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -55,11 +55,11 @@ import de.uka.ilkd.key.util.KeYResourceManager;
  * Provides static methods that makes testing easier.
  * @author Martin Hentschel
  */
-public final class TestKeY4EclipseUtil {
+public final class TestKeYUIUtil {
    /**
     * Forbid instances.
     */
-   private TestKeY4EclipseUtil() {
+   private TestKeYUIUtil() {
    }
    
    /**

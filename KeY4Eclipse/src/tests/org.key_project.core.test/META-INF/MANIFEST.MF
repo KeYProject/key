@@ -3,18 +3,14 @@ Bundle-ManifestVersion: 2
 Bundle-Name: KeY Core Test
 Bundle-SymbolicName: org.key_project.core.test
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: org.key_project.key4eclipse.test.Activator
+Bundle-Activator: org.key_project.core.test.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.7.100",
  org.eclipse.ui,
  org.junit;bundle-version="4.8.1",
- org.eclipse.swtbot.go;bundle-version="2.0.4",
- org.key_project.swtbot.swing;bundle-version="1.0.0",
  org.key_project.util;bundle-version="1.0.0",
  org.key_project.util.test;bundle-version="1.0.0",
- org.key_project.core;bundle-version="1.0.0",
- org.key_project.ui;bundle-version="1.0.0",
- org.key_project.key4eclipse.starter.core;bundle-version="1.0.0"
+ org.key_project.core;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: KeY Project
@@ -41,6 +37,5 @@ Export-Package: de.uka.ilkd.key.java,
  de.uka.ilkd.key.util,
  de.uka.ilkd.key.util.pp,
  de.uka.ilkd.key.util.removegenerics,
- org.key_project.key4eclipse.test.suite,
- org.key_project.key4eclipse.test.suite.swtbot,
- org.key_project.key4eclipse.test.util
+ org.key_project.core.test.suite,
+ org.key_project.core.test.util

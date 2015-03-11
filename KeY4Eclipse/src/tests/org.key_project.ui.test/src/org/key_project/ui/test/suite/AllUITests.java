@@ -11,21 +11,20 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.key4eclipse.test.suite.swtbot;
+package org.key_project.ui.test.suite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.key_project.key4eclipse.test.testcase.swtbot.SWTBotExampleTest;
-import org.key_project.key4eclipse.test.testcase.swtbot.SWTBotMainTest;
+import org.key_project.ui.test.testcase.KeYExampleUtilTest;
 
 /**
- * Run all contained JUnit 4 test cases that requires SWT Bot.
+ * Run all contained JUnit 4 test cases.
  * @author Martin Hentschel
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    SWTBotExampleTest.class,
-    SWTBotMainTest.class
+   KeYExampleUtilTest.class
+   //RunAllProofsTest.class // This class is not listed because it takes to much time.
 })
-public class SWTBotAllKeY4EclipseTests {
+public class AllUITests {
 }

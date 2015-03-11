@@ -11,14 +11,14 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.key4eclipse.test.testcase.swtbot;
+package org.key_project.key4eclipse.starter.core.test.testcase.swtbot;
 
 import java.lang.reflect.InvocationTargetException;
 
 import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.swtbot.swing.bot.SwingBotJFrame;
+import org.key_project.ui.test.util.TestKeYUIUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 
 import de.uka.ilkd.key.core.Main;
@@ -38,7 +38,7 @@ public class SWTBotMainTest extends AbstractSetupTestCase {
     public void testOpeningMainWindow() throws InterruptedException, InvocationTargetException {
         // Open KeY user interface and make sure that a window is opened.
         KeYUtil.openMainWindowAsync();
-        SwingBotJFrame frame = TestKeY4EclipseUtil.keyGetMainWindow();
+        SwingBotJFrame frame = TestKeYUIUtil.keyGetMainWindow();
         assertTrue(frame.isOpen());
         assertNotNull(MainWindow.getInstance());
         assertTrue(MainWindow.getInstance().isVisible());
