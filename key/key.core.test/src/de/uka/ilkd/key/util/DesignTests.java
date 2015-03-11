@@ -34,8 +34,16 @@ import de.uka.ilkd.key.logic.Term;
  */
 public class DesignTests extends TestCase {
 
-    private static final File binaryPath = new File(IOUtil.getClassLocation(Term.class), "de"+File.separator+"uka"+File.separator+"ilkd"+File.separator+"key");
+    private static final File binaryPath;
           
+    static {
+       File projectRoot = IOUtil.getClassLocation(Term.class);
+       if ("org.key_project.core".equals(projectRoot.getName())) {
+          projectRoot = new File(projectRoot, "bin");
+       }
+       binaryPath = new File(projectRoot, "de"+File.separator+"uka"+File.separator+"ilkd"+File.separator+"key");
+    }
+    
     private static final FileFilter FILTER = new FileFilter() {
         public boolean accept(File fileName) {
             final String absolutePath = fileName.getAbsolutePath();
@@ -56,6 +64,7 @@ public class DesignTests extends TestCase {
 
     public void setUp() {
 	allClasses = getAllClasses(binaryPath);
+	assertTrue(allClasses.length >= 1);
     }
 
     /** 
@@ -77,8 +86,7 @@ public class DesignTests extends TestCase {
 	    className = className.substring(0, className.indexOf(".class"));
 	    
 	    try {
-		    classes[i] = ClassLoader.getSystemClassLoader().
-			loadClass(className);
+		    classes[i] = Term.class.getClassLoader().loadClass(className);
 	    } catch (ClassNotFoundException cnfe) {
 		System.err.println("That's weiry. Cannot find class " + 
 				   className+"\n"+cnfe);
