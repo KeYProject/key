@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Permissions: all-permissions
-Class-Path: key.util.jar ../libs/antlr.jar ../libs/recoderKey.jar key.core.jar key.core.testgen.jar
+Class-Path: key.util.jar ../libs/antlr.jar ../libs/recoderKey.jar key.core.jar key.core.testgen.jar key.core.symbolic_execution.jar
 Codebase: *.key-project.org i12www.iti.kit.edu i12www.ira.uka.de
 Application-Name: KeY
 Main-Class: de.uka.ilkd.key.core.Main
