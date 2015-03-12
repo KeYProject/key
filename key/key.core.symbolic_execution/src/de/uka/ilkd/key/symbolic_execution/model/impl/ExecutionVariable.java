@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -150,8 +151,9 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     * @throws ProofInputException Occurred Exception.
     */
    protected ExecutionValue[] lazyComputeValues() throws ProofInputException {
-      if (!isDisposed()) {
-         final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
+      InitConfig initConfig = getInitConfig();
+      if (initConfig != null) { // Otherwise proof is disposed.
+         final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(initConfig, true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
          final Services services = sideProofEnv.getServicesForEnvironment();
          final TermBuilder tb = services.getTermBuilder();
          // Start site proof to extract the value of the result variable.
@@ -198,7 +200,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                // Determine type
                String typeString = value.sort().toString();
                // Compute value condition
-               Term condition = computeValueCondition(tb, valueEntry.getValue(), services);
+               Term condition = computeValueCondition(tb, valueEntry.getValue(), initConfig);
                String conditionString = null;
                if (condition != null) {
                   conditionString = formatTerm(condition, services);
@@ -216,7 +218,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             // Instantiate unknown child values
             if (!unknownValues.isEmpty()) {
                // Compute value condition
-               Term condition = computeValueCondition(tb, unknownValues, services);
+               Term condition = computeValueCondition(tb, unknownValues, initConfig);
                String conditionString = null;
                if (condition != null) {
                   conditionString = formatTerm(condition, services);
@@ -291,11 +293,11 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     * or combination of each path condition per {@link Goal}.
     * @param tb The {@link TermBuilder} to use passed to ensure that it is still available even if the {@link Proof} is disposed in between.
     * @param valueGoals The {@link Goal}s to compute combined path condition for.
-    * @param services The {@link Services} to use.
+    * @param initConfig The {@link InitConfig} to use.
     * @return The combined path condition.
     * @throws ProofInputException Occurred Exception.
     */
-   protected Term computeValueCondition(TermBuilder tb, List<Goal> valueGoals, Services services) throws ProofInputException {
+   protected Term computeValueCondition(TermBuilder tb, List<Goal> valueGoals, InitConfig initConfig) throws ProofInputException {
       if (!valueGoals.isEmpty()) {
          List<Term> pathConditions = new LinkedList<Term>();
          Proof proof = null;
@@ -304,8 +306,8 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             proof = valueGoal.node().proof();
          }
          Term comboundPathCondition = tb.or(pathConditions);
-         comboundPathCondition = SymbolicExecutionUtil.simplify(proof, comboundPathCondition);
-         comboundPathCondition = SymbolicExecutionUtil.improveReadability(comboundPathCondition, services);
+         comboundPathCondition = SymbolicExecutionUtil.simplify(initConfig, proof, comboundPathCondition);
+         comboundPathCondition = SymbolicExecutionUtil.improveReadability(comboundPathCondition, initConfig.getServices());
          return comboundPathCondition;
       }
       else {

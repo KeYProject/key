@@ -619,7 +619,7 @@ public final class SymbolicExecutionSideProofUtil {
                                                   String splittingOption) {
       assert starter != null;
       starter.setMaxRuleApplications(10000);
-      StrategyProperties sp = !proof.isDisposed() ? 
+      StrategyProperties sp = proof != null && !proof.isDisposed() ? 
                               proof.getSettings().getStrategySettings().getActiveStrategyProperties() : // Is a clone that can be modified
                               new StrategyProperties();
       StrategyProperties.setDefaultStrategyProperties(sp, false, true, true, false, false);
@@ -726,8 +726,19 @@ public final class SymbolicExecutionSideProofUtil {
    public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(final Proof source, final boolean useSimplifyTermProfile) {
       assert source != null;
       assert !source.isDisposed();
+      return cloneProofEnvironmentWithOwnOneStepSimplifier(source.getInitConfig(), useSimplifyTermProfile);
+   }
+   
+   /**
+    * Creates a copy of the {@link ProofEnvironment} of the given {@link Proof}
+    * which has his own {@link OneStepSimplifier} instance. Such copies are
+    * required for instance during parallel usage of site proofs because
+    * {@link OneStepSimplifier} has an internal state.
+    * @param sourceInitConfig The {@link InitConfig} to copy its {@link ProofEnvironment}.
+    * @return The created {@link ProofEnvironment} which is a copy of the environment of the given {@link Proof} but with its own {@link OneStepSimplifier} instance.
+    */
+   public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(final InitConfig sourceInitConfig, final boolean useSimplifyTermProfile) {
       // Get required source instances
-      final InitConfig sourceInitConfig = source.getInitConfig();
       final RuleJustificationInfo sourceJustiInfo = sourceInitConfig.getJustifInfo();
       // Create new profile which has separate OneStepSimplifier instance
       JavaProfile profile;
@@ -738,7 +749,7 @@ public final class SymbolicExecutionSideProofUtil {
                Profile sourceProfile = sourceInitConfig.getProfile();
                if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
                   ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
-                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations(SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(source))); // Make sure that the term labels of symbolic execution are also supported by the new environment.
+                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations(SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(sourceInitConfig))); // Make sure that the term labels of symbolic execution are also supported by the new environment.
                   return result;
                }
                else {
@@ -754,7 +765,7 @@ public final class SymbolicExecutionSideProofUtil {
                Profile sourceProfile = sourceInitConfig.getProfile();
                if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
                   ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
-                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations(SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(source))); // Make sure that the term labels of symbolic execution are also supported by the new environment.
+                  result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations(SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(sourceInitConfig))); // Make sure that the term labels of symbolic execution are also supported by the new environment.
                   return result;
                }
                else {
@@ -764,7 +775,7 @@ public final class SymbolicExecutionSideProofUtil {
          };
       }
       // Create new InitConfig
-      final InitConfig initConfig = new InitConfig(source.getServices().copy(profile, false));
+      final InitConfig initConfig = new InitConfig(sourceInitConfig.getServices().copy(profile, false));
       // Set modified taclet options in which runtime exceptions are banned.
       ImmutableSet<Choice> choices = sourceInitConfig.getActivatedChoices();
       choices = choices.remove(new Choice("allow", "runtimeExceptions"));

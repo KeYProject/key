@@ -111,6 +111,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -126,6 +127,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -204,6 +206,18 @@ public final class SymbolicExecutionUtil {
    
    /**
     * Simplifies the given {@link Term} in a side proof. 
+    * @param initConfig The {@link InitConfig} to use.
+    * @param term The {@link Term} to simplify.
+    * @return The simplified {@link Term}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public static Term simplify(InitConfig initConfig,
+                               Term term) throws ProofInputException {
+      return simplify(initConfig, null, term);
+   }
+   
+   /**
+    * Simplifies the given {@link Term} in a side proof. 
     * @param parentProof The parent {@link Proof}.
     * @param term The {@link Term} to simplify.
     * @return The simplified {@link Term}.
@@ -211,11 +225,26 @@ public final class SymbolicExecutionUtil {
     */
    public static Term simplify(Proof parentProof,
                                Term term) throws ProofInputException {
-      final Services services = parentProof.getServices();
-      final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(parentProof, true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
-      // Create sequent to proof
+      assert !parentProof.isDisposed();
+      return simplify(parentProof.getInitConfig(), parentProof, term);
+   }
+   
+   /**
+    * Simplifies the given {@link Term} in a side proof. 
+    * @param initConfig The {@link InitConfig} to use.
+    * @param parentProof The parent {@link Proof} which provides the {@link StrategySettings}.
+    * @param term The {@link Term} to simplify.
+    * @return The simplified {@link Term}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public static Term simplify(InitConfig initConfig,
+                               Proof parentProof,
+                               Term term) throws ProofInputException {
+      final Services services = initConfig.getServices();
+      final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(initConfig, true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
+      // Create Sequent to prove
       Sequent sequentToProve = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(term), false, true).sequent();
-      // Return created sequent and the used predicate to identify the value interested in.
+      // Return created Sequent and the used predicate to identify the value interested in.
       ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(parentProof, sideProofEnv, sequentToProve);
       try {
          // The simplified formula is the conjunction of all open goals

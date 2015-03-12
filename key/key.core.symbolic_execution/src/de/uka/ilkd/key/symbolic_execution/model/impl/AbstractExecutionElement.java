@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -64,6 +65,15 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
    public Services getServices() {
       Proof proof = getProof();
       return proof != null && !proof.isDisposed() ? proof.getServices() : null;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public InitConfig getInitConfig() {
+      Proof proof = getProof();
+      return proof != null && !proof.isDisposed() ? proof.getInitConfig() : null;
    }
 
    /**

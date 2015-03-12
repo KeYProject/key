@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 
 /**
@@ -33,10 +34,16 @@ public interface IExecutionElement {
    public ITreeSettings getSettings();
    
    /**
-    * Returns the {@link Services} used in {@link #getProof()}.
-    * @return The {@link Services} used in {@link #getProof()}.
+    * Returns the {@link Services} used by {@link #getProof()}.
+    * @return The {@link Services} used by {@link #getProof()}.
     */
    public Services getServices();
+   
+   /**
+    * Returns the {@link InitConfig} used by {@link #getProof()}.
+    * @return The {@link InitConfig} used by {@link #getProof()}.
+    */
+   public InitConfig getInitConfig();
    
    /**
     * Returns the {@link Proof} from which the symbolic execution tree was extracted.
