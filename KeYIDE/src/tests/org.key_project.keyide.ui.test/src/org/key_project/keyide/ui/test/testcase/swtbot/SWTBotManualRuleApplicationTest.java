@@ -18,7 +18,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
@@ -680,6 +682,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             assertFalse(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
             // Start auto mode if required
             if (stopCondition != null) {
+               Node oldNode = keyEditor.getCurrentNode();
                StrategySettings ss = keyEditor.getCurrentProof().getSettings().getStrategySettings();
                ss.setCustomApplyStrategyStopCondition(stopCondition);
                SymbolicExecutionUtil.updateStrategySettings(proof, useOperationContracts, true, false, false);
@@ -690,6 +693,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                SymbolicExecutionUtil.updateStrategySettings(proof, sp);
                proof.setActiveStrategy(proof.getInitConfig().getProfile().getDefaultStrategyFactory().create(proof, sp));
                keyEditor.getProofControl().startAndWaitForAutoMode(keyEditor.getCurrentProof());
+               waitUntilSelectedNodeHasChanged(bot, keyEditor, oldNode);
             }
 
             // Get node to apply rule on
@@ -732,6 +736,32 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                    steps); 
    }
    
+   /**
+    * Waits until a new {@link Node} is selected.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @param keyEditor The {@link KeYEditor} to check.
+    * @param oldNode The old {@link Node}.
+    */
+   protected void waitUntilSelectedNodeHasChanged(SWTWorkbenchBot bot, 
+                                                  final KeYEditor keyEditor, 
+                                                  final Node oldNode) {
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return oldNode != keyEditor.getCurrentNode();
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "Node '" + oldNode + "' is still selected.";
+         }
+      });
+   }
+
    /**
     * Some additional test steps used by {@link SWTBotManualRuleApplicationTest#doStartProofTest(String, IStopCondition, int, int, String, IAppliedRuleTest, boolean)} to finish and test an applied rule.
     * @author Martin Hentschel
