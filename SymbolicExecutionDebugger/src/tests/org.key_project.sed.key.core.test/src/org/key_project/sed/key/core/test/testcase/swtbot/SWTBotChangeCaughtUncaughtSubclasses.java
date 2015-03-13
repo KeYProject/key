@@ -66,6 +66,7 @@ public class SWTBotChangeCaughtUncaughtSubclasses extends AbstractKeYDebugTarget
             Boolean.FALSE,
             Boolean.TRUE,
             Boolean.FALSE,
+            Boolean.FALSE,
             8, 
             executor);   
    } 

@@ -1674,4 +1674,28 @@ public class TestUtilsUtil {
    public static IPerspectiveDescriptor getResourcePerspective() {
       return TestUtilsUtil.getPerspective("org.eclipse.ui.resourcePerspective");
    }
+
+   /**
+    * Waits until the given {@link SWTBotTree} has items.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @param tree THe {@link SWTBotTree} to wait for.
+    */
+   public static void waitUntilTreeHasItems(SWTWorkbenchBot bot, final SWTBotTree tree) {
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            SWTBotTreeItem[] items = tree.getAllItems();
+            return !ArrayUtil.isEmpty(items);
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "Tree has no items.";
+         }
+      });
+   }
 }

@@ -534,6 +534,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean usePrettyPrinting,
                                        Boolean showSignatureOnMethodReturnNodes,
                                        Boolean higlightReachedSourceCode,
+                                       Boolean truthValueEvaluationEnabled,
                                        int timeoutFactor, 
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       doKeYDebugTargetTest(projectName,
@@ -552,6 +553,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            usePrettyPrinting,
                            showSignatureOnMethodReturnNodes,
                            higlightReachedSourceCode,
+                           truthValueEvaluationEnabled,
                            timeoutFactor, 
                            executor);
    }
@@ -596,6 +598,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean usePrettyPrinting,
                                        Boolean showSignatureOnMethodReturnNodes,
                                        Boolean higlightReachedSourceCode,
+                                       Boolean truthValueEvaluationEnabled,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       doKeYDebugTargetTest(projectName, 
@@ -615,6 +618,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            usePrettyPrinting,
                            showSignatureOnMethodReturnNodes,
                            higlightReachedSourceCode,
+                           truthValueEvaluationEnabled,
                            timeoutFactor, 
                            executor);
    }
@@ -660,6 +664,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean usePrettyPrinting,
                                        Boolean showSignatureOnMethodReturnNodes,
                                        Boolean higlightReachedSourceCode,
+                                       Boolean truthValueEvaluationEnabled,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       // Create test project
@@ -669,7 +674,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          projectConfigurator.configure(project);
       }
       // Do test steps
-      doKeYDebugTargetTest(project, closePropertiesView, closeExecutionTreeViews, selector, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, higlightReachedSourceCode, timeoutFactor, executor);
+      doKeYDebugTargetTest(project, closePropertiesView, closeExecutionTreeViews, selector, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, higlightReachedSourceCode, truthValueEvaluationEnabled, timeoutFactor, executor);
    }
    
    /**
@@ -707,6 +712,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean usePrettyPrinting,
                                        Boolean showSignatureOnMethodReturnNodes,
                                        Boolean higlightReachedSourceCode,
+                                       Boolean truthValueEvaluationEnabled,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       // Create bot
@@ -743,7 +749,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          assertEquals(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, higlightReachedSourceCode);
+         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, higlightReachedSourceCode, truthValueEvaluationEnabled);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();

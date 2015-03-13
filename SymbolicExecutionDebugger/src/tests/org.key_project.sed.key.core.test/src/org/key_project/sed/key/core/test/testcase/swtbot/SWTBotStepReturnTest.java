@@ -79,6 +79,7 @@ public class SWTBotStepReturnTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.TRUE, 
                            Boolean.FALSE,
+                           Boolean.FALSE,
                            4, 
                            executor);
    }

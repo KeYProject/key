@@ -38,7 +38,7 @@ import org.key_project.sed.ui.visualization.test.suite.swtbot.SWTBotAllSEDUIVisu
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-   SWTBotAllTests.class,
+//   SWTBotAllTests.class,
    
    SWTBotAllSEDCoreTests.class,
    SWTBotAllSEDUITests.class,

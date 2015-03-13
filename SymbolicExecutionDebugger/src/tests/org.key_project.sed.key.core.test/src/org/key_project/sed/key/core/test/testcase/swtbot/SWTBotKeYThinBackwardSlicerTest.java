@@ -84,6 +84,7 @@ public class SWTBotKeYThinBackwardSlicerTest extends AbstractKeYDebugTargetTestC
                            Boolean.FALSE,
                            Boolean.FALSE, 
                            Boolean.FALSE,
+                           Boolean.FALSE,
                            14, 
                            executor);
    }

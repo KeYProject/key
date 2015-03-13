@@ -438,7 +438,6 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
       }
       catch (Exception e) {
          LogUtil.getLogger().logError(e);
-         LogUtil.getLogger().openErrorDialog(getSite().getShell(), e);
       }
    }
 

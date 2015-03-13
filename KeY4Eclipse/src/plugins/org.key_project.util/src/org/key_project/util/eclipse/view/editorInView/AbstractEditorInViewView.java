@@ -297,12 +297,14 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
     */
    protected void setMessage(final String message) {
       this.messageText = message;
-      if (messageLabel != null) {
+      if (messageLabel != null && !messageLabel.isDisposed()) {
          messageLabel.getDisplay().syncExec(new Runnable() {
             @Override
             public void run() {
-               SWTUtil.setText(messageLabel, message);
-               updateShownControl(rootComposite, rootLayout);
+               if (messageLabel != null && !messageLabel.isDisposed()) {
+                  SWTUtil.setText(messageLabel, message);
+                  updateShownControl(rootComposite, rootLayout);
+               }
             };
          });
       }
