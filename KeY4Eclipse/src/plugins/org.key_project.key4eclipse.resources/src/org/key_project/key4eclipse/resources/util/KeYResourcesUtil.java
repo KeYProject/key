@@ -140,7 +140,7 @@ public class KeYResourcesUtil {
             Object target = proofRef.getTarget();
             if (IProofReference.USE_CONTRACT.equals(proofRef.getKind()) && target instanceof Contract){
                Contract contract = (Contract) target;
-               ImmutableSet<Contract> contracts = pe.getSpecificationRepository().splitContract(contract);
+               ImmutableSet<Contract> contracts = proofRef.getSource().getServices().getSpecificationRepository().splitContract(contract);
                for (Contract atomicContract : contracts) {
                   for(ProofElement proofElement : proofElements){
                      if(atomicContract.getName().equals(proofElement.getContract().getName())){
