@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
-import java.util.ServiceLoader;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.reflection.ClassLoaderUtil;
 
 /**
  * Provides static utility methods to get the following service:
@@ -55,7 +55,7 @@ public final class ProofInitServiceUtil {
     */
    private static ImmutableList<POExtension> createOperationPOExtension() {
       ImmutableList<POExtension> extensions = ImmutableSLList.nil();
-      Iterator<POExtension> iter = ServiceLoader.load(POExtension.class).iterator();
+      Iterator<POExtension> iter = ClassLoaderUtil.loadServices(POExtension.class).iterator();
       while (iter.hasNext()) {
          try {
             POExtension extension = iter.next();
@@ -105,7 +105,7 @@ public final class ProofInitServiceUtil {
     */
    private static Map<String, DefaultProfileResolver> createDefaultProfileResolver() {
       Map<String, DefaultProfileResolver> result = new HashMap<String, DefaultProfileResolver>();
-      Iterator<DefaultProfileResolver> iter = ServiceLoader.load(DefaultProfileResolver.class).iterator();
+      Iterator<DefaultProfileResolver> iter = ClassLoaderUtil.loadServices(DefaultProfileResolver.class).iterator();
       while (iter.hasNext()) {
          try {
             DefaultProfileResolver resolver = iter.next();

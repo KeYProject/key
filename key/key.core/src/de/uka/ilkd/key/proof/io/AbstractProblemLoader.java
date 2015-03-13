@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.antlr.runtime.MismatchedTokenException;
+import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
@@ -440,7 +441,7 @@ public abstract class AbstractProblemLoader {
             }
             try {
                 // Try to instantiate proof obligation by calling static method: public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException
-                Class<?> poClassInstance = Class.forName(poClass);
+                Class<?> poClassInstance = ClassLoaderUtil.getClassforName(poClass);
                 Method loadMethod = poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
                 return (LoadedPOContainer)loadMethod.invoke(null, initConfig, properties);
             }

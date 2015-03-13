@@ -16,9 +16,9 @@ package de.uka.ilkd.key.core;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.List;
-import java.util.ServiceLoader;
 
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
@@ -374,7 +374,7 @@ public final class Main {
 
         if (cl.isSet(MACRO)) {
             String macro = cl.getString(MACRO, "");
-            for (ProofMacro m: ServiceLoader.load(ProofMacro.class)) {
+            for (ProofMacro m: ClassLoaderUtil.loadServices(ProofMacro.class)) {
                 if (macro.equals(m.getClass().getSimpleName())) {
                     // memorize macro for later
                     try {

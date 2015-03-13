@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KeY Core
-Bundle-SymbolicName: org.key_project.core
+Bundle-SymbolicName: org.key_project.core;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,

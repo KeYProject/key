@@ -169,12 +169,29 @@ public final class IOUtil {
        if (file != null && file.exists()) {
            if (file.isDirectory()) {
                File[] children = file.listFiles();
-               for (File child : children) {
-                   delete(child);
+               if (children != null) {
+                  for (File child : children) {
+                     delete(child);
+                 }
                }
            }
            file.delete();
        }
+   }
+
+   /**
+    * Reads the complete content from the {@link URL}.
+    * @param file The {@link URL} to read from.
+    * @return The read content or {@code null} if the {@link URL} is {@code null}.
+    * @throws IOException Occurred Exception.
+    */
+   public static String readFrom(URL url) throws IOException {
+      if (url != null) {
+         return readFrom(url.openStream());
+      }
+      else {
+         return null;
+      }
    }
 
    /**
