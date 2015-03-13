@@ -7,10 +7,9 @@ import de.uka.ilkd.key.rule.MatchConditions;
 
 
 public class MatchProgramInstruction implements IMatchInstruction<ProgramElement> {
-   
+
    private final ProgramElement pe;
-   
-   
+
    public MatchProgramInstruction(ProgramElement pe) {
       this.pe = pe;
    }
@@ -19,5 +18,4 @@ public class MatchProgramInstruction implements IMatchInstruction<ProgramElement
    public MatchConditions match(ProgramElement p_pe, MatchConditions matchCond, Services services) {
       return pe.match(new SourceData(p_pe, -1, services), matchCond);
    }
-
 }

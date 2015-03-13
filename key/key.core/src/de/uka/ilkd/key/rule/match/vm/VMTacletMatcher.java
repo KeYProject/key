@@ -39,7 +39,7 @@ public class VMTacletMatcher implements TacletMatcher {
       
       final ImmutableArray<QuantifiableVariable> boundVars = pattern.boundVars();     
       if (!boundVars.isEmpty()) {
-         program[instrPtr] = Instruction.matchBoundVars(boundVars);
+         program[instrPtr] = Instruction.matchAndBindVariables(boundVars);
          ++instrPtr;
       }
       
@@ -72,6 +72,12 @@ public class VMTacletMatcher implements TacletMatcher {
       for (int i = 0; i < pattern.arity(); i++) {
          createProgram(pattern.sub(i), instrPtr);
       }
+      
+      if (!boundVars.isEmpty()) {
+         program[instrPtr] = Instruction.unbindVariables(boundVars);
+         ++instrPtr;
+      }
+
    }
 
 
