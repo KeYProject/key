@@ -1,10 +1,10 @@
 package org.key_project.jmlediting.profile.key.seq;
 
 
-public class SeqConcatKeyword extends BinaryOpSeqPrimitiveKeyword {
+public class ContainsKeyword extends BinaryOpSeqPrimitiveKeyword {
 
-   public SeqConcatKeyword() {
-      super("\\seq_concat");
+   public ContainsKeyword() {
+      super("\\contains");
    }
 
    @Override

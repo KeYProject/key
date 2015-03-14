@@ -5,10 +5,15 @@ import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.profile.jmlref.parser.UnarySpecExpressionParser;
 
-public class SeqSingletonKeyword extends AbstractKeyword {
+public class SingletonKeyword extends AbstractKeyword {
 
-   public SeqSingletonKeyword() {
-      super("\\seq_singleton");
+   public SingletonKeyword() {
+      super("\\singleton");
+   }
+
+   @Override
+   public IKeywortSort getSort() {
+      return SeqPrimitiveKeywordSort.INSTANCE;
    }
 
    @Override
@@ -19,11 +24,6 @@ public class SeqSingletonKeyword extends AbstractKeyword {
    @Override
    public IKeywordParser createParser() {
       return new UnarySpecExpressionParser();
-   }
-
-   @Override
-   public IKeywortSort getSort() {
-      return SeqPrimitiveKeywordSort.INSTANCE;
    }
 
 }

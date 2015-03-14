@@ -142,8 +142,8 @@ public final class LexicalHelper {
       }
       if (!(text.charAt(position) == '\\' || Character
             .isJavaIdentifierStart(text.charAt(position)))) {
-         throw new ParserException("Not a valid JML keyword identifier", text,
-               position);
+         throw new ParserException("Not a valid JML keyword identifier begin '"
+               + text.charAt(position) + "'", text, position);
       }
       position++;
       while (position < end

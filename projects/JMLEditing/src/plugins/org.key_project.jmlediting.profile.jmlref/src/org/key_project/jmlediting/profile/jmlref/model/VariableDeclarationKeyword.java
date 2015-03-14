@@ -45,7 +45,8 @@ public abstract class VariableDeclarationKeyword extends
             return seq(
                   expr.typeSpec(),
                   separatedNonEmptyListErrorRecovery(',', ident(),
-                        "Expected at least one variable name"));
+                        "Expected at least one variable name"),
+                  opt(seq(constant("="), expr)));
          }
       };
    }

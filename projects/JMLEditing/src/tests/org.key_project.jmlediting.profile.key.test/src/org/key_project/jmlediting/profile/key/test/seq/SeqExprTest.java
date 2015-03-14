@@ -22,12 +22,17 @@ import org.key_project.jmlediting.profile.key.test.KeyProfileTestUtils;
 
 public class SeqExprTest {
 
-   private final String textComment = " @ ghost \\seq x; \n" + " @ "
+   private final String textComment = " @ ghost \\seq x; \n"
+         + " @ "
          + " @ requires x == \\seq_empty; \n"
          + " @ requires y == \\values [2 .. 5] [3..4]; \n"
          + " @ ensures x == \\seq_singleton (1); \n"
-         + " @ ensures y == (\\seq_def int x; a;b;c); \n" + " @ \n"
+         + " @ ensures y == (\\seq_def int x; a;b;c); \n"
+         + " @ \n"
          + " @ set x = \\seq_concat(\\seq_singleton(1), this.get()); \n"
+         + " @ ensures \\contains(\\seq_empty, a) && \\indexOf(x, a) == 2; \n"
+         + " @ requires \\seq_length(\\singleton(1)) == 1; \n"
+         + " @ requires \\seq_sub(\\seq_empty, \\seq_empty, \\seq_empty).* ; \n"
          + " @ ";
 
    @Test

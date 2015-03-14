@@ -15,6 +15,9 @@ import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
 import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
+import org.key_project.jmlediting.profile.key.behavior.BreakBehaviorKeyword;
+import org.key_project.jmlediting.profile.key.behavior.ContinueBehaviorKeyword;
+import org.key_project.jmlediting.profile.key.behavior.ReturnBehaviorKeyword;
 import org.key_project.jmlediting.profile.key.locset.AllFieldsKeyword;
 import org.key_project.jmlediting.profile.key.locset.DisjointKeyword;
 import org.key_project.jmlediting.profile.key.locset.EmptyKeywod;
@@ -34,13 +37,18 @@ import org.key_project.jmlediting.profile.key.other.KeyAccessibleKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAssignableKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyPureKeyword;
+import org.key_project.jmlediting.profile.key.seq.ContainsKeyword;
+import org.key_project.jmlediting.profile.key.seq.IndexOfKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqConcatKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqDefKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqEmptyKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqExpressionParser;
 import org.key_project.jmlediting.profile.key.seq.SeqKeyword;
+import org.key_project.jmlediting.profile.key.seq.SeqLengthKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqPrimary;
 import org.key_project.jmlediting.profile.key.seq.SeqSingletonKeyword;
+import org.key_project.jmlediting.profile.key.seq.SeqSubKeyword;
+import org.key_project.jmlediting.profile.key.seq.SingletonKeyword;
 import org.key_project.jmlediting.profile.key.seq.ValuesKeyword;
 
 public class KeyProfile extends JMLReferenceProfile {
@@ -66,6 +74,10 @@ public class KeyProfile extends JMLReferenceProfile {
       replace(supportedKeywords, AccessibleKeyword.class,
             new KeyAccessibleKeyword());
 
+      // Key specific behaviors
+      supportedKeywords.addAll(Arrays.asList(new BreakBehaviorKeyword(),
+            new ContinueBehaviorKeyword(), new ReturnBehaviorKeyword()));
+
       supportedKeywords.add(new InvKeyword());
       supportedPrimaries.add(new DynamicLogicPrimary());
 
@@ -88,7 +100,9 @@ public class KeyProfile extends JMLReferenceProfile {
       // Support for seq expression
       supportedKeywords.addAll(Arrays.asList(new SeqKeyword(),
             new SeqConcatKeyword(), new SeqDefKeyword(), new SeqEmptyKeyword(),
-            new SeqSingletonKeyword(), new ValuesKeyword()));
+            new SeqSingletonKeyword(), new ValuesKeyword(),
+            new ContainsKeyword(), new IndexOfKeyword(), new SeqSubKeyword(),
+            new SeqLengthKeyword(), new SingletonKeyword()));
       supportedPrimaries.add(new SeqPrimary());
       this.additionalPrimarySuffixes.add(SeqExpressionParser.seqSuffix(this));
 

@@ -11,7 +11,8 @@ import org.key_project.jmlediting.profile.key.test.seq.SeqExprTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({ KeyAccessibleTest.class, LocSetExprTest.class,
-      KeyInvariantTest.class, SeqExprTest.class, IndexTest.class })
+      KeyInvariantTest.class, SeqExprTest.class, IndexTest.class,
+      SeqExprTest.class })
 public class KeyProfileTestSuite {
 
 }
