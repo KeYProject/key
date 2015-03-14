@@ -1,14 +1,18 @@
 package org.key_project.jmlediting.profile.key.other;
 
+import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
+
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.LexicalHelper;
+import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
 
 public class DynamicLogicPrimary implements IJMLPrimary {
 
@@ -31,6 +35,7 @@ public class DynamicLogicPrimary implements IJMLPrimary {
    }
 
    private static DL_Keyword keyword = new DL_Keyword();
+   private IJMLExpressionProfile profile;
 
    @Override
    public IASTNode parse(final String text, final int start, final int end)
@@ -50,28 +55,20 @@ public class DynamicLogicPrimary implements IJMLPrimary {
       final int identifierEnd = LexicalHelper.getIdentifier(text,
             identifierStart, end);
 
-      // Get content in parenthesis
-      final int whiteSpaceEnd = LexicalHelper.skipWhiteSpacesOrAt(text,
-            identifierEnd, end);
-      if (text.charAt(whiteSpaceEnd) != '(') {
-         throw new ParserException("Expected open parenthesis", text,
-               whiteSpaceEnd);
-      }
-      final int contentStart = LexicalHelper.skipWhiteSpacesOrAt(text,
-            whiteSpaceEnd + 1, end);
-      final int contentEnd = LexicalHelper.scanForClosingCharacter(')', text,
-            contentStart, end);
+      // Parse the rest
+      final ParseFunction rest = brackets(opt(new ExpressionParser(this.profile)
+            .exprList()));
+
+      final IASTNode dlcontent = rest.parse(text, identifierEnd, end);
 
       // Create the nodes
       final IASTNode keywordNode = Nodes.createKeyword(keywordBegin,
             identifierStart, keyword, "\\dl_");
       final IASTNode identifier = Nodes.createString(identifierStart,
             identifierEnd, text.substring(identifierStart, identifierEnd));
-      final IASTNode stringContent = Nodes.createString(contentStart,
-            contentEnd, text.substring(contentStart, contentEnd));
       final IASTNode content = Nodes.createNode(identifierStart,
-            contentEnd + 1, NodeTypes.KEYWORD_CONTENT, identifier,
-            stringContent);
+            dlcontent.getEndOffset(), NodeTypes.KEYWORD_CONTENT, identifier,
+            dlcontent);
       final IASTNode keywordAppl = Nodes.createNode(NodeTypes.KEYWORD_APPL,
             keywordNode, content);
       return keywordAppl;
@@ -79,6 +76,7 @@ public class DynamicLogicPrimary implements IJMLPrimary {
 
    @Override
    public void setProfile(final IJMLExpressionProfile profile) {
+      this.profile = profile;
    }
 
 }
