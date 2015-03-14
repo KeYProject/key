@@ -162,7 +162,6 @@ public class JMLStoreRefProposer {
       // compute the prefix the AutoCompletion has to handle
       final String prefix = JMLCompletionUtil.computePrefix(this.context, node);
 
-      // TODO check for ArrayIndices
       // propose StoreRef specific keywords, when called at the beginning.
       if (allowKeywords) {
          result.addAll(JMLCompletionUtil.getKeywordProposals(this.context,
@@ -180,7 +179,7 @@ public class JMLStoreRefProposer {
          result.addAll(this.proposeMethodParameters(prefix));
       }
 
-      // TODO atm not implemented, but here API statements get resolved and
+      // atm not implemented, but here API statements get resolved and
       // fields from them get proposed
       result.addAll(this.proposeStoreRefApiVariables(node, restNodes));
 
