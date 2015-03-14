@@ -78,7 +78,7 @@ public class JMLNewProfileDialog extends StatusDialog {
             profileId, profileName);
 
       try {
-         JMLProfileManagement.instance().addDerivedProfile(newProfile);
+         JMLProfileManagement.instance().addUserDefinedProfile(newProfile);
          JMLProfileManagement.instance().writeDerivedProfiles();
       }
       catch (final InvalidProfileException ipe) {

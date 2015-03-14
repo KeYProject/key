@@ -73,6 +73,11 @@ public final class JMLProfileManagement {
     * objects exists for an identifier.
     */
    private final Map<String, IJMLProfile> profileCache = new HashMap<String, IJMLProfile>();
+   /**
+    * Stores all user defined profiles from the eclipse settings, thus a subset
+    * of the value set of the profileCache.
+    */
+   private final Set<IDerivedProfile> userDefinedProfiles = new HashSet<IDerivedProfile>();
 
    /**
     * List for all listeners.
@@ -140,12 +145,53 @@ public final class JMLProfileManagement {
             this.profileCache.values()));
    }
 
-   private void cacheProfile(final IJMLProfile profile)
+   /**
+    * Stores the given profile in the cache if a profile with its identifier is
+    * not already known. The profile is validated before caching.
+    *
+    * @param profile
+    *           the profile to store in the cache
+    * @return whether the profile was stored in the cache because it was new
+    * @throws InvalidProfileException
+    *            if the profile is not valid
+    */
+   private boolean cacheProfile(final IJMLProfile profile)
          throws InvalidProfileException {
-      this.validateProfile(profile);
-      this.profileCache.put(profile.getIdentifier(), profile);
+      if (!this.profileCache.containsKey(profile.getIdentifier())) {
+         this.validateProfile(profile);
+         this.profileCache.put(profile.getIdentifier(), profile);
+         return true;
+      }
+      else {
+         // An object for this identifier has already been created
+         // reuse it from the cache and throw away the created one
+         return false;
+      }
    }
 
+   /**
+    * Stores the given profile in the cache and remembers it as a user defined
+    * profile.
+    *
+    * @param profile
+    *           the profile to cache
+    * @throws InvalidProfileException
+    *            if the profile is invalid and cannot be used
+    */
+   private void cacheUserDefinedProfile(final IDerivedProfile profile)
+         throws InvalidProfileException {
+      if (this.cacheProfile(profile)) {
+         this.userDefinedProfiles.add(profile);
+      }
+   }
+
+   /**
+    * Loads all available profiles from registered extension points and puts
+    * them into the cache.
+    *
+    * @throws InvalidProfileException
+    *            if any profile is not valid
+    */
    private void loadExtensionProfiles() throws InvalidProfileException {
       // Get the extension point
       final IExtensionPoint extensionPoint = Platform.getExtensionRegistry()
@@ -158,16 +204,12 @@ public final class JMLProfileManagement {
             try {
                final Object profileO = elem.createExecutableExtension("class");
                if (profileO instanceof IJMLProfile) {
-                  final IJMLProfile profile = (IJMLProfile) profileO;
-                  if (!this.profileCache.containsKey(profile.getIdentifier())) {
-                     this.cacheProfile(profile);
-                  }
-                  else {
-                     // An object for this identifier has already been created
-                     // reuse it from the cache and throw away the created one
-                  }
+                  this.cacheProfile((IJMLProfile) profileO);
                }
-
+               else {
+                  throw new InvalidProfileException(
+                        "Registered profile does not implement IJMLProfile.");
+               }
             }
             catch (final CoreException e) {
                // Invalid class of the extension object
@@ -179,6 +221,13 @@ public final class JMLProfileManagement {
       }
    }
 
+   /**
+    * Loads all user defined derived profiles in the current workspace settings
+    * and puts them into the cache.
+    *
+    * @throws InvalidProfileException
+    *            if any profile is invalid
+    */
    private void loadDerivedProfiles() throws InvalidProfileException {
       final IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
@@ -186,8 +235,11 @@ public final class JMLProfileManagement {
       try {
          final String[] profileKeys = p.keys();
          for (final String profileKey : profileKeys) {
+            // Check whether this profile is not already known, otherwise we can
+            // skip parsing and loading it
             if (!this.profileCache.containsKey(profileKey)) {
 
+               // Get the XML string from the prferences
                final String xmlContent = p.get(profileKey, null);
                if (xmlContent == null) {
                   throw new InvalidProfileException("Profile with id "
@@ -195,19 +247,24 @@ public final class JMLProfileManagement {
                }
 
                try {
-
+                  // Parse the profile
                   final Document xmlDoc = DocumentBuilderFactory.newInstance()
                         .newDocumentBuilder()
                         .parse(new InputSource(new StringReader(xmlContent)));
+
+                  // and load the profile
                   final IDerivedProfile profile = ProfilePersistenceFactory
                         .createDerivedProfilePersistence().read(xmlDoc);
-
+                  // Check that the profile has the same id as the preference
+                  // key
                   if (!profile.getIdentifier().equals(profileKey)) {
                      throw new InvalidProfileException(
                            "Profile has a wrong id. Expected " + profileKey
                                  + " but got " + profile.getIdentifier());
                   }
-                  this.cacheProfile(profile);
+                  // Remember the user defined profiles because they need to be
+                  // written back eventually
+                  this.cacheUserDefinedProfile(profile);
 
                }
                catch (final ParserConfigurationException e) {
@@ -236,51 +293,66 @@ public final class JMLProfileManagement {
       }
    }
 
+   /**
+    * Writes all user defined profiles back to the workspace settings to persist
+    * them between different runtimes. This only writes the derived profiles,
+    * which are user defined and not supplied by an extension point.
+    *
+    * @throws InvalidProfileException
+    *            if any profile is invalid and thus cannot be persisted
+    */
    public void writeDerivedProfiles() throws InvalidProfileException {
       final IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
       final Preferences p = preferences.node(JML_DERIVED_PROFILES);
 
-      for (final IJMLProfile profile : this.getAvailableProfiles()) {
+      for (final IDerivedProfile profile : this.userDefinedProfiles) {
 
-         // TODO only write profiles which are not from extension points
-         if (profile instanceof IDerivedProfile) {
-            try {
-               final Document document = ProfilePersistenceFactory
-                     .createDerivedProfilePersistence().persist(
-                           (IDerivedProfile) profile);
-               final TransformerFactory tf = TransformerFactory.newInstance();
-               final Transformer transformer = tf.newTransformer();
-               transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
-                     "yes");
-               final StringWriter writer = new StringWriter();
-               transformer.transform(new DOMSource(document), new StreamResult(
-                     writer));
-               p.put(profile.getIdentifier(), writer.toString());
-            }
-            catch (final ProfilePersistenceException e) {
-               throw new InvalidProfileException(
-                     "Unable to persist the given profile", e);
-            }
-            catch (final TransformerConfigurationException e) {
-               // TODO Auto-generated catch block
-               e.printStackTrace();
-            }
-            catch (final TransformerException e) {
-               // TODO Auto-generated catch block
-               e.printStackTrace();
-            }
+         try {
+            // Create the XML Document and convert it to a string
+            final Document document = ProfilePersistenceFactory
+                  .createDerivedProfilePersistence().persist(profile);
+            final TransformerFactory tf = TransformerFactory.newInstance();
+            final Transformer transformer = tf.newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
+                  "yes");
+            final StringWriter writer = new StringWriter();
+            transformer.transform(new DOMSource(document), new StreamResult(
+                  writer));
+            // Put the string in the prferences
+            p.put(profile.getIdentifier(), writer.toString());
+         }
+         catch (final ProfilePersistenceException e) {
+            throw new InvalidProfileException(
+                  "Unable to persist the given profile", e);
+         }
+         catch (final TransformerConfigurationException e) {
+            // Should not occur
+            throw new InvalidProfileException("Unable to write XML document");
+         }
+         catch (final TransformerException e) {
+            // Should not occur
+            throw new InvalidProfileException("Unable to write XML document");
          }
       }
    }
 
-   public void addDerivedProfile(final IDerivedProfile newProfile)
+   /**
+    * Adds a new user defined profile to the available profiles. The profile is
+    * written to the eclipse preferences immediately.
+    *
+    * @param newProfile
+    *           the new user defined profile
+    * @throws InvalidProfileException
+    *            is the user profile is invalid and cannot be used.
+    */
+   public void addUserDefinedProfile(final IDerivedProfile newProfile)
          throws InvalidProfileException {
       if (this.getProfileFromIdentifier(newProfile.getIdentifier()) != null) {
          throw new IllegalArgumentException(
                "A profile with the given id is already known.");
       }
-      this.cacheProfile(newProfile);
+      this.cacheUserDefinedProfile(newProfile);
       this.writeDerivedProfiles();
       this.fireNewProfileAddedEvent(newProfile);
    }
@@ -292,6 +364,8 @@ public final class JMLProfileManagement {
     *
     * @param profile
     *           the profile to validate
+    * @throws InvalidProfileException
+    *            if the validation failed because the profile is invalid
     */
    private void validateProfile(final IJMLProfile profile)
          throws InvalidProfileException {
