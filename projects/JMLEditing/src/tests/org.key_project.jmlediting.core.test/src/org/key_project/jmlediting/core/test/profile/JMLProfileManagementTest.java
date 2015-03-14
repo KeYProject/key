@@ -55,11 +55,6 @@ public class JMLProfileManagementTest {
       }
 
       @Override
-      public <T> Set<T> getExtensions(final Object key, final Class<T> clazz) {
-         return Collections.emptySet();
-      }
-
-      @Override
       public Set<IJMLValidator> getValidators() {
          // TODO Auto-generated method stub
          return Collections.emptySet();

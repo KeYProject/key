@@ -8,7 +8,10 @@ import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordCo
 import org.key_project.jmlediting.core.validation.IJMLValidator;
 
 /**
- * Defines a profile for a JML variant.
+ * Defines a profile for a JML dialect. A profile consists of a unique id, a
+ * name and a set of keywords, which are supported by the profile. A profile can
+ * create a parse which parses JML comments belonging to the implemented JML
+ * dialect.
  *
  * @author Moritz Lichter
  *
@@ -37,30 +40,6 @@ public interface IJMLProfile {
    Set<IKeyword> getSupportedKeywords();
 
    /**
-    * Returns a set of supported content descriptions which the user may use to
-    * create other keywords dynamically.
-    *
-    * @return a set of all supported content descriptions, which is not
-    *         modifiable
-    */
-   Set<IUserDefinedKeywordContentDescription> getSupportedContentDescriptions();
-
-   /**
-    * Returns an extension to the project for the given key and type. This can
-    * be used put or get extensions to a profile which is not worth for a single
-    * method because it is not generic.
-    *
-    * @param key
-    *           the key object
-    * @param clazz
-    *           the type class
-    * @return a set of all extension values, never null
-    * @param <T>
-    *           the type of the extension
-    */
-   <T> Set<T> getExtensions(Object key, Class<T> clazz);
-
-   /**
     * Creates a new parser to parse JML for this profile. A parser created with
     * this method must only be used once. This allows the parser to cover some
     * state. But implementations of this method may return the same object
@@ -71,13 +50,33 @@ public interface IJMLProfile {
    IJMLParser createParser();
 
    /**
-    * Returns a Set of Validators that this Profile provides.
+    * Returns a set of {@link IJMLValidator} that this profile provides.
     *
-    * @return a Set of Validators the Profile provides or an Empty Set if there
-    *         are no Validators.
+    * @return a set of {@link IJMLValidator} the profile provides or an Empty
+    *         Set if there are no validators
     */
    Set<IJMLValidator> getValidators();
 
+   /**
+    * Derives a new profile from this profile which can be edited. The created
+    * profile does not contains any changes to this profile, but they may be
+    * configured to the created profile later.
+    *
+    * @param id
+    *           the id of the new profile
+    * @param name
+    *           the name of the profile
+    * @return a new derived profile
+    */
    IEditableDerivedProfile derive(String id, String name);
+
+   /**
+    * Returns a set of supported content descriptions which the user may use to
+    * create other keywords dynamically.
+    *
+    * @return a set of all supported content descriptions, which is not
+    *         modifiable
+    */
+   Set<IUserDefinedKeywordContentDescription> getSupportedContentDescriptions();
 
 }

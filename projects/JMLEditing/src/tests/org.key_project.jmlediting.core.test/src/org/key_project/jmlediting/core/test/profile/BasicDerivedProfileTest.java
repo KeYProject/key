@@ -3,7 +3,6 @@ package org.key_project.jmlediting.core.test.profile;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -76,10 +75,6 @@ public class BasicDerivedProfileTest {
          return new DefaultJMLParser(this);
       }
 
-      public void putExtension() {
-         this.putExtension(key, baseValue, Object.class);
-      }
-
       @Override
       public IEditableDerivedProfile derive(final String id, final String name) {
          return new DerivedProfile<IJMLProfile>(id, name, this) {
@@ -94,11 +89,6 @@ public class BasicDerivedProfileTest {
             final IJMLProfile parentProfile) {
          super(name, identifier, parentProfile);
       }
-
-      public void putExtension() {
-         this.putExtension(key, derivedValue, Object.class);
-      }
-
    }
 
    private final BaseProfile parentProfile = new BaseProfile();
@@ -216,24 +206,6 @@ public class BasicDerivedProfileTest {
       assertEquals("First supported keywords wrong", expected, supported1);
       assertEquals("Second supported keywords wrong", expected, supported2);
       assertEquals("Third supported keywords wrong", expected, supported3);
-   }
-
-   @Test
-   public void testExtensions() {
-      assertEquals("Test no extensions", Collections.emptySet(),
-            this.derivedProfile.getExtensions(key, Object.class));
-   }
-
-   @Test
-   public void testOnlyParentExtensions() {
-      this.parentProfile.putExtension();
-      assertEquals("No extension of parent", set(baseValue),
-            this.derivedProfile.getExtensions(key, Object.class));
-   }
-
-   @Test(expected = UnsupportedOperationException.class)
-   public void testDerivedProfileNoExtensions() {
-      this.derivedProfile.putExtension();
    }
 
    @Test(expected = IllegalArgumentException.class)

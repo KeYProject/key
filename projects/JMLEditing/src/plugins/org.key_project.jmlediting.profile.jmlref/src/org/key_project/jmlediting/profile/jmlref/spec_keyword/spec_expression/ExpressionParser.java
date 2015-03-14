@@ -27,8 +27,6 @@ import org.key_project.jmlediting.profile.jmlref.type.TypeKeywordSort;
  */
 public class ExpressionParser implements ParseFunction {
 
-   public static final Object ADDITIONAL_PRIMARY_SUFFIXES = new Object();
-
    /**
     * The main parser which is used to parse text.
     */
@@ -236,8 +234,8 @@ public class ExpressionParser implements ParseFunction {
        * | `[' expression `]'<br>
        * | [ `[' `]' ] ... . class
        */
-      final Set<ParseFunction> additionalSuffixes = profile.getExtensions(
-            ADDITIONAL_PRIMARY_SUFFIXES, ParseFunction.class);
+      final Set<ParseFunction> additionalSuffixes = profile
+            .getPrimarySuffixExtensions();
       final ParseFunction primarySuffix = alt(appendFirsts(
             additionalSuffixes,
             seq(MEMBER_ACCESS, constant("."),

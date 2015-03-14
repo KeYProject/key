@@ -106,8 +106,8 @@ public class DerivedProfilePersistence implements IDerivedProfilePersistence {
       }
 
       // Create a new derived profile
-      final IEditableDerivedProfile profile = parentProfile.derive(name,
-            identifier);
+      final IEditableDerivedProfile profile = parentProfile.derive(identifier,
+            name);
 
       // And load additional and disabled keywords
       this.readAdditonalKeywords(profileNode, profile);

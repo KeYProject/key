@@ -2,6 +2,7 @@ package org.key_project.jmlediting.profile.jmlref;
 
 import java.util.Set;
 
+import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.profile.DerivedProfile;
 import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
 
@@ -16,6 +17,11 @@ public class DerivedExpressionProfile extends
    @Override
    public Set<IJMLPrimary> getSupportedPrimaries() {
       return this.getParentProfile().getSupportedPrimaries();
+   }
+
+   @Override
+   public Set<ParseFunction> getPrimarySuffixExtensions() {
+      return this.getParentProfile().getPrimarySuffixExtensions();
    }
 
 }

@@ -34,11 +34,11 @@ public class ParseErrorMarkerTest {
       final TestProject result = UITestUtils.createProjectWithFile(bot,
             PROJECT_NAME, PACKAGE_NAME, CLASS_NAME,
             SaveGuarantee.SAVE_BUT_NO_CHANGES_LATER);
-      result.restoreClassAndOpen();
       testProject = result.getProject().getProject();
-      openEditor = result.getOpenedEditor();
       JMLPreferencesHelper.setProjectJMLProfile(testProject,
             UITestUtils.findReferenceProfile());
+      result.restoreClassAndOpen();
+      openEditor = result.getOpenedEditor();
    }
 
    @Test

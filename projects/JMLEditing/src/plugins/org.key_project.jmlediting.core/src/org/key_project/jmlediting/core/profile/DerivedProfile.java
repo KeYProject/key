@@ -13,6 +13,8 @@ import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordCo
  * An implementation of {@link IEditableDerivedProfile}.
  *
  * @author Moritz Lichter
+ * @param <P>
+ *           the type of the parent profile profile
  *
  */
 public abstract class DerivedProfile<P extends IJMLProfile> extends
@@ -194,20 +196,6 @@ public abstract class DerivedProfile<P extends IJMLProfile> extends
    @Override
    public Set<IKeyword> getAdditionalKeywords() {
       return Collections.unmodifiableSet(this.additionalKeywords);
-   }
-
-   @Override
-   public <T> Set<T> getExtensions(final Object key, final Class<T> clazz) {
-      // Because the derived profile does not define extensions, return the
-      // extensions of the parent
-      return this.parentProfile.getExtensions(key, clazz);
-   }
-
-   @Override
-   protected <T> void putExtension(final Object key, final T newValue,
-         final Class<T> clazz) {
-      throw new UnsupportedOperationException(
-            "A derived profile is not allowed to define extensions");
    }
 
    @Override

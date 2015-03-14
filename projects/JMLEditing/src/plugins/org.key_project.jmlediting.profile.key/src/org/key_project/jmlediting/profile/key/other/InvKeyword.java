@@ -1,7 +1,11 @@
 package org.key_project.jmlediting.profile.key.other;
 
+import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
+
+import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.profile.syntax.EmptyKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 import org.key_project.jmlediting.profile.jmlref.primary.AbstractJMLPrimaryKeyword;
 import org.key_project.jmlediting.profile.key.KeyProfile;
 
@@ -30,6 +34,10 @@ public class InvKeyword extends AbstractJMLPrimaryKeyword {
    @Override
    public IKeywordParser createParser() {
       return EmptyKeywordParser.getInstance();
+   }
+
+   public static ParseFunction invSuffix(final IJMLExpressionProfile profile) {
+      return separateBy('.', keywords(InvKeyword.class, profile));
    }
 
 }

@@ -3,6 +3,7 @@ package org.key_project.jmlediting.ui.test;
 import static org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses;
 import static org.eclipse.swtbot.swt.finder.waits.Conditions.waitForMenu;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -170,6 +171,7 @@ public class UITestUtils {
             return profile;
          }
       }
+      fail("Reference Profile not found");
       return null;
    }
 

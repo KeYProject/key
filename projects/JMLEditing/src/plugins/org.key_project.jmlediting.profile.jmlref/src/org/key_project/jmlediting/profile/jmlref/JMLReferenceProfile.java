@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
+import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
 import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.validation.IJMLValidator;
@@ -183,5 +184,10 @@ public class JMLReferenceProfile extends AbstractJMLProfile implements
    @Override
    public IEditableDerivedProfile derive(final String id, final String name) {
       return new DerivedExpressionProfile(id, name, this);
+   }
+
+   @Override
+   public Set<ParseFunction> getPrimarySuffixExtensions() {
+      return Collections.emptySet();
    }
 }

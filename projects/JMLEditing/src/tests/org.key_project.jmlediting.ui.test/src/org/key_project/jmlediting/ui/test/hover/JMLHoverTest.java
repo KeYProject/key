@@ -40,24 +40,25 @@ public class JMLHoverTest {
 
    @BeforeClass
    public static void createProject() throws CoreException,
-   InterruptedException {
+         InterruptedException {
       final IJavaProject project = TestUtilsUtil
             .createJavaProject(PROJECT_NAME);
-      final IFolder testFolder = TestUtilsUtil.createFolder(project
-            .getProject().getFolder("src"), PACKAGE_NAME);
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
-            "data/template/" + CLASS_NAME + ".java", testFolder);
-      UITestUtils.selectFileInProject(bot, PROJECT_NAME, "src/test/" + CLASS_NAME
-            + ".java");
-      editor = bot.activeEditor().toTextEditor();
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(),
             UITestUtils.findReferenceProfile());
       profile = JMLPreferencesHelper.getProjectActiveJMLProfile(project
             .getProject());
+      final IFolder testFolder = TestUtilsUtil.createFolder(project
+            .getProject().getFolder("src"), PACKAGE_NAME);
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
+            "data/template/" + CLASS_NAME + ".java", testFolder);
+      UITestUtils.selectFileInProject(bot, PROJECT_NAME, "src/test/"
+            + CLASS_NAME + ".java");
+      editor = bot.activeEditor().toTextEditor();
    }
 
    @Test
    public void testKeywordHover() throws IOException {
+      bot.sleep(5000);
       // Read to hover file
       final BufferedReader reader = new BufferedReader(new InputStreamReader(
             BundleUtil.openInputStream(Activator.PLUGIN_ID,

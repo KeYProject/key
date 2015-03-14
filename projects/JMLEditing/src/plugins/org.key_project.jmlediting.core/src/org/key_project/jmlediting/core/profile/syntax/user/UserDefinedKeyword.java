@@ -30,7 +30,7 @@ public class UserDefinedKeyword extends AbstractKeyword implements
    /**
     * The closing character.
     */
-   private final char closingCharacter;
+   private final Character closingCharacter;
    private final IKeywortSort sort;
 
    /**
