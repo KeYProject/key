@@ -164,7 +164,7 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
         numOfInvokedMacros++;
     }
 
-    protected void macroFinished(final ProofMacroFinishedInfo info) {
+    protected synchronized void macroFinished(final ProofMacroFinishedInfo info) {
         if (numOfInvokedMacros > 0) {
             numOfInvokedMacros--;
         }
@@ -177,7 +177,8 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
 
         @Override
         public void taskStarted(String message, int size) {
-            if (!ApplyStrategy.PROCESSING_STRATEGY.equals(message)) {//TODO: have a source object that make clear I am not a macro
+            if (!(ApplyStrategy.PROCESSING_STRATEGY.equals(message) ||
+                  "Loading problem ...".equals(message))) {//TODO: have a source object that make clear I am not a macro
                 macroStarted(message, size);
             }
         }
