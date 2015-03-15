@@ -23,6 +23,8 @@ import java.util.LinkedList;
 
 import junit.framework.TestCase;
 
+import org.junit.Assert;
+import org.junit.Before;
 import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.logic.Term;
@@ -40,7 +42,10 @@ public class DesignTests extends TestCase {
        File projectRoot = IOUtil.getClassLocation(Term.class);
        if ("org.key_project.core".equals(projectRoot.getName())) {
           projectRoot = new File(projectRoot, "bin");
+       } else if (projectRoot.isFile()) {
+          projectRoot = new File(projectRoot.getParentFile().getParentFile().getParentFile(), "key.core" + File.separator + "bin");
        }
+       
        binaryPath = new File(projectRoot, "de"+File.separator+"uka"+File.separator+"ilkd"+File.separator+"key");
     }
     
@@ -62,9 +67,10 @@ public class DesignTests extends TestCase {
     public DesignTests() {
     }
 
+    @Before
     public void setUp() {
-	allClasses = getAllClasses(binaryPath);
-	assertTrue(allClasses.length >= 1);
+      allClasses = getAllClasses(binaryPath);
+	   Assert.assertTrue("No classes found in and below " + binaryPath, allClasses.length >= 1);
     }
 
     /** 
@@ -121,23 +127,23 @@ public class DesignTests extends TestCase {
      * <code>topDir</code>
      */
     public static Class<?>[] getAllClasses(File topDir) {
-	LinkedList<Class<?>> result = new LinkedList<Class<?>>();
-	copyToList(getClasses(topDir), result);	    
+       LinkedList<Class<?>> result = new LinkedList<Class<?>>();
+       copyToList(getClasses(topDir), result);	    
 
-	File[] subDirectories = topDir.listFiles
-	(new FileFilter() {
-		public boolean accept(File fileName) {
-		    return fileName.isDirectory();
-		}
-	    });
-	if (subDirectories == null) {
-	    return new Class[0];
-	} else {
-	    for (int i = 0; i<subDirectories.length; i++) {
-		copyToList(getAllClasses(subDirectories[i]), result);
-	    }
-	    return (Class[])result.toArray(new Class[result.size()]);
-	}
+       File[] subDirectories = topDir.listFiles
+             (new FileFilter() {
+                public boolean accept(File fileName) {
+                   return fileName.isDirectory();
+                }
+             });
+       if (subDirectories == null) {
+          return new Class[0];
+       } else {
+          for (int i = 0; i<subDirectories.length; i++) {
+             copyToList(getAllClasses(subDirectories[i]), result);
+          }
+          return (Class[])result.toArray(new Class[result.size()]);
+       }
     }
 
     /** prints an enumeration of of those classes that hurt a design principle */
