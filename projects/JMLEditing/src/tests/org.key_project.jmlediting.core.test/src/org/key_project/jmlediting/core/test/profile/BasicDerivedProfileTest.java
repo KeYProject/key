@@ -83,17 +83,9 @@ public class BasicDerivedProfileTest {
 
    }
 
-   private static final class TestDerivedProfile extends DerivedProfile {
-
-      public TestDerivedProfile(final String name, final String identifier,
-            final IJMLProfile parentProfile) {
-         super(name, identifier, parentProfile);
-      }
-   }
-
    private final BaseProfile parentProfile = new BaseProfile();
-   private final TestDerivedProfile derivedProfile = new TestDerivedProfile(
-         "Derived", this.getClass().getName(), this.parentProfile);
+   private final IEditableDerivedProfile derivedProfile = this.parentProfile
+         .derive(this.getClass().getName(), "Derived");
 
    @Test
    public void testCorrectParentProfile() {
@@ -240,7 +232,9 @@ public class BasicDerivedProfileTest {
 
    @Test(expected = IllegalArgumentException.class)
    public void testInitializeWithoutParent() {
-      new TestDerivedProfile("a", "b", null);
+      new DerivedProfile<IJMLProfile>("a", "b", null) {
+      };
+      ;
    }
 
    @Test(expected = IllegalArgumentException.class)

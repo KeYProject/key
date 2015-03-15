@@ -53,7 +53,7 @@ public class PersistenceParentProfile extends AbstractJMLProfile {
 
    @Override
    public IEditableDerivedProfile derive(final String id, final String name) {
-      return new DerivedProfile<IJMLProfile>(name, id, this) {
+      return new DerivedProfile<IJMLProfile>(id, name, this) {
       };
    }
 

@@ -60,7 +60,7 @@ public abstract class DerivedProfile<P extends IJMLProfile> extends
     * @param parentProfile
     *           the parent profile, not allowed to be null
     */
-   public DerivedProfile(final String name, final String identifier,
+   public DerivedProfile(final String identifier, final String name,
          final P parentProfile) {
       super();
       if (identifier == null) {
