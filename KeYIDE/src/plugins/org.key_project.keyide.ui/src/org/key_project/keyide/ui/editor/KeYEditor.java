@@ -90,6 +90,7 @@ import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -267,7 +268,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    private final ProverTaskListener proverTaskListener = new ProverTaskListener() {
       @Override
-      public void taskStarted(String message, int size) {
+      public void taskStarted(TaskStartedInfo info) {
       }
       
       @Override
