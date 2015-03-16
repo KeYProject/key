@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
@@ -38,6 +39,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.IParent;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaConventions;
@@ -94,27 +96,33 @@ public class JDTUtil {
     */
    public static IJavaProject createJavaProject(String name, 
                                                 IProject... referencedProjects) throws CoreException {
-      return createJavaProject(name, getOutputFolderName(), getSourceFolderName(), referencedProjects);
+      return createJavaProject(name, 
+                               getOutputFolderName(), 
+                               new String[] {getSourceFolderName()}, 
+                               referencedProjects);
    }
 
    /**
     * Creates a new {@link IJavaProject} that is an {@link IProject} with a JDT nature.
     * @param name The project name.
     * @param outputFolderName The name of the output folder to create.
-    * @param srcFolderName The name of the source folder to create.
+    * @param srcFolderNames The name of the source folder to create.
     * @param referencedProjects Additional {@link IProject}s to include in the build path.
     * @return The created {@link IJavaProject}.
     * @throws CoreException Occurred Exception.
     */
    public static IJavaProject createJavaProject(String name, 
                                                 String outputFolderName,
-                                                String srcFolderName,
+                                                String[] srcFolderNames,
                                                 IProject... referencedProjects) throws CoreException {
       IProject project = ResourceUtil.createProject(name);
       IFolder bin = project.getFolder(outputFolderName);
       CoreUtility.createDerivedFolder(bin, true, true, null);
-      IFolder src = project.getFolder(srcFolderName);
-      CoreUtility.createFolder(src, true, true, null);
+      IFolder[] src = new IFolder[srcFolderNames.length];
+      for (int i = 0; i < srcFolderNames.length; i++) {
+         src[i] = project.getFolder(srcFolderNames[i]);
+         CoreUtility.createFolder(src[i], true, true, null);
+      }
       return convertToJavaProject(project, bin, src, referencedProjects);
    }
    
@@ -145,7 +153,7 @@ public class JDTUtil {
     */
    public static IJavaProject convertToJavaProject(IProject project, 
                                                    final IContainer bin, 
-                                                   final IContainer src, 
+                                                   final IContainer[] src, 
                                                    final IProject... referencedProjects) throws CoreException {
       final IJavaProject javaProject = JavaCore.create(project); 
       IRunnableWithException run = new AbstractRunnableWithException() {
@@ -153,10 +161,13 @@ public class JDTUtil {
          public void run() {
             try {
                JavaCapabilityConfigurationPage page = new JavaCapabilityConfigurationPage();
-               IClasspathEntry[] entries = new IClasspathEntry[1 + referencedProjects.length];
-               entries[0] = JavaCore.newSourceEntry(src.getFullPath());
+               IClasspathEntry[] entries = new IClasspathEntry[src.length + referencedProjects.length];
+               for (int i = 0; i < src.length; i++) {
+                  entries[i] = JavaCore.newSourceEntry(src[i].getFullPath());
+                  
+               }
                for (int i = 0; i < referencedProjects.length; i++) {
-                  entries[i + 1] = JavaCore.newProjectEntry(referencedProjects[i].getFullPath());
+                  entries[i + src.length] = JavaCore.newProjectEntry(referencedProjects[i].getFullPath());
                }
                entries = ArrayUtil.addAll(entries, getDefaultJRELibrary());
                page.init(javaProject, bin.getFullPath(), entries, false);
@@ -539,11 +550,20 @@ public class JDTUtil {
    public static boolean isJavaProject(IProject project) {
        if (project != null) {
            IJavaProject javaProject = getJavaProject(project);
-           return javaProject != null && javaProject.exists();
+           return isJavaProject(javaProject);
        }
        else {
            return false;
        }
+   }
+
+   /**
+    * Checks if the given {@link IJavaProject} is a Java project.
+    * @param project The {@link IJavaProject} to check.
+    * @return {@code true} is Java project, {@code false} is no Java project.
+    */
+   public static boolean isJavaProject(IJavaProject javaProject) {
+      return javaProject != null && javaProject.exists();
    }
    
    /**
@@ -1008,6 +1028,80 @@ public class JDTUtil {
             }
          }
          return sb.toString();
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Returns all {@link IPackageFragmentRoot}s of the given {@link IJavaProject}.
+    * @param project The {@link IJavaProject} to list its {@link IPackageFragmentRoot}s.
+    * @return The found {@link IPackageFragmentRoot}s.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static List<IPackageFragmentRoot> getSourceFolders(IJavaProject project) throws JavaModelException {
+      List<IPackageFragmentRoot> result = new LinkedList<IPackageFragmentRoot>();
+      if (project != null) {
+         IPackageFragmentRoot[] roots = project.getAllPackageFragmentRoots();
+         for (IPackageFragmentRoot root : roots) {
+            if (root.getKind() == IPackageFragmentRoot.K_SOURCE) {
+               result.add(root);
+            }
+         }
+      }
+      return result;
+   }
+   
+   /**
+    * Lists all {@link ICompilationUnit}s recursively within given {@link IPackageFragmentRoot}s
+    * @param sourceFolders The {@link IPackageFragmentRoot}s to list its contained {@link ICompilationUnit}s.
+    * @return The recursively found {@link ICompilationUnit}s.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static List<ICompilationUnit> listCompilationUnit(List<IPackageFragmentRoot> sourceFolders) throws JavaModelException{
+      List<ICompilationUnit> result = new LinkedList<ICompilationUnit>();
+      if (sourceFolders != null) {
+         for (IPackageFragmentRoot root : sourceFolders) {
+            findCompilationUnitsRecursively(root, result);
+         }
+      }
+      return result;
+   }
+   
+   /**
+    * Utility method used by {@link #listCompilationUnit(List)}.
+    * @param javaElement The current {@link IJavaElement} to search in.
+    * @param toFill The result {@link List} to fill.
+    * @throws JavaModelException Occurred Exception.
+    */
+   private static void findCompilationUnitsRecursively(IJavaElement javaElement, List<ICompilationUnit> toFill) throws JavaModelException {
+      if (javaElement instanceof ICompilationUnit) {
+         toFill.add((ICompilationUnit) javaElement);
+      }
+      else if (javaElement instanceof IParent) {
+         IJavaElement[] children = ((IParent) javaElement).getChildren();
+         for (IJavaElement child : children) {
+            findCompilationUnitsRecursively(child, toFill);
+         }
+      }
+   }
+   
+   /**
+    * Parses the given {@link ICompilationUnit}.
+    * @param compilationUnit The {@link ICompilationUnit} to parse.
+    * @return The parsed {@link ASTNode} or {@code null} if no {@link ICompilationUnit} is defined.
+    */
+   public static ASTNode parse(ICompilationUnit compilationUnit) {
+      if (compilationUnit != null) {
+         ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
+         parser.setResolveBindings(true);
+         parser.setSource(compilationUnit);
+         Map<?, ?> options = JavaCore.getOptions();
+         JavaCore.setComplianceOptions(JavaModelUtil.VERSION_LATEST, options);
+         parser.setCompilerOptions(options);
+         ASTNode result = parser.createAST(null);
+         return result;
       }
       else {
          return null;

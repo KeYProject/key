@@ -220,8 +220,7 @@ public class TestUtilsUtil {
    }
 
    /**
-    * Creates a new {@link IJavaProject} that is an {@link IProject} with
-    * a JDT nature.
+    * Creates a new {@link IJavaProject} that is an {@link IProject} with a JDT nature.
     * @param name The project name.
     * @return The created {@link IJavaProject}.
     * @throws CoreException Occurred Exception.
@@ -229,6 +228,18 @@ public class TestUtilsUtil {
     */
    public static IJavaProject createJavaProject(String name) throws CoreException, InterruptedException {
       return JDTUtil.createJavaProject(name);
+   }
+   
+   /**
+    * Creates a new {@link IJavaProject} that is an {@link IProject} with a JDT nature. 
+    * @param name The project name.
+    * @param sourceFolderNames The name of the project source folders.
+    * @return The created {@link IJavaProject}.
+    * @throws CoreException Occurred Exception.
+    * @throws InterruptedException Occurred Exception.
+    */
+   public static IJavaProject createJavaProject(String name, String... sourceFolderNames) throws CoreException, InterruptedException {
+      return JDTUtil.createJavaProject(name, JDTUtil.getOutputFolderName(), sourceFolderNames);
    }
 
    /**
@@ -1697,5 +1708,16 @@ public class TestUtilsUtil {
             return "Tree has no items.";
          }
       });
+   }
+   
+   /**
+    * Compares the given {@link String}s ignoring whitespace.
+    * @param expected The expected value.
+    * @param actual The current value.
+    */
+   public static void assertEqualsIgnoreWhitespace(String expected, String actual) {
+      if (!StringUtil.equalIgnoreWhiteSpace(expected, actual)) {
+         TestCase.assertEquals(expected, actual);
+      }
    }
 }

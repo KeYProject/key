@@ -26,14 +26,17 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.junit.Test;
@@ -503,15 +506,30 @@ public class JDTUtilTest extends TestCase {
      * Tests {@link JDTUtil#isJavaProject(IProject)}
      */
     @Test
-    public void testIsJavaProject() throws CoreException, InterruptedException {
+    public void testIsJavaProject_IProject() throws CoreException, InterruptedException {
         // Test null
-        assertFalse(JDTUtil.isJavaProject(null));
+        assertFalse(JDTUtil.isJavaProject((IProject)null));
         // Test general project
         IProject project = TestUtilsUtil.createProject("JDTUtilTest_testisJavaProject_general");
         assertFalse(JDTUtil.isJavaProject(project));
         // Test Java project
         IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testisJavaProject_Java"); 
         assertTrue(JDTUtil.isJavaProject(javaProject.getProject()));
+    }
+    
+    /**
+     * Tests {@link JDTUtil#isJavaProject(IJavaProject)}
+     */
+    @Test
+    public void testIsJavaProject_IJavaProject() throws CoreException, InterruptedException {
+       // Test null
+       assertFalse(JDTUtil.isJavaProject((IJavaProject)null));
+       // Test general project
+       IProject project = TestUtilsUtil.createProject("JDTUtilTest_testisJavaProject_Java_general");
+       assertFalse(JDTUtil.isJavaProject(JDTUtil.getJavaProject(project)));
+       // Test Java project
+       IJavaProject javaProject = JDTUtil.createJavaProject("JDTUtilTest_testisJavaProject_Java_Java"); 
+       assertTrue(JDTUtil.isJavaProject(javaProject));
     }
 
     /**
@@ -676,5 +694,94 @@ public class JDTUtilTest extends TestCase {
         assertFalse(general2Found);
         assertTrue(jdt1Found);
         assertTrue(jdt2Found);
+    }
+    
+    /**
+     * Tests {@link JDTUtil#getSourceFolders(IJavaProject)}
+     */
+    @Test
+    public void testGetSourceFolders() throws CoreException, InterruptedException{
+       //Test null
+       List<IPackageFragmentRoot> sourceFolders = JDTUtil.getSourceFolders(null);
+       assertNotNull(sourceFolders);
+       assertEquals(0, sourceFolders.size());
+       //Test Java project with one IPackageFragmentRoot
+       IJavaProject project = TestUtilsUtil.createJavaProject("JDTUtilTest_testShowSrcFolders_IJavaProject_one");
+       sourceFolders = JDTUtil.getSourceFolders(project);
+       assertNotNull(sourceFolders);
+       assertEquals(1, sourceFolders.size());
+       assertEquals(project.getProject().getFolder("src"), sourceFolders.get(0).getResource());
+       //Test Java project with two IPackageFragmentRoot
+       IJavaProject project1 = TestUtilsUtil.createJavaProject("JDTUtilTest_testShowSrcFolders_IJavaProject_two", "src", "src1");
+       List<IPackageFragmentRoot> sourceFolders1 = JDTUtil.getSourceFolders(null);
+       sourceFolders1 = JDTUtil.getSourceFolders(project1);
+       assertNotNull(sourceFolders1);
+       assertEquals(2,sourceFolders1.size());
+       assertEquals(project1.getProject().getFolder("src"), sourceFolders1.get(0).getResource());
+       assertEquals(project1.getProject().getFolder("src1"), sourceFolders1.get(1).getResource());
+    }
+    
+    /**
+     * {@link JDTUtil#listCompilationUnit(List)}
+     * @throws JavaModelException
+     */
+    @Test
+    public void testListCompilationUnit() throws CoreException, InterruptedException{
+       // Create project to test
+       IJavaProject project = TestUtilsUtil.createJavaProject("JDTUtilTest_testListCompilationUnit", "src", "src1");
+       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/listCompilationUnitExample", project.getProject());
+       //Test null
+       List<ICompilationUnit> javafiles = JDTUtil.listCompilationUnit(null);
+       assertNotNull(javafiles);
+       assertEquals(0,javafiles.size());
+       //Test Source Folder with one Java File
+       List<IPackageFragmentRoot> sourceFolders1 = JDTUtil.getSourceFolders(project);
+       javafiles = JDTUtil.listCompilationUnit(sourceFolders1);
+       assertNotNull(javafiles);
+       assertEquals(5, javafiles.size());
+       assertEquals(new Path("/JDTUtilTest_testListCompilationUnit/src/Hello.java"), javafiles.get(0).getResource().getFullPath());
+       assertEquals(new Path("/JDTUtilTest_testListCompilationUnit/src/folder1/Hello0.java"), javafiles.get(1).getResource().getFullPath());
+       assertEquals(new Path("/JDTUtilTest_testListCompilationUnit/src/folder1/folder1_1/Hello3.java"),javafiles.get(2).getResource().getFullPath());
+       assertEquals(new Path("/JDTUtilTest_testListCompilationUnit/src1/Hello1.java"),javafiles.get(3).getResource().getFullPath());
+       assertEquals(new Path("/JDTUtilTest_testListCompilationUnit/src1/folder2/Hello2.java"),javafiles.get(4).getResource().getFullPath());
+    }
+    
+    /**
+     * {@link JDTUtil#createASTNodeFromICompUnit(ICompilationUnit)}
+     * @throws CoreException
+     * @throws InterruptedException
+     */
+    @Test
+    public void testCreateASTNodeFromICompilationUnit() throws CoreException, InterruptedException{
+       // Create project to test
+       IJavaProject project = TestUtilsUtil.createJavaProject("JDTUtilTest_testCreateASTNodeFromICompilationUnit", "src", "src1");
+       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/listCompilationUnitExample", project.getProject());
+       List<IPackageFragmentRoot> sourceFolders = JDTUtil.getSourceFolders(project);
+       assertEquals(2, sourceFolders.size());
+       List<ICompilationUnit> compilationUnits = JDTUtil.listCompilationUnit(sourceFolders);
+       assertTrue(compilationUnits.size() >= 2);
+       
+       //Test null
+       ASTNode asti = JDTUtil.parse(null);
+       assertNull(asti);
+       assertEquals(null,asti);
+       
+       //Test ASTNode with one ICompilationUnit including Code 
+       ICompilationUnit icompunit = compilationUnits.get(0);
+       ASTNode ast = JDTUtil.parse(icompunit);
+       //Ast Node Class Dependency core.dom not equal icompunit with internal.core
+       assertNotSame(ast.getClass(), icompunit.getClass());
+       //Comparing the Content of an Class with Content of the ASTNode
+       TestUtilsUtil.assertEqualsIgnoreWhitespace("public class Hello {\n   int test = 0;\n}", icompunit.getSource().trim().toString());
+       TestUtilsUtil.assertEqualsIgnoreWhitespace("public class Hello {\n  int test=0;\n}\n", ast.getRoot().toString());
+     
+       //Test ASTNode with one ICompilationUnit containing package and empty method 
+       ICompilationUnit icompunit1 = compilationUnits.get(1);
+       ASTNode ast1 = JDTUtil.parse(icompunit1);
+       //Ast Node Class Dependency core.dom not equal icompunit with internal.core
+       assertNotSame(ast.getClass(), icompunit.getClass());
+       //Comparing the Content of an Class with Content of the ASTNode
+       TestUtilsUtil.assertEqualsIgnoreWhitespace("package folder1;\n\npublic class Hello0 {\n\n}\n", icompunit1.getSource().toString());
+       TestUtilsUtil.assertEqualsIgnoreWhitespace("package folder1;\npublic class Hello0 {\n}\n", ast1.getRoot().toString());
     }
 }

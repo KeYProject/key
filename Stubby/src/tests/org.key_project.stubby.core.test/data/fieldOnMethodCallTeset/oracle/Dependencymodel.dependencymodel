@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
+  <types xsi:type="dependencymodel:Type" name="FieldOnMethodCallTeset" source="true" extends="//@types.0" package="" simpleName="FieldOnMethodCallTeset">
+    <methods name="main" returnType="//@types.2"/>
+    <methods name="next" returnType="//@types.1"/>
+    <fields name="value" visibility="PRIVATE" type="//@types.2"/>
+  </types>
+  <types xsi:type="dependencymodel:Datatype" name="int"/>
+</dependencymodel:DependencyModel>
