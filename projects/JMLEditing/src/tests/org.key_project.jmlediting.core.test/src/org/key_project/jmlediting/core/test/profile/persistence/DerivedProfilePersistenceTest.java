@@ -9,33 +9,35 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
-import org.key_project.jmlediting.core.profile.DerivedProfile;
 import org.key_project.jmlediting.core.profile.IDerivedProfile;
 import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.core.profile.persistence.IDerivedProfilePersistence;
 import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceException;
 import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceFactory;
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription.ClosingCharacterLaw;
 import org.key_project.jmlediting.core.profile.syntax.user.UserDefinedKeyword;
-import org.key_project.jmlediting.core.test.parser.ProfileWrapper;
 import org.w3c.dom.Document;
 
 public class DerivedProfilePersistenceTest {
 
-   private final IJMLProfile availableProfile = ProfileWrapper.testProfile;
+   private final IJMLProfile availableProfile = JMLProfileManagement.instance()
+         .getProfileFromIdentifier(PersistenceParentProfile.class.getName());
    private final IDerivedProfilePersistence persistence = ProfilePersistenceFactory
          .createDerivedProfilePersistence();
 
    @Test
    public void testPersistEmptyDerivedProfile()
          throws ProfilePersistenceException {
-      final IDerivedProfile profile = new DerivedProfile("Test",
-            "org.test.test", this.availableProfile);
+      final IDerivedProfile profile = this.availableProfile.derive(
+            "org.test.test", "Test");
       final Document doc = this.persistence.persist(profile);
       final IDerivedProfile readProfile = this.persistence.read(doc);
 
@@ -50,8 +52,8 @@ public class DerivedProfilePersistenceTest {
    @Test
    public void testPersistParentDisablesKeywords()
          throws ProfilePersistenceException {
-      final IEditableDerivedProfile profile = new DerivedProfile("Test",
-            "org.test.test", this.availableProfile);
+      final IEditableDerivedProfile profile = this.availableProfile.derive(
+            "org.test.test", "Test");
       // Pick some parent keywords
       final List<IKeyword> parentKeywords = new ArrayList<IKeyword>(
             this.availableProfile.getSupportedKeywords());
@@ -94,6 +96,11 @@ public class DerivedProfilePersistenceTest {
       public String getDescription() {
          return null;
       }
+
+      @Override
+      public IKeywortSort getSort() {
+         return ToplevelKeywordSort.INSTANCE;
+      }
    }
 
    // Illegal for persistence because the keyword has a non nullary constructor
@@ -108,13 +115,18 @@ public class DerivedProfilePersistenceTest {
          return null;
       }
 
+      @Override
+      public IKeywortSort getSort() {
+         return null;
+      }
+
    }
 
    @Test
    public void testPersistAdditionalKeywordsFromUserClass()
          throws ProfilePersistenceException {
-      final IEditableDerivedProfile profile = new DerivedProfile("Test",
-            "org.test.test", this.availableProfile);
+      final IEditableDerivedProfile profile = this.availableProfile.derive(
+            "org.test.test", "Test");
       profile.addKeyword(new TestKeyword());
 
       final Document doc = this.persistence.persist(profile);
@@ -129,8 +141,8 @@ public class DerivedProfilePersistenceTest {
    @Test(expected = ProfilePersistenceException.class)
    public void testPersitKeywordWithNonNullaryConstructor()
          throws ProfilePersistenceException {
-      final IEditableDerivedProfile profile = new DerivedProfile("IllegalTest",
-            "org.test.illegal", this.availableProfile);
+      final IEditableDerivedProfile profile = this.availableProfile.derive(
+            "org.test.illegal", "IllegalTest");
       profile.addKeyword(new IllegalTestKeyword("illegal_keyword"));
 
       // Should throw an exception
@@ -140,8 +152,8 @@ public class DerivedProfilePersistenceTest {
    @Test
    public void testPersistUserDefinedKeyword()
          throws ProfilePersistenceException {
-      final IEditableDerivedProfile profile = new DerivedProfile("IllegalTest",
-            "org.test.userdef", this.availableProfile);
+      final IEditableDerivedProfile profile = this.availableProfile.derive(
+            "org.test.userdef", "IllegalTest");
       final IUserDefinedKeywordContentDescription contentDescription = this.availableProfile
             .getSupportedContentDescriptions().iterator().next();
       Character closingChar;
@@ -154,7 +166,8 @@ public class DerivedProfilePersistenceTest {
       final String keyword = "mykeyword";
       final String keywrodDescription = "My own keyword.";
       profile.addKeyword(new UserDefinedKeyword(Collections.singleton(keyword),
-            contentDescription, keywrodDescription, closingChar));
+            ToplevelKeywordSort.INSTANCE, contentDescription,
+            keywrodDescription, closingChar));
 
       final Document doc = this.persistence.persist(profile);
       final IDerivedProfile readProfile = this.persistence.read(doc);
@@ -176,6 +189,8 @@ public class DerivedProfilePersistenceTest {
             newUserKeyword.getContentDescription());
       assertEquals("Wrong closing character", closingChar,
             newUserKeyword.getClosingCharacter());
+      assertEquals("Wrong sort", ToplevelKeywordSort.INSTANCE,
+            newUserKeyword.getSort());
 
    }
 

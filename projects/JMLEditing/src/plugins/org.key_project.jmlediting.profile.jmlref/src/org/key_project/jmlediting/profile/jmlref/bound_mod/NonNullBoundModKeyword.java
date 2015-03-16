@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.bound_mod;
 
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 
 /**
  * Non null as bound modifier.
@@ -8,8 +9,7 @@ import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
  * @author Moritz Lichter
  *
  */
-public class NonNullBoundModKeyword extends AbstractEmptyKeyword implements
-      IBoundVarModifierKeyword {
+public class NonNullBoundModKeyword extends AbstractEmptyKeyword {
 
    /**
     * Creates a new instance.
@@ -23,6 +23,11 @@ public class NonNullBoundModKeyword extends AbstractEmptyKeyword implements
       return "Specifies that a bound logical variable is not allowed to be null.\n"
             + "In order to quantify over the elements of a type named non_null or "
             + "nullable is necessary to provide an explicit nullity modifier.";
+   }
+
+   @Override
+   public IKeywortSort getSort() {
+      return BoundVarModifierKeywordSort.INSTANCE;
    }
 
 }

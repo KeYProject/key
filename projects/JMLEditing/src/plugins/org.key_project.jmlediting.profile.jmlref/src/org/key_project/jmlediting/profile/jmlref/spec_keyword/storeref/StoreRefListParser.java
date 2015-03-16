@@ -9,8 +9,9 @@ import java.util.Set;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
+import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.SpecExpressionParser;
 
 /**
@@ -50,11 +51,11 @@ public class StoreRefListParser implements ParseFunction {
     * @param allowInformalDescription
     *           whether informal descriptions are allows
     */
-   public StoreRefListParser(final IJMLProfile profile,
+   public StoreRefListParser(final IJMLExpressionProfile profile,
          final boolean allowInformalDescription) {
       // Determine keywords which are allowed as storage location keywords
-      final Set<IStoreRefKeyword> storeRefKeywords = JMLProfileHelper
-            .filterKeywords(profile, IStoreRefKeyword.class);
+      final Set<IKeyword> storeRefKeywords = JMLProfileHelper.filterKeywords(
+            profile, StoreRefKeywordSort.INSTANCE);
 
       // The list if filled by the constructor because the content is profile
       // sensitive

@@ -86,7 +86,6 @@ public class JMLStoreRefProposer {
          this.cu = (CompilationUnit) context.getCompilationUnit();
       }
       else {
-         // TODO make eclipse explode
          this.cu = null;
       }
    }
@@ -132,9 +131,6 @@ public class JMLStoreRefProposer {
       // compute all TypeBinding needed to resolve visibility of variables
       final ITypeBinding activeType = activeTypeDecl.resolveBinding();
       this.declaringType = topDecl.resolveBinding();
-      System.out.println("declaring: " + this.declaringType.getName());
-      System.out.println("active: " + activeType.getName());
-      System.out.println("activeIsNested?" + activeType.isNested());
       final IASTNode node;
       final List<IASTNode> restNodes;
       final boolean allowKeywords;
@@ -146,7 +142,6 @@ public class JMLStoreRefProposer {
          restNodes = Collections.<IASTNode> emptyList();
       }
       else {
-         System.out.println("expr: " + expr.prettyPrintAST());
          node = expr.getChildren().get(0);
          restNodes = expr.getChildren().get(1).getChildren();
       }
@@ -161,22 +156,17 @@ public class JMLStoreRefProposer {
          }
          final int commentBeginOffset = ((Comment) ast.getCommentList().get(
                firstLeadingComment)).getStartPosition();
-         System.out.println("putting: " + commentBeginOffset);
          this.parameterMap.put(commentBeginOffset, decl);
-         // this.parameterList.add(new MethodParameter(decl.getStartPosition(),
-         // decl.parameters()));
       }
 
       // compute the prefix the AutoCompletion has to handle
       final String prefix = JMLCompletionUtil.computePrefix(this.context, node);
 
-      // TODO check for ArrayIndices
-      System.out.println("allowKeywords == " + allowKeywords);
       // propose StoreRef specific keywords, when called at the beginning.
       if (allowKeywords) {
          result.addAll(JMLCompletionUtil.getKeywordProposals(this.context,
                prefix, JMLCompletionProposalComputer.getJMLImg(),
-               IStoreRefKeyword.class));
+               StoreRefKeywordSort.INSTANCE));
       }
 
       // propose all (visible)fields
@@ -189,7 +179,7 @@ public class JMLStoreRefProposer {
          result.addAll(this.proposeMethodParameters(prefix));
       }
 
-      // TODO atm not implemented, but here API statements get resolved and
+      // atm not implemented, but here API statements get resolved and
       // fields from them get proposed
       result.addAll(this.proposeStoreRefApiVariables(node, restNodes));
 
@@ -224,7 +214,6 @@ public class JMLStoreRefProposer {
          final int replacementOffset = this.context.getInvocationOffset()
                - prefix.length();
          final int prefixLength = prefix.length();
-         System.out.println("Prefix: " + prefix);
          // check all VariableDeclarations to match the prefix
          for (final SingleVariableDeclaration param : methodParams) {
             final IVariableBinding varBind = param.resolveBinding();
@@ -237,7 +226,6 @@ public class JMLStoreRefProposer {
                result.add(new CompletionProposal(replacementString,
                      replacementOffset, prefixLength, cursorPosition, image,
                      replacementString, null, null));
-               System.out.println("added: " + replacementString);
             }
          }
       }
@@ -245,53 +233,33 @@ public class JMLStoreRefProposer {
       return result;
    }
 
+   /**
+    * helper method to get the MethodDeclaration for the JML-Comment the
+    * AutoCompletion is called in.
+    *
+    * @return the corresponding MethodDeclaration according to InvocationOffset
+    */
    private MethodDeclaration getMethodDeclaration() {
       final int offset = this.context.getInvocationOffset();
 
-      final CommentLocator locator = new CommentLocator(
-            this.context.getDocument());
+      final CommentLocator locator = new CommentLocator(this.context
+            .getDocument().get());
 
       final CommentRange range = locator.getJMLComment(offset);
       System.out.println("commentRange: " + range.getBeginOffset() + "-"
             + range.getEndOffset());
 
       return this.parameterMap.get(range.getBeginOffset());
-
-      // search for the Methodparameters
-      // for (final MethodParameter methodParams : this.parameterList) {
-      // // continue if comment is after the method -> no checking needed
-      // if (range.getEndOffset() > methodParams.getStartOffset()) {
-      // System.out.println("outOfRange: " + methodParams.getStartOffset());
-      // continue;
-      // }
-      // boolean setResult = true;
-      // // check all following characters to be either whitespace or eol, or to
-      // // be in comment. Else the JMLComment does not belong to this method
-      // for (int i = range.getEndOffset(); i < methodParams.getStartOffset() -
-      // 1; i++) {
-      // final char toBeChecked = content.charAt(i);
-      // System.out.println("checking chat at " + i + ": \'" + toBeChecked
-      // + "\'");
-      // if (toBeChecked == ' ' || toBeChecked == '\n'
-      // || toBeChecked == '\r') {
-      // System.out.println("\twhitespace/eol");
-      // continue;
-      // }
-      // else if (locator.getCommentOfOffset(i) != null) {
-      // System.out.println("\tinComment");
-      // continue;
-      // }
-      // System.out.println("noAddParams...");
-      // setResult = false;
-      // break;
-      // }
-      // if (setResult) {
-      // System.out.println("---setting methodParam");
-      // result = methodParams;
-      // }
-      // }
    }
 
+   /**
+    * helper Method to resolve the type of a Method Parameter to propose further
+    * variables.
+    *
+    * @param fieldName
+    *           the name of the variable
+    * @return the ITypeBinding for the corresponding variable-type
+    */
    private ITypeBinding getMethodParameterTypeForName(final String fieldName) {
       final MethodDeclaration method = this.getMethodDeclaration();
       if (method == null) {
@@ -312,6 +280,25 @@ public class JMLStoreRefProposer {
       return null;
    }
 
+   /**
+    * (may be extracted some time). Propose all visible Variables for StoreRef
+    * AutoCompletion
+    *
+    *
+    * @param activeType
+    *           the ITypeBinding to look in
+    * @param node
+    *           the parsed JML
+    * @param restNodes
+    *           the JML following the current Type
+    * @param allowAsteric
+    *           whether to allow the asteric as a proposal
+    * @param allowKeywords
+    *           whether to allow keywords as a proposal
+    * @param withProtectedOrInline
+    *           propose protected or inline variables
+    * @return the list of variables to propose;
+    */
    private List<ICompletionProposal> proposeStoreRefVariables(
          final ITypeBinding activeType, final IASTNode node,
          final List<IASTNode> restNodes, final boolean allowAsteric,
@@ -416,11 +403,29 @@ public class JMLStoreRefProposer {
       }
    }
 
+   /**
+    * not implemented yet.
+    *
+    * @param node
+    *           current parsed JML
+    * @param restNodes
+    *           following JML
+    * @return proposals for API-Variables
+    */
    private Collection<ICompletionProposal> proposeStoreRefApiVariables(
          final IASTNode node, final List<IASTNode> restNodes) {
       return Collections.emptyList();
    }
 
+   /**
+    * check whether a final variable is visible to propose
+    *
+    * @param varBind
+    *           the variable to check visibility for
+    * @param method
+    *           the
+    * @return
+    */
    private boolean checkFinalVisible(final IVariableBinding varBind,
          final MethodDeclaration method) {
       return (varBind.getModifiers() & Modifier.FINAL) == 0

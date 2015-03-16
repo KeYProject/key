@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
-import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 
@@ -14,10 +13,12 @@ import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordCo
  * An implementation of {@link IEditableDerivedProfile}.
  *
  * @author Moritz Lichter
+ * @param <P>
+ *           the type of the parent profile profile
  *
  */
-public class DerivedProfile extends AbstractJMLProfile implements
-      IDerivedProfile, IEditableDerivedProfile {
+public abstract class DerivedProfile<P extends IJMLProfile> extends
+      AbstractJMLProfile implements IDerivedProfile, IEditableDerivedProfile {
 
    /**
     * The name of the profile.
@@ -31,7 +32,7 @@ public class DerivedProfile extends AbstractJMLProfile implements
    /**
     * The constant parent profile of this profile.
     */
-   private final IJMLProfile parentProfile;
+   private final P parentProfile;
 
    /**
     * A set holding all keywords of the parent which are disabled.
@@ -59,8 +60,8 @@ public class DerivedProfile extends AbstractJMLProfile implements
     * @param parentProfile
     *           the parent profile, not allowed to be null
     */
-   public DerivedProfile(final String name, final String identifier,
-         final IJMLProfile parentProfile) {
+   public DerivedProfile(final String identifier, final String name,
+         final P parentProfile) {
       super();
       if (identifier == null) {
          throw new IllegalArgumentException(
@@ -179,7 +180,7 @@ public class DerivedProfile extends AbstractJMLProfile implements
    }
 
    @Override
-   public IJMLProfile getParentProfile() {
+   public P getParentProfile() {
       return this.parentProfile;
    }
 
@@ -198,28 +199,14 @@ public class DerivedProfile extends AbstractJMLProfile implements
    }
 
    @Override
-   public <T> Set<T> getExtensions(final Object key, final Class<T> clazz) {
-      // Because the derived profile does not define extensions, return the
-      // extensions of the parent
-      return this.parentProfile.getExtensions(key, clazz);
-   }
-
-   @Override
-   protected <T> void putExtension(final Object key, final T newValue,
-         final Class<T> clazz) {
-      throw new UnsupportedOperationException(
-            "A derived profile is not allowed to define extensions");
-   }
-
-   @Override
-   public Set<IJMLPrimary> getSupportedPrimaries() {
-      // Derived profiles cannot define new primaries
-      return this.parentProfile.getSupportedPrimaries();
-   }
-
-   @Override
    public Set<IUserDefinedKeywordContentDescription> getSupportedContentDescriptions() {
       return this.parentProfile.getSupportedContentDescriptions();
+   }
+
+   @Override
+   public IEditableDerivedProfile derive(final String id, final String name) {
+      throw new UnsupportedOperationException(
+            "Cannot derive from a derived profile");
    }
 
 }

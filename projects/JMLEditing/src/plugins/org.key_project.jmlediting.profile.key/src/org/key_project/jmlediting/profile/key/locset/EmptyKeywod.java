@@ -1,8 +1,10 @@
 package org.key_project.jmlediting.profile.key.locset;
 
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.profile.jmlref.primary.JMLPrimaryKeywordSort;
 
-public class EmptyKeywod extends AbstractEmptyKeyword implements ILocSetKeyword {
+public class EmptyKeywod extends AbstractEmptyKeyword {
 
    public EmptyKeywod() {
       super("\\empty");
@@ -10,8 +12,12 @@ public class EmptyKeywod extends AbstractEmptyKeyword implements ILocSetKeyword 
 
    @Override
    public String getDescription() {
-      // TODO Auto-generated method stub
       return null;
+   }
+
+   @Override
+   public IKeywortSort getSort() {
+      return JMLPrimaryKeywordSort.INSTANCE;
    }
 
 }

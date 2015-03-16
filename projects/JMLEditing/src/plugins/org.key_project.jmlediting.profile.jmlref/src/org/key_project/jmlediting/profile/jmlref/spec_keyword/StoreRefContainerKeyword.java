@@ -2,7 +2,7 @@ package org.key_project.jmlediting.profile.jmlref.spec_keyword;
 
 import org.key_project.jmlediting.core.profile.syntax.IKeywordAutoProposer;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefKeywordContentParser;
+import org.key_project.jmlediting.profile.jmlref.parser.StoreRefKeywordContentParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefKeywordProposer;
 
 /**

@@ -7,6 +7,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordAutoProposer;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.core.profile.syntax.ParseFunctionKeywordParser;
 
 /**
@@ -29,7 +30,8 @@ public class UserDefinedKeyword extends AbstractKeyword implements
    /**
     * The closing character.
     */
-   private final char closingCharacter;
+   private final Character closingCharacter;
+   private final IKeywortSort sort;
 
    /**
     * Creates a new {@link UserDefinedKeyword}.
@@ -44,6 +46,7 @@ public class UserDefinedKeyword extends AbstractKeyword implements
     *           the closing character for this keyword, may be null
     */
    public UserDefinedKeyword(final Set<String> keywords,
+         final IKeywortSort sort,
          final IUserDefinedKeywordContentDescription contentDescription,
          final String description, final Character closingCharacter) {
       super(keywords);
@@ -55,9 +58,14 @@ public class UserDefinedKeyword extends AbstractKeyword implements
          throw new IllegalArgumentException(
                "Description is not allowed to be null");
       }
+      if (sort == null) {
+         throw new IllegalArgumentException(
+               "The sort is not allowed to be null");
+      }
       this.contentDescription = contentDescription;
       this.description = description;
       this.closingCharacter = closingCharacter;
+      this.sort = sort;
    }
 
    @Override
@@ -68,7 +76,7 @@ public class UserDefinedKeyword extends AbstractKeyword implements
    @Override
    public IKeywordParser createParser() {
       // Get the parse function from the content description.
-      return new ParseFunctionKeywordParser() {
+      return new ParseFunctionKeywordParser<IJMLProfile>(IJMLProfile.class) {
 
          @Override
          protected ParseFunction createParseFunction(final IJMLProfile profile) {
@@ -92,6 +100,11 @@ public class UserDefinedKeyword extends AbstractKeyword implements
    @Override
    public Character getClosingCharacter() {
       return this.closingCharacter;
+   }
+
+   @Override
+   public IKeywortSort getSort() {
+      return this.sort;
    }
 
 }

@@ -1,46 +1,59 @@
 package org.key_project.jmlediting.profile.key;
 
-import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
-
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParseFunction;
-import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
 import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
+import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.EverythingKeyword;
+import org.key_project.jmlediting.profile.key.behavior.BreakBehaviorKeyword;
+import org.key_project.jmlediting.profile.key.behavior.ContinueBehaviorKeyword;
+import org.key_project.jmlediting.profile.key.behavior.ReturnBehaviorKeyword;
+import org.key_project.jmlediting.profile.key.locset.AllFieldsKeyword;
+import org.key_project.jmlediting.profile.key.locset.DisjointKeyword;
 import org.key_project.jmlediting.profile.key.locset.EmptyKeywod;
 import org.key_project.jmlediting.profile.key.locset.InfiniteUnionKeyword;
 import org.key_project.jmlediting.profile.key.locset.IntersetOperatorKeyword;
 import org.key_project.jmlediting.profile.key.locset.LocSetEverythingKeyword;
 import org.key_project.jmlediting.profile.key.locset.LocSetKeyword;
-import org.key_project.jmlediting.profile.key.locset.ReachLocsParser;
+import org.key_project.jmlediting.profile.key.locset.LocSetSuffix;
+import org.key_project.jmlediting.profile.key.locset.ReachLocsKeyword;
 import org.key_project.jmlediting.profile.key.locset.SetMinusOperatorKeyword;
 import org.key_project.jmlediting.profile.key.locset.SetUnionOperatorKeyword;
+import org.key_project.jmlediting.profile.key.locset.SubsetKeyword;
 import org.key_project.jmlediting.profile.key.other.DynamicLogicPrimary;
+import org.key_project.jmlediting.profile.key.other.IndexKeyword;
 import org.key_project.jmlediting.profile.key.other.InvKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAccessibleKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAssignableKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyPureKeyword;
+import org.key_project.jmlediting.profile.key.seq.ContainsKeyword;
+import org.key_project.jmlediting.profile.key.seq.IndexOfKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqConcatKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqDefKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqEmptyKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqExpressionParser;
 import org.key_project.jmlediting.profile.key.seq.SeqKeyword;
+import org.key_project.jmlediting.profile.key.seq.SeqLengthKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqPrimary;
 import org.key_project.jmlediting.profile.key.seq.SeqSingletonKeyword;
+import org.key_project.jmlediting.profile.key.seq.SeqSubKeyword;
+import org.key_project.jmlediting.profile.key.seq.SingletonKeyword;
 import org.key_project.jmlediting.profile.key.seq.ValuesKeyword;
 
 public class KeyProfile extends JMLReferenceProfile {
+
+   private final Set<ParseFunction> additionalPrimarySuffixes;
 
    public KeyProfile() {
       super(KeywordLocale.AMERICAN);
@@ -49,6 +62,8 @@ public class KeyProfile extends JMLReferenceProfile {
             .getSupportedKeywordsInternal();
       final Set<IJMLPrimary> supportedPrimaries = this
             .getSupportedPrimariesInternal();
+      this.additionalPrimarySuffixes = new HashSet<ParseFunction>(
+            super.getPrimarySuffixExtensions());
 
       // Add strictly keywords
       supportedKeywords.add(new StrictlyPureKeyword());
@@ -59,29 +74,40 @@ public class KeyProfile extends JMLReferenceProfile {
       replace(supportedKeywords, AccessibleKeyword.class,
             new KeyAccessibleKeyword());
 
+      // Key specific behaviors
+      supportedKeywords.addAll(Arrays.asList(new BreakBehaviorKeyword(),
+            new ContinueBehaviorKeyword(), new ReturnBehaviorKeyword()));
+
       supportedKeywords.add(new InvKeyword());
       supportedPrimaries.add(new DynamicLogicPrimary());
 
       // Support for LocSetExpressions
-      replace(supportedKeywords, EverythingKeyword.class,
-            new LocSetEverythingKeyword());
-      supportedKeywords.addAll(Arrays.asList(new EmptyKeywod(),
-            new InfiniteUnionKeyword(), new IntersetOperatorKeyword(),
-            new ReachLocsParser(), new SetMinusOperatorKeyword(),
-            new SetUnionOperatorKeyword(), new LocSetKeyword()));
+      // Add everything for a different sort
+      supportedKeywords.add(new LocSetEverythingKeyword());
+      // All other keywords
+      supportedKeywords
+            .addAll(Arrays.asList(new EmptyKeywod(),
+                  new InfiniteUnionKeyword(), new IntersetOperatorKeyword(),
+                  new ReachLocsKeyword(), new SetMinusOperatorKeyword(),
+                  new SetUnionOperatorKeyword(), new LocSetKeyword(),
+                  new AllFieldsKeyword(), new DisjointKeyword(),
+                  new SubsetKeyword()));
+      this.additionalPrimarySuffixes.add(LocSetSuffix.locSetSuffixes());
 
       // Allows \inv as access on a not toplevel object just as for x[3].\inv
-      this.putExtension(ExpressionParser.ADDITIONAL_PRIMARY_SUFFIXES,
-            separateBy('.', keywords(InvKeyword.class, this)),
-            ParseFunction.class);
+      this.additionalPrimarySuffixes.add(InvKeyword.invSuffix(this));
 
       // Support for seq expression
       supportedKeywords.addAll(Arrays.asList(new SeqKeyword(),
             new SeqConcatKeyword(), new SeqDefKeyword(), new SeqEmptyKeyword(),
-            new SeqSingletonKeyword(), new ValuesKeyword()));
+            new SeqSingletonKeyword(), new ValuesKeyword(),
+            new ContainsKeyword(), new IndexOfKeyword(), new SeqSubKeyword(),
+            new SeqLengthKeyword(), new SingletonKeyword()));
       supportedPrimaries.add(new SeqPrimary());
-      this.putExtension(ExpressionParser.CONDITONAL_EXPR_SUFFIXES,
-            SeqExpressionParser.seqExpressionSuffix(this), ParseFunction.class);
+      this.additionalPrimarySuffixes.add(SeqExpressionParser.seqSuffix(this));
+
+      // Other keywords
+      supportedKeywords.addAll(Arrays.asList(new IndexKeyword()));
    }
 
    private static void replace(final Set<IKeyword> keywords,
@@ -110,6 +136,11 @@ public class KeyProfile extends JMLReferenceProfile {
    @Override
    public IJMLParser createParser() {
       return new DefaultJMLParser(this);
+   }
+
+   @Override
+   public Set<ParseFunction> getPrimarySuffixExtensions() {
+      return Collections.unmodifiableSet(this.additionalPrimarySuffixes);
    }
 
 }

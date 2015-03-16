@@ -12,10 +12,26 @@ import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordAutoProposer;
 
+/**
+ * This class provides AutoProposals for StoreRefKeywords (like assignable and
+ * accessible).
+ *
+ * @author Thomas Glaser
+ *
+ */
 public class StoreRefKeywordProposer implements IKeywordAutoProposer {
 
+   /**
+    * defines, whether to propose final variables or not.
+    */
    private final boolean proposeFinal;
 
+   /**
+    * standard and only constructor.
+    *
+    * @param proposeFinal
+    *           whether to propose final variables or not
+    */
    public StoreRefKeywordProposer(final boolean proposeFinal) {
       super();
       this.proposeFinal = proposeFinal;
@@ -53,13 +69,12 @@ public class StoreRefKeywordProposer implements IKeywordAutoProposer {
          }
       }
 
-      // TODO NodeTypes.LIST?
+      // if we have a storeRef Expression, propose something
       if (content.getType() == StoreRefNodeTypes.STORE_REF_LIST) {
          final IASTNode exprInOffset = Nodes.selectChildWithPosition(content
                .getChildren().get(0), context.getInvocationOffset() - 1);
          final boolean hasExpr = content.traverse(
                new INodeTraverser<Boolean>() {
-
                   @Override
                   public Boolean traverse(final IASTNode node,
                         final Boolean existing) {
@@ -78,20 +93,21 @@ public class StoreRefKeywordProposer implements IKeywordAutoProposer {
          result.addAll(new JMLStoreRefProposer(context, this.proposeFinal)
                .propose(exprInOffset, hasExpr));
       }
-      else if (content.getType() == NodeTypes.KEYWORD) {
-         // TODO
-         System.out.println("fertig..." + content);
-      }
-      else if (content.getType() == NodeTypes.ERROR_NODE) {
-         // TODO
-         System.out.println("error");
-      }
-      else {
-         System.out.println("nothing... ");
-      }
       return result;
    }
 
+   /**
+    * if we want to propose something right after the closing ; we want to
+    * propose TopLevelKeywords. this methods checks where the autoCompletion is
+    * called.
+    *
+    * @param node
+    *           the parsed JML
+    * @param context
+    *           the InvocationContext
+    * @return true, if the autoCompletion is called after the closing ;, false
+    *         if not.
+    */
    private boolean isOffsetAfterSemicolon(final IASTNode node,
          final JavaContentAssistInvocationContext context) {
       // Check whether offset is after a closing semicolon

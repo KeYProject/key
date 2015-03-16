@@ -6,7 +6,7 @@ package org.key_project.jmlediting.profile.jmlref.visibility;
  * @author Moritz Lichter
  *
  */
-public class PrivateKeyword extends JavaVisiblityKeyword {
+public class PrivateKeyword extends JavaModifierKeyword {
 
    /**
     * Creates a new private keyword instance.

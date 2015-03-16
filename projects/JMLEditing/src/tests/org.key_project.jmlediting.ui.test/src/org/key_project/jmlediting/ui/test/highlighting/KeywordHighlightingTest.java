@@ -102,9 +102,9 @@ public class KeywordHighlightingTest {
    public static void initProject() throws CoreException, InterruptedException {
       final UITestUtils.TestProject result = UITestUtils.createProjectWithFile(
             bot, PROJECT_NAME, PACKAGE_NAME, CLASS_NAME, SaveGuarantee.NO_SAVE);
-      result.restoreClassAndOpen();
       JMLPreferencesHelper.setProjectJMLProfile(result.getProject()
             .getProject(), UITestUtils.findReferenceProfile());
+      result.restoreClassAndOpen();
       editor = result.getOpenedEditor();
    }
 

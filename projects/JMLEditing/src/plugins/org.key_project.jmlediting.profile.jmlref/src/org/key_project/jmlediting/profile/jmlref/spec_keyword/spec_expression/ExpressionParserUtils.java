@@ -12,8 +12,8 @@ import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
+import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
 
 /**
  * This class contains some utility methods to parse expressions. The declared
@@ -317,7 +317,7 @@ public final class ExpressionParserUtils {
     * @return a {@link ParseFunction} parsing {@link IJMLPrimary}
     */
    public static ParseFunction primary(final Collection<IJMLPrimary> primaries,
-         final IJMLProfile profile) {
+         final IJMLExpressionProfile profile) {
       return new ParseFunction() {
 
          private final ParseFunction primary = alt(primaries

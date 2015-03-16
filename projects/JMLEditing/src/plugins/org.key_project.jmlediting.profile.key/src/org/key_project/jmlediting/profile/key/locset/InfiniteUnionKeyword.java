@@ -5,14 +5,15 @@ import static org.key_project.jmlediting.core.parser.util.JavaBasicsParser.ident
 
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.parser.ParseFunction;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
-import org.key_project.jmlediting.core.profile.syntax.ParseFunctionKeywordParser;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
+import org.key_project.jmlediting.profile.jmlref.parser.JMLRefParseFunctionKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.primary.JMLPrimaryKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
 
-public class InfiniteUnionKeyword extends AbstractKeyword implements
-      ILocSetKeyword {
+public class InfiniteUnionKeyword extends AbstractKeyword {
 
    public InfiniteUnionKeyword() {
       super("\\infinite_union");
@@ -20,26 +21,29 @@ public class InfiniteUnionKeyword extends AbstractKeyword implements
 
    @Override
    public String getDescription() {
-      // TODO Auto-generated method stub
       return null;
    }
 
    @Override
    public IKeywordParser createParser() {
-      return new ParseFunctionKeywordParser() {
+      return new JMLRefParseFunctionKeywordParser() {
 
          @Override
-         protected ParseFunction createParseFunction(final IJMLProfile profile) {
+         protected ParseFunction createParseFunction(
+               final IJMLExpressionProfile profile) {
             /**
-             * \infinite_union(⟨Type⟩ ⟨Id⟩; 􏰀(⟨BoolExpr⟩;)􏰁? ⟨LocSetExpr⟩)
+             * \infinite_union ( type id; [bool-expr ;] loc-set-expr)
              */
-            final LocSetExprListParser locSetExpr = new LocSetExprListParser(
-                  profile);
             final ExpressionParser expr = new ExpressionParser(profile);
             return brackets(seq(expr.typeSpec(), ident(), constant(";"),
-                  opt(closedBy(NodeTypes.NODE, expr, ';')), locSetExpr.elem()));
+                  opt(closedBy(NodeTypes.NODE, expr, ';')), expr));
          }
       };
+   }
+
+   @Override
+   public IKeywortSort getSort() {
+      return JMLPrimaryKeywordSort.INSTANCE;
    }
 
 }

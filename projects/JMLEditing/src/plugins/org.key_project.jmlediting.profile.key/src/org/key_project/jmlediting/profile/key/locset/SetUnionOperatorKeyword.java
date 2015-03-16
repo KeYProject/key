@@ -1,9 +1,7 @@
 package org.key_project.jmlediting.profile.key.locset;
 
-import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 
-public class SetUnionOperatorKeyword extends AbstractEmptyKeyword implements
-      ILocSetOperatorKeyword {
+public class SetUnionOperatorKeyword extends LocSetBinaryOperatorKeyword {
 
    public SetUnionOperatorKeyword() {
       super("\\set_union");

@@ -2,8 +2,8 @@ package org.key_project.jmlediting.profile.key.seq;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
+import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
 
 public class SeqPrimary implements IJMLPrimary {
 
@@ -16,7 +16,7 @@ public class SeqPrimary implements IJMLPrimary {
    }
 
    @Override
-   public void setProfile(final IJMLProfile profile) {
+   public void setProfile(final IJMLExpressionProfile profile) {
       this.seqExprParser = new SeqExpressionParser(profile);
    }
 }

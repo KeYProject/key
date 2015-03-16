@@ -3,6 +3,7 @@ package org.key_project.jmlediting.ui.test;
 import static org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses;
 import static org.eclipse.swtbot.swt.finder.waits.Conditions.waitForMenu;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -163,13 +164,14 @@ public class UITestUtils {
    }
 
    public static IJMLProfile findReferenceProfile() {
-      for (final IJMLProfile profile : JMLProfileManagement
+      for (final IJMLProfile profile : JMLProfileManagement.instance()
             .getAvailableProfiles()) {
          if (profile.getIdentifier().equals(
                "org.key_project.jmlediting.profile.jmlref")) {
             return profile;
          }
       }
+      fail("Reference Profile not found");
       return null;
    }
 

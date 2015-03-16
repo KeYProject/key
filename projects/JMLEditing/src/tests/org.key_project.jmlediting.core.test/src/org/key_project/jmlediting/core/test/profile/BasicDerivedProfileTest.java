@@ -3,7 +3,6 @@ package org.key_project.jmlediting.core.test.profile;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,9 +11,12 @@ import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
 import org.key_project.jmlediting.core.profile.DerivedProfile;
+import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 
 public class BasicDerivedProfileTest {
 
@@ -32,6 +34,11 @@ public class BasicDerivedProfileTest {
       @Override
       public String toString() {
          return this.getKeywords().iterator().next();
+      }
+
+      @Override
+      public IKeywortSort getSort() {
+         return ToplevelKeywordSort.INSTANCE;
       }
 
    }
@@ -68,28 +75,17 @@ public class BasicDerivedProfileTest {
          return new DefaultJMLParser(this);
       }
 
-      public void putExtension() {
-         this.putExtension(key, baseValue, Object.class);
-      }
-
-   }
-
-   private static final class TestDerivedProfile extends DerivedProfile {
-
-      public TestDerivedProfile(final String name, final String identifier,
-            final IJMLProfile parentProfile) {
-         super(name, identifier, parentProfile);
-      }
-
-      public void putExtension() {
-         this.putExtension(key, derivedValue, Object.class);
+      @Override
+      public IEditableDerivedProfile derive(final String id, final String name) {
+         return new DerivedProfile<IJMLProfile>(id, name, this) {
+         };
       }
 
    }
 
    private final BaseProfile parentProfile = new BaseProfile();
-   private final TestDerivedProfile derivedProfile = new TestDerivedProfile(
-         "Derived", this.getClass().getName(), this.parentProfile);
+   private final IEditableDerivedProfile derivedProfile = this.parentProfile
+         .derive(this.getClass().getName(), "Derived");
 
    @Test
    public void testCorrectParentProfile() {
@@ -124,13 +120,6 @@ public class BasicDerivedProfileTest {
             "Unconfigured Derived profile does support the same keywords as parent",
             this.parentProfile.getSupportedKeywords(),
             this.derivedProfile.getSupportedKeywords());
-   }
-
-   @Test
-   public void testDerivedProfilesSupportsParentPrimaries() {
-      assertEquals("Derived profile does not support primaries of parent",
-            this.parentProfile.getSupportedPrimaries(),
-            this.derivedProfile.getSupportedPrimaries());
    }
 
    @Test
@@ -211,24 +200,6 @@ public class BasicDerivedProfileTest {
       assertEquals("Third supported keywords wrong", expected, supported3);
    }
 
-   @Test
-   public void testExtensions() {
-      assertEquals("Test no extensions", Collections.emptySet(),
-            this.derivedProfile.getExtensions(key, Object.class));
-   }
-
-   @Test
-   public void testOnlyParentExtensions() {
-      this.parentProfile.putExtension();
-      assertEquals("No extension of parent", set(baseValue),
-            this.derivedProfile.getExtensions(key, Object.class));
-   }
-
-   @Test(expected = UnsupportedOperationException.class)
-   public void testDerivedProfileNoExtensions() {
-      this.derivedProfile.putExtension();
-   }
-
    @Test(expected = IllegalArgumentException.class)
    public void testAddNullKeyword() {
       this.derivedProfile.addKeyword(null);
@@ -261,17 +232,19 @@ public class BasicDerivedProfileTest {
 
    @Test(expected = IllegalArgumentException.class)
    public void testInitializeWithoutParent() {
-      new DerivedProfile("a", "b", null);
+      new DerivedProfile<IJMLProfile>("a", "b", null) {
+      };
+      ;
    }
 
    @Test(expected = IllegalArgumentException.class)
    public void testInitializeWithoutName() {
-      new DerivedProfile(null, "a", this.parentProfile);
+      this.parentProfile.derive("a", null);
    }
 
    @Test(expected = IllegalArgumentException.class)
    public void testInitializeWithoutIdentifier() {
-      new DerivedProfile("a", null, this.parentProfile);
+      this.parentProfile.derive(null, "a");
    }
 
    private static <T> Set<T> set(final T... keywords) {

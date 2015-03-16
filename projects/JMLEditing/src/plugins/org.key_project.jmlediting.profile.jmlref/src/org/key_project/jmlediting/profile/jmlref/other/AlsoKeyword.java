@@ -1,7 +1,6 @@
 package org.key_project.jmlediting.profile.jmlref.other;
 
-import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
+import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyToplevelKeyword;
 
 /**
  * Specifies the also keyword.
@@ -9,8 +8,7 @@ import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
  * @author Moritz Lichter
  *
  */
-public class AlsoKeyword extends AbstractEmptyKeyword implements
-IToplevelKeyword {
+public class AlsoKeyword extends AbstractEmptyToplevelKeyword {
 
    /**
     * Creates a new instance for the also keyword.

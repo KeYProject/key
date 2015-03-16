@@ -8,12 +8,14 @@ import java.util.Set;
 import org.junit.Test;
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
+import org.key_project.jmlediting.core.profile.DerivedProfile;
+import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
-import org.key_project.jmlediting.core.profile.syntax.IJMLPrimary;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.core.validation.IJMLValidator;
+
 public class JMLProfileManagementTest {
 
    private static class DummyProfile implements IJMLProfile {
@@ -43,11 +45,6 @@ public class JMLProfileManagementTest {
       }
 
       @Override
-      public Set<IJMLPrimary> getSupportedPrimaries() {
-         return Collections.emptySet();
-      }
-
-      @Override
       public Set<IUserDefinedKeywordContentDescription> getSupportedContentDescriptions() {
          return Collections.emptySet();
       }
@@ -58,14 +55,15 @@ public class JMLProfileManagementTest {
       }
 
       @Override
-      public <T> Set<T> getExtensions(final Object key, final Class<T> clazz) {
+      public Set<IJMLValidator> getValidators() {
+         // TODO Auto-generated method stub
          return Collections.emptySet();
       }
 
       @Override
-      public Set<IJMLValidator> getValidators() {
-         // TODO Auto-generated method stub
-         return Collections.emptySet();
+      public IEditableDerivedProfile derive(final String id, final String name) {
+         return new DerivedProfile<IJMLProfile>(id, name, this) {
+         };
       }
 
    }
@@ -87,9 +85,9 @@ public class JMLProfileManagementTest {
    }
 
    @Test
-   public void test() {
+   public void testLoadProfiles() {
       final Set<IJMLProfile> availablesProfiles = JMLProfileManagement
-            .getAvailableProfiles();
+            .instance().getAvailableProfiles();
       assertTrue(
             "Found no available profiles " + availablesProfiles.getClass(),
             !availablesProfiles.isEmpty());

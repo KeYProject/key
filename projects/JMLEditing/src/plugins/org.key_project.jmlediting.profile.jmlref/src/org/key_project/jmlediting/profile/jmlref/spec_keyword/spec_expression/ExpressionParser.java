@@ -11,8 +11,8 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.IRecursiveParseFunction;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.profile.jmlref.type.ITypeKeyword;
+import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
+import org.key_project.jmlediting.profile.jmlref.type.TypeKeywordSort;
 
 /**
  * The Expression Parser parses expressions as defined in the JML Reference
@@ -26,9 +26,6 @@ import org.key_project.jmlediting.profile.jmlref.type.ITypeKeyword;
  *
  */
 public class ExpressionParser implements ParseFunction {
-
-   public static final Object ADDITIONAL_PRIMARY_SUFFIXES = new Object();
-   public static final Object CONDITONAL_EXPR_SUFFIXES = new Object();
 
    /**
     * The main parser which is used to parse text.
@@ -45,8 +42,11 @@ public class ExpressionParser implements ParseFunction {
     * The parser for typeSpec.
     */
    private final ParseFunction typeSpecParser;
+   private final ParseFunction referenceType;
 
    private final ParseFunction assignmentExprParser;
+   private final ParseFunction exprListParser;
+   private final ParseFunction equivalenceExpr;
 
    /**
     * Returns the parser which parses array dimension declaration.
@@ -66,8 +66,25 @@ public class ExpressionParser implements ParseFunction {
       return this.typeSpecParser;
    }
 
+   /**
+    * Returns the parser which parses reference types.
+    *
+    * @return
+    */
+   public ParseFunction referenceType() {
+      return this.referenceType;
+   }
+
    public ParseFunction assignmentExpr() {
       return this.assignmentExprParser;
+   }
+
+   public ParseFunction exprList() {
+      return this.exprListParser;
+   }
+
+   public ParseFunction equivalenceExpr() {
+      return this.equivalenceExpr;
    }
 
    @Override
@@ -84,7 +101,7 @@ public class ExpressionParser implements ParseFunction {
     * @param profile
     *           the profile to parse according to
     */
-   public ExpressionParser(final IJMLProfile profile) {
+   public ExpressionParser(final IJMLExpressionProfile profile) {
 
       // Initially create some parse function which refer recursively to
       // themselves
@@ -101,7 +118,7 @@ public class ExpressionParser implements ParseFunction {
       final IRecursiveParseFunction unaryExpr = recursiveInit();
       final IRecursiveParseFunction expressionList = recursiveInit();
       final IRecursiveParseFunction arrayInitializer = recursiveInit();
-      final IRecursiveParseFunction conditionalOrigExpr = recursiveInit();
+      final IRecursiveParseFunction conditionalExpr = recursiveInit();
       final IRecursiveParseFunction assignmentExpr = recursiveInit();
       final IRecursiveParseFunction impliesNonBackwardExpr = recursiveInit();
       final IRecursiveParseFunction referenceType = recursiveInit();
@@ -167,8 +184,9 @@ public class ExpressionParser implements ParseFunction {
       /**
        * type ::= reference-type | built-in-type
        */
-      final ParseFunction type = alt(keywords(ITypeKeyword.class, profile),
-            referenceType, builtInType);
+      final ParseFunction type = alt(
+            keywords(TypeKeywordSort.INSTANCE, profile), referenceType,
+            builtInType);
       /**
        * type-spec ::= [ ownership-modifiers ] type [ dims ]<br>
        * | \TYPE [ dims ]
@@ -216,8 +234,8 @@ public class ExpressionParser implements ParseFunction {
        * | `[' expression `]'<br>
        * | [ `[' `]' ] ... . class
        */
-      final Set<ParseFunction> additionalSuffixes = profile.getExtensions(
-            ADDITIONAL_PRIMARY_SUFFIXES, ParseFunction.class);
+      final Set<ParseFunction> additionalSuffixes = profile
+            .getPrimarySuffixExtensions();
       final ParseFunction primarySuffix = alt(appendFirsts(
             additionalSuffixes,
             seq(MEMBER_ACCESS, constant("."),
@@ -388,33 +406,14 @@ public class ExpressionParser implements ParseFunction {
             equivalenceOp, impliesExpr);
 
       /**
-       * conditional-expr-orig ::= equivalence-expr <br>
-       * [ ? conditional-expr-orig : conditional-expr-orig ]
+       * conditional-expr ::= equivalence-expr-ext <br>
+       * [ ? conditional-expr : conditional-expr]
        */
-      conditionalOrigExpr.defineAs(repackListOp(
+      conditionalExpr.defineAs(repackListOp(
             CONDITIONAL_OP,
             seq(equivalenceExpr,
-                  unpackOptional(opt(seq(constant("?"), conditionalOrigExpr,
-                        constant(":"), conditionalOrigExpr))))));
-      // The following is to support extensions which append something to
-      // expression
-      /**
-       * conditional-expr ::= conditional-expr-orig [conditional-expr-suffix]
-       */
-      final Set<ParseFunction> conditionalExprSuffixes = profile.getExtensions(
-            CONDITONAL_EXPR_SUFFIXES, ParseFunction.class);
-
-      final ParseFunction conditionalExprSuffix;
-      // alt requires at least one argument -> check whether there is something
-      if (conditionalExprSuffixes.isEmpty()) {
-         conditionalExprSuffix = fail();
-      }
-      else {
-         conditionalExprSuffix = alt(conditionalExprSuffixes
-               .toArray(new ParseFunction[0]));
-      }
-      final ParseFunction conditionalExpr = seq(conditionalOrigExpr,
-            opt(conditionalExprSuffix));
+                  unpackOptional(opt(seq(constant("?"), conditionalExpr,
+                        constant(":"), conditionalExpr))))));
 
       /**
        * assignment-op ::= = | += | -= | *= | /= | %= | >>= | >>>= | <<= | &= |
@@ -444,5 +443,8 @@ public class ExpressionParser implements ParseFunction {
       this.dimsParser = dims;
       this.typeSpecParser = typeSpec;
       this.assignmentExprParser = assignmentExpr;
+      this.referenceType = referenceType;
+      this.exprListParser = expressionList;
+      this.equivalenceExpr = equivalenceExpr;
    }
 }

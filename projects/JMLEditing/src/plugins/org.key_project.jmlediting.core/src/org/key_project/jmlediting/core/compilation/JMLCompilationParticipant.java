@@ -12,6 +12,7 @@ import org.eclipse.jdt.core.compiler.CategorizedProblem;
 import org.eclipse.jdt.core.compiler.CompilationParticipant;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.compiler.ReconcileContext;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 import org.eclipse.jdt.internal.compiler.problem.ProblemSeverities;
@@ -24,6 +25,7 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLValidationError;
+import org.key_project.jmlediting.core.validation.CommentVisitor;
 import org.key_project.jmlediting.core.validation.JMLValidationContext;
 import org.key_project.jmlediting.core.validation.JMLValidationEngine;
 import org.key_project.util.eclipse.Logger;
@@ -137,12 +139,15 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                source, jmlComments, ast, jmlParser);
          final JMLValidationEngine engine = new JMLValidationEngine(
                JMLPreferencesHelper
-               .getProjectActiveJMLProfile(res.getProject()),
+                     .getProjectActiveJMLProfile(res.getProject()),
                jmlContext);
          // End of Preparation
          final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
          for (final CommentRange jmlComment : jmlComments) {
             try {
+               System.out.println(""
+                     + this.findCorrespondingNode(jmlComment.getBeginOffset(),
+                           jmlComment.getEndOffset(), ast));
                final IASTNode node = jmlParser.parse(source, jmlComment);
                errors.addAll(engine.validateComment(node));
                // Throw away the result, here only a parse exception is
@@ -156,5 +161,12 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          // TODO: Unify ErrorMarkerUpdater
          ValidationErrorMarkerUpdater.createErrorMarkers(res, source, errors);
       }
+   }
+
+   ASTNode findCorrespondingNode(final int offset, final int endOffset,
+         final ASTNode ast) {
+      final CommentVisitor visitor = new CommentVisitor(offset, endOffset);
+      ast.accept(visitor);
+      return visitor.getCorrespondingNode();
    }
 }

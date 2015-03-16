@@ -12,8 +12,13 @@ import org.junit.Test;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
+import org.key_project.jmlediting.core.parser.DefaultJMLParser;
+import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
+import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
+import org.key_project.jmlediting.core.profile.DerivedProfile;
+import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 
@@ -453,7 +458,30 @@ public class ParserBuilderTest {
 
    @Test(expected = IllegalArgumentException.class)
    public void testKeywordIllegal1() {
-      keywords((Iterable<IKeyword>) null, ProfileWrapper.testProfile);
+      keywords((Iterable<IKeyword>) null, new AbstractJMLProfile() {
+
+         @Override
+         public String getName() {
+            return "No keywords profile";
+         }
+
+         @Override
+         public String getIdentifier() {
+            return "no.keyword";
+         }
+
+         @Override
+         public IJMLParser createParser() {
+            return new DefaultJMLParser(this);
+         }
+
+         @Override
+         public IEditableDerivedProfile derive(final String id,
+               final String name) {
+            return new DerivedProfile<IJMLProfile>(id, name, this) {
+            };
+         }
+      });
    }
 
    @Test(expected = IllegalArgumentException.class)

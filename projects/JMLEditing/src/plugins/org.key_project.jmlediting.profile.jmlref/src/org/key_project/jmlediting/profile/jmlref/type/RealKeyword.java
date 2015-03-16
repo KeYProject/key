@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.type;
 
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 
 /**
  * Implementation of the real keyword.
@@ -8,7 +9,7 @@ import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
  * @author Moritz Lichter
  *
  */
-public class RealKeyword extends AbstractEmptyKeyword implements ITypeKeyword {
+public class RealKeyword extends AbstractEmptyKeyword {
 
    /**
     * No instance of real.
@@ -20,6 +21,11 @@ public class RealKeyword extends AbstractEmptyKeyword implements ITypeKeyword {
    @Override
    public String getDescription() {
       return "The type \real models arbitrary precision floating point numbers.";
+   }
+
+   @Override
+   public IKeywortSort getSort() {
+      return TypeKeywordSort.INSTANCE;
    }
 
 }
