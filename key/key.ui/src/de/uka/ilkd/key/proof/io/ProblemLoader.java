@@ -21,8 +21,10 @@ import javax.swing.SwingWorker;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.DefaultTaskFinishedInfo;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.proof.init.Profile;
 
 /**
@@ -85,7 +87,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
    private void fireTaskStarted() {
        if (ptl != null) {
-           ptl.taskStarted("Loading problem ...", 0);
+           ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Loading, "Loading problem ...", 0));
        }
    }
 

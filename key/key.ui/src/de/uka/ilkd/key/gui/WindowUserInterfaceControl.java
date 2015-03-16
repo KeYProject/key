@@ -54,6 +54,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -240,9 +241,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     }
 
     @Override
-    public void taskStarted(String message, int size) {
-        super.taskStarted(message, size);
-        mainWindow.setStatusLine(message, size);
+    public void taskStarted(TaskStartedInfo info) {
+        super.taskStarted(info);
+        mainWindow.setStatusLine(info.getMessage(), info.getSize());
     }
 
     @Override

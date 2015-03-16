@@ -19,11 +19,13 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -80,7 +82,7 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
         Proof selectedProof = selectedNode.proof();
         TaskFinishedInfo info =
                 ProofMacroFinishedInfo.getDefaultInfo(macro, selectedProof);
-        ptl.taskStarted(macro.getName(), 0);
+        ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
         try {
             synchronized(macro) {
                 info = macro.applyTo(mediator.getUI(), selectedNode, posInOcc, ptl);

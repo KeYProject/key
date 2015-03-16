@@ -4,9 +4,11 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 /**
@@ -63,7 +65,7 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
         while (getNumberSteps() > 0 && getCondition() && macro.canApplyTo(proof, goals, posInOcc)) {
             final ProverTaskListener pml =
                     new ProofMacroListener(this, listener);
-            pml.taskStarted(macro.getName(), 0);
+            pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
             synchronized(macro) {
                 // wait for macro to terminate
                 info = macro.applyTo(uic, proof, goals, posInOcc, pml);
@@ -80,7 +82,7 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
         if (steps > 0 && altMacro.canApplyTo(proof, goals, posInOcc)) {
             final ProverTaskListener pml =
                     new ProofMacroListener(this, listener);
-            pml.taskStarted(altMacro.getName(), 0);
+            pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, altMacro.getName(), 0));
             info = altMacro.applyTo(uic, proof, goals, posInOcc, pml);
             synchronized(altMacro) {
                 // wait for macro to terminate

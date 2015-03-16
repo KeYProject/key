@@ -22,6 +22,7 @@ import org.key_project.util.java.IOUtil;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.util.Debug;
@@ -124,7 +125,7 @@ public class AutoSaver implements ProverTaskListener {
     }
 
     @Override
-    public void taskStarted(String message, int size) {
+    public void taskStarted(TaskStartedInfo info) {
         // currently not used
     }
 

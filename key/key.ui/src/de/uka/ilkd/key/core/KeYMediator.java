@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.DefaultTaskFinishedInfo;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -45,6 +46,7 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
@@ -762,7 +764,7 @@ public class KeYMediator {
 
                         @Override
                         public void run() {
-                            ui.taskStarted("Rebuilding...", totalNumber);
+                            ui.taskStarted(new DefaultTaskStartedInfo(TaskKind.Other, "Rebuilding...", totalNumber));
                             ui.taskProgress(currentTacletNumber);
 
                          }
@@ -788,7 +790,7 @@ public class KeYMediator {
 
                         @Override
                         public void run() {
-                            ui.taskStarted("Cutting...", 0);
+                            ui.taskStarted(new DefaultTaskStartedInfo(TaskKind.Other, "Cutting...", 0));
                         }
                     });
 

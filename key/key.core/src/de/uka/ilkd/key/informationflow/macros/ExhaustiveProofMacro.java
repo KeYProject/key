@@ -28,10 +28,12 @@ import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.ProofMacroListener;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 
 /**
  * The abstract class ExhaustiveProofMacro can be used to create compound macros
@@ -134,7 +136,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
             if (applicableAt != null) {
                 final ProverTaskListener pml =
                         new ProofMacroListener(macro, listener);
-                pml.taskStarted(getName(), 0);
+                pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, getName(), 0));
                 synchronized(macro) {
                     // wait for macro to terminate
                     info = macro.applyTo(uic, proof, ImmutableSLList.<Goal>nil().prepend(goal),

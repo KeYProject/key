@@ -14,9 +14,11 @@ import de.uka.ilkd.key.informationflow.macros.StartSideProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -110,7 +112,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
           try {
               getMediator().stopInterface(true);
               getMediator().setInteractive(false);
-              ptl.taskStarted(macro.getName(), 0);
+              ptl.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
               synchronized(macro) {
                   // wait for macro to terminate
                   info = macro.applyTo(this, getMediator().getSelectedNode(), null, ptl);

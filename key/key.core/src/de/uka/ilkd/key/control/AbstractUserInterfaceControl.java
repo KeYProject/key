@@ -21,11 +21,11 @@ import java.util.logging.Logger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -80,13 +80,12 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
 
     /**
      * Fires the event {@link ProverTaskListener#taskStarted(String, int)} to all listener.
-     * @param message The message.
-     * @param size The amount of work.
+     * @param info the {@link TaskStartedInfo} containing general information about the task that is just about to start
      */
-    protected void fireTaskStarted(String message, int size) {
+    protected void fireTaskStarted(TaskStartedInfo info) {
        ProverTaskListener[] listener = proverTaskListener.toArray(new ProverTaskListener[proverTaskListener.size()]);
        for (ProverTaskListener l : listener) {
-          l.taskStarted(message, size);
+          l.taskStarted(info);
        }
     }
 
@@ -113,8 +112,8 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
     }
 
    @Override
-   public void taskStarted(String message, int size) {
-      fireTaskStarted(message, size);
+   public void taskStarted(TaskStartedInfo info) {
+      fireTaskStarted(info);
    }
 
    @Override
@@ -160,7 +159,7 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
        return numOfInvokedMacros != 0;
     }
 
-    protected void macroStarted(String message, int size) {
+    protected void macroStarted(TaskStartedInfo info) {
         numOfInvokedMacros++;
     }
 
@@ -176,10 +175,9 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
     private class ProofMacroListenerAdapter implements ProverTaskListener {
 
         @Override
-        public void taskStarted(String message, int size) {
-            if (!(ApplyStrategy.PROCESSING_STRATEGY.equals(message) ||
-                  "Loading problem ...".equals(message))) {//TODO: have a source object that make clear I am not a macro
-                macroStarted(message, size);
+        public void taskStarted(TaskStartedInfo info) {
+            if (TaskStartedInfo.TaskKind.Macro.equals(info.getKind())) {
+                macroStarted(info);
             }
         }
 

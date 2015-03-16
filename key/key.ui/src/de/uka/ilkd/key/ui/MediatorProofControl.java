@@ -25,7 +25,8 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
  * A {@link ProofControl} which performs the automode in a {@link SwingWorker}.
  * @author Martin Hentschel
  */
-// TODO: This class should not know/use the AbstractMediatorUserInterfaceControl and the KeYMediator. Refactor the implementation and use events to update the user interface.
+// TODO: This class should not know/use the AbstractMediatorUserInterfaceControl and the KeYMediator.
+// Refactor the implementation and use events to update the user interface.
 public class MediatorProofControl extends AbstractProofControl {
    private final AbstractMediatorUserInterfaceControl ui;
 

@@ -17,11 +17,14 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 
 /**
  * The interface ProofMacro is the entry point to a general strategy extension
@@ -228,10 +231,11 @@ public interface ProofMacro {
         }
 
         @Override
-        public void taskStarted(String message, int size) {
+        public void taskStarted(TaskStartedInfo info) {
             //assert size == numberSteps;
             String suffix = getMessageSuffix();
-            super.taskStarted(message + suffix, numberGoals * numberSteps);
+            super.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, 
+                  info.getMessage() + suffix, numberGoals * numberSteps));
             super.taskProgress(completedGoals * numberSteps);
         }
 

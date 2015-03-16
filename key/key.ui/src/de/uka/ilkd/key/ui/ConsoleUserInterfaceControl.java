@@ -32,6 +32,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -178,14 +180,14 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
    }
 
     @Override
-    public void taskStarted(String message, int size) {
-        super.taskStarted(message, size);
-        progressMax = size;
+    public void taskStarted(TaskStartedInfo info) {
+        super.taskStarted(info);
+        progressMax = info.getSize();
         if (verbosity >= Verbosity.HIGH) {
-            if (ApplyStrategy.PROCESSING_STRATEGY.equals(message)) {
-                System.out.print(message+" ["); // start progress bar
+            if (TaskKind.Strategy.equals(info.getKind())) {
+                System.out.print(info.getMessage()+" ["); // start progress bar
             } else {
-                System.out.println(message);
+                System.out.println(info.getMessage());
             }
         }
     }

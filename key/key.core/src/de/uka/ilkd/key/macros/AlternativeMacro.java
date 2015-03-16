@@ -21,9 +21,11 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 
 /**
  * The abstract class AlternativeMacro can be used to create compound macros
@@ -91,7 +93,7 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
             if(macro.canApplyTo(proof, goals, posInOcc)) {
                 final ProverTaskListener pml =
                         new ProofMacroListener(macro, listener);
-                pml.taskStarted(macro.getName(), 0);
+                pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
                 synchronized(macro) {
                     // wait for macro to terminate
                     info = macro.applyTo(uic, proof, goals, posInOcc, pml);
