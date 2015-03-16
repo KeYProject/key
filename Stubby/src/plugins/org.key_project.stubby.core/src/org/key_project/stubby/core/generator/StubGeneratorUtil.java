@@ -134,7 +134,7 @@ public final class StubGeneratorUtil {
             Type type = (Type) abstractType;
             String projectStubFolder = STUB_FOLDER_NAME;
             String[] res = type.getPackage().split("\\.");
-            String projectSimpleName = type.getSimpleName() + ".java";  
+            String projectSimpleName = type.getSimpleName() + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT;  
             IProject stubProject = project.getProject();
             IFolder stubFolder = stubProject.getFolder(projectStubFolder);
             if (!stubFolder.exists()) { 
@@ -215,19 +215,6 @@ public final class StubGeneratorUtil {
                   if (!typeBinding.isTypeVariable()) {
                      ensureTypeExists((Type)null, typeBinding);
                   }
-               }
-            }
-
-            private AbstractType ensureTypeExists(Method method, ITypeBinding typeBinding) {
-               if (typeBinding.isTypeVariable()) {
-                  AbstractType result = searchTypeVariable(method.getTypeVariables(), typeBinding);
-                  if (result == null) {
-                     result = ensureTypeExists(method, typeBinding);
-                  }
-                  return result;
-               }
-               else {
-                  return ensureTypeExists((ITypeVariableContainer)method, typeBinding);
                }
             }
             
@@ -470,6 +457,7 @@ public final class StubGeneratorUtil {
              */
             protected void createMethodFromDeclaration(Type typ, IMethodBinding methodBinding) {
                Method method = DependencymodelFactory.eINSTANCE.createMethod();
+               typ.getMethods().add(method);
                methodBinding = methodBinding.getMethodDeclaration();
                method.setName(methodBinding.getName());
                method.setVisibility(createVisibility(methodBinding.getModifiers()));
@@ -489,7 +477,6 @@ public final class StubGeneratorUtil {
                   method.getThrows().add(methodThrow);
                }
                method.setReturnType(ensureTypeExists(method, methodBinding.getReturnType()));
-               typ.getMethods().add(method);
             }
             
             protected TypeVariable createTypeVariable(ITypeVariableContainer containerType, ITypeBinding typeParameter) {

@@ -82,6 +82,11 @@ public class JDTUtil {
    public static final String JAVA_FILE_EXTENSION = "java";
    
    /**
+    * File extension of Java source files with leading dot.
+    */
+   public static final String JAVA_FILE_EXTENSION_WITH_DOT = "." + JAVA_FILE_EXTENSION;
+   
+   /**
     * Forbid instances by this private constructor.
     */
    private JDTUtil() {
