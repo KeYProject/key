@@ -9,9 +9,15 @@ import org.eclipse.ui.IStartup;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 
-
+/**
+ * Handles the start of all {@link KeYProjectBuildJob}s at the eclipse startup.
+ * @author Stefan Käsdorf
+ */
 public class KeYResourcesStartup implements IStartup {
 
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public void earlyStartup() {
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
@@ -26,7 +32,10 @@ public class KeYResourcesStartup implements IStartup {
       }
       for(IProject keyProject : keyProjects){
          KeYResourcesUtil.synchronizeProject(keyProject);
-         if(KeYResourcesUtil.hasBuildFile(keyProject)){
+         KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(keyProject);
+         keyDelta.update(null);
+         if(keyDelta.isBuildRequired() || keyDelta.isBuilding()){
+            keyDelta.setIsSettingUp(true);
             KeYProjectBuildJob proofManagerJob = new KeYProjectBuildJob(keyProject, KeYProjectBuildJob.STARTUP_BUILD);
             proofManagerJob.setRule(new KeYProjectBuildMutexRule(keyProject));
             proofManagerJob.schedule();

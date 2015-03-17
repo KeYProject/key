@@ -1,6 +1,9 @@
 package org.key_project.key4eclipse.resources.io;
 
-
+/**
+ * Represents a contract reference for the ProofMetaReferences
+ * @author Stefan Käsdorf
+ */
 public class ProofMetaReferenceContract {
    
    private String name;

@@ -1,5 +1,9 @@
 package org.key_project.key4eclipse.resources.io;
 
+/**
+ * Represents an axiom reference for the ProofMetaReferences
+ * @author Stefan Käsdorf
+ */
 public class ProofMetaReferenceAxiom {
 
    private String kjt;

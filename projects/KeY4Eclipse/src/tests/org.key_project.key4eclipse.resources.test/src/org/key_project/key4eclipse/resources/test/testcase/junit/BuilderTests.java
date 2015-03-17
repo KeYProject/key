@@ -515,9 +515,6 @@ public class BuilderTests extends AbstractResourceTest {
       assertTrue(proofFolder.exists());
       assertTrue(proofFile.exists() && metaFile.exists());
 
-      KeY4EclipseResourcesTestUtil.cleanBuildResourceChangeListener listener = new KeY4EclipseResourcesTestUtil.cleanBuildResourceChangeListener(proofFile, metaFile);
-      ResourcesPlugin.getWorkspace().addResourceChangeListener(listener);
-
       InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/BuilderTests/testCleanBuild/customProof.proof");
       proofFile.setContents(is, IResource.FORCE, null);
       is.close();
@@ -525,6 +522,9 @@ public class BuilderTests extends AbstractResourceTest {
       
       long proofFileModStamp = proofFile.getLocalTimeStamp();
       long metaFileModStamp = metaFile.getLocalTimeStamp();
+      
+      KeY4EclipseResourcesTestUtil.cleanBuildResourceChangeListener listener = new KeY4EclipseResourcesTestUtil.cleanBuildResourceChangeListener(proofFile, metaFile);
+      ResourcesPlugin.getWorkspace().addResourceChangeListener(listener);
 
       assertTrue(javaFile.exists());
       assertTrue(proofFolder.exists());
@@ -538,6 +538,7 @@ public class BuilderTests extends AbstractResourceTest {
       assertTrue(proofFile.getLocalTimeStamp() != proofFileModStamp);
       assertTrue(metaFile.getLocalTimeStamp() != metaFileModStamp);
       assertFalse(listener.getDeleted());
+      ResourcesPlugin.getWorkspace().removeResourceChangeListener(listener);
    }
    
 
@@ -1339,8 +1340,8 @@ public class BuilderTests extends AbstractResourceTest {
       assertTrue(proofFolder.exists());
       assertTrue(proofFile.exists() && metaFile.exists());
 
-      assertTrue(proofFileModStamp != proofFile.getLocalTimeStamp());
-      assertTrue(metaFileModStamp != metaFile.getLocalTimeStamp());
+      assertTrue(proofFileModStamp == proofFile.getLocalTimeStamp());
+      assertTrue(metaFileModStamp == metaFile.getLocalTimeStamp());
    }
    
    
@@ -1384,8 +1385,8 @@ public class BuilderTests extends AbstractResourceTest {
       assertTrue(proofFolder.exists());
       assertTrue(proofFile.exists() && metaFile.exists());
 
-      assertTrue(proofFileModStamp != proofFile.getLocalTimeStamp());
-      assertTrue(metaFileModStamp != metaFile.getLocalTimeStamp());
+      assertTrue(proofFileModStamp == proofFile.getLocalTimeStamp());
+      assertTrue(metaFileModStamp == metaFile.getLocalTimeStamp());
    }
    
    

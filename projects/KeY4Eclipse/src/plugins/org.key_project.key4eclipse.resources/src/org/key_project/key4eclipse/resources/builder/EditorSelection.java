@@ -6,6 +6,10 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.IMethod;
 
+/**
+ * Stores the current state of the editor. Includes open files, active/selected file and the selected method within the active file.
+ * @author Stefan Käsdorf
+ */
 public class EditorSelection {
    private IMethod selectedMethod;
    private IFile activeFile;

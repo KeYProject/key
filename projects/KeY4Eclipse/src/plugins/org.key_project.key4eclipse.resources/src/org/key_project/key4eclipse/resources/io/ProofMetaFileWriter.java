@@ -90,7 +90,6 @@ public class ProofMetaFileWriter {
    public static final String ATTRIBUTE_VISIBILITY = "visibility";
    public static final String ATTRIBUTE_IS_STATIC = "isStatic";
    public static final String ATTRIBUTE_IS_FINAL = "isFinal";
-   public static final String ATTRIBUTE_IS_CALLED_IN_CONSTRUCTOR = "isCalledInConstructor";
    public static final String ATTRIBUTE_INITIALIZER = "initializer";
    public static final String ATTRIBUTE_REP = "rep";
    
@@ -336,7 +335,6 @@ public class ProofMetaFileWriter {
                attributeValues.put(ATTRIBUTE_VISIBILITY, access.getVisibility());
                attributeValues.put(ATTRIBUTE_IS_STATIC, String.valueOf(access.isStatic()));
                attributeValues.put(ATTRIBUTE_IS_FINAL, String.valueOf(access.isFinal()));
-               attributeValues.put(ATTRIBUTE_IS_CALLED_IN_CONSTRUCTOR, String.valueOf(access.isCalledInConstructor()));
                attributeValues.put(ATTRIBUTE_INITIALIZER, access.getInitializer());
                XMLUtil.appendEmptyTag(level + 1, TAG_ACCESS_REFERENCE, attributeValues, sb);
             }

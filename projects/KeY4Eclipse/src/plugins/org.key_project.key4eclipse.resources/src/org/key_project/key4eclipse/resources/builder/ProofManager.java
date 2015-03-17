@@ -13,10 +13,8 @@
 
 package org.key_project.key4eclipse.resources.builder;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,8 +32,6 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -45,6 +41,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaCore;
+import org.key_project.key4eclipse.resources.io.LastChangesFileWriter;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
 import org.key_project.key4eclipse.resources.io.ProofMetaReferencesComparator;
 import org.key_project.key4eclipse.resources.log.LogManager;
@@ -66,7 +63,6 @@ import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -81,6 +77,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -105,6 +102,7 @@ public class ProofManager {
    private final IFolder mainProofFolder;
    private List<ProofElement> proofElements;
    private KeYProjectDelta keyDelta;
+   private Set<IFile> changedJavaFiles;
    private EditorSelection editorSelection;
    private final KeYEnvironment<CustomUserInterface> environment;
    private List<ProofElement> proofQueue = Collections.synchronizedList(new LinkedList<ProofElement>());
@@ -156,9 +154,11 @@ public class ProofManager {
       Location location = ExceptionTools.getLocation(e);
       IResource res = project;
       int lineNumber = -1;
-      res = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(location.getFilename()));
+      if(location != null){
+         res = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(location.getFilename()));
+         lineNumber = location.getLine();
+      }
       String markerMessage = e.getMessage();
-      lineNumber = location.getLine();
       synchronized (keyDelta.lock) {
          keyDelta.resetDelta();
       }
@@ -170,16 +170,16 @@ public class ProofManager {
     * Runs the {@link Proof}s available in the {@link IProject} dependent on the ProofManageMentProperties.
     * @param changedJavaFiles - {@link LinkedList} with all changed java{@link IFile}s
     * @param monitor - the {@link IProgressMonitor}
-    * @throws Exception
+    * @throws CoreException 
     */
    public void runProofs(IProgressMonitor monitor) throws CoreException{
+      proofElements = computeProofElementsAndUpdateProjectInfo();
       synchronized (keyDelta.lock) {
-         proofElements = computeProofElementsAndUpdateProjectInfo();
+         changedJavaFiles = keyDelta.getChangedJavaFiles();
+         sortProofElements(editorSelection);
+         selectProofElementsForBuild();
          keyDelta.resetDelta();
       }
-      createBuildFile();
-      sortProofElements(editorSelection);
-      selectProofElementsForBuild();
       cleanMarker();
       if(KeYProjectProperties.isAutoDeleteProofFiles(project)){
          cleanProofFolder(getAllFiles(), mainProofFolder);
@@ -189,38 +189,11 @@ public class ProofManager {
       initThreads(monitor);
       checkContractRecursion();
       if(!monitor.isCanceled()){
-         deleteBuildFile();
+         synchronized (keyDelta.lock) {
+            LastChangesFileWriter.updateBuildState(project, false);
+         }
       }
       monitor.done();
-   }
-   
-   
-   private void createBuildFile() throws CoreException {
-      final IFile buildFile = KeYResourcesUtil.getProofFolder(project).getFile(KeYResourcesUtil.BUILD_FILE);
-      final String message = "The last build was not finished. A new build is required.";
-      final byte[] bytes = message.getBytes();
-      IWorkspaceRunnable operation = new IWorkspaceRunnable() {
-         @Override
-         public void run(IProgressMonitor monitor) throws CoreException {
-            if (!buildFile.exists()) {
-               buildFile.create(new ByteArrayInputStream(bytes), true, null);
-            }
-         }
-      };
-      ResourcesPlugin.getWorkspace().run(operation, null, IWorkspace.AVOID_UPDATE, null);
-   }
-
-   private void deleteBuildFile() throws CoreException {
-      final IFile buildFile = KeYResourcesUtil.getProofFolder(project).getFile(KeYResourcesUtil.BUILD_FILE);
-      IWorkspaceRunnable operation = new IWorkspaceRunnable() {
-         @Override
-         public void run(IProgressMonitor monitor) throws CoreException {
-            if (buildFile.exists()) {
-               buildFile.delete(true, null);
-            }
-         }
-      };
-      ResourcesPlugin.getWorkspace().run(operation, null, IWorkspace.AVOID_UPDATE, null);
    }
    
    
@@ -533,7 +506,7 @@ public class ProofManager {
                build = true;
             }
             else {
-               ProofMetaReferencesComparator comparator = new ProofMetaReferencesComparator(pe, environment);
+               ProofMetaReferencesComparator comparator = new ProofMetaReferencesComparator(pe, environment, changedJavaFiles);
                if (MD5changed(pe) || comparator.compareReferences()) {
                   build = true;
                }
@@ -542,7 +515,7 @@ public class ProofManager {
          if(build){
             pe.setBuild(true);
             pe.setOutdated(true);
-            MarkerUtil.setOutdated(pe, true);
+            MarkerUtil.setOutdated(pe);
             if(pe.hasMetaFile() && pe.hasProofFile()){
                try {
                   keyDelta.addJobChangedFile(pe.getMetaFile());
@@ -644,7 +617,9 @@ public class ProofManager {
       return fileProofs;
    }
    
-   
+   /**
+    * Removes all unnecessary KeY Marker.
+    */
    private void cleanMarker() {
       List<IMarker> peMarker = new LinkedList<IMarker>();
       for(ProofElement pe : proofElements){
@@ -688,7 +663,7 @@ public class ProofManager {
                if(!proofFiles.contains(res) && 
                   !ProjectInfoManager.getInstance().isProjectInfoFile((IFile)res) &&
                   !LogManager.getInstance().isLogFile((IFile)res) &&
-                  !KeYResourcesUtil.isBuildFile(res)) {
+                  !KeYResourcesUtil.isLastChangesFile((IFile)res)) {
                   keyDelta.addJobChangedFile((IFile) res);
                   res.delete(true, null);
                }
@@ -748,6 +723,10 @@ public class ProofManager {
    }
    
    
+   /**
+    * Saves all proofs in the {@code proofsToSave} list to the proof folder and creates their meta files. 
+    * Also updates the {@link KeYProjectDelta}'s {@code jobChangedFiles} list and creates the KeY Marker for the proof.
+    */
    private void saveProofs() {
       Pair<ProofElement, InputStream> proofToSave = null;
       while((proofToSave = getProofToSave()) != null){
@@ -767,6 +746,13 @@ public class ProofManager {
       }
    }
    
+   /**
+    * Saves a proof into a file.
+    * @param proofFile the file to save the proof in
+    * @param is the {@link InputStream} of the proof to save 
+    * @param isClosed the status of the proof
+    * @throws CoreException
+    */
    private void saveProof(IFile proofFile, InputStream is, boolean isClosed) throws CoreException{
       IFolder proofFolder = KeYResourcesUtil.createFolder(proofFile);
       if(proofFolder != null && proofFolder.exists()){
@@ -780,6 +766,10 @@ public class ProofManager {
       }
    }
    
+   /**
+    * Returns the next proof from the proof queue.
+    * @return the next proof in the queue
+    */
    public synchronized Pair<ProofElement, InputStream> getProofToSave(){
       synchronized (proofsToSave) {
          if(!proofsToSave.isEmpty()){
@@ -790,6 +780,10 @@ public class ProofManager {
    }
    
    
+   /**
+    * Returns the number of proofs that require to be build.
+    * @return the number of proofs 
+    */
    private int getNumOfProofsToDo(){
       int num = 0;
       for(ProofElement pe : proofElements){
@@ -906,9 +900,8 @@ public class ProofManager {
    
    
    /**
-    * Checks if the MD5 of the proof{@link IFile} is different to the MD5 stored in the metafile.
-    * @param proofFile - the proof{@link IFile} to use
-    * @param pmfr - the {@link ProofMetaFileReader} to use
+    * Checks if the MD5 of the proofs {@link IFile} is different to the MD5 stored in the meta file.
+    * @param pe the proof to be checked
     * @return false if both MD5s are equal. true otherwise
     * @throws CoreException 
     * @throws IOException 
@@ -932,6 +925,9 @@ public class ProofManager {
    }
    
    
+   /**
+    * Restores the old marker of the proof if the proof is no longer part of a cycle.
+    */
    private void restoreOldMarkerForRemovedCycles() {
       for(ProofElement pe : proofElements){
          if(pe.getProofMarker() == null && (pe.getRecursionMarker() == null || pe.getRecursionMarker().isEmpty())){
@@ -943,6 +939,11 @@ public class ProofManager {
    }
 
 
+   /**
+    * Searches for recursion cycles within the whole project and returns them as a {@link HashMap} of 
+    * {@link List}s of {@link ProofElement}s where each {@link List} represents one cycle. 
+    * @param cycles A {@link HashMap} of {@link List}s of {@link ProofElement}s
+    */
    private void findCycles(HashSet<List<ProofElement>> cycles){
       Map<ProofElement, List<ProofElement>> usedContracts = new LinkedHashMap<ProofElement, List<ProofElement>>();
       for(ProofElement pe : proofElements){
@@ -955,6 +956,12 @@ public class ProofManager {
       }
    }
    
+   /**
+    * Recursive method to follow every possible cycle path
+    * @param cycle the current path
+    * @param cycles the {@link Set} of found cycles
+    * @param usedContracts the contracts used by the cycles last {@link ProofElement}
+    */
    private void searchCycle(List<ProofElement> cycle, HashSet<List<ProofElement>> cycles, Map<ProofElement, List<ProofElement>> usedContracts){
       List<ProofElement> succs = usedContracts.get(cycle.get(cycle.size()-1));
       for(ProofElement pe : succs){
@@ -974,6 +981,10 @@ public class ProofManager {
    }
    
    
+   /**
+    * Removes all recursion marker in the {@link IProject}. Called before detecting recursion marker.
+    * @throws CoreException
+    */
    private void removeAllRecursionMarker() throws CoreException {
       for(ProofElement pe : proofElements){
          pe.setRecursionMarker(new LinkedList<IMarker>());

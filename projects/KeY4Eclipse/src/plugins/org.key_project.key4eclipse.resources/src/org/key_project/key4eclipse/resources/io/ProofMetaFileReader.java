@@ -18,7 +18,6 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -216,7 +215,7 @@ public class ProofMetaFileReader {
             if (!ProofMetaFileWriter.TAG_ACCESS_REFERENCES.equals(parent)) {
                throw new SAXException(ProofMetaFileWriter.TAG_ACCESS_REFERENCE  + " has to be a child of " + ProofMetaFileWriter.TAG_ACCESS_REFERENCES + ".");
             }
-            ProofMetaReferenceAccess access = new ProofMetaReferenceAccess(getKJT(attributes), getName(attributes), getType(attributes), getVisibility(attributes), getIsStatic(attributes), getIsFinal(attributes), getIsCalledInConstructor(attributes), getInitializer(attributes));
+            ProofMetaReferenceAccess access = new ProofMetaReferenceAccess(getKJT(attributes), getName(attributes), getType(attributes), getVisibility(attributes), getIsStatic(attributes), getIsFinal(attributes), getInitializer(attributes));
             references.addAccess(access);
             parentStack.addFirst(ProofMetaFileWriter.TAG_ACCESS_REFERENCE);
          }
@@ -449,17 +448,6 @@ public class ProofMetaFileReader {
       protected boolean getIsFinal(Attributes attributes) {
          return Boolean.parseBoolean(attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_IS_FINAL));
       }
-
-      
-      /**
-       * Returns if a field is called in a constructor.
-       * @param attributes The attributes to read from.
-       * @return The read value.
-       */
-      protected boolean getIsCalledInConstructor(Attributes attributes) {
-         return Boolean.parseBoolean(attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_IS_CALLED_IN_CONSTRUCTOR));
-      }
-
       
       /**
        * Returns a fields initializer
@@ -517,7 +505,7 @@ public class ProofMetaFileReader {
    }
 
    /**
-    * Return the {@link LinkedList} with all {@link ProofMetaFileTypeElement}s.
+    * Returns a {@link LinkedList} with all {@link ProofMetaFileTypeElement}s.
     * @return the {@link ProofMetaFileTypeElement}s
     */
    public List<ProofMetaFileTypeElement> getTypeElements() {

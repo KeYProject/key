@@ -1,5 +1,9 @@
 package org.key_project.key4eclipse.resources.io;
 
+/**
+ * Represents an access reference for the ProofMetaReferences
+ * @author Stefan Käsdorf
+ */
 public class ProofMetaReferenceAccess {
 
    private String kjt;
@@ -8,17 +12,15 @@ public class ProofMetaReferenceAccess {
    private String visibility;
    private boolean isStatic;
    private boolean isFinal;
-   private boolean assignedInConstructor;
    private String initializer;
    
-   public ProofMetaReferenceAccess(String kjt, String name, String type, String visibility, boolean isStatic, boolean isFinal, boolean assignedInConstructor, String initializer){
+   public ProofMetaReferenceAccess(String kjt, String name, String type, String visibility, boolean isStatic, boolean isFinal, String initializer){
       this.kjt = kjt;
       this.name = name;
       this.type = type;
       this.visibility = visibility;
       this.isStatic = isStatic;
       this.isFinal = isFinal;
-      this.assignedInConstructor = assignedInConstructor;
       this.initializer = initializer;
    }
 
@@ -44,10 +46,6 @@ public class ProofMetaReferenceAccess {
 
    public boolean isFinal() {
       return isFinal;
-   }
-
-   public boolean isCalledInConstructor() {
-      return assignedInConstructor;
    }
 
    public String getInitializer() {

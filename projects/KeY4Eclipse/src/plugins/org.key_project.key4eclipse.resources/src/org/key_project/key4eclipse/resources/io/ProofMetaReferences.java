@@ -1,39 +1,22 @@
 package org.key_project.key4eclipse.resources.io;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
-import org.key_project.key4eclipse.resources.util.LogUtil;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -41,6 +24,10 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
+/**
+ * Creates the representation of all references used by a particular {@link ProofElement}
+ * @author Stefan Käsdorf
+ */
 public class ProofMetaReferences {
 
    private String contract;
@@ -61,8 +48,13 @@ public class ProofMetaReferences {
       this.contracts = new LinkedList<ProofMetaReferenceContract>();
    }
       
+   /**
+    * Creates the {@link ProofMetaReferences} from a {@link ProofElement}
+    * @param pe the {@link ProofElement} to use
+    * @param env the {@link KeYEnvironment} to use
+    */
    public void createFromProofElement(ProofElement pe, KeYEnvironment<?> env) {
-      contract = contractToString(pe.getContract());
+      contract = KeYResourcesUtil.contractToString(pe.getContract());
       List<IProofReference<?>> references = KeYResourcesUtil.sortProofReferences(KeYResourcesUtil.filterProofReferences(pe.getProofReferences()), IProofReference.USE_AXIOM, IProofReference.USE_INVARIANT, IProofReference.ACCESS, IProofReference.CALL_METHOD, IProofReference.INLINE_METHOD, IProofReference.USE_CONTRACT);
       for(IProofReference<?> proofRef : references){
          if(IProofReference.USE_AXIOM.equals(proofRef.getKind())){
@@ -90,7 +82,7 @@ public class ProofMetaReferences {
             Contract c = (Contract) proofRef.getTarget();
             String name = c.getName();
             if(!containsContract(name)){
-               contracts.add(new ProofMetaReferenceContract(name, contractToString(c)));
+               contracts.add(new ProofMetaReferenceContract(name, KeYResourcesUtil.contractToString(c)));
             }
          }
       }
@@ -100,13 +92,13 @@ public class ProofMetaReferences {
       if(axiom instanceof RepresentsAxiom){
          RepresentsAxiom repAxiom = (RepresentsAxiom) axiom;
          KeYJavaType kjt = repAxiom.getKJT();
-         axioms.add(new ProofMetaReferenceAxiom(kjt.getFullName(), repAxiom.getName(), repAxiomToString(repAxiom)));
+         axioms.add(new ProofMetaReferenceAxiom(kjt.getFullName(), repAxiom.getName(), KeYResourcesUtil.repAxiomToString(repAxiom)));
       }
    }
 
    private void createInvariant(ClassInvariant invariant) {
       KeYJavaType kjt = invariant.getKJT();
-      invariants.add(new ProofMetaReferenceInvariant(kjt.getFullName(), invariant.getName(), invariantToString(invariant)));
+      invariants.add(new ProofMetaReferenceInvariant(kjt.getFullName(), invariant.getName(), KeYResourcesUtil.invariantToString(invariant)));
    }
    
    private void createAccess(IProgramVariable variable, KeYEnvironment<?> env, IProgramMethod target) {
@@ -126,12 +118,11 @@ public class ProofMetaReferences {
                }
                boolean isStatic = fieldDecl.isStatic();
                boolean isFinal = fieldDecl.isFinal();
-               boolean isCalledInConstructor = target.isConstructor();//TODO how to find out if this variable is set in a constructor??
                String initializer =  "";
-               if(isStatic || isFinal) {
+               if(isFinal) {
                   initializer = fieldDecl.getFieldSpecifications().get(0).getInitializer().toString();
                }
-               accesses.add(new ProofMetaReferenceAccess(kjt.getFullName(), name, type, visibility, isStatic, isFinal, isCalledInConstructor, initializer));
+               accesses.add(new ProofMetaReferenceAccess(kjt.getFullName(), name, type, visibility, isStatic, isFinal, initializer));
             }
          }
       }
@@ -148,10 +139,11 @@ public class ProofMetaReferences {
             String implementationsString = KeYResourcesUtil.implementationTypesToString(implementations);
             callMethods.add(new ProofMetaReferenceCallMethod(kjt.getFullName(), name, parameters, implementationsString));
             for(Map.Entry<KeYJavaType, IProgramMethod> implementation : implementations.entrySet()) {
-               List<IProgramMethod> overloads = findOverloads(implementation.getValue(), env);
-               for(IProgramMethod pm : overloads) {
-                  createInlineMethod(pm);
-               }
+//               List<IProgramMethod> overloads = findOverloads(implementation.getValue(), env);
+//               for(IProgramMethod pm : overloads) {
+//                  createInlineMethod(pm);
+//               }
+               createInlineMethod(implementation.getValue());
             }
          }
       }
@@ -237,16 +229,6 @@ public class ProofMetaReferences {
          }
       }
       return false;
-   }
-
-   private String contractToString(Contract c) {
-      return c.toString();
-   }
-   private String repAxiomToString(RepresentsAxiom a) {
-      return a.toString();
-   }
-   private String invariantToString(ClassInvariant i){
-      return i.getOriginalInv().toString();
    }
 
    public String getContract() {

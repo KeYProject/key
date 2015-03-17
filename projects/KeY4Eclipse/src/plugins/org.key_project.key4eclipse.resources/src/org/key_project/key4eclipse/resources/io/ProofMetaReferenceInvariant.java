@@ -1,5 +1,9 @@
 package org.key_project.key4eclipse.resources.io;
 
+/**
+ * Represents a invariant reference for the ProofMetaReferences
+ * @author Stefan Käsdorf
+ */
 public class ProofMetaReferenceInvariant {
    
    private String kjt;

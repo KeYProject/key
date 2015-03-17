@@ -37,6 +37,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
     * The builder id.
     */
    public final static String BUILDER_ID = "org.key_project.key4eclipse.resources.KeYProjectBuilder";
+   
    /**
     * {@inheritDoc}
     */
@@ -53,8 +54,8 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       keyDelta.update(delta);
       try {
          if(KeYProjectProperties.isEnableKeYResourcesBuilds(project)){ 
-            if(keyDelta.isBuildRequired() && !keyDelta.isBuilding()){
-               keyDelta.setIsBuilding(true);
+            if((keyDelta.getCleanRequest() || keyDelta.isBuildRequired()) && !keyDelta.isSettingUp()){
+               keyDelta.setIsSettingUp(true);
                int buildType = IncrementalProjectBuilder.FULL_BUILD == kind ? KeYProjectBuildJob.FULL_BUILD : KeYProjectBuildJob.AUTO_BUILD;
                KeYProjectBuildJob proofManagerJob = new KeYProjectBuildJob(project, buildType);
                proofManagerJob.setRule(new KeYProjectBuildMutexRule(project));
@@ -79,6 +80,8 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       final boolean onlyRequiredProofs = KeYProjectProperties.isEnableBuildRequiredProofsOnly(project);
       final int numberOfThreads = KeYProjectProperties.getNumberOfThreads(project);
       final boolean enableThreading = KeYProjectProperties.isEnableMultiThreading(project);
+      KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
+      keyDelta.requestClean();
       LogManager.getInstance().log(project, new LogRecord(LogRecordKind.CLEAN, start, System.currentTimeMillis() - start, onlyRequiredProofs, enableThreading, numberOfThreads));
    }
 }

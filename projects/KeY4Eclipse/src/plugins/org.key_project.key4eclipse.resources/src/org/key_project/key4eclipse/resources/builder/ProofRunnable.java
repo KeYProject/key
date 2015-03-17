@@ -11,15 +11,12 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.key_project.key4eclipse.resources.io.ProofMetaReferences;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.StringUtil;
-
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.proof.Goal;
@@ -39,6 +36,10 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 
+/**
+ * Runnable to perform the actual proof execution.
+ * @author Stefan Käsdorf
+ */
 public class ProofRunnable implements Runnable {
    
    private List<ProofElement> proofElements;
@@ -93,6 +94,10 @@ public class ProofRunnable implements Runnable {
    }
 
 
+   /**
+    * Acquires the next proof from the proof queue.
+    * @return the next proof
+    */
    private ProofElement getProofToDo() {
       ProofElement pe = null;
       synchronized (proofsToDo) {
@@ -106,9 +111,10 @@ public class ProofRunnable implements Runnable {
    
    /**
     * If the {@link ProofElement}s proof{@link IFile} exists the {@link Proof} stored in this {@link IFile} will be loaded. When the {@link Proof} is 
-    * loaded and if it's not closed yet, the automode will be started. If the {@link IFile} doesn't exists a new Proof will be 
-    * created and the automode will be started.
-    * @param ProofElement - the {@link ProofElement} for the {@link Proof}
+    * loaded and if it's not closed yet, the auto mode will be started. If the {@link IFile} doesn't exists a new Proof will be 
+    * created and the auto mode will be started.
+    * @param pe the {@link ProofElement} for the {@link Proof}
+    * @return the created {@link Proof}
     * @throws Exception
     */
    private Proof processProof(ProofElement pe){
@@ -160,7 +166,7 @@ public class ProofRunnable implements Runnable {
    /**
     * Loads the {@link Proof} of the given {@link ProofElement} and runs the AutoMode.
     * @return the loaded {@link Proof}.}
-    * @param ProofElement - the given {@link ProofElement}
+    * @param pe the given {@link ProofElement}
     */
    private Proof loadProof(ProofElement pe){
       Proof proof = null;
@@ -185,8 +191,13 @@ public class ProofRunnable implements Runnable {
    }
    
    
-
-   
+   /**
+    * Generates the message for the proof marker.
+    * @param pe the {@link ProofElement} belonging to the {@link Proof}
+    * @param proof the particular {@link Proof}
+    * @param time the measured build time
+    * @return the marker message
+    */
    private String generateProofMarkerMessage(ProofElement pe, Proof proof, long time){
       StringBuffer sb = new StringBuffer();
       boolean closed = pe.getProofClosed();
@@ -238,6 +249,7 @@ public class ProofRunnable implements Runnable {
    /**
     * Creates the {@link ByteOutputStream} for the given {@link Proof}.
     * @param proof - the {@link Proof} to use
+    * @param file the proofs proof{@link IFile}
     * @return the {@link ByteOutputStream} for the given {@link Proof}
     * @throws CoreException
     */

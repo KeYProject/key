@@ -1,7 +1,9 @@
 package org.key_project.key4eclipse.resources.io;
 
-import java.util.List;
-
+/**
+ * Represents a call method reference for the ProofMetaReferences
+ * @author Stefan Käsdorf
+ */
 public class ProofMetaReferenceCallMethod {
 
    private String kjt;

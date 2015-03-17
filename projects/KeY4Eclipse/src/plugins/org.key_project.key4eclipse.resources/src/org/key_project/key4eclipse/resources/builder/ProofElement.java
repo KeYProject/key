@@ -264,26 +264,6 @@ public class ProofElement {
       }
       return false;
    }
-   
-   
-   public boolean hasProofMarker(){
-      if(proofMarker != null && proofMarker.exists()){
-         return true;
-      }
-      return false;
-   }
-   
-   
-   public boolean hasRecursionMarker(){
-      if(recursionMarker != null && !recursionMarker.isEmpty()){
-         for(IMarker marker : recursionMarker){
-            if(marker != null && marker.exists()){
-               return true;
-            }
-         }
-      }
-      return false;
-   }
 
 
    public SpecificationRepository getSpecificationRepository() {

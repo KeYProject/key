@@ -35,7 +35,6 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -85,12 +84,12 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.util.Pair;
 
@@ -102,7 +101,7 @@ public class KeYResourcesUtil {
    public static final String PROOF_FOLDER_NAME = "proofs";
    public static final String PROOF_FILE_EXTENSION = "proof";
    public static final String META_FILE_EXTENSION = "proofmeta";
-   public static final String BUILD_FILE = ".build";
+   public static final String LAST_CHANGES_FILE = ".lastChanges";
    
    /**
     * Key of {@link IResource#getPersistentProperty(QualifiedName)} to store the proof closed result of a proof file.
@@ -211,6 +210,11 @@ public class KeYResourcesUtil {
    }
    
    
+   /**
+    * Filters a {@link Set} of {@link IProofReference}s in order to exclude external resources
+    * @param proofReferences {@link Set} of {@link IProofReference}s
+    * @return {@link Set} of filtered {@link IProofReference}s 
+    */
    public static Set<IProofReference<?>> filterProofReferences(Set<IProofReference<?>> proofReferences) {
       Set<IProofReference<?>> filteredReferences = new HashSet<IProofReference<?>>();
       for(IProofReference<?> proofReference : proofReferences){
@@ -227,7 +231,12 @@ public class KeYResourcesUtil {
       return filteredReferences;
    }
    
-   
+   /**
+    * Sorts all elements of a {@link Set} of {@link IProofReference}s by the given {@code sortOrder} and returns a {@link List} with the result.
+    * @param proofReferences a {@link Set} of {@link IProofReference}s
+    * @param sortOrder the sort order
+    * @return a {@link List} with the sorted {@link IProofReference}s
+    */
    public static List<IProofReference<?>> sortProofReferences(Set<IProofReference<?>> proofReferences, String... sortOrder) {
       if (proofReferences != null && sortOrder != null && sortOrder.length > 0) {
          List<IProofReference<?>> sortedReferences = new LinkedList<IProofReference<?>>();
@@ -333,6 +342,12 @@ public class KeYResourcesUtil {
    }
    
    
+   /**
+    * Acquires the {@link ProofElement}s associated with the given proof files. 
+    * @param proofFiles the given proof files
+    * @param proofElements {@link List} of proof elements to check
+    * @return a {@link List} of the {@link ProofElement} associated with the given proof files
+    */
    public static List<ProofElement> getProofElementsByProofFiles(List<IFile> proofFiles, List<ProofElement> proofElements){
       List<ProofElement> tmpProofElements = cloneList(proofElements);
       List<ProofElement> foundproofElements = new LinkedList<ProofElement>();
@@ -405,34 +420,6 @@ public class KeYResourcesUtil {
              PROOF_FOLDER_NAME.equals(element.getName()) &&
              element.getParent() instanceof IProject &&
              isKeYProject(element.getProject());
-   }
-   
-   
-
-   
-   
-   public static int getLineForOffset(String str, int offset){
-      StringBuilder sb = new StringBuilder(str);
-      int index = 0;
-      int lineCount = 0;
-      while(index <= offset){
-         int indexRN = sb.indexOf("\r\n", index);
-         int indexR = sb.indexOf("\r", index);
-         int indexN = sb.indexOf("\n", index);
-         if(indexRN > -1 && (indexRN <= indexR || indexR == -1) && (indexRN < indexN || indexN == -1)){
-            index = indexRN + 2;
-         }
-         else if(indexR > -1 && (indexR < indexRN || indexRN == -1) && (indexR < indexN || indexN == -1)){
-            index = indexR + 1;
-         }
-         else if(indexN > -1 && (indexN < indexRN || indexRN == -1) && (indexN < indexR || indexR == -1)){
-            index = indexN + 1;
-         }
-         else return 1;
-         
-         lineCount++;
-      }
-      return lineCount;
    }
    
    
@@ -516,6 +503,12 @@ public class KeYResourcesUtil {
    }
    
    
+   /**
+    * Collects all {@link ProofElement}s associated with a {@link IMethod}
+    * @param proofElements {@link List} of all available {@link ProofElement}s
+    * @param method the {@link IMethod} to use
+    * @return {@link List} with all associated {@link ProofElement}s
+    */
    public static List<ProofElement> getProofElementsForMethod(List<ProofElement> proofElements, IMethod method) {
       List<ProofElement> methodProofElements = new LinkedList<ProofElement>();
       if(method != null){
@@ -584,15 +577,6 @@ public class KeYResourcesUtil {
       }
       return false;
    }
-   
-   
-   public static boolean isSourceFolder(IResource res) {
-      IFolder srcFolder = KeYResourcesUtil.getJavaSrcFolder(res.getProject());
-      if(srcFolder != null && srcFolder.equals(res)){
-         return true;
-      }
-      return false;
-   }
 
       
    /**
@@ -609,6 +593,11 @@ public class KeYResourcesUtil {
    }
    
    
+   /**
+    * Returns the {@link IProject}'s proof folder
+    * @param project the {@link IProject} to use
+    * @return the proof folder
+    */
    public static IFolder getProofFolder(IProject project){
       if(isKeYProject(project)){
          return project.getFolder(PROOF_FOLDER_NAME);
@@ -855,6 +844,11 @@ public class KeYResourcesUtil {
 //   }
    
    
+   /**
+    * Collects all currently living {@link KeYProjectBuildJob}s of a particular {@link IProject}
+    * @param project the {@link IProject} to use
+    * @return {@link List} with all {@link KeYProjectBuildJob}s
+    */
    public static List<KeYProjectBuildJob> getProjectBuildJobs(IProject project){
       List<KeYProjectBuildJob> projectKeYJobs = new LinkedList<KeYProjectBuildJob>();
       if(project != null){
@@ -871,20 +865,13 @@ public class KeYResourcesUtil {
       }
       return projectKeYJobs;
    }
-   
-   
-   public static int getNumberOfAutoBuildsInQueue(IProject project){
-      int num = 0;
-      List<KeYProjectBuildJob> projectBuildJobs = KeYResourcesUtil.getProjectBuildJobs(project);
-      for(KeYProjectBuildJob job : projectBuildJobs){
-         if(KeYProjectBuildJob.AUTO_BUILD == job.getBuildType() && Job.WAITING == job.getState()){
-            num++;
-         }
-      }
-      return num;
-   }
 
    
+   /**
+    * Checks if the given {@link IResource} is a proof file
+    * @param res the {@link IResource} to use 
+    * @return true if the {@link IResource} is a proof file. Otherwise false 
+    */
    public static boolean isProofFile(IResource res){
       if(res != null && res.exists()){
          return KeYResourcesUtil.PROOF_FILE_EXTENSION.equals(res.getFileExtension());
@@ -892,6 +879,11 @@ public class KeYResourcesUtil {
       return false;
    }
    
+   /**
+    * Checks if the given {@link IResource} is a meta file
+    * @param res the {@link IResource} to use 
+    * @return true if the {@link IResource} is a meta file. Otherwise false 
+    */
    public static boolean isMetaFile(IResource res){
       if(res != null && res.exists()){
          return KeYResourcesUtil.META_FILE_EXTENSION.equals(res.getFileExtension());
@@ -900,6 +892,11 @@ public class KeYResourcesUtil {
    }
    
    
+   /**
+    * Checks if the given {@link IResource} is a proof file and if it is located in the {@link IProject}'s proof folder
+    * @param res the {@link IResource} to use 
+    * @return true if the {@link IResource} is a proof file in the proof folder. Otherwise false 
+    */
    public static boolean isProofFileAndInProofFolder(IResource res){
       if(res != null && res.exists() && isProofFile(res)){
          IProject project = res.getProject();
@@ -910,7 +907,25 @@ public class KeYResourcesUtil {
       return false;
    }
    
+   /**
+    * Checks if the given {@link IFile} is the {@link IProject}s lastChangesFile
+    * @param file the IFile to check
+    * @return true if the {@link IFile} is the lastChangesFile. Otherwise false
+    */
+   public static boolean isLastChangesFile(IFile file) {
+      if (file != null) {
+         return LAST_CHANGES_FILE.equals(file.getName()) &&
+                file.getParent() instanceof IFolder &&
+                KeYResourcesUtil.isProofFolder((IFolder)file.getParent());
+      }
+      return false;
+   }
+   
 
+   /**
+    * Synchronizes the given {@link IProject}
+    * @param project the {@link IProject} to use
+    */
    public static void synchronizeProject(IProject project){
       if(!project.isSynchronized(IResource.DEPTH_INFINITE)){
          try {
@@ -923,6 +938,11 @@ public class KeYResourcesUtil {
    }
    
    
+   /**
+    * Converts a {@link ImmutableArray} of {@link ParameterDeclaration}s into a semicolon separated {@link String}
+    * @param parameters {@link ImmutableArray} of {@link ParameterDeclaration}s 
+    * @return the converted Array
+    */
    public static String parametersToString(ImmutableArray<ParameterDeclaration> parameters){
       String parameterString = "";
       for(ParameterDeclaration parameter : parameters){
@@ -932,6 +952,11 @@ public class KeYResourcesUtil {
    }
    
 
+   /**
+    * Removes all line breaks in a {@link String}
+    * @param str the {@link String} to use
+    * @return {@link String} without line breaks
+    */
    public static String removeLineBreaks(String str){
       str = str.replaceAll("\r\n", " ");
       str = str.replaceAll("\r", " ");
@@ -940,6 +965,11 @@ public class KeYResourcesUtil {
    }
    
    
+   /**
+    * Creates a single line {@link String} representation of the source code of a {@link MethodDeclaration}
+    * @param methodDecl the {@link MethodDeclaration} to use
+    * @return the source {@link String}
+    */
    public static String createSourceString(MethodDeclaration methodDecl){
       StringWriter sw = new StringWriter();
       try{
@@ -955,6 +985,13 @@ public class KeYResourcesUtil {
    }
    
    
+   /**
+    * Searches a {@link KeYJavaType} for a {@link IProgramMethod} with the given name and parameters
+    * @param kjt the {@link KeYJavaType} to use
+    * @param method the method name
+    * @param parameters semicolon separated parameters
+    * @return the {@link IProgramMethod} of null
+    */
    public static IProgramMethod getMethodForKjt(KeYJavaType kjt, String method, String parameters) {
       if(kjt != null && kjt.getJavaType() instanceof TypeDeclaration) {
          TypeDeclaration typeDecl = (TypeDeclaration) kjt.getJavaType();
@@ -972,22 +1009,36 @@ public class KeYResourcesUtil {
    }
    
    
-   public static Map<KeYJavaType, IProgramMethod> getKjtsOfAllImplementations(KeYEnvironment<?> env, KeYJavaType kjt, String method, String parameters) {
+   /**
+    * Collects each implementation of the method specified by {@code methodName} and {@code parameters} in the given {@link KeYJavaType} and all subTypes. 
+    * @param env the {@link KeYEnvironment} to use
+    * @param kjt the {@link KeYJavaType} to use
+    * @param methodName the method name
+    * @param parameters semicolon separated parameters
+    * @return {@link Map} with each {@link KeYJavaType} mapping to the associated {@link IProgramMethod}
+    */
+   public static Map<KeYJavaType, IProgramMethod> getKjtsOfAllImplementations(KeYEnvironment<?> env, KeYJavaType kjt, String methodName, String parameters) {
       Map<KeYJavaType, IProgramMethod> types = new HashMap<KeYJavaType, IProgramMethod>();
-      IProgramMethod pm = KeYResourcesUtil.getMethodForKjt(kjt, method, parameters);
+      IProgramMethod pm = KeYResourcesUtil.getMethodForKjt(kjt, methodName, parameters);
       if(pm != null) {
          types.put(kjt, pm);
       }
       Iterator<KeYJavaType> it = env.getJavaInfo().getAllSubtypes(kjt).iterator();
       while(it.hasNext()){
          kjt = it.next();
-         if((pm = KeYResourcesUtil.getMethodForKjt(kjt, method, parameters)) != null && !types.containsKey(kjt)){
+         if((pm = KeYResourcesUtil.getMethodForKjt(kjt, methodName, parameters)) != null && !types.containsKey(kjt)){
             types.put(kjt, pm);
          }
       }
       return types;
    }
    
+   
+   /**
+    * Creates a semicolon separated {@link String} of all {@link KeYJavaType} keys in the given {@link Map}
+    * @param implementations the {@link Map} to use
+    * @return semicolon separated {@link String} of all {@link KeYJavaType}s
+    */
    public static String implementationTypesToString(Map<KeYJavaType, IProgramMethod> implementations) {
       String implementationTypesString = "";
       for(KeYJavaType kjt : implementations.keySet()){
@@ -998,6 +1049,13 @@ public class KeYResourcesUtil {
       return implementationTypesString;
    }
 
+   
+   /**
+    * Returns the {@link FieldDeclaration} matching the given name in the given {@link KeYJavaType}
+    * @param kjt the {@link KeYJavaType} to use
+    * @param name the field name
+    * @return the {@link FieldDeclaration} or null
+    */
    public static FieldDeclaration getFieldDeclFromKjt(KeYJavaType kjt, String name) {
       if(kjt.getJavaType() instanceof TypeDeclaration) {
          TypeDeclaration typeDecl = (TypeDeclaration) kjt.getJavaType();
@@ -1017,19 +1075,33 @@ public class KeYResourcesUtil {
       return null;
    }
 
-
-   public static boolean isBuildFile(IResource res) {
-      if(res != null) {
-         IFile buildFile = getProofFolder(res.getProject()).getFile(KeYResourcesUtil.BUILD_FILE);
-         if(buildFile.equals(res)) {
-            return true;
-         }
-      }
-      return false;
+   
+   /**
+    * Converts the given {@link Contract} into a {@link String} representation
+    * @param contract the {@link Contract} to use
+    * @return the {@link String} representation
+    */
+   public static String contractToString(Contract contract) {
+      return contract.toString();
    }
    
-   public static boolean hasBuildFile(IProject project) {
-      IFile buildFile = getProofFolder(project).getFile(KeYResourcesUtil.BUILD_FILE);
-      return buildFile.exists();
+
+   /**
+    * Converts the given {@link RepresentsAxiom} into a {@link String} representation
+    * @param axiom the {@link RepresentsAxiom} to use
+    * @return the {@link String} representation
+    */
+   public static String repAxiomToString(RepresentsAxiom axiom) {
+      return axiom.toString();
+   }
+
+
+   /**
+    * Converts the given {@link ClassInvariant} into a {@link String} representation
+    * @param invariant the {@link ClassInvariant} to use
+    * @return the {@link String} representation
+    */
+   public static String invariantToString(ClassInvariant invariant){
+      return invariant.getOriginalInv().toString();
    }
 }

@@ -13,6 +13,10 @@ import de.uka.ilkd.key.java.statement.Do;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.While;
 
+/**
+ * Extends the {@link PrettyPrinter} in order to print comments for all loop types and inline methods.
+ * @author Stefan Käsdorf
+ */
 public class ProofMetaReferencesPrettyPrinter extends PrettyPrinter {
 
    public ProofMetaReferencesPrettyPrinter(Writer o, boolean noLineFeed) {

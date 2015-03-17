@@ -34,6 +34,10 @@ import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 
+/**
+ * A job for running KeY Project Builds.
+ * @author Stefan Käsdorf
+ */
 @SuppressWarnings("restriction")
 public class KeYProjectBuildJob extends Job{
    
@@ -56,10 +60,10 @@ public class KeYProjectBuildJob extends Job{
       if(buildType != KeYProjectBuildJob.FULL_BUILD){
          this.editorSelection = getEditorSelection();
       }
-      if(buildType != KeYProjectBuildJob.AUTO_BUILD && buildType != KeYProjectBuildJob.FULL_BUILD ){
+      if(buildType == KeYProjectBuildJob.MANUAL_BUILD){
          KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
          keyDelta.update(null);
-         keyDelta.setIsBuilding(true);
+         keyDelta.setIsSettingUp(true);
       }
       cancelProjectJobs();
    }
@@ -128,7 +132,10 @@ public class KeYProjectBuildJob extends Job{
       }
    }
    
-   
+   /**
+    * Acquires the current {@link EditorSelection} to allow intelligent proof ordering.
+    * @return the current {@link EditorSelection}
+    */
    private EditorSelection getEditorSelection(){
       final EditorSelection editorSelection = new EditorSelection();
       Display.getDefault().syncExec(new Runnable() {
