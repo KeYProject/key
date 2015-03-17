@@ -9,8 +9,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.key_project.stubby.core.util.StubGeneratorUtil;
 import org.key_project.stubby.ui.util.LogUtil;
+import org.key_project.stubby.ui.wizard.GenerateStubsWizard;
 import org.key_project.util.jdt.JDTUtil;
 
 /**
@@ -36,13 +36,13 @@ public class GenerateStubsHandler extends AbstractHandler {
                   javaProject = JDTUtil.getJavaProject((IProject) element);
                }
                if (JDTUtil.isJavaProject(javaProject)) {
-                  StubGeneratorUtil.generateStubs(javaProject);
+                  GenerateStubsWizard.openWizard(HandlerUtil.getActiveShell(event), javaProject);
                }
             }
          }
          catch (Exception e) {
-            LogUtil.logError(e);
-            LogUtil.openErrorDialog(e, HandlerUtil.getActiveShell(event));
+            LogUtil.getLogger().logError(e);
+            LogUtil.getLogger().openErrorDialog(HandlerUtil.getActiveShell(event), e);
          }
       }
       return null;

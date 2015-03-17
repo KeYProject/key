@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
@@ -40,6 +41,57 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class ResourceUtilTest extends TestCase {
+   /**
+    * {@link ResourceUtil#ensureExists(org.eclipse.core.resources.IContainer)}.
+    * @throws CoreException 
+    */
+   @Test
+   public void testEnsureExists() throws CoreException {
+      // Test null
+      assertFalse(ResourceUtil.ensureExists(null));
+      // Test not existing project
+      IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("ResourceUtilTest_testEnsureExists");
+      assertTrue(ResourceUtil.ensureExists(project));
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      // Test existing project
+      assertTrue(ResourceUtil.ensureExists(project));
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      // Test not existing folder
+      project.delete(true, null);
+      IFolder folder = project.getFolder("folder");
+      assertTrue(ResourceUtil.ensureExists(folder));
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      assertTrue(folder.exists());
+      // Test existing folder
+      assertTrue(ResourceUtil.ensureExists(folder));
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      assertTrue(folder.exists());
+      // Test not existing sub folder
+      IFolder subFolder = folder.getFolder("subFolder");
+      assertTrue(ResourceUtil.ensureExists(subFolder));
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      assertTrue(folder.exists());
+      assertTrue(subFolder.exists());
+      // Test existing sub folder
+      assertTrue(ResourceUtil.ensureExists(subFolder));
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      assertTrue(folder.exists());
+      assertTrue(subFolder.exists());
+      // Test not existing project
+      project.delete(true, null);
+      assertTrue(ResourceUtil.ensureExists(subFolder));
+      assertTrue(project.exists());
+      assertTrue(project.isOpen());
+      assertTrue(folder.exists());
+      assertTrue(subFolder.exists());
+   }
+   
    /**
     * {@link ResourceUtil#encodeURIPath(String)}.
     */

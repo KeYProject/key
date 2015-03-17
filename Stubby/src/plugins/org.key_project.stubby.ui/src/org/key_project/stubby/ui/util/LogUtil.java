@@ -1,10 +1,20 @@
+/*******************************************************************************
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.stubby.ui.util;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.swt.widgets.Shell;
 import org.key_project.stubby.ui.Activator;
+import org.key_project.util.eclipse.Logger;
 
 /**
  * Provides static methods for logging.
@@ -12,36 +22,24 @@ import org.key_project.stubby.ui.Activator;
  */
 public final class LogUtil {
    /**
-    * Logs the error.
-    * @param t The error to log.
+    * The default {@link Logger} instance.
     */
-   public static void logError(Throwable t) {
-      if (t != null) {
-         IStatus status = createErrorStatus(t);
-         Activator.getDefault().getLog().log(status);
-      }
+   private static Logger logger;
+   
+   /**
+    * Forbid instances.
+    */
+   private LogUtil() {
    }
    
    /**
-    * Creates an error status.
-    * @param t The exception.
-    * @return The created error status.
+    * Returns the default {@link Logger} instance for this plug-in.
+    * @return The default {@link Logger} instance for this plug-in.
     */
-   public static IStatus createErrorStatus(Throwable t) {
-      return new Status(IStatus.ERROR, Activator.PLUGIN_ID, t.getMessage(), t);
-   }
-
-   /**
-    * Opens an error dialog.
-    * @param t The exception to show in an error dialog.
-    * @param parentShell The parent {@link Shell} to use.
-    */
-   public static void openErrorDialog(final Throwable t, final Shell parentShell) {
-      parentShell.getDisplay().syncExec(new Runnable() {
-         @Override
-         public void run() {
-            ErrorDialog.openError(parentShell, "Error", null, createErrorStatus(t));
-         }
-      });
+   public static Logger getLogger() {
+      if (logger == null) {
+         logger = new Logger(Activator.getDefault(), Activator.PLUGIN_ID);
+      }
+      return logger;
    }
 }

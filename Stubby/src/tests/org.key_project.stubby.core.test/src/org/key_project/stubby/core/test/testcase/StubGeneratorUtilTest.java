@@ -646,7 +646,7 @@ public class StubGeneratorUtilTest extends TestCase {
       IJavaProject project = TestUtilsUtil.createJavaProject(projectName, "src");
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToSourceFilesInPlugin, project.getProject().getFolder("src"));
       // Create dependency model
-      DependencyModel dependencyModel = StubGeneratorUtil.createDependencyModel(project);
+      DependencyModel dependencyModel = StubGeneratorUtil.createDependencyModel(project, null);
       // Load oracle file
       ResourceSet rst = new ResourceSetImpl();
       Resource resource = rst.getResource(URI.createPlatformPluginURI("/" + Activator.PLUGIN_ID + "/" + pathToOracleFileInPlugin, true), true);
@@ -671,14 +671,14 @@ public class StubGeneratorUtilTest extends TestCase {
       IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToSourceFilesInPlugin, project.getProject().getFolder("src"));
       // Generate stubs
-      StubGeneratorUtil.generateStubs(project);
+      StubGeneratorUtil.generateStubs(project, StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH, null);
       // Extract oracle stubs into project
       IFolder oracleFolder = project.getProject().getFolder("oracleStubs");
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToOracleStubsFileInPlugin, oracleFolder);
       // Create new oracle stubs if requested
       createOracleFiles(project, pathToOracleStubsFileInPlugin);
       // Compare generated stubs with oracle stubs
-      IFolder stubFolder = project.getProject().getFolder(StubGeneratorUtil.STUB_FOLDER_NAME);
+      IFolder stubFolder = project.getProject().getFolder(StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH);
       assertResources(oracleFolder.members(), stubFolder.members());
    }
 
@@ -699,10 +699,10 @@ public class StubGeneratorUtilTest extends TestCase {
       // Fill src folder
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToSourceFilesInPlugin, project.getProject().getFolder("src"));
       // Fill stub folder
-      IFolder stubFolder = project.getProject().getFolder(StubGeneratorUtil.STUB_FOLDER_NAME);
+      IFolder stubFolder = project.getProject().getFolder(StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH);
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToInitialStubs, stubFolder);
       // Generate stubs
-      StubGeneratorUtil.generateStubs(project);
+      StubGeneratorUtil.generateStubs(project, StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH, null);
       // Extract oracle stubs into project
       IFolder oracleFolder = project.getProject().getFolder("oracleStubs");
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToOracleStubsFileInPlugin, oracleFolder);
@@ -768,7 +768,7 @@ public class StubGeneratorUtilTest extends TestCase {
       if (oracleDirectory != null) {
          File oracleSubDirectory = new File(oracleDirectory, pathToOracleStubsFileInPlugin);
          oracleSubDirectory.mkdirs();
-         assertTrue(ResourceUtil.copyIntoFileSystem(project.getProject().getFolder(StubGeneratorUtil.STUB_FOLDER_NAME), oracleSubDirectory));
+         assertTrue(ResourceUtil.copyIntoFileSystem(project.getProject().getFolder(StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH), oracleSubDirectory));
          printOracleDirectory();
       }
    }

@@ -461,4 +461,40 @@ public class ResourceUtil {
          return null;
       }
    }
+
+   /**
+    * Ensures that the given {@link IContainer} exists.
+    * @param container The {@link IContainer} to check.
+    * @return {@code true} if {@link IContainer} exists and {@code false} otherwise.
+    * @throws CoreException Occurred Exception.
+    */
+   public static boolean ensureExists(IContainer container) throws CoreException {
+      if (container instanceof IFolder) {
+         if (!container.exists()) { 
+            if (ensureExists(container.getParent())) {
+               ((IFolder) container).create(true, true, null);
+               return true;
+            }
+            else {
+               return false;
+            }
+         }
+         else {
+            return true;
+         }
+      }
+      else if (container instanceof IProject) {
+         IProject project = (IProject) container;
+         if (!project.exists()) {
+            project.create(null);
+         }
+         if (!project.isOpen()) {
+            project.open(null);
+         }
+         return true;
+      }
+      else {
+         return false;
+      }
+   }
 }
