@@ -3,5 +3,5 @@ package java.util;
 /**
  * @generated
  */
-public interface List {
+public interface List<E extends java.lang.Object> {
 }

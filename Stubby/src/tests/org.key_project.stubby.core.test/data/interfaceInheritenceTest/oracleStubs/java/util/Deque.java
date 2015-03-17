@@ -3,5 +3,5 @@ package java.util;
 /**
  * @generated
  */
-public interface Deque {
+public interface Deque<E extends java.lang.Object> {
 }

@@ -3,5 +3,5 @@ package java.lang;
 /**
  * @generated
  */
-public interface Iterable {
+public interface Iterable<T extends java.lang.Object> {
 }

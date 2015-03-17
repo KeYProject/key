@@ -6,7 +6,9 @@ import org.key_project.stubby.model.dependencymodel.AbstractType;
 import org.key_project.stubby.model.dependencymodel.Field;
 import org.key_project.stubby.model.dependencymodel.Method;
 import org.key_project.stubby.model.dependencymodel.Type;
+import org.key_project.stubby.model.dependencymodel.TypeVariable;
 import org.key_project.stubby.model.dependencymodel.Visibility;
+import org.key_project.util.java.StringUtil;
 
 public class TypeTemplate {
    protected static String nl;
@@ -18,7 +20,7 @@ public class TypeTemplate {
       return result;
    }
 
-   public final String NL = nl == null ? (System.getProperties().getProperty("line.separator")) : nl;
+   public final String NL = nl == null ? (StringUtil.NEW_LINE) : nl;
 
    public String generate(Object argument) {
       final StringBuffer sb = new StringBuffer();
@@ -42,7 +44,15 @@ public class TypeTemplate {
       else {
          sb.append(INDENT + type.getKind().toJavaKindKeyword());
       }
-      sb.append(" " + type.getSimpleName() + " {");
+      sb.append(" " + type.getSimpleName());
+      for (TypeVariable var : type.getTypeVariables()) {
+         sb.append("<");
+         sb.append(var.getName());
+         sb.append(" extends ");
+         sb.append(var.getType().getName());
+         sb.append(">");
+      }
+      sb.append(" {");
       List<Field> allFields = type.getFields();
       for (Field stubField : allFields) {
          sb.append(NL + NL + INDENT + "   /**" + NL + INDENT + "    * @generated" + NL + INDENT + "    */");

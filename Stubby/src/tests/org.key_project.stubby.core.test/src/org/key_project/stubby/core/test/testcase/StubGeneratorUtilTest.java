@@ -1,5 +1,7 @@
 package org.key_project.stubby.core.test.testcase;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -34,7 +36,9 @@ import org.key_project.stubby.model.dependencymodel.Type;
 import org.key_project.stubby.model.dependencymodel.TypeVariable;
 import org.key_project.stubby.model.dependencymodel.WildcardType;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -43,6 +47,43 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class StubGeneratorUtilTest extends TestCase {
+   /**
+    * <p>
+    * If this constant is {@code true} a temporary directory is created with
+    * new oracle files. The developer has than to copy the new required files
+    * into the plug-in so that they are used during next test execution.
+    * </p>
+    * <p>
+    * <b>Attention: </b> It is strongly required that new test scenarios
+    * are verified with the SED application. If everything is fine a new test
+    * method can be added to this class and the first test execution can be
+    * used to generate the required oracle file. Existing oracle files should
+    * only be replaced if the functionality of the Symbolic Execution Debugger
+    * has changed so that they are outdated.
+    * </p>
+    */
+   public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = false;
+   
+   /**
+    * The used temporary oracle directory.
+    */
+   private static final File oracleDirectory;
+
+   /**
+    * Creates the temporary oracle directory if required.
+    */
+   static {
+      File directory = null;
+      try {
+         if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
+            directory = IOUtil.createTempDirectory("ORACLE_DIRECTORY", StringUtil.EMPTY_STRING);
+         }
+      }
+      catch (IOException e) {
+      }
+      oracleDirectory = directory;
+   }
+
    @Test
    public void testExtractReferences_wildcardTest() throws CoreException, InterruptedException{
       doExtractReferencesTest("JDTUtilTest_testExtractReferences_wildcardTest", 
@@ -606,9 +647,34 @@ public class StubGeneratorUtilTest extends TestCase {
       // Extract oracle stubs into project
       IFolder oracleFolder = project.getProject().getFolder("oracleStubs");
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToOracleStubsFileInPlugin, oracleFolder);
-      // Compare generated stubs with oracle stubs
+      // Create new oracle stubs if requested
       IFolder stubFolder = project.getProject().getFolder(StubGeneratorUtil.STUB_FOLDER_NAME);
+      if (oracleDirectory != null) {
+         File oracleSubDirectory = new File(oracleDirectory, pathToOracleStubsFileInPlugin);
+         oracleSubDirectory.mkdirs();
+         assertTrue(ResourceUtil.copyIntoFileSystem(project.getProject().getFolder(StubGeneratorUtil.STUB_FOLDER_NAME), oracleSubDirectory));
+         printOracleDirectory();
+      }
+      // Compare generated stubs with oracle stubs
       assertResources(oracleFolder.members(), stubFolder.members());
+   }
+   
+   /**
+    * Prints {@link #oracleDirectory} to the user via {@link System#out}.
+    */
+   protected static void printOracleDirectory() {
+      if (oracleDirectory != null) {
+         final String HEADER_LINE = "Oracle Directory is:";
+         final String PREFIX = "### ";
+         final String SUFFIX = " ###";
+         String path = oracleDirectory.toString();
+         int length = Math.max(path.length(), HEADER_LINE.length());
+         String borderLines = StringUtil.createLine("#", PREFIX.length() + length + SUFFIX.length());
+         System.out.println(borderLines);
+         System.out.println(PREFIX + HEADER_LINE + StringUtil.createLine(" ", length - HEADER_LINE.length()) + SUFFIX);
+         System.out.println(PREFIX + path + StringUtil.createLine(" ", length - path.length()) + SUFFIX);
+         System.out.println(borderLines);
+      }
    }
    
    protected void doChangedTestStubs(String stubProject, 

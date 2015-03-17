@@ -535,9 +535,13 @@ public class ResourceUtilTest extends TestCase {
       // Create project
       IProject project = TestUtilsUtil.createProject("ResourceUtilTest_testCopyIntoFileSystem");
       IFile file = TestUtilsUtil.createFile(project, "Test.txt", "Hello World!");
+      IFolder folder = TestUtilsUtil.createFolder(project, "folder");
+      IFile subFile = TestUtilsUtil.createFile(folder, "TestSub.txt", "Hello Sub Folder!");
       // Create tmp file
       File tmpFile = File.createTempFile("Test", ".txt");
       tmpFile.delete();
+      // Create temp dir
+      File tempDir = IOUtil.createTempDirectory("Test", "folder");
       try {
          // Test null
          assertFalse(ResourceUtil.copyIntoFileSystem(null, tmpFile));
@@ -554,9 +558,17 @@ public class ResourceUtilTest extends TestCase {
          assertTrue(ResourceUtil.copyIntoFileSystem(file, tmpFile));
          assertTrue(tmpFile.exists());
          assertEquals("Hello World!", IOUtil.readFrom(tmpFile));
+         // Test copy project
+         assertTrue(ResourceUtil.copyIntoFileSystem(project, tempDir));
+         assertTrue(tempDir.exists());
+         assertTrue(new File(tempDir, file.getName()).exists());
+         assertEquals("Hello World!", IOUtil.readFrom(new File(tempDir, file.getName())));
+         assertTrue(new File(tempDir, folder.getName()).exists());
+         assertEquals("Hello Sub Folder!", IOUtil.readFrom(new File(tempDir, folder.getName() + File.separator + subFile.getName())));
       }
       finally {
          tmpFile.delete();
+         tempDir.delete();
       }
    }
 }

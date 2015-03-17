@@ -3,5 +3,5 @@ package java.util;
 /**
  * @generated
  */
-public class LinkedList {
+public class LinkedList<E extends java.lang.Object> {
 }
