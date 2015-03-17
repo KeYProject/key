@@ -9,7 +9,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.key_project.stubby.core.generator.StubGeneratorUtil;
+import org.key_project.stubby.core.util.StubGeneratorUtil;
 import org.key_project.stubby.ui.util.LogUtil;
 import org.key_project.util.jdt.JDTUtil;
 

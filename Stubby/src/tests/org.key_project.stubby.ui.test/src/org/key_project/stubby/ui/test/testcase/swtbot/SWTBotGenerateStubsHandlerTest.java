@@ -9,7 +9,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
 import org.key_project.stubby.core.test.testcase.StubGeneratorUtilTest;
 import org.key_project.stubby.ui.test.Activator;
-import org.key_project.stubby.ui.test.uti.StubbyUITestUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -28,10 +27,10 @@ public class SWTBotGenerateStubsHandlerTest extends TestCase {
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/helloWorldExample", javaProject.getProject());
       TestUtilsUtil.waitForBuild();
       // Close welcome screen
-      //StubbyUITestUtil.closeWelcomeView();
-      // Click on project context menu to generate stubs
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
-      SWTBotTreeItem projectItem = StubbyUITestUtil.selectInProjectExplorer(bot, javaProject.getProject().getName());
+      TestUtilsUtil.closeWelcomeView(bot);
+      // Click on project context menu to generate stubs
+      SWTBotTreeItem projectItem = TestUtilsUtil.selectInProjectExplorer(bot, javaProject.getProject().getName());
       projectItem.contextMenu("Generate Stubs").click();
       // Extract oracle stubs into project
       IFolder oracleFolder = javaProject.getProject().getFolder("oracleStubs");

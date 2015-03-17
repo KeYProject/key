@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -18,13 +17,10 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.junit.Test;
-import org.key_project.stubby.core.generator.StubGeneratorUtil;
 import org.key_project.stubby.core.test.Activator;
+import org.key_project.stubby.core.util.StubGeneratorUtil;
 import org.key_project.stubby.model.dependencymodel.AbstractType;
 import org.key_project.stubby.model.dependencymodel.ArrayType;
 import org.key_project.stubby.model.dependencymodel.Datatype;
@@ -39,7 +35,6 @@ import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
-import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 import org.osgi.framework.Bundle;
 
@@ -86,10 +81,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
 
    @Test
-   public void testExtractReferences_wildcardTest() throws CoreException, InterruptedException{
-      doExtractReferencesTest("JDTUtilTest_testExtractReferences_wildcardTest", 
-                              "data/wildcardTest/test",
-                              "data/wildcardTest/oracle/Dependencymodel.dependencymodel");
+   public void testExtractReferences_wildcardTest() throws Exception{
+      doDependencyModelTest("JDTUtilTest_testExtractReferences_wildcardTest", 
+                            "data/wildcardTest/test",
+                            "data/wildcardTest/oracle/Dependencymodel.dependencymodel");
    }
    
    @Test
@@ -100,10 +95,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
   
    @Test
-   public void testExtractReferences_importTest() throws CoreException, InterruptedException{
-      doExtractReferencesTest("JDTUtilTest_testExtractReferences_importTest", 
-                              "data/importTest/test",
-                              "data/importTest/oracle/Dependencymodel.dependencymodel");
+   public void testExtractReferences_importTest() throws Exception{
+      doDependencyModelTest("JDTUtilTest_testExtractReferences_importTest", 
+                            "data/importTest/test",
+                            "data/importTest/oracle/Dependencymodel.dependencymodel");
    }
    
    @Test
@@ -114,10 +109,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
 
    @Test
-   public void testExtractReferences_innerTypeTest() throws CoreException, InterruptedException{
-      doExtractReferencesTest("JDTUtilTest_testExtractReferences_innerTypeTest", 
-                              "data/innerTypeTest/test",
-                              "data/innerTypeTest/oracle/Dependencymodel.dependencymodel");
+   public void testExtractReferences_innerTypeTest() throws Exception{
+      doDependencyModelTest("JDTUtilTest_testExtractReferences_innerTypeTest", 
+                            "data/innerTypeTest/test",
+                            "data/innerTypeTest/oracle/Dependencymodel.dependencymodel");
    }
 
    @Test
@@ -128,10 +123,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_methodCallTest() throws CoreException, InterruptedException{
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_methodCallTest", 
-                              "data/methodCallTest/test",
-                              "data/methodCallTest/oracle/Dependencymodel.dependencymodel");
+   public void testExtractReferences_methodCallTest() throws Exception{
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_methodCallTest", 
+                            "data/methodCallTest/test",
+                            "data/methodCallTest/oracle/Dependencymodel.dependencymodel");
    }
    
    @Test
@@ -142,10 +137,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_superMethodCallTest() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_superMethodCallTest",
-                              "data/superMethodCallTest/test",
-                              "data/superMethodCallTest/oracle/Dependencymodel.dependencymodel");
+   public void testExtractReferences_superMethodCallTest() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_superMethodCallTest",
+                            "data/superMethodCallTest/test",
+                            "data/superMethodCallTest/oracle/Dependencymodel.dependencymodel");
    }
    
    @Test
@@ -156,10 +151,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_implicitSuperMethodCallTest() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_implicitSuper",
-                              "data/implicitSuperMethodCallTest/test",
-                              "data/implicitSuperMethodCallTest/oracle/Dependencymodel.dependencymodel");
+   public void testExtractReferences_implicitSuperMethodCallTest() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_implicitSuper",
+                            "data/implicitSuperMethodCallTest/test",
+                            "data/implicitSuperMethodCallTest/oracle/Dependencymodel.dependencymodel");
    }
    
    @Test
@@ -170,10 +165,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_fieldCallTest() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTes_testGetReferenceMap_fieldCallTest",
-                              "data/fieldCallTest/test",
-                              "data/fieldCallTest/oracle/Dependencymodel.dependencymodel"); 
+   public void testExtractReferences_fieldCallTest() throws Exception {
+      doDependencyModelTest("JDTUtilTes_testGetReferenceMap_fieldCallTest",
+                            "data/fieldCallTest/test",
+                            "data/fieldCallTest/oracle/Dependencymodel.dependencymodel"); 
    }
    
    @Test
@@ -184,10 +179,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_superFieldCallTest() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_superFieldCallTest", 
-                              "data/superFieldCallTest/test",
-                              "data/superFieldCallTest/oracle/Dependencymodel.dependencymodel");
+   public void testExtractReferences_superFieldCallTest() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_superFieldCallTest", 
+                            "data/superFieldCallTest/test",
+                            "data/superFieldCallTest/oracle/Dependencymodel.dependencymodel");
    }
    
    @Test
@@ -199,9 +194,9 @@ public class StubGeneratorUtilTest extends TestCase {
    
    @Test
    public void testExtractReferences_implicitSuperFieldCallTest() throws Exception {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_implicitSuperFieldCallTest", 
-                              "data/implicitSuperFieldCallTest/test",
-                              "data/implicitSuperFieldCallTest/oracle/Dependencymodel.dependencymodel");
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_implicitSuperFieldCallTest", 
+                            "data/implicitSuperFieldCallTest/test",
+                            "data/implicitSuperFieldCallTest/oracle/Dependencymodel.dependencymodel");
    }
    
    @Test
@@ -213,9 +208,9 @@ public class StubGeneratorUtilTest extends TestCase {
    
    @Test
    public void testExtractReferences_implicitFieldCallTest() throws Exception {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_implicitFieldCallTest", 
-                              "data/implicitFieldCallTest/test",
-                              "data/implicitFieldCallTest/oracle/Dependencymodel.dependencymodel");
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_implicitFieldCallTest", 
+                            "data/implicitFieldCallTest/test",
+                            "data/implicitFieldCallTest/oracle/Dependencymodel.dependencymodel");
    }
    
    @Test
@@ -227,9 +222,9 @@ public class StubGeneratorUtilTest extends TestCase {
    
    @Test
    public void testExtractReferences_nestedFieldCallTest() throws Exception {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_nestedFieldCallTest",
-                              "data/nestedFieldCallTest/test",
-                              "data/nestedFieldCallTest/oracle/Dependencymodel.dependencymodel"); 
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_nestedFieldCallTest",
+                            "data/nestedFieldCallTest/test",
+                            "data/nestedFieldCallTest/oracle/Dependencymodel.dependencymodel"); 
    }
    
    @Test
@@ -241,10 +236,10 @@ public class StubGeneratorUtilTest extends TestCase {
    
    
    @Test
-   public void testExtractReferences_constructorCallTest() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_constructorCallTest", 
-                              "data/constructorCallTest/test",
-                              "data/constructorCallTest/oracle/Dependencymodel.dependencymodel");
+   public void testExtractReferences_constructorCallTest() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_constructorCallTest", 
+                            "data/constructorCallTest/test",
+                            "data/constructorCallTest/oracle/Dependencymodel.dependencymodel");
    }
    
    @Test
@@ -256,9 +251,9 @@ public class StubGeneratorUtilTest extends TestCase {
    
    @Test 
    public void testExtractReferences_superConstructorCallTest() throws Exception {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_superConstructorCallTest", 
-                              "/data/superConstructorCallTest/test",
-                              "data/superConstructorCallTest/oracle/Dependencymodel.dependencymodel");
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_superConstructorCallTest", 
+                            "/data/superConstructorCallTest/test",
+                            "data/superConstructorCallTest/oracle/Dependencymodel.dependencymodel");
    }
    
    @Test
@@ -270,9 +265,9 @@ public class StubGeneratorUtilTest extends TestCase {
    
    @Test
    public void testExtractReferences_implicitSuperConstructorCallTest() throws Exception {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_implicitSuperConstructorCallTest", 
-                              "data/implicitSuperConstructorCallTest/test",
-                              "data/implicitSuperConstructorCallTest/oracle/Dependencymodel.dependencymodel");
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_implicitSuperConstructorCallTest", 
+                            "data/implicitSuperConstructorCallTest/test",
+                            "data/implicitSuperConstructorCallTest/oracle/Dependencymodel.dependencymodel");
    }
    
    @Test
@@ -283,10 +278,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_innerThisTest() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_innerThisTest", 
-                              "data/innerThisTest/test",
-                              "data/innerThisTest/oracle/Dependencymodel.dependencymodel");
+   public void testExtractReferences_innerThisTest() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_innerThisTest", 
+                            "data/innerThisTest/test",
+                            "data/innerThisTest/oracle/Dependencymodel.dependencymodel");
    }
    
    @Test
@@ -298,9 +293,9 @@ public class StubGeneratorUtilTest extends TestCase {
    
    @Test
    public void testExtractReferences_fieldOnMethodCallTeset() throws Exception {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_fieldOnMethodCallTeset", 
-                              "data/fieldOnMethodCallTeset/test",
-                              "data/fieldOnMethodCallTeset/oracle/Dependencymodel.dependencymodel");
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_fieldOnMethodCallTeset", 
+                            "data/fieldOnMethodCallTeset/test",
+                            "data/fieldOnMethodCallTeset/oracle/Dependencymodel.dependencymodel");
    }
    
    @Test
@@ -311,10 +306,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_nestedFieldOnMethodCallTest() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_nestedFieldOnMethodCallTeset",
-                              "data/nestedFieldOnMethodCallTeset/test",
-                              "data/nestedFieldOnMethodCallTeset/oracle/Dependencymodel.dependencymodel");
+   public void testExtractReferences_nestedFieldOnMethodCallTest() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_nestedFieldOnMethodCallTeset",
+                            "data/nestedFieldOnMethodCallTeset/test",
+                            "data/nestedFieldOnMethodCallTeset/oracle/Dependencymodel.dependencymodel");
                               
    }
    
@@ -326,10 +321,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test 
-   public void testExtractReferences_parameterTypesTest() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_parameterTypesTest",
-                              "data/parameterTypesTest/test", 
-                              "data/parameterTypesTest/oracle/Dependencymodel.dependencymodel");
+   public void testExtractReferences_parameterTypesTest() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_parameterTypesTest",
+                            "data/parameterTypesTest/test", 
+                            "data/parameterTypesTest/oracle/Dependencymodel.dependencymodel");
                               
    }
    
@@ -341,10 +336,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test 
-   public void testExtractReferences_fullInheritenceTest() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_fullInheritenceTest",
-                              "data/fullInheritenceTest/test",
-                              "data/fullInheritenceTest/oracle/Dependencymodel.dependencymodel");                          
+   public void testExtractReferences_fullInheritenceTest() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_fullInheritenceTest",
+                            "data/fullInheritenceTest/test",
+                            "data/fullInheritenceTest/oracle/Dependencymodel.dependencymodel");                          
    }
    
    @Test
@@ -355,10 +350,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_interfaceInheritenceTest() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_interfaceInheritenceTest", 
-                              "data/interfaceInheritenceTest/test",
-                              "data/interfaceInheritenceTest/oracle/Dependencymodel.dependencymodel");
+   public void testExtractReferences_interfaceInheritenceTest() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_interfaceInheritenceTest", 
+                            "data/interfaceInheritenceTest/test",
+                            "data/interfaceInheritenceTest/oracle/Dependencymodel.dependencymodel");
    }
    
    @Test
@@ -369,10 +364,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_genericsTest() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_genericsTest",
-                              "data/genericsTest/test", 
-                              "data/genericsTest/oracle/Dependencymodel.dependencymodel");                           
+   public void testExtractReferences_genericsTest() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_genericsTest",
+                            "data/genericsTest/test", 
+                            "data/genericsTest/oracle/Dependencymodel.dependencymodel");                           
    }
    
    @Test
@@ -383,10 +378,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_arrayTest() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_arrayTest",
-                              "data/arrayTest/test", 
-                              "data/arrayTest/oracle/Dependencymodel.dependencymodel");                           
+   public void testExtractReferences_arrayTest() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_arrayTest",
+                            "data/arrayTest/test", 
+                            "data/arrayTest/oracle/Dependencymodel.dependencymodel");                           
    }
    
    @Test
@@ -397,10 +392,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_fieldDeclarationTest() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_fieldDeclarationTest",
-                              "data/fieldDeclarationTest/test", 
-                              "data/fieldDeclarationTest/oracle/Dependencymodel.dependencymodel");                           
+   public void testExtractReferences_fieldDeclarationTest() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_fieldDeclarationTest",
+                            "data/fieldDeclarationTest/test", 
+                            "data/fieldDeclarationTest/oracle/Dependencymodel.dependencymodel");                           
    }
    
    @Test
@@ -411,10 +406,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_multiInterfaceInheritance() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_multiInterfaceInheritance",
-                              "data/multiInterfaceInheritance/test", 
-                              "data/multiInterfaceInheritance/oracle/Dependencymodel.dependencymodel");                           
+   public void testExtractReferences_multiInterfaceInheritance() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_multiInterfaceInheritance",
+                            "data/multiInterfaceInheritance/test", 
+                            "data/multiInterfaceInheritance/oracle/Dependencymodel.dependencymodel");                           
    }
    
    @Test
@@ -425,10 +420,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_multileGenericArguments() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_multileGenericArguments",
-                              "data/multileGenericArguments/test", 
-                              "data/multileGenericArguments/oracle/Dependencymodel.dependencymodel");                           
+   public void testExtractReferences_multileGenericArguments() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_multileGenericArguments",
+                            "data/multileGenericArguments/test", 
+                            "data/multileGenericArguments/oracle/Dependencymodel.dependencymodel");                           
    }
    
    @Test
@@ -439,10 +434,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_simpleGenericMethodArgument() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_simpleGenericMethodArgument",
-                              "data/simpleGenericMethodArgument/test", 
-                              "data/simpleGenericMethodArgument/oracle/Dependencymodel.dependencymodel");                           
+   public void testExtractReferences_simpleGenericMethodArgument() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_simpleGenericMethodArgument",
+                            "data/simpleGenericMethodArgument/test", 
+                            "data/simpleGenericMethodArgument/oracle/Dependencymodel.dependencymodel");                           
    }
    
    @Test
@@ -453,10 +448,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_simpleGenericTest() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_simpleGenericTest",
-                              "data/simpleGenericTest/test", 
-                              "data/simpleGenericTest/oracle/Dependencymodel.dependencymodel");                           
+   public void testExtractReferences_simpleGenericTest() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_simpleGenericTest",
+                            "data/simpleGenericTest/test", 
+                            "data/simpleGenericTest/oracle/Dependencymodel.dependencymodel");                           
    }
    
    @Test
@@ -467,10 +462,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_simpleGenericTypeArgument() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_simpleGenericTypeArgument",
-                              "data/simpleGenericTypeArgument/test", 
-                              "data/simpleGenericTypeArgument/oracle/Dependencymodel.dependencymodel");                           
+   public void testExtractReferences_simpleGenericTypeArgument() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_simpleGenericTypeArgument",
+                            "data/simpleGenericTypeArgument/test", 
+                            "data/simpleGenericTypeArgument/oracle/Dependencymodel.dependencymodel");                           
    }
    
    @Test
@@ -481,10 +476,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_simpleInnerType() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_simpleInnerType",
-                              "data/simpleInnerType/test", 
-                              "data/simpleInnerType/oracle/Dependencymodel.dependencymodel");                           
+   public void testExtractReferences_simpleInnerType() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_simpleInnerType",
+                            "data/simpleInnerType/test", 
+                            "data/simpleInnerType/oracle/Dependencymodel.dependencymodel");                           
    }
    
    @Test
@@ -495,10 +490,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
  
    @Test
-   public void testExtractReferences_multiParamTest() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_multiParamTest",
-                              "data/multiParamTest/test", 
-                              "data/multiParamTest/oracle/Dependencymodel.dependencymodel");
+   public void testExtractReferences_multiParamTest() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_multiParamTest",
+                            "data/multiParamTest/test", 
+                            "data/multiParamTest/oracle/Dependencymodel.dependencymodel");
                                                         
    }
    
@@ -510,10 +505,10 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
-   public void testExtractReferences_sameParamTest() throws CoreException, InterruptedException {
-      doExtractReferencesTest("JDTUtilTest_testGetReferenceMap_sameParamTest",
-                              "data/sameParamTest/test", 
-                              "data/sameParamTest/oracle/Dependencymodel.dependencymodel");
+   public void testExtractReferences_sameParamTest() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testGetReferenceMap_sameParamTest",
+                            "data/sameParamTest/test", 
+                            "data/sameParamTest/oracle/Dependencymodel.dependencymodel");
                                                         
    }
 
@@ -636,13 +631,45 @@ public class StubGeneratorUtilTest extends TestCase {
                          "data/stubRegeneration_changeInnerTypes/initialStubs",
                          "data/stubRegeneration_changeInnerTypes/oracleStubs");
    }
+
+   /**
+    * Tests the created {@link DependencyModel}.
+    * @param projectName The name of the {@link IJavaProject} to perform test in.
+    * @param pathToSourceFilesInPlugin The path to the source files in the {@link Bundle}.
+    * @param pathToOracleFileInPlugin The path to the oracle file in the {@link Bundle}.
+    * @throws Exception Occurred Exception.
+    */
+   protected void doDependencyModelTest(String projectName,
+                                        String pathToSourceFilesInPlugin,
+                                        String pathToOracleFileInPlugin) throws Exception {
+      // Create project with Source Folders and ASTNode to test
+      IJavaProject project = TestUtilsUtil.createJavaProject(projectName, "src");
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToSourceFilesInPlugin, project.getProject().getFolder("src"));
+      // Create dependency model
+      DependencyModel dependencyModel = StubGeneratorUtil.createDependencyModel(project);
+      // Load oracle file
+      ResourceSet rst = new ResourceSetImpl();
+      Resource resource = rst.getResource(URI.createPlatformPluginURI("/" + Activator.PLUGIN_ID + "/" + pathToOracleFileInPlugin, true), true);
+      assertEquals(1, resource.getContents().size());
+      assertTrue(resource.getContents().get(0) instanceof DependencyModel);
+      DependencyModel expectedModel = (DependencyModel) resource.getContents().get(0);
+      // Test model
+      assertDependenyModel(expectedModel, dependencyModel);
+   }   
    
-   protected void doTestStubs(String stubProject, 
-                              String pathToTestDataInPlugin, 
+   /**
+    * Performs a stub generation test.
+    * @param projectName The name of the {@link IJavaProject} to perform test in.
+    * @param pathToSourceFilesInPlugin The path to the test data in the {@link Bundle}.
+    * @param pathToOracleStubsFileInPlugin The path to the oracle files in the {@link Bundle}.
+    * @throws Exception Occurred Exception.
+    */
+   protected void doTestStubs(String projectName, 
+                              String pathToSourceFilesInPlugin, 
                               String pathToOracleStubsFileInPlugin) throws Exception {
       // Create project and add code to generate stubs from
-      IJavaProject project = TestUtilsUtil.createJavaProject(stubProject);
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToTestDataInPlugin, project.getProject().getFolder("src"));
+      IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToSourceFilesInPlugin, project.getProject().getFolder("src"));
       // Generate stubs
       StubGeneratorUtil.generateStubs(project);
       // Extract oracle stubs into project
@@ -655,6 +682,82 @@ public class StubGeneratorUtilTest extends TestCase {
       assertResources(oracleFolder.members(), stubFolder.members());
    }
 
+   /**
+    * Performs a stub generation test with existing stubs.
+    * @param projectName The name of the {@link IJavaProject} to perform test in.
+    * @param pathToSourceFilesInPlugin The path to the test data in the {@link Bundle}.
+    * @param pathToInitialStubs The path to the existing stubs in the {@link Bundle}.
+    * @param pathToOracleStubsFileInPlugin The path to the oracle files in the {@link Bundle}.
+    * @throws Exception Occurred Exception.
+    */
+   protected void doChangedTestStubs(String projectName, 
+                                     String pathToSourceFilesInPlugin, 
+                                     String pathToInitialStubs,
+                                     String pathToOracleStubsFileInPlugin) throws Exception {
+      // Create project
+      IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
+      // Fill src folder
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToSourceFilesInPlugin, project.getProject().getFolder("src"));
+      // Fill stub folder
+      IFolder stubFolder = project.getProject().getFolder(StubGeneratorUtil.STUB_FOLDER_NAME);
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToInitialStubs, stubFolder);
+      // Generate stubs
+      StubGeneratorUtil.generateStubs(project);
+      // Extract oracle stubs into project
+      IFolder oracleFolder = project.getProject().getFolder("oracleStubs");
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToOracleStubsFileInPlugin, oracleFolder);
+      // Create new oracle stubs if requested
+      createOracleFiles(project, pathToOracleStubsFileInPlugin);
+      // Compare generated stubs with oracle stubs
+      assertResources(oracleFolder.members(), stubFolder.members());
+   }
+   
+   /**
+    * Ensures that the given {@link IResource}s have the same content.
+    * @param expected The expected {@link IResource}s.
+    * @param current The current {@link IResource}s.
+    * @throws Exception Occurred Exception.
+    */
+   public static void assertResources(IResource[] expected, IResource[] current) throws Exception {
+      if (expected != null) {
+         assertNotNull(current);
+         assertEquals(expected.length, current.length);
+         for (int i = 0; i < expected.length; i++) {
+            assertResource(expected[i], current[i]);
+         }
+      }
+      else {
+         assertNull(current);
+      }
+   }
+  
+   /**
+    * Ensures the same content of the given {@link IResource}s.
+    * @param expected The expected {@link IResource}.
+    * @param current The current {@link IResource}.
+    * @throws Exception Occurred Exception.
+    */
+   public static void assertResource(IResource expected, IResource current) throws Exception {
+      assertEquals(expected.getName(), current.getName());
+      assertEquals(expected.getType(), current.getType());
+      if (expected instanceof IFolder) {
+         assertTrue(current instanceof IFolder);
+         assertResources(((IFolder) expected).members(), ((IFolder) current).members());
+      }
+      else {
+         assertFalse(current instanceof IFolder);
+      }
+      if (expected instanceof IFile) {
+         assertTrue(current instanceof IFile);
+         String expectedContent = IOUtil.readFrom(((IFile) expected).getContents());
+         String currentContent = IOUtil.readFrom(((IFile) current).getContents());
+         assertEquals(expectedContent, currentContent);
+      }
+      else {
+         assertFalse(current instanceof IFile);
+      }
+   }
+   
    /**
     * Creates new oracle files if required.
     * @param project The current {@link IJavaProject}.
@@ -688,105 +791,35 @@ public class StubGeneratorUtilTest extends TestCase {
       }
    }
    
-   protected void doChangedTestStubs(String stubProject, 
-                                     String pathToTestDataInPlugin, 
-                                     String pathToInitialStubs,
-                                     String pathToOracleStubsFileInPlugin) throws Exception {
-      // Create project
-      IJavaProject project = TestUtilsUtil.createJavaProject(stubProject);
-      // Fill src folder
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToTestDataInPlugin, project.getProject().getFolder("src"));
-      // Fill stub folder
-      IFolder stubFolder = project.getProject().getFolder(StubGeneratorUtil.STUB_FOLDER_NAME);
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToInitialStubs, stubFolder);
-      // Generate stubs
-      StubGeneratorUtil.generateStubs(project);
-      // Extract oracle stubs into project
-      IFolder oracleFolder = project.getProject().getFolder("oracleStubs");
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToOracleStubsFileInPlugin, oracleFolder);
-      // Create new oracle stubs if requested
-      createOracleFiles(project, pathToOracleStubsFileInPlugin);
-      // Compare generated stubs with oracle stubs
-      assertResources(oracleFolder.members(), stubFolder.members());
-   }
-   
-
-   public static void assertResources(IResource[] expected, IResource[] current) throws Exception {
+   /**
+    * Ensures the same content of the given {@link DependencyModel}s.
+    * @param expected The expected {@link DependencyModel}.
+    * @param current The current {@link DependencyModel}.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertDependenyModel(DependencyModel expected, DependencyModel current) {
       if (expected != null) {
          assertNotNull(current);
-         assertEquals(expected.length, current.length);
-         for (int i = 0; i < expected.length; i++) {
-            assertResource(expected[i], current[i]);
-         }
+         assertAbstractTypes(expected.getTypes(), current.getTypes(), new HashSet<AbstractType>());
       }
       else {
          assertNull(current);
       }
    }
-  
-   public static void assertResource(IResource expected, IResource current) throws Exception {
-      assertEquals(expected.getName(), current.getName());
-      assertEquals(expected.getType(), current.getType());
-      if (expected instanceof IFolder) {
-         assertTrue(current instanceof IFolder);
-         assertResources(((IFolder) expected).members(), ((IFolder) current).members());
-      }
-      else {
-         assertFalse(current instanceof IFolder);
-      }
-      if (expected instanceof IFile) {
-         assertTrue(current instanceof IFile);
-         String expectedContent = IOUtil.readFrom(((IFile) expected).getContents());
-         String currentContent = IOUtil.readFrom(((IFile) current).getContents());
-         assertEquals(expectedContent, currentContent);
-      }
-      else {
-         assertFalse(current instanceof IFile);
-      }
-    }
-
-   /**
-    * Method test the extracted References 
-    * @param projectName {@link String}
-    * @param pathToTestDataInPlugin {@link String}
-    * @param expectedTypes {@link Typ}
-    * @throws CoreException
-    * @throws InterruptedException
-    */
-   protected void doExtractReferencesTest(String projectName,
-                                          String pathToTestDataInPlugin,
-                                          String pathToOracleFileInPlugin) throws CoreException, InterruptedException {
-      // Create project with Source Folders and ASTNode to test
-      IJavaProject project = TestUtilsUtil.createJavaProject(projectName, "src");
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToTestDataInPlugin, project.getProject().getFolder("src"));
-      List<IPackageFragmentRoot> sourceFolders = JDTUtil.getSourceFolders(project);
-      List<ICompilationUnit> icompUnitList = JDTUtil.listCompilationUnit(sourceFolders);
-      List<AbstractType> testTypes = new LinkedList<AbstractType>();
-      for (ICompilationUnit icompUnit : icompUnitList) {
-         //ICompilationUnit icompunit = JDTUtil.listCompilationUnit(sourceFolders).get(0); // TODO: For all found files
-         //System.out.println(icompunit.getElementName());
-         ASTNode ast = JDTUtil.parse(icompUnit);
-         // Compute references
-         testTypes = StubGeneratorUtil.extractTypesAndMembers(ast);
-         //testTypes.addAll(StubGeneratorUtil.extractTypesAndMembers(ast));
-      }
-      // Load oracle file
-      ResourceSet rst = new ResourceSetImpl();
-      Resource resource = rst.getResource(URI.createPlatformPluginURI("/" + Activator.PLUGIN_ID + "/" + pathToOracleFileInPlugin, true), true);
-      assertEquals(1, resource.getContents().size());
-      assertTrue(resource.getContents().get(0) instanceof DependencyModel);
-      DependencyModel expectedModel = (DependencyModel) resource.getContents().get(0);
-      //AbstractType[] expectedTypes = expectedModel.getTypes().toArray(new AbstractType[expectedModel.getTypes().size()]);
-      List<AbstractType> expectedTypes = expectedModel.getTypes();
-      // Test types
-      assertAbstractTypes(expectedTypes, testTypes, new HashSet<AbstractType>());
-      assertEquals("Number of types", expectedTypes.size(), testTypes.size());
-   }
    
-   private void assertAbstractTypes(List<? extends AbstractType> expectedTypes, List<? extends AbstractType> actualTypes, Set<AbstractType> nownAbstractTypes) {
-      assertEquals("Number of types", expectedTypes.size(), actualTypes.size());
-      Iterator<? extends AbstractType> expectTypIter = expectedTypes.iterator();
-      Iterator<? extends AbstractType> actualTypIter = actualTypes.iterator();
+   /**
+    * Ensures the same content of the given {@link AbstractType}s.
+    * @param expected The expected {@link AbstractType}s.
+    * @param current The current {@link AbstractType}s.
+    * @param nownAbstractTypes The already tested {@link AbstractType}s.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertAbstractTypes(List<? extends AbstractType> expected, 
+                                      List<? extends AbstractType> current, 
+                                      Set<AbstractType> nownAbstractTypes) {
+      assertEquals("Number of types", expected.size(), current.size());
+      Iterator<? extends AbstractType> expectTypIter = expected.iterator();
+      Iterator<? extends AbstractType> actualTypIter = current.iterator();
       while( expectTypIter.hasNext() && actualTypIter.hasNext()){
          AbstractType expectedType = expectTypIter.next();
          AbstractType actualType = actualTypIter.next();
@@ -796,34 +829,43 @@ public class StubGeneratorUtilTest extends TestCase {
       assertFalse(actualTypIter.hasNext());
    }
 
-   private void assertAbstractType(AbstractType expectedType, AbstractType actualType, Set<AbstractType> nownAbstractTypes) {
-      if (nownAbstractTypes.add(actualType)) {
-         if (expectedType instanceof Type) {
-            assertTrue(actualType instanceof Type);
-            assertType((Type) expectedType, (Type) actualType, nownAbstractTypes);
+   /**
+    * Ensures the same content of the given {@link AbstractType}s.
+    * @param expected The expected {@link AbstractType}.
+    * @param current The current {@link AbstractType}.
+    * @param nownAbstractTypes The already tested {@link AbstractType}s.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertAbstractType(AbstractType expected, 
+                                     AbstractType current, 
+                                     Set<AbstractType> nownAbstractTypes) {
+      if (nownAbstractTypes.add(current)) {
+         if (expected instanceof Type) {
+            assertTrue(current instanceof Type);
+            assertType((Type) expected, (Type) current, nownAbstractTypes);
          }
-         else if (expectedType instanceof GenericType) {
-            assertTrue(actualType instanceof GenericType);
-            assertGenericType((GenericType) expectedType, (GenericType) actualType, nownAbstractTypes);
+         else if (expected instanceof GenericType) {
+            assertTrue(current instanceof GenericType);
+            assertGenericType((GenericType) expected, (GenericType) current, nownAbstractTypes);
          }
-         else if (expectedType instanceof Datatype) {
-            assertTrue(actualType instanceof Datatype);
-            assertDatatype((Datatype) expectedType, (Datatype) actualType);
+         else if (expected instanceof Datatype) {
+            assertTrue(current instanceof Datatype);
+            assertDatatype((Datatype) expected, (Datatype) current);
          }
-         else if (expectedType instanceof WildcardType) {
-            assertTrue(actualType instanceof WildcardType);
-            assertWildcardType((WildcardType) expectedType, (WildcardType) actualType);
+         else if (expected instanceof WildcardType) {
+            assertTrue(current instanceof WildcardType);
+            assertWildcardType((WildcardType) expected, (WildcardType) current);
          }
-         else if (expectedType instanceof ArrayType) {
-            assertTrue(actualType instanceof ArrayType);
-            assertArrayType((ArrayType) expectedType, (ArrayType) actualType, nownAbstractTypes);
+         else if (expected instanceof ArrayType) {
+            assertTrue(current instanceof ArrayType);
+            assertArrayType((ArrayType) expected, (ArrayType) current, nownAbstractTypes);
          }
-         else if (expectedType instanceof TypeVariable) {
-            assertTrue(actualType instanceof TypeVariable);
-            assertTypeVariables((TypeVariable) expectedType, (TypeVariable) actualType, nownAbstractTypes);
+         else if (expected instanceof TypeVariable) {
+            assertTrue(current instanceof TypeVariable);
+            assertTypeVariables((TypeVariable) expected, (TypeVariable) current, nownAbstractTypes);
          }
-         else if (expectedType == null) {
-            assertNull(actualType); 
+         else if (expected == null) {
+            assertNull(current); 
          }
          else{
            fail("Unsupported type");
@@ -831,60 +873,108 @@ public class StubGeneratorUtilTest extends TestCase {
       }
    }
    
-   private void assertArrayType(ArrayType expectedType, ArrayType actualType, Set<AbstractType> nownAbstractTypes) {
-      internalAbstractType(expectedType, actualType);
-      assertAbstractType(expectedType.getBaseType(), actualType.getBaseType(), nownAbstractTypes);
-   }
-
-   private void assertWildcardType(WildcardType expectedType, WildcardType actualType) {
-      internalAbstractType(expectedType, actualType);
-   }
-
-   private void assertDatatype(Datatype expectedType, Datatype actualType) {
-      internalAbstractType(expectedType, actualType);
-   }
-   private void assertTypeVariables(TypeVariable expectedType, TypeVariable actualType, Set<AbstractType> nownAbstractTypes) {
-      internalAbstractType(expectedType, actualType);
-      assertAbstractType(expectedType.getType(), actualType.getType(), nownAbstractTypes);
-   }
-
-   private void assertGenericType(GenericType expectedType, GenericType actualType, Set<AbstractType> nownAbstractTypes) {
-      internalAbstractType(expectedType, actualType);
-      assertAbstractTypes(expectedType.getTypeArguments(), actualType.getTypeArguments(), nownAbstractTypes);
-      assertAbstractType(expectedType.getBaseType(), actualType.getBaseType(), nownAbstractTypes);
-   }
-
-   private void assertType(Type expectedType, Type actualType, Set<AbstractType> nownAbstractTypes) {
-      internalAbstractType(expectedType, actualType);
-      assertEquals(expectedType.isAbstract(), actualType.isAbstract());
-      assertEquals(expectedType.isFinal(), actualType.isFinal());
-      assertEquals(expectedType.isStatic(), actualType.isStatic());
-      assertEquals(expectedType.getKind(), actualType.getKind());
-      assertEquals(expectedType.getPackage(), actualType.getPackage());
-      assertEquals(expectedType.getSimpleName(), actualType.getSimpleName());
-      assertEquals(expectedType.getVisibility(), actualType.getVisibility());
-      assertAbstractTypes(expectedType.getExtends(), actualType.getExtends(), nownAbstractTypes);
-      assertAbstractTypes(expectedType.getImplements(), actualType.getImplements(), nownAbstractTypes);
-      assertAbstractTypes(expectedType.getInnerTypes(), actualType.getInnerTypes(), nownAbstractTypes);
-      assertMethods(expectedType.getMethods(), actualType.getMethods(), nownAbstractTypes);
-      assertFields(expectedType.getFields(), actualType.getFields(), nownAbstractTypes);
-      assertTypeVariables(expectedType.getTypeVariables(), actualType.getTypeVariables(), nownAbstractTypes);
-   }
-
-   private void internalAbstractType(AbstractType expectedType, AbstractType actualType) {
-      assertEquals(expectedType.isSource(), actualType.isSource());
-      assertEquals(expectedType.getName(), actualType.getName());
+   /**
+    * Ensures the same content of the given {@link ArrayType}s.
+    * @param expected The expected {@link ArrayType}.
+    * @param current The current {@link ArrayType}.
+    * @param nownAbstractTypes The already tested {@link AbstractType}s.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertArrayType(ArrayType expected, 
+                                  ArrayType current, 
+                                  Set<AbstractType> nownAbstractTypes) {
+      internalAbstractType(expected, current);
+      assertAbstractType(expected.getBaseType(), current.getBaseType(), nownAbstractTypes);
    }
 
    /**
-    * Compares expected {@link List} of {@link String} with {@link List} of {@link Method}
-    * @param expected {@link List} of {@link String} 
-    * @param actual {@link List} of {@link Method}
+    * Ensures the same content of the given {@link WildcardType}s.
+    * @param expected The expected {@link WildcardType}.
+    * @param current The current {@link WildcardType}.
+    * @throws Exception Occurred Exception.
     */
-   protected void assertMethods(List<Method> expected, List<Method> actual, Set<AbstractType> nownAbstractTypes) {
-      assertEquals("Number of methods", expected.size(), actual.size());
+   protected void assertWildcardType(WildcardType expectedType, WildcardType actualType) {
+      internalAbstractType(expectedType, actualType);
+   }
+
+   /**
+    * Ensures the same content of the given {@link Datatype}s.
+    * @param expected The expected {@link Datatype}.
+    * @param current The current {@link Datatype}.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertDatatype(Datatype expectedType, Datatype actualType) {
+      internalAbstractType(expectedType, actualType);
+   }
+   
+   /**
+    * Ensures the same content of the given {@link TypeVariable}s.
+    * @param expected The expected {@link TypeVariable}.
+    * @param current The current {@link TypeVariable}.
+    * @param nownAbstractTypes The already tested {@link AbstractType}s.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertTypeVariables(TypeVariable expected, 
+                                      TypeVariable current, 
+                                      Set<AbstractType> nownAbstractTypes) {
+      internalAbstractType(expected, current);
+      assertAbstractType(expected.getType(), current.getType(), nownAbstractTypes);
+   }
+
+   /**
+    * Ensures the same content of the given {@link GenericType}s.
+    * @param expected The expected {@link GenericType}.
+    * @param current The current {@link GenericType}.
+    * @param nownAbstractTypes The already tested {@link AbstractType}s.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertGenericType(GenericType expected, 
+                                    GenericType current, 
+                                    Set<AbstractType> nownAbstractTypes) {
+      internalAbstractType(expected, current);
+      assertAbstractTypes(expected.getTypeArguments(), current.getTypeArguments(), nownAbstractTypes);
+      assertAbstractType(expected.getBaseType(), current.getBaseType(), nownAbstractTypes);
+   }
+
+   /**
+    * Ensures the same content of the given {@link Type}s.
+    * @param expected The expected {@link Type}.
+    * @param current The current {@link Type}.
+    * @param nownAbstractTypes The already tested {@link AbstractType}s.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertType(Type expected, 
+                             Type current, 
+                             Set<AbstractType> nownAbstractTypes) {
+      internalAbstractType(expected, current);
+      assertEquals(expected.isAbstract(), current.isAbstract());
+      assertEquals(expected.isFinal(), current.isFinal());
+      assertEquals(expected.isStatic(), current.isStatic());
+      assertEquals(expected.getKind(), current.getKind());
+      assertEquals(expected.getPackage(), current.getPackage());
+      assertEquals(expected.getSimpleName(), current.getSimpleName());
+      assertEquals(expected.getVisibility(), current.getVisibility());
+      assertAbstractTypes(expected.getExtends(), current.getExtends(), nownAbstractTypes);
+      assertAbstractTypes(expected.getImplements(), current.getImplements(), nownAbstractTypes);
+      assertAbstractTypes(expected.getInnerTypes(), current.getInnerTypes(), nownAbstractTypes);
+      assertMethods(expected.getMethods(), current.getMethods(), nownAbstractTypes);
+      assertFields(expected.getFields(), current.getFields(), nownAbstractTypes);
+      assertTypeVariables(expected.getTypeVariables(), current.getTypeVariables(), nownAbstractTypes);
+   }
+
+   /**
+    * Ensures the same content of the given {@link Method}s.
+    * @param expected The expected {@link Method}s.
+    * @param current The current {@link Method}s.
+    * @param nownAbstractTypes The already tested {@link AbstractType}s.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertMethods(List<Method> expected, 
+                                List<Method> current, 
+                                Set<AbstractType> nownAbstractTypes) {
+      assertEquals("Number of methods", expected.size(), current.size());
       Iterator<Method> expectTypIter = expected.iterator();
-      Iterator<Method> actualTypIter = actual.iterator();
+      Iterator<Method> actualTypIter = current.iterator();
       while( expectTypIter.hasNext() && actualTypIter.hasNext()){
          Method expectedMethod = expectTypIter.next();
          Method actualMethod = actualTypIter.next();
@@ -894,27 +984,40 @@ public class StubGeneratorUtilTest extends TestCase {
       assertFalse(actualTypIter.hasNext());
    }
 
-   private void assertMethod(Method expectedType, Method actualType, Set<AbstractType> nownAbstractTypes) {
-      assertEquals(expectedType.isAbstract(), actualType.isAbstract());
-      assertEquals(expectedType.isFinal(), actualType.isFinal());
-      assertEquals(expectedType.isStatic(), actualType.isStatic());
-      assertEquals(expectedType.getName(), actualType.getName());
-      assertEquals(expectedType.getVisibility(), actualType.getVisibility());
-      assertAbstractTypes(expectedType.getParameterTypes(), actualType.getParameterTypes(), nownAbstractTypes);
-      assertAbstractTypes(expectedType.getThrows(), actualType.getThrows(), nownAbstractTypes);
-      assertAbstractType(expectedType.getReturnType(), actualType.getReturnType(), nownAbstractTypes);
-      assertTypeVariables(expectedType.getTypeVariables(), actualType.getTypeVariables(), nownAbstractTypes);
+   /**
+    * Ensures the same content of the given {@link Method}s.
+    * @param expected The expected {@link Method}.
+    * @param current The current {@link Method}.
+    * @param nownAbstractTypes The already tested {@link AbstractType}s.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertMethod(Method expected, 
+                               Method current, 
+                               Set<AbstractType> nownAbstractTypes) {
+      assertEquals(expected.isAbstract(), current.isAbstract());
+      assertEquals(expected.isFinal(), current.isFinal());
+      assertEquals(expected.isStatic(), current.isStatic());
+      assertEquals(expected.getName(), current.getName());
+      assertEquals(expected.getVisibility(), current.getVisibility());
+      assertAbstractTypes(expected.getParameterTypes(), current.getParameterTypes(), nownAbstractTypes);
+      assertAbstractTypes(expected.getThrows(), current.getThrows(), nownAbstractTypes);
+      assertAbstractType(expected.getReturnType(), current.getReturnType(), nownAbstractTypes);
+      assertTypeVariables(expected.getTypeVariables(), current.getTypeVariables(), nownAbstractTypes);
    }
 
    /**
-    * Compares List of {@link String} with {@link List} of {@link Field}
-    * @param expected {@link List} of {@link String} 
-    * @param actual {@link List} of {@link Field}
+    * Ensures the same content of the given {@link Field}s.
+    * @param expected The expected {@link Field}s.
+    * @param current The current {@link Field}s.
+    * @param nownAbstractTypes The already tested {@link AbstractType}s.
+    * @throws Exception Occurred Exception.
     */
-   protected void assertFields(List<Field> expected, List<Field> actual, Set<AbstractType> nownAbstractTypes) {
-      assertEquals("Number of fields", expected.size(), actual.size());
+   protected void assertFields(List<Field> expected, 
+                               List<Field> current, 
+                               Set<AbstractType> nownAbstractTypes) {
+      assertEquals("Number of fields", expected.size(), current.size());
       Iterator<Field> expectTypIter = expected.iterator();
-      Iterator<Field> actualTypIter = actual.iterator();
+      Iterator<Field> actualTypIter = current.iterator();
       while( expectTypIter.hasNext() && actualTypIter.hasNext()){
          Field expectedField = expectTypIter.next();
          Field actualField = actualTypIter.next();
@@ -924,19 +1027,37 @@ public class StubGeneratorUtilTest extends TestCase {
       assertFalse(actualTypIter.hasNext());
    }
 
-   private void assertField(Field expected, Field actual, Set<AbstractType> nownAbstractTypes) {
-      assertEquals(expected.isFinal(), actual.isFinal());
-      assertEquals(expected.isStatic(), actual.isStatic());
-      assertEquals(expected.getConstantValue(), actual.getConstantValue());
-      assertEquals(expected.getName(), actual.getName());
-      assertEquals(expected.getVisibility(), actual.getVisibility());
-      assertAbstractType(expected.getType(), actual.getType(), nownAbstractTypes);
+   /**
+    * Ensures the same content of the given {@link Field}s.
+    * @param expected The expected {@link Field}.
+    * @param current The current {@link Field}.
+    * @param nownAbstractTypes The already tested {@link AbstractType}s.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertField(Field expected, 
+                              Field current, 
+                              Set<AbstractType> nownAbstractTypes) {
+      assertEquals(expected.isFinal(), current.isFinal());
+      assertEquals(expected.isStatic(), current.isStatic());
+      assertEquals(expected.getConstantValue(), current.getConstantValue());
+      assertEquals(expected.getName(), current.getName());
+      assertEquals(expected.getVisibility(), current.getVisibility());
+      assertAbstractType(expected.getType(), current.getType(), nownAbstractTypes);
    }
 
-   private void assertTypeVariables(List<TypeVariable> expected, List<TypeVariable> actual, Set<AbstractType> nownAbstractTypes) {
-      assertEquals("Number of fields", expected.size(), actual.size());
+   /**
+    * Ensures the same content of the given {@link TypeVariable}s.
+    * @param expected The expected {@link TypeVariable}s.
+    * @param current The current {@link TypeVariable}s.
+    * @param nownAbstractTypes The already tested {@link AbstractType}s.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertTypeVariables(List<TypeVariable> expected, 
+                                      List<TypeVariable> current, 
+                                      Set<AbstractType> nownAbstractTypes) {
+      assertEquals("Number of fields", expected.size(), current.size());
       Iterator<TypeVariable> expectTypIter = expected.iterator();
-      Iterator<TypeVariable> actualTypIter = actual.iterator();
+      Iterator<TypeVariable> actualTypIter = current.iterator();
       while( expectTypIter.hasNext() && actualTypIter.hasNext()){
          TypeVariable expectedVar = expectTypIter.next();
          TypeVariable actualVar = actualTypIter.next();
@@ -946,10 +1067,27 @@ public class StubGeneratorUtilTest extends TestCase {
       assertFalse(actualTypIter.hasNext());
    }
 
-   private void assertTypeVariable(TypeVariable expected, TypeVariable actual, Set<AbstractType> nownAbstractTypes) {
-      assertEquals(expected.getName(), actual.getName());
-      assertAbstractType(expected.getType(), actual.getType(), nownAbstractTypes);
+   /**
+    * Ensures the same content of the given {@link TypeVariable}s.
+    * @param expected The expected {@link TypeVariable}.
+    * @param current The current {@link TypeVariable}.
+    * @param nownAbstractTypes The already tested {@link AbstractType}s.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertTypeVariable(TypeVariable expected, 
+                                     TypeVariable current, 
+                                     Set<AbstractType> nownAbstractTypes) {
+      assertEquals(expected.getName(), current.getName());
+      assertAbstractType(expected.getType(), current.getType(), nownAbstractTypes);
    }
-   
-  
+
+   /**
+    * Utility test method comparing the same content of all {@link AbstractType}s.
+    * @param expected The exepcted {@link AbstractType}.
+    * @param current The current {@link AbstractType}.
+    */
+   private void internalAbstractType(AbstractType expected, AbstractType current) {
+      assertEquals(expected.isSource(), current.isSource());
+      assertEquals(expected.getName(), current.getName());
+   }
 }

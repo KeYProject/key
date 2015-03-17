@@ -19,6 +19,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.stubby.ui.test.suite.swtbot,
- org.key_project.stubby.ui.test.testcase.swtbot,
- org.key_project.stubby.ui.test.uti
+ org.key_project.stubby.ui.test.testcase.swtbot
 Import-Package: org.key_project.stubby.core.test.testcase
