@@ -74,7 +74,7 @@ public final class StubGeneratorUtil {
    /**
     * Indicates if the dependency model should be saved during stub generation.
     */
-   public static final boolean SAVE_DEPENDENCY_MODEL = true;
+   public static final boolean SAVE_DEPENDENCY_MODEL = false;
    
    /**
     * The file extension used to store dependency models.

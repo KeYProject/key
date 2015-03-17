@@ -3,7 +3,7 @@ package java.util;
 /**
  * @generated
  */
-public interface List<E extends java.lang.Object> extends Collection {
+public interface List<E extends java.lang.Object> extends Collection<E> {
    /*@ normal_behavior
      @ requires true;
      @ ensures true;

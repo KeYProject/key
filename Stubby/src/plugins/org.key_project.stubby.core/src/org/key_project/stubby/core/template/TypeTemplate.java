@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.key_project.stubby.model.dependencymodel.AbstractType;
 import org.key_project.stubby.model.dependencymodel.Field;
+import org.key_project.stubby.model.dependencymodel.GenericType;
 import org.key_project.stubby.model.dependencymodel.Method;
 import org.key_project.stubby.model.dependencymodel.Type;
 import org.key_project.stubby.model.dependencymodel.TypeVariable;
@@ -54,6 +55,12 @@ public class TypeTemplate {
       return sb.toString();
    }
    
+   /**
+    * Appends the {@link Type}.
+    * @param type The {@link Type} to append.
+    * @param sb The {@link StringBuffer} to append to.
+    * @param level The current indent level.
+    */
    protected void appendType(Type type, StringBuffer sb, int level) {
       final String INDENT = StringUtil.createLine(" ", level * 3);
       // Append type declaration
@@ -100,20 +107,20 @@ public class TypeTemplate {
             else {
                afterFirst = true;
             }
-            sb.append(extendType.getName());
+            appendTypeName(extendType, sb);
          }
       }
       if (!type.getImplements().isEmpty()) {
          sb.append(" implements ");
          boolean afterFirst = false;
-         for (AbstractType extendType : type.getImplements()) {
+         for (AbstractType implementsType : type.getImplements()) {
             if (afterFirst) {
                sb.append(", ");
             }
             else {
                afterFirst = true;
             }
-            sb.append(extendType.getName());
+            appendTypeName(implementsType, sb);
          }
       }
       sb.append(" {" + NL);
@@ -141,6 +148,38 @@ public class TypeTemplate {
       sb.append(INDENT +"}");
    }
 
+   /**
+    * Appends the name of the given {@link AbstractType}.
+    * @param type The {@link AbstractType} to append its name.
+    * @param sb The {@link StringBuffer} to append to.
+    */
+   protected void appendTypeName(AbstractType type, StringBuffer sb) {
+      sb.append(type.getName());
+      if (type instanceof GenericType) {
+         GenericType genericType = (GenericType) type;
+         if (!genericType.getTypeArguments().isEmpty()) {
+            sb.append("<");
+            boolean afterFirst = false;
+            for (AbstractType arg : genericType.getTypeArguments()) {
+               if (afterFirst) {
+                  sb.append(", ");
+               }
+               else {
+                  afterFirst = true;
+               }
+               appendTypeName(arg, sb);
+            }
+            sb.append(">");
+         }
+      }
+   }
+
+   /**
+    * Appends the {@link Method}.
+    * @param method The {@link Method} to append.
+    * @param sb The {@link StringBuffer} to append to.
+    * @param level The current indent level.
+    */
    protected void appendMethod(Method method, StringBuffer sb, int level) {
       final String INDENT = StringUtil.createLine(" ", level * 3);
       sb.append(INDENT + "/*@ normal_behavior" + NL);
@@ -179,26 +218,38 @@ public class TypeTemplate {
       sb.append(");");
    }
 
-   protected void appendField(Field stubField, StringBuffer sb, int level) {
+   /**
+    * Appends the {@link Field}.
+    * @param field The {@link Field} to append.
+    * @param sb The {@link StringBuffer} to append to.
+    * @param level The current indent level.
+    */
+   protected void appendField(Field field, StringBuffer sb, int level) {
       final String INDENT = StringUtil.createLine(" ", level * 3);
       sb.append(INDENT + "/**" + NL);
       sb.append(INDENT + " * @generated" + NL);
       sb.append(INDENT + " */" + NL);
-      sb.append(INDENT + stubField.getVisibility().toJavaKeyword() + " ");
-      if (stubField.isStatic()) {
+      sb.append(INDENT + field.getVisibility().toJavaKeyword() + " ");
+      if (field.isStatic()) {
          sb.append( "static ");
       }
-      if (stubField.isFinal()) {
+      if (field.isFinal()) {
          sb.append( "final ");
       }
-      sb.append(stubField.getType().getName() + " " + stubField.getName());
-      if (!StringUtil.isTrimmedEmpty(stubField.getConstantValue())) {
+      sb.append(field.getType().getName() + " " + field.getName());
+      if (!StringUtil.isTrimmedEmpty(field.getConstantValue())) {
          sb.append("= ");
-         sb.append(stubField.getConstantValue());
+         sb.append(field.getConstantValue());
       }
       sb.append(";");
    }
 
+   /**
+    * Appends the separator between {@link Type} members.
+    * @param afterFirstMember Indicates if a previous member is available.
+    * @param sb The {@link StringBuffer} to append to.
+    * @return The new previous state member available state.
+    */
    protected boolean appendNewMemberSeparator(boolean afterFirstMember, StringBuffer sb) {
       if (afterFirstMember) {
          sb.append(NL + NL);
