@@ -1,4 +1,7 @@
 package java.io;
 
-public class FilterOutputStream {
+/**
+ * @generated
+ */
+public class FilterOutputStream extends java.io.OutputStream {
 }

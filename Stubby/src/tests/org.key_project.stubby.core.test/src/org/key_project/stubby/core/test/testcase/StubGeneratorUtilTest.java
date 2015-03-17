@@ -41,6 +41,7 @@ import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
+import org.osgi.framework.Bundle;
 
 /**
  * Tests for {@link StubGeneratorUtil}
@@ -648,15 +649,25 @@ public class StubGeneratorUtilTest extends TestCase {
       IFolder oracleFolder = project.getProject().getFolder("oracleStubs");
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToOracleStubsFileInPlugin, oracleFolder);
       // Create new oracle stubs if requested
+      createOracleFiles(project, pathToOracleStubsFileInPlugin);
+      // Compare generated stubs with oracle stubs
       IFolder stubFolder = project.getProject().getFolder(StubGeneratorUtil.STUB_FOLDER_NAME);
+      assertResources(oracleFolder.members(), stubFolder.members());
+   }
+
+   /**
+    * Creates new oracle files if required.
+    * @param project The current {@link IJavaProject}.
+    * @param pathToOracleStubsFileInPlugin The path to the oracle files in the {@link Bundle}.
+    * @throws CoreException Occurred Exception.
+    */
+   protected static void createOracleFiles(IJavaProject project, String pathToOracleStubsFileInPlugin) throws CoreException {
       if (oracleDirectory != null) {
          File oracleSubDirectory = new File(oracleDirectory, pathToOracleStubsFileInPlugin);
          oracleSubDirectory.mkdirs();
          assertTrue(ResourceUtil.copyIntoFileSystem(project.getProject().getFolder(StubGeneratorUtil.STUB_FOLDER_NAME), oracleSubDirectory));
          printOracleDirectory();
       }
-      // Compare generated stubs with oracle stubs
-      assertResources(oracleFolder.members(), stubFolder.members());
    }
    
    /**
@@ -693,6 +704,8 @@ public class StubGeneratorUtilTest extends TestCase {
       // Extract oracle stubs into project
       IFolder oracleFolder = project.getProject().getFolder("oracleStubs");
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToOracleStubsFileInPlugin, oracleFolder);
+      // Create new oracle stubs if requested
+      createOracleFiles(project, pathToOracleStubsFileInPlugin);
       // Compare generated stubs with oracle stubs
       assertResources(oracleFolder.members(), stubFolder.members());
    }

@@ -1,4 +1,7 @@
 package java.lang;
 
-public interface Iterable {
+/**
+ * @generated
+ */
+public interface Iterable<T extends java.lang.Object> {
 }

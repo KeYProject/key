@@ -3,7 +3,7 @@ package javax.swing.plaf.metal;
 /**
  * @generated
  */
-public class MetalBorders {
+public class MetalBorders extends java.lang.Object {
    /**
     * @generated NOT
     */

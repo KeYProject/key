@@ -3,11 +3,10 @@ package javax.swing;
 /**
  * @generated
  */
-public class TransferHandler {
-
+public class TransferHandler extends java.lang.Object implements java.io.Serializable {
    /**
     * @generated
     */
-   interface HasGetTransferHandler {
+   static interface HasGetTransferHandler {
    }
 }

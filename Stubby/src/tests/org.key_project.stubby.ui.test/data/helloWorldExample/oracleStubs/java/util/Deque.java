@@ -1,4 +1,7 @@
 package java.util;
 
-public interface Deque {
+/**
+ * @generated
+ */
+public interface Deque<E extends java.lang.Object> extends Queue {
 }

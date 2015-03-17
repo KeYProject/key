@@ -3,8 +3,7 @@ package java.awt;
 /**
  * @generated
  */
-public class Color {
-
+public class Color extends java.lang.Object implements java.awt.Paint, java.io.Serializable {
    /*@ normal_behavior
      @ requires true;
      @ ensures true;

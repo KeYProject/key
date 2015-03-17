@@ -10,9 +10,21 @@ import org.key_project.stubby.model.dependencymodel.TypeVariable;
 import org.key_project.stubby.model.dependencymodel.Visibility;
 import org.key_project.util.java.StringUtil;
 
+/**
+ * Template to generate a Java file containing stubs.
+ * @author Martin Hentschel
+ */
 public class TypeTemplate {
+   /**
+    * The new line separator.
+    */
    protected static String nl;
 
+   /**
+    * Creates a new {@link TypeTemplate}.
+    * @param lineSeparator The line separator to use.
+    * @return The created {@link TypeTemplate}.
+    */
    public static synchronized TypeTemplate create(String lineSeparator) {
       nl = lineSeparator;
       TypeTemplate result = new TypeTemplate();
@@ -20,8 +32,16 @@ public class TypeTemplate {
       return result;
    }
 
+   /**
+    * The new line separator to use.
+    */
    public final String NL = nl == null ? (StringUtil.NEW_LINE) : nl;
 
+   /**
+    * Generates the Java file content.
+    * @param argument The argument.
+    * @return The created Java file.
+    */
    public String generate(Object argument) {
       final StringBuffer sb = new StringBuffer();
       Type type = (Type) argument;
@@ -34,72 +54,155 @@ public class TypeTemplate {
       return sb.toString();
    }
    
-   public void appendType(Type type, StringBuffer sb, int level) {
-      final String INDENT = createSpaces(level * 3);
+   protected void appendType(Type type, StringBuffer sb, int level) {
+      final String INDENT = StringUtil.createLine(" ", level * 3);
+      // Append type declaration
       sb.append(INDENT + "/**" + NL + INDENT + " * @generated" + NL + INDENT + " */" + NL);
-      if (type.getVisibility() != Visibility.DEFAULT) {
-         sb.append(INDENT + type.getVisibility().toJavaKeyword() + " ");
-         sb.append(type.getKind().toJavaKindKeyword());
+      sb.append(INDENT + type.getVisibility().toJavaKeyword());
+      if (!Visibility.DEFAULT.equals(type.getVisibility())) {
+         sb.append(" ");
       }
-      else {
-         sb.append(INDENT + type.getKind().toJavaKindKeyword());
+      if (type.isFinal()) {
+         sb.append("final ");
       }
-      sb.append(" " + type.getSimpleName());
-      for (TypeVariable var : type.getTypeVariables()) {
+      if (type.isStatic()) {
+         sb.append("static ");
+      }
+      if (type.isAbstract()) {
+         sb.append("abstract ");
+      }
+      sb.append(type.getKind().toJavaKindKeyword());
+      sb.append(" ");
+      sb.append(type.getSimpleName());
+      if (!type.getTypeVariables().isEmpty()) {
          sb.append("<");
-         sb.append(var.getName());
-         sb.append(" extends ");
-         sb.append(var.getType().getName());
-         sb.append(">");
-      }
-      sb.append(" {");
-      List<Field> allFields = type.getFields();
-      for (Field stubField : allFields) {
-         sb.append(NL + NL + INDENT + "   /**" + NL + INDENT + "    * @generated" + NL + INDENT + "    */");
-         sb.append(NL + "   ");
-         sb.append(INDENT + stubField.getVisibility().toJavaKeyword() + " ");
-         sb.append((stubField.isStatic() ? "static " : ""));
-         sb.append((stubField.isFinal() ? "final " : ""));
-         sb.append(stubField.getType().getName() + " ");
-         sb.append(stubField.getName() + ";" + NL);
-      }
-      List<Method> allMethods = type.getMethods();
-      for (Method method : allMethods) {
-         sb.append(NL + NL + INDENT + "   /*@ normal_behavior" + NL + INDENT + "     @ requires true;" + NL + INDENT +"     @ ensures true;" + NL + INDENT + "     @ assignable \\everything;" + NL + INDENT +"     @*/" + NL + INDENT + "   /**" + NL + INDENT + "    * @generated" + NL + INDENT + "    */");
-         sb.append(NL + "   ");
-         sb.append(INDENT + method.getVisibility().toJavaKeyword() + " ");
-         sb.append((method.isAbstract() ? "abstract " : ""));
-         sb.append((method.isStatic() ? "static " : ""));
-         sb.append((method.isFinal() ? "final " : ""));
-         sb.append(method.getReturnType().getName() + " ");
-         sb.append(method.getName() + "(");
-         int paramCount = 0;
          boolean afterFirst = false;
-         for (AbstractType paramType : method.getParameterTypes()) {
+         for (TypeVariable var : type.getTypeVariables()) {
             if (afterFirst) {
                sb.append(", ");
             }
             else {
                afterFirst = true;
             }
-            sb.append(paramType.getName());
-            sb.append(" param");
-            sb.append(paramCount++);
+            sb.append(var.getName());
+            sb.append(" extends ");
+            sb.append(var.getType().getName());
          }
-         sb.append(");");
+         sb.append(">");
       }
+      if (!type.getExtends().isEmpty()) {
+         sb.append(" extends ");
+         boolean afterFirst = false;
+         for (AbstractType extendType : type.getExtends()) {
+            if (afterFirst) {
+               sb.append(", ");
+            }
+            else {
+               afterFirst = true;
+            }
+            sb.append(extendType.getName());
+         }
+      }
+      if (!type.getImplements().isEmpty()) {
+         sb.append(" implements ");
+         boolean afterFirst = false;
+         for (AbstractType extendType : type.getImplements()) {
+            if (afterFirst) {
+               sb.append(", ");
+            }
+            else {
+               afterFirst = true;
+            }
+            sb.append(extendType.getName());
+         }
+      }
+      sb.append(" {" + NL);
+      // Append fields
+      boolean afterFirstMember = false;
+      List<Field> allFields = type.getFields();
+      for (Field stubField : allFields) {
+         afterFirstMember = appendNewMemberSeparator(afterFirstMember, sb);
+         appendField(stubField, sb, level + 1);
+      }
+      // Append methods
+      List<Method> allMethods = type.getMethods();
+      for (Method method : allMethods) {
+         afterFirstMember = appendNewMemberSeparator(afterFirstMember, sb);
+         appendMethod(method, sb, level + 1);
+      }
+      // Append inner types
       for (Type innerType : type.getInnerTypes()) {
-         sb.append(NL + NL);
+         afterFirstMember = appendNewMemberSeparator(afterFirstMember, sb);
          appendType(innerType, sb, level + 1);
       }
-      sb.append(NL + INDENT +"}");
+      if (afterFirstMember) {
+         sb.append(NL);
+      }
+      sb.append(INDENT +"}");
    }
 
-   private String createSpaces(int numOfSpaces) {
-      StringBuffer sb = new StringBuffer();
-      for (int i=0; i<numOfSpaces; i++) {
-         sb.append(" ");
+   protected void appendMethod(Method method, StringBuffer sb, int level) {
+      final String INDENT = StringUtil.createLine(" ", level * 3);
+      sb.append(INDENT + "/*@ normal_behavior" + NL);
+      sb.append(INDENT + "  @ requires true;" + NL);
+      sb.append(INDENT + "  @ ensures true;" + NL);
+      sb.append(INDENT + "  @ assignable \\everything;" + NL);
+      sb.append(INDENT + "  @*/" + NL);
+      sb.append(INDENT + "/**" + NL);
+      sb.append(INDENT + " * @generated" + NL);
+      sb.append(INDENT + " */" + NL);
+      sb.append(INDENT + method.getVisibility().toJavaKeyword() + " ");
+      if (method.isAbstract()) {
+         sb.append("abstract ");
       }
-      return sb.toString();
+      if (method.isStatic()) {
+         sb.append("static ");
+      }
+      if (method.isFinal()) {
+         sb.append("final ");
+      }
+      sb.append(method.getReturnType().getName() + " ");
+      sb.append(method.getName() + "(");
+      int paramCount = 0;
+      boolean afterFirst = false;
+      for (AbstractType paramType : method.getParameterTypes()) {
+         if (afterFirst) {
+            sb.append(", ");
+         }
+         else {
+            afterFirst = true;
+         }
+         sb.append(paramType.getName());
+         sb.append(" param");
+         sb.append(paramCount++);
+      }
+      sb.append(");");
+   }
+
+   protected void appendField(Field stubField, StringBuffer sb, int level) {
+      final String INDENT = StringUtil.createLine(" ", level * 3);
+      sb.append(INDENT + "/**" + NL);
+      sb.append(INDENT + " * @generated" + NL);
+      sb.append(INDENT + " */" + NL);
+      sb.append(INDENT + stubField.getVisibility().toJavaKeyword() + " ");
+      if (stubField.isStatic()) {
+         sb.append( "static ");
+      }
+      if (stubField.isFinal()) {
+         sb.append( "final ");
+      }
+      sb.append(stubField.getType().getName() + " " + stubField.getName());
+      if (!StringUtil.isTrimmedEmpty(stubField.getConstantValue())) {
+         sb.append("= ");
+         sb.append(stubField.getConstantValue());
+      }
+      sb.append(";");
+   }
+
+   protected boolean appendNewMemberSeparator(boolean afterFirstMember, StringBuffer sb) {
+      if (afterFirstMember) {
+         sb.append(NL + NL);
+      }
+      return true;
    }
 }

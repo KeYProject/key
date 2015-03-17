@@ -3,5 +3,5 @@ package java.lang;
 /**
  * @generated
  */
-public interface CharSequence {
+public interface AutoCloseable {
 }

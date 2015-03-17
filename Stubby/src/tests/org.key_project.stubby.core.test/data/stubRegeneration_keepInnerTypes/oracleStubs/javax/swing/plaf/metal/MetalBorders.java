@@ -3,16 +3,16 @@ package javax.swing.plaf.metal;
 /**
  * @generated
  */
-public class MetalBorders {
+public class MetalBorders extends java.lang.Object {
    /**
     * @generated
     */
-   public class ButtonBorder {
+   public static class ButtonBorder extends javax.swing.border.AbstractBorder implements javax.swing.plaf.UIResource {
    }
 
    /**
     * @generated
     */
-   public class Flush3DBorder {
+   public static class Flush3DBorder extends javax.swing.border.AbstractBorder implements javax.swing.plaf.UIResource {
    }
 }

@@ -3,5 +3,5 @@ package java.lang;
 /**
  * @generated
  */
-public interface Override {
+public interface Override extends java.lang.annotation.Annotation {
 }

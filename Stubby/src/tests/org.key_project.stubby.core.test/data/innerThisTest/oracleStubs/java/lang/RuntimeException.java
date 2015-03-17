@@ -3,5 +3,5 @@ package java.lang;
 /**
  * @generated
  */
-public class RuntimeException {
+public class RuntimeException extends java.lang.Exception {
 }

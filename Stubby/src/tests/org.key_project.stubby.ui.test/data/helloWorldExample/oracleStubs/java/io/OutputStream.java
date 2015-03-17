@@ -1,4 +1,7 @@
 package java.io;
 
-public class OutputStream {
+/**
+ * @generated
+ */
+public abstract class OutputStream extends java.lang.Object implements java.io.Closeable, java.io.Flushable {
 }

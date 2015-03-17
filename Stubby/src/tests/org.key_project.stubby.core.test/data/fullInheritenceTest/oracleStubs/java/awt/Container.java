@@ -3,5 +3,5 @@ package java.awt;
 /**
  * @generated
  */
-public class Container {
+public class Container extends java.awt.Component {
 }

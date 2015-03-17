@@ -3,5 +3,5 @@ package java.awt.event;
 /**
  * @generated
  */
-public interface FocusListener {
+public interface FocusListener extends java.util.EventListener {
 }

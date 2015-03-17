@@ -3,5 +3,5 @@ package java.lang;
 /**
  * @generated
  */
-public class UnsupportedOperationException {
+public class UnsupportedOperationException extends java.lang.RuntimeException {
 }

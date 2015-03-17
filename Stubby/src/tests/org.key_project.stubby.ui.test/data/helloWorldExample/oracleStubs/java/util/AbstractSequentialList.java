@@ -1,4 +1,7 @@
 package java.util;
 
-public class AbstractSequentialList {
+/**
+ * @generated
+ */
+public abstract class AbstractSequentialList<E extends java.lang.Object> extends AbstractList {
 }

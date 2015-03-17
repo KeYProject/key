@@ -3,5 +3,5 @@ package java.util;
 /**
  * @generated
  */
-public class AbstractCollection<E extends java.lang.Object> {
+public abstract class AbstractCollection<E extends java.lang.Object> extends java.lang.Object implements Collection {
 }

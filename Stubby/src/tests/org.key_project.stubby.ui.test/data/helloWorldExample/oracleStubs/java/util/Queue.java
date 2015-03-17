@@ -1,4 +1,7 @@
 package java.util;
 
-public interface Queue {
+/**
+ * @generated
+ */
+public interface Queue<E extends java.lang.Object> extends Collection {
 }

@@ -3,5 +3,5 @@ package java.util;
 /**
  * @generated
  */
-public class AbstractSequentialList<E extends java.lang.Object> {
+public abstract class AbstractSequentialList<E extends java.lang.Object> extends AbstractList {
 }

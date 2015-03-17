@@ -3,5 +3,5 @@ package java.awt;
 /**
  * @generated
  */
-public class HeadlessException {
+public class HeadlessException extends java.lang.UnsupportedOperationException {
 }

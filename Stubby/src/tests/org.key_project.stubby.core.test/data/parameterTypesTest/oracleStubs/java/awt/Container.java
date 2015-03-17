@@ -3,8 +3,7 @@ package java.awt;
 /**
  * @generated
  */
-public class Container {
-
+public class Container extends java.awt.Component {
    /*@ normal_behavior
      @ requires true;
      @ ensures true;

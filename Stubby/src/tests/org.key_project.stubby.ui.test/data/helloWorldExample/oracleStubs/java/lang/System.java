@@ -1,5 +1,11 @@
 package java.lang;
 
-public class System {
+/**
+ * @generated
+ */
+public final class System extends java.lang.Object {
+   /**
+    * @generated
+    */
    public static final java.io.PrintStream out;
 }

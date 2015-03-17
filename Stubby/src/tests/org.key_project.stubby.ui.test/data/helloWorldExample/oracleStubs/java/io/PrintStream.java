@@ -1,13 +1,16 @@
 package java.io;
 
-public class PrintStream {
-
+/**
+ * @generated
+ */
+public class PrintStream extends java.io.FilterOutputStream implements java.lang.Appendable, java.io.Closeable {
    /*@ normal_behavior
      @ requires true;
      @ ensures true;
      @ assignable \everything;
      @*/
-   public void println(
-      java.lang.Object param0
-   );
+   /**
+    * @generated
+    */
+   public void println(java.lang.Object param0);
 }

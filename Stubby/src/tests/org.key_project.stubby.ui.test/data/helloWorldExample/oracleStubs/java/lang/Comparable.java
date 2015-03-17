@@ -1,4 +1,7 @@
 package java.lang;
 
-public interface Comparable {
+/**
+ * @generated
+ */
+public interface Comparable<T extends java.lang.Object> {
 }

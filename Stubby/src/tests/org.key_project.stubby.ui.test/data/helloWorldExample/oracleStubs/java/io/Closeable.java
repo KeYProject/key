@@ -1,4 +1,7 @@
 package java.io;
 
-public interface Closeable {
+/**
+ * @generated
+ */
+public interface Closeable extends java.lang.AutoCloseable {
 }

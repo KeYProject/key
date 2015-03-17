@@ -1,4 +1,7 @@
 package java.lang;
 
-public class String {
+/**
+ * @generated
+ */
+public final class String extends java.lang.Object implements java.io.Serializable, Comparable, java.lang.CharSequence {
 }

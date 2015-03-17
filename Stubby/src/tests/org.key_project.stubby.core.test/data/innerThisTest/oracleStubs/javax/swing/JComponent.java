@@ -3,5 +3,5 @@ package javax.swing;
 /**
  * @generated
  */
-public class JComponent {
+public abstract class JComponent extends java.awt.Container implements java.io.Serializable, javax.swing.TransferHandler.HasGetTransferHandler {
 }
