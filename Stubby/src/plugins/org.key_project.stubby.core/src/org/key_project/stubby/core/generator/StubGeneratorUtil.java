@@ -74,7 +74,7 @@ public final class StubGeneratorUtil {
    /**
     * Indicates if the dependency model should be saved during stub generation.
     */
-   public static final boolean SAVE_DEPENDENCY_MODEL = false;
+   public static final boolean SAVE_DEPENDENCY_MODEL = true;
    
    /**
     * The file extension used to store dependency models.
@@ -437,15 +437,14 @@ public final class StubGeneratorUtil {
              * @param methodBinding {@IMethodBinding}
              */
             protected void ensureMethodExist(IMethodBinding methodBinding) {
+               methodBinding = methodBinding.getMethodDeclaration();
                AbstractType methodType = ensureTypeExists((Type)null, methodBinding.getDeclaringClass());
                methodType = findBaseType(methodType);
-               if (methodType instanceof Type) {
+               if (methodType instanceof Type) { // Nothing needs to be done if Typ is not available
                   Type typ = (Type)methodType;
-                  if (typ != null) { // Nothing needs to be done if Typ is not available
-                     if (!containsMethod(typ, methodBinding.getName(), methodBinding.getParameterTypes())) {
-                        createMethodFromDeclaration(typ, methodBinding);
-                     }              
-                  }
+                  if (!containsMethod(typ, methodBinding.getName(), methodBinding.getParameterTypes())) {
+                     createMethodFromDeclaration(typ, methodBinding);
+                  }              
                }
                
             }
