@@ -306,7 +306,6 @@ public final class JMLProfileManagement {
             .getNode(Activator.PLUGIN_ID);
       final Preferences p = preferences.node(JML_DERIVED_PROFILES);
 
-      System.out.println("Write " + this.userDefinedProfiles);
       for (final IDerivedProfile profile : this.userDefinedProfiles) {
 
          try {
