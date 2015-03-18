@@ -42,6 +42,7 @@ import org.key_project.jmlediting.profile.key.other.IndexKeyword;
 import org.key_project.jmlediting.profile.key.other.InvKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAccessibleKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAssignableKeyword;
+import org.key_project.jmlediting.profile.key.other.LessThanNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyPureKeyword;
 import org.key_project.jmlediting.profile.key.parser.KeyTargetLabelPredicateParser;
@@ -87,6 +88,7 @@ public class KeyProfile extends JMLReferenceProfile {
             new KeyAssignableKeyword());
       replace(supportedKeywords, AccessibleKeyword.class,
             new KeyAccessibleKeyword());
+      supportedKeywords.add(new LessThanNothingKeyword());
 
       // Key specific behaviors
       supportedKeywords.addAll(Arrays.asList(new BreakBehaviorKeyword(),
