@@ -22,6 +22,9 @@ import org.key_project.jmlediting.profile.jmlref.spec_statement.ReturnsClauseKey
 import org.key_project.jmlediting.profile.key.behavior.BreakBehaviorKeyword;
 import org.key_project.jmlediting.profile.key.behavior.ContinueBehaviorKeyword;
 import org.key_project.jmlediting.profile.key.behavior.ReturnBehaviorKeyword;
+import org.key_project.jmlediting.profile.key.bounded_quantifier.BProdQuantifierKeyword;
+import org.key_project.jmlediting.profile.key.bounded_quantifier.BSumQuantifierKeyword;
+import org.key_project.jmlediting.profile.key.bounded_quantifier.BoundedQuantifierPrimary;
 import org.key_project.jmlediting.profile.key.locset.AllFieldsKeyword;
 import org.key_project.jmlediting.profile.key.locset.DisjointKeyword;
 import org.key_project.jmlediting.profile.key.locset.EmptyKeywod;
@@ -42,6 +45,8 @@ import org.key_project.jmlediting.profile.key.other.KeyAssignableKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyPureKeyword;
 import org.key_project.jmlediting.profile.key.parser.KeyTargetLabelPredicateParser;
+import org.key_project.jmlediting.profile.key.primary.NewElemsFreshKeyword;
+import org.key_project.jmlediting.profile.key.primary.NonNullElementsKeyword;
 import org.key_project.jmlediting.profile.key.seq.ContainsKeyword;
 import org.key_project.jmlediting.profile.key.seq.IndexOfKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqConcatKeyword;
@@ -106,16 +111,21 @@ public class KeyProfile extends JMLReferenceProfile {
       this.additionalPrimarySuffixes.add(InvKeyword.invSuffix(this));
 
       // Support for seq expression
-      supportedKeywords.addAll(Arrays.asList(new SeqKeyword(),
-            new SeqConcatKeyword(), new SeqDefKeyword(), new SeqEmptyKeyword(),
-            new SeqSingletonKeyword(), new ValuesKeyword(),
-            new ContainsKeyword(), new IndexOfKeyword(), new SeqSubKeyword(),
-            new SeqLengthKeyword(), new SingletonKeyword()));
+      supportedKeywords
+            .addAll(Arrays.asList(new SeqKeyword(), new SeqConcatKeyword(),
+                  new SeqDefKeyword(), new SeqEmptyKeyword(),
+                  new SeqSingletonKeyword(), new ValuesKeyword(),
+                  new ContainsKeyword(), new IndexOfKeyword(),
+                  new SeqSubKeyword(), new SeqLengthKeyword(),
+                  new SingletonKeyword(), new IndexKeyword()));
       supportedPrimaries.add(new SeqPrimary());
       this.additionalPrimarySuffixes.add(SeqExpressionParser.seqSuffix(this));
 
       // Other keywords
-      supportedKeywords.addAll(Arrays.asList(new IndexKeyword()));
+      supportedKeywords.addAll(Arrays.asList(new NewElemsFreshKeyword(),
+            new NonNullElementsKeyword(), new BSumQuantifierKeyword(),
+            new BSumQuantifierKeyword(), new BProdQuantifierKeyword()));
+      supportedPrimaries.add(new BoundedQuantifierPrimary());
 
       replace(supportedKeywords, BreakClauseKeyword.class,
             new KeyBreaksClauseKeyword());

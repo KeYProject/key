@@ -1,7 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.primary;
 
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
-import org.key_project.jmlediting.profile.jmlref.parser.UnarySpecExpressionParser;
+import org.key_project.jmlediting.profile.jmlref.parser.UnarySpecExpressionArgParser;
 
 /**
  * Implementation of the invariant keyword.
@@ -26,6 +26,6 @@ public class InvariantForKeyword extends AbstractJMLPrimaryKeyword {
 
    @Override
    public IKeywordParser createParser() {
-      return new UnarySpecExpressionParser();
+      return new UnarySpecExpressionArgParser();
    }
 }

@@ -29,9 +29,9 @@ import org.key_project.jmlediting.profile.jmlref.other.InvariantKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.NonNullKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.NullableKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.PureKeyword;
-import org.key_project.jmlediting.profile.jmlref.parser.BinarySpecExpressionParser;
-import org.key_project.jmlediting.profile.jmlref.parser.TrinarySpecExpressionParser;
-import org.key_project.jmlediting.profile.jmlref.parser.UnarySpecExpressionParser;
+import org.key_project.jmlediting.profile.jmlref.parser.BinarySpecExpressionArgParser;
+import org.key_project.jmlediting.profile.jmlref.parser.TrinarySpecExpressionArgParser;
+import org.key_project.jmlediting.profile.jmlref.parser.UnarySpecExpressionArgParser;
 import org.key_project.jmlediting.profile.jmlref.primary.FreshKeyword;
 import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
 import org.key_project.jmlediting.profile.jmlref.primary.InvariantForKeyword;
@@ -135,9 +135,9 @@ public class JMLReferenceProfile extends AbstractJMLProfile implements
             Arrays.asList(new KeywordJMLPrimary(), new QuantifierPrimary()));
 
       this.getSupportedContentDescriptionsInternal().addAll(
-            Arrays.asList(new UnarySpecExpressionParser(),
-                  new BinarySpecExpressionParser(),
-                  new TrinarySpecExpressionParser()));
+            Arrays.asList(new UnarySpecExpressionArgParser(),
+                  new BinarySpecExpressionArgParser(),
+                  new TrinarySpecExpressionArgParser()));
 
    }
 

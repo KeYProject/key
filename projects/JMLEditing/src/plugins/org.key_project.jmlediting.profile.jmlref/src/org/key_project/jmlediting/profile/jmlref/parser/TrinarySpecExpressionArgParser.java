@@ -7,24 +7,24 @@ import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
 
 /**
- * A parser for binary expression arguments in brackets.
+ * A parser for trinary expression arguments.
  * 
  * @author Moritz Lichter
  *
  */
-public class BinarySpecExpressionParser extends
+public class TrinarySpecExpressionArgParser extends
       JMLRefUserParseFunctionKeywordParser {
 
    @Override
    protected ParseFunction createParseFunction(
          final IJMLExpressionProfile profile) {
       final ExpressionParser expr = new ExpressionParser(profile);
-      return brackets(seq(expr, constant(","), expr));
+      return brackets(seq(expr, constant(","), expr, constant(","), expr));
    }
 
    @Override
    public String getDescription() {
-      return "( <expression> , <expression> )";
+      return "( <expression> , <expression> , <expression> )";
    }
 
 }

@@ -3,7 +3,7 @@ package org.key_project.jmlediting.profile.jmlref.primary;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
-import org.key_project.jmlediting.profile.jmlref.parser.BracketSpecExpressionListParser;
+import org.key_project.jmlediting.profile.jmlref.parser.SpecExpressionListArgParser;
 
 /**
  * The implementation of the \fresh primary.
@@ -35,7 +35,7 @@ public class FreshKeyword extends AbstractKeyword {
 
    @Override
    public IKeywordParser createParser() {
-      return new BracketSpecExpressionListParser();
+      return new SpecExpressionListArgParser();
    }
 
 }

@@ -1,17 +1,11 @@
 package org.key_project.jmlediting.profile.key.test.spec_statement;
 
-import static org.key_project.jmlediting.profile.key.test.KeyProfileTestUtils.keyProfile;
+import static org.key_project.jmlediting.profile.key.test.KeyProfileTestUtils.testParseComplete;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.test.parser.ParserTestUtils;
 
 public class SpecStatementsTest {
-
-   private static void testParseComplete(final String text)
-         throws ParserException {
-      ParserTestUtils.testParseComplete(text, keyProfile().createParser());
-   }
 
    @Test
    public void testReturnsEmpty() throws ParserException {
