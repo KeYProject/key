@@ -10,11 +10,15 @@ import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
 import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
 import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_statement.BreakClauseKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_statement.ContinuesClauseKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_statement.ReturnsClauseKeyword;
 import org.key_project.jmlediting.profile.key.behavior.BreakBehaviorKeyword;
 import org.key_project.jmlediting.profile.key.behavior.ContinueBehaviorKeyword;
 import org.key_project.jmlediting.profile.key.behavior.ReturnBehaviorKeyword;
@@ -37,6 +41,7 @@ import org.key_project.jmlediting.profile.key.other.KeyAccessibleKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAssignableKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyPureKeyword;
+import org.key_project.jmlediting.profile.key.parser.KeyTargetLabelPredicateParser;
 import org.key_project.jmlediting.profile.key.seq.ContainsKeyword;
 import org.key_project.jmlediting.profile.key.seq.IndexOfKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqConcatKeyword;
@@ -50,6 +55,9 @@ import org.key_project.jmlediting.profile.key.seq.SeqSingletonKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqSubKeyword;
 import org.key_project.jmlediting.profile.key.seq.SingletonKeyword;
 import org.key_project.jmlediting.profile.key.seq.ValuesKeyword;
+import org.key_project.jmlediting.profile.key.spec_statement.KeyBreaksClauseKeyword;
+import org.key_project.jmlediting.profile.key.spec_statement.KeyContinuesClauseKeyword;
+import org.key_project.jmlediting.profile.key.spec_statement.KeyReturnsClauseKeyword;
 
 public class KeyProfile extends JMLReferenceProfile {
 
@@ -108,6 +116,18 @@ public class KeyProfile extends JMLReferenceProfile {
 
       // Other keywords
       supportedKeywords.addAll(Arrays.asList(new IndexKeyword()));
+
+      replace(supportedKeywords, BreakClauseKeyword.class,
+            new KeyBreaksClauseKeyword());
+      replace(supportedKeywords, ContinuesClauseKeyword.class,
+            new KeyContinuesClauseKeyword());
+      replace(supportedKeywords, ReturnsClauseKeyword.class,
+            new KeyReturnsClauseKeyword());
+
+      // Support for other keyword contents to the user
+      final Set<IUserDefinedKeywordContentDescription> contents = this
+            .getSupportedContentDescriptionsInternal();
+      contents.add(new KeyTargetLabelPredicateParser());
    }
 
    private static void replace(final Set<IKeyword> keywords,
