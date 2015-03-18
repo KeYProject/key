@@ -56,6 +56,7 @@ import org.key_project.jmlediting.profile.key.seq.SeqExpressionParser;
 import org.key_project.jmlediting.profile.key.seq.SeqKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqLengthKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqPrimary;
+import org.key_project.jmlediting.profile.key.seq.SeqReverseKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqSingletonKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqSubKeyword;
 import org.key_project.jmlediting.profile.key.seq.SingletonKeyword;
@@ -111,13 +112,12 @@ public class KeyProfile extends JMLReferenceProfile {
       this.additionalPrimarySuffixes.add(InvKeyword.invSuffix(this));
 
       // Support for seq expression
-      supportedKeywords
-            .addAll(Arrays.asList(new SeqKeyword(), new SeqConcatKeyword(),
-                  new SeqDefKeyword(), new SeqEmptyKeyword(),
-                  new SeqSingletonKeyword(), new ValuesKeyword(),
-                  new ContainsKeyword(), new IndexOfKeyword(),
-                  new SeqSubKeyword(), new SeqLengthKeyword(),
-                  new SingletonKeyword(), new IndexKeyword()));
+      supportedKeywords.addAll(Arrays.asList(new SeqKeyword(),
+            new SeqConcatKeyword(), new SeqDefKeyword(), new SeqEmptyKeyword(),
+            new SeqSingletonKeyword(), new ValuesKeyword(),
+            new ContainsKeyword(), new IndexOfKeyword(), new SeqSubKeyword(),
+            new SeqLengthKeyword(), new SingletonKeyword(), new IndexKeyword(),
+            new SeqReverseKeyword()));
       supportedPrimaries.add(new SeqPrimary());
       this.additionalPrimarySuffixes.add(SeqExpressionParser.seqSuffix(this));
 
