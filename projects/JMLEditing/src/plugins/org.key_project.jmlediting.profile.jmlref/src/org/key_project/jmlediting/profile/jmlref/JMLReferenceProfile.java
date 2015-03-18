@@ -69,6 +69,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_statement.ReturnsClauseKey
 import org.key_project.jmlediting.profile.jmlref.type.BigIntKeyword;
 import org.key_project.jmlediting.profile.jmlref.type.RealKeyword;
 import org.key_project.jmlediting.profile.jmlref.validator.LoopInvariantValidator;
+import org.key_project.jmlediting.profile.jmlref.visibility.FinalKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.InstanceKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.PrivateKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.ProtectedKeyword;
@@ -129,7 +130,7 @@ public class JMLReferenceProfile extends AbstractJMLProfile implements
                   new ReachKeyword(), new InstanceKeyword(),
                   new StaticKeyword(), new InitiallyKeyword(),
                   new ContinuesClauseKeyword(), new BreakClauseKeyword(),
-                  new ReturnsClauseKeyword()));
+                  new ReturnsClauseKeyword(), new FinalKeyword()));
 
       this.getSupportedPrimariesInternal().addAll(
             Arrays.asList(new KeywordJMLPrimary(), new QuantifierPrimary()));

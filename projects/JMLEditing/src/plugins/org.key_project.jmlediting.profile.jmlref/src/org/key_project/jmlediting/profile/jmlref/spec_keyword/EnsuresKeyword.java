@@ -15,7 +15,7 @@ public class EnsuresKeyword extends AbstractGenericSpecificationKeyword {
     * Creates a new ensures keyword instance.
     */
    public EnsuresKeyword() {
-      super("ensures");
+      super("ensures", "post", "post_redundantly", "ensures_redundantly");
    }
 
    @Override

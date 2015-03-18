@@ -22,7 +22,7 @@ public class RequiresKeyword extends AbstractGenericSpecificationKeyword {
     * Creates a new instance for the requires keyword.
     */
    public RequiresKeyword() {
-      super("requires");
+      super("requires", "pre", "requires_redundantly", "pre_redundantly");
    }
 
    @Override
