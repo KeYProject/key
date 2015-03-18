@@ -112,13 +112,12 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
          if (UseBootClassPathKind.EXTERNAL_IN_FILE_SYSTEM.equals(kind)) {
             externalBootClassPath = IOUtil.createTempDirectory("Boot", "ClassPath");
             BundleUtil.extractFromBundleToFilesystem(Activator.PLUGIN_ID, "data/stubbyExample/boot", externalBootClassPath);
-            KeYResourceProperties.setUseBootClassPathKind(project, kind);
-            KeYResourceProperties.setBootClassPath(project, externalBootClassPath.getAbsolutePath());
+            KeYResourceProperties.setBootClassPath(project, kind, externalBootClassPath.getAbsolutePath());
          }
          else if (UseBootClassPathKind.WORKSPACE.equals(kind)) {
             IFolder folder = TestUtilsUtil.createFolder(javaProject.getProject(), "boot");
             BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/stubbyExample/boot", folder);
-            KeYResourceProperties.setBootClassPath(project, folder.getFullPath().toString());
+            KeYResourceProperties.setBootClassPath(project, kind, folder.getFullPath().toString());
          }
          super.initProject(javaProject);
       }

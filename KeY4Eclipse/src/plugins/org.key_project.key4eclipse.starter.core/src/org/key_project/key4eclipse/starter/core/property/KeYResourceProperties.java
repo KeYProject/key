@@ -22,6 +22,7 @@ import java.util.List;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -29,6 +30,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jdt.core.JavaModelException;
+import org.key_project.key4eclipse.starter.core.decorator.ClassPathFolderLightweightLabelDecorator;
+import org.key_project.key4eclipse.starter.core.decorator.ClassPathProjectLightweightLabelDecorator;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
 import org.key_project.key4eclipse.starter.core.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -108,18 +111,6 @@ public final class KeYResourceProperties {
     }
     
     /**
-     * Sets the use boot class path entry.
-     * @param project The {@link IProject} to configure.
-     * @param kind The value to save.
-     * @throws CoreException Occurred Exception.
-     */
-    public static void setUseBootClassPathKind(IProject project, UseBootClassPathKind kind) throws CoreException {
-        if (project != null && project.isOpen()) {
-            project.setPersistentProperty(PROP_USE_BOOT_CLASS_PATH, kind != null ? kind.toString() : null);
-        }
-    }
-    
-    /**
      * Returns the boot class path entry value.
      * @param project The {@link IProject} to read from.
      * @return The boot class path entry value.
@@ -137,12 +128,33 @@ public final class KeYResourceProperties {
     /**
      * Sets the boot class path entry.
      * @param project The {@link IProject} to configure.
+     * @param kind The {@link UseBootClassPathKind} of the path.
      * @param bootClassPath The value to save.
      * @throws CoreException Occurred Exception.
      */
-    public static void setBootClassPath(IProject project, String bootClassPath) throws CoreException {
+    public static void setBootClassPath(IProject project, UseBootClassPathKind kind, String bootClassPath) throws CoreException {
         if (project != null && project.isOpen()) {
-            project.setPersistentProperty(PROP_BOOT_CLASS_PATH, bootClassPath);
+           IResource oldResource = null;
+           if (UseBootClassPathKind.WORKSPACE.equals(getUseBootClassPathKind(project))) {
+              oldResource = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(getBootClassPath(project)));
+           }
+           if (oldResource instanceof IFolder && oldResource.exists()) {
+              ClassPathFolderLightweightLabelDecorator.redecorateFolder((IFolder)oldResource);
+           }
+           else if (oldResource instanceof IProject && oldResource.exists()) {
+              ClassPathProjectLightweightLabelDecorator.redecorateFolder((IProject) oldResource);
+           }
+           project.setPersistentProperty(PROP_USE_BOOT_CLASS_PATH, kind != null ? kind.toString() : null);
+           project.setPersistentProperty(PROP_BOOT_CLASS_PATH, bootClassPath);
+           if (UseBootClassPathKind.WORKSPACE.equals(kind)) {
+              oldResource = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(bootClassPath));
+              if (oldResource instanceof IFolder && oldResource.exists()) {
+                 ClassPathFolderLightweightLabelDecorator.redecorateFolder((IFolder)oldResource);
+              }
+              else if (oldResource instanceof IProject && oldResource.exists()) {
+                 ClassPathProjectLightweightLabelDecorator.redecorateFolder((IProject) oldResource);
+              }
+           }
         }
     }
     
@@ -220,11 +232,31 @@ public final class KeYResourceProperties {
      */
     public static void setClassPathEntries(IProject project, List<KeYClassPathEntry> entries) throws CoreException {
         if (project != null && project.isOpen()) {
+            List<IResource> resources = new LinkedList<IResource>();
+            // Get old content
+            List<KeYClassPathEntry> oldEntries = KeYResourceProperties.getClassPathEntries(project);
+            if (!CollectionUtil.isEmpty(oldEntries)) {
+               for (KeYClassPathEntry entry : oldEntries) {
+                  if (KeYClassPathEntryKind.WORKSPACE.equals(entry.getKind())) {
+                     IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(entry.getPath()));
+                     if (resource != null && resource.exists()) {
+                        resources.add(resource);
+                     }
+                  }
+               }
+            }
+            // Create new content
             StringBuffer sb = new StringBuffer();
             sb.append("<?xml version=\"1.0\"?>");
             sb.append("<classPathEntries>");
             if (entries != null) {
                 for (KeYClassPathEntry entry : entries) {
+                    if (KeYClassPathEntryKind.WORKSPACE.equals(entry.getKind())) {
+                       IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(entry.getPath()));
+                       if (resource != null && resource.exists()) {
+                          resources.add(resource);
+                       }
+                    }
                     sb.append("<entry");
                     if (entry.getKind() != null) {
                         sb.append(" kind=\"" + entry.getKind().toString() + "\"");
@@ -236,7 +268,17 @@ public final class KeYResourceProperties {
                 }
             }
             sb.append("</classPathEntries>");
+            // Change property
             project.setPersistentProperty(PROP_CLASS_PATH_ENTRIES, sb.toString());
+            // Update decorations
+            for (IResource resource : resources) {
+               if (resource instanceof IFolder) {
+                  ClassPathFolderLightweightLabelDecorator.redecorateFolder((IFolder) resource);
+               }
+               else if (resource instanceof IProject) {
+                  ClassPathProjectLightweightLabelDecorator.redecorateFolder((IProject) resource);
+               }
+            }
         }
     }
     
