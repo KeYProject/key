@@ -336,12 +336,6 @@ public final class JMLProfileManagement {
             throw new InvalidProfileException("Unable to write XML document");
          }
       }
-      try {
-         p.sync();
-      }
-      catch (final BackingStoreException e) {
-         throw new InvalidProfileException(e);
-      }
    }
 
    /**
