@@ -33,6 +33,7 @@ import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYCl
 import org.key_project.key4eclipse.starter.core.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.xml.sax.Attributes;
@@ -143,6 +144,29 @@ public final class KeYResourceProperties {
         if (project != null && project.isOpen()) {
             project.setPersistentProperty(PROP_BOOT_CLASS_PATH, bootClassPath);
         }
+    }
+    
+    /**
+     * Searches the {@link KeYClassPathEntry} with the given properties.
+     * @param entries The available {@link KeYClassPathEntry}s.
+     * @param kind The expected {@link KeYClassPathEntryKind}.
+     * @param path The expected path.
+     * @return The found {@link KeYClassPathEntry} or {@code null} if not found.
+     */
+    public static KeYClassPathEntry searchClassPathEntry(final List<KeYClassPathEntry> entries, 
+                                                         final KeYClassPathEntryKind kind,
+                                                         final String path) {
+       return CollectionUtil.search(entries, new IFilter<KeYClassPathEntry>() {
+          @Override
+          public boolean select(KeYClassPathEntry element) {
+             if (kind.equals(element.getKind())) {
+                return path.equals(element.getPath());
+             }
+             else {
+                return false;
+             }
+          }
+       });
     }
     
     /**

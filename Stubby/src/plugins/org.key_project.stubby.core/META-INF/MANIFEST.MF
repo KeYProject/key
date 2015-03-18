@@ -14,5 +14,6 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
-Export-Package: org.key_project.stubby.core.jdt,
+Export-Package: org.key_project.stubby.core.customization,
+ org.key_project.stubby.core.jdt,
  org.key_project.stubby.core.util

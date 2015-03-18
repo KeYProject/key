@@ -31,6 +31,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.key_project.stubby.core.Activator;
+import org.key_project.stubby.core.customization.IGeneratorCustomization;
 import org.key_project.stubby.core.jdt.DependencyAnalyzer;
 import org.key_project.stubby.core.template.TypeTemplate;
 import org.key_project.stubby.model.dependencymodel.AbstractType;
@@ -79,10 +80,12 @@ public final class StubGeneratorUtil {
     * @param project The {@link IJavaProject} to generate stubs for.
     * @param stubFolderPath The path to the stub folder.
     * @param monitor The {@link IProgressMonitor} to use.
+    * @param customizations Optional {@link IGeneratorCustomization} to consider.
     */
    public static void generateStubs(IJavaProject project, 
                                     String stubFolderPath,
-                                    IProgressMonitor monitor) throws CoreException {
+                                    IProgressMonitor monitor,
+                                    IGeneratorCustomization... customizations) throws CoreException {
       try {
          if (monitor == null) {
             monitor = new NullProgressMonitor();
@@ -102,6 +105,10 @@ public final class StubGeneratorUtil {
          }
          // Generate stubs with help of JET
          generateFiles(dependencyModel, project, stubFolderPath, monitor);
+         // Inform customizations
+         for (IGeneratorCustomization customization : customizations) {
+            customization.stubFilesGenerated(project, stubFolderPath);
+         }
       }
       catch (IOException e) {
          throw new CoreException(new Status(IStatus.ERROR, "BUNDLE_ID", e.getMessage(), e));

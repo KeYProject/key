@@ -35,12 +35,3 @@ the mentioned Eclipse version!
 -----------------------------------------------
 1. KeY4Eclipse - Follow the instructions of Section (3) in 
    '../KeY4Eclipse/Readme.txt' carefully
-
-
-(3.2) Import Eclipse Projects from GIT Repository
--------------------------------------------------
-1. Select main menu item 'File, Import...'
-2. Select 'General, Existing Projects into Workspace' and press 'Next >'
-3. Set root directory to '<root>/GIT/KeY/Stubby/src'
-4. Ensure that 'Copy projects into workspace' is NOT selected.
-5. Finish the wizard
