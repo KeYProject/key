@@ -10,6 +10,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 import org.osgi.framework.Bundle;
 
@@ -32,7 +33,9 @@ public abstract class AbstractSWTBotGenerateStubsTest extends TestCase {
                                     IGeneratorTestSteps steps) throws Exception {
       // Create java project and fill it with source and expected oracle files
       IJavaProject javaProject = TestUtilsUtil.createJavaProject(projectName);
-      BundleUtil.extractFromBundleToWorkspace(bundleId, pathToSourceFiles, javaProject.getProject());
+      if (pathToSourceFiles != null) {
+         BundleUtil.extractFromBundleToWorkspace(bundleId, pathToSourceFiles, javaProject.getProject().getFolder(JDTUtil.getSourceFolderName()));
+      }
       TestUtilsUtil.waitForBuild();
       // Close welcome screen
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
@@ -48,6 +51,7 @@ public abstract class AbstractSWTBotGenerateStubsTest extends TestCase {
       SWTBotText stubFolderText = shell.bot().text();
       steps.testAndSetSettings(shell, stubFolderText);
       TestUtilsUtil.clickDirectly(shell.bot().button("Finish"));
+      steps.wizardFinished(shell);
       bot.waitUntil(Conditions.shellCloses(shell));
       // Ensure that new stub folder is set
       steps.testResults(javaProject);
@@ -64,7 +68,7 @@ public abstract class AbstractSWTBotGenerateStubsTest extends TestCase {
        * @throws Exception Occurred Exception.
        */
       public void initProject(IJavaProject javaProject) throws Exception;
-      
+
       /**
        * Tests the dialog content and may sets settings.
        * @param shell The {@link SWTBotShell} of the {@link Wizard}.
@@ -72,6 +76,12 @@ public abstract class AbstractSWTBotGenerateStubsTest extends TestCase {
        * @throws Exception Occurred Exception.
        */
       public void testAndSetSettings(SWTBotShell shell, SWTBotText stubFolderText) throws Exception;
+      
+      /**
+       * Called after the {@link Wizard} has finished.
+       * @param shell The {@link SWTBotShell} of the {@link Wizard}.
+       */
+      public void wizardFinished(SWTBotShell shell);
       
       /**
        * Tests the generation results.

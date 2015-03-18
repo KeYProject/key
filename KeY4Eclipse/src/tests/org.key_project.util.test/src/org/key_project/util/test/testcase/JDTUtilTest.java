@@ -762,7 +762,7 @@ public class JDTUtilTest extends TestCase {
        assertTrue(compilationUnits.size() >= 2);
        
        //Test null
-       ASTNode asti = JDTUtil.parse(null);
+       ASTNode asti = JDTUtil.parse((ICompilationUnit)null);
        assertNull(asti);
        assertEquals(null,asti);
        

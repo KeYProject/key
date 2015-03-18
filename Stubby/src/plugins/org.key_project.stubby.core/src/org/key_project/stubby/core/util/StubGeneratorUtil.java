@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -81,17 +82,22 @@ public final class StubGeneratorUtil {
     * @param stubFolderPath The path to the stub folder.
     * @param monitor The {@link IProgressMonitor} to use.
     * @param customizations Optional {@link IGeneratorCustomization} to consider.
+    * @return All ignored types including the reason why.
     */
-   public static void generateStubs(IJavaProject project, 
-                                    String stubFolderPath,
-                                    IProgressMonitor monitor,
-                                    IGeneratorCustomization... customizations) throws CoreException {
+   public static List<IgnoredType> generateStubs(IJavaProject project, 
+                                                 String stubFolderPath,
+                                                 IProgressMonitor monitor,
+                                                 IGeneratorCustomization... customizations) throws CoreException {
       try {
          if (monitor == null) {
             monitor = new NullProgressMonitor();
          }
          // Create dependency model
          DependencyModel dependencyModel = createDependencyModel(project, monitor);
+         // Inform customizations
+         for (IGeneratorCustomization customization : customizations) {
+            customization.dependencyModelCreated(project, stubFolderPath, dependencyModel);
+         }
          // Save dependency model in project
          if (SAVE_DEPENDENCY_MODEL) {
             SWTUtil.checkCanceled(monitor);
@@ -104,11 +110,12 @@ public final class StubGeneratorUtil {
             monitor.done();
          }
          // Generate stubs with help of JET
-         generateFiles(dependencyModel, project, stubFolderPath, monitor);
+         List<IgnoredType> ignoredTypes = generateFiles(dependencyModel, project, stubFolderPath, monitor, customizations);
          // Inform customizations
          for (IGeneratorCustomization customization : customizations) {
             customization.stubFilesGenerated(project, stubFolderPath);
          }
+         return ignoredTypes;
       }
       catch (IOException e) {
          throw new CoreException(new Status(IStatus.ERROR, "BUNDLE_ID", e.getMessage(), e));
@@ -161,23 +168,37 @@ public final class StubGeneratorUtil {
     * @param javaProject The target {@link IJavaProject}.
     * @param stubFolderPath The path to the stub folder.
     * @param monitor The {@link IProgressMonitor} to use.
+    * @param customizations Optional {@link IGeneratorCustomization} to consider.
+    * @return All ignored types including the reason why.
     * @throws CoreException Occurred Exception.
     */
-   private static void generateFiles(DependencyModel dependencyModel, 
-                                     IJavaProject javaProject, 
-                                     String stubFolderPath,
-                                     IProgressMonitor monitor) throws CoreException {
+   private static List<IgnoredType> generateFiles(DependencyModel dependencyModel, 
+                                                  IJavaProject javaProject, 
+                                                  String stubFolderPath,
+                                                  IProgressMonitor monitor,
+                                                  IGeneratorCustomization... customizations) throws CoreException {
+      List<IgnoredType> ignoredTypes = new LinkedList<IgnoredType>();
       if (dependencyModel != null && JDTUtil.isJavaProject(javaProject)) {
          monitor.beginTask("Creating stub files", dependencyModel.getTypes().size());
          for (AbstractType abstractType : dependencyModel.getTypes()) {
             SWTUtil.checkCanceled(monitor);
             if (abstractType instanceof Type && !abstractType.isSource()) {
-               generateType((Type) abstractType, javaProject.getProject(), stubFolderPath);
+               String ignoreReason = null;
+               for (int i = 0; ignoreReason == null && i < customizations.length; i++) {
+                  ignoreReason = customizations[i].getIgnoreReason(javaProject, stubFolderPath, abstractType);
+               }
+               if (ignoreReason == null) {
+                  generateType((Type) abstractType, javaProject.getProject(), stubFolderPath);
+               }
+               else {
+                  ignoredTypes.add(new IgnoredType((Type) abstractType, ignoreReason));
+               }
             }
             monitor.worked(1);
          }
          monitor.done();
       }
+      return ignoredTypes;
    }
    
    /**
@@ -192,8 +213,7 @@ public final class StubGeneratorUtil {
                                     IProject stubProject, 
                                     String stubFolderPath) throws CoreException {
       // Create new content
-      TypeTemplate template = new TypeTemplate();
-      String content = template.generate(type);
+      String content = generateContent(type);
       // Save file
       String[] res = type.getPackage().split("\\.");
       String projectSimpleName = type.getSimpleName() + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT;  
@@ -227,6 +247,16 @@ public final class StubGeneratorUtil {
       return stubJavaClass;
    }
    
+   /**
+    * Generates the java stub source code of the given {@link Type}.
+    * @param type The {@link Type}.
+    * @return The generated java stub source code.
+    */
+   public static String generateContent(Type type) {
+      TypeTemplate template = new TypeTemplate();
+      return template.generate(type);
+   }
+
    /**
     * Returns the URL of the given merge rules.
     * @return The URL of the given merge rules.
@@ -284,5 +314,24 @@ public final class StubGeneratorUtil {
     */
    public static void setStubFolderPath(IProject project, String stubFolder) throws CoreException {
       project.setPersistentProperty(STUB_FOLDER_PATH, stubFolder);
+   }
+   
+   public static final class IgnoredType {
+      private final Type type;
+      
+      private final String reason;
+
+      public IgnoredType(Type type, String reason) {
+         this.type = type;
+         this.reason = reason;
+      }
+
+      public Type getType() {
+         return type;
+      }
+
+      public String getReason() {
+         return reason;
+      }
    }
 }

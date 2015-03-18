@@ -15,6 +15,7 @@ package org.key_project.util.jdt;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -66,6 +67,7 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithException;
@@ -1102,6 +1104,29 @@ public class JDTUtil {
          ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
          parser.setResolveBindings(true);
          parser.setSource(compilationUnit);
+         Map<?, ?> options = JavaCore.getOptions();
+         JavaCore.setComplianceOptions(JavaModelUtil.VERSION_LATEST, options);
+         parser.setCompilerOptions(options);
+         ASTNode result = parser.createAST(null);
+         return result;
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Parses the given {@link ICompilationUnit}.
+    * @param compilationUnit The {@link ICompilationUnit} to parse.
+    * @return The parsed {@link ASTNode} or {@code null} if no {@link ICompilationUnit} is defined.
+    * @throws IOException Occurred Exception
+    */
+   public static ASTNode parse(InputStream in) throws IOException {
+      if (in != null) {
+         String content = IOUtil.readFrom(in);
+         ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
+         parser.setResolveBindings(true);
+         parser.setSource(content.toCharArray());
          Map<?, ?> options = JavaCore.getOptions();
          JavaCore.setComplianceOptions(JavaModelUtil.VERSION_LATEST, options);
          parser.setCompilerOptions(options);

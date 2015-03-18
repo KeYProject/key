@@ -23,7 +23,7 @@ public class SWTBotGenerateStubsHandlerTest extends AbstractSWTBotGenerateStubsT
    public void testHelloWorldExample() throws Exception {
       doGenerationTest("SWTBotGenerateStubsHandlerTest_testHelloWorldExample", 
                        Activator.PLUGIN_ID, 
-                       "data/helloWorldExample",
+                       "data/helloWorldExample/src",
                        new IGeneratorTestSteps() {
                           @Override
                           public void initProject(IJavaProject javaProject) throws Exception {
@@ -35,6 +35,10 @@ public class SWTBotGenerateStubsHandlerTest extends AbstractSWTBotGenerateStubsT
                           public void testAndSetSettings(SWTBotShell shell, SWTBotText stubFolderText) throws Exception {
                              assertEquals("myStubFolder", stubFolderText.getText());
                              stubFolderText.setText("new/stub folder");
+                          }
+
+                          @Override
+                          public void wizardFinished(SWTBotShell shell) {
                           }
 
                           @Override

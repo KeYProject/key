@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.junit.Test;
 import org.key_project.stubby.core.test.Activator;
 import org.key_project.stubby.core.util.StubGeneratorUtil;
+import org.key_project.stubby.core.util.StubGeneratorUtil.IgnoredType;
 import org.key_project.stubby.model.dependencymodel.AbstractType;
 import org.key_project.stubby.model.dependencymodel.ArrayType;
 import org.key_project.stubby.model.dependencymodel.Datatype;
@@ -671,7 +672,9 @@ public class StubGeneratorUtilTest extends TestCase {
       IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToSourceFilesInPlugin, project.getProject().getFolder("src"));
       // Generate stubs
-      StubGeneratorUtil.generateStubs(project, StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH, null);
+      List<IgnoredType> ignoredTyps = StubGeneratorUtil.generateStubs(project, StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH, null);
+      assertNotNull(ignoredTyps);
+      assertEquals(0, ignoredTyps.size());
       // Extract oracle stubs into project
       IFolder oracleFolder = project.getProject().getFolder("oracleStubs");
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToOracleStubsFileInPlugin, oracleFolder);
@@ -702,7 +705,9 @@ public class StubGeneratorUtilTest extends TestCase {
       IFolder stubFolder = project.getProject().getFolder(StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH);
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToInitialStubs, stubFolder);
       // Generate stubs
-      StubGeneratorUtil.generateStubs(project, StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH, null);
+      List<IgnoredType> ignoredTyps = StubGeneratorUtil.generateStubs(project, StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH, null);
+      assertNotNull(ignoredTyps);
+      assertEquals(0, ignoredTyps.size());
       // Extract oracle stubs into project
       IFolder oracleFolder = project.getProject().getFolder("oracleStubs");
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToOracleStubsFileInPlugin, oracleFolder);
