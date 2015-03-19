@@ -10,7 +10,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -49,7 +48,7 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
       final GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
       final Composite myComposite = new Composite(composite, SWT.NONE);
       myComposite.setLayoutData(data);
-      myComposite.setLayout(new GridLayout(3, false));
+      myComposite.setLayout(this.getLayout());
 
       super.addProfileName(myComposite, true);
 

@@ -8,13 +8,19 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -34,7 +40,9 @@ public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
    private final String message;
 
    protected Text profileNameText;
+   protected ControlDecoration profileNameError;
    protected Combo derivedFromCombo;
+   protected ControlDecoration comboError;
 
    public AbstractJMLProfileDialog(final Shell parent,
          final IJMLProfile profile, final String title, final String message) {
@@ -131,6 +139,28 @@ public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
       this.derivedFromCombo.setLayoutData(data);
       JMLSWTUtil.fillComboWithParentProfilesAndDate(this.derivedFromCombo);
       this.derivedFromCombo.setEnabled(enabled);
+
+      this.comboError = new ControlDecoration(this.derivedFromCombo, SWT.RIGHT
+            | SWT.TOP);
+      this.comboError.setImage(FieldDecorationRegistry.getDefault()
+            .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR).getImage());
+      this.comboError
+            .setDescriptionText("Please select a profile to derive from!");
+      this.comboError.show();
+
+      this.derivedFromCombo.addModifyListener(new ModifyListener() {
+         @Override
+         public void modifyText(final ModifyEvent e) {
+            final int index = AbstractJMLProfileDialog.this.derivedFromCombo
+                  .getSelectionIndex();
+            if (index == -1) {
+               AbstractJMLProfileDialog.this.comboError.show();
+            }
+            else {
+               AbstractJMLProfileDialog.this.comboError.hide();
+            }
+         }
+      });
    }
 
    protected void addProfileName(final Composite myComposite,
@@ -148,6 +178,28 @@ public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
       this.profileNameText = new Text(myComposite, SWT.SINGLE | SWT.BORDER);
       this.profileNameText.setLayoutData(data);
       this.profileNameText.setEnabled(enabled);
+
+      this.profileNameError = new ControlDecoration(this.profileNameText,
+            SWT.RIGHT | SWT.TOP);
+      this.profileNameError.setImage(FieldDecorationRegistry.getDefault()
+            .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR).getImage());
+      this.profileNameError
+            .setDescriptionText("Profile name must not be empty!");
+      this.profileNameError.show();
+
+      this.profileNameText.addModifyListener(new ModifyListener() {
+         @Override
+         public void modifyText(final ModifyEvent e) {
+            if (AbstractJMLProfileDialog.this.profileNameText.getText()
+                  .isEmpty()) {
+               AbstractJMLProfileDialog.this.profileNameError.show();
+            }
+            else {
+               AbstractJMLProfileDialog.this.profileNameError.hide();
+            }
+
+         }
+      });
    }
 
    protected void addKeywordTableLabel(final Composite myComposite,
@@ -200,6 +252,11 @@ public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
 
    protected TableItem getSelectedParentTableItem() {
       return this.keywordTable.getSelection()[0];
+   }
+
+   @Override
+   protected Layout getLayout() {
+      return new GridLayout(3, false);
    }
 
    protected void fillKeywordTable() {

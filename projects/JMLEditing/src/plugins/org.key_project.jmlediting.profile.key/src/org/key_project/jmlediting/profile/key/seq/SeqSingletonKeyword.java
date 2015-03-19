@@ -5,8 +5,17 @@ import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.profile.jmlref.parser.UnarySpecExpressionArgParser;
 
+/**
+ * The seq singletion keyword for KeY.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public class SeqSingletonKeyword extends AbstractKeyword {
 
+   /**
+    * Creates a new seq singleton keyword instance.
+    */
    public SeqSingletonKeyword() {
       super("\\seq_singleton");
    }

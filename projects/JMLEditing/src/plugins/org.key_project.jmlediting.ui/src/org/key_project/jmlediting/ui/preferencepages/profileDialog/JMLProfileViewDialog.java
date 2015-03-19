@@ -1,14 +1,18 @@
 package org.key_project.jmlediting.ui.preferencepages.profileDialog;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 
 public class JMLProfileViewDialog extends AbstractJMLProfileDialog {
+
+   private final Color redColor = Display.getCurrent().getSystemColor(
+         SWT.COLOR_RED);
 
    public JMLProfileViewDialog(final Shell parent, final IJMLProfile profile) {
       super(parent, profile, "JML Profile Viewer", "");
@@ -19,7 +23,7 @@ public class JMLProfileViewDialog extends AbstractJMLProfileDialog {
       final GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
       final Composite myComposite = new Composite(composite, SWT.NONE);
       myComposite.setLayoutData(data);
-      myComposite.setLayout(new GridLayout(3, false));
+      myComposite.setLayout(this.getLayout());
 
       super.addProfileName(myComposite, false);
 

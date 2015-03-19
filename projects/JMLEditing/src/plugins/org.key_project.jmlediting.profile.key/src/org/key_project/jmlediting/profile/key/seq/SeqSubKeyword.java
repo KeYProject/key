@@ -5,8 +5,17 @@ import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.profile.jmlref.parser.TrinarySpecExpressionArgParser;
 
+/**
+ * The seq sub keyword for KeY.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public class SeqSubKeyword extends AbstractKeyword {
 
+   /**
+    * Creates a new seq sub keyword instance.
+    */
    public SeqSubKeyword() {
       super("\\seq_sub");
    }

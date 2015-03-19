@@ -4,7 +4,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -22,7 +21,7 @@ public class JMLNewProfileDialog extends AbstractJMLProfileDialog {
    @Override
    protected Control getDialogArea(final Composite composite) {
       final Composite myComposite = new Composite(composite, SWT.NONE);
-      myComposite.setLayout(new GridLayout(3, false));
+      myComposite.setLayout(this.getLayout());
       myComposite.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
 
       this.addProfileName(myComposite, true);
@@ -47,44 +46,6 @@ public class JMLNewProfileDialog extends AbstractJMLProfileDialog {
          }
       });
 
-      // final GridData labelData = new GridData(SWT.FILL, SWT.CENTER, false,
-      // true);
-      // final GridData textData = new GridData(SWT.FILL, SWT.CENTER, false,
-      // true);
-      //
-      // final Label profileNameLabel = new Label(myComposite, SWT.NONE);
-      // profileNameLabel.setText("Profile Name: ");
-      // profileNameLabel.setLayoutData(labelData);
-      //
-      // this.profileNameText = new Text(myComposite, SWT.SINGLE | SWT.BORDER);
-      // this.profileNameText.setLayoutData(textData);
-      //
-      // final Label profileIdLabel = new Label(myComposite, SWT.NONE);
-      // profileIdLabel.setText("Profile ID: ");
-      // profileIdLabel.setLayoutData(labelData);
-      //
-      // this.profileIdText = new Text(myComposite, SWT.SINGLE | SWT.BORDER);
-      // this.profileIdText.setLayoutData(textData);
-      //
-      // final Label derivedFromLabel = new Label(myComposite, SWT.NONE);
-      // derivedFromLabel.setText("Derived from: ");
-      // derivedFromLabel.setLayoutData(labelData);
-      //
-      // this.derivedFromCombo = new Combo(myComposite, SWT.READ_ONLY |
-      // SWT.BORDER);
-      // JMLSWTUtil.fillComboWithParentProfilesAndDate(this.derivedFromCombo);
-      // this.derivedFromCombo.setLayoutData(textData);
-      //
-      // this.derivedFromCombo.addSelectionListener(new SelectionListener() {
-      // @Override
-      // public void widgetSelected(final SelectionEvent e) {
-      // }
-      //
-      // @Override
-      // public void widgetDefaultSelected(final SelectionEvent e) {
-      // }
-      // });
-      //
       return composite;
    }
 
