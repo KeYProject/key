@@ -1117,13 +1117,23 @@ public class JDTUtil {
    
    /**
     * Parses the given {@link ICompilationUnit}.
-    * @param compilationUnit The {@link ICompilationUnit} to parse.
+    * @param in The {@link InputStream} to parse.
     * @return The parsed {@link ASTNode} or {@code null} if no {@link ICompilationUnit} is defined.
     * @throws IOException Occurred Exception
     */
    public static ASTNode parse(InputStream in) throws IOException {
-      if (in != null) {
-         String content = IOUtil.readFrom(in);
+      String content = IOUtil.readFrom(in);
+      return parse(content);
+   }
+   
+   /**
+    * Parses the given {@link ICompilationUnit}.
+    * @param content The {@link String} to parse.
+    * @return The parsed {@link ASTNode} or {@code null} if no {@link ICompilationUnit} is defined.
+    * @throws IOException Occurred Exception
+    */
+   public static ASTNode parse(String content) throws IOException {
+      if (content != null) {
          ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
          parser.setResolveBindings(true);
          parser.setSource(content.toCharArray());

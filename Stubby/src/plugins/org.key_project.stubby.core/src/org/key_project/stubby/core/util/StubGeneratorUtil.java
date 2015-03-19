@@ -41,6 +41,7 @@ import org.key_project.stubby.model.dependencymodel.DependencymodelFactory;
 import org.key_project.stubby.model.dependencymodel.Type;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.osgi.framework.Bundle;
@@ -177,6 +178,15 @@ public final class StubGeneratorUtil {
                                                   String stubFolderPath,
                                                   IProgressMonitor monitor,
                                                   IGeneratorCustomization... customizations) throws CoreException {
+      // Ensure that stub folder exists
+      IFolder stubFolder = javaProject.getProject().getFolder(new Path(stubFolderPath));
+      if (!stubFolder.exists() || ArrayUtil.isEmpty(stubFolder.members())) {
+         ResourceUtil.ensureExists(stubFolder);
+         for (IGeneratorCustomization customization : customizations) {
+            customization.stubFolderCreated(stubFolder);
+         }
+      }
+      // Generate files
       List<IgnoredType> ignoredTypes = new LinkedList<IgnoredType>();
       if (dependencyModel != null && JDTUtil.isJavaProject(javaProject)) {
          monitor.beginTask("Creating stub files", dependencyModel.getTypes().size());

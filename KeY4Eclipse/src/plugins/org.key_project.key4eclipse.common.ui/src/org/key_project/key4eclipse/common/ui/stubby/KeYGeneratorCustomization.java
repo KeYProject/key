@@ -1,18 +1,23 @@
 package org.key_project.key4eclipse.common.ui.stubby;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
@@ -23,6 +28,10 @@ import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.U
 import org.key_project.stubby.core.customization.IGeneratorCustomization;
 import org.key_project.stubby.model.dependencymodel.AbstractType;
 import org.key_project.stubby.model.dependencymodel.DependencyModel;
+import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.java.JavaReduxFileCollection;
@@ -137,6 +146,114 @@ public class KeYGeneratorCustomization implements IGeneratorCustomization {
          }
       }
       return result;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void stubFolderCreated(IFolder stubFolder) throws CoreException {
+      try {
+         if (bootClassPath) {
+            JavaReduxFileCollection collection = new JavaReduxFileCollection(JavaProfile.getDefaultProfile());
+            Walker walker = collection.createWalker(JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT);
+            while (walker.step()) {
+               addBootClassPathJavaFile(stubFolder, walker.openCurrent());
+            }
+         }
+      }
+      catch (IOException e) {
+         throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
+      }
+   }
+
+   /**
+    * Adds the Java file of the given {@link InputStream} to the stub folder.
+    * @param stubFolder The stub folder.
+    * @param in The {@link InputStream} of the Java file.
+    * @throws IOException Occurred Exception.
+    * @throws CoreException Occurred Exception.
+    */
+   protected void addBootClassPathJavaFile(IFolder stubFolder, InputStream in) throws IOException, CoreException {
+      String content = IOUtil.readFrom(in);
+      ASTNode ast = JDTUtil.parse(content);
+      if (ast != null) {
+         TypeAnalyzer visitor = new TypeAnalyzer();
+         ast.accept(visitor);
+         TypeDeclaration publicType = visitor.getPublicType();
+         if (publicType != null) {
+            if (visitor.getPackageDeclaration() != null) {
+               String packageDeclaration = visitor.getPackageDeclaration().getName().toString();
+               String[] packageFragments = packageDeclaration.split("\\.");
+               for (String packageFragment : packageFragments) {
+                  stubFolder = stubFolder.getFolder(packageFragment);
+                  ResourceUtil.ensureExists(stubFolder);
+               }
+            }
+            IFile file = stubFolder.getFile(publicType.getName() + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT);
+            ResourceUtil.createFile(file, new ByteArrayInputStream(content.getBytes()), null);
+         }
+      }
+   }
+   
+   /**
+    * An {@link ASTVisitor} to list all {@link TypeDeclaration}s.
+    * @author Martin Hentschel
+    */
+   protected static class TypeAnalyzer extends ASTVisitor {
+      /**
+       * The found {@link TypeDeclaration}
+       */
+      private final List<TypeDeclaration> types = new LinkedList<TypeDeclaration>();
+      
+      /**
+       * The {@link PackageDeclaration}.
+       */
+      private PackageDeclaration packageDeclaration;
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean visit(CompilationUnit node) {
+         packageDeclaration = node.getPackage();
+         return super.visit(node);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean visit(TypeDeclaration node) {
+         types.add(node);
+         return super.visit(node);
+      }
+
+      /**
+       * Returns the {@link PackageDeclaration}.
+       * @return The {@link PackageDeclaration} or {@code null} if not available.
+       */
+      public PackageDeclaration getPackageDeclaration() {
+         return packageDeclaration;
+      }
+
+      /**
+       * Returns the public {@link TypeDeclaration}.
+       * @return The public {@link TypeDeclaration} or {@code null} if not available.
+       */
+      public TypeDeclaration getPublicType() {
+         if (types.size() == 1) {
+            return types.get(0);
+         }
+         else {
+            return CollectionUtil.search(types, new IFilter<TypeDeclaration>() {
+               @Override
+               public boolean select(TypeDeclaration element) {
+                  return Modifier.isPublic(element.getModifiers());
+               }
+            });
+         }
+      }
    }
 
    /**
