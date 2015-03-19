@@ -89,7 +89,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                         new String[] { error.getErrorMessage() },
                         new String[] { error.getErrorMessage() },
                         ProblemSeverities.Error, error.getErrorOffset(), error
-                        .getErrorOffset(), -1, -1));
+                              .getErrorOffset(), -1, -1));
                }
 
                // And now put the problems to the context to make them visible
@@ -148,18 +148,19 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                jmlContext);
          final List commentList = ast.getCommentList();
          ast.accept(new GenericVisitor() {
-
             @Override
             protected boolean visitNode(final ASTNode node) {
                final int start = ast.firstLeadingCommentIndex(node);
                final int end = ast.lastTrailingCommentIndex(node);
-               System.out.println("Size: " + commentList.size());
-               for (int i = start; i <= end; i++) {
-                  System.out.println("Putting: " + commentList.get(i)
-                        + "with Parent " + node);
-                  inverse.put((Comment) commentList.get(i), node);
-                  // TODO: Map CommentRanges to Comments
-               }
+               System.out.println("node: " + node + " start: " + start
+                     + " end: " + end);
+               /*
+                * for (int i = start; i <= end; i++) { if (commentList.size() >=
+                * end) { System.out.println("Putting: " + commentList.get(i) +
+                * "with Parent " + node); } inverse.put((Comment)
+                * commentList.get(i), node); // TODO: Map CommentRanges to
+                * Comments }
+                */
                return super.visitNode(node);
             }
          });
@@ -167,6 +168,9 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
          for (final CommentRange jmlComment : jmlComments) {
             try {
+               // System.out.println(""
+               // + this.findCorrespondingNode(jmlComment.getBeginOffset(),
+               // jmlComment.getEndOffset(), ast));
                final IASTNode node = jmlParser.parse(source, jmlComment);
                errors.addAll(engine.validateComment(node));
                // Throw away the result, here only a parse exception is

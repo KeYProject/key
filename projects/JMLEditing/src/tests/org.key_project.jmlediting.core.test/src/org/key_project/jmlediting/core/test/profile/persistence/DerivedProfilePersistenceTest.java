@@ -22,7 +22,6 @@ import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
-import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription.ClosingCharacterLaw;
 import org.key_project.jmlediting.core.profile.syntax.user.UserDefinedKeyword;
 import org.w3c.dom.Document;
 
@@ -156,13 +155,7 @@ public class DerivedProfilePersistenceTest {
             "org.test.userdef", "IllegalTest");
       final IUserDefinedKeywordContentDescription contentDescription = this.availableProfile
             .getSupportedContentDescriptions().iterator().next();
-      Character closingChar;
-      if (contentDescription.getClosingCharacterLaw() == ClosingCharacterLaw.NOT_ALLOWED) {
-         closingChar = null;
-      }
-      else {
-         closingChar = ';';
-      }
+      final Character closingChar = ';';
       final String keyword = "mykeyword";
       final String keywrodDescription = "My own keyword.";
       profile.addKeyword(new UserDefinedKeyword(Collections.singleton(keyword),

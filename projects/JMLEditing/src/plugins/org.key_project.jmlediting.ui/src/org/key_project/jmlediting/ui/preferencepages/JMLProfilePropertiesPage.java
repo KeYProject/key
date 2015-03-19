@@ -27,7 +27,7 @@ import org.key_project.jmlediting.core.profile.IProfileManagementListener;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.ui.preferencepages.profileDialog.AbstractJMLProfileDialog;
-import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLNewProfileDialog;
+import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLProfileNewDialog;
 import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLProfileEditDialog;
 import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLProfileViewDialog;
 
@@ -60,6 +60,12 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     * The list of the profiles, in the same order as shown in the list.
     */
    private java.util.List<IJMLProfile> allProfiles;
+
+   /**
+    * keep the difference between the selected (checked) Profile and the
+    * selected (highlighted) profile to view/edit
+    */
+   private IJMLProfile profile2EditView;
 
    /**
     * The {@link IPreferenceChangeListener} which listens to changes of the
@@ -151,13 +157,13 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
       this.initUI();
 
+      final Button newButton = this
+            .createTableSideButton(myComposite, "New...");
       this.editViewButton = this.createTableSideButton(myComposite, "Edit...");
       final Button exportButton = this.createTableSideButton(myComposite,
             "Export...");
       final Button importButton = this.createTableSideButton(myComposite,
             "Import...");
-      final Button newButton = this
-            .createTableSideButton(myComposite, "New...");
 
       this.updateSelection();
 
@@ -184,7 +190,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       newButton.addSelectionListener(new SelectionListener() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            new JMLNewProfileDialog(JMLProfilePropertiesPage.this.getShell())
+            new JMLProfileNewDialog(JMLProfilePropertiesPage.this.getShell())
                   .open();
          }
 
@@ -195,18 +201,24 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       this.editViewButton.addSelectionListener(new SelectionListener() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            final IJMLProfile profile = JMLProfilePropertiesPage.this
-                  .getSelectedProfile();
             AbstractJMLProfileDialog dialog;
-            if (JMLProfilePropertiesPage.this.isProfileDerived(profile)) {
+
+            if (JMLProfilePropertiesPage.this.profile2EditView == null) {
+               JMLProfilePropertiesPage.this.profile2EditView = JMLProfilePropertiesPage.this
+                     .getSelectedProfile();
+            }
+
+            if (JMLProfilePropertiesPage.this
+                  .isProfileDerived(JMLProfilePropertiesPage.this.profile2EditView)) {
                dialog = new JMLProfileEditDialog(JMLProfilePropertiesPage.this
-                     .getShell(), profile);
+                     .getShell(),
+                     JMLProfilePropertiesPage.this.profile2EditView);
             }
             else {
                dialog = new JMLProfileViewDialog(JMLProfilePropertiesPage.this
-                     .getShell(), profile);
+                     .getShell(),
+                     JMLProfilePropertiesPage.this.profile2EditView);
             }
-            dialog.setProfile(profile);
             dialog.open();
          }
 
@@ -248,14 +260,12 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       this.profilesListTable.addListener(SWT.Selection, new Listener() {
          @Override
          public void handleEvent(final Event event) {
+            final TableItem item = (TableItem) event.item;
+            final IJMLProfile profile = JMLProfilePropertiesPage.this.allProfiles
+                  .get(JMLProfilePropertiesPage.this.profilesListTable
+                        .indexOf(item));
             if (event.detail == SWT.CHECK) {
-               final TableItem item = (TableItem) event.item;
                if (item.getChecked()) {
-                  final IJMLProfile profile = JMLProfilePropertiesPage.this.allProfiles
-                        .get(JMLProfilePropertiesPage.this.profilesListTable
-                              .indexOf(item));
-                  JMLProfilePropertiesPage.this
-                        .updateEditViewButtonLabel(profile);
                   for (final TableItem item2 : JMLProfilePropertiesPage.this.profilesListTable
                         .getItems()) {
                      if (item != item2) {
@@ -279,6 +289,10 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
                   }
                }
 
+            }
+            else {
+               JMLProfilePropertiesPage.this.updateEditViewButtonLabel(profile);
+               JMLProfilePropertiesPage.this.profile2EditView = profile;
             }
          }
       });
@@ -439,7 +453,9 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       for (int i = 0; i < this.profilesListTable.getItemCount(); i++) {
          // Can only have one selection
          if (this.profilesListTable.getItem(i).getChecked()) {
-            return this.allProfiles.get(i);
+            final IJMLProfile result = this.allProfiles.get(i);
+            System.out.println("returning: " + result.getName());
+            return result;
          }
       }
       return null;
@@ -453,9 +469,11 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       // Only write into properties if a selection is available (user is forced
       // to),
       if (selectedProfile == null && !this.useProjectSettings()) {
+         System.out.println("returning false due to not selected...");
          return false;
       }
 
+      System.out.println("project? " + this.isProjectPreferencePage());
       if (this.isProjectPreferencePage()) {
          // Project preferences
          final IProject project = this.getProject();
@@ -465,6 +483,8 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
                // is forced
                // to)
                if (selectedProfile == null) {
+                  System.out
+                        .println("returning false due to selected == null...");
                   return false;
                }
                // Set property
@@ -477,6 +497,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
             }
          }
          catch (final CoreException e) {
+            e.printStackTrace();
             return false;
          }
       }

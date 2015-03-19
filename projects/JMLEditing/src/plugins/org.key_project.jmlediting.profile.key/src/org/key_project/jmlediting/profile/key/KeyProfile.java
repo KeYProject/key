@@ -10,14 +10,21 @@ import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
 import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
 import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_statement.BreakClauseKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_statement.ContinuesClauseKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_statement.ReturnsClauseKeyword;
 import org.key_project.jmlediting.profile.key.behavior.BreakBehaviorKeyword;
 import org.key_project.jmlediting.profile.key.behavior.ContinueBehaviorKeyword;
 import org.key_project.jmlediting.profile.key.behavior.ReturnBehaviorKeyword;
+import org.key_project.jmlediting.profile.key.bounded_quantifier.BProdQuantifierKeyword;
+import org.key_project.jmlediting.profile.key.bounded_quantifier.BSumQuantifierKeyword;
+import org.key_project.jmlediting.profile.key.bounded_quantifier.BoundedQuantifierPrimary;
 import org.key_project.jmlediting.profile.key.locset.AllFieldsKeyword;
 import org.key_project.jmlediting.profile.key.locset.DisjointKeyword;
 import org.key_project.jmlediting.profile.key.locset.EmptyKeywod;
@@ -35,21 +42,29 @@ import org.key_project.jmlediting.profile.key.other.IndexKeyword;
 import org.key_project.jmlediting.profile.key.other.InvKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAccessibleKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAssignableKeyword;
+import org.key_project.jmlediting.profile.key.other.LessThanNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyPureKeyword;
+import org.key_project.jmlediting.profile.key.parser.KeyTargetLabelPredicateParser;
+import org.key_project.jmlediting.profile.key.primary.NewElemsFreshKeyword;
+import org.key_project.jmlediting.profile.key.primary.NonNullElementsKeyword;
 import org.key_project.jmlediting.profile.key.seq.ContainsKeyword;
 import org.key_project.jmlediting.profile.key.seq.IndexOfKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqConcatKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqDefKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqEmptyKeyword;
-import org.key_project.jmlediting.profile.key.seq.SeqExpressionParser;
+import org.key_project.jmlediting.profile.key.seq.SeqPrimaryParser;
 import org.key_project.jmlediting.profile.key.seq.SeqKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqLengthKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqPrimary;
+import org.key_project.jmlediting.profile.key.seq.SeqReverseKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqSingletonKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqSubKeyword;
 import org.key_project.jmlediting.profile.key.seq.SingletonKeyword;
 import org.key_project.jmlediting.profile.key.seq.ValuesKeyword;
+import org.key_project.jmlediting.profile.key.spec_statement.KeyBreaksClauseKeyword;
+import org.key_project.jmlediting.profile.key.spec_statement.KeyContinuesClauseKeyword;
+import org.key_project.jmlediting.profile.key.spec_statement.KeyReturnsClauseKeyword;
 
 public class KeyProfile extends JMLReferenceProfile {
 
@@ -73,6 +88,7 @@ public class KeyProfile extends JMLReferenceProfile {
             new KeyAssignableKeyword());
       replace(supportedKeywords, AccessibleKeyword.class,
             new KeyAccessibleKeyword());
+      supportedKeywords.add(new LessThanNothingKeyword());
 
       // Key specific behaviors
       supportedKeywords.addAll(Arrays.asList(new BreakBehaviorKeyword(),
@@ -102,12 +118,28 @@ public class KeyProfile extends JMLReferenceProfile {
             new SeqConcatKeyword(), new SeqDefKeyword(), new SeqEmptyKeyword(),
             new SeqSingletonKeyword(), new ValuesKeyword(),
             new ContainsKeyword(), new IndexOfKeyword(), new SeqSubKeyword(),
-            new SeqLengthKeyword(), new SingletonKeyword()));
+            new SeqLengthKeyword(), new SingletonKeyword(), new IndexKeyword(),
+            new SeqReverseKeyword()));
       supportedPrimaries.add(new SeqPrimary());
-      this.additionalPrimarySuffixes.add(SeqExpressionParser.seqSuffix(this));
+      this.additionalPrimarySuffixes.add(SeqPrimaryParser.seqSuffix(this));
 
       // Other keywords
-      supportedKeywords.addAll(Arrays.asList(new IndexKeyword()));
+      supportedKeywords.addAll(Arrays.asList(new NewElemsFreshKeyword(),
+            new NonNullElementsKeyword(), new BSumQuantifierKeyword(),
+            new BSumQuantifierKeyword(), new BProdQuantifierKeyword()));
+      supportedPrimaries.add(new BoundedQuantifierPrimary());
+
+      replace(supportedKeywords, BreakClauseKeyword.class,
+            new KeyBreaksClauseKeyword());
+      replace(supportedKeywords, ContinuesClauseKeyword.class,
+            new KeyContinuesClauseKeyword());
+      replace(supportedKeywords, ReturnsClauseKeyword.class,
+            new KeyReturnsClauseKeyword());
+
+      // Support for other keyword contents to the user
+      final Set<IUserDefinedKeywordContentDescription> contents = this
+            .getSupportedContentDescriptionsInternal();
+      contents.add(new KeyTargetLabelPredicateParser());
    }
 
    private static void replace(final Set<IKeyword> keywords,

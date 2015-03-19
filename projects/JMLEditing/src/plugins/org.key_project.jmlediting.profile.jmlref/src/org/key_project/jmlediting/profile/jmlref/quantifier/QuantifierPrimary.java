@@ -7,7 +7,6 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.parser.util.JavaBasicsParser;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 import org.key_project.jmlediting.profile.jmlref.bound_mod.BoundVarModifierKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
@@ -28,6 +27,7 @@ public class QuantifierPrimary implements IJMLPrimary {
     * The main parser for quantifiers.
     */
    private ParseFunction quantifierParser;
+   private ParseFunction quantifiedVarDecls;
 
    @Override
    public void setProfile(final IJMLExpressionProfile profile) {
@@ -72,6 +72,11 @@ public class QuantifierPrimary implements IJMLPrimary {
             opt(seq(closedBy(QUANTIFIER_PREDICATE, opt(predicate), ';'))), expr));
 
       this.quantifierParser = specQuantifiedExpr;
+      this.quantifiedVarDecls = quantifiedVarDecls;
+   }
+
+   public ParseFunction quantifiedVarDecls() {
+      return this.quantifiedVarDecls;
    }
 
    @Override

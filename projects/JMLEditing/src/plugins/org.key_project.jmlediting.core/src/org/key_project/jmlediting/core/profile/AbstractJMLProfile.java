@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.user.EmptyKeywordContent;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.core.validation.IJMLValidator;
 
@@ -33,6 +34,7 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
    public AbstractJMLProfile() {
       this.supportedKeywords = new HashSet<IKeyword>();
       this.supportedContentDescriptions = new HashSet<IUserDefinedKeywordContentDescription>();
+      this.supportedContentDescriptions.add(new EmptyKeywordContent());
    }
 
    @Override

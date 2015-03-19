@@ -1,12 +1,12 @@
 package org.key_project.jmlediting.core;
 
-import org.eclipse.core.runtime.Plugin;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends Plugin {
+public class Activator extends AbstractUIPlugin {
 
    // The plug-in ID
    public static final String PLUGIN_ID = "org.key_project.jmlediting.core"; //$NON-NLS-1$
@@ -22,7 +22,7 @@ public class Activator extends Plugin {
 
    /*
     * (non-Javadoc)
-    * 
+    *
     * @see
     * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
     * )
@@ -35,7 +35,7 @@ public class Activator extends Plugin {
 
    /*
     * (non-Javadoc)
-    * 
+    *
     * @see
     * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
     * )

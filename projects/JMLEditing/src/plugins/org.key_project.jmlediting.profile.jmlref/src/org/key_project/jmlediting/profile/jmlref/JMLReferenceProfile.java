@@ -29,6 +29,9 @@ import org.key_project.jmlediting.profile.jmlref.other.InvariantKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.NonNullKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.NullableKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.PureKeyword;
+import org.key_project.jmlediting.profile.jmlref.parser.BinarySpecExpressionArgParser;
+import org.key_project.jmlediting.profile.jmlref.parser.TrinarySpecExpressionArgParser;
+import org.key_project.jmlediting.profile.jmlref.parser.UnarySpecExpressionArgParser;
 import org.key_project.jmlediting.profile.jmlref.primary.FreshKeyword;
 import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
 import org.key_project.jmlediting.profile.jmlref.primary.InvariantForKeyword;
@@ -66,6 +69,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_statement.ReturnsClauseKey
 import org.key_project.jmlediting.profile.jmlref.type.BigIntKeyword;
 import org.key_project.jmlediting.profile.jmlref.type.RealKeyword;
 import org.key_project.jmlediting.profile.jmlref.validator.LoopInvariantValidator;
+import org.key_project.jmlediting.profile.jmlref.visibility.FinalKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.InstanceKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.PrivateKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.ProtectedKeyword;
@@ -126,13 +130,15 @@ public class JMLReferenceProfile extends AbstractJMLProfile implements
                   new ReachKeyword(), new InstanceKeyword(),
                   new StaticKeyword(), new InitiallyKeyword(),
                   new ContinuesClauseKeyword(), new BreakClauseKeyword(),
-                  new ReturnsClauseKeyword()));
+                  new ReturnsClauseKeyword(), new FinalKeyword()));
 
       this.getSupportedPrimariesInternal().addAll(
             Arrays.asList(new KeywordJMLPrimary(), new QuantifierPrimary()));
 
-      // this.getSupportedContentDescriptionsInternal().addAll(
-      // Arrays.asList(new SpecExpressionContentDescription()));
+      this.getSupportedContentDescriptionsInternal().addAll(
+            Arrays.asList(new UnarySpecExpressionArgParser(),
+                  new BinarySpecExpressionArgParser(),
+                  new TrinarySpecExpressionArgParser()));
 
    }
 
