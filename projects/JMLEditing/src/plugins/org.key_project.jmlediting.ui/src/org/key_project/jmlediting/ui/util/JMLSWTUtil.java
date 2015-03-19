@@ -10,23 +10,6 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 
 public class JMLSWTUtil {
-   public static String[] getProfiles4Combo() {
-      final List<IJMLProfile> allProfiles = JMLProfileManagement.instance()
-            .getAvailableProfilesSortedByName();
-
-      final List<String> result = new ArrayList<String>();
-
-      final Iterator<IJMLProfile> iterator = allProfiles.iterator();
-      while (iterator.hasNext()) {
-         final IJMLProfile profile = iterator.next();
-         if (!(profile instanceof IDerivedProfile)) {
-            result.add(profile.getName());
-         }
-      }
-
-      return result.toArray(new String[result.size()]);
-   }
-
    public static void fillComboWithParentProfilesAndDate(final Combo combo) {
       final List<IJMLProfile> allProfiles = JMLProfileManagement.instance()
             .getAvailableProfilesSortedByName();

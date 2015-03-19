@@ -29,6 +29,7 @@ import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.ui.preferencepages.profileDialog.AbstractJMLProfileDialog;
 import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLNewProfileDialog;
 import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLProfileEditDialog;
+import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLProfileViewDialog;
 
 /**
  * The {@link JMLProfilePropertiesPage} implements a properties and preferences
@@ -64,7 +65,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     * keep the difference between the selected (checked) Profile and the
     * selected (highlighted) profile to view/edit
     */
-   private IJMLProfile profile2View;
+   private IJMLProfile profile2EditView;
 
    /**
     * The {@link IPreferenceChangeListener} which listens to changes of the
@@ -201,16 +202,23 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          @Override
          public void widgetSelected(final SelectionEvent e) {
             AbstractJMLProfileDialog dialog;
+
+            if (JMLProfilePropertiesPage.this.profile2EditView == null) {
+               JMLProfilePropertiesPage.this.profile2EditView = JMLProfilePropertiesPage.this
+                     .getSelectedProfile();
+            }
+
             if (JMLProfilePropertiesPage.this
-                  .isProfileDerived(JMLProfilePropertiesPage.this.profile2View)) {
+                  .isProfileDerived(JMLProfilePropertiesPage.this.profile2EditView)) {
                dialog = new JMLProfileEditDialog(JMLProfilePropertiesPage.this
-                     .getShell(), JMLProfilePropertiesPage.this.profile2View);
+                     .getShell(),
+                     JMLProfilePropertiesPage.this.profile2EditView);
             }
             else {
-               dialog = new JMLProfileEditDialog(JMLProfilePropertiesPage.this
-                     .getShell(), JMLProfilePropertiesPage.this.profile2View);
+               dialog = new JMLProfileViewDialog(JMLProfilePropertiesPage.this
+                     .getShell(),
+                     JMLProfilePropertiesPage.this.profile2EditView);
             }
-            dialog.setProfile(JMLProfilePropertiesPage.this.profile2View);
             dialog.open();
          }
 
@@ -284,7 +292,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
             }
             else {
                JMLProfilePropertiesPage.this.updateEditViewButtonLabel(profile);
-               JMLProfilePropertiesPage.this.profile2View = profile;
+               JMLProfilePropertiesPage.this.profile2EditView = profile;
             }
          }
       });
