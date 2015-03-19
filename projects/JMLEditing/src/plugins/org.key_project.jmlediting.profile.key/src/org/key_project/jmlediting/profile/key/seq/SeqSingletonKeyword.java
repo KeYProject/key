@@ -6,7 +6,7 @@ import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.profile.jmlref.parser.UnarySpecExpressionArgParser;
 
 /**
- * The seq singletion keyword for KeY.
+ * The seq singleton keyword for KeY.
  *
  * @author Moritz Lichter
  *

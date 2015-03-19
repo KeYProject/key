@@ -6,7 +6,7 @@ import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.profile.jmlref.parser.UnarySpecExpressionArgParser;
 
 /**
- * The singleton keyword for KeT.
+ * The singleton keyword for KeY.
  *
  * @author Moritz Lichter
  *
@@ -14,7 +14,7 @@ import org.key_project.jmlediting.profile.jmlref.parser.UnarySpecExpressionArgPa
 public class SingletonKeyword extends AbstractKeyword {
 
    /**
-    * Creates a new singletion keyword instance.
+    * Creates a new singleton keyword instance.
     */
    public SingletonKeyword() {
       super("\\singleton");

@@ -27,7 +27,7 @@ import org.key_project.jmlediting.core.profile.IProfileManagementListener;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.ui.preferencepages.profileDialog.AbstractJMLProfileDialog;
-import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLNewProfileDialog;
+import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLProfileNewDialog;
 import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLProfileEditDialog;
 import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLProfileViewDialog;
 
@@ -190,7 +190,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       newButton.addSelectionListener(new SelectionListener() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            new JMLNewProfileDialog(JMLProfilePropertiesPage.this.getShell())
+            new JMLProfileNewDialog(JMLProfilePropertiesPage.this.getShell())
                   .open();
          }
 

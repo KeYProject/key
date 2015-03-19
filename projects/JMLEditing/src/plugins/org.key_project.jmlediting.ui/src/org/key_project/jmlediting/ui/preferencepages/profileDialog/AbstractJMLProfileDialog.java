@@ -27,10 +27,12 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.ui.util.JMLSWTUtil;
 
 public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
+   protected static final String PLEASE_RESOLVE = "Please resolve the errors before saving!";
 
    private IJMLProfile profile;
 
@@ -192,12 +194,13 @@ public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
          public void modifyText(final ModifyEvent e) {
             if (AbstractJMLProfileDialog.this.profileNameText.getText()
                   .isEmpty()) {
+               AbstractJMLProfileDialog.this.profileNameError
+                     .setDescriptionText("Profile name must not be empty!");
                AbstractJMLProfileDialog.this.profileNameError.show();
             }
             else {
                AbstractJMLProfileDialog.this.profileNameError.hide();
             }
-
          }
       });
    }
@@ -282,6 +285,25 @@ public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
 
       this.keywordTable.setEnabled(true);
       this.keywordTable.redraw();
+   }
+
+   protected boolean checkProfileNameUnique(final String profileId) {
+      if (JMLProfileManagement.instance().getProfileFromIdentifier(profileId) != null) {
+         this.profileNameError
+               .setDescriptionText("Profile Name already exists!");
+         this.setMessage(PLEASE_RESOLVE, IMessageProvider.ERROR);
+         this.profileNameError.show();
+         return false;
+      }
+      else {
+         this.setMessage("", IMessageProvider.NONE);
+         this.profileNameError.hide();
+         return true;
+      }
+   }
+
+   protected String generateId(final String profileName) {
+      return "user.defined.profile." + profileName.replaceAll("\\s", "");
    }
 
 }

@@ -274,7 +274,14 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
 
    @Override
    protected void okPressed() {
-      this.derivedProfile.setName(this.profileNameText.getText());
+      final String profileName = this.profileNameText.getText();
+      final String profileId = this.generateId(profileName);
+
+      if (!this.checkProfileNameUnique(profileId)) {
+         return;
+      }
+      this.derivedProfile.setName(profileName);
+      // TODO edit ID?
 
       try {
          JMLProfileManagement.instance().writeDerivedProfiles();

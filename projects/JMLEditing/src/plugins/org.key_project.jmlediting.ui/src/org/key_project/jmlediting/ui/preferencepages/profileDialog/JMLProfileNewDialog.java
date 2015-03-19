@@ -1,5 +1,6 @@
 package org.key_project.jmlediting.ui.preferencepages.profileDialog;
 
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -12,9 +13,9 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.InvalidProfileException;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 
-public class JMLNewProfileDialog extends AbstractJMLProfileDialog {
+public class JMLProfileNewDialog extends AbstractJMLProfileDialog {
 
-   public JMLNewProfileDialog(final Shell parent) {
+   public JMLProfileNewDialog(final Shell parent) {
       super(parent, null, "New JML Profile", "");
    }
 
@@ -36,9 +37,9 @@ public class JMLNewProfileDialog extends AbstractJMLProfileDialog {
 
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            final IJMLProfile profile = JMLNewProfileDialog.this
+            final IJMLProfile profile = JMLProfileNewDialog.this
                   .getSelectedProfileFromCombo();
-            JMLNewProfileDialog.this.setProfile(profile);
+            JMLProfileNewDialog.this.setProfile(profile);
          }
 
          @Override
@@ -54,6 +55,18 @@ public class JMLNewProfileDialog extends AbstractJMLProfileDialog {
       final String profileName = this.profileNameText.getText();
       final String profileId = this.generateId(profileName);
       final IJMLProfile parentProfile = this.getSelectedProfileFromCombo();
+
+      if (profileName.isEmpty() || parentProfile == null) {
+         this.setMessage(PLEASE_RESOLVE, IMessageProvider.ERROR);
+         return;
+      }
+      else {
+         this.setMessage("", IMessageProvider.NONE);
+      }
+
+      if (!this.checkProfileNameUnique(profileId)) {
+         return;
+      }
 
       final IEditableDerivedProfile newProfile = parentProfile.derive(
             profileId, profileName);
@@ -71,11 +84,11 @@ public class JMLNewProfileDialog extends AbstractJMLProfileDialog {
    }
 
    private IJMLProfile getSelectedProfileFromCombo() {
+      final int index = this.derivedFromCombo.getSelectionIndex();
+      if (index == -1) {
+         return null;
+      }
       return (IJMLProfile) this.derivedFromCombo.getData(this.derivedFromCombo
-            .getItem(this.derivedFromCombo.getSelectionIndex()));
-   }
-
-   private String generateId(final String profileName) {
-      return "user.defined.profile." + profileName.replaceAll("\\s", "");
+            .getItem(index));
    }
 }
