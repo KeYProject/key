@@ -48,8 +48,7 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
    private Table derivedTable;
 
    public JMLProfileEditDialog(final Shell parent, final IJMLProfile profile) {
-      super(parent, profile);
-      this.setTitle("JML Profile Editor");
+      super(parent, profile, "JML Profile Editor", "teste");
    }
 
    @Override

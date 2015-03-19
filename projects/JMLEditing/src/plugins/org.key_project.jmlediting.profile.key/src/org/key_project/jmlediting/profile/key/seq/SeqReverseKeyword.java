@@ -3,17 +3,12 @@ package org.key_project.jmlediting.profile.key.seq;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
-import org.key_project.jmlediting.profile.jmlref.parser.TrinarySpecExpressionArgParser;
+import org.key_project.jmlediting.profile.jmlref.parser.UnarySpecExpressionArgParser;
 
-public class SeqSubKeyword extends AbstractKeyword {
+public class SeqReverseKeyword extends AbstractKeyword {
 
-   public SeqSubKeyword() {
-      super("\\seq_sub");
-   }
-
-   @Override
-   public IKeywortSort getSort() {
-      return SeqPrimitiveKeywordSort.INSTANCE;
+   public SeqReverseKeyword() {
+      super("\\seq_reverse");
    }
 
    @Override
@@ -23,7 +18,12 @@ public class SeqSubKeyword extends AbstractKeyword {
 
    @Override
    public IKeywordParser createParser() {
-      return new TrinarySpecExpressionArgParser();
+      return new UnarySpecExpressionArgParser();
+   }
+
+   @Override
+   public IKeywortSort getSort() {
+      return SeqPrimitiveKeywordSort.INSTANCE;
    }
 
 }

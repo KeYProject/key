@@ -18,12 +18,24 @@ import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 
-public class JMLCompletionUtil {
+/**
+ * Provides several Methods needed for AutoCompletion.
+ *
+ * @author Thomas Glaser
+ *
+ */
+public final class JMLCompletionUtil {
+   /**
+    * only static Access.
+    */
    private JMLCompletionUtil() {
 
    }
 
    // not needed atm, but functionality may be needed sometimes
+   /**
+    * manually defined Proposals for KeywordProposals.
+    */
    private static final List<String> CUSTOM_PROPOSALS = Arrays
          .asList(new String[0]);
 
@@ -118,6 +130,15 @@ public class JMLCompletionUtil {
             ToplevelKeywordSort.INSTANCE);
    }
 
+   /**
+    * compute the Prefix with respect to the parsed JML.
+    *
+    * @param context
+    *           the context the completion is invoked from
+    * @param node
+    *           the parsed JML
+    * @return the computed prefix
+    */
    public static String computePrefix(
          final JavaContentAssistInvocationContext context, final IASTNode node) {
       String prefix = null;

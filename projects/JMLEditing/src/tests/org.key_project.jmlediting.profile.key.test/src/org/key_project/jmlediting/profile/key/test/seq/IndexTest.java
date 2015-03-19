@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.profile.key.test.other;
+package org.key_project.jmlediting.profile.key.test.seq;
 
 import static org.key_project.jmlediting.core.test.parser.ParserTestUtils.testParseComplete;
 

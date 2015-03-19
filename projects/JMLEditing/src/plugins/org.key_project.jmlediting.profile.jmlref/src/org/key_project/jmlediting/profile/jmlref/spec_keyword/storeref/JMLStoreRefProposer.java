@@ -418,13 +418,13 @@ public class JMLStoreRefProposer {
    }
 
    /**
-    * check whether a final variable is visible to propose
+    * check whether a final variable is visible to propose.
     *
     * @param varBind
     *           the variable to check visibility for
     * @param method
     *           the
-    * @return
+    * @return whether final variables should be visible or not
     */
    private boolean checkFinalVisible(final IVariableBinding varBind,
          final MethodDeclaration method) {
