@@ -12,7 +12,7 @@ public class Color extends java.lang.Object implements java.awt.Paint, java.io.S
    /**
     * @generated
     */
-   public void Color(int param0, boolean param1);
+   public Color(int param0, boolean param1);
 
    /*@ normal_behavior
      @ requires true;

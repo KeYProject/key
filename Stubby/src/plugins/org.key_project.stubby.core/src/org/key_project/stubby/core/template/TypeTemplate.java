@@ -200,7 +200,9 @@ public class TypeTemplate {
       if (method.isFinal()) {
          sb.append("final ");
       }
-      sb.append(method.getReturnType().getName() + " ");
+      if (!method.isConstructor()) {
+         sb.append(method.getReturnType().getName() + " ");
+      }
       sb.append(method.getName() + "(");
       int paramCount = 0;
       boolean afterFirst = false;

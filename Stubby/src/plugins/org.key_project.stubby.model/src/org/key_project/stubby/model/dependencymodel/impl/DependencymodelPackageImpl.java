@@ -388,6 +388,15 @@ public class DependencymodelPackageImpl extends EPackageImpl implements Dependen
     * <!-- end-user-doc -->
     * @generated
     */
+   public EAttribute getMethod_Constructor() {
+      return (EAttribute)methodEClass.getEStructuralFeatures().get(8);
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
    public EClass getField() {
       return fieldEClass;
    }
@@ -659,6 +668,7 @@ public class DependencymodelPackageImpl extends EPackageImpl implements Dependen
       createEReference(methodEClass, METHOD__RETURN_TYPE);
       createEReference(methodEClass, METHOD__PARAMETER_TYPES);
       createEReference(methodEClass, METHOD__THROWS);
+      createEAttribute(methodEClass, METHOD__CONSTRUCTOR);
 
       fieldEClass = createEClass(FIELD);
       createEAttribute(fieldEClass, FIELD__NAME);
@@ -758,6 +768,7 @@ public class DependencymodelPackageImpl extends EPackageImpl implements Dependen
       initEReference(getMethod_ReturnType(), this.getAbstractType(), null, "returnType", null, 0, 1, Method.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
       initEReference(getMethod_ParameterTypes(), this.getAbstractType(), null, "parameterTypes", null, 0, -1, Method.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
       initEReference(getMethod_Throws(), this.getAbstractType(), null, "throws", null, 0, -1, Method.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+      initEAttribute(getMethod_Constructor(), ecorePackage.getEBoolean(), "constructor", null, 0, 1, Method.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
       initEClass(fieldEClass, Field.class, "Field", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
       initEAttribute(getField_Name(), ecorePackage.getEString(), "name", null, 0, 1, Field.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

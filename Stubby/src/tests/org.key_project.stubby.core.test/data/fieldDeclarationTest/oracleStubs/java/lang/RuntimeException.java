@@ -12,5 +12,5 @@ public class RuntimeException extends java.lang.Exception {
    /**
     * @generated
     */
-   public void RuntimeException();
+   public RuntimeException();
 }

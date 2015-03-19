@@ -396,6 +396,7 @@ public class DependencyAnalyzer extends ASTVisitor {
       method.setAbstract(Modifier.isAbstract(methodBinding.getModifiers()));
       method.setFinal(Modifier.isFinal(methodBinding.getModifiers()));
       method.setStatic(Modifier.isStatic(methodBinding.getModifiers()));
+      method.setConstructor(methodBinding.isConstructor());
       for (ITypeBinding typeParameter : methodBinding.getTypeParameters()) {
          method.getTypeVariables().add(createTypeVariable(typ, typeParameter));
       }

@@ -20,6 +20,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link org.key_project.stubby.model.dependencymodel.Method#getReturnType <em>Return Type</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.Method#getParameterTypes <em>Parameter Types</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.Method#getThrows <em>Throws</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.Method#isConstructor <em>Constructor</em>}</li>
  * </ul>
  * </p>
  *
@@ -218,5 +219,31 @@ public interface Method extends ITypeVariableContainer {
     * @generated
     */
    EList<AbstractType> getThrows();
+
+   /**
+    * Returns the value of the '<em><b>Constructor</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <p>
+    * If the meaning of the '<em>Constructor</em>' attribute isn't clear,
+    * there really should be more of a description here...
+    * </p>
+    * <!-- end-user-doc -->
+    * @return the value of the '<em>Constructor</em>' attribute.
+    * @see #setConstructor(boolean)
+    * @see org.key_project.stubby.model.dependencymodel.DependencymodelPackage#getMethod_Constructor()
+    * @model
+    * @generated
+    */
+   boolean isConstructor();
+
+   /**
+    * Sets the value of the '{@link org.key_project.stubby.model.dependencymodel.Method#isConstructor <em>Constructor</em>}' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @param value the new value of the '<em>Constructor</em>' attribute.
+    * @see #isConstructor()
+    * @generated
+    */
+   void setConstructor(boolean value);
 
 } // Method

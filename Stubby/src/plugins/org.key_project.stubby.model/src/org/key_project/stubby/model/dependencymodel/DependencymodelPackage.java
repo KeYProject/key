@@ -395,13 +395,22 @@ public interface DependencymodelPackage extends EPackage {
    int METHOD__THROWS = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 7;
 
    /**
+    * The feature id for the '<em><b>Constructor</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int METHOD__CONSTRUCTOR = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 8;
+
+   /**
     * The number of structural features of the '<em>Method</em>' class.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int METHOD_FEATURE_COUNT = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 8;
+   int METHOD_FEATURE_COUNT = ITYPE_VARIABLE_CONTAINER_FEATURE_COUNT + 9;
 
    /**
     * The number of operations of the '<em>Method</em>' class.
@@ -1059,6 +1068,17 @@ public interface DependencymodelPackage extends EPackage {
    EReference getMethod_Throws();
 
    /**
+    * Returns the meta object for the attribute '{@link org.key_project.stubby.model.dependencymodel.Method#isConstructor <em>Constructor</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the attribute '<em>Constructor</em>'.
+    * @see org.key_project.stubby.model.dependencymodel.Method#isConstructor()
+    * @see #getMethod()
+    * @generated
+    */
+   EAttribute getMethod_Constructor();
+
+   /**
     * Returns the meta object for class '{@link org.key_project.stubby.model.dependencymodel.Field <em>Field</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -1524,6 +1544,14 @@ public interface DependencymodelPackage extends EPackage {
        * @generated
        */
       EReference METHOD__THROWS = eINSTANCE.getMethod_Throws();
+
+      /**
+       * The meta object literal for the '<em><b>Constructor</b></em>' attribute feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EAttribute METHOD__CONSTRUCTOR = eINSTANCE.getMethod_Constructor();
 
       /**
        * The meta object literal for the '{@link org.key_project.stubby.model.dependencymodel.impl.FieldImpl <em>Field</em>}' class.

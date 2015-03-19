@@ -41,6 +41,7 @@ import org.key_project.stubby.model.dependencymodel.Visibility;
  *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.MethodImpl#getReturnType <em>Return Type</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.MethodImpl#getParameterTypes <em>Parameter Types</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.MethodImpl#getThrows <em>Throws</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.MethodImpl#isConstructor <em>Constructor</em>}</li>
  * </ul>
  * </p>
  *
@@ -186,6 +187,26 @@ public class MethodImpl extends MinimalEObjectImpl.Container implements Method {
     * @ordered
     */
    protected EList<AbstractType> throws_;
+
+   /**
+    * The default value of the '{@link #isConstructor() <em>Constructor</em>}' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #isConstructor()
+    * @generated
+    * @ordered
+    */
+   protected static final boolean CONSTRUCTOR_EDEFAULT = false;
+
+   /**
+    * The cached value of the '{@link #isConstructor() <em>Constructor</em>}' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #isConstructor()
+    * @generated
+    * @ordered
+    */
+   protected boolean constructor = CONSTRUCTOR_EDEFAULT;
 
    /**
     * <!-- begin-user-doc -->
@@ -400,6 +421,27 @@ public class MethodImpl extends MinimalEObjectImpl.Container implements Method {
     * <!-- end-user-doc -->
     * @generated
     */
+   public boolean isConstructor() {
+      return constructor;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public void setConstructor(boolean newConstructor) {
+      boolean oldConstructor = constructor;
+      constructor = newConstructor;
+      if (eNotificationRequired())
+         eNotify(new ENotificationImpl(this, Notification.SET, DependencymodelPackage.METHOD__CONSTRUCTOR, oldConstructor, constructor));
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
    @Override
    public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
       switch (featureID) {
@@ -436,6 +478,8 @@ public class MethodImpl extends MinimalEObjectImpl.Container implements Method {
             return getParameterTypes();
          case DependencymodelPackage.METHOD__THROWS:
             return getThrows();
+         case DependencymodelPackage.METHOD__CONSTRUCTOR:
+            return isConstructor();
       }
       return super.eGet(featureID, resolve, coreType);
    }
@@ -479,6 +523,9 @@ public class MethodImpl extends MinimalEObjectImpl.Container implements Method {
             getThrows().clear();
             getThrows().addAll((Collection<? extends AbstractType>)newValue);
             return;
+         case DependencymodelPackage.METHOD__CONSTRUCTOR:
+            setConstructor((Boolean)newValue);
+            return;
       }
       super.eSet(featureID, newValue);
    }
@@ -518,6 +565,9 @@ public class MethodImpl extends MinimalEObjectImpl.Container implements Method {
          case DependencymodelPackage.METHOD__THROWS:
             getThrows().clear();
             return;
+         case DependencymodelPackage.METHOD__CONSTRUCTOR:
+            setConstructor(CONSTRUCTOR_EDEFAULT);
+            return;
       }
       super.eUnset(featureID);
    }
@@ -548,6 +598,8 @@ public class MethodImpl extends MinimalEObjectImpl.Container implements Method {
             return parameterTypes != null && !parameterTypes.isEmpty();
          case DependencymodelPackage.METHOD__THROWS:
             return throws_ != null && !throws_.isEmpty();
+         case DependencymodelPackage.METHOD__CONSTRUCTOR:
+            return constructor != CONSTRUCTOR_EDEFAULT;
       }
       return super.eIsSet(featureID);
    }
@@ -572,6 +624,8 @@ public class MethodImpl extends MinimalEObjectImpl.Container implements Method {
       result.append(final_);
       result.append(", abstract: ");
       result.append(abstract_);
+      result.append(", constructor: ");
+      result.append(constructor);
       result.append(')');
       return result.toString();
    }

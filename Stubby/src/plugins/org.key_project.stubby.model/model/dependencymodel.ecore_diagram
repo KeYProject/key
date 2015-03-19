@@ -68,6 +68,10 @@
         <element xmi:type="ecore:EAttribute" href="dependencymodel.ecore#//Method/abstract"/>
         <layoutConstraint xmi:type="notation:Location" xmi:id="_Qt6NYXvGEeSI7c0Ht_Vajg"/>
       </children>
+      <children xmi:type="notation:Node" xmi:id="_xPSv0M4WEeSWR-wo9Sf_6A" type="3001">
+        <element xmi:type="ecore:EAttribute" href="dependencymodel.ecore#//Method/constructor"/>
+        <layoutConstraint xmi:type="notation:Location" xmi:id="_xPSv0c4WEeSWR-wo9Sf_6A"/>
+      </children>
       <styles xmi:type="notation:SortingStyle" xmi:id="_uWXsvnopEeSmHruTPZhjmA"/>
       <styles xmi:type="notation:FilteringStyle" xmi:id="_uWXsv3opEeSmHruTPZhjmA"/>
     </children>

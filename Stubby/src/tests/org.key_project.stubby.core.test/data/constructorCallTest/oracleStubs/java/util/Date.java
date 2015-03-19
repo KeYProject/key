@@ -12,5 +12,5 @@ public class Date extends java.lang.Object implements java.io.Serializable, java
    /**
     * @generated
     */
-   public void Date(java.lang.String param0);
+   public Date(java.lang.String param0);
 }

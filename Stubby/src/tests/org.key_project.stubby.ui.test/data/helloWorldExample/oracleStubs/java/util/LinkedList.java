@@ -12,5 +12,5 @@ public class LinkedList<E extends java.lang.Object> extends AbstractSequentialLi
    /**
     * @generated
     */
-   public void LinkedList();
+   public LinkedList();
 }

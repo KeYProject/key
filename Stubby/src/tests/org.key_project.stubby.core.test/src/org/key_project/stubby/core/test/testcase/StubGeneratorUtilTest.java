@@ -2,6 +2,7 @@ package org.key_project.stubby.core.test.testcase;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -52,10 +53,10 @@ public class StubGeneratorUtilTest extends TestCase {
     * </p>
     * <p>
     * <b>Attention: </b> It is strongly required that new test scenarios
-    * are verified with the SED application. If everything is fine a new test
+    * are verified with the Stubby application. If everything is fine a new test
     * method can be added to this class and the first test execution can be
     * used to generate the required oracle file. Existing oracle files should
-    * only be replaced if the functionality of the Symbolic Execution Debugger
+    * only be replaced if the functionality of Stubby
     * has changed so that they are outdated.
     * </p>
     */
@@ -648,6 +649,8 @@ public class StubGeneratorUtilTest extends TestCase {
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToSourceFilesInPlugin, project.getProject().getFolder("src"));
       // Create dependency model
       DependencyModel dependencyModel = StubGeneratorUtil.createDependencyModel(project, null);
+      // Create new oracle files if needed
+      createOracleFiles(dependencyModel, pathToOracleFileInPlugin);
       // Load oracle file
       ResourceSet rst = new ResourceSetImpl();
       Resource resource = rst.getResource(URI.createPlatformPluginURI("/" + Activator.PLUGIN_ID + "/" + pathToOracleFileInPlugin, true), true);
@@ -658,6 +661,24 @@ public class StubGeneratorUtilTest extends TestCase {
       assertDependenyModel(expectedModel, dependencyModel);
    }   
    
+   /**
+    * Creates a new oracle file in the temporary directory.
+    * @param dependencyModel The current {@link DependencyModel}.
+    * @param pathToOracleFileInPlugin The path to the oracle file in the {@link Bundle}.
+    * @throws IOException Occurred Exception
+    */
+   protected static void createOracleFiles(DependencyModel dependencyModel, String pathToOracleFileInPlugin) throws IOException {
+      if (oracleDirectory != null) {
+         File oracleFile = new File(oracleDirectory, pathToOracleFileInPlugin);
+         oracleFile.getParentFile().mkdirs();
+         ResourceSet rst = new ResourceSetImpl();
+         Resource resource = rst.createResource(URI.createFileURI(oracleFile.getAbsolutePath()));
+         resource.getContents().add(dependencyModel);
+         resource.save(Collections.EMPTY_MAP);
+         printOracleDirectory();
+      }
+   }
+
    /**
     * Performs a stub generation test.
     * @param projectName The name of the {@link IJavaProject} to perform test in.
@@ -1004,6 +1025,7 @@ public class StubGeneratorUtilTest extends TestCase {
       assertEquals(expected.isStatic(), current.isStatic());
       assertEquals(expected.getName(), current.getName());
       assertEquals(expected.getVisibility(), current.getVisibility());
+      assertEquals(expected.isConstructor(), current.isConstructor());
       assertAbstractTypes(expected.getParameterTypes(), current.getParameterTypes(), nownAbstractTypes);
       assertAbstractTypes(expected.getThrows(), current.getThrows(), nownAbstractTypes);
       assertAbstractType(expected.getReturnType(), current.getReturnType(), nownAbstractTypes);
