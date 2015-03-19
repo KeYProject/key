@@ -26,7 +26,7 @@ public class ClassPathFolderLightweightLabelDecorator extends AbstractClassPathL
    /**
     * The ID of this {@link ILightweightLabelDecorator}.
     */
-   public static final String ID = "key_project.key4eclipse.starter.core.classPathProjectDecorator";
+   public static final String ID = "key_project.key4eclipse.starter.core.classPathFolderDecorator";
 
    /**
     * {@inheritDoc}
