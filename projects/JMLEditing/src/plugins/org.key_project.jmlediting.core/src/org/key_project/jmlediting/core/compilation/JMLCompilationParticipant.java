@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -115,8 +116,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
        * Here the errors are reported as error markers which appear in the
        * problems list.
        */
-      final Map<Comment, ASTNode> inverse = new HashMap();
-      final Map<Comment, ASTNode> jmlCommentToInverse = new HashMap();
+
       if (isBatch) {
          return;
       }
@@ -144,26 +144,52 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                source, jmlComments, ast, jmlParser);
          final JMLValidationEngine engine = new JMLValidationEngine(
                JMLPreferencesHelper
-               .getProjectActiveJMLProfile(res.getProject()),
+                     .getProjectActiveJMLProfile(res.getProject()),
                jmlContext);
-         final List commentList = ast.getCommentList();
+         final List<Comment> commentList = ast.getCommentList();
+         final Map<Comment, ASTNode> inverse = new HashMap();
+         final Map<Comment, ASTNode> jmlCommentToInverse = new HashMap();
          ast.accept(new GenericVisitor() {
             @Override
             protected boolean visitNode(final ASTNode node) {
+               // First Leading Comment
+               // Second Leading Comment
+               // ...
+               // AST Node
+               // ...
+               // Last trailing comment
                final int start = ast.firstLeadingCommentIndex(node);
                final int end = ast.lastTrailingCommentIndex(node);
-               System.out.println("node: " + node + " start: " + start
-                     + " end: " + end);
-               /*
-                * for (int i = start; i <= end; i++) { if (commentList.size() >=
-                * end) { System.out.println("Putting: " + commentList.get(i) +
-                * "with Parent " + node); } inverse.put((Comment)
-                * commentList.get(i), node); // TODO: Map CommentRanges to
-                * Comments }
-                */
+
+               if (start != -1) {
+                  int pos = start;
+                  while (pos < commentList.size()
+                        && commentList.get(pos).getStartPosition() < node
+                              .getStartPosition()) {
+                     assert !inverse.containsKey(commentList.get(pos));
+                     inverse.put(commentList.get(pos), node);
+                     pos++;
+
+                  }
+
+               }
+
+               // Do something similar with trailing for the case, that we are
+               // interessted in
+               // them because I think JML is always above
+               // Maybe store them in to maps to be able to distinguish them
+               // later
+               // So one map for leading and one fore trailing
+
                return super.visitNode(node);
             }
          });
+
+         for (final Entry<Comment, ASTNode> comments : inverse.entrySet()) {
+            System.out.println("Assigned: " + comments.getKey() + " to "
+                  + comments.getValue());
+         }
+
          // End of Preparation
          final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
          for (final CommentRange jmlComment : jmlComments) {
