@@ -9,17 +9,33 @@ import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
 
-public class SeqExpressionParser implements ParseFunction {
+/**
+ * The seq expression parser. If parses any seq primary according to the KeY
+ * Grammar.
+ *
+ * @author Moritz Lichter
+ *
+ */
+public class SeqPrimaryParser implements ParseFunction {
 
-   private final ParseFunction seqExprParser;
+   /**
+    * The parse function for seq primaries.
+    */
+   private final ParseFunction seqPrimaryParser;
 
    @Override
    public IASTNode parse(final String text, final int start, final int end)
          throws ParserException {
-      return this.seqExprParser.parse(text, start, end);
+      return this.seqPrimaryParser.parse(text, start, end);
    }
 
-   public SeqExpressionParser(final IJMLExpressionProfile profile) {
+   /**
+    * Creates a new {@link SeqPrimaryParser} for the given profile.
+    *
+    * @param profile
+    *           the profile to parse according to
+    */
+   public SeqPrimaryParser(final IJMLExpressionProfile profile) {
       /**
        * seq-expr ::= <br>
        * \seq_empty | <br>
@@ -57,11 +73,20 @@ public class SeqExpressionParser implements ParseFunction {
       final ParseFunction seqPrim = alt(
             keywords(SeqPrimitiveKeywordSort.INSTANCE, profile), seqDefExpr);
 
-      final ParseFunction seqExpr = seqPrim; // , list(seqSuffix));
+      final ParseFunction seqExpr = seqPrim;
 
-      this.seqExprParser = seqExpr;
+      this.seqPrimaryParser = seqExpr;
    }
 
+   /**
+    * Creates a {@link ParseFunction} that parses the additional suffixes for
+    * seq expression. Its not used in this parser because the parser parses only
+    * primitives without suffixes.
+    *
+    * @param profile
+    *           the profile to parse according to
+    * @return a {@link ParseFunction} which parses all seq primary suffixes
+    */
    public static ParseFunction seqSuffix(final IJMLExpressionProfile profile) {
       final ExpressionParser expr = new ExpressionParser(profile);
       final ParseFunction seqSuffix = seq(squareBrackets(seq(expr,

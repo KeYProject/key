@@ -53,7 +53,7 @@ import org.key_project.jmlediting.profile.key.seq.IndexOfKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqConcatKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqDefKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqEmptyKeyword;
-import org.key_project.jmlediting.profile.key.seq.SeqExpressionParser;
+import org.key_project.jmlediting.profile.key.seq.SeqPrimaryParser;
 import org.key_project.jmlediting.profile.key.seq.SeqKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqLengthKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqPrimary;
@@ -121,7 +121,7 @@ public class KeyProfile extends JMLReferenceProfile {
             new SeqLengthKeyword(), new SingletonKeyword(), new IndexKeyword(),
             new SeqReverseKeyword()));
       supportedPrimaries.add(new SeqPrimary());
-      this.additionalPrimarySuffixes.add(SeqExpressionParser.seqSuffix(this));
+      this.additionalPrimarySuffixes.add(SeqPrimaryParser.seqSuffix(this));
 
       // Other keywords
       supportedKeywords.addAll(Arrays.asList(new NewElemsFreshKeyword(),
