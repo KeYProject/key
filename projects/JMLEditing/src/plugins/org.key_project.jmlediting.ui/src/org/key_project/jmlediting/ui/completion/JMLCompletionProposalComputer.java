@@ -39,8 +39,15 @@ import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
 public class JMLCompletionProposalComputer implements
       IJavaCompletionProposalComputer {
 
+   /**
+    * lazy loading of the KeY Image to display in Keyword-Proposals.
+    */
    private static Image img = null;
 
+   /**
+    *
+    * @return the KeY-Image for the Keyword-Proposals
+    */
    public static Image getJMLImg() {
       if (img != null) {
          return img;
@@ -165,6 +172,13 @@ public class JMLCompletionProposalComputer implements
 
    }
 
+   /**
+    * Propose all Toplevel Keywords.
+    *
+    * @param javaContext
+    *           the context the proposal is invoked from
+    * @return All Toplevel Keywords matching the prefix
+    */
    private List<ICompletionProposal> proposeToplevelKeywords(
          final JavaContentAssistInvocationContext javaContext) {
       System.out.println("fallback");
