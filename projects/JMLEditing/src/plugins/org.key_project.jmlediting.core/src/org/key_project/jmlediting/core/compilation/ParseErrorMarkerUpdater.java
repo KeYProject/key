@@ -9,8 +9,24 @@ import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.utilities.Position;
 import org.key_project.util.eclipse.Logger;
 
+/**
+ * Class for Updating the GUI with Error Markers from the JML Parsers Errors.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public class ParseErrorMarkerUpdater {
 
+   /**
+    * Converts an offset into a Position.
+    *
+    * @param text
+    *           the text to operate on
+    * @param offset
+    *           the offset to convert
+    * @return the Position of the offset or null if offset is not inside the
+    *         texts range
+    */
    private static Position getPositionForOffset(final String text,
          final int offset) {
       final char[] textc = text.toCharArray();
@@ -39,6 +55,12 @@ public class ParseErrorMarkerUpdater {
       return null;
    }
 
+   /**
+    * Removes Errormarkers from the Resource.
+    *
+    * @param res
+    *           the Resource
+    */
    public static void removeErrorMarkers(final IResource res) {
       try {
 
@@ -55,10 +77,20 @@ public class ParseErrorMarkerUpdater {
       }
       catch (final CoreException e) {
          new Logger(Activator.getDefault(), Activator.PLUGIN_ID)
-               .createErrorStatus(e);
+         .createErrorStatus(e);
       }
    }
 
+   /**
+    * Creates error Markers on the Resource.
+    *
+    * @param res
+    *           the Resource
+    * @param text
+    *           the Resources text
+    * @param exception
+    *           The Parse Exception to display as Errormarkers
+    */
    public static void createErrorMarkers(final IResource res,
          final String text, final ParserException exception) {
       for (final ParserError error : exception.getAllErrors()) {
@@ -77,7 +109,7 @@ public class ParseErrorMarkerUpdater {
          }
          catch (final CoreException e) {
             new Logger(Activator.getDefault(), Activator.PLUGIN_ID)
-                  .createErrorStatus(e);
+            .createErrorStatus(e);
          }
 
       }

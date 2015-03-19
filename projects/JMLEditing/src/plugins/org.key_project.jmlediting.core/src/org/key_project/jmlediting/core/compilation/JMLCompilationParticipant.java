@@ -1,7 +1,9 @@
 package org.key_project.jmlediting.core.compilation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -14,8 +16,10 @@ import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.compiler.ReconcileContext;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 import org.eclipse.jdt.internal.compiler.problem.ProblemSeverities;
+import org.eclipse.jdt.internal.corext.dom.GenericVisitor;
 import org.key_project.jmlediting.core.Activator;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.IJMLParser;
@@ -25,7 +29,6 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLValidationError;
-import org.key_project.jmlediting.core.validation.CommentVisitor;
 import org.key_project.jmlediting.core.validation.JMLValidationContext;
 import org.key_project.jmlediting.core.validation.JMLValidationEngine;
 import org.key_project.util.eclipse.Logger;
@@ -112,6 +115,8 @@ public class JMLCompilationParticipant extends CompilationParticipant {
        * Here the errors are reported as error markers which appear in the
        * problems list.
        */
+      final Map<Comment, ASTNode> inverse = new HashMap();
+      final Map<Comment, ASTNode> jmlCommentToInverse = new HashMap();
       if (isBatch) {
          return;
       }
@@ -139,15 +144,29 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                source, jmlComments, ast, jmlParser);
          final JMLValidationEngine engine = new JMLValidationEngine(
                JMLPreferencesHelper
-                     .getProjectActiveJMLProfile(res.getProject()),
+               .getProjectActiveJMLProfile(res.getProject()),
                jmlContext);
+         final List commentList = ast.getCommentList();
+         ast.accept(new GenericVisitor() {
+
+            @Override
+            protected boolean visitNode(final ASTNode node) {
+               final int start = ast.firstLeadingCommentIndex(node);
+               final int end = ast.lastTrailingCommentIndex(node);
+               System.out.println("Size: " + commentList.size());
+               for (int i = start; i <= end; i++) {
+                  System.out.println("Putting: " + commentList.get(i)
+                        + "with Parent " + node);
+                  inverse.put((Comment) commentList.get(i), node);
+                  // TODO: Map CommentRanges to Comments
+               }
+               return super.visitNode(node);
+            }
+         });
          // End of Preparation
          final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
          for (final CommentRange jmlComment : jmlComments) {
             try {
-               System.out.println(""
-                     + this.findCorrespondingNode(jmlComment.getBeginOffset(),
-                           jmlComment.getEndOffset(), ast));
                final IASTNode node = jmlParser.parse(source, jmlComment);
                errors.addAll(engine.validateComment(node));
                // Throw away the result, here only a parse exception is
@@ -161,12 +180,5 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          // TODO: Unify ErrorMarkerUpdater
          ValidationErrorMarkerUpdater.createErrorMarkers(res, source, errors);
       }
-   }
-
-   ASTNode findCorrespondingNode(final int offset, final int endOffset,
-         final ASTNode ast) {
-      final CommentVisitor visitor = new CommentVisitor(offset, endOffset);
-      ast.accept(visitor);
-      return visitor.getCorrespondingNode();
    }
 }
