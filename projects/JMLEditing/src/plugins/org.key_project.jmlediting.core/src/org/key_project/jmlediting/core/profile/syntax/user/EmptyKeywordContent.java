@@ -1,11 +1,10 @@
 package org.key_project.jmlediting.core.profile.syntax.user;
 
-import org.key_project.jmlediting.core.parser.ParseFunction;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.EmptyKeywordParser;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 
-public class EmptyKeywordContent extends
-      AbstractUserDefinedKeywordContentDescription {
+public class EmptyKeywordContent implements
+      IUserDefinedKeywordContentDescription {
 
    @Override
    public String getId() {
@@ -18,12 +17,7 @@ public class EmptyKeywordContent extends
    }
 
    @Override
-   public ClosingCharacterLaw getClosingCharacterLaw() {
-      return ClosingCharacterLaw.NOT_ALLOWED;
-   }
-
-   @Override
-   protected ParseFunction getContentParseFunction(final IJMLProfile profile) {
+   public IKeywordParser getKeywordParser() {
       return EmptyKeywordParser.getInstance();
    }
 

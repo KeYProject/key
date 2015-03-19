@@ -2,7 +2,9 @@ package org.key_project.jmlediting.core.profile.syntax.user;
 
 import java.util.Set;
 
+import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.parser.ParseFunction;
+import org.key_project.jmlediting.core.parser.ParserBuilder;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordAutoProposer;
@@ -80,9 +82,17 @@ public class UserDefinedKeyword extends AbstractKeyword implements
 
          @Override
          protected ParseFunction createParseFunction(final IJMLProfile profile) {
-            return UserDefinedKeyword.this.contentDescription
-                  .getContentParseFunction(profile,
-                        UserDefinedKeyword.this.closingCharacter);
+
+            final ParseFunction content = UserDefinedKeyword.this.contentDescription
+                  .getKeywordParser();
+            if (UserDefinedKeyword.this.closingCharacter == null) {
+               return UserDefinedKeyword.this.contentDescription
+                     .getKeywordParser();
+            }
+            else {
+               return ParserBuilder.closedBy(NodeTypes.NODE, content,
+                     UserDefinedKeyword.this.closingCharacter);
+            }
          }
       };
    }

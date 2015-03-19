@@ -39,6 +39,11 @@ public class KeyAccessibleTest {
       this.testParse("accessible \\inv : this.*;");
    }
 
+   @Test
+   public void parseAssignableLessThenNothing() {
+      this.testParse("assignable \\less_than_nothing;");
+   }
+
    private void testParse(final String text) {
       try {
          ParserTestUtils.testParseComplete(text, KeyProfileTestUtils
