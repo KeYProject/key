@@ -86,7 +86,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                         new String[] { error.getErrorMessage() },
                         new String[] { error.getErrorMessage() },
                         ProblemSeverities.Error, error.getErrorOffset(), error
-                        .getErrorOffset(), -1, -1));
+                              .getErrorOffset(), -1, -1));
                }
 
                // And now put the problems to the context to make them visible
@@ -145,9 +145,9 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
          for (final CommentRange jmlComment : jmlComments) {
             try {
-               System.out.println(""
-                     + this.findCorrespondingNode(jmlComment.getBeginOffset(),
-                           jmlComment.getEndOffset(), ast));
+               // System.out.println(""
+               // + this.findCorrespondingNode(jmlComment.getBeginOffset(),
+               // jmlComment.getEndOffset(), ast));
                final IASTNode node = jmlParser.parse(source, jmlComment);
                errors.addAll(engine.validateComment(node));
                // Throw away the result, here only a parse exception is

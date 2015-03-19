@@ -1,12 +1,17 @@
 package org.key_project.jmlediting.ui.preferencepages.profileDialog;
 
-import org.eclipse.jface.dialogs.StatusDialog;
+import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -16,25 +21,35 @@ import org.key_project.jmlediting.core.profile.InvalidProfileException;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.ui.util.JMLSWTUtil;
 
-public class JMLNewProfileDialog extends StatusDialog {
+public class JMLNewProfileDialog extends TitleAreaDialog {
 
    private Text profileNameText;
    private Text profileIdText;
    private Combo derivedFromCombo;
+   private final Color redColor = Display.getCurrent().getSystemColor(
+         SWT.COLOR_MAGENTA);
+   private final Color whiteColor = Display.getCurrent().getSystemColor(
+         SWT.COLOR_WHITE);
 
    public JMLNewProfileDialog(final Shell parent) {
       super(parent);
+      this.setShellStyle(super.getShellStyle() | SWT.RESIZE);
+      this.setHelpAvailable(false);
+   }
+
+   @Override
+   public void create() {
+      super.create();
       this.setTitle("New JML Profile");
-      this.setShellStyle(super.getShellStyle() | SWT.RESIZE | SWT.FILL);
+      this.setMessage("", IMessageProvider.NONE);
    }
 
    @Override
    protected Control createDialogArea(final Composite parent) {
       final Composite composite = (Composite) super.createDialogArea(parent);
-
       final Composite myComposite = new Composite(composite, SWT.NONE);
-      myComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
       myComposite.setLayout(new GridLayout(2, false));
+      myComposite.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
 
       final GridData labelData = new GridData(SWT.FILL, SWT.CENTER, false, true);
       final GridData textData = new GridData(SWT.FILL, SWT.CENTER, false, true);
@@ -61,7 +76,15 @@ public class JMLNewProfileDialog extends StatusDialog {
       JMLSWTUtil.fillComboWithParentProfilesAndDate(this.derivedFromCombo);
       this.derivedFromCombo.setLayoutData(textData);
 
-      // TODO validate
+      this.derivedFromCombo.addSelectionListener(new SelectionListener() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+         }
+
+         @Override
+         public void widgetDefaultSelected(final SelectionEvent e) {
+         }
+      });
 
       return composite;
    }
