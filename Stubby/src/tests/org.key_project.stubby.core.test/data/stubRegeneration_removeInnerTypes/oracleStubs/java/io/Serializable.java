@@ -3,5 +3,5 @@ package java.io;
 /**
  * @generated
  */
-public interface Serializable {    
+public interface Serializable {
 }

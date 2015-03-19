@@ -3,5 +3,5 @@ package javax.swing.border;
 /**
  * @generated
  */
-public class AbstractBorder {    
+public abstract class AbstractBorder extends java.lang.Object implements javax.swing.border.Border, java.io.Serializable {
 }

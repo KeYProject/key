@@ -10,10 +10,11 @@ public class MetalBorders extends java.lang.Object {
    public class ButtonBorder {
    // CLASS BODY WILL BE MAINTAINED BY REGENERATION
    }
+
    /**
     * @generated NOT
     */
    public class Flush3DBorder {
    // CLASS BODY WILL BE MAINTAINED BY REGENERATION
-   }    
+   }
 }

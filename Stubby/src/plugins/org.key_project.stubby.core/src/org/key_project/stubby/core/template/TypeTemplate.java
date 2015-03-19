@@ -182,14 +182,14 @@ public class TypeTemplate {
     */
    protected void appendMethod(Method method, StringBuffer sb, int level) {
       final String INDENT = StringUtil.createLine(" ", level * 3);
+      sb.append(INDENT + "/**" + NL);
+      sb.append(INDENT + " * @generated" + NL);
+      sb.append(INDENT + " */" + NL);
       sb.append(INDENT + "/*@ normal_behavior" + NL);
       sb.append(INDENT + "  @ requires true;" + NL);
       sb.append(INDENT + "  @ ensures true;" + NL);
       sb.append(INDENT + "  @ assignable \\everything;" + NL);
       sb.append(INDENT + "  @*/" + NL);
-      sb.append(INDENT + "/**" + NL);
-      sb.append(INDENT + " * @generated" + NL);
-      sb.append(INDENT + " */" + NL);
       sb.append(INDENT + method.getVisibility().toJavaKeyword() + " ");
       if (method.isAbstract()) {
          sb.append("abstract ");

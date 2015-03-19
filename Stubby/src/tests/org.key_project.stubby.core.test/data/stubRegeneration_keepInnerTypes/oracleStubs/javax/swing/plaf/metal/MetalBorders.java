@@ -10,7 +10,7 @@ public class MetalBorders extends java.lang.Object {
    public static class ButtonBorder extends javax.swing.border.AbstractBorder implements javax.swing.plaf.UIResource {
    }
 
-   /**
+  /**
     * @generated
     */
    public static class Flush3DBorder extends javax.swing.border.AbstractBorder implements javax.swing.plaf.UIResource {

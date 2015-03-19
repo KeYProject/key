@@ -13,8 +13,14 @@ public class Font extends java.lang.Object implements java.io.Serializable {
     * @generated 
     */
    public boolean isBold();
+ 
    /**
     * @generated NOT
     */
+   /*@ normal_behavior 
+     @ requires true;
+     @ ensures true;
+     @ assignable \everything;
+     @*/
    public boolean isItalic();
 }

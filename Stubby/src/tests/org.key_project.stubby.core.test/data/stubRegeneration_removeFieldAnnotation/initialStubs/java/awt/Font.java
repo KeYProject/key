@@ -4,8 +4,7 @@ package java.awt;
  * @generated
  */
 public class Font {
-
-   /*@ normal_behavior 
+   /*@ normal_behavior
      @ requires true;
      @ ensures true;
      @ assignable \everything;
@@ -13,5 +12,5 @@ public class Font {
    /**
     * @generated 
     */
-   public boolean isBold();  
+   public boolean isBold();
 }

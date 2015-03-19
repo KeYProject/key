@@ -5,15 +5,16 @@ package javax.swing.plaf.metal;
  */
 public class MetalBorders {
    /**
-   * @generated 
-   */
+     * @generated 
+     */
    public class ButtonBorderChange {
-   // CLASS NAME WILL NOT BE MAINTAINED BY REGENERATION
+   // CLASS NAME WILL NOT BE MAINTAINED BY REGENERATION, COMMENT WILL BE DROPPED
    }
+
    /**
-   * @generated 
-   */
+     * @generated 
+     */
    public class Flush3DBorderChange {
-   // CLASS BODY WILL NOT BE MAINTAINED BY REGENERATION
-   }    
+   // CLASS BODY WILL NOT BE MAINTAINED BY REGENERATION, COMMENT WILL BE DROPPED
+   }
 }

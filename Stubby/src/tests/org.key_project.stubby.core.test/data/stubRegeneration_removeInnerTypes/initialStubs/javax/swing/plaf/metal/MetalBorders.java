@@ -5,15 +5,17 @@ package javax.swing.plaf.metal;
  */
 public class MetalBorders {
    /**
-   * @generated 
-   */
+    * @generated 
+    */
    public class ButtonBorder {
    }
+
    /**
-   * @generated 
-   */
+    * @generated 
+    */
    public class Flush3DBorder {
    }
+
    /**
     * @generated
     */

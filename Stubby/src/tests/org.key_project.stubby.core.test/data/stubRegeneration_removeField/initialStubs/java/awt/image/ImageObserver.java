@@ -8,8 +8,9 @@ public interface ImageObserver {
     * @generated
     */
    public static final int ABORT;
+
    /**
     * @generated
     */
-   public static final int ALLBITS; 
+   public static final int ALLBITS;
 }

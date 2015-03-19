@@ -530,6 +530,14 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
+   public void testStubRegeneration_removeInnerTypes() throws Exception {
+      doChangedTestStubs("StubGeneratorUtil_testStubRegeneration_replaceMethodContent",
+                         "data/stubRegeneration_removeInnerTypes/test",
+                         "data/stubRegeneration_removeInnerTypes/initialStubs",
+                         "data/stubRegeneration_removeInnerTypes/oracleStubs");
+   }
+   
+   @Test
    public void testStubRegeneration_keepMethodContent() throws Exception {
       doChangedTestStubs("StubGeneratorUtil_testStubRegeneration_keepMethodContent",
                          "data/stubRegeneration_keepMethodContent/test",
@@ -553,13 +561,36 @@ public class StubGeneratorUtilTest extends TestCase {
                          "data/stubRegeneration_addMethod/oracleStubs");
    }
    
-   
    @Test
    public void testStubRegeneration_addField() throws Exception {
       doChangedTestStubs("StubGeneratorUtil_testStubRegeneration_addField",
                          "data/stubRegeneration_addField/test",
                          "data/stubRegeneration_addField/initialStubs",
                          "data/stubRegeneration_addField/oracleStubs");
+   }
+   
+   @Test
+   public void testStubRegeneration_addConstructor() throws Exception {
+      doChangedTestStubs("StubGeneratorUtil_stubRegeneration_addConstructor",
+                         "data/stubRegeneration_addConstructor/test",
+                         "data/stubRegeneration_addConstructor/initialStubs",
+                         "data/stubRegeneration_addConstructor/oracleStubs");
+   }
+   
+   @Test
+   public void testStubRegeneration_addConstructorAgain() throws Exception {
+      doChangedTestStubs("StubGeneratorUtil_stubRegeneration_addConstructorAgain",
+                         "data/stubRegeneration_addConstructorAgain/test",
+                         "data/stubRegeneration_addConstructorAgain/initialStubs",
+                         "data/stubRegeneration_addConstructorAgain/oracleStubs");
+   }
+   
+   @Test
+   public void testStubRegeneration_removeAndKeepConstructor() throws Exception {
+      doChangedTestStubs("StubGeneratorUtil_stubRegeneration_removeAndKeepConstructor",
+                         "data/stubRegeneration_removeAndKeepConstructor/test",
+                         "data/stubRegeneration_removeAndKeepConstructor/initialStubs",
+                         "data/stubRegeneration_removeAndKeepConstructor/oracleStubs");
    }
    
    @Test

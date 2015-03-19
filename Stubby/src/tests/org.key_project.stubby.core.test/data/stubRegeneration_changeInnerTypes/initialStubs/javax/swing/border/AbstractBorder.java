@@ -3,5 +3,5 @@ package javax.swing.border;
 /**
  * @generated
  */
-public class AbstractBorder {    
+public class AbstractBorder {
 }

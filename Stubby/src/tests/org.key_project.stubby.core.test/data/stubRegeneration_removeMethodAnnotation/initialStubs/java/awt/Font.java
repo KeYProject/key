@@ -17,5 +17,10 @@ public class Font {
    /**
     * @generated NOT
     */
+   /*@ normal_behavior 
+     @ requires true;
+     @ ensures true;
+     @ assignable \everything;
+     @*/
    public boolean isItalic();
 }

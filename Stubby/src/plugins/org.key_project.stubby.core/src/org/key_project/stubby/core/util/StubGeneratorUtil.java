@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.codegen.merge.java.JControlModel;
 import org.eclipse.emf.codegen.merge.java.JMerger;
 import org.eclipse.emf.codegen.merge.java.facade.FacadeHelper;
-import org.eclipse.emf.codegen.merge.java.facade.jdom.JDOMFacadeHelper;
+import org.eclipse.emf.codegen.merge.java.facade.ast.ASTFacadeHelper;
 import org.eclipse.emf.codegen.util.CodeGenUtil;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -234,7 +234,7 @@ public final class StubGeneratorUtil {
          // Merge new with existing content
          JControlModel controlModel = new JControlModel();
          controlModel.setConvertToStandardBraceStyle(true);
-         FacadeHelper facadeHelper = CodeGenUtil.instantiateFacadeHelper(JDOMFacadeHelper.class.getName()); // The default class JMerger.DEFAULT_FACADE_HELPER_CLASS drops non Javadoc comments
+         FacadeHelper facadeHelper = CodeGenUtil.instantiateFacadeHelper(ASTFacadeHelper.class.getName()); // The JDOMFacadeHelper can not parser constructors ending with ';' instead by a body.
          controlModel.initialize(facadeHelper, getStubbyMergeURI());
          JMerger merger = new JMerger(controlModel);
          merger.setSourceCompilationUnit(merger.createCompilationUnitForContents(content));

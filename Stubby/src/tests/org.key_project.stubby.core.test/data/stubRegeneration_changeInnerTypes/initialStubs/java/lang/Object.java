@@ -3,5 +3,5 @@ package java.lang;
 /**
  * @generated
  */
-public class Object {    
+public class Object {
 }

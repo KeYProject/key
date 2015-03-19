@@ -7,7 +7,8 @@ public interface ImageObserver {
    /**
     * @generated
     */
-   public static final int ABORT= 128;
+   public static final int ABORT = 128;
+
    /**
     * @generated NOT
     */

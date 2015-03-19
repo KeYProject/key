@@ -4,17 +4,15 @@ package java.awt;
  * @generated
  */
 public class Font {
-
+   /**
+    * @generated
+    */
    /*@ normal_behavior
      @ requires true;
      @ ensures true;
      @ assignable \everything;
      @*/
-   /**
-    * @generated
-    */
-   public boolean isBold(
-   ) {
+   public boolean isBold() {
       // METHOD BODY WILL BE DELETED BY REGENERATION
    }
 }
