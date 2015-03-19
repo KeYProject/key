@@ -19,6 +19,7 @@ import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
+import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
 import org.key_project.stubby.core.customization.IGeneratorCustomization;
 import org.key_project.stubby.model.dependencymodel.AbstractType;
 import org.key_project.stubby.model.dependencymodel.DependencyModel;
@@ -41,6 +42,11 @@ public class KeYGeneratorCustomization implements IGeneratorCustomization {
    private final boolean classPath;
    
    /**
+    * Is stub folder the boot class path?
+    */
+   private final boolean bootClassPath;
+   
+   /**
     * The full qualified type names of types contained in the boot class path.
     */
    private Set<String> bootTypes;
@@ -48,9 +54,11 @@ public class KeYGeneratorCustomization implements IGeneratorCustomization {
    /**
     * Constructor.
     * @param classPath Is stub folder part of class path?
+    * @param bootClassPath Is stub folder the boot class path?
     */
-   public KeYGeneratorCustomization(boolean classPath) {
+   public KeYGeneratorCustomization(boolean classPath, boolean bootClassPath) {
       this.classPath = classPath;
+      this.bootClassPath = bootClassPath;
    }
 
    /**
@@ -154,7 +162,7 @@ public class KeYGeneratorCustomization implements IGeneratorCustomization {
    public void stubFilesGenerated(IJavaProject javaProject, String stubFolderPath) throws CoreException {
       IProject project = javaProject.getProject();
       final String fullPath = KeYStubGenerationCustomization.computeFullPath(project, stubFolderPath);
-      // Ensure that class path is correct according to KeYGeneratorCustomization#classPath.
+      // Ensure that class path is correct according to classPath.
       List<KeYClassPathEntry> entries = KeYResourceProperties.getClassPathEntries(project);
       KeYClassPathEntry entry = KeYResourceProperties.searchClassPathEntry(entries, KeYClassPathEntryKind.WORKSPACE, fullPath);
       if (classPath) {
@@ -168,6 +176,18 @@ public class KeYGeneratorCustomization implements IGeneratorCustomization {
          if (entry != null) {
             entries.remove(entry);
             KeYResourceProperties.setClassPathEntries(project, entries);
+         }
+      }
+      // Ensure that boot class path is correct according to #bootClassPath.
+      boolean isBootClassPath = KeYStubGenerationCustomization.isBootClassPath(project, stubFolderPath);
+      if (bootClassPath) {
+         if (!isBootClassPath) {
+            KeYResourceProperties.setBootClassPath(project, UseBootClassPathKind.WORKSPACE, fullPath);
+         }
+      }
+      else {
+         if (isBootClassPath) {
+            KeYResourceProperties.setBootClassPath(project, UseBootClassPathKind.KEY_DEFAULT, null);
          }
       }
    }

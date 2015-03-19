@@ -95,7 +95,7 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
        * @param kind The {@link UseBootClassPathKind} to test.
        */
       public IgnoredClassPathTypesSteps(UseBootClassPathKind kind) {
-         super(true, true);
+         super(true, true, false, false);
          this.kind = kind;
          expectedIgnoredTypes.add("java.lang.Object");
          expectedIgnoredTypes.add("java.io.Serializable");
@@ -155,6 +155,29 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
          IFolder stubFolder = javaProject.getProject().getFolder(new Path(StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH));
          StubGeneratorUtilTest.assertResources(oracleFolder.members(), stubFolder.members());
       }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      protected UseBootClassPathKind getDefaultUseBootClassPathKind(IJavaProject javaProject) {
+         return kind;
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      protected String getDefaultBootClassPath(IJavaProject javaProject) {
+         if (UseBootClassPathKind.WORKSPACE.equals(kind)) {
+            return javaProject.getProject().getFolder("boot").getFullPath().toString();
+         }
+         else {
+            return externalBootClassPath != null ? 
+                   externalBootClassPath.getAbsolutePath() : 
+                   null;
+         }
+      }
    }
    
    /**
@@ -166,7 +189,7 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
       doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testClassPath_to_ClassPath", 
                        Activator.PLUGIN_ID, 
                        null, 
-                       new PathGeneratorTestSteps(true, true));
+                       new PathGeneratorTestSteps(true, true, false, false));
    }
 
    /**
@@ -178,7 +201,7 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
       doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testClassPath_to_NotClassPath", 
                        Activator.PLUGIN_ID, 
                        null, 
-                       new PathGeneratorTestSteps(true, false));
+                       new PathGeneratorTestSteps(true, false, false, false));
    }
 
    /**
@@ -190,7 +213,7 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
       doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testNotClassPath_to_ClassPath", 
                        Activator.PLUGIN_ID, 
                        null, 
-                       new PathGeneratorTestSteps(false, true));
+                       new PathGeneratorTestSteps(false, true, false, false));
    }
 
    /**
@@ -202,7 +225,67 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
       doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testNotClassPath_to_NotClassPath", 
                        Activator.PLUGIN_ID, 
                        null, 
-                       new PathGeneratorTestSteps(false, false));
+                       new PathGeneratorTestSteps(false, false, false, false));
+   }
+   
+   /**
+    * Tests class path to class path.
+    * @throws Exception Occurred Exception
+    */
+   @Test
+   public void testBootClassPath_to_BootClassPath() throws Exception {
+      doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testBootClassPath_to_BootClassPath", 
+                       Activator.PLUGIN_ID, 
+                       null, 
+                       new PathGeneratorTestSteps(false, false, true, true));
+   }
+
+   /**
+    * Tests class path to not class path.
+    * @throws Exception Occurred Exception
+    */
+   @Test
+   public void testClassPath_to_BootClassPath() throws Exception {
+      doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testClassPath_to_BootClassPath", 
+                       Activator.PLUGIN_ID, 
+                       null, 
+                       new PathGeneratorTestSteps(true, false, false, true));
+   }
+
+   /**
+    * Tests not class path to class path.
+    * @throws Exception Occurred Exception
+    */
+   @Test
+   public void testNotClassPath_to_BootClassPath() throws Exception {
+      doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testNotClassPath_to_BootClassPath", 
+                       Activator.PLUGIN_ID, 
+                       null, 
+                       new PathGeneratorTestSteps(false, false, false, true));
+   }
+
+   /**
+    * Tests not class path to not class path.
+    * @throws Exception Occurred Exception
+    */
+   @Test
+   public void testBootClassPath_to_NotClassPath() throws Exception {
+      doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testBootClassPath_to_NotClassPath", 
+                       Activator.PLUGIN_ID, 
+                       null, 
+                       new PathGeneratorTestSteps(false, false, true, false));
+   }
+
+   /**
+    * Tests not class path to not class path.
+    * @throws Exception Occurred Exception
+    */
+   @Test
+   public void testBootClassPath_to_ClassPath() throws Exception {
+      doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testBootClassPath_to_ClassPath", 
+                       Activator.PLUGIN_ID, 
+                       null, 
+                       new PathGeneratorTestSteps(false, true, true, false));
    }
    
    /**
@@ -219,15 +302,32 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
        * Should be after generation part of the class path?
        */
       private final boolean afterClassPath;
+      
+      /**
+       * Is before generation part of the boot class path?
+       */
+      private final boolean beforeBootClassPath;
+      
+      /**
+       * Should be after generation part of the boot class path?
+       */
+      private final boolean afterBootClassPath;
 
       /**
        * Constructor
        * @param beforeClassPath Is before generation part of the class path?
        * @param afterClassPath Should be after generation part of the class path?
+       * @param beforeBootClassPath Is before generation part of the boot class path?
+       * @param afterBootClassPath Should be after generation part of the boot class path?
        */
-      public PathGeneratorTestSteps(boolean beforeClassPath, boolean afterClassPath) {
+      public PathGeneratorTestSteps(boolean beforeClassPath, 
+                                    boolean afterClassPath,
+                                    boolean beforeBootClassPath,
+                                    boolean afterBootClassPath) {
          this.beforeClassPath = beforeClassPath;
          this.afterClassPath = afterClassPath;
+         this.beforeBootClassPath = beforeBootClassPath;
+         this.afterBootClassPath = afterBootClassPath;
       }
 
       /**
@@ -235,12 +335,15 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
        */
       @Override
       public void initProject(IJavaProject javaProject) throws Exception {
+         IProject project = javaProject.getProject();
+         String fullPath = KeYStubGenerationCustomization.computeFullPath(project, StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH);
          if (beforeClassPath) {
-            IProject project = javaProject.getProject();
-            String fullPath = KeYStubGenerationCustomization.computeFullPath(project, StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH);
             List<KeYClassPathEntry> entries = KeYResourceProperties.getClassPathEntries(project);
             entries.add(new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, fullPath));
             KeYResourceProperties.setClassPathEntries(project, entries);
+         }
+         if (beforeBootClassPath) {
+            KeYResourceProperties.setBootClassPath(project, UseBootClassPathKind.WORKSPACE, fullPath);
          }
       }
 
@@ -252,16 +355,27 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
          // Test initial values
          SWTBotRadio notUsed = shell.bot().radio("&Not considered");
          SWTBotRadio classPath = shell.bot().radio("&Class Path");
-         if (beforeClassPath) {
+         SWTBotRadio bootClassPath = shell.bot().radio("&Boot Class Path");
+         if (beforeBootClassPath) {
+            assertFalse(notUsed.isSelected());
+            assertFalse(classPath.isSelected());
+            assertTrue(bootClassPath.isSelected());
+         }
+         else if (beforeClassPath) {
             assertFalse(notUsed.isSelected());
             assertTrue(classPath.isSelected());
+            assertFalse(bootClassPath.isSelected());
          }
          else {
             assertTrue(notUsed.isSelected());
             assertFalse(classPath.isSelected());            
+            assertFalse(bootClassPath.isSelected());
          }
          // Set values to test
-         if (afterClassPath) {
+         if (afterBootClassPath) {
+            bootClassPath.click();
+         }
+         else if (afterClassPath) {
             classPath.click();
          }
          else {
@@ -288,6 +402,32 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
          else {
             assertNull(entry);
          }
+         if (afterBootClassPath) {
+            assertEquals(UseBootClassPathKind.WORKSPACE, KeYResourceProperties.getUseBootClassPathKind(project));
+            assertEquals(fullPath, KeYResourceProperties.getBootClassPath(project));
+         }
+         else {
+            assertEquals(getDefaultUseBootClassPathKind(javaProject), KeYResourceProperties.getUseBootClassPathKind(project));
+            assertEquals(getDefaultBootClassPath(javaProject), KeYResourceProperties.getBootClassPath(project));
+         }
+      }
+      
+      /**
+       * Returns the default {@link UseBootClassPathKind}.
+       * @param javaProject The {@link IJavaProject} to test.
+       * @return The default {@link UseBootClassPathKind}.
+       */
+      protected UseBootClassPathKind getDefaultUseBootClassPathKind(IJavaProject javaProject) {
+         return UseBootClassPathKind.KEY_DEFAULT;
+      }
+      
+      /**
+       * Returns the default boot class path.
+       * @param javaProject The {@link IJavaProject} to test.
+       * @return The default boot class path.
+       */
+      protected String getDefaultBootClassPath(IJavaProject javaProject) {
+         return null;
       }
    }
 }
