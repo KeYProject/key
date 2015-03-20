@@ -17,10 +17,9 @@ import org.key_project.jmlediting.core.utilities.CommentRange;
  */
 public class JMLValidationContext implements IJMLValidationContext {
 
-   private final Map<Comment, ASTNode> inverse;
-   private final Map<Comment, ASTNode> inverseTrailing;
-   private final Map<CommentRange, Comment> jmlCommentToInverse;
-   private final Map<CommentRange, Comment> jmlCommentToInverseTrailing;
+   private final Map<Comment, ASTNode> leadingCommentToNodeMap;
+   private final Map<Comment, ASTNode> trailingCommentToNodeMap;
+   private final Map<CommentRange, Comment> jmlCommentToCommentMap;
    /**
     * the source to validate on.
     */
@@ -45,14 +44,12 @@ public class JMLValidationContext implements IJMLValidationContext {
     * @param inverse
     *           the Map from Leading Comments to ASTNodes
     *
-    * @param inverseTrailing
+    * @param assignedLeadingComments
     *           the Map from Trailing Comments to ASTNodes
     *
-    * @param jmlCommentToInverse
+    * @param assignedTrailingComments
     *           the Map from JML Comments to leading comments
     *
-    * @param jmlCommentToInverseTrailing
-    *           the Map from JML Comments to trailing comments
     *
     * @param src
     *           The Source
@@ -66,17 +63,16 @@ public class JMLValidationContext implements IJMLValidationContext {
     * @param jmlParser
     *           The jmlParser
     */
-   public JMLValidationContext(final Map<Comment, ASTNode> inverse,
-         final Map<Comment, ASTNode> inverseTrailing,
-         final Map<CommentRange, Comment> jmlCommentToInverse,
-         final Map<CommentRange, Comment> jmlCommentToInverseTrailing,
+   public JMLValidationContext(
+         final Map<Comment, ASTNode> assignedLeadingComments,
+         final Map<Comment, ASTNode> assignedTrailingComments,
+         final Map<CommentRange, Comment> jmlCommentsToComments,
          final String src, final List<CommentRange> jmlComments,
          final CompilationUnit javaAST, final IJMLParser jmlParser) {
       super();
-      this.inverse = inverse;
-      this.inverseTrailing = inverseTrailing;
-      this.jmlCommentToInverse = jmlCommentToInverse;
-      this.jmlCommentToInverseTrailing = jmlCommentToInverseTrailing;
+      this.leadingCommentToNodeMap = assignedLeadingComments;
+      this.trailingCommentToNodeMap = assignedTrailingComments;
+      this.jmlCommentToCommentMap = jmlCommentsToComments;
       this.src = src;
       this.jmlComments = jmlComments;
       this.javaAST = javaAST;
@@ -105,22 +101,18 @@ public class JMLValidationContext implements IJMLValidationContext {
    }
 
    @Override
-   public Map<Comment, ASTNode> getInverse() {
-      return this.inverse;
+   public ASTNode getNodeForLeadingComment(final Comment c) {
+      return this.leadingCommentToNodeMap.get(c);
    }
 
    @Override
-   public Map<Comment, ASTNode> getInverseTrailing() {
-      return this.inverseTrailing;
+   public ASTNode getNodeForTrailingComment(final Comment c) {
+      return this.trailingCommentToNodeMap.get(c);
    }
 
    @Override
-   public Map<CommentRange, Comment> getJmlCommentToInverse() {
-      return this.jmlCommentToInverse;
+   public Comment getCommentForJMLComment(final CommentRange jmlComment) {
+      return this.jmlCommentToCommentMap.get(jmlComment);
    }
 
-   @Override
-   public Map<CommentRange, Comment> getJmlCommentToInverseTrailing() {
-      return this.jmlCommentToInverseTrailing;
-   }
 }

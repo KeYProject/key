@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -141,11 +140,20 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          final IJMLParser jmlParser = JMLPreferencesHelper
                .getProjectActiveJMLProfile(res.getProject()).createParser();
 
+         // TODO encapsulate all that calculations
          final List<Comment> commentList = ast.getCommentList();
-         final Map<Comment, ASTNode> inverse = new HashMap();
-         final Map<Comment, ASTNode> inverseTrailing = new HashMap();
-         final Map<CommentRange, Comment> jmlCommentToInverse = new HashMap();
-         final Map<CommentRange, Comment> jmlCommentToInverseTrailing = new HashMap();
+         final Map<Comment, ASTNode> inverse = new HashMap<Comment, ASTNode>();
+         final Map<Comment, ASTNode> inverseTrailing = new HashMap<Comment, ASTNode>();
+         final Map<CommentRange, Comment> jmlCommentToComment = new HashMap<CommentRange, Comment>();
+
+         for (final CommentRange c : jmlComments) {
+            for (final Comment jdtComment : commentList) {
+               if (c.getBeginOffset() == jdtComment.getStartPosition()) {
+                  jmlCommentToComment.put(c, jdtComment);
+               }
+            }
+
+         }
          ast.accept(new GenericVisitor() {
             @Override
             protected boolean visitNode(final ASTNode node) {
@@ -161,14 +169,6 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                               .getStartPosition()) {
                      assert !inverse.containsKey(commentList.get(pos));
                      inverse.put(commentList.get(pos), node);
-                     for (final CommentRange c : jmlComments) {
-                        if (c.getBeginOffset() == commentList.get(pos)
-                              .getStartPosition()) {
-                           assert !jmlCommentToInverse.containsKey(c);
-                           jmlCommentToInverse.put(c, commentList.get(pos));
-                        }
-
-                     }
                      pos++;
 
                   }
@@ -179,18 +179,9 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                   int pos = end;
                   while (pos >= 0
                         && commentList.get(pos).getStartPosition() > node
-                        .getStartPosition()) {
+                              .getStartPosition()) {
                      assert !inverseTrailing.containsKey(commentList.get(pos));
                      inverseTrailing.put(commentList.get(pos), node);
-                     for (final CommentRange c : jmlComments) {
-                        if (c.getBeginOffset() == commentList.get(pos)
-                              .getStartPosition()) {
-                           assert !jmlCommentToInverseTrailing.containsKey(c);
-                           jmlCommentToInverseTrailing.put(c,
-                                 commentList.get(pos));
-                        }
-
-                     }
                      pos--;
                   }
                }
@@ -199,18 +190,13 @@ public class JMLCompilationParticipant extends CompilationParticipant {
             }
          });
 
-         for (final Entry<Comment, ASTNode> comments : inverse.entrySet()) {
-            System.out.println("Assigned: " + comments.getKey() + " to "
-                  + comments.getValue());
-         }
-         for (final Entry<CommentRange, Comment> comments : jmlCommentToInverse
-               .entrySet()) {
-            System.out.println("Assigned JMLComment: " + comments.getKey()
-                  + " to " + comments.getValue());
-         }
+         // for (final Entry<Comment, ASTNode> comments : inverse.entrySet()) {
+         // System.out.println("Assigned: " + comments.getKey() + " to "
+         // + comments.getValue());
+         // }
          final JMLValidationContext jmlContext = new JMLValidationContext(
-               inverse, inverseTrailing, jmlCommentToInverse,
-               jmlCommentToInverseTrailing, source, jmlComments, ast, jmlParser);
+               inverse, inverseTrailing, jmlCommentToComment, source,
+               jmlComments, ast, jmlParser);
          final JMLValidationEngine engine = new JMLValidationEngine(
                JMLPreferencesHelper
                      .getProjectActiveJMLProfile(res.getProject()),

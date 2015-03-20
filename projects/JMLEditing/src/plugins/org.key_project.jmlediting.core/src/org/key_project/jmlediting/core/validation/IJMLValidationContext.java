@@ -1,7 +1,6 @@
 package org.key_project.jmlediting.core.validation;
 
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Comment;
@@ -48,29 +47,22 @@ public interface IJMLValidationContext {
 
    /**
     * Returns the Map that maps Leading Comments to ASTNodes
-    * 
+    *
     * @return the Map
     */
-   Map<Comment, ASTNode> getInverse();
+   ASTNode getNodeForLeadingComment(Comment c);
 
    /**
     * Returns the Map that maps Trailing Comments to ASTNodes
-    * 
+    *
     * @return the Map
     */
-   Map<Comment, ASTNode> getInverseTrailing();
-
-   /**
-    * Returns the Map that maps JMLComments to Leading Comments
-    * 
-    * @return the Map
-    */
-   Map<CommentRange, Comment> getJmlCommentToInverse();
+   ASTNode getNodeForTrailingComment(Comment c);
 
    /**
     * Returns the Map that maps JMLComments to Trailing Comments
-    * 
+    *
     * @return the Map
     */
-   Map<CommentRange, Comment> getJmlCommentToInverseTrailing();
+   Comment getCommentForJMLComment(CommentRange jmlComment);
 }
