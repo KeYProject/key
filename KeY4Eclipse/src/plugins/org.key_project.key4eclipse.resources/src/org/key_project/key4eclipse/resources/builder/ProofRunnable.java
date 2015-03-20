@@ -166,7 +166,7 @@ public class ProofRunnable implements Runnable {
       if(loadEnv != null){
          proof = loadEnv.getLoadedProof();
          if (proof != null){
-            if(error) {
+            if(error || loadEnv.getReplayResult().hasErrors()) {
                loadEnv.getProofControl().startAndWaitForAutoMode(proof);
             }
          }
