@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.EmptyKeywordContent;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.core.validation.IJMLValidator;
@@ -28,6 +30,8 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
     */
    private final Set<IUserDefinedKeywordContentDescription> supportedContentDescriptions;
 
+   private final Set<IKeywortSort> availableSorts;
+
    /**
     * Creates a new empty {@link AbstractJMLProfile}.
     */
@@ -35,6 +39,8 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
       this.supportedKeywords = new HashSet<IKeyword>();
       this.supportedContentDescriptions = new HashSet<IUserDefinedKeywordContentDescription>();
       this.supportedContentDescriptions.add(new EmptyKeywordContent());
+      this.availableSorts = new HashSet<IKeywortSort>();
+      this.availableSorts.add(ToplevelKeywordSort.INSTANCE);
    }
 
    @Override
@@ -45,6 +51,11 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
    @Override
    public Set<IUserDefinedKeywordContentDescription> getSupportedContentDescriptions() {
       return Collections.unmodifiableSet(this.supportedContentDescriptions);
+   }
+
+   @Override
+   public Set<IKeywortSort> getAvailableKeywordSorts() {
+      return Collections.unmodifiableSet(this.availableSorts);
    }
 
    /**
@@ -65,6 +76,10 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
     */
    protected final Set<IUserDefinedKeywordContentDescription> getSupportedContentDescriptionsInternal() {
       return this.supportedContentDescriptions;
+   }
+
+   protected Set<IKeywortSort> getAvailableKeywordSortsInternal() {
+      return this.availableSorts;
    }
 
    @Override
