@@ -5,29 +5,25 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Text;
 import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.InvalidProfileException;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.ui.util.JMLSWTUtil;
 
 public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
 
@@ -42,33 +38,48 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
    private static final String BUTTON_TEXT_ENABLE = "Enable";
 
    private Button enableDisableButton;
-   private Text profileNameText;
-   private Text profileIdText;
-   private Combo derivedFromCombo;
    private Table derivedTable;
 
    public JMLProfileEditDialog(final Shell parent, final IJMLProfile profile) {
-      super(parent, profile, "JML Profile Editor", "teste");
+      super(parent, profile, "JML Profile Editor", "Profile ID: "
+            + profile.getIdentifier());
    }
 
    @Override
-   protected Control createDialogArea(final Composite parent) {
-      final Composite composite = (Composite) super.createDialogArea(parent);
-
+   protected Control getDialogArea(final Composite composite) {
       final GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
       final Composite myComposite = new Composite(composite, SWT.NONE);
       myComposite.setLayoutData(data);
-      myComposite.setLayout(new GridLayout(3, false));
+      myComposite.setLayout(this.getLayout());
 
-      this.addProfileName(myComposite);
+      super.addProfileName(myComposite, true);
 
-      this.addProfileId(myComposite);
+      super.addDerivedFrom(myComposite, false);
 
-      this.addDerivedFrom(myComposite);
+      super.addKeywordTableLabel(myComposite,
+            "Keywords from parent profile: (Green: enabled; Red: disabled)");
 
-      this.addParentTableLabel(myComposite);
+      super.addKeywordTable(myComposite, 200);
+      super.getKeywordTable().addSelectionListener(new SelectionListener() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            final IKeyword selectedKeyword = JMLProfileEditDialog.this
+                  .getSelectedParentKeyword();
+            if (JMLProfileEditDialog.this.derivedProfile
+                  .isParentKeywordDisabled(selectedKeyword)) {
+               JMLProfileEditDialog.this.enableDisableButton
+                     .setText(BUTTON_TEXT_ENABLE);
+            }
+            else {
+               JMLProfileEditDialog.this.enableDisableButton
+                     .setText(BUTTON_TEXT_DISABLE);
+            }
+         }
 
-      this.addParentTable(myComposite);
+         @Override
+         public void widgetDefaultSelected(final SelectionEvent e) {
+         }
+      });
 
       this.addEnableDisableButton(myComposite);
 
@@ -77,10 +88,6 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
       this.addDerivedTable(myComposite);
 
       this.addDerivedButtons(myComposite);
-
-      if (super.getProfileToEdit() != null) {
-         this.setProfile(super.getProfileToEdit());
-      }
 
       return composite;
    }
@@ -91,7 +98,10 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
       derivedKeywordNewButton.addSelectionListener(new SelectionListener() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            // TODO
+            final JMLKeywordDialog dialog = new JMLKeywordDialog(
+                  JMLProfileEditDialog.this.getShell(),
+                  JMLProfileEditDialog.this.derivedProfile);
+            dialog.open();
          }
 
          @Override
@@ -103,7 +113,10 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
       derivedKeywordEditButton.addSelectionListener(new SelectionListener() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            // TODO
+            final JMLKeywordDialog dialog = new JMLKeywordDialog(
+                  JMLProfileEditDialog.this.getShell(),
+                  JMLProfileEditDialog.this.derivedProfile);
+            dialog.open();
          }
 
          @Override
@@ -157,49 +170,6 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
       });
    }
 
-   private void addParentTable(final Composite myComposite) {
-      GridData data;
-      data = new GridData(SWT.FILL, SWT.TOP, true, true);
-      data.heightHint = 200;
-      data.horizontalSpan = 2;
-      super.setKeywordTable(new Table(myComposite, SWT.H_SCROLL | SWT.V_SCROLL
-            | SWT.BORDER | SWT.FULL_SELECTION));
-      super.getKeywordTable().setLayoutData(data);
-      super.getKeywordTable().setHeaderVisible(true);
-      super.getKeywordTable().setLinesVisible(true);
-
-      super.getKeywordTable().addSelectionListener(new SelectionListener() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            final IKeyword selectedKeyword = JMLProfileEditDialog.this
-                  .getSelectedParentKeyword();
-            if (JMLProfileEditDialog.this.derivedProfile
-                  .isParentKeywordDisabled(selectedKeyword)) {
-               JMLProfileEditDialog.this.enableDisableButton
-                     .setText(BUTTON_TEXT_ENABLE);
-            }
-            else {
-               JMLProfileEditDialog.this.enableDisableButton
-                     .setText(BUTTON_TEXT_DISABLE);
-            }
-         }
-
-         @Override
-         public void widgetDefaultSelected(final SelectionEvent e) {
-         }
-      });
-
-      final TableColumn genericKeywordTableColumn = new TableColumn(
-            super.getKeywordTable(), SWT.LEFT);
-      genericKeywordTableColumn.setText("Keyword");
-      genericKeywordTableColumn.setWidth(150);
-
-      final TableColumn genericDescriptionTableColumn = new TableColumn(
-            super.getKeywordTable(), SWT.LEFT);
-      genericDescriptionTableColumn.setText("Description");
-      genericDescriptionTableColumn.setWidth(300);
-   }
-
    private void addDerivedTable(final Composite myComposite) {
       GridData data;
       data = new GridData(SWT.FILL, SWT.TOP, true, true);
@@ -235,88 +205,23 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
       genericDescriptionTableColumn.setWidth(300);
    }
 
-   private void addParentTableLabel(final Composite myComposite) {
-      GridData data;
-      data = new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1);
-      data.horizontalSpan = 3;
-      data.verticalIndent = 20;
-      final Label parentTableLabel = new Label(myComposite, SWT.NONE);
-      parentTableLabel
-            .setText("Keywords from parent profile: (Green: enabled; Red: disabled)");
-      parentTableLabel.setLayoutData(data);
-   }
+   @Override
+   public void setProfile(final IJMLProfile profile) {
+      super.setProfile(profile);
 
-   private void addDerivedTableLabel(final Composite myComposite) {
-      GridData data;
-      data = new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1);
-      data.horizontalSpan = 3;
-      data.verticalIndent = 20;
-      final Label derivedTableLabel = new Label(myComposite, SWT.NONE);
-      derivedTableLabel.setText("Custom Keywords: ");
-      derivedTableLabel.setLayoutData(data);
-   }
-
-   private void addDerivedFrom(final Composite myComposite) {
-      GridData data;
-      data = new GridData(SWT.FILL, SWT.TOP, false, true);
-      data.horizontalSpan = 1;
-      final Label derivedFromLabel = new Label(myComposite, SWT.NONE);
-      derivedFromLabel.setText("Derived from: ");
-      derivedFromLabel.setLayoutData(data);
-
-      data = new GridData(SWT.LEFT, SWT.TOP, true, true);
-      data.horizontalSpan = 2;
-      data.widthHint = 200;
-      this.derivedFromCombo = new Combo(myComposite, SWT.BORDER | SWT.READ_ONLY);
-      this.derivedFromCombo.setLayoutData(data);
-      this.derivedFromCombo.setItems(JMLSWTUtil.getProfiles4Combo());
-   }
-
-   private void addProfileId(final Composite myComposite) {
-      GridData data;
-      data = new GridData(SWT.FILL, SWT.TOP, false, true);
-      data.horizontalSpan = 1;
-      final Label profileIdLabel = new Label(myComposite, SWT.NONE);
-      profileIdLabel.setText("Profile ID: ");
-      profileIdLabel.setLayoutData(data);
-
-      data = new GridData(SWT.LEFT, SWT.TOP, true, true);
-      data.horizontalSpan = 2;
-      data.widthHint = 200;
-      this.profileIdText = new Text(myComposite, SWT.SINGLE | SWT.BORDER);
-      this.profileIdText.setLayoutData(data);
-      this.profileIdText.setEnabled(false);
-   }
-
-   private void addProfileName(final Composite myComposite) {
-      GridData data;
-      data = new GridData(SWT.FILL, SWT.TOP, false, true);
-      data.horizontalSpan = 1;
-      final Label profileNameLabel = new Label(myComposite, SWT.NONE);
-      profileNameLabel.setText("ProfileName: ");
-      profileNameLabel.setLayoutData(data);
-
-      data = new GridData(SWT.LEFT, SWT.TOP, true, true);
-      data.horizontalSpan = 2;
-      data.widthHint = 200;
-      this.profileNameText = new Text(myComposite, SWT.SINGLE | SWT.BORDER);
-      this.profileNameText.setLayoutData(data);
+      this.profileNameText.setText(profile.getName());
    }
 
    @Override
-   public void setProfile(final IJMLProfile profile) {
-      super.setProfileToEdit(profile);
-      this.derivedProfile = (IEditableDerivedProfile) profile;
+   protected void fillKeywordTable() {
+      this.derivedProfile = (IEditableDerivedProfile) this.getProfileToEdit();
 
       if (super.getKeywordTable() == null) {
          return;
       }
 
-      this.profileNameText.setText(profile.getName());
-      this.profileIdText.setText(profile.getIdentifier());
       this.derivedFromCombo.select(this
             .getComboIndexForProfile(this.derivedProfile.getParentProfile()));
-      this.derivedFromCombo.setEnabled(false);
 
       final Comparator<IKeyword> keywordComparator = new Comparator<IKeyword>() {
          @Override
@@ -355,20 +260,7 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
       }
       this.derivedTable.setEnabled(true);
       this.derivedTable.redraw();
-   }
-
-   private TableItem getSelectedParentTableItem() {
-      return JMLProfileEditDialog.this.getKeywordTable().getSelection()[0];
-   }
-
-   private IKeyword getSelectedParentKeyword() {
-      final TableItem selectedItem = this.getSelectedParentTableItem();
-      return (IKeyword) selectedItem.getData();
-   }
-
-   private TableItem getSelectedDerivedTableItem() {
-      return this.derivedTable.getSelection()[0];
-   }
+   };
 
    private IKeyword getSelectedDerivedKeyword() {
       final TableItem selectedItem = this.getSelectedDerivedTableItem();
@@ -384,9 +276,19 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
       return 0;
    }
 
+   private TableItem getSelectedDerivedTableItem() {
+      return this.derivedTable.getSelection()[0];
+   }
+
    @Override
    protected void okPressed() {
-      this.derivedProfile.setName(this.profileNameText.getText());
+      final String profileName = this.profileNameText.getText();
+
+      if (!this.checkProfileNameUnique(profileName)) {
+         this.setMessage(this.NAME_EXISTS, IMessageProvider.ERROR);
+         return;
+      }
+      this.derivedProfile.setName(profileName);
 
       try {
          JMLProfileManagement.instance().writeDerivedProfiles();

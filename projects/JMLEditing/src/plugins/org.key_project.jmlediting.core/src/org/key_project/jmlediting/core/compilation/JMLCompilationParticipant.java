@@ -1,7 +1,10 @@
 package org.key_project.jmlediting.core.compilation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -14,8 +17,10 @@ import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.compiler.ReconcileContext;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 import org.eclipse.jdt.internal.compiler.problem.ProblemSeverities;
+import org.eclipse.jdt.internal.corext.dom.GenericVisitor;
 import org.key_project.jmlediting.core.Activator;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.IJMLParser;
@@ -25,7 +30,6 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLValidationError;
-import org.key_project.jmlediting.core.validation.CommentVisitor;
 import org.key_project.jmlediting.core.validation.JMLValidationContext;
 import org.key_project.jmlediting.core.validation.JMLValidationEngine;
 import org.key_project.util.eclipse.Logger;
@@ -112,6 +116,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
        * Here the errors are reported as error markers which appear in the
        * problems list.
        */
+
       if (isBatch) {
          return;
       }
@@ -141,6 +146,61 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                JMLPreferencesHelper
                      .getProjectActiveJMLProfile(res.getProject()),
                jmlContext);
+         final List<Comment> commentList = ast.getCommentList();
+         final Map<Comment, ASTNode> inverse = new HashMap();
+         final Map<CommentRange, Comment> jmlCommentToInverse = new HashMap();
+         ast.accept(new GenericVisitor() {
+            @Override
+            protected boolean visitNode(final ASTNode node) {
+               // First Leading Comment
+               // Second Leading Comment
+               // ...
+               // AST Node
+               // ...
+               // Last trailing comment
+               final int start = ast.firstLeadingCommentIndex(node);
+               final int end = ast.lastTrailingCommentIndex(node);
+
+               if (start != -1) {
+                  int pos = start;
+                  while (pos < commentList.size()
+                        && commentList.get(pos).getStartPosition() < node
+                              .getStartPosition()) {
+                     assert !inverse.containsKey(commentList.get(pos));
+                     inverse.put(commentList.get(pos), node);
+                     for (final CommentRange c : jmlComments) {
+                        if (c.getBeginOffset() == commentList.get(pos)
+                              .getStartPosition()) {
+                           jmlCommentToInverse.put(c, commentList.get(pos));
+                        }
+
+                     }
+                     pos++;
+
+                  }
+
+               }
+
+               // Do something similar with trailing for the case, that we are
+               // interested in
+               // them because I think JML is always above
+               // Maybe store them in to maps to be able to distinguish them
+               // later
+               // So one map for leading and one fore trailing
+
+               return super.visitNode(node);
+            }
+         });
+
+         for (final Entry<Comment, ASTNode> comments : inverse.entrySet()) {
+            System.out.println("Assigned: " + comments.getKey() + " to "
+                  + comments.getValue());
+         }
+         for (final Entry<CommentRange, Comment> comments : jmlCommentToInverse
+               .entrySet()) {
+            System.out.println("Assigned JMLComment: " + comments.getKey()
+                  + " to " + comments.getValue());
+         }
          // End of Preparation
          final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
          for (final CommentRange jmlComment : jmlComments) {
@@ -161,12 +221,5 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          // TODO: Unify ErrorMarkerUpdater
          ValidationErrorMarkerUpdater.createErrorMarkers(res, source, errors);
       }
-   }
-
-   ASTNode findCorrespondingNode(final int offset, final int endOffset,
-         final ASTNode ast) {
-      final CommentVisitor visitor = new CommentVisitor(offset, endOffset);
-      ast.accept(visitor);
-      return visitor.getCorrespondingNode();
    }
 }

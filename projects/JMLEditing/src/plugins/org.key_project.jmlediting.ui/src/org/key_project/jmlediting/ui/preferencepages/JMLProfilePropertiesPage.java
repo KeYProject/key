@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jdt.internal.ui.preferences.PropertyAndPreferencePage;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -27,8 +28,9 @@ import org.key_project.jmlediting.core.profile.IProfileManagementListener;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.ui.preferencepages.profileDialog.AbstractJMLProfileDialog;
-import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLNewProfileDialog;
 import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLProfileEditDialog;
+import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLProfileNewDialog;
+import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLProfileViewDialog;
 
 /**
  * The {@link JMLProfilePropertiesPage} implements a properties and preferences
@@ -64,7 +66,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     * keep the difference between the selected (checked) Profile and the
     * selected (highlighted) profile to view/edit
     */
-   private IJMLProfile profile2View;
+   private IJMLProfile profile2EditView;
 
    /**
     * The {@link IPreferenceChangeListener} which listens to changes of the
@@ -189,7 +191,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       newButton.addSelectionListener(new SelectionListener() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            new JMLNewProfileDialog(JMLProfilePropertiesPage.this.getShell())
+            new JMLProfileNewDialog(JMLProfilePropertiesPage.this.getShell())
                   .open();
          }
 
@@ -201,17 +203,29 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          @Override
          public void widgetSelected(final SelectionEvent e) {
             AbstractJMLProfileDialog dialog;
+
+            if (JMLProfilePropertiesPage.this.profile2EditView == null) {
+               JMLProfilePropertiesPage.this.profile2EditView = JMLProfilePropertiesPage.this
+                     .getSelectedProfile();
+            }
+
             if (JMLProfilePropertiesPage.this
-                  .isProfileDerived(JMLProfilePropertiesPage.this.profile2View)) {
+                  .isProfileDerived(JMLProfilePropertiesPage.this.profile2EditView)) {
                dialog = new JMLProfileEditDialog(JMLProfilePropertiesPage.this
-                     .getShell(), JMLProfilePropertiesPage.this.profile2View);
+                     .getShell(),
+                     JMLProfilePropertiesPage.this.profile2EditView);
             }
             else {
-               dialog = new JMLProfileEditDialog(JMLProfilePropertiesPage.this
-                     .getShell(), JMLProfilePropertiesPage.this.profile2View);
+               dialog = new JMLProfileViewDialog(JMLProfilePropertiesPage.this
+                     .getShell(),
+                     JMLProfilePropertiesPage.this.profile2EditView);
             }
-            dialog.setProfile(JMLProfilePropertiesPage.this.profile2View);
             dialog.open();
+            // updates the table after closing editDialog with OK
+            if (dialog instanceof JMLProfileEditDialog
+                  && dialog.getReturnCode() == Window.OK) {
+               JMLProfilePropertiesPage.this.fillTable();
+            }
          }
 
          @Override
@@ -284,7 +298,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
             }
             else {
                JMLProfilePropertiesPage.this.updateEditViewButtonLabel(profile);
-               JMLProfilePropertiesPage.this.profile2View = profile;
+               JMLProfilePropertiesPage.this.profile2EditView = profile;
             }
          }
       });
@@ -313,11 +327,6 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
    private boolean isProfileDerived(final IJMLProfile profile) {
       return profile instanceof IDerivedProfile;
-   }
-
-   private IJMLProfile getProfileForTableItem(final TableItem item) {
-      return JMLProfilePropertiesPage.this.allProfiles
-            .get(JMLProfilePropertiesPage.this.profilesListTable.indexOf(item));
    }
 
    private void updateEditViewButtonLabel(final IJMLProfile profile) {

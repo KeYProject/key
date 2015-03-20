@@ -5,8 +5,17 @@ import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.profile.jmlref.parser.UnarySpecExpressionArgParser;
 
+/**
+ * The singleton keyword for KeY.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public class SingletonKeyword extends AbstractKeyword {
 
+   /**
+    * Creates a new singleton keyword instance.
+    */
    public SingletonKeyword() {
       super("\\singleton");
    }
