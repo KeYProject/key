@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLValidationError;
 
 /**
@@ -51,11 +52,12 @@ public class JMLValidationEngine {
     *         emptylist if all specifications are valid (or could not be checked
     *         because there was no validator)
     */
-   public List<JMLValidationError> validateComment(final IASTNode c) {
+   public List<JMLValidationError> validateComment(final CommentRange c,
+         final IASTNode node) {
       final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
       final Set<IJMLValidator> validator = this.activeProfile.getValidators();
       for (final IJMLValidator jmlValidator : validator) {
-         errors.addAll(jmlValidator.validate(this.context, c));
+         errors.addAll(jmlValidator.validate(c, this.context, node));
 
       }
       return errors;
