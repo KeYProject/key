@@ -25,12 +25,16 @@ public class KeyAccessibleKeyword extends AccessibleKeyword {
          protected ParseFunction createContentParseFunction(
                final IJMLExpressionProfile profile) {
             final ExpressionParser expr = new ExpressionParser(profile);
+            final ParseFunction measuredBy = seq(
+                  keywords(AccessibleMeasuredByKeyword.class, profile),
+                  expr.exprList());
             final ParseFunction content = alt(
                   keywords(StoreRefKeywordSort.INSTANCE, profile),
-                  expr.exprList());
-            return alt(
-                  seq(alt(ident(), keywords(InvKeyword.class, profile)),
-                        constant(":"), content), content);
+                  seq(expr.exprList(), opt(measuredBy)));
+            final ParseFunction identAccess = seq(
+                  alt(ident(), keywords(InvKeyword.class, profile)),
+                  constant(":"), content);
+            return alt(identAccess, content);
          }
 
       };

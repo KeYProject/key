@@ -44,12 +44,18 @@ public class KeyAccessibleTest {
       this.testParse("assignable \\less_than_nothing;");
    }
 
+   @Test
+   public void parseAccessibleMeasuredBy() {
+      this.testParse("accessible  \\inv: x,t,r \\measured_by  y,d,x;");
+   }
+
    private void testParse(final String text) {
       try {
          ParserTestUtils.testParseComplete(text, KeyProfileTestUtils
                .keyProfile().createParser());
       }
       catch (final ParserException e) {
+         e.printStackTrace();
          fail(e.getMessage());
       }
    }

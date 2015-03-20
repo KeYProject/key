@@ -37,6 +37,7 @@ import org.key_project.jmlediting.profile.key.locset.ReachLocsKeyword;
 import org.key_project.jmlediting.profile.key.locset.SetMinusOperatorKeyword;
 import org.key_project.jmlediting.profile.key.locset.SetUnionOperatorKeyword;
 import org.key_project.jmlediting.profile.key.locset.SubsetKeyword;
+import org.key_project.jmlediting.profile.key.other.AccessibleMeasuredByKeyword;
 import org.key_project.jmlediting.profile.key.other.DynamicLogicPrimary;
 import org.key_project.jmlediting.profile.key.other.IndexKeyword;
 import org.key_project.jmlediting.profile.key.other.InvKeyword;
@@ -89,7 +90,8 @@ public class KeyProfile extends JMLReferenceProfile {
             new KeyAssignableKeyword());
       replace(supportedKeywords, AccessibleKeyword.class,
             new KeyAccessibleKeyword());
-      supportedKeywords.add(new LessThanNothingKeyword());
+      supportedKeywords.addAll(Arrays.asList(new AccessibleMeasuredByKeyword(),
+            new LessThanNothingKeyword()));
 
       // Key specific behaviors
       supportedKeywords.addAll(Arrays.asList(new BreakBehaviorKeyword(),
