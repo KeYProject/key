@@ -8,7 +8,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Ex
 
 /**
  * A parser for trinary expression arguments.
- * 
+ *
  * @author Moritz Lichter
  *
  */
@@ -24,7 +24,7 @@ public class TrinarySpecExpressionArgParser extends
 
    @Override
    public String getDescription() {
-      return "( <expression> , <expression> , <expression> )";
+      return "'(' <expression> ',' <expression> ',' <expression> ')'";
    }
 
 }

@@ -11,7 +11,8 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefL
  * @author Moritz Lichter
  *
  */
-public class StoreRefKeywordContentParser extends SemicolonClosedKeywordParser {
+public class StoreRefKeywordContentParser extends
+      JMLRefUserParseFunctionKeywordParser {
 
    /**
     * Stores whether informal descriptions are allowed as storage locations.
@@ -30,9 +31,19 @@ public class StoreRefKeywordContentParser extends SemicolonClosedKeywordParser {
    }
 
    @Override
-   protected ParseFunction createContentParseFunction(
+   protected ParseFunction createParseFunction(
          final IJMLExpressionProfile profile) {
       return new StoreRefListParser(profile, this.allowInformalDescription);
+   }
+
+   @Override
+   public String getDescription() {
+      if (this.allowInformalDescription) {
+         return "<store-ref-list with informal descriptions>";
+      }
+      else {
+         return "<store-ref-list>";
+      }
    }
 
 }

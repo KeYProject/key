@@ -3,7 +3,7 @@ package org.key_project.jmlediting.profile.jmlref.primary;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
-import org.key_project.jmlediting.profile.jmlref.parser.BracketsTypeParser;
+import org.key_project.jmlediting.profile.jmlref.parser.TypeArgParser;
 
 /**
  * The implementation of the \type primary.
@@ -34,7 +34,7 @@ public class TypeKeyword extends AbstractKeyword {
 
    @Override
    public IKeywordParser createParser() {
-      return new BracketsTypeParser();
+      return new TypeArgParser();
    }
 
 }

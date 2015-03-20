@@ -2,6 +2,7 @@ package org.key_project.jmlediting.profile.jmlref.spec_keyword;
 
 import org.key_project.jmlediting.core.profile.syntax.IKeywordAutoProposer;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.parser.JMLRefParseFunctionKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.parser.StoreRefKeywordContentParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefKeywordProposer;
 
@@ -29,7 +30,8 @@ public abstract class StoreRefContainerKeyword extends
 
    @Override
    public IKeywordParser createParser() {
-      return new StoreRefKeywordContentParser(true);
+      return JMLRefParseFunctionKeywordParser
+            .semicolonClosed(new StoreRefKeywordContentParser(true));
    }
 
    @Override

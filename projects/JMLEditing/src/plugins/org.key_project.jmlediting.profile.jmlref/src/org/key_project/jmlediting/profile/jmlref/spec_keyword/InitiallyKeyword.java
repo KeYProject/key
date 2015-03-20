@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword;
 
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.parser.JMLRefParseFunctionKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.parser.PredicateContentParser;
 
 /**
@@ -27,7 +28,8 @@ public class InitiallyKeyword extends AbstractGenericSpecificationKeyword {
 
    @Override
    public IKeywordParser createParser() {
-      return new PredicateContentParser();
+      return JMLRefParseFunctionKeywordParser
+            .semicolonClosed(new PredicateContentParser());
    }
 
 }

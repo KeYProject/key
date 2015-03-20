@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword;
 
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.parser.JMLRefParseFunctionKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.parser.PredicateOtNotSpecifiedParser;
 
 /**
@@ -26,7 +27,8 @@ public class DivergesKeyword extends AbstractGenericSpecificationKeyword {
 
    @Override
    public IKeywordParser createParser() {
-      return new PredicateOtNotSpecifiedParser();
+      return JMLRefParseFunctionKeywordParser
+            .semicolonClosed(new PredicateOtNotSpecifiedParser());
    }
 
 }

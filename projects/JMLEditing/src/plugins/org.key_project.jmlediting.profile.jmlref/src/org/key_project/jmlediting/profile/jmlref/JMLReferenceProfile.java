@@ -14,6 +14,7 @@ import org.key_project.jmlediting.core.validation.IJMLValidator;
 import org.key_project.jmlediting.profile.jmlref.behavior.BehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.ExceptionalBehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.NormalBehaviorKeyword;
+import org.key_project.jmlediting.profile.jmlref.bound_mod.BoundVarModifierKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.bound_mod.NonNullBoundModKeyword;
 import org.key_project.jmlediting.profile.jmlref.bound_mod.NullableBoundModKeyword;
 import org.key_project.jmlediting.profile.jmlref.loop.DecreasingKeyword;
@@ -30,11 +31,17 @@ import org.key_project.jmlediting.profile.jmlref.other.NonNullKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.NullableKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.PureKeyword;
 import org.key_project.jmlediting.profile.jmlref.parser.BinarySpecExpressionArgParser;
+import org.key_project.jmlediting.profile.jmlref.parser.PredicateContentParser;
+import org.key_project.jmlediting.profile.jmlref.parser.PredicateOtNotSpecifiedParser;
+import org.key_project.jmlediting.profile.jmlref.parser.SpecExpressionContentParser;
+import org.key_project.jmlediting.profile.jmlref.parser.StoreRefKeywordContentParser;
 import org.key_project.jmlediting.profile.jmlref.parser.TrinarySpecExpressionArgParser;
+import org.key_project.jmlediting.profile.jmlref.parser.TypeArgParser;
 import org.key_project.jmlediting.profile.jmlref.parser.UnarySpecExpressionArgParser;
 import org.key_project.jmlediting.profile.jmlref.primary.FreshKeyword;
 import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
 import org.key_project.jmlediting.profile.jmlref.primary.InvariantForKeyword;
+import org.key_project.jmlediting.profile.jmlref.primary.JMLPrimaryKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.primary.KeywordJMLPrimary;
 import org.key_project.jmlediting.profile.jmlref.primary.ReachKeyword;
 import org.key_project.jmlediting.profile.jmlref.primary.TypeKeyword;
@@ -45,6 +52,7 @@ import org.key_project.jmlediting.profile.jmlref.quantifier.MaxQuantifierKeyword
 import org.key_project.jmlediting.profile.jmlref.quantifier.MinQuantifierKeyword;
 import org.key_project.jmlediting.profile.jmlref.quantifier.NumOfQuantifierKeyword;
 import org.key_project.jmlediting.profile.jmlref.quantifier.ProductQuantifierKeyword;
+import org.key_project.jmlediting.profile.jmlref.quantifier.QuantifierKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.quantifier.QuantifierPrimary;
 import org.key_project.jmlediting.profile.jmlref.quantifier.SumQuantifierKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
@@ -57,17 +65,20 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.MeasuredByKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.SignalsKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.SignalsOnlyKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.requires.RequiresKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.requires.RequiresValueKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.requires.SameKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.OldKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ResultKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.EverythingKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.NotSpecifiedKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.NothingKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.spec_statement.BreakClauseKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_statement.ContinuesClauseKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_statement.ReturnsClauseKeyword;
 import org.key_project.jmlediting.profile.jmlref.type.BigIntKeyword;
 import org.key_project.jmlediting.profile.jmlref.type.RealKeyword;
+import org.key_project.jmlediting.profile.jmlref.type.TypeKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.validator.LoopInvariantValidator;
 import org.key_project.jmlediting.profile.jmlref.visibility.FinalKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.InstanceKeyword;
@@ -138,7 +149,20 @@ public class JMLReferenceProfile extends AbstractJMLProfile implements
       this.getSupportedContentDescriptionsInternal().addAll(
             Arrays.asList(new UnarySpecExpressionArgParser(),
                   new BinarySpecExpressionArgParser(),
-                  new TrinarySpecExpressionArgParser()));
+                  new TrinarySpecExpressionArgParser(),
+                  new PredicateContentParser(),
+                  new PredicateOtNotSpecifiedParser(), new TypeArgParser(),
+                  new StoreRefKeywordContentParser(true),
+                  new StoreRefKeywordContentParser(false),
+                  new SpecExpressionContentParser()));
+
+      // Register supported sorts
+      this.getAvailableKeywordSortsInternal().addAll(
+            Arrays.asList(BoundVarModifierKeywordSort.INSTANCE,
+                  JMLPrimaryKeywordSort.INSTANCE,
+                  QuantifierKeywordSort.INSTANCE,
+                  RequiresValueKeywordSort.INSTANCE,
+                  StoreRefKeywordSort.INSTANCE, TypeKeywordSort.INSTANCE));
 
    }
 

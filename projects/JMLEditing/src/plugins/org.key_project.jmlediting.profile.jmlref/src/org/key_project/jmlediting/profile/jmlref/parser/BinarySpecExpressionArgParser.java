@@ -8,7 +8,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Ex
 
 /**
  * A parser for binary expression arguments in brackets.
- * 
+ *
  * @author Moritz Lichter
  *
  */
@@ -24,7 +24,7 @@ public class BinarySpecExpressionArgParser extends
 
    @Override
    public String getDescription() {
-      return "( <expression> , <expression> )";
+      return "'(' <expression> ',' <expression> ')'";
    }
 
 }

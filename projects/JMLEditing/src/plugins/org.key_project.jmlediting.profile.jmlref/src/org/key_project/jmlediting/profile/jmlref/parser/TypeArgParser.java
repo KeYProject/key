@@ -7,24 +7,21 @@ import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.SpecExpressionParser;
 
 /**
- * A parse for a list of expression arguments.
+ * A parser for a type argument.
  * 
  * @author Moritz Lichter
  *
  */
-public class SpecExpressionListArgParser extends
-      JMLRefUserParseFunctionKeywordParser {
-
+public class TypeArgParser extends JMLRefUserParseFunctionKeywordParser {
    @Override
    protected ParseFunction createParseFunction(
          final IJMLExpressionProfile profile) {
-      final SpecExpressionParser expr = new SpecExpressionParser(profile);
-      return brackets(expr.exprList());
+      final SpecExpressionParser parser = new SpecExpressionParser(profile);
+      return brackets(parser.typeSpec());
    }
 
    @Override
    public String getDescription() {
-      return "'(' <expression> ','? <expression>? ... ')'";
+      return "'(' <type> ')'";
    }
-
 }
