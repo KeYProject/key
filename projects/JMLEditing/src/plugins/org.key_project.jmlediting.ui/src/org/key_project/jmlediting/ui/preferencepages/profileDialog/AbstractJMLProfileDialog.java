@@ -3,8 +3,10 @@ package org.key_project.jmlediting.ui.preferencepages.profileDialog;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -32,7 +34,9 @@ import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.ui.util.JMLSWTUtil;
 
 public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
-   protected static final String PLEASE_RESOLVE = "Please resolve the errors before saving!";
+   protected final String NAME_EXISTS = "Profile Name already exists!";
+   protected final String PLEASE_SELECT = "Please select a profile to derive from!";
+   protected final String PLEASE_FILL = "Profile Name must not be empty!";
 
    private IJMLProfile profile;
 
@@ -146,8 +150,7 @@ public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
             | SWT.TOP);
       this.comboError.setImage(FieldDecorationRegistry.getDefault()
             .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR).getImage());
-      this.comboError
-            .setDescriptionText("Please select a profile to derive from!");
+      this.comboError.setDescriptionText(this.PLEASE_SELECT);
       this.comboError.show();
 
       this.derivedFromCombo.addModifyListener(new ModifyListener() {
@@ -185,8 +188,7 @@ public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
             SWT.RIGHT | SWT.TOP);
       this.profileNameError.setImage(FieldDecorationRegistry.getDefault()
             .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR).getImage());
-      this.profileNameError
-            .setDescriptionText("Profile name must not be empty!");
+      this.profileNameError.setDescriptionText(this.PLEASE_FILL);
       this.profileNameError.show();
 
       this.profileNameText.addModifyListener(new ModifyListener() {
@@ -195,7 +197,7 @@ public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
             if (AbstractJMLProfileDialog.this.profileNameText.getText()
                   .isEmpty()) {
                AbstractJMLProfileDialog.this.profileNameError
-                     .setDescriptionText("Profile name must not be empty!");
+                     .setDescriptionText(AbstractJMLProfileDialog.this.PLEASE_FILL);
                AbstractJMLProfileDialog.this.profileNameError.show();
             }
             else {
@@ -287,11 +289,9 @@ public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
       this.keywordTable.redraw();
    }
 
-   protected boolean checkProfileNameUnique(final String profileId) {
-      if (JMLProfileManagement.instance().getProfileFromIdentifier(profileId) != null) {
-         this.profileNameError
-               .setDescriptionText("Profile Name already exists!");
-         this.setMessage(PLEASE_RESOLVE, IMessageProvider.ERROR);
+   protected boolean checkProfileNameUnique(final String profileName) {
+      if (JMLProfileManagement.instance().getProfileFromName(profileName) != null) {
+         this.profileNameError.setDescriptionText(this.NAME_EXISTS);
          this.profileNameError.show();
          return false;
       }
@@ -303,7 +303,14 @@ public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
    }
 
    protected String generateId(final String profileName) {
-      return "user.defined.profile." + profileName.replaceAll("\\s", "");
+      String result = "user.defined.profile."
+            + profileName.replaceAll("\\s", "");
+      final Random rnd = new Random(new Date().getTime());
+      while (JMLProfileManagement.instance().getProfileFromIdentifier(result) != null) {
+         result += rnd.nextInt(9);
+      }
+
+      return result;
    }
 
 }

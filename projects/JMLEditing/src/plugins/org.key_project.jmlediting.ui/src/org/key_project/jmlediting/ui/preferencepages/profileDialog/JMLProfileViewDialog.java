@@ -15,7 +15,8 @@ public class JMLProfileViewDialog extends AbstractJMLProfileDialog {
          SWT.COLOR_RED);
 
    public JMLProfileViewDialog(final Shell parent, final IJMLProfile profile) {
-      super(parent, profile, "JML Profile Viewer", "");
+      super(parent, profile, "JML Profile Viewer", "Profile ID: "
+            + profile.getIdentifier());
    }
 
    @Override
