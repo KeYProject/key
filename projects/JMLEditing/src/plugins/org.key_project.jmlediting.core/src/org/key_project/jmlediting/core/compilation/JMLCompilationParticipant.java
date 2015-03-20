@@ -90,7 +90,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                         new String[] { error.getErrorMessage() },
                         new String[] { error.getErrorMessage() },
                         ProblemSeverities.Error, error.getErrorOffset(), error
-                              .getErrorOffset(), -1, -1));
+                        .getErrorOffset(), -1, -1));
                }
 
                // And now put the problems to the context to make them visible
@@ -140,24 +140,17 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                .createAST(null);
          final IJMLParser jmlParser = JMLPreferencesHelper
                .getProjectActiveJMLProfile(res.getProject()).createParser();
-         final JMLValidationContext jmlContext = new JMLValidationContext(
-               source, jmlComments, ast, jmlParser);
-         final JMLValidationEngine engine = new JMLValidationEngine(
-               JMLPreferencesHelper
-                     .getProjectActiveJMLProfile(res.getProject()),
-               jmlContext);
+
          final List<Comment> commentList = ast.getCommentList();
          final Map<Comment, ASTNode> inverse = new HashMap();
+         final Map<Comment, ASTNode> inverseTrailing = new HashMap();
          final Map<CommentRange, Comment> jmlCommentToInverse = new HashMap();
+         final Map<CommentRange, Comment> jmlCommentToInverseTrailing = new HashMap();
          ast.accept(new GenericVisitor() {
             @Override
             protected boolean visitNode(final ASTNode node) {
-               // First Leading Comment
-               // Second Leading Comment
-               // ...
-               // AST Node
-               // ...
-               // Last trailing comment
+               // Maps All Leading Comments to its node
+               // Also Maps JML comments to Comments, which are mapped to nodes
                final int start = ast.firstLeadingCommentIndex(node);
                final int end = ast.lastTrailingCommentIndex(node);
 
@@ -165,12 +158,13 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                   int pos = start;
                   while (pos < commentList.size()
                         && commentList.get(pos).getStartPosition() < node
-                              .getStartPosition()) {
+                        .getStartPosition()) {
                      assert !inverse.containsKey(commentList.get(pos));
                      inverse.put(commentList.get(pos), node);
                      for (final CommentRange c : jmlComments) {
                         if (c.getBeginOffset() == commentList.get(pos)
                               .getStartPosition()) {
+                           assert !jmlCommentToInverse.containsKey(c);
                            jmlCommentToInverse.put(c, commentList.get(pos));
                         }
 
@@ -180,13 +174,26 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                   }
 
                }
+               // Same as above for Trailing Comments
+               if (end != -1) {
+                  int pos = end;
+                  while (pos >= 0
+                        && commentList.get(pos).getStartPosition() > node
+                              .getStartPosition()) {
+                     assert !inverseTrailing.containsKey(commentList.get(pos));
+                     inverseTrailing.put(commentList.get(pos), node);
+                     for (final CommentRange c : jmlComments) {
+                        if (c.getBeginOffset() == commentList.get(pos)
+                              .getStartPosition()) {
+                           assert !jmlCommentToInverseTrailing.containsKey(c);
+                           jmlCommentToInverseTrailing.put(c,
+                                 commentList.get(pos));
+                        }
 
-               // Do something similar with trailing for the case, that we are
-               // interested in
-               // them because I think JML is always above
-               // Maybe store them in to maps to be able to distinguish them
-               // later
-               // So one map for leading and one fore trailing
+                     }
+                     pos--;
+                  }
+               }
 
                return super.visitNode(node);
             }
@@ -201,6 +208,13 @@ public class JMLCompilationParticipant extends CompilationParticipant {
             System.out.println("Assigned JMLComment: " + comments.getKey()
                   + " to " + comments.getValue());
          }
+         final JMLValidationContext jmlContext = new JMLValidationContext(
+               inverse, inverseTrailing, jmlCommentToInverse,
+               jmlCommentToInverseTrailing, source, jmlComments, ast, jmlParser);
+         final JMLValidationEngine engine = new JMLValidationEngine(
+               JMLPreferencesHelper
+               .getProjectActiveJMLProfile(res.getProject()),
+               jmlContext);
          // End of Preparation
          final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
          for (final CommentRange jmlComment : jmlComments) {
