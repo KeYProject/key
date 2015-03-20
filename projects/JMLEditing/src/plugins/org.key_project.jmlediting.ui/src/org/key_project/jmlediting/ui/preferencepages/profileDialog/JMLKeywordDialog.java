@@ -1,5 +1,9 @@
 package org.key_project.jmlediting.ui.preferencepages.profileDialog;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
@@ -12,30 +16,91 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
+import org.key_project.jmlediting.core.profile.InvalidProfileException;
+import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
+import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
+import org.key_project.jmlediting.core.profile.syntax.user.UserDefinedKeyword;
 
 public class JMLKeywordDialog extends TitleAreaDialog {
    private final IEditableDerivedProfile derivedProfile;
 
+   private final IUserDefinedKeyword keyword;
+
    private Text keywordText;
    private Combo contentCombo;
-   private Combo endingCharacterCombo;
+   private Combo closingCharacterCombo;
    private Combo sortCombo;
    private Text descriptionText;
 
    public JMLKeywordDialog(final Shell parent,
-         final IEditableDerivedProfile derivedProfile) {
+         final IEditableDerivedProfile derivedProfile,
+         final IUserDefinedKeyword keyword) {
       super(parent);
       this.derivedProfile = derivedProfile;
+      this.keyword = keyword;
       this.setHelpAvailable(false);
    }
 
    @Override
    public void create() {
       super.create();
-      this.setTitle("Dummy Title");
-      this.setMessage("Only a Dummy", IMessageProvider.WARNING);
+      if (this.keyword != null) {
+         this.setTitle("Edit Keyword");
+      }
+      else {
+         this.setTitle("Create New Keyword");
+      }
+      this.setMessage("", IMessageProvider.NONE);
+   }
+
+   private void fillView() {
+      String formattedKeyword = "";
+      final Iterator<String> iterator = this.keyword.getKeywords().iterator();
+      while (iterator.hasNext()) {
+         formattedKeyword += iterator.next();
+         if (iterator.hasNext()) {
+            formattedKeyword += ", ";
+         }
+      }
+      this.keywordText.setText(formattedKeyword);
+
+      for (int i = 0; i < this.contentCombo.getItemCount(); i++) {
+         final IUserDefinedKeywordContentDescription content = (IUserDefinedKeywordContentDescription) this.contentCombo
+               .getData(this.contentCombo.getItem(i));
+         if (content.getId().equals(
+               this.keyword.getContentDescription().getId())) {
+            this.contentCombo.select(i);
+            break;
+         }
+      }
+
+      if (this.keyword.getClosingCharacter() == null) {
+         this.closingCharacterCombo.select(0);
+      }
+      else {
+         for (int i = 1; i < this.closingCharacterCombo.getItemCount(); i++) {
+            final Character endingChar = this.closingCharacterCombo.getItem(i)
+                  .charAt(0);
+            if (endingChar.equals(this.keyword.getClosingCharacter())) {
+               this.closingCharacterCombo.select(i);
+               break;
+            }
+         }
+      }
+
+      for (int i = 0; i < this.sortCombo.getItemCount(); i++) {
+         final IKeywordSort sort = (IKeywordSort) this.sortCombo
+               .getData(this.sortCombo.getItem(i));
+         if (sort.getDescription().equals(
+               this.keyword.getSort().getDescription())) {
+            this.sortCombo.select(i);
+            break;
+         }
+      }
+
+      this.descriptionText.setText(this.keyword.getDescription());
    }
 
    @Override
@@ -68,6 +133,10 @@ public class JMLKeywordDialog extends TitleAreaDialog {
 
       this.fillCombos();
 
+      if (this.keyword != null) {
+         this.fillView();
+      }
+
       return composite;
    }
 
@@ -75,7 +144,6 @@ public class JMLKeywordDialog extends TitleAreaDialog {
       for (final IUserDefinedKeywordContentDescription content : this.derivedProfile
             .getSupportedContentDescriptions()) {
          this.contentCombo.add(content.getDescription());
-         System.out.println("added: \"" + content.getDescription() + "\"");
          this.contentCombo.setData(content.getDescription(), content);
       }
 
@@ -85,9 +153,9 @@ public class JMLKeywordDialog extends TitleAreaDialog {
          this.sortCombo.setData(sort.getDescription(), sort);
       }
 
-      this.endingCharacterCombo.add("");
-      this.endingCharacterCombo.add(";");
-      this.endingCharacterCombo.select(0);
+      this.closingCharacterCombo.add("");
+      this.closingCharacterCombo.add(";");
+      this.closingCharacterCombo.select(0);
    }
 
    private void addDescriptionText(final Composite myComposite) {
@@ -101,9 +169,9 @@ public class JMLKeywordDialog extends TitleAreaDialog {
    private void addEndingCharacterCombo(final Composite myComposite) {
       final GridData data = new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1);
       data.horizontalIndent = 20;
-      this.endingCharacterCombo = new Combo(myComposite, SWT.BORDER
+      this.closingCharacterCombo = new Combo(myComposite, SWT.BORDER
             | SWT.READ_ONLY);
-      this.endingCharacterCombo.setLayoutData(data);
+      this.closingCharacterCombo.setLayoutData(data);
    }
 
    private void addSortCombo(final Composite myComposite) {
@@ -140,6 +208,47 @@ public class JMLKeywordDialog extends TitleAreaDialog {
 
    @Override
    protected void okPressed() {
+      final String formattedKeyword = this.keywordText.getText();
+      final Set<String> keywords = new HashSet<String>();
+      for (final String kw : formattedKeyword.split(",\\s")) {
+         keywords.add(kw);
+      }
+
+      final IKeywordSort sort = (IKeywordSort) this.sortCombo
+            .getData(this.sortCombo.getItem(this.sortCombo.getSelectionIndex()));
+
+      final IUserDefinedKeywordContentDescription contentDescription = (IUserDefinedKeywordContentDescription) this.contentCombo
+            .getData(this.contentCombo.getItem(this.contentCombo
+                  .getSelectionIndex()));
+
+      final String description = this.descriptionText.getText();
+
+      final Character closingCharacter;
+      if (this.closingCharacterCombo.getSelectionIndex() == 0) {
+         closingCharacter = null;
+      }
+      else {
+         closingCharacter = this.closingCharacterCombo.getItem(
+               this.closingCharacterCombo.getSelectionIndex()).charAt(0);
+      }
+
+      if (this.keyword != null) {
+         this.derivedProfile.removeKeyword(this.keyword);
+      }
+      final IUserDefinedKeyword keyword2Save = new UserDefinedKeyword(keywords,
+            sort, contentDescription, description, closingCharacter);
+
+      this.derivedProfile.addKeyword(keyword2Save);
+
+      try {
+         JMLProfileManagement.instance().writeDerivedProfiles();
+      }
+      catch (final InvalidProfileException ipe) {
+         ipe.printStackTrace();
+         this.setMessage(ipe.getMessage(), IMessageProvider.ERROR);
+         return;
+      }
+
       super.okPressed();
    }
 }
