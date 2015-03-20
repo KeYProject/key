@@ -56,7 +56,6 @@ public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
       this.title = title;
       this.message = message;
       this.profile = profile;
-      this.setShellStyle(super.getShellStyle() | SWT.RESIZE | SWT.FILL);
       this.setHelpAvailable(false);
    }
 
