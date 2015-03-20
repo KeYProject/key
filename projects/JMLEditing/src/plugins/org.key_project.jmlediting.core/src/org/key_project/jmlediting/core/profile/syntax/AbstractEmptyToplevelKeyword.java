@@ -9,7 +9,7 @@ public abstract class AbstractEmptyToplevelKeyword extends AbstractEmptyKeyword 
    }
 
    @Override
-   public IKeywortSort getSort() {
+   public IKeywordSort getSort() {
       return ToplevelKeywordSort.INSTANCE;
    }
 

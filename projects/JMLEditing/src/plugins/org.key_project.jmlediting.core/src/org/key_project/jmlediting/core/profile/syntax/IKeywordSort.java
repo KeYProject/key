@@ -1,7 +1,7 @@
 package org.key_project.jmlediting.core.profile.syntax;
 
 /**
- * The {@link IKeywortSort} defines the sort of a keyword, for example
+ * The {@link IKeywordSort} defines the sort of a keyword, for example
  * ToplevelSort or QuantifierSort. Each non abstract implementing class is
  * forces to have a public static final field named INSTANCE which contains the
  * single object created by this sort class.
@@ -9,7 +9,7 @@ package org.key_project.jmlediting.core.profile.syntax;
  * @author Moritz Lichter
  *
  */
-public interface IKeywortSort {
+public interface IKeywordSort {
 
    /**
     * Returns a human readable and understandable description of the sort. It
@@ -28,6 +28,6 @@ public interface IKeywortSort {
     *           the sort to check against
     * @return whether this sort covers the other
     */
-   boolean covers(IKeywortSort other);
+   boolean covers(IKeywordSort other);
 
 }

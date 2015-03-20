@@ -1,7 +1,7 @@
 package org.key_project.jmlediting.profile.key.seq;
 
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 
 /**
  * The seq def keyowrd. Does not belong to any sort because it is explicitly
@@ -25,7 +25,7 @@ public class SeqDefKeyword extends AbstractEmptyKeyword {
    }
 
    @Override
-   public IKeywortSort getSort() {
+   public IKeywordSort getSort() {
       return null;
    }
 

@@ -7,7 +7,7 @@ import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 import org.key_project.jmlediting.profile.jmlref.parser.JMLRefParseFunctionKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.primary.JMLPrimaryKeywordSort;
@@ -42,7 +42,7 @@ public class InfiniteUnionKeyword extends AbstractKeyword {
    }
 
    @Override
-   public IKeywortSort getSort() {
+   public IKeywordSort getSort() {
       return JMLPrimaryKeywordSort.INSTANCE;
    }
 

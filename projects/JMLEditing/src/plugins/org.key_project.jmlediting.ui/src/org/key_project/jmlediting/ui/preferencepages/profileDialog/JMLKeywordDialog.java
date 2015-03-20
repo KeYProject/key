@@ -12,7 +12,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
-import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
+import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 
 public class JMLKeywordDialog extends TitleAreaDialog {
    private final IEditableDerivedProfile derivedProfile;
@@ -65,7 +66,28 @@ public class JMLKeywordDialog extends TitleAreaDialog {
 
       this.addDescriptionText(myComposite);
 
+      this.fillCombos();
+
       return composite;
+   }
+
+   private void fillCombos() {
+      for (final IUserDefinedKeywordContentDescription content : this.derivedProfile
+            .getSupportedContentDescriptions()) {
+         this.contentCombo.add(content.getDescription());
+         System.out.println("added: \"" + content.getDescription() + "\"");
+         this.contentCombo.setData(content.getDescription(), content);
+      }
+
+      for (final IKeywordSort sort : this.derivedProfile
+            .getAvailableKeywordSorts()) {
+         this.sortCombo.add(sort.getDescription());
+         this.sortCombo.setData(sort.getDescription(), sort);
+      }
+
+      this.endingCharacterCombo.add("");
+      this.endingCharacterCombo.add(";");
+      this.endingCharacterCombo.select(0);
    }
 
    private void addDescriptionText(final Composite myComposite) {
@@ -82,21 +104,12 @@ public class JMLKeywordDialog extends TitleAreaDialog {
       this.endingCharacterCombo = new Combo(myComposite, SWT.BORDER
             | SWT.READ_ONLY);
       this.endingCharacterCombo.setLayoutData(data);
-
-      this.endingCharacterCombo.add("");
-      this.endingCharacterCombo.add(";");
-      this.endingCharacterCombo.add("?");
-      this.endingCharacterCombo.select(0);
    }
 
    private void addSortCombo(final Composite myComposite) {
       final GridData data = new GridData(SWT.LEFT, SWT.TOP, false, false, 3, 1);
       this.sortCombo = new Combo(myComposite, SWT.BORDER | SWT.READ_ONLY);
       this.sortCombo.setLayoutData(data);
-
-      this.sortCombo.add(ToplevelKeywordSort.INSTANCE.getDescription());
-      this.sortCombo.add("?");
-      this.sortCombo.select(0);
    }
 
    private void addContentCombo(final Composite myComposite) {
@@ -104,11 +117,6 @@ public class JMLKeywordDialog extends TitleAreaDialog {
       data.horizontalIndent = 20;
       this.contentCombo = new Combo(myComposite, SWT.BORDER | SWT.READ_ONLY);
       this.contentCombo.setLayoutData(data);
-
-      this.contentCombo.add("<Expression>");
-      this.contentCombo.add("<StoreRefList>");
-      this.contentCombo.add(">AllFakeDummies<");
-      this.contentCombo.select(0);
    }
 
    private void addLabel(final Composite myComposite, final String text,

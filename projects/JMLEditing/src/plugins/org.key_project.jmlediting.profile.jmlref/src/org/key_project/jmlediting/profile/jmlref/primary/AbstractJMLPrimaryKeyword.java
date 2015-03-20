@@ -3,7 +3,7 @@ package org.key_project.jmlediting.profile.jmlref.primary;
 import java.util.Set;
 
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 
 public abstract class AbstractJMLPrimaryKeyword extends AbstractKeyword {
 
@@ -19,7 +19,7 @@ public abstract class AbstractJMLPrimaryKeyword extends AbstractKeyword {
    }
 
    @Override
-   public IKeywortSort getSort() {
+   public IKeywordSort getSort() {
       return JMLPrimaryKeywordSort.INSTANCE;
    }
 

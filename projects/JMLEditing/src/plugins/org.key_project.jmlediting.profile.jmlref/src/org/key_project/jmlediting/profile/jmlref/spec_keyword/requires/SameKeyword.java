@@ -1,7 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword.requires;
 
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 
 /**
  * Implementation for the \same keyword.
@@ -24,7 +24,7 @@ public class SameKeyword extends AbstractEmptyKeyword {
    }
 
    @Override
-   public IKeywortSort getSort() {
+   public IKeywordSort getSort() {
       return RequiresValueKeywordSort.INSTANCE;
    }
 

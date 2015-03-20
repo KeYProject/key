@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 
 public class JMLProfileHelper {
@@ -66,7 +66,7 @@ public class JMLProfileHelper {
     * @return the filtered Set of {@link IKeyword} which are sub sorts of sorts
     */
    public static Set<IKeyword> filterKeywords(final IJMLProfile profile,
-         final IKeywortSort sort) {
+         final IKeywordSort sort) {
       if (sort == null) {
          throw new IllegalArgumentException("Sort is not allowed to be null");
       }

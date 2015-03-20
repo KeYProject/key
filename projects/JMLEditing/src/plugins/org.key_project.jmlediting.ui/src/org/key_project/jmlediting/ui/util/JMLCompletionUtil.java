@@ -15,7 +15,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 
 /**
@@ -52,13 +52,13 @@ public final class JMLCompletionUtil {
     *           the Image to be displayed in front of the proposal, null for no
     *           Image
     * @param sort
-    *           the {@link IKeywortSort} of which all proposals have to be
+    *           the {@link IKeywordSort} of which all proposals have to be
     * @return List<{@link ICompletionProposal}> the computed standardProposals
     */
    public static List<ICompletionProposal> getKeywordProposals(
          final JavaContentAssistInvocationContext context,
          final String proposalPrefix, final Image proposalImage,
-         final IKeywortSort sort) {
+         final IKeywordSort sort) {
       if (sort == null) {
          throw new IllegalArgumentException("Sort may not be null!");
       }

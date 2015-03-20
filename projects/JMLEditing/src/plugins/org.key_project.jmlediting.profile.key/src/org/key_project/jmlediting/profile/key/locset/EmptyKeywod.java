@@ -1,7 +1,7 @@
 package org.key_project.jmlediting.profile.key.locset;
 
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.primary.JMLPrimaryKeywordSort;
 
 public class EmptyKeywod extends AbstractEmptyKeyword {
@@ -16,7 +16,7 @@ public class EmptyKeywod extends AbstractEmptyKeyword {
    }
 
    @Override
-   public IKeywortSort getSort() {
+   public IKeywordSort getSort() {
       return JMLPrimaryKeywordSort.INSTANCE;
    }
 
