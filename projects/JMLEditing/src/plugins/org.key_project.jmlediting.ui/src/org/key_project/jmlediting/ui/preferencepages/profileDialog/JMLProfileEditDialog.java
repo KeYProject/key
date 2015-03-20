@@ -98,7 +98,10 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
       derivedKeywordNewButton.addSelectionListener(new SelectionListener() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            // TODO
+            final JMLKeywordDialog dialog = new JMLKeywordDialog(
+                  JMLProfileEditDialog.this.getShell(),
+                  JMLProfileEditDialog.this.derivedProfile);
+            dialog.open();
          }
 
          @Override
@@ -110,7 +113,10 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
       derivedKeywordEditButton.addSelectionListener(new SelectionListener() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            // TODO
+            final JMLKeywordDialog dialog = new JMLKeywordDialog(
+                  JMLProfileEditDialog.this.getShell(),
+                  JMLProfileEditDialog.this.derivedProfile);
+            dialog.open();
          }
 
          @Override

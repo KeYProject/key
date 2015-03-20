@@ -133,7 +133,6 @@ public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
          final boolean enabled) {
       GridData data;
       data = new GridData(SWT.FILL, SWT.TOP, false, true);
-      data.horizontalSpan = 1;
       final Label derivedFromLabel = new Label(myComposite, SWT.NONE);
       derivedFromLabel.setText("Derived from: ");
       derivedFromLabel.setLayoutData(data);
@@ -177,8 +176,7 @@ public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
       profileNameLabel.setText("ProfileName: ");
       profileNameLabel.setLayoutData(data);
 
-      data = new GridData(SWT.LEFT, SWT.TOP, true, true);
-      data.horizontalSpan = 2;
+      data = new GridData(SWT.LEFT, SWT.TOP, true, true, 2, 1);
       data.widthHint = 200;
       this.profileNameText = new Text(myComposite, SWT.SINGLE | SWT.BORDER);
       this.profileNameText.setLayoutData(data);
@@ -210,8 +208,7 @@ public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
    protected void addKeywordTableLabel(final Composite myComposite,
          final String text) {
       GridData data;
-      data = new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1);
-      data.horizontalSpan = 3;
+      data = new GridData(SWT.LEFT, SWT.TOP, false, false, 3, 1);
       data.verticalIndent = 20;
       final Label keywordTableLabel = new Label(myComposite, SWT.NONE);
       keywordTableLabel.setText(text);
@@ -220,8 +217,7 @@ public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
 
    protected void addDerivedTableLabel(final Composite myComposite) {
       GridData data;
-      data = new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1);
-      data.horizontalSpan = 3;
+      data = new GridData(SWT.LEFT, SWT.TOP, false, false, 3, 1);
       data.verticalIndent = 20;
       final Label derivedTableLabel = new Label(myComposite, SWT.NONE);
       derivedTableLabel.setText("Custom Keywords: ");
@@ -230,9 +226,8 @@ public abstract class AbstractJMLProfileDialog extends TitleAreaDialog {
 
    protected void addKeywordTable(final Composite myComposite, final int height) {
       GridData data;
-      data = new GridData(SWT.FILL, SWT.TOP, true, true);
+      data = new GridData(SWT.FILL, SWT.TOP, true, true, 2, 1);
       data.heightHint = height;
-      data.horizontalSpan = 2;
       this.keywordTable = new Table(myComposite, SWT.H_SCROLL | SWT.V_SCROLL
             | SWT.BORDER | SWT.FULL_SELECTION);
       this.keywordTable.setLayoutData(data);
