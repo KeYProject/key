@@ -35,6 +35,7 @@ import org.key_project.jmlediting.profile.jmlref.parser.PredicateContentParser;
 import org.key_project.jmlediting.profile.jmlref.parser.PredicateOtNotSpecifiedParser;
 import org.key_project.jmlediting.profile.jmlref.parser.SpecExpressionContentParser;
 import org.key_project.jmlediting.profile.jmlref.parser.StoreRefKeywordContentParser;
+import org.key_project.jmlediting.profile.jmlref.parser.TargetLabelPredOrNotParser;
 import org.key_project.jmlediting.profile.jmlref.parser.TrinarySpecExpressionArgParser;
 import org.key_project.jmlediting.profile.jmlref.parser.TypeArgParser;
 import org.key_project.jmlediting.profile.jmlref.parser.UnarySpecExpressionArgParser;
@@ -154,7 +155,8 @@ public class JMLReferenceProfile extends AbstractJMLProfile implements
                   new PredicateOtNotSpecifiedParser(), new TypeArgParser(),
                   new StoreRefKeywordContentParser(true),
                   new StoreRefKeywordContentParser(false),
-                  new SpecExpressionContentParser()));
+                  new SpecExpressionContentParser(),
+                  new TargetLabelPredOrNotParser()));
 
       // Register supported sorts
       this.getAvailableKeywordSortsInternal().addAll(

@@ -53,10 +53,11 @@ import org.key_project.jmlediting.profile.key.seq.IndexOfKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqConcatKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqDefKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqEmptyKeyword;
-import org.key_project.jmlediting.profile.key.seq.SeqPrimaryParser;
 import org.key_project.jmlediting.profile.key.seq.SeqKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqLengthKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqPrimary;
+import org.key_project.jmlediting.profile.key.seq.SeqPrimaryParser;
+import org.key_project.jmlediting.profile.key.seq.SeqPrimitiveKeywordSort;
 import org.key_project.jmlediting.profile.key.seq.SeqReverseKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqSingletonKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqSubKeyword;
@@ -140,6 +141,11 @@ public class KeyProfile extends JMLReferenceProfile {
       final Set<IUserDefinedKeywordContentDescription> contents = this
             .getSupportedContentDescriptionsInternal();
       contents.add(new KeyTargetLabelPredicateParser());
+
+      this.getAvailableKeywordSortsInternal().addAll(
+            Arrays.asList(SeqPrimitiveKeywordSort.INSTANCE));
+      this.getSupportedContentDescriptionsInternal().addAll(
+            Arrays.asList(new KeyTargetLabelPredicateParser()));
    }
 
    private static void replace(final Set<IKeyword> keywords,

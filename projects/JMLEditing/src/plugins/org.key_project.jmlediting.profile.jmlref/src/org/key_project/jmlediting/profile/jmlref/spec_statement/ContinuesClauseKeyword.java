@@ -1,6 +1,8 @@
 package org.key_project.jmlediting.profile.jmlref.spec_statement;
 
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.parser.JMLRefParseFunctionKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.parser.TargetLabelPredOrNotParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AbstractGenericSpecificationKeyword;
 
 /**
@@ -29,7 +31,8 @@ public class ContinuesClauseKeyword extends AbstractGenericSpecificationKeyword 
 
    @Override
    public IKeywordParser createParser() {
-      return new TargetLabelPredOrNotParser();
+      return JMLRefParseFunctionKeywordParser
+            .semicolonClosed(new TargetLabelPredOrNotParser());
    }
 
 }

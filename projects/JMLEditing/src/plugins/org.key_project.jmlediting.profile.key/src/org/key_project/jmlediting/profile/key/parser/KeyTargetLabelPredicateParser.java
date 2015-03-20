@@ -13,7 +13,7 @@ public class KeyTargetLabelPredicateParser extends
 
    @Override
    public String getDescription() {
-      return " ['(' <ident>? ')']? <predicate>? ";
+      return " ('(' <ident>? ')')? <predicate>? ";
    }
 
    @Override

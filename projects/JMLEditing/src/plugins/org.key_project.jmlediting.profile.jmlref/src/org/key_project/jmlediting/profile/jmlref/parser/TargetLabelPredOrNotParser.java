@@ -1,11 +1,10 @@
-package org.key_project.jmlediting.profile.jmlref.spec_statement;
+package org.key_project.jmlediting.profile.jmlref.parser;
 
 import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
 
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.util.JavaBasicsParser;
 import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
-import org.key_project.jmlediting.profile.jmlref.parser.SemicolonClosedKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.PredicateOrNotParser;
 
 /**
@@ -14,9 +13,10 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Pr
  * @author Moritz Lichter
  *
  */
-final class TargetLabelPredOrNotParser extends SemicolonClosedKeywordParser {
+public class TargetLabelPredOrNotParser extends
+      JMLRefUserParseFunctionKeywordParser {
    @Override
-   protected ParseFunction createContentParseFunction(
+   protected ParseFunction createParseFunction(
          final IJMLExpressionProfile profile) {
       /**
        * continues-clause ::= <br>
@@ -39,5 +39,10 @@ final class TargetLabelPredOrNotParser extends SemicolonClosedKeywordParser {
 
       return seq(opt(targetLabel), opt(predOrNot));
 
+   }
+
+   @Override
+   public String getDescription() {
+      return " ( '->' '(' <ident> ')' )? ( <predicate> | '\\not_specified')?";
    }
 }
