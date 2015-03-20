@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: JML Reference Profile
+Bundle-Name: JML Editing JML Reference Profile
 Bundle-SymbolicName: org.key_project.jmlediting.profile.jmlref;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.jmlediting.profile.jmlref.Activator
@@ -24,3 +24,4 @@ Export-Package: org.key_project.jmlediting.profile.jmlref,
  org.key_project.jmlediting.profile.jmlref.spec_statement,
  org.key_project.jmlediting.profile.jmlref.type
 Import-Package: org.eclipse.core.resources
+Bundle-Vendor: KeY Project

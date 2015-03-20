@@ -157,7 +157,7 @@ public class KeyProfile extends JMLReferenceProfile {
 
    @Override
    public String getName() {
-      return "Key Profile";
+      return "KeY Profile";
    }
 
    @Override

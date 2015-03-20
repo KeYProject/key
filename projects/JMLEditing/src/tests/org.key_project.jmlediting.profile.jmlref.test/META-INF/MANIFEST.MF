@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Test
+Bundle-Name: JML Editing JML Reference Profile Test
 Bundle-SymbolicName: org.key_project.jmlediting.profile.jmlref.test
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.jmlediting.profile.jmlref.test.Activator
@@ -13,3 +13,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.key_project.jmlediting.profile.jmlref.test.parser,
  org.key_project.jmlediting.profile.jmlref.test.suite
+Bundle-Vendor: KeY Project
