@@ -130,7 +130,12 @@ public class JMLCompletionProposalComputer implements
                // Caret is not allowed to be on the keyword itself and not at
                // the end of the keyword (or on whitespace) if the keywrod does
                // not contains a toplevel error (e.g. missing semicolon)
-               if (!caretOnKeyword) {
+
+               final boolean onContent = isCaretOnKeywordContent(
+                     keywordApplNode, caretPosition)
+                     || hasToplevelError(keywordApplNode);
+
+               if (!caretOnKeyword && onContent) {
 
                   // Get the keyword from the node and get result of
                   // autoproposals
@@ -170,6 +175,32 @@ public class JMLCompletionProposalComputer implements
       }
       return result;
 
+   }
+
+   private static boolean hasToplevelError(final IASTNode keywordApplNode) {
+      if (keywordApplNode.getChildren().size() == 1) {
+         // EmptyKeyword
+         return false;
+      }
+      final IASTNode keywordContent = keywordApplNode.getChildren().get(1);
+      if (keywordContent.getType() == NodeTypes.ERROR_NODE) {
+         return true;
+      }
+      if (keywordContent.getChildren().isEmpty()) {
+         // Should not occur
+         return false;
+      }
+      final IASTNode topContentNode = keywordContent.getChildren().get(0);
+      return topContentNode.getType() == NodeTypes.ERROR_NODE;
+   }
+
+   private static boolean isCaretOnKeywordContent(
+         final IASTNode keywordApplNode, final int caret) {
+      if (keywordApplNode.getChildren().size() == 1) {
+         // EmptyKeyword
+         return keywordApplNode.containsCaret(caret);
+      }
+      return keywordApplNode.getChildren().get(1).containsCaret(caret);
    }
 
    /**
