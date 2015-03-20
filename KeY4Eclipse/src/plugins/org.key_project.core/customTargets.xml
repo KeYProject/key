@@ -46,6 +46,13 @@
 				<include name="*/"/>
 			</fileset>
 		</copy>
+      <!-- Copy META-INF/services into target directory -->
+      <mkdir dir="${target.folder}/META-INF/services"/>
+      <copy todir="${target.folder}/META-INF/services" failonerror="true" overwrite="true">
+         <fileset dir="${basedir}/../../../../key/key.core/META-INF/services">
+            <include name="*/"/>
+         </fileset>
+      </copy>
 	</target>
 
 	<!-- After compiled files are copied to target directory -->
