@@ -56,16 +56,20 @@ public class JMLProfileNewDialog extends AbstractJMLProfileDialog {
       final String profileId = this.generateId(profileName);
       final IJMLProfile parentProfile = this.getSelectedProfileFromCombo();
 
-      if (profileName.isEmpty() || parentProfile == null) {
-         this.setMessage(PLEASE_RESOLVE, IMessageProvider.ERROR);
+      if (profileName.isEmpty()) {
+         this.setMessage(this.PLEASE_FILL, IMessageProvider.ERROR);
+         return;
+      }
+      else if (parentProfile == null) {
+         this.setMessage(this.PLEASE_SELECT, IMessageProvider.ERROR);
+         return;
+      }
+      else if (!this.checkProfileNameUnique(profileName)) {
+         this.setMessage(this.NAME_EXISTS, IMessageProvider.ERROR);
          return;
       }
       else {
          this.setMessage("", IMessageProvider.NONE);
-      }
-
-      if (!this.checkProfileNameUnique(profileId)) {
-         return;
       }
 
       final IEditableDerivedProfile newProfile = parentProfile.derive(

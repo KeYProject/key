@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -40,7 +41,8 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
    private Table derivedTable;
 
    public JMLProfileEditDialog(final Shell parent, final IJMLProfile profile) {
-      super(parent, profile, "JML Profile Editor", "");
+      super(parent, profile, "JML Profile Editor", "Profile ID: "
+            + profile.getIdentifier());
    }
 
    @Override
@@ -96,7 +98,10 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
       derivedKeywordNewButton.addSelectionListener(new SelectionListener() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            // TODO
+            final JMLKeywordDialog dialog = new JMLKeywordDialog(
+                  JMLProfileEditDialog.this.getShell(),
+                  JMLProfileEditDialog.this.derivedProfile);
+            dialog.open();
          }
 
          @Override
@@ -108,7 +113,10 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
       derivedKeywordEditButton.addSelectionListener(new SelectionListener() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            // TODO
+            final JMLKeywordDialog dialog = new JMLKeywordDialog(
+                  JMLProfileEditDialog.this.getShell(),
+                  JMLProfileEditDialog.this.derivedProfile);
+            dialog.open();
          }
 
          @Override
@@ -275,13 +283,12 @@ public class JMLProfileEditDialog extends AbstractJMLProfileDialog {
    @Override
    protected void okPressed() {
       final String profileName = this.profileNameText.getText();
-      final String profileId = this.generateId(profileName);
 
-      if (!this.checkProfileNameUnique(profileId)) {
+      if (!this.checkProfileNameUnique(profileName)) {
+         this.setMessage(this.NAME_EXISTS, IMessageProvider.ERROR);
          return;
       }
       this.derivedProfile.setName(profileName);
-      // TODO edit ID?
 
       try {
          JMLProfileManagement.instance().writeDerivedProfiles();

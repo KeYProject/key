@@ -422,4 +422,20 @@ public final class JMLProfileManagement {
       return profile;
    }
 
+   /**
+    * Returns the IJMLProfile for the given name or null if no profile is found
+    * for the name.
+    *
+    * @param name
+    *           the name of the profile
+    * @return the profile or null
+    */
+   public IJMLProfile getProfileFromName(final String name) {
+      for (final IJMLProfile profile : this.getAvailableProfiles()) {
+         if (profile.getName().equals(name)) {
+            return profile;
+         }
+      }
+      return null;
+   }
 }

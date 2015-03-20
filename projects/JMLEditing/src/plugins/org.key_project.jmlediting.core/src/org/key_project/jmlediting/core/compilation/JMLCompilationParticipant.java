@@ -148,7 +148,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                jmlContext);
          final List<Comment> commentList = ast.getCommentList();
          final Map<Comment, ASTNode> inverse = new HashMap();
-         final Map<Comment, ASTNode> jmlCommentToInverse = new HashMap();
+         final Map<CommentRange, Comment> jmlCommentToInverse = new HashMap();
          ast.accept(new GenericVisitor() {
             @Override
             protected boolean visitNode(final ASTNode node) {
@@ -168,6 +168,13 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                               .getStartPosition()) {
                      assert !inverse.containsKey(commentList.get(pos));
                      inverse.put(commentList.get(pos), node);
+                     for (final CommentRange c : jmlComments) {
+                        if (c.getBeginOffset() == commentList.get(pos)
+                              .getStartPosition()) {
+                           jmlCommentToInverse.put(c, commentList.get(pos));
+                        }
+
+                     }
                      pos++;
 
                   }
@@ -175,7 +182,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                }
 
                // Do something similar with trailing for the case, that we are
-               // interessted in
+               // interested in
                // them because I think JML is always above
                // Maybe store them in to maps to be able to distinguish them
                // later
@@ -189,7 +196,11 @@ public class JMLCompilationParticipant extends CompilationParticipant {
             System.out.println("Assigned: " + comments.getKey() + " to "
                   + comments.getValue());
          }
-
+         for (final Entry<CommentRange, Comment> comments : jmlCommentToInverse
+               .entrySet()) {
+            System.out.println("Assigned JMLComment: " + comments.getKey()
+                  + " to " + comments.getValue());
+         }
          // End of Preparation
          final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
          for (final CommentRange jmlComment : jmlComments) {
