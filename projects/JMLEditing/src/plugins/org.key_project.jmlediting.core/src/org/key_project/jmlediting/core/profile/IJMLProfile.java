@@ -4,6 +4,7 @@ import java.util.Set;
 
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.core.validation.IJMLValidator;
 
@@ -78,5 +79,12 @@ public interface IJMLProfile {
     *         modifiable
     */
    Set<IUserDefinedKeywordContentDescription> getSupportedContentDescriptions();
+
+   /**
+    * Returns a set of all {@link IKeywortSort}s defined in this profile
+    * 
+    * @return an immutable non null set
+    */
+   Set<IKeywortSort> getAvailableKeywordSorts();
 
 }
