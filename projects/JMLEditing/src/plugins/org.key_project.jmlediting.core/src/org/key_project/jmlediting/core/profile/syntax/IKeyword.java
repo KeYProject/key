@@ -25,7 +25,7 @@ public interface IKeyword {
     * @return the keyword sort. May be null if the keyword does not belong to a
     *         sort.
     */
-   IKeywortSort getSort();
+   IKeywordSort getSort();
 
    /**
     * Returns the description for this keyword. The description may be null to

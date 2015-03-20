@@ -1,7 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.model;
 
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 
 /**
  * The implementation of the such that keyword which is used in the
@@ -25,7 +25,7 @@ public class SuchThatKeyword extends AbstractEmptyKeyword {
    }
 
    @Override
-   public IKeywortSort getSort() {
+   public IKeywordSort getSort() {
       return null;
    }
 

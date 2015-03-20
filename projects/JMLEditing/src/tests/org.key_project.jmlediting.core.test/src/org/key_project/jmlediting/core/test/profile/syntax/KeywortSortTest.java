@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeywordSort;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.MalformedKeywortSortException;
 
 public class KeywortSortTest {
@@ -78,7 +78,7 @@ public class KeywortSortTest {
    }
 
    private static interface IKeywortSortGetter {
-      IKeywortSort getSort();
+      IKeywordSort getSort();
    }
 
    private static void testMalformedKeywortSort(final IKeywortSortGetter test) {
@@ -100,7 +100,7 @@ public class KeywortSortTest {
       testMalformedKeywortSort(new IKeywortSortGetter() {
 
          @Override
-         public IKeywortSort getSort() {
+         public IKeywordSort getSort() {
             return new SortWithoutInstance();
          }
       });
@@ -111,7 +111,7 @@ public class KeywortSortTest {
       testMalformedKeywortSort(new IKeywortSortGetter() {
 
          @Override
-         public IKeywortSort getSort() {
+         public IKeywordSort getSort() {
             return NotAccessableInstanceSort.INSTANCE;
          }
       });
@@ -123,7 +123,7 @@ public class KeywortSortTest {
       testMalformedKeywortSort(new IKeywortSortGetter() {
 
          @Override
-         public IKeywortSort getSort() {
+         public IKeywordSort getSort() {
             return WrongInstanceTypeSort.INSTANCE;
          }
       });
@@ -134,7 +134,7 @@ public class KeywortSortTest {
       testMalformedKeywortSort(new IKeywortSortGetter() {
 
          @Override
-         public IKeywortSort getSort() {
+         public IKeywordSort getSort() {
             return WrongInstanceObjectSort.INSTANCE;
          }
       });

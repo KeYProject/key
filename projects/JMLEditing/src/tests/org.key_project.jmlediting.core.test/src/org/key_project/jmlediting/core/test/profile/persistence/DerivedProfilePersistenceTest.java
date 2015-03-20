@@ -18,7 +18,7 @@ import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceExc
 import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceFactory;
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
@@ -97,7 +97,7 @@ public class DerivedProfilePersistenceTest {
       }
 
       @Override
-      public IKeywortSort getSort() {
+      public IKeywordSort getSort() {
          return ToplevelKeywordSort.INSTANCE;
       }
    }
@@ -115,7 +115,7 @@ public class DerivedProfilePersistenceTest {
       }
 
       @Override
-      public IKeywortSort getSort() {
+      public IKeywordSort getSort() {
          return null;
       }
 

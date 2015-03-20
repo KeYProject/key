@@ -16,7 +16,7 @@ public abstract class AbstractToplevelKeyword extends AbstractKeyword {
    }
 
    @Override
-   public IKeywortSort getSort() {
+   public IKeywordSort getSort() {
       return ToplevelKeywordSort.INSTANCE;
    }
 

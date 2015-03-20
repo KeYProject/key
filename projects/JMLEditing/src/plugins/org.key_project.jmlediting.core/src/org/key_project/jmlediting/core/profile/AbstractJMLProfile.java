@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.EmptyKeywordContent;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
@@ -30,7 +30,7 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
     */
    private final Set<IUserDefinedKeywordContentDescription> supportedContentDescriptions;
 
-   private final Set<IKeywortSort> availableSorts;
+   private final Set<IKeywordSort> availableSorts;
 
    /**
     * Creates a new empty {@link AbstractJMLProfile}.
@@ -39,7 +39,7 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
       this.supportedKeywords = new HashSet<IKeyword>();
       this.supportedContentDescriptions = new HashSet<IUserDefinedKeywordContentDescription>();
       this.supportedContentDescriptions.add(new EmptyKeywordContent());
-      this.availableSorts = new HashSet<IKeywortSort>();
+      this.availableSorts = new HashSet<IKeywordSort>();
       this.availableSorts.add(ToplevelKeywordSort.INSTANCE);
    }
 
@@ -54,7 +54,7 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
    }
 
    @Override
-   public Set<IKeywortSort> getAvailableKeywordSorts() {
+   public Set<IKeywordSort> getAvailableKeywordSorts() {
       return Collections.unmodifiableSet(this.availableSorts);
    }
 
@@ -78,7 +78,7 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
       return this.supportedContentDescriptions;
    }
 
-   protected Set<IKeywortSort> getAvailableKeywordSortsInternal() {
+   protected Set<IKeywordSort> getAvailableKeywordSortsInternal() {
       return this.availableSorts;
    }
 

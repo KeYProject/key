@@ -9,7 +9,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 
 /**
  * Provides abstractions to build a parser from given basic element. A parser is
@@ -746,7 +746,7 @@ public final class ParserBuilder {
       return keywords(JMLProfileHelper.filterKeywords(profile, clazz), profile);
    }
 
-   public static ParseFunction keywords(final IKeywortSort sort,
+   public static ParseFunction keywords(final IKeywordSort sort,
          final IJMLProfile profile) {
       return keywords(JMLProfileHelper.filterKeywords(profile, sort), profile);
    }

@@ -4,14 +4,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 /**
- * Abstract implementation of the {@link IKeywortSort}. Typically implementing
+ * Abstract implementation of the {@link IKeywordSort}. Typically implementing
  * classes only need to define the description. Subclasses are needed because
  * the define the subsort relation of sorts.
  *
  * @author Moritz Lichter
  *
  */
-public abstract class AbstractKeywordSort implements IKeywortSort {
+public abstract class AbstractKeywordSort implements IKeywordSort {
 
    /**
     * The description of the sort.
@@ -42,7 +42,7 @@ public abstract class AbstractKeywordSort implements IKeywortSort {
    }
 
    @Override
-   public final boolean covers(final IKeywortSort other) {
+   public final boolean covers(final IKeywordSort other) {
       if (other == null) {
          return false;
       }
@@ -53,9 +53,9 @@ public abstract class AbstractKeywordSort implements IKeywortSort {
     * Validates that concrete classes have a public static final INSTANCE field
     * declared which is of type of the subclass.
     */
-   private static void validateInstanceField(final IKeywortSort sort)
+   private static void validateInstanceField(final IKeywordSort sort)
          throws MalformedKeywortSortException {
-      final Class<? extends IKeywortSort> concreteClass = sort.getClass();
+      final Class<? extends IKeywordSort> concreteClass = sort.getClass();
       // Need to have a public static final INSTANCE field
       try {
          final Field instanceField = concreteClass.getField("INSTANCE");
@@ -93,10 +93,10 @@ public abstract class AbstractKeywordSort implements IKeywortSort {
     * @throws MalformedKeywortSortException
     *            if the INSTANCE field is not valid or not found
     */
-   public static void validateContentOfInstanceField(final IKeywortSort sort)
+   public static void validateContentOfInstanceField(final IKeywordSort sort)
          throws MalformedKeywortSortException {
       validateInstanceField(sort);
-      final Class<? extends IKeywortSort> concreteClass = sort.getClass();
+      final Class<? extends IKeywordSort> concreteClass = sort.getClass();
       try {
          // Check that the value of the sort is really of this type and not of a
          // subtype
@@ -125,7 +125,7 @@ public abstract class AbstractKeywordSort implements IKeywortSort {
       }
    }
 
-   public static <T extends IKeywortSort> T getSortObject(
+   public static <T extends IKeywordSort> T getSortObject(
          final Class<T> sortClass) {
       try {
          final Object sortObject = sortClass.getField("INSTANCE").get(null);

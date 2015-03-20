@@ -17,7 +17,7 @@ import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceException;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.core.profile.syntax.user.UserDefinedKeyword;
@@ -215,7 +215,7 @@ public abstract class KeywordPersistence {
       // of the elem
       String description = null;
       final Set<String> keywords = new HashSet<String>();
-      IKeywortSort sort = null;
+      IKeywordSort sort = null;
 
       final NodeList children = elem.getChildNodes();
       for (int i = 0; i < children.getLength(); i++) {
@@ -251,9 +251,9 @@ public abstract class KeywordPersistence {
                         "Expected one class reference for a sort");
                }
                // Load the class and instantiate the sort from it
-               final Class<? extends IKeywortSort> sortClass = ClassReferencePersistence
+               final Class<? extends IKeywordSort> sortClass = ClassReferencePersistence
                      .loadClassReference((Element) classNodes.item(0),
-                           IKeywortSort.class);
+                           IKeywordSort.class);
                sort = AbstractKeywordSort.getSortObject(sortClass);
             }
             else {

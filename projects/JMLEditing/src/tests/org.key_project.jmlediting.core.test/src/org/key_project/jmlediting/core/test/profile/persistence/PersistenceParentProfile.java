@@ -10,7 +10,7 @@ import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.EmptyKeywordContent;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
@@ -22,7 +22,7 @@ public class PersistenceParentProfile extends AbstractJMLProfile {
       keywords.add(new AbstractEmptyKeyword("keyword1") {
 
          @Override
-         public IKeywortSort getSort() {
+         public IKeywordSort getSort() {
             return ToplevelKeywordSort.INSTANCE;
          }
 

@@ -13,7 +13,7 @@ import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.core.validation.IJMLValidator;
 
@@ -56,7 +56,7 @@ public class JMLProfileManagementTest {
       }
 
       @Override
-      public Set<IKeywortSort> getAvailableKeywordSorts() {
+      public Set<IKeywordSort> getAvailableKeywordSorts() {
          return Collections.emptySet();
       }
 

@@ -1,7 +1,7 @@
 package org.key_project.jmlediting.profile.key.seq;
 
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 
 /**
  * The seq empty keyword for key.
@@ -24,7 +24,7 @@ public class SeqEmptyKeyword extends AbstractEmptyKeyword {
    }
 
    @Override
-   public IKeywortSort getSort() {
+   public IKeywordSort getSort() {
       return SeqPrimitiveKeywordSort.INSTANCE;
    }
 

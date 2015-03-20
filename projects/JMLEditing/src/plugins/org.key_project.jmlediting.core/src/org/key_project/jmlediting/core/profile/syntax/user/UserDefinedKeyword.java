@@ -9,7 +9,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordAutoProposer;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
-import org.key_project.jmlediting.core.profile.syntax.IKeywortSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.ParseFunctionKeywordParser;
 
 /**
@@ -33,7 +33,7 @@ public class UserDefinedKeyword extends AbstractKeyword implements
     * The closing character.
     */
    private final Character closingCharacter;
-   private final IKeywortSort sort;
+   private final IKeywordSort sort;
 
    /**
     * Creates a new {@link UserDefinedKeyword}.
@@ -48,7 +48,7 @@ public class UserDefinedKeyword extends AbstractKeyword implements
     *           the closing character for this keyword, may be null
     */
    public UserDefinedKeyword(final Set<String> keywords,
-         final IKeywortSort sort,
+         final IKeywordSort sort,
          final IUserDefinedKeywordContentDescription contentDescription,
          final String description, final Character closingCharacter) {
       super(keywords);
@@ -113,7 +113,7 @@ public class UserDefinedKeyword extends AbstractKeyword implements
    }
 
    @Override
-   public IKeywortSort getSort() {
+   public IKeywordSort getSort() {
       return this.sort;
    }
 
