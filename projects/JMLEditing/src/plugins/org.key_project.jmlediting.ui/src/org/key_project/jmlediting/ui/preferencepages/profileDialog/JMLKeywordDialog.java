@@ -10,7 +10,11 @@ import java.util.Set;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -37,6 +41,8 @@ public class JMLKeywordDialog extends TitleAreaDialog {
    private Combo closingCharacterCombo;
    private Combo sortCombo;
    private Text descriptionText;
+
+   private ControlDecoration keywordTextError;
 
    public JMLKeywordDialog(final Shell parent,
          final IEditableDerivedProfile derivedProfile,
@@ -160,6 +166,7 @@ public class JMLKeywordDialog extends TitleAreaDialog {
          this.contentCombo.add(content.getDescription());
          this.contentCombo.setData(content.getDescription(), content);
       }
+      this.contentCombo.select(0);
 
       final List<IKeywordSort> sorts = new ArrayList<IKeywordSort>(
             this.derivedProfile.getAvailableKeywordSorts());
@@ -173,6 +180,7 @@ public class JMLKeywordDialog extends TitleAreaDialog {
          this.sortCombo.add(sort.getDescription());
          this.sortCombo.setData(sort.getDescription(), sort);
       }
+      this.sortCombo.select(0);
 
       this.closingCharacterCombo.add("");
       this.closingCharacterCombo.add(";");
@@ -225,6 +233,30 @@ public class JMLKeywordDialog extends TitleAreaDialog {
       data.widthHint = 175;
       this.keywordText = new Text(myComposite, SWT.SINGLE | SWT.BORDER);
       this.keywordText.setLayoutData(data);
+
+      this.keywordTextError = new ControlDecoration(this.keywordText, SWT.RIGHT
+            | SWT.TOP);
+      this.keywordTextError.setImage(FieldDecorationRegistry.getDefault()
+            .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR).getImage());
+      this.keywordTextError.setDescriptionText(this
+            .getErrorPleaseFill("Keyword"));
+      this.keywordTextError.show();
+
+      this.keywordText.addModifyListener(new ModifyListener() {
+         @Override
+         public void modifyText(final ModifyEvent e) {
+            if (JMLKeywordDialog.this.keywordText.getText().isEmpty()) {
+               JMLKeywordDialog.this.keywordTextError.show();
+            }
+            else {
+               JMLKeywordDialog.this.keywordTextError.hide();
+            }
+         }
+      });
+   }
+
+   private String getErrorPleaseFill(final String what) {
+      return what + " must not be empty!";
    }
 
    @Override
