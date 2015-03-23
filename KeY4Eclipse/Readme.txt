@@ -151,12 +151,18 @@ It is recommended NOT to work with the Java Projects and
 NOT to import them into the workspace!
 
 1. Switch into perspective 'Plug-in Development'
-2. Select main menu item 'File, Import...'
-3. Select 'General, Existing Projects into Workspace' and press 'Next >'
-4. Set root directory to '<root>/GIT/KeY/KeY4Eclipse/src'
-5. Ensure that 'Copy projects into workspace' is NOT selected.
-6. Finish the wizard
 
+2.1. Select main menu item 'File, Import...'
+2.2. Select 'General, Existing Projects into Workspace' and press 'Next >'
+2.3. Set root directory to '<root>/GIT/KeY/KeY4Eclipse/src'
+2.4. Ensure that 'Copy projects into workspace' is NOT selected.
+2.5. Finish the wizard
+
+3.1. Select main menu item 'File, Import...'
+3.2. Select 'General, Existing Projects into Workspace' and press 'Next >'
+3.3. Set root directory to '<root>/GIT/KeY/Stubby/src'
+3.4. Ensure that 'Copy projects into workspace' is NOT selected.
+3.5. Finish the wizard
 
 (4) Start KeY4Eclipse as Eclipse Product
 ----------------------------------------

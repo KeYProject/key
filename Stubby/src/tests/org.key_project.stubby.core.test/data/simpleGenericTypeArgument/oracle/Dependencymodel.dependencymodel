@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
+  <types xsi:type="dependencymodel:Type" name="SimpleGenericTypeArgument" source="true" extends="//@types.1" package="" simpleName="SimpleGenericTypeArgument">
+    <typeVariables name="T" type="//@types.0"/>
+    <typeVariables name="X" type="//@types.1"/>
+  </types>
+  <types xsi:type="dependencymodel:Type" name="MyClass" source="true" visibility="DEFAULT" extends="//@types.1" package="" simpleName="MyClass"/>
+  <types xsi:type="dependencymodel:Type" name="Blub" source="true" visibility="DEFAULT" extends="//@types.1" package="" simpleName="Blub">
+    <typeVariables name="T" type="//@types.3"/>
+  </types>
+</dependencymodel:DependencyModel>

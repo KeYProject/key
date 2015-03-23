@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
+  <types xsi:type="dependencymodel:Type" name="java.awt.image.ImageObserver" kind="INTERFACE" package="java.awt.image" simpleName="ImageObserver"/>
+  <types xsi:type="dependencymodel:Type" name="java.awt.MenuContainer" kind="INTERFACE" package="java.awt" simpleName="MenuContainer"/>
+  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
+  <types xsi:type="dependencymodel:Type" name="java.awt.Component" extends="//@types.0" implements="//@types.1 //@types.2 //@types.3" abstract="true" package="java.awt" simpleName="Component"/>
+  <types xsi:type="dependencymodel:Type" name="java.awt.Container" extends="//@types.4" package="java.awt" simpleName="Container"/>
+  <types xsi:type="dependencymodel:Type" name="javax.accessibility.Accessible" kind="INTERFACE" package="javax.accessibility" simpleName="Accessible"/>
+  <types xsi:type="dependencymodel:Type" name="java.awt.Window" extends="//@types.5" implements="//@types.6" package="java.awt" simpleName="Window"/>
+  <types xsi:type="dependencymodel:Type" name="java.awt.Frame" extends="//@types.7" implements="//@types.2" package="java.awt" simpleName="Frame"/>
+  <types xsi:type="dependencymodel:Type" name="javax.swing.WindowConstants" kind="INTERFACE" package="javax.swing" simpleName="WindowConstants"/>
+  <types xsi:type="dependencymodel:Type" name="javax.swing.RootPaneContainer" kind="INTERFACE" package="javax.swing" simpleName="RootPaneContainer"/>
+  <types xsi:type="dependencymodel:Type" name="javax.swing.TransferHandler" extends="//@types.0" implements="//@types.3" package="javax.swing" simpleName="TransferHandler">
+    <innerTypes name="javax.swing.TransferHandler.HasGetTransferHandler" kind="INTERFACE" visibility="DEFAULT" static="true" package="javax.swing" simpleName="HasGetTransferHandler"/>
+  </types>
+  <types xsi:type="dependencymodel:Type" name="javax.swing.JFrame" extends="//@types.8" implements="//@types.9 //@types.6 //@types.10 //@types.11/@innerTypes.0" package="javax.swing" simpleName="JFrame">
+    <fields name="rootPane" visibility="PROTECTED" type="//@types.14"/>
+  </types>
+  <types xsi:type="dependencymodel:Type" name="javax.swing.JComponent" extends="//@types.5" implements="//@types.3 //@types.11/@innerTypes.0" abstract="true" package="javax.swing" simpleName="JComponent"/>
+  <types xsi:type="dependencymodel:Type" name="javax.swing.JRootPane" extends="//@types.13" implements="//@types.6" package="javax.swing" simpleName="JRootPane"/>
+  <types xsi:type="dependencymodel:Type" name="InnerThis" source="true" extends="//@types.0" package="" simpleName="InnerThis">
+    <methods name="main" static="true" returnType="//@types.16"/>
+    <innerTypes name="" source="true" visibility="DEFAULT" extends="//@types.12" package="" simpleName="">
+      <methods name="" visibility="DEFAULT" returnType="//@types.16" throws="//@types.21" constructor="true"/>
+      <methods name="inner" returnType="//@types.14"/>
+    </innerTypes>
+  </types>
+  <types xsi:type="dependencymodel:Datatype" name="void"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Throwable" extends="//@types.0" implements="//@types.3" package="java.lang" simpleName="Throwable"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Exception" extends="//@types.17" package="java.lang" simpleName="Exception"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.RuntimeException" extends="//@types.18" package="java.lang" simpleName="RuntimeException"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.UnsupportedOperationException" extends="//@types.19" package="java.lang" simpleName="UnsupportedOperationException"/>
+  <types xsi:type="dependencymodel:Type" name="java.awt.HeadlessException" extends="//@types.20" package="java.awt" simpleName="HeadlessException"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.annotation.Annotation" kind="INTERFACE" package="java.lang.annotation" simpleName="Annotation"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Override" kind="INTERFACE" extends="//@types.22" package="java.lang" simpleName="Override"/>
+</dependencymodel:DependencyModel>

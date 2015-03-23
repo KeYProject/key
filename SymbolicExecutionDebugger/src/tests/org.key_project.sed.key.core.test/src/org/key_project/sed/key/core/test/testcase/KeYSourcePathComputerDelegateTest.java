@@ -127,16 +127,14 @@ public class KeYSourcePathComputerDelegateTest extends AbstractSetupTestCase {
          assertSourceContainer(result, new FolderSourceContainer(project.getProject().getFolder("src"), false));
          // Set boot class path to external file
          tempFile = File.createTempFile("KeYSourcePathComputerDelegateTest", ".jar");
-         KeYResourceProperties.setBootClassPath(project.getProject(), tempFile.getAbsolutePath());
-         KeYResourceProperties.setUseBootClassPathKind(project.getProject(), UseBootClassPathKind.EXTERNAL_IN_FILE_SYSTEM);
+         KeYResourceProperties.setBootClassPath(project.getProject(), UseBootClassPathKind.EXTERNAL_IN_FILE_SYSTEM, tempFile.getAbsolutePath());
          // Compute and test container
          result = computer.computeSourceContainers(configuration, new NullProgressMonitor());
          assertSourceContainer(result, 
                                new FolderSourceContainer(project.getProject().getFolder("src"), false),
                                new ExternalArchiveSourceContainer(tempFile.getAbsolutePath(), false));
          // Set boot class path to external folder
-         KeYResourceProperties.setBootClassPath(project.getProject(), tempFile.getParent());
-         KeYResourceProperties.setUseBootClassPathKind(project.getProject(), UseBootClassPathKind.EXTERNAL_IN_FILE_SYSTEM);
+         KeYResourceProperties.setBootClassPath(project.getProject(), UseBootClassPathKind.EXTERNAL_IN_FILE_SYSTEM, tempFile.getParent());
          // Compute and test container
          result = computer.computeSourceContainers(configuration, new NullProgressMonitor());
          assertSourceContainer(result, 
@@ -144,8 +142,7 @@ public class KeYSourcePathComputerDelegateTest extends AbstractSetupTestCase {
                                new DirectorySourceContainer(tempFile.getParentFile(), false));
          // Set boot class path to workspace file
          IFile workspaceFile = (IFile)method.getResource();
-         KeYResourceProperties.setBootClassPath(project.getProject(), workspaceFile.getFullPath().toString());
-         KeYResourceProperties.setUseBootClassPathKind(project.getProject(), UseBootClassPathKind.WORKSPACE);
+         KeYResourceProperties.setBootClassPath(project.getProject(), UseBootClassPathKind.WORKSPACE, workspaceFile.getFullPath().toString());
          // Compute and test container
          result = computer.computeSourceContainers(configuration, new NullProgressMonitor());
          assertSourceContainer(result, 
@@ -153,16 +150,14 @@ public class KeYSourcePathComputerDelegateTest extends AbstractSetupTestCase {
                                new ArchiveSourceContainer(workspaceFile, false));
          // Set boot class path to workspace folder
          IFolder workspaceFolder = (IFolder)workspaceFile.getParent();
-         KeYResourceProperties.setBootClassPath(project.getProject(), workspaceFolder.getFullPath().toString());
-         KeYResourceProperties.setUseBootClassPathKind(project.getProject(), UseBootClassPathKind.WORKSPACE);
+         KeYResourceProperties.setBootClassPath(project.getProject(), UseBootClassPathKind.WORKSPACE, workspaceFolder.getFullPath().toString());
          // Compute and test container
          result = computer.computeSourceContainers(configuration, new NullProgressMonitor());
          assertSourceContainer(result, 
                                new FolderSourceContainer(project.getProject().getFolder("src"), false),
                                new FolderSourceContainer(workspaceFolder, false));
          // Set boot class path to workspace project
-         KeYResourceProperties.setBootClassPath(project.getProject(), project.getProject().getFullPath().toString());
-         KeYResourceProperties.setUseBootClassPathKind(project.getProject(), UseBootClassPathKind.WORKSPACE);
+         KeYResourceProperties.setBootClassPath(project.getProject(), UseBootClassPathKind.WORKSPACE, project.getProject().getFullPath().toString());
          // Compute and test container
          result = computer.computeSourceContainers(configuration, new NullProgressMonitor());
          assertSourceContainer(result, 

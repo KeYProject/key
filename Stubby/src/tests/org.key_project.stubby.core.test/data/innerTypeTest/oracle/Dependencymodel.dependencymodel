@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
+  <types xsi:type="dependencymodel:Type" name="InnerTypeTest" source="true" extends="//@types.0" package="" simpleName="InnerTypeTest"/>
+  <types xsi:type="dependencymodel:Type" name="A" source="true" visibility="DEFAULT" extends="//@types.0" package="" simpleName="A">
+    <innerTypes name="A.InnerA" source="true" visibility="DEFAULT" extends="//@types.0" package="" simpleName="InnerA">
+      <fields name="value" type="//@types.3"/>
+    </innerTypes>
+  </types>
+  <types xsi:type="dependencymodel:Datatype" name="int"/>
+</dependencymodel:DependencyModel>

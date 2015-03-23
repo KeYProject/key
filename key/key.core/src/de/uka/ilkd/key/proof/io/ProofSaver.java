@@ -245,11 +245,7 @@ public class ProofSaver {
        try {
     	   File file = new File(filename).getCanonicalFile();
 
-    	   while (file.isFile()) { // an if should actually do
-    		   file = file.getParentFile();
-    	   }
-    	   
-    	   basePath = file.getCanonicalPath();
+    	   basePath = file.getParentFile().getCanonicalPath(); // File file is always a file and not a directory. Thus we have to go back exactly one fragment in the path.
            
     	   // locate filenames in header
            for (String s: search){

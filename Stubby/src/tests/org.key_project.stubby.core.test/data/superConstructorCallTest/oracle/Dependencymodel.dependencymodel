@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
+  <types xsi:type="dependencymodel:Type" name="SuperConstructorCall" source="true" extends="//@types.0" package="" simpleName="SuperConstructorCall">
+    <methods name="SuperConstructorCall" returnType="//@types.2" constructor="true"/>
+  </types>
+  <types xsi:type="dependencymodel:Datatype" name="void"/>
+  <types xsi:type="dependencymodel:Type" name="SuperConstructorB" source="true" visibility="DEFAULT" extends="//@types.1" package="" simpleName="SuperConstructorB">
+    <methods name="SuperConstructorB" returnType="//@types.2" constructor="true"/>
+  </types>
+</dependencymodel:DependencyModel>
