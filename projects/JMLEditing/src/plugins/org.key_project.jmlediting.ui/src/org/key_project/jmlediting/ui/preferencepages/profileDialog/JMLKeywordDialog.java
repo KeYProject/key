@@ -1,7 +1,11 @@
 package org.key_project.jmlediting.ui.preferencepages.profileDialog;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -141,14 +145,31 @@ public class JMLKeywordDialog extends TitleAreaDialog {
    }
 
    private void fillCombos() {
-      for (final IUserDefinedKeywordContentDescription content : this.derivedProfile
-            .getSupportedContentDescriptions()) {
+      final List<IUserDefinedKeywordContentDescription> descriptions = new ArrayList<IUserDefinedKeywordContentDescription>(
+            this.derivedProfile.getSupportedContentDescriptions());
+      Collections.sort(descriptions,
+            new Comparator<IUserDefinedKeywordContentDescription>() {
+               @Override
+               public int compare(
+                     final IUserDefinedKeywordContentDescription o1,
+                     final IUserDefinedKeywordContentDescription o2) {
+                  return o1.getDescription().compareTo(o2.getDescription());
+               }
+            });
+      for (final IUserDefinedKeywordContentDescription content : descriptions) {
          this.contentCombo.add(content.getDescription());
          this.contentCombo.setData(content.getDescription(), content);
       }
 
-      for (final IKeywordSort sort : this.derivedProfile
-            .getAvailableKeywordSorts()) {
+      final List<IKeywordSort> sorts = new ArrayList<IKeywordSort>(
+            this.derivedProfile.getAvailableKeywordSorts());
+      Collections.sort(sorts, new Comparator<IKeywordSort>() {
+         @Override
+         public int compare(final IKeywordSort o1, final IKeywordSort o2) {
+            return o1.getDescription().compareTo(o2.getDescription());
+         }
+      });
+      for (final IKeywordSort sort : sorts) {
          this.sortCombo.add(sort.getDescription());
          this.sortCombo.setData(sort.getDescription(), sort);
       }
