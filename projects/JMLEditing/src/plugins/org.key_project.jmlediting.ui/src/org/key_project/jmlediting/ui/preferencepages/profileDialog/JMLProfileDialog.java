@@ -171,10 +171,9 @@ public class JMLProfileDialog extends TitleAreaDialog {
       myComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
       myComposite.setLayout(new GridLayout(3, false));
 
-      this.addProfileName(myComposite, true);
-
       if (this.profile == null
-            || (this.derivedProfile == null || this.derivedProfile instanceof IEditableDerivedProfile)) {
+            || (this.profile != null && this.derivedProfile != null)) {
+         this.addProfileName(myComposite, true);
          this.addDerivedFrom(myComposite, this.derivedProfile == null);
          if (this.derivedProfile == null) {
             this.derivedFromCombo.addSelectionListener(new SelectionListener() {
@@ -223,6 +222,7 @@ public class JMLProfileDialog extends TitleAreaDialog {
          this.addDerivedButtons(myComposite);
       }
       else {
+         this.addProfileName(myComposite, false);
          this.profileNameText.setText(this.profile.getName());
          this.addKeywordTableLabel(myComposite, "Supported Keywords");
 
@@ -230,9 +230,7 @@ public class JMLProfileDialog extends TitleAreaDialog {
       }
 
       this.fillKeywordTable();
-      if (this.profile != null
-            && this.profile instanceof IEditableDerivedProfile) {
-         this.derivedProfile = (IEditableDerivedProfile) this.profile;
+      if (this.derivedProfile != null) {
          this.derivedFromCombo
                .select(this.getComboIndexForProfile(this.derivedProfile
                      .getParentProfile()));

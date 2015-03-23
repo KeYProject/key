@@ -12,6 +12,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.help.ui.internal.ExecuteCommandAction;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.swt.SWT;
@@ -446,5 +447,34 @@ public class UITestUtils {
          final SWTBotEclipseEditor editor) {
       return new CommentLocator(editor.getText()).findJMLCommentRanges();
 
+   }
+
+   public static void openGlobalSettings(final SWTWorkbenchBot bot) {
+      // We need to do something special on mac
+      if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+         // Cannot access the menu item for preferences on mac because it is
+         // located in a native menu, which even prohibits the key shortcut to
+         // work using SWT bot.
+         // Therefore, I use the following action to open the preferences window
+         // which makes use of nun public UI
+         // I took the code from here, where the same problem was solved:
+         // https://code.google.com/p/swordfish-tooling/source/diff?spec=svn843&r=843&format=side&path=/trunk/org.eclipse.swordfish.tooling.systemtest/src/org/eclipse/swordfish/tooling/target/platform/test/ide/MacEclipseIDE.java
+         // This code needs the dependency on help.ui
+         final Thread t = new Thread() {
+            @SuppressWarnings("restriction")
+            @Override
+            public void run() {
+               final ExecuteCommandAction action = new ExecuteCommandAction();
+               action.setInitializationString("org.eclipse.ui.window.preferences");
+               action.run();
+            }
+         };
+         t.start();
+      }
+      else {
+         // On windows and other linux/unix implementations beside mac this
+         // command should work
+         bot.menu("Window").menu("Preferences").click();
+      }
    }
 }
