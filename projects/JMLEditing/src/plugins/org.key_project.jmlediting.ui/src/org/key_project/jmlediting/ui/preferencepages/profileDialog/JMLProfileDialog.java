@@ -17,14 +17,12 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -43,14 +41,11 @@ public class JMLProfileDialog extends TitleAreaDialog {
    private final String NAME_EXISTS = "Profile Name already exists!";
    private final String PLEASE_SELECT = "Please select a profile to derive from!";
    private final String PLEASE_FILL = "Profile Name must not be empty!";
-   private final String BUTTON_TEXT_DISABLE = "Disable";
-   private final String BUTTON_TEXT_ENABLE = "Enable";
 
    private final IJMLProfile profile;
    private IEditableDerivedProfile derivedProfile;
 
    private Table keywordTable;
-   private Button enableDisableButton;
    private Table derivedTable;
 
    private final String title;
@@ -68,11 +63,6 @@ public class JMLProfileDialog extends TitleAreaDialog {
                .compareTo(o2.getKeywords().iterator().next());
       }
    };
-
-   private final Color redColor = Display.getCurrent().getSystemColor(
-         SWT.COLOR_RED);
-   private final Color greenColor = Display.getCurrent().getSystemColor(
-         SWT.COLOR_DARK_GREEN);
 
    public JMLProfileDialog(final Shell parent, final IJMLProfile profile) {
       super(parent);
@@ -137,26 +127,22 @@ public class JMLProfileDialog extends TitleAreaDialog {
             this.profileNameText.setText(this.profile.getName());
          }
 
-         this.addKeywordTableLabel(myComposite,
-               "Keywords from parent profile: (Green: enabled; Red: disabled)");
-         this.addKeywordTable(myComposite, 200);
+         this.addKeywordTableLabel(myComposite, "Keywords from parent profile");
+         this.addKeywordTable(myComposite, true);
          this.keywordTable.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
-               final IKeyword selectedKeyword = JMLProfileDialog.this
-                     .getSelectedParentKeyword();
-               if (JMLProfileDialog.this.derivedProfile == null
-                     && !JMLProfileDialog.this.saveNewProfile(false)) {
-                  return;
-               }
-               if (JMLProfileDialog.this.derivedProfile
-                     .isParentKeywordDisabled(selectedKeyword)) {
-                  JMLProfileDialog.this.enableDisableButton
-                        .setText(JMLProfileDialog.this.BUTTON_TEXT_ENABLE);
-               }
-               else {
-                  JMLProfileDialog.this.enableDisableButton
-                        .setText(JMLProfileDialog.this.BUTTON_TEXT_DISABLE);
+               if (e.detail == SWT.CHECK) {
+                  final IKeyword selectedKeyword = JMLProfileDialog.this
+                        .getParentKeyword4TableItem((TableItem) e.item);
+                  if (JMLProfileDialog.this.derivedProfile == null
+                        && !JMLProfileDialog.this.saveNewProfile(false)) {
+                     return;
+                  }
+                  JMLProfileDialog.this.derivedProfile
+                        .setParentKeywordDisabled(selectedKeyword,
+                              !JMLProfileDialog.this.derivedProfile
+                                    .isParentKeywordDisabled(selectedKeyword));
                }
             }
 
@@ -164,8 +150,6 @@ public class JMLProfileDialog extends TitleAreaDialog {
             public void widgetDefaultSelected(final SelectionEvent e) {
             }
          });
-         this.addEnableDisableButton(myComposite);
-
          this.addDerivedTableLabel(myComposite);
 
          this.addDerivedTable(myComposite);
@@ -176,7 +160,7 @@ public class JMLProfileDialog extends TitleAreaDialog {
          this.profileNameText.setText(this.profile.getName());
          this.addKeywordTableLabel(myComposite, "Supported Keywords");
 
-         this.addKeywordTable(myComposite, 400);
+         this.addKeywordTable(myComposite, false);
       }
 
       this.fillKeywordTable();
@@ -311,12 +295,19 @@ public class JMLProfileDialog extends TitleAreaDialog {
       derivedTableLabel.setLayoutData(data);
    }
 
-   private void addKeywordTable(final Composite myComposite, final int height) {
+   private void addKeywordTable(final Composite myComposite,
+         final boolean derived) {
       GridData data;
       data = new GridData(SWT.FILL, SWT.TOP, true, true, 2, 1);
-      data.heightHint = height;
-      this.keywordTable = new Table(myComposite, SWT.H_SCROLL | SWT.V_SCROLL
-            | SWT.BORDER | SWT.FULL_SELECTION);
+      int style = SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION;
+      if (derived) {
+         style = style | SWT.CHECK | SWT.MULTI;
+         data.heightHint = 200;
+      }
+      else {
+         data.heightHint = 400;
+      }
+      this.keywordTable = new Table(myComposite, style);
       this.keywordTable.setLayoutData(data);
       this.keywordTable.setHeaderVisible(true);
       this.keywordTable.setLinesVisible(true);
@@ -332,19 +323,11 @@ public class JMLProfileDialog extends TitleAreaDialog {
       genericDescriptionTableColumn.setWidth(300);
    }
 
-   private IKeyword getSelectedParentKeyword() {
-      final TableItem selectedItem = this.getSelectedParentTableItem();
+   private IKeyword getParentKeyword4TableItem(final TableItem selectedItem) {
       if (selectedItem == null) {
          return null;
       }
       return (IKeyword) selectedItem.getData();
-   }
-
-   private TableItem getSelectedParentTableItem() {
-      if (this.keywordTable.getSelection().length == 0) {
-         return null;
-      }
-      return this.keywordTable.getSelection()[0];
    }
 
    private void fillKeywordTable() {
@@ -377,12 +360,8 @@ public class JMLProfileDialog extends TitleAreaDialog {
          item.setText(this.keywordToTableData(keyword));
          item.setData(keyword);
          if (this.derivedProfile != null) {
-            if (this.derivedProfile.isParentKeywordDisabled(keyword)) {
-               item.setForeground(this.redColor);
-            }
-            else {
-               item.setForeground(this.greenColor);
-            }
+            item.setChecked(!this.derivedProfile
+                  .isParentKeywordDisabled(keyword));
          }
       }
       this.keywordTable.setEnabled(true);
@@ -467,46 +446,6 @@ public class JMLProfileDialog extends TitleAreaDialog {
          @Override
          public void widgetSelected(final SelectionEvent e) {
             // TODO
-         }
-
-         @Override
-         public void widgetDefaultSelected(final SelectionEvent e) {
-         }
-      });
-   }
-
-   private void addEnableDisableButton(final Composite myComposite) {
-      this.enableDisableButton = this.createTableSideButton(myComposite,
-            "En/Disable");
-      this.enableDisableButton.addSelectionListener(new SelectionListener() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            final TableItem selectedItem = JMLProfileDialog.this
-                  .getSelectedParentTableItem();
-            final IKeyword selectedKeyword = JMLProfileDialog.this
-                  .getSelectedParentKeyword();
-
-            if (JMLProfileDialog.this.derivedProfile == null
-                  && !JMLProfileDialog.this.saveNewProfile(false)) {
-               System.out.println("returning from enableDisableButton...");
-               return;
-            }
-
-            if (JMLProfileDialog.this.derivedProfile
-                  .isParentKeywordDisabled(selectedKeyword)) {
-               JMLProfileDialog.this.enableDisableButton
-                     .setText(JMLProfileDialog.this.BUTTON_TEXT_DISABLE);
-               JMLProfileDialog.this.derivedProfile.setParentKeywordDisabled(
-                     selectedKeyword, false);
-               selectedItem.setForeground(JMLProfileDialog.this.greenColor);
-            }
-            else {
-               JMLProfileDialog.this.enableDisableButton
-                     .setText(JMLProfileDialog.this.BUTTON_TEXT_ENABLE);
-               JMLProfileDialog.this.derivedProfile.setParentKeywordDisabled(
-                     selectedKeyword, true);
-               selectedItem.setForeground(JMLProfileDialog.this.redColor);
-            }
          }
 
          @Override
