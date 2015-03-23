@@ -10,7 +10,6 @@ import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
 import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
-import org.key_project.jmlediting.core.validation.IJMLValidator;
 import org.key_project.jmlediting.profile.jmlref.behavior.BehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.ExceptionalBehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.behavior.NormalBehaviorKeyword;
@@ -80,7 +79,6 @@ import org.key_project.jmlediting.profile.jmlref.spec_statement.ReturnsClauseKey
 import org.key_project.jmlediting.profile.jmlref.type.BigIntKeyword;
 import org.key_project.jmlediting.profile.jmlref.type.RealKeyword;
 import org.key_project.jmlediting.profile.jmlref.type.TypeKeywordSort;
-import org.key_project.jmlediting.profile.jmlref.validator.LoopInvariantValidator;
 import org.key_project.jmlediting.profile.jmlref.visibility.FinalKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.InstanceKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.PrivateKeyword;
@@ -99,7 +97,7 @@ import org.key_project.jmlediting.profile.jmlref.visibility.StaticKeyword;
  *
  */
 public class JMLReferenceProfile extends AbstractJMLProfile implements
-      IJMLExpressionProfile {
+IJMLExpressionProfile {
 
    /**
     * The set containing all supported keywords.
@@ -118,31 +116,31 @@ public class JMLReferenceProfile extends AbstractJMLProfile implements
                   new AccessibleKeyword(), new RequiresKeyword(),
                   new BehaviorKeyword(lang), new ExceptionalBehaviorKeyword(
                         lang), new NormalBehaviorKeyword(lang),
-                  new AlsoKeyword(), new HelperKeyword(), new PureKeyword(),
-                  new PrivateKeyword(), new ProtectedKeyword(),
-                  new PublicKeyword(), new SpecProtectedKeyword(),
-                  new SpecPublicKeyword(), new EverythingKeyword(),
-                  new NothingKeyword(), new NotSpecifiedKeyword(),
-                  new ResultKeyword(), new OldKeyword(), new SameKeyword(),
-                  new ForallQuantifierKeyword(),
-                  new ExistentialQuantifierKeyword(),
-                  new MinQuantifierKeyword(), new MaxQuantifierKeyword(),
-                  new ProductQuantifierKeyword(), new SumQuantifierKeyword(),
-                  new NumOfQuantifierKeyword(), new NonNullBoundModKeyword(),
-                  new NullableBoundModKeyword(), new InvariantKeyword(),
-                  new LoopInvariantKeyword(), new DecreasingKeyword(),
-                  new InvariantForKeyword(), new SuchThatKeyword(),
-                  new SetKeyword(), new ModelKeyword(), new GhostKeyword(),
-                  new RepresentsKeyword(), new NonNullKeyword(),
-                  new NullableKeyword(), new RealKeyword(),
-                  new BigIntKeyword(), new DivergesKeyword(),
-                  new MeasuredByKeyword(), new SignalsKeyword(),
-                  new SignalsOnlyKeyword(), new AxiomKeyword(),
-                  new TypeofKeyword(), new TypeKeyword(), new FreshKeyword(),
-                  new ReachKeyword(), new InstanceKeyword(),
-                  new StaticKeyword(), new InitiallyKeyword(),
-                  new ContinuesClauseKeyword(), new BreakClauseKeyword(),
-                  new ReturnsClauseKeyword(), new FinalKeyword()));
+                        new AlsoKeyword(), new HelperKeyword(), new PureKeyword(),
+                        new PrivateKeyword(), new ProtectedKeyword(),
+                        new PublicKeyword(), new SpecProtectedKeyword(),
+                        new SpecPublicKeyword(), new EverythingKeyword(),
+                        new NothingKeyword(), new NotSpecifiedKeyword(),
+                        new ResultKeyword(), new OldKeyword(), new SameKeyword(),
+                        new ForallQuantifierKeyword(),
+                        new ExistentialQuantifierKeyword(),
+                        new MinQuantifierKeyword(), new MaxQuantifierKeyword(),
+                        new ProductQuantifierKeyword(), new SumQuantifierKeyword(),
+                        new NumOfQuantifierKeyword(), new NonNullBoundModKeyword(),
+                        new NullableBoundModKeyword(), new InvariantKeyword(),
+                        new LoopInvariantKeyword(), new DecreasingKeyword(),
+                        new InvariantForKeyword(), new SuchThatKeyword(),
+                        new SetKeyword(), new ModelKeyword(), new GhostKeyword(),
+                        new RepresentsKeyword(), new NonNullKeyword(),
+                        new NullableKeyword(), new RealKeyword(),
+                        new BigIntKeyword(), new DivergesKeyword(),
+                        new MeasuredByKeyword(), new SignalsKeyword(),
+                        new SignalsOnlyKeyword(), new AxiomKeyword(),
+                        new TypeofKeyword(), new TypeKeyword(), new FreshKeyword(),
+                        new ReachKeyword(), new InstanceKeyword(),
+                        new StaticKeyword(), new InitiallyKeyword(),
+                        new ContinuesClauseKeyword(), new BreakClauseKeyword(),
+                        new ReturnsClauseKeyword(), new FinalKeyword()));
 
       this.getSupportedPrimariesInternal().addAll(
             Arrays.asList(new KeywordJMLPrimary(), new QuantifierPrimary()));
@@ -204,13 +202,6 @@ public class JMLReferenceProfile extends AbstractJMLProfile implements
    @Override
    public IJMLParser createParser() {
       return new DefaultJMLParser(this);
-   }
-
-   @Override
-   public Set<IJMLValidator> getValidators() {
-      final Set<IJMLValidator> validator = new HashSet<IJMLValidator>(
-            Arrays.asList(new LoopInvariantValidator()));
-      return validator;
    }
 
    @Override

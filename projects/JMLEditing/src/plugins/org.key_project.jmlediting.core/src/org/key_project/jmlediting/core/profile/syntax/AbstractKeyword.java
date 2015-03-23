@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.key_project.jmlediting.core.validation.IKeywordValidator;
+
 /**
  * An {@link AbstractKeyword} does some default implementation for an
  * {@link IKeyword}.
@@ -90,6 +92,11 @@ public abstract class AbstractKeyword implements IKeyword {
 
    @Override
    public IKeywordAutoProposer createAutoProposer() {
+      return null;
+   }
+
+   @Override
+   public IKeywordValidator getKeywordValidator() {
       return null;
    }
 

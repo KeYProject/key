@@ -8,14 +8,10 @@ import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.key_project.jmlediting.core.dom.IASTNode;
-import org.key_project.jmlediting.core.dom.IKeywordNode;
-import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLValidationError;
 import org.key_project.jmlediting.core.validation.IJMLValidationContext;
-import org.key_project.jmlediting.core.validation.JMLKeywordValidator;
-import org.key_project.jmlediting.profile.jmlref.loop.DecreasingKeyword;
-import org.key_project.jmlediting.profile.jmlref.loop.LoopInvariantKeyword;
+import org.key_project.jmlediting.core.validation.IKeywordValidator;
 
 /**
  * This Class checks if Loop Invariant specifications in JML are placed valid,
@@ -26,31 +22,22 @@ import org.key_project.jmlediting.profile.jmlref.loop.LoopInvariantKeyword;
  * @author David Giessing
  *
  */
-public class LoopInvariantValidator extends JMLKeywordValidator {
+public class LoopInvariantValidator extends IKeywordValidator {
 
    @Override
    public List<JMLValidationError> validate(final CommentRange c,
          final IJMLValidationContext context, final IASTNode node) {
       final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
       // TODO migrate this to a keyword validator
-      for (final IKeywordNode iKeywordNode : Nodes.getAllKeywords(node)) {
-         if ((iKeywordNode.getKeyword() instanceof LoopInvariantKeyword)
-               || (iKeywordNode.getKeyword() instanceof DecreasingKeyword)) {
-            // Validate the Loop Keywords
-            if (isLoop(context.getNodeForLeadingComment(context
-                  .getCommentForJMLComment(c)))) {
-               continue;
-            }
-            else {
-               // TODO do not encode marker ID here
-               errors.add(new JMLValidationError(
-                     "org.key_project.jmlediting.core.validationerror",
-                     "Loop Specification followed by a non Loop Java Statement",
-                     node));
-            }
-         }
-
+      // Validate the Loop Keywords
+      if (!isLoop(context.getNodeForLeadingComment(context
+            .getCommentForJMLComment(c)))) {
+         // TODO do not encode marker ID here
+         errors.add(new JMLValidationError(
+               "org.key_project.jmlediting.core.validationerror",
+               "Loop Specification followed by a non Loop Java Statement", node));
       }
+
       return errors;
    }
 

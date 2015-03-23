@@ -6,7 +6,6 @@ import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
-import org.key_project.jmlediting.core.validation.IJMLValidator;
 
 /**
  * Defines a profile for a JML dialect. A profile consists of a unique id, a
@@ -51,14 +50,6 @@ public interface IJMLProfile {
    IJMLParser createParser();
 
    /**
-    * Returns a set of {@link IJMLValidator} that this profile provides.
-    *
-    * @return a set of {@link IJMLValidator} the profile provides or an Empty
-    *         Set if there are no validators
-    */
-   Set<IJMLValidator> getValidators();
-
-   /**
     * Derives a new profile from this profile which can be edited. The created
     * profile does not contains any changes to this profile, but they may be
     * configured to the created profile later.
@@ -82,7 +73,7 @@ public interface IJMLProfile {
 
    /**
     * Returns a set of all {@link IKeywordSort}s defined in this profile
-    * 
+    *
     * @return an immutable non null set
     */
    Set<IKeywordSort> getAvailableKeywordSorts();

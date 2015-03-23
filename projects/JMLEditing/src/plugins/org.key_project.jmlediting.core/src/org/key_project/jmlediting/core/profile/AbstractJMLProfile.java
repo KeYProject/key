@@ -9,7 +9,6 @@ import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.EmptyKeywordContent;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
-import org.key_project.jmlediting.core.validation.IJMLValidator;
 
 /**
  * This class implements some methods of the {@link IJMLProfile} in a generic
@@ -80,11 +79,6 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
 
    protected Set<IKeywordSort> getAvailableKeywordSortsInternal() {
       return this.availableSorts;
-   }
-
-   @Override
-   public Set<IJMLValidator> getValidators() {
-      return Collections.emptySet();
    }
 
 }

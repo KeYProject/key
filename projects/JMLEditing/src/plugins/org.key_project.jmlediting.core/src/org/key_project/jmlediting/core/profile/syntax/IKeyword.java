@@ -2,6 +2,8 @@ package org.key_project.jmlediting.core.profile.syntax;
 
 import java.util.Set;
 
+import org.key_project.jmlediting.core.validation.IKeywordValidator;
+
 /**
  * The {@link IKeyword} specifies an JML keyword.
  *
@@ -52,5 +54,12 @@ public interface IKeyword {
     * @return an {@link IKeywordAutoProposer}
     */
    IKeywordAutoProposer createAutoProposer();
+
+   /**
+    * Returns the Keywords specific Validator.
+    *
+    * @return the Validator or null if there is none.
+    */
+   IKeywordValidator getKeywordValidator();
 
 }

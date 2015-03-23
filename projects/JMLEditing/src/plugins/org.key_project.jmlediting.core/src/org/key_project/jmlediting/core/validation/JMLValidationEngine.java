@@ -2,9 +2,10 @@ package org.key_project.jmlediting.core.validation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.IKeywordNode;
+import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLValidationError;
@@ -51,14 +52,19 @@ public class JMLValidationEngine {
     * @return a List of IMarkers that represent invalid specifications,
     *         emptylist if all specifications are valid (or could not be checked
     *         because there was no validator)
+    *
+    * @param node
+    *           the parse result for CommentRange c
     */
    public List<JMLValidationError> validateComment(final CommentRange c,
          final IASTNode node) {
       final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
-      final Set<IJMLValidator> validator = this.activeProfile.getValidators();
-      for (final IJMLValidator jmlValidator : validator) {
-         errors.addAll(jmlValidator.validate(c, this.context, node));
-
+      IKeywordValidator validator = null;
+      for (final IKeywordNode keywordNode : Nodes.getAllKeywords(node)) {
+         validator = keywordNode.getKeyword().getKeywordValidator();
+         if (validator != null) {
+            errors.addAll(validator.validate(c, this.context, node));
+         }
       }
       return errors;
    }

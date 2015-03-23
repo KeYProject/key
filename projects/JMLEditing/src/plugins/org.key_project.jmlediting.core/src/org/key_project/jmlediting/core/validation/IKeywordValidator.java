@@ -12,7 +12,7 @@ import org.key_project.jmlediting.core.utilities.JMLValidationError;
  * @author David Giessing
  *
  */
-public abstract class JMLKeywordValidator implements IJMLValidator {
+public abstract class IKeywordValidator implements IJMLValidator {
 
    /*
     * (non-Javadoc)

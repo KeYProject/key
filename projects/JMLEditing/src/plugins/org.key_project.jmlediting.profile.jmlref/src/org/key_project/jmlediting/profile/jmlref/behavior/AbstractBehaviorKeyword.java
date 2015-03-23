@@ -11,6 +11,7 @@ import org.key_project.jmlediting.core.profile.syntax.IKeywordAutoProposer;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
+import org.key_project.jmlediting.core.validation.IKeywordValidator;
 import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
 
 /**
@@ -73,6 +74,11 @@ public abstract class AbstractBehaviorKeyword implements IKeyword {
    @Override
    public IKeywordSort getSort() {
       return ToplevelKeywordSort.INSTANCE;
+   }
+
+   @Override
+   public IKeywordValidator getKeywordValidator() {
+      return null;
    }
 
 }

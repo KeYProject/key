@@ -3,9 +3,11 @@ package org.key_project.jmlediting.profile.jmlref.loop;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.profile.syntax.AbstractToplevelKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.core.validation.IKeywordValidator;
 import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 import org.key_project.jmlediting.profile.jmlref.parser.SemicolonClosedKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.SpecExpressionParser;
+import org.key_project.jmlediting.profile.jmlref.validator.LoopInvariantValidator;
 
 /**
  * The implementation of the decreasing keyword for loop invariants.
@@ -40,6 +42,11 @@ public class DecreasingKeyword extends AbstractToplevelKeyword {
             return new SpecExpressionParser(profile);
          }
       };
+   }
+
+   @Override
+   public IKeywordValidator getKeywordValidator() {
+      return new LoopInvariantValidator();
    }
 
 }

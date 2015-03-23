@@ -17,9 +17,21 @@ import org.key_project.jmlediting.core.utilities.CommentRange;
  */
 public class JMLValidationContext implements IJMLValidationContext {
 
+   /**
+    * the Map from Leading Comments to ASTNodes.
+    */
    private final Map<Comment, ASTNode> leadingCommentToNodeMap;
+
+   /**
+    * the Map from Trailing Comments to ASTNodes.
+    */
    private final Map<Comment, ASTNode> trailingCommentToNodeMap;
+
+   /**
+    * the Map from JML Comments to leading comments.
+    */
    private final Map<CommentRange, Comment> jmlCommentToCommentMap;
+
    /**
     * the source to validate on.
     */
@@ -41,13 +53,13 @@ public class JMLValidationContext implements IJMLValidationContext {
    /**
     * Creates a IJMLValidation context.
     *
-    * @param inverse
+    * @param assignedLeadingComments
     *           the Map from Leading Comments to ASTNodes
     *
-    * @param assignedLeadingComments
+    * @param assignedTrailingComments
     *           the Map from Trailing Comments to ASTNodes
     *
-    * @param assignedTrailingComments
+    * @param jmlCommentsToComments
     *           the Map from JML Comments to leading comments
     *
     *
