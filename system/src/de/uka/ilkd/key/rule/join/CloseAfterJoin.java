@@ -134,7 +134,7 @@ public class CloseAfterJoin implements BuiltInRule {
          final Services services,
          final RuleApp ruleApp) throws RuleAbortException {
       
-      ImmutableList<Goal> jpNewGoals = goal.split(2);
+      ImmutableList<Goal> jpNewGoals = goal.split(1);
       
       final Goal linkedGoal = jpNewGoals.head();
       linkedGoal.setBranchLabel("Joined with node " + joinNode.parent().serialNr());
@@ -168,14 +168,14 @@ public class CloseAfterJoin implements BuiltInRule {
          
       });
       
-      Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
-      ruleIsWeakeningGoal.setBranchLabel("Joined node is weakening");
-            
-      Term isWeakeningForm = getSyntacticWeakeningFormula(services);
-      // Delete previous sequents      
-      clearSemisequent(ruleIsWeakeningGoal, true);
-      clearSemisequent(ruleIsWeakeningGoal, false);
-      ruleIsWeakeningGoal.addFormula(new SequentFormula(isWeakeningForm), false, true);
+//      Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
+//      ruleIsWeakeningGoal.setBranchLabel("Joined node is weakening");
+//            
+//      Term isWeakeningForm = getSyntacticWeakeningFormula(services);
+//      // Delete previous sequents      
+//      clearSemisequent(ruleIsWeakeningGoal, true);
+//      clearSemisequent(ruleIsWeakeningGoal, false);
+//      ruleIsWeakeningGoal.addFormula(new SequentFormula(isWeakeningForm), false, true);
       
       // Register partner nodes
       JOIN_NODE_TO_PARTNERS_MAP.get(joinNode).add(linkedGoal.node());
