@@ -28,8 +28,7 @@ public class LoopInvariantValidator extends IKeywordValidator {
    public List<JMLValidationError> validate(final CommentRange c,
          final IJMLValidationContext context, final IASTNode node) {
       final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
-      // TODO migrate this to a keyword validator
-      // Validate the Loop Keywords
+      // Validate the Loop Keyword
       if (!isLoop(context.getNodeForLeadingComment(context
             .getCommentForJMLComment(c)))) {
          // TODO do not encode marker ID here
