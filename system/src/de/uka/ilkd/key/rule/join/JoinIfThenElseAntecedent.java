@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Quadruple;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
 /**
@@ -139,9 +140,17 @@ public class JoinIfThenElseAntecedent extends JoinRule {
                
             } else {
                
+               Function newSkolemConst = JoinRuleUtils.getNewSkolemConstantForPrefix(
+                     v.name().toString(), v.sort(), services);
+               
+               newElementaryUpdates = newElementaryUpdates.prepend(
+                     tb.elementary(
+                           v,
+                           tb.func(newSkolemConst)));
+               
                newPathCondition = tb.and(newPathCondition,
                      tb.and(getIfThenElseConstraints(
-                           tb.var(v),
+                           tb.func(newSkolemConst),
                            rightSide1,
                            rightSide2,
                            state1,
@@ -283,7 +292,7 @@ public class JoinIfThenElseAntecedent extends JoinRule {
             } else {
                
                // if-then-else
-               Function skolemConstant = getNewScolemConstantForPrefix(
+               Function skolemConstant = getNewSkolemConstantForPrefix(
                      field1.name().toString(),
                      ((Function) value1.op()).sort(),
                      services);

@@ -131,7 +131,7 @@ public class JoinWeaken extends JoinRule {
                
                // Apply weakening to fresh constant: Different values
                final Function skolemConstant =
-                     getNewScolemConstantForPrefix(varNamePrefix, v.sort(), services);
+                     getNewSkolemConstantForPrefix(varNamePrefix, v.sort(), services);
                
                newElementaryUpdates = newElementaryUpdates.prepend(
                      tb.elementary(
@@ -185,7 +185,7 @@ public class JoinWeaken extends JoinRule {
             !(heap2.op() instanceof Function)) {
          // Covers the case of two different symbolic heaps
          final Function skolemConstant =
-               getNewScolemConstantForPrefix("heap", heap1.sort(), services);
+               getNewSkolemConstantForPrefix("heap", heap1.sort(), services);
          
          return tb.func(skolemConstant);
       }
@@ -224,7 +224,7 @@ public class JoinWeaken extends JoinRule {
             } else {
                
                // if-then-else
-               Function skolemConstant = getNewScolemConstantForPrefix(
+               Function skolemConstant = getNewSkolemConstantForPrefix(
                      field1.name().toString(),
                      ((Function) value1.op()).sort(),
                      services);
@@ -260,7 +260,7 @@ public class JoinWeaken extends JoinRule {
       }
 
       final Function skolemConstant =
-            getNewScolemConstantForPrefix("heap", heap1.sort(), services);
+            getNewSkolemConstantForPrefix("heap", heap1.sort(), services);
       return tb.func(skolemConstant);
    }
 

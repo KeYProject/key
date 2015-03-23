@@ -126,7 +126,7 @@ public abstract class JoinWithLatticeAbstraction extends JoinRule {
             AbstractDomainElement joinElem = lattice.join(abstrElem1, abstrElem2);
             
             skolemConstant =
-                  getNewScolemConstantForPrefix(joinElem.toString(), v.sort(), services);
+                  getNewSkolemConstantForPrefix(joinElem.toString(), v.sort(), services);
             
             newConstraints = tb.and(newConstraints, joinElem.getDefiningAxiom(tb.func(skolemConstant), services));
             //NOTE: We also remember the precise values by if-then-else construction. This
@@ -282,7 +282,7 @@ public abstract class JoinWithLatticeAbstraction extends JoinRule {
                AbstractDomainElement joinElem = lattice.join(abstrElem1, abstrElem2);
                
                Function skolemConstant =
-                     getNewScolemConstantForPrefix(joinElem.toString(), ((Function) value1.op()).sort(), services);
+                     getNewSkolemConstantForPrefix(joinElem.toString(), ((Function) value1.op()).sort(), services);
                
                newConstraints.add(joinElem.getDefiningAxiom(tb.func(skolemConstant), services));
                //NOTE: We also remember the precise values by if-then-else construction. This

@@ -179,6 +179,27 @@ public class JoinRuleUtils {
    }
    
    /**
+    * Returns all Skolem constants in the given term.
+    * 
+    * @param term The term to extract Skolem constants from.
+    * @return All SkolemConstants of the given term.
+    */
+   public static HashSet<Function> getSkolemConstants(Term term) {
+      HashSet<Function> result = new HashSet<Function>();
+      
+      if (term.op() instanceof Function
+            && ((Function) term.op()).isSkolemConstant()) {
+         result.add((Function) term.op());
+      } else {
+         for (Term sub : term.subs()) {
+            result.addAll(getSkolemConstants(sub));
+         }
+      }
+      
+      return result;
+   }
+   
+   /**
     * Returns the right side for a given location variable in an update
     * (in normal form).
     * 
@@ -286,7 +307,7 @@ public class JoinRuleUtils {
     * @return A new Skolem constant of the given sort with the given
     *     prefix in its name.
     */
-   public static Function getNewScolemConstantForPrefix(String prefix, Sort sort, Services services) {
+   public static Function getNewSkolemConstantForPrefix(String prefix, Sort sort, Services services) {
       Function result = null;
       String newName = "";
       
@@ -335,10 +356,34 @@ public class JoinRuleUtils {
     */
    public static Term substConstantsByFreshVars(
          Term term, HashMap<Function, LogicVariable> replMap, Services services) {
+      return substConstantsByFreshVars(term, null, replMap, services);
+   }
+   
+   /**
+    * Substitutes all constants in the given term that are contained in
+    * the set restrictTo by fresh variables. If restrictTo is null, then
+    * all constants in the term are replaced.
+    * Multiple occurrences of a constant are substituted by the same
+    * variable.
+    * 
+    * @param term Term in which to substitute constants by variables.
+    * @param restrictTo Set of constants to replace. If null, all constants
+    *    are replaced.
+    * @param replMap Map from constants to variables in order to remember
+    *    substitutions of one constant.
+    * @return A term equal to the input, but with constants substituted by
+    *    fresh variables.
+    */
+   public static Term substConstantsByFreshVars(
+         Term term,
+         HashSet<Function> restrictTo,
+         HashMap<Function, LogicVariable> replMap,
+         Services services) {
       TermBuilder tb = services.getTermBuilder();
       
       if (term.op() instanceof Function
-            && ((Function) term.op()).isSkolemConstant()) {
+            && ((Function) term.op()).isSkolemConstant()
+            && (restrictTo == null || restrictTo.contains((Function) term.op()))) {
          
          Function constant = (Function) term.op();
          

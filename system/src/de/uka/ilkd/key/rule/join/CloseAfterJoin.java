@@ -222,35 +222,49 @@ public class CloseAfterJoin implements BuiltInRule {
       // Create the predicate term
       final Term predTerm = tb.func(predicateSymb, origQfdVarTerms.toArray(new Term[] {}));
       
-      // Create the formula All-Cl(C2 -> {U2} P(...)) -> All-Cl(C1 -> {U1} P(...))
+      // Obtain set of new Skolem constants in join state
+      HashSet<Function> constantsOrigState =
+            JoinRuleUtils.getSkolemConstants(thisSEState.getSymbolicState());
+      HashSet<Function> newConstants =
+            JoinRuleUtils.getSkolemConstants(joinState.getSymbolicState());
+      newConstants.removeAll(constantsOrigState);
+      
+      // Create the formula \forall v1,...,vn. (C2 -> {U2} P(...)) -> (C1 -> {U1} P(...))
       Term result = tb.imp(
             allClosure(tb.imp(
                   joinState.getPathCondition(),
-                  tb.apply(joinState.getSymbolicState(), predTerm))),
-            allClosure(tb.imp(
+                  tb.apply(joinState.getSymbolicState(), predTerm)),
+                  newConstants),
+            tb.imp(
                   thisSEState.getPathCondition(),
-                  tb.apply(thisSEState.getSymbolicState(), predTerm))));
+                  tb.apply(thisSEState.getSymbolicState(), predTerm)));
       
       return result;
    }
    
    /**
-    * Universally closes all logical and location variables in
-    * the given term. Before, all Skolem constants in the term
-    * are replaced by fresh variables, where multiple occurrences
-    * of the same constant are replaced by the same variable.
+    * Universally closes all logical variables in the given term. Before,
+    * all Skolem constants in the term are replaced by fresh logical
+    * variables, where multiple occurrences of the same constant are
+    * replaced by the same variable.
     * 
     * @param term Term to universally close.
+    * @param constsToReplace Skolem constants to replace before the universal
+    *    closure. 
     * @param services The services object.
     * @return A new term which is equivalent to the universal closure
-    *    of the argument term, with Skolem constants having been replaced
-    *    by fresh variables before.
+    *    of the argument term, with Skolem constants in constsToReplace
+    *    having been replaced by fresh variables before.
     */
-   private Term allClosure(final Term term) {
-      return JoinRuleUtils.allClosure(
-            substConstantsByFreshVars(
-                  term, new HashMap<Function, LogicVariable>(), services),
-            services);
+   private Term allClosure(final Term term, final HashSet<Function> constsToReplace) {
+      TermBuilder tb = services.getTermBuilder();
+      
+      Term termWithReplConstants = substConstantsByFreshVars(
+            term, constsToReplace, new HashMap<Function, LogicVariable>(), services);
+      
+      return tb.all(
+            termWithReplConstants.freeVars(),
+            termWithReplConstants);
    }
 
    @Override
