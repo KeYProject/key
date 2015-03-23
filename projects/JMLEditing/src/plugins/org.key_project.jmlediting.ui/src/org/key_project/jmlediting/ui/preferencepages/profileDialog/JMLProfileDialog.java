@@ -38,27 +38,81 @@ import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeyword;
 import org.key_project.jmlediting.ui.util.JMLSWTUtil;
 
+/**
+ * A dialog to view, create and edit JMLProfiles.
+ *
+ * @author Thomas Glaser
+ *
+ */
 public class JMLProfileDialog extends TitleAreaDialog {
-   private final String NAME_EXISTS = "Profile Name already exists!";
-   private final String PLEASE_SELECT = "Please select a profile to derive from!";
-   private final String PLEASE_FILL = "Profile Name must not be empty!";
+   /**
+    * error text if profile name already exists.
+    */
+   private static final String NAME_EXISTS = "Profile Name already exists!";
+   /**
+    * error text if no profile to derive from is selected.
+    */
+   private static final String PLEASE_SELECT = "Please select a profile to derive from!";
+   /**
+    * error text if profile name is empty.
+    */
+   private static final String PLEASE_FILL = "Profile Name must not be empty!";
 
+   /**
+    * the JMLProfile to view (null indicates new Profile).
+    */
    private final IJMLProfile profile;
+   /**
+    * the JMLProfile to edit.
+    */
    private IEditableDerivedProfile derivedProfile;
 
+   /**
+    * the table to show predefined keywords.
+    */
    private Table keywordTable;
+   /**
+    * the table to show all user defined keywords.
+    */
    private Table derivedTable;
+   /**
+    * the button to edit user defined keywords.
+    */
    private Button derivedKeywordEditButton;
+   /**
+    * the button to remove user defined keywords.
+    */
    private Button derivedKeywordRemoveButton;
 
+   /**
+    * the title of the dialog.
+    */
    private final String title;
+   /**
+    * the message of the dialog.
+    */
    private final String message;
 
+   /**
+    * the Widget containing the profile name.
+    */
    private Text profileNameText;
+   /**
+    * the Widget to display keyword validation errors.
+    */
    private ControlDecoration profileNameError;
+   /**
+    * the Widget containing the available Profiles to derive from.
+    */
    private Combo derivedFromCombo;
+   /**
+    * the Widget to display deriveFrom validation errors.
+    */
    private ControlDecoration comboError;
 
+   /**
+    * the comparator of Keywords to display them in lexical order.
+    */
    private final Comparator<IKeyword> keywordComparator = new Comparator<IKeyword>() {
       @Override
       public int compare(final IKeyword o1, final IKeyword o2) {
@@ -67,6 +121,15 @@ public class JMLProfileDialog extends TitleAreaDialog {
       }
    };
 
+   /**
+    * the only Constructor.
+    *
+    * @param parent
+    *           the parent shell
+    * @param profile
+    *           the profile to view/edit (instanceof IEditableDerivedProfile
+    *           when edit, and null when new Profile)
+    */
    public JMLProfileDialog(final Shell parent, final IJMLProfile profile) {
       super(parent);
       this.profile = profile;
@@ -224,7 +287,7 @@ public class JMLProfileDialog extends TitleAreaDialog {
             | SWT.TOP);
       this.comboError.setImage(FieldDecorationRegistry.getDefault()
             .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR).getImage());
-      this.comboError.setDescriptionText(this.PLEASE_SELECT);
+      this.comboError.setDescriptionText(PLEASE_SELECT);
       this.comboError.show();
 
       this.derivedFromCombo.addModifyListener(new ModifyListener() {
@@ -261,7 +324,7 @@ public class JMLProfileDialog extends TitleAreaDialog {
             SWT.RIGHT | SWT.TOP);
       this.profileNameError.setImage(FieldDecorationRegistry.getDefault()
             .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR).getImage());
-      this.profileNameError.setDescriptionText(this.PLEASE_FILL);
+      this.profileNameError.setDescriptionText(PLEASE_FILL);
       this.profileNameError.show();
 
       this.profileNameText.addModifyListener(new ModifyListener() {
@@ -269,7 +332,7 @@ public class JMLProfileDialog extends TitleAreaDialog {
          public void modifyText(final ModifyEvent e) {
             if (JMLProfileDialog.this.profileNameText.getText().isEmpty()) {
                JMLProfileDialog.this.profileNameError
-                     .setDescriptionText(JMLProfileDialog.this.PLEASE_FILL);
+                     .setDescriptionText(JMLProfileDialog.PLEASE_FILL);
                JMLProfileDialog.this.profileNameError.show();
             }
             else {
@@ -371,7 +434,7 @@ public class JMLProfileDialog extends TitleAreaDialog {
       this.keywordTable.redraw();
    }
 
-   private boolean checkProfileNameUnique(final String profileName) {
+   private boolean isProfileNameUnique(final String profileName) {
       if (JMLProfileManagement.instance().getProfileFromName(profileName) != null) {
          this.profileNameError.setDescriptionText(this.NAME_EXISTS);
          this.profileNameError.show();
@@ -593,13 +656,19 @@ public class JMLProfileDialog extends TitleAreaDialog {
             .getItem(index));
    }
 
+   /**
+    * save the edited profile.
+    *
+    * @param onOkPressed
+    * @return whether validation had success
+    */
    private boolean saveEditProfile(final boolean onOkPressed) {
       System.out.println("saveEditProfile(" + onOkPressed + ")");
       final String profileName = this.profileNameText.getText();
 
       if (!profileName.equals(this.derivedProfile.getName())
-            && !this.checkProfileNameUnique(profileName)) {
-         this.setMessage(this.NAME_EXISTS, IMessageProvider.ERROR);
+            && !this.isProfileNameUnique(profileName)) {
+         this.setMessage(NAME_EXISTS, IMessageProvider.ERROR);
          return false;
       }
       this.derivedProfile.setName(profileName);
@@ -616,6 +685,13 @@ public class JMLProfileDialog extends TitleAreaDialog {
       return true;
    }
 
+   /**
+    * create a new derived profile and save it.
+    *
+    * @param onOkPressed
+    *           is this method called out of "okPressed"?
+    * @return whether validation had success
+    */
    private boolean saveNewProfile(final boolean onOkPressed) {
       System.out.println("saveNewProfile(" + onOkPressed + ")");
       final String profileName = this.profileNameText.getText();
@@ -623,20 +699,18 @@ public class JMLProfileDialog extends TitleAreaDialog {
       final IJMLProfile parentProfile = this.getSelectedProfileFromCombo();
 
       if (profileName.isEmpty()) {
-         this.setMessage(this.PLEASE_FILL, IMessageProvider.ERROR);
+         this.setMessage(PLEASE_FILL, IMessageProvider.ERROR);
          return false;
       }
-      else if (parentProfile == null) {
-         this.setMessage(this.PLEASE_SELECT, IMessageProvider.ERROR);
+      if (parentProfile == null) {
+         this.setMessage(PLEASE_SELECT, IMessageProvider.ERROR);
          return false;
       }
-      else if (!this.checkProfileNameUnique(profileName)) {
-         this.setMessage(this.NAME_EXISTS, IMessageProvider.ERROR);
+      if (!this.isProfileNameUnique(profileName)) {
+         this.setMessage(NAME_EXISTS, IMessageProvider.ERROR);
          return false;
       }
-      else {
-         this.setMessage("", IMessageProvider.NONE);
-      }
+      this.setMessage("", IMessageProvider.NONE);
 
       final IEditableDerivedProfile newProfile = parentProfile.derive(
             profileId, profileName);
