@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -47,6 +48,8 @@ public class JMLProfileDialog extends TitleAreaDialog {
 
    private Table keywordTable;
    private Table derivedTable;
+   private Button derivedKeywordEditButton;
+   private Button derivedKeywordRemoveButton;
 
    private final String title;
    private final String message;
@@ -419,39 +422,56 @@ public class JMLProfileDialog extends TitleAreaDialog {
          public void widgetDefaultSelected(final SelectionEvent e) {
          }
       });
-      final Button derivedKeywordEditButton = this.createTableSideButton(
-            myComposite, "Edit...");
-      derivedKeywordEditButton.addSelectionListener(new SelectionListener() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            final IUserDefinedKeyword keyword = JMLProfileDialog.this
-                  .getSelectedDerivedKeyword();
-            if (keyword == null) {
-               return;
-            }
-            final JMLKeywordDialog dialog = new JMLKeywordDialog(
-                  JMLProfileDialog.this.getShell(),
-                  JMLProfileDialog.this.derivedProfile, keyword);
-            dialog.open();
-            JMLProfileDialog.this.fillDerivedTable();
-         }
+      this.derivedKeywordEditButton = this.createTableSideButton(myComposite,
+            "Edit...");
+      this.derivedKeywordEditButton
+            .addSelectionListener(new SelectionListener() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  final IUserDefinedKeyword keyword = JMLProfileDialog.this
+                        .getSelectedDerivedKeyword();
+                  if (keyword == null) {
+                     return;
+                  }
+                  final JMLKeywordDialog dialog = new JMLKeywordDialog(
+                        JMLProfileDialog.this.getShell(),
+                        JMLProfileDialog.this.derivedProfile, keyword);
+                  dialog.open();
+                  JMLProfileDialog.this.fillDerivedTable();
+               }
 
-         @Override
-         public void widgetDefaultSelected(final SelectionEvent e) {
-         }
-      });
-      final Button derivedKeywordRemoveButton = this.createTableSideButton(
-            myComposite, "Remove...");
-      derivedKeywordRemoveButton.addSelectionListener(new SelectionListener() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            // TODO
-         }
+               @Override
+               public void widgetDefaultSelected(final SelectionEvent e) {
+               }
+            });
 
-         @Override
-         public void widgetDefaultSelected(final SelectionEvent e) {
-         }
-      });
+      this.derivedKeywordRemoveButton = this.createTableSideButton(myComposite,
+            "Remove...");
+      this.derivedKeywordRemoveButton
+            .addSelectionListener(new SelectionListener() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  final IUserDefinedKeyword keyword = JMLProfileDialog.this
+                        .getSelectedDerivedKeyword();
+                  if (keyword == null) {
+                     return;
+                  }
+                  final boolean remove = MessageDialog.openConfirm(
+                        JMLProfileDialog.this.getShell(), "Remove Keyword",
+                        "Are you reall sure to remove the keyword \""
+                              + keyword.getKeywords().iterator().next()
+                              + "\"? \r\n(Cannot be undone!)");
+                  if (remove) {
+                     JMLProfileDialog.this.derivedProfile
+                           .removeKeyword(keyword);
+                     JMLProfileDialog.this.fillDerivedTable();
+                  }
+               }
+
+               @Override
+               public void widgetDefaultSelected(final SelectionEvent e) {
+               }
+            });
    }
 
    private void addDerivedTable(final Composite myComposite) {
@@ -470,7 +490,8 @@ public class JMLProfileDialog extends TitleAreaDialog {
       this.derivedTable.addSelectionListener(new SelectionListener() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            // TODO
+            JMLProfileDialog.this.derivedKeywordEditButton.setVisible(true);
+            JMLProfileDialog.this.derivedKeywordRemoveButton.setVisible(true);
          }
 
          @Override
@@ -511,6 +532,9 @@ public class JMLProfileDialog extends TitleAreaDialog {
                .keywordToDerivedTableData((IUserDefinedKeyword) keyword));
          item.setData(keyword);
       }
+
+      this.derivedKeywordEditButton.setVisible(false);
+      this.derivedKeywordRemoveButton.setVisible(false);
 
       this.derivedTable.setEnabled(true);
       this.derivedTable.redraw();
