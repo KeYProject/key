@@ -30,6 +30,7 @@ public class JMLProfileDialogTest {
    private static final String PROFILETABLE_LABEL = "Choose active JML Profile from available ones:";
 
    private static final String NEW_PROFILE_NAME = "TestProfile123";
+   private static final String SECOND_NEW_PROFILE_NAME = "SecondProfile";
    private static final String PROFILENAME_TO_SELECT = "KeY Profile";
 
    /**
@@ -72,7 +73,7 @@ public class JMLProfileDialogTest {
             .select();
    }
 
-   // @Test
+   @Test
    public void testCurrentProfileIsSelected() {
       final String selectedProfileName = this.getCheckedItemFirstColumn(bot
             .tableWithLabel(PROFILETABLE_LABEL));
@@ -81,14 +82,14 @@ public class JMLProfileDialogTest {
             JMLPreferencesHelper.getDefaultJMLProfile().getName());
    }
 
-   // @Test
+   @Test
    public void testOnlyOneItemIsChecked() {
       final int count = this.getCheckedItemCount(bot
             .tableWithLabel(PROFILETABLE_LABEL));
       assertEquals("Less or more than 1 Profile is checked!", 1, count);
    }
 
-   // @Test
+   @Test
    public void testNewProfileSelection() {
       final String currentProfileName = this.getCheckedItemFirstColumn(bot
             .tableWithLabel(PROFILETABLE_LABEL));
@@ -105,7 +106,7 @@ public class JMLProfileDialogTest {
       bot.button("Apply").click();
    }
 
-   // @Test
+   @Test
    public void testViewProfile() {
       final IJMLProfile profile = JMLPreferencesHelper.getDefaultJMLProfile();
       bot.button("View...").click();
@@ -123,8 +124,8 @@ public class JMLProfileDialogTest {
    }
 
    /**
-    * need this order, because only a derived profile can be edited, and default
-    * there is no derived profile...
+    * need this in order, because only a derived profile can be edited, and by
+    * default there is no derived profile...
     */
    @Test
    public void testNewAndEditProfile() {
@@ -137,7 +138,33 @@ public class JMLProfileDialogTest {
             .select();
       bot.button("Edit...").click();
 
-      this.sleep();
+      assertFalse("DerivedFromCombo should be disabled!", bot
+            .comboBoxWithLabel(DERIVED_FROM).isEnabled());
+
+      final SWTBotTable keywordTable = bot.tableWithLabel(KEYWORDTABLE_EDIT);
+
+      assertFalse("Disabled Keywords are not saved!", keywordTable
+            .getTableItem(0).isChecked()
+            || keywordTable.getTableItem(1).isChecked());
+      boolean allOtherChecked = true;
+      for (int i = 2; i < keywordTable.rowCount(); i++) {
+         if (allOtherChecked) {
+            allOtherChecked = keywordTable.getTableItem(2).isChecked();
+         }
+      }
+      assertTrue("Too many Keywords are disabled!", allOtherChecked);
+
+      final SWTBotText profileNameText = bot.textWithLabel(PROFILE_NAME);
+      profileNameText.setText(SECOND_NEW_PROFILE_NAME);
+
+      this.clickOK();
+
+      assertTrue(
+            "Edit Profile was not successfull! (edit name not saved)",
+            bot.tableWithLabel(PROFILETABLE_LABEL).containsItem(
+                  SECOND_NEW_PROFILE_NAME)
+                  && !bot.tableWithLabel(PROFILETABLE_LABEL).containsItem(
+                        NEW_PROFILE_NAME));
    }
 
    private void testNewProfileAndSave() {
@@ -165,14 +192,10 @@ public class JMLProfileDialogTest {
       keywordTable.getTableItem(1).uncheck();
       this.clickOK();
 
-      final SWTBotTable profileTable = bot.tableWithLabel(PROFILETABLE_LABEL);
-      assertTrue("New Profile is not saved!",
-            profileTable.containsItem(NEW_PROFILE_NAME));
-   }
-
-   private void sleep() {
-      System.err.println("jetzt!!!");
-      bot.sleep(100000000000L);
+      assertTrue(
+            "New Profile is not saved!",
+            bot.tableWithLabel(PROFILETABLE_LABEL).containsItem(
+                  NEW_PROFILE_NAME));
    }
 
    private void testWidgetNotThere(final Type type, final String name) {
