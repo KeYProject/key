@@ -8,7 +8,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Sp
 
 /**
  * Parser to parse a unary expression arguments in brackets.
- * 
+ *
  * @author Moritz Lichter
  *
  */
@@ -24,7 +24,7 @@ public class UnarySpecExpressionArgParser extends
 
    @Override
    public String getDescription() {
-      return "( <expression> )";
+      return "'(' <expression> ')'";
    }
 
 }
