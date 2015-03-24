@@ -293,11 +293,13 @@ public class JMLKeywordDialog extends TitleAreaDialog {
       this.keywordText.addModifyListener(new ModifyListener() {
          @Override
          public void modifyText(final ModifyEvent e) {
-            if (JMLKeywordDialog.this.keywordText.getText().isEmpty()) {
-               JMLKeywordDialog.this.keywordTextError.show();
+            final String text = JMLKeywordDialog.this.keywordText.getText();
+            if (!text.isEmpty()
+                  && JMLKeywordDialog.this.checkNoWhitespace(text)) {
+               JMLKeywordDialog.this.keywordTextError.hide();
             }
             else {
-               JMLKeywordDialog.this.keywordTextError.hide();
+               JMLKeywordDialog.this.keywordTextError.show();
             }
          }
       });
@@ -308,7 +310,10 @@ public class JMLKeywordDialog extends TitleAreaDialog {
       final String formattedKeyword = this.keywordText.getText();
       final Set<String> keywords = new HashSet<String>();
       for (final String kw : formattedKeyword.split(",\\s")) {
-         keywords.add(kw);
+         if (!kw.isEmpty() && this.checkNoWhitespace(kw)) {
+            System.out.println("adding Keyword: \"" + kw + "\"");
+            keywords.add(kw);
+         }
       }
 
       if (keywords.size() == 0) {
@@ -346,5 +351,14 @@ public class JMLKeywordDialog extends TitleAreaDialog {
       this.derivedProfile.addKeyword(keyword2Save);
 
       super.okPressed();
+   }
+
+   private boolean checkNoWhitespace(final String kw) {
+      for (int i = 0; i < kw.length(); i++) {
+         if (Character.isWhitespace(kw.charAt(i))) {
+            return false;
+         }
+      }
+      return true;
    }
 }

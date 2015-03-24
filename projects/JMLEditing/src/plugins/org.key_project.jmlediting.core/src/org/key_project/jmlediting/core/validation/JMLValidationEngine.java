@@ -60,9 +60,9 @@ public class JMLValidationEngine {
    public List<JMLError> validateComment(final CommentRange c,
          final IASTNode node) {
       final List<JMLError> errors = new ArrayList<JMLError>();
-      IKeywordValidator validator = null;
       for (final IKeywordNode keywordNode : Nodes.getAllKeywords(node)) {
-         validator = keywordNode.getKeyword().getKeywordValidator();
+         final IKeywordValidator validator = keywordNode.getKeyword()
+               .getKeywordValidator();
          if (validator != null) {
             errors.addAll(validator.validate(c, this.context, node));
          }
