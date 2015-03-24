@@ -29,7 +29,7 @@ public class SeqExprTest {
          + " @ ensures x == \\seq_singleton (1); \n"
          + " @ ensures y == (\\seq_def int x; a;b;c); \n"
          + " @ \n"
-         + " @ set x = \\seq_concat(\\seq_singleton(1), this.get()); \n"
+         + " @ set x = \\seq_put(\\seq_concat(\\seq_singleton(1), this.get()), 1, 2); \n"
          + " @ ensures \\contains(\\seq_empty, a) && \\indexOf(x, a) == 2; \n"
          + " @ requires \\seq_length(\\singleton(1)) == 1; \n"
          + " @ requires \\seq_sub(\\seq_empty, \\seq_reverse(\\seq_empty), \\seq_empty).* ; \n"

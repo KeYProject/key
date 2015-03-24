@@ -59,6 +59,7 @@ import org.key_project.jmlediting.profile.key.seq.SeqLengthKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqPrimary;
 import org.key_project.jmlediting.profile.key.seq.SeqPrimaryParser;
 import org.key_project.jmlediting.profile.key.seq.SeqPrimitiveKeywordSort;
+import org.key_project.jmlediting.profile.key.seq.SeqPutKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqReverseKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqSingletonKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqSubKeyword;
@@ -122,7 +123,7 @@ public class KeyProfile extends JMLReferenceProfile {
             new SeqSingletonKeyword(), new ValuesKeyword(),
             new ContainsKeyword(), new IndexOfKeyword(), new SeqSubKeyword(),
             new SeqLengthKeyword(), new SingletonKeyword(), new IndexKeyword(),
-            new SeqReverseKeyword()));
+            new SeqReverseKeyword(), new SeqPutKeyword()));
       supportedPrimaries.add(new SeqPrimary());
       this.additionalPrimarySuffixes.add(SeqPrimaryParser.seqSuffix(this));
 
