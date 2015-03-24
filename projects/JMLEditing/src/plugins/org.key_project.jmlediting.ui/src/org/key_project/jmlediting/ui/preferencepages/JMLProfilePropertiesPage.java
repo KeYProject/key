@@ -107,7 +107,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
          @Override
          public void newProfileAdded(final IJMLProfile newProfile) {
-            JMLProfilePropertiesPage.this.fillTable();
+            // JMLProfilePropertiesPage.this.fillTable();
          }
       };
       JMLProfileManagement.instance().addListener(

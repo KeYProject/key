@@ -174,12 +174,13 @@ public class JMLProfileDialog extends TitleAreaDialog {
       if (this.profile == null
             || (this.profile != null && this.derivedProfile != null)) {
          this.addProfileName(myComposite, true);
-         this.addDerivedFrom(myComposite, this.derivedProfile == null);
-         if (this.derivedProfile == null) {
+         this.addDerivedFrom(myComposite, this.profile == null);
+         if (this.profile == null) {
             this.derivedFromCombo.addSelectionListener(new SelectionListener() {
 
                @Override
                public void widgetSelected(final SelectionEvent e) {
+                  System.out.println("selected derivedFromCombo");
                   JMLProfileDialog.this.fillKeywordTable();
                }
 
@@ -192,7 +193,7 @@ public class JMLProfileDialog extends TitleAreaDialog {
             this.profileNameText.setText(this.profile.getName());
          }
 
-         this.addKeywordTableLabel(myComposite, "Keywords from parent profile");
+         this.addKeywordTableLabel(myComposite, "Keywords from parent profile:");
          this.addKeywordTable(myComposite, true);
          this.keywordTable.addSelectionListener(new SelectionListener() {
             @Override
@@ -270,7 +271,7 @@ public class JMLProfileDialog extends TitleAreaDialog {
       GridData data;
       data = new GridData(SWT.FILL, SWT.TOP, false, true);
       final Label derivedFromLabel = new Label(myComposite, SWT.NONE);
-      derivedFromLabel.setText("Derived from: ");
+      derivedFromLabel.setText("Derived from:");
       derivedFromLabel.setLayoutData(data);
 
       data = new GridData(SWT.LEFT, SWT.TOP, true, true);
@@ -309,7 +310,7 @@ public class JMLProfileDialog extends TitleAreaDialog {
       data = new GridData(SWT.FILL, SWT.TOP, false, true);
       data.horizontalSpan = 1;
       final Label profileNameLabel = new Label(myComposite, SWT.NONE);
-      profileNameLabel.setText("ProfileName: ");
+      profileNameLabel.setText("Profile Name:");
       profileNameLabel.setLayoutData(data);
 
       data = new GridData(SWT.LEFT, SWT.TOP, true, true, 2, 1);
@@ -355,7 +356,7 @@ public class JMLProfileDialog extends TitleAreaDialog {
       data = new GridData(SWT.LEFT, SWT.TOP, false, false, 3, 1);
       data.verticalIndent = 20;
       final Label derivedTableLabel = new Label(myComposite, SWT.NONE);
-      derivedTableLabel.setText("Custom Keywords: ");
+      derivedTableLabel.setText("Custom Keywords:");
       derivedTableLabel.setLayoutData(data);
    }
 
@@ -402,7 +403,7 @@ public class JMLProfileDialog extends TitleAreaDialog {
       this.keywordTable.removeAll();
 
       final List<IKeyword> keywordList;
-      if (this.derivedProfile != null) {
+      if (this.profile != null && this.derivedProfile != null) {
          keywordList = new ArrayList<IKeyword>(this.derivedProfile
                .getParentProfile().getSupportedKeywords());
       }
@@ -413,6 +414,11 @@ public class JMLProfileDialog extends TitleAreaDialog {
       else if (this.saveNewProfile(false)) {
          keywordList = new ArrayList<IKeyword>(this.derivedProfile
                .getParentProfile().getSupportedKeywords());
+      }
+      else if (this.derivedFromCombo != null
+            && this.getSelectedProfileFromCombo() != null) {
+         keywordList = new ArrayList<IKeyword>(this
+               .getSelectedProfileFromCombo().getSupportedKeywords());
       }
       else {
          return;
@@ -427,6 +433,9 @@ public class JMLProfileDialog extends TitleAreaDialog {
             item.setChecked(!this.derivedProfile
                   .isParentKeywordDisabled(keyword));
          }
+         else {
+            item.setChecked(true);
+         }
       }
       this.keywordTable.setEnabled(true);
       this.keywordTable.redraw();
@@ -434,7 +443,7 @@ public class JMLProfileDialog extends TitleAreaDialog {
 
    private boolean isProfileNameUnique(final String profileName) {
       if (JMLProfileManagement.instance().getProfileFromName(profileName) != null) {
-         this.profileNameError.setDescriptionText(this.NAME_EXISTS);
+         this.profileNameError.setDescriptionText(NAME_EXISTS);
          this.profileNameError.show();
          return false;
       }
@@ -698,24 +707,29 @@ public class JMLProfileDialog extends TitleAreaDialog {
 
       if (profileName.isEmpty()) {
          this.setMessage(PLEASE_FILL, IMessageProvider.ERROR);
+         this.derivedProfile = null;
          return false;
       }
       if (parentProfile == null) {
          this.setMessage(PLEASE_SELECT, IMessageProvider.ERROR);
+         this.derivedProfile = null;
          return false;
       }
       if (!this.isProfileNameUnique(profileName)) {
          this.setMessage(NAME_EXISTS, IMessageProvider.ERROR);
+         this.derivedProfile = null;
          return false;
       }
       this.setMessage("", IMessageProvider.NONE);
 
-      final IEditableDerivedProfile newProfile = parentProfile.derive(
-            profileId, profileName);
+      if (this.derivedProfile == null) {
+         this.derivedProfile = parentProfile.derive(profileId, profileName);
+      }
 
       if (onOkPressed) {
          try {
-            JMLProfileManagement.instance().addUserDefinedProfile(newProfile);
+            JMLProfileManagement.instance().addUserDefinedProfile(
+                  this.derivedProfile);
             JMLProfileManagement.instance().writeDerivedProfiles();
          }
          catch (final InvalidProfileException ipe) {
@@ -723,11 +737,7 @@ public class JMLProfileDialog extends TitleAreaDialog {
             return false;
          }
       }
-      else {
-         this.derivedProfile = newProfile;
-      }
       return true;
-
    }
 
    @Override
