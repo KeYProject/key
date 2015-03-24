@@ -156,7 +156,7 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
       }
       
       Term resultPathCondition = joinedState.second;
-//      resultPathCondition = trySimplify(services.getProof(), resultPathCondition, true);
+      resultPathCondition = trySimplify(services.getProof(), resultPathCondition, true);
       
       // Delete previous sequents      
       clearSemisequent(newGoal, true);
@@ -403,7 +403,7 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
                      joinValuesInStates(
                            new LocationVariable(
                                  new ProgramElementName(field1.name().toString()),
-                                 field1.sort()),
+                                 value1.sort()),
                            state1, value1, state2, value2, services);
 
                newConstraints.addAll(joinedValAndConstr.first);
