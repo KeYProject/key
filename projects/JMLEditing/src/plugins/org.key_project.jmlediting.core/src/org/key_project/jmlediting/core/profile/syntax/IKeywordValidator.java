@@ -31,13 +31,4 @@ public interface IKeywordValidator {
     */
    List<JMLError> validate(CommentRange c, final IJMLValidationContext context,
          final IASTNode node);
-
-   /**
-    * Generates an errorMessage to be displayed.
-    *
-    * @param errorMessage
-    *           the basic errorMessage
-    * @return the complete errorMessage
-    */
-   String generateErrorMessage(String errorMessage);
 }

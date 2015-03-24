@@ -92,7 +92,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                         new String[] { error.getErrorMessage() },
                         new String[] { error.getErrorMessage() },
                         ProblemSeverities.Error, error.getErrorOffset(), error
-                              .getErrorOffset(), -1, -1));
+                        .getErrorOffset(), -1, -1));
                }
 
                // And now put the problems to the context to make them visible
@@ -208,7 +208,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                int pos = start;
                while (pos < commentList.size()
                      && commentList.get(pos).getStartPosition() < node
-                           .getStartPosition()) {
+                     .getStartPosition()) {
                   assert !inverse.containsKey(commentList.get(pos));
                   inverse.put(commentList.get(pos), node);
                   pos++;
@@ -221,7 +221,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                int pos = end;
                while (pos >= 0
                      && commentList.get(pos).getStartPosition() > node
-                           .getStartPosition()) {
+                     .getStartPosition()) {
                   assert !inverseTrailing.containsKey(commentList.get(pos));
                   inverseTrailing.put(commentList.get(pos), node);
                   pos--;
@@ -249,7 +249,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
    private List<JMLError> convertParseException(final ParserException e) {
       final List<JMLError> converted = new ArrayList<JMLError>();
       for (final ParserError err : e.getAllErrors()) {
-         converted.add(new JMLError(ErrorTypes.ParseError, err
+         converted.add(new JMLError("", ErrorTypes.ParseError, err
                .getErrorMessage(), err.getErrorOffset()));
       }
       return converted;
