@@ -129,7 +129,13 @@ public class JMLStoreRefProposer {
       }
 
       // compute all TypeBinding needed to resolve visibility of variables
-      final ITypeBinding activeType = activeTypeDecl.resolveBinding();
+      final ITypeBinding activeType;
+      if (activeTypeDecl != null) {
+         activeType = activeTypeDecl.resolveBinding();
+      }
+      else {
+         activeType = null;
+      }
       this.declaringType = topDecl.resolveBinding();
       final IASTNode node;
       final List<IASTNode> restNodes;
@@ -170,8 +176,10 @@ public class JMLStoreRefProposer {
       }
 
       // propose all (visible)fields
-      result.addAll(this.proposeStoreRefVariables(activeType, node, restNodes,
-            false, allowKeywords, true));
+      if (activeType != null) {
+         result.addAll(this.proposeStoreRefVariables(activeType, node,
+               restNodes, false, allowKeywords, true));
+      }
 
       // if we have no other Expressions, we can propose the Method parameters
       // -> only at the beginning of proposals;
