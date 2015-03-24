@@ -20,6 +20,6 @@ public class PredicateOtNotSpecifiedParser extends
 
    @Override
    public String getDescription() {
-      return "<predicate> | '\not_specified'";
+      return "<predicate> | '\\not_specified'";
    }
 }

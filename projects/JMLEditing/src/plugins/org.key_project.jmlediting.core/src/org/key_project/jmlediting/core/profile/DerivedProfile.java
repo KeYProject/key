@@ -7,6 +7,7 @@ import java.util.Set;
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 
 /**
@@ -17,8 +18,8 @@ import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordCo
  *           the type of the parent profile profile
  *
  */
-public abstract class DerivedProfile<P extends IJMLProfile> extends
-      AbstractJMLProfile implements IDerivedProfile, IEditableDerivedProfile {
+public abstract class DerivedProfile<P extends IJMLProfile> implements
+      IDerivedProfile, IEditableDerivedProfile {
 
    /**
     * The name of the profile.
@@ -33,6 +34,8 @@ public abstract class DerivedProfile<P extends IJMLProfile> extends
     * The constant parent profile of this profile.
     */
    private final P parentProfile;
+
+   private final Set<IKeyword> supportedKeywords;
 
    /**
     * A set holding all keywords of the parent which are disabled.
@@ -77,6 +80,8 @@ public abstract class DerivedProfile<P extends IJMLProfile> extends
       this.disabledParentKeywords = new HashSet<IKeyword>();
       this.additionalKeywords = new HashSet<IKeyword>();
       this.keywordSetIsDirty = true;
+      this.supportedKeywords = new HashSet<IKeyword>();
+      this.recalculateSupportedKeywords();
    }
 
    @Override
@@ -106,16 +111,14 @@ public abstract class DerivedProfile<P extends IJMLProfile> extends
     * Recalculates the set of all available keywords.
     */
    private void recalculateSupportedKeywords() {
-      final Set<IKeyword> supportedKeywords = this
-            .getSupportedKeywordsInternal();
       // Clear old ones
-      supportedKeywords.clear();
+      this.supportedKeywords.clear();
       // Add the keyword of the parent
-      supportedKeywords.addAll(this.parentProfile.getSupportedKeywords());
+      this.supportedKeywords.addAll(this.parentProfile.getSupportedKeywords());
       // and remove the disabled ones
-      supportedKeywords.removeAll(this.disabledParentKeywords);
+      this.supportedKeywords.removeAll(this.disabledParentKeywords);
       // finally add the additonal ones
-      supportedKeywords.addAll(this.additionalKeywords);
+      this.supportedKeywords.addAll(this.additionalKeywords);
    }
 
    @Override
@@ -125,7 +128,7 @@ public abstract class DerivedProfile<P extends IJMLProfile> extends
          this.recalculateSupportedKeywords();
          this.keywordSetIsDirty = false;
       }
-      return super.getSupportedKeywords();
+      return this.supportedKeywords;
    }
 
    @Override
@@ -207,6 +210,11 @@ public abstract class DerivedProfile<P extends IJMLProfile> extends
    public IEditableDerivedProfile derive(final String id, final String name) {
       throw new UnsupportedOperationException(
             "Cannot derive from a derived profile");
+   }
+
+   @Override
+   public Set<IKeywordSort> getAvailableKeywordSorts() {
+      return this.parentProfile.getAvailableKeywordSorts();
    }
 
 }
