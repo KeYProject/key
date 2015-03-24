@@ -30,8 +30,8 @@ public class LoopInvariantValidator extends AbstractKeywordValidator {
          final IJMLValidationContext context, final IASTNode node) {
       final List<JMLError> errors = new ArrayList<JMLError>();
       // Validate the Loop Keyword
-      if (!isLoop(context.getNodeForLeadingComment(context
-            .getCommentForJMLComment(c)))) {
+      if (!this.isFollowingJavaElementValid(context
+            .getNodeForLeadingComment(context.getCommentForJMLComment(c)))) {
          errors.add(new JMLError("LoopValidationError",
                ErrorTypes.ValidationError, "Loop Specification followed"
                      + " by a non Loop Java Statement", node.getEndOffset()));
@@ -40,14 +40,8 @@ public class LoopInvariantValidator extends AbstractKeywordValidator {
       return errors;
    }
 
-   /**
-    * Checks whether a given ASTNode represents a Loop.
-    *
-    * @param node
-    *           the ASTNode
-    * @return true if node is a Loop else false
-    */
-   public static boolean isLoop(final ASTNode node) {
+   @Override
+   public boolean isFollowingJavaElementValid(final ASTNode node) {
       return (node instanceof ForStatement) || (node instanceof WhileStatement)
             || (node instanceof DoStatement);
    }
