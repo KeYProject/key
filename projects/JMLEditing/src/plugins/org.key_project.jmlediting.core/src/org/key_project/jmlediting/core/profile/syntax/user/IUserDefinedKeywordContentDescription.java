@@ -29,11 +29,8 @@ public interface IUserDefinedKeywordContentDescription {
    /**
     * Creates the content parse function for the keyword for the given profile.
     *
-    * @param profile
-    *           the profile to create the parse function for the closing
-    *           character or null if none
     * @return the content parse function for the keyword
     */
-   IKeywordParser getKeywordParser();
+   IKeywordParser createKeywordParser();
 
 }
