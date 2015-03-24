@@ -2,6 +2,7 @@ package org.key_project.jmlediting.core.profile.syntax;
 
 import java.util.List;
 
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLError;
@@ -33,11 +34,11 @@ public interface IKeywordValidator {
          final IASTNode node);
 
    /**
-    * Generates an errorMessage to be displayed.
+    * Checks if node is a valid Statement for this Validator.
     *
-    * @param errorMessage
-    *           the basic errorMessage
-    * @return the complete errorMessage
+    * @param node
+    *           the Node to Validate
+    * @return true if valid, else false
     */
-   String generateErrorMessage(String errorMessage);
+   boolean isFollowingJavaElementValid(ASTNode node);
 }

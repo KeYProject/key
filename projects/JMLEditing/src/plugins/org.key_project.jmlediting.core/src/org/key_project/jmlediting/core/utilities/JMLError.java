@@ -9,6 +9,11 @@ package org.key_project.jmlediting.core.utilities;
 public class JMLError {
 
    /**
+    * The Specific ErrorType of the JMLError
+    */
+   private final String specificErrorType;
+
+   /**
     * Represents the errorType.
     */
    private final ErrorTypes errorType;
@@ -31,8 +36,9 @@ public class JMLError {
     * @param offset
     *           the offset of the Error
     */
-   public JMLError(final ErrorTypes errorType, final String errorMessage,
-         final int offset) {
+   public JMLError(final String specificError, final ErrorTypes errorType,
+         final String errorMessage, final int offset) {
+      this.specificErrorType = specificError;
       this.errorType = errorType;
       this.errorMessage = errorMessage;
       this.offset = offset;
@@ -49,7 +55,7 @@ public class JMLError {
     * @return the errorMessage
     */
    public String getErrorMessage() {
-      return this.errorMessage;
+      return this.specificErrorType + ": " + this.errorMessage;
    }
 
    /**
