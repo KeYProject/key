@@ -108,7 +108,6 @@ public class JMLValidationContext implements IJMLValidationContext {
 
    @Override
    public IJMLParser getJMLParser() {
-      // TODO Auto-generated method stub
       return this.jmlParser;
    }
 

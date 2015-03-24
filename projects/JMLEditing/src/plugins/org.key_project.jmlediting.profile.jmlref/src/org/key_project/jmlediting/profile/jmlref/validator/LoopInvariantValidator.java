@@ -10,8 +10,8 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeywordValidator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
-import org.key_project.jmlediting.core.utilities.JMLError;
 import org.key_project.jmlediting.core.utilities.ErrorTypes;
+import org.key_project.jmlediting.core.utilities.JMLError;
 import org.key_project.jmlediting.core.validation.IJMLValidationContext;
 
 /**
@@ -25,7 +25,7 @@ import org.key_project.jmlediting.core.validation.IJMLValidationContext;
  */
 public class LoopInvariantValidator extends AbstractKeywordValidator {
    /**
-    * Initializes the Validator with its errorType
+    * Initializes the Validator with its errorType.
     */
    public LoopInvariantValidator() {
       super("LoopValidationError: ");
@@ -38,10 +38,9 @@ public class LoopInvariantValidator extends AbstractKeywordValidator {
       // Validate the Loop Keyword
       if (!isLoop(context.getNodeForLeadingComment(context
             .getCommentForJMLComment(c)))) {
-         errors.add(new JMLError(
-               ErrorTypes.ValidationError,
-               super.generateErrorMessage("Loop Specification followed by a non Loop Java Statement"),
-               node.getEndOffset()));
+         errors.add(new JMLError(ErrorTypes.ValidationError, super
+               .generateErrorMessage("Loop Specification followed"
+                     + " by a non Loop Java Statement"), node.getEndOffset()));
       }
 
       return errors;

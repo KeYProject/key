@@ -46,23 +46,32 @@ public interface IJMLValidationContext {
    IJMLParser getJMLParser();
 
    /**
-    * Returns the Map that maps Leading Comments to ASTNodes
+    * Returns the Node for the given leading Comment c.
     *
-    * @return the Map
+    * @param c
+    *           the leading Comment
+    *
+    * @return the node
     */
    ASTNode getNodeForLeadingComment(Comment c);
 
    /**
-    * Returns the Map that maps Trailing Comments to ASTNodes
+    * Returns the Node for the given trailing Comment c.
     *
-    * @return the Map
+    * @param c
+    *           the trailing Comment
+    *
+    * @return the Node
     */
    ASTNode getNodeForTrailingComment(Comment c);
 
    /**
-    * Returns the Map that maps JMLComments to Trailing Comments
+    * Returns the JDTComment that represents the given jmlComment.
     *
-    * @return the Map
+    * @param jmlComment
+    *           , the jmlComment
+    *
+    * @return the JDTComment
     */
    Comment getCommentForJMLComment(CommentRange jmlComment);
 }

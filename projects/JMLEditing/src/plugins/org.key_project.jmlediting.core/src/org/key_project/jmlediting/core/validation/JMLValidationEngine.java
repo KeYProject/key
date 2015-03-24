@@ -44,14 +44,14 @@ public class JMLValidationEngine {
 
    /**
     * validates all JMLSpecifications in a comment that can be validated via the
-    * Profile specific Validators. If a Specification is not valid ErrorMarkers
-    * are added to the List
+    * Profiles KeywordSpecific Validators. If a Specification is not valid
+    * ErrorMarkers are added to the List
     *
     * @param c
     *           the JMLComment that has to be validated represented by its Top
     *           Node
-    * @return a List of IMarkers that represent invalid specifications,
-    *         emptylist if all specifications are valid (or could not be checked
+    * @return a List of IMarkers that represent invalid specifications, an empty
+    *         List if all specifications are valid (or could not be checked
     *         because there was no validator)
     *
     * @param node
