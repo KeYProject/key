@@ -277,11 +277,14 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
          
          if (proofClosed) {
             
-            // Arbitrary choice: Take value of first state
-            newElementaryUpdates = newElementaryUpdates.prepend(
-                  tb.elementary(
-                        v,
-                        rightSide1));
+            // Arbitrary choice: Take value of first state if
+            // this does not equal the program variable itself
+            if (!rightSide1.equals(tb.var(v))) {
+               newElementaryUpdates = newElementaryUpdates.prepend(
+                     tb.elementary(
+                           v,
+                           rightSide1));
+            }
             
          } else {
             
