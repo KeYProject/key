@@ -1,10 +1,11 @@
-package org.key_project.jmlediting.core.validation;
+package org.key_project.jmlediting.core.profile.syntax;
 
 import java.util.List;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLValidationError;
+import org.key_project.jmlediting.core.validation.IJMLValidationContext;
 
 /**
  * Class for Validating JML.
@@ -12,11 +13,11 @@ import org.key_project.jmlediting.core.utilities.JMLValidationError;
  * @author David Giessing
  *
  */
-public abstract class IKeywordValidator implements IJMLValidator {
+public interface IKeywordValidator extends IJMLValidator {
 
    /*
     * (non-Javadoc)
-    *
+    * 
     * @see
     * org.key_project.jmlediting.core.validator.JMLValidator#isValid(org.key_project
     * .jmlediting.core.dom.IASTNode)

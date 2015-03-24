@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.key_project.jmlediting.core.validation.IKeywordValidator;
-
 /**
  * An {@link AbstractKeyword} does some default implementation for an
  * {@link IKeyword}.

@@ -2,7 +2,7 @@ package org.key_project.jmlediting.profile.jmlref.bound_mod;
 
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
-import org.key_project.jmlediting.core.validation.IKeywordValidator;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordValidator;
 
 /**
  * Non null as bound modifier.

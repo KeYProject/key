@@ -8,10 +8,10 @@ import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.profile.syntax.AbstractKeywordValidator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLValidationError;
 import org.key_project.jmlediting.core.validation.IJMLValidationContext;
-import org.key_project.jmlediting.core.validation.IKeywordValidator;
 
 /**
  * This Class checks if Loop Invariant specifications in JML are placed valid,
@@ -22,7 +22,14 @@ import org.key_project.jmlediting.core.validation.IKeywordValidator;
  * @author David Giessing
  *
  */
-public class LoopInvariantValidator extends IKeywordValidator {
+public class LoopInvariantValidator extends AbstractKeywordValidator {
+
+   /**
+    * Initializes the Validator with its Marker ID.
+    */
+   public LoopInvariantValidator() {
+      super("org.key_project.jmlediting.core.validationerror");
+   }
 
    @Override
    public List<JMLValidationError> validate(final CommentRange c,
@@ -31,15 +38,20 @@ public class LoopInvariantValidator extends IKeywordValidator {
       // Validate the Loop Keyword
       if (!isLoop(context.getNodeForLeadingComment(context
             .getCommentForJMLComment(c)))) {
-         // TODO do not encode marker ID here
-         errors.add(new JMLValidationError(
-               "org.key_project.jmlediting.core.validationerror",
+         errors.add(new JMLValidationError(this.MARKER_ID,
                "Loop Specification followed by a non Loop Java Statement", node));
       }
 
       return errors;
    }
 
+   /**
+    * Checks whether a given ASTNode represents a Loop.
+    *
+    * @param node
+    *           the ASTNode
+    * @return true if node is a Loop else false
+    */
    public static boolean isLoop(final ASTNode node) {
       return (node instanceof ForStatement) || (node instanceof WhileStatement)
             || (node instanceof DoStatement);

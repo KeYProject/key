@@ -1,10 +1,11 @@
-package org.key_project.jmlediting.core.validation;
+package org.key_project.jmlediting.core.profile.syntax;
 
 import java.util.List;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.JMLValidationError;
+import org.key_project.jmlediting.core.validation.IJMLValidationContext;
 
 public interface IJMLValidator {
    /**
