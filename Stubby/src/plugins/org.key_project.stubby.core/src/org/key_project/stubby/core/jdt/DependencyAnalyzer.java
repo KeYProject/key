@@ -334,6 +334,9 @@ public class DependencyAnalyzer extends ASTVisitor {
    @Override
    public boolean visit(SuperConstructorInvocation node) {
       IMethodBinding methodBinding = node.resolveConstructorBinding();
+      if (methodBinding == null) {
+         throw new IllegalStateException("Can't resolve super constructor invocation '" + node + "' in the Java build path.");
+      }
       ensureMethodExist(methodBinding);
       return true;
    }
@@ -441,6 +444,9 @@ public class DependencyAnalyzer extends ASTVisitor {
    @Override
    public boolean visit(FieldAccess node) {
       IVariableBinding variableBinding = node.resolveFieldBinding();
+      if (variableBinding == null) {
+         throw new IllegalStateException("Can't resolve field access '" + node + "' in the Java build path.");
+      }
       ensureFieldExists(variableBinding);
       return true;
    }
@@ -451,6 +457,9 @@ public class DependencyAnalyzer extends ASTVisitor {
    @Override
    public boolean visit(MethodInvocation node) {
       IMethodBinding methodBinding = node.resolveMethodBinding();
+      if (methodBinding == null) {
+         throw new IllegalStateException("Can't resolve method invocation '" + node + "' in the Java build path.");
+      }
       ensureMethodExist(methodBinding);
       return true;
    }
@@ -461,6 +470,9 @@ public class DependencyAnalyzer extends ASTVisitor {
    @Override
    public boolean visit(ClassInstanceCreation node) {
       IMethodBinding methodBinding = node.resolveConstructorBinding();
+      if (methodBinding == null) {
+         throw new IllegalStateException("Can't resolve class instance creation '" + node + "' in the Java build path.");
+      }
       ensureMethodExist(methodBinding);
       return true;
    }
@@ -471,6 +483,9 @@ public class DependencyAnalyzer extends ASTVisitor {
    @Override
    public boolean visit(SuperFieldAccess node) {
       IVariableBinding variableBinding = node.resolveFieldBinding();
+      if (variableBinding == null) {
+         throw new IllegalStateException("Can't resolve super field access '" + node + "' in the Java build path.");
+      }
       ensureFieldExists(variableBinding);
       return true;
    }
@@ -534,6 +549,9 @@ public class DependencyAnalyzer extends ASTVisitor {
    @Override
    public boolean visit(SuperMethodInvocation node) {
       IMethodBinding methodBinding = node.resolveMethodBinding();
+      if (methodBinding == null) {
+         throw new IllegalStateException("Can't resolve super method invocation '" + node + "' in the Java build path.");
+      }
       ensureMethodExist(methodBinding);
       return true;
    }

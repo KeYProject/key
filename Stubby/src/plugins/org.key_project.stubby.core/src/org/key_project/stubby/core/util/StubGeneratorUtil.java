@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
@@ -119,7 +120,7 @@ public final class StubGeneratorUtil {
          return ignoredTypes;
       }
       catch (IOException e) {
-         throw new CoreException(new Status(IStatus.ERROR, "BUNDLE_ID", e.getMessage(), e));
+         throw new CoreException(new Status(IStatus.ERROR, Activator.BUNDLE_ID, e.getMessage(), e));
       }
    }
    
@@ -131,35 +132,43 @@ public final class StubGeneratorUtil {
     * @throws CoreException Occurred Exception.
     */
    public static DependencyModel createDependencyModel(IJavaProject project, IProgressMonitor monitor) throws CoreException {
-      if (monitor == null) {
-         monitor = new NullProgressMonitor();
-      }
-      if (project != null) {
-         // Find compilation units in source folders
-         monitor.beginTask("Listing source files", IProgressMonitor.UNKNOWN);
-         List<IPackageFragmentRoot> sourceFolders = JDTUtil.getSourceFolders(project);
-         List<ICompilationUnit> compilationUnits = JDTUtil.listCompilationUnit(sourceFolders);
-         monitor.done();
-         // Create dependency model
-         monitor.beginTask("Analyzing dependencies", compilationUnits.size());
-         DependencyModel dependencyModel = DependencymodelFactory.eINSTANCE.createDependencyModel();
-         DependencyAnalyzer analyzer = new DependencyAnalyzer();
-         for (ICompilationUnit unit : compilationUnits) {
-            SWTUtil.checkCanceled(monitor);
-            ASTNode ast = JDTUtil.parse(unit);
-            if (ast != null) {
-               ast.accept(analyzer);
-            }
-            monitor.worked(1);
+      try {
+         if (monitor == null) {
+            monitor = new NullProgressMonitor();
          }
-         monitor.done();
-         monitor.beginTask("Creating dependency model", IProgressMonitor.UNKNOWN);
-         dependencyModel.getTypes().addAll(analyzer.getOuterTypes());
-         monitor.done();
-         return dependencyModel;
+         if (project != null) {
+            // Find compilation units in source folders
+            monitor.beginTask("Listing source files", IProgressMonitor.UNKNOWN);
+            List<IPackageFragmentRoot> sourceFolders = JDTUtil.getSourceFolders(project);
+            List<ICompilationUnit> compilationUnits = JDTUtil.listCompilationUnit(sourceFolders);
+            monitor.done();
+            // Create dependency model
+            monitor.beginTask("Analyzing dependencies", compilationUnits.size());
+            DependencyModel dependencyModel = DependencymodelFactory.eINSTANCE.createDependencyModel();
+            DependencyAnalyzer analyzer = new DependencyAnalyzer();
+            for (ICompilationUnit unit : compilationUnits) {
+               SWTUtil.checkCanceled(monitor);
+               ASTNode ast = JDTUtil.parse(unit);
+               if (ast != null) {
+                  ast.accept(analyzer);
+               }
+               monitor.worked(1);
+            }
+            monitor.done();
+            monitor.beginTask("Creating dependency model", IProgressMonitor.UNKNOWN);
+            dependencyModel.getTypes().addAll(analyzer.getOuterTypes());
+            monitor.done();
+            return dependencyModel;
+         }
+         else {
+            return null;
+         }
       }
-      else {
-         return null;
+      catch (OperationCanceledException e) {
+         throw e;
+      }
+      catch (RuntimeException e) {
+         throw new CoreException(new Status(IStatus.ERROR, Activator.BUNDLE_ID, e.getMessage(), e));
       }
    }
 
