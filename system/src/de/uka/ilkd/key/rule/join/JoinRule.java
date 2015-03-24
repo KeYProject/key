@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -155,7 +156,7 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
       }
       
       Term resultPathCondition = joinedState.second;
-      resultPathCondition = trySimplify(services.getProof(), resultPathCondition, true);
+//      resultPathCondition = trySimplify(services.getProof(), resultPathCondition, true);
       
       // Delete previous sequents      
       clearSemisequent(newGoal, true);
@@ -399,7 +400,11 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
             } else {
                
                Pair<HashSet<Term>, Term> joinedValAndConstr =
-                     joinValuesInStates(heapVar, state1, value1, state2, value2, services);
+                     joinValuesInStates(
+                           new LocationVariable(
+                                 new ProgramElementName(field1.name().toString()),
+                                 field1.sort()),
+                           state1, value1, state2, value2, services);
 
                newConstraints.addAll(joinedValAndConstr.first);
                joinedVal = joinedValAndConstr.second;
