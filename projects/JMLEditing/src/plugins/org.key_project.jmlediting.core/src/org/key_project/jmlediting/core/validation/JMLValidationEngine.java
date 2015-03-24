@@ -9,7 +9,7 @@ import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordValidator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
-import org.key_project.jmlediting.core.utilities.JMLValidationError;
+import org.key_project.jmlediting.core.utilities.JMLError;
 
 /**
  *
@@ -57,9 +57,9 @@ public class JMLValidationEngine {
     * @param node
     *           the parse result for CommentRange c
     */
-   public List<JMLValidationError> validateComment(final CommentRange c,
+   public List<JMLError> validateComment(final CommentRange c,
          final IASTNode node) {
-      final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
+      final List<JMLError> errors = new ArrayList<JMLError>();
       IKeywordValidator validator = null;
       for (final IKeywordNode keywordNode : Nodes.getAllKeywords(node)) {
          validator = keywordNode.getKeyword().getKeywordValidator();

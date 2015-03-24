@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.utilities.CommentRange;
-import org.key_project.jmlediting.core.utilities.JMLValidationError;
+import org.key_project.jmlediting.core.utilities.JMLError;
 import org.key_project.jmlediting.core.validation.IJMLValidationContext;
 
 /**
@@ -17,12 +17,21 @@ public interface IKeywordValidator extends IJMLValidator {
 
    /*
     * (non-Javadoc)
-    * 
+    *
     * @see
     * org.key_project.jmlediting.core.validator.JMLValidator#isValid(org.key_project
     * .jmlediting.core.dom.IASTNode)
     */
    @Override
-   public abstract List<JMLValidationError> validate(CommentRange c,
+   List<JMLError> validate(CommentRange c,
          final IJMLValidationContext context, final IASTNode node);
+
+   /**
+    * Generates an errorMessage to be displayed.
+    *
+    * @param errorMessage
+    *           the basic errorMessage
+    * @return the complete errorMessage
+    */
+   String generateErrorMessage(String errorMessage);
 }
