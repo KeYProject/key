@@ -1,10 +1,11 @@
-package org.key_project.jmlediting.core.validation;
+package org.key_project.jmlediting.core.profile.syntax;
 
 import java.util.List;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.utilities.CommentRange;
-import org.key_project.jmlediting.core.utilities.JMLValidationError;
+import org.key_project.jmlediting.core.utilities.JMLError;
+import org.key_project.jmlediting.core.validation.IJMLValidationContext;
 
 public interface IJMLValidator {
    /**
@@ -19,6 +20,6 @@ public interface IJMLValidator {
     * @return a List of IMarkers if some Specifications are invalid or an empty
     *         list if they are all valid
     */
-   List<JMLValidationError> validate(CommentRange c,
+   List<JMLError> validate(CommentRange c,
          IJMLValidationContext context, IASTNode node);
 }

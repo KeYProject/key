@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.compiler.ReconcileContext;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.Comment;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 import org.eclipse.jdt.internal.compiler.problem.ProblemSeverities;
 import org.eclipse.jdt.internal.corext.dom.GenericVisitor;
@@ -28,7 +29,9 @@ import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
-import org.key_project.jmlediting.core.utilities.JMLValidationError;
+import org.key_project.jmlediting.core.utilities.ErrorMarkerUpdater;
+import org.key_project.jmlediting.core.utilities.ErrorTypes;
+import org.key_project.jmlediting.core.utilities.JMLError;
 import org.key_project.jmlediting.core.validation.JMLValidationContext;
 import org.key_project.jmlediting.core.validation.JMLValidationEngine;
 import org.key_project.util.eclipse.Logger;
@@ -123,8 +126,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          final IFile res = context.getFile();
          final String source = new String(context.getContents());
          // Remove all JML Error markers from the file
-         ParseErrorMarkerUpdater.removeErrorMarkers(res);
-         ValidationErrorMarkerUpdater.removeErrorMarkers(res);
+         ErrorMarkerUpdater.removeErrorMarkers(res);
          // Detect all comments in the file and then parse it
          final CommentLocator locator = new CommentLocator(source);
          final List<CommentRange> jmlComments = locator.findJMLCommentRanges();
@@ -140,86 +142,116 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          final IJMLParser jmlParser = JMLPreferencesHelper
                .getProjectActiveJMLProfile(res.getProject()).createParser();
 
-         // TODO encapsulate all that calculations
-         final List<Comment> commentList = ast.getCommentList();
-         final Map<Comment, ASTNode> inverse = new HashMap<Comment, ASTNode>();
-         final Map<Comment, ASTNode> inverseTrailing = new HashMap<Comment, ASTNode>();
-         final Map<CommentRange, Comment> jmlCommentToComment = new HashMap<CommentRange, Comment>();
-
-         for (final CommentRange c : jmlComments) {
-            for (final Comment jdtComment : commentList) {
-               if (c.getBeginOffset() == jdtComment.getStartPosition()) {
-                  jmlCommentToComment.put(c, jdtComment);
-               }
-            }
-
-         }
-         ast.accept(new GenericVisitor() {
-            @Override
-            protected boolean visitNode(final ASTNode node) {
-               // Maps All Leading Comments to its node
-               // Also Maps JML comments to Comments, which are mapped to nodes
-               final int start = ast.firstLeadingCommentIndex(node);
-               final int end = ast.lastTrailingCommentIndex(node);
-
-               if (start != -1) {
-                  int pos = start;
-                  while (pos < commentList.size()
-                        && commentList.get(pos).getStartPosition() < node
-                              .getStartPosition()) {
-                     assert !inverse.containsKey(commentList.get(pos));
-                     inverse.put(commentList.get(pos), node);
-                     pos++;
-
-                  }
-
-               }
-               // Same as above for Trailing Comments
-               if (end != -1) {
-                  int pos = end;
-                  while (pos >= 0
-                        && commentList.get(pos).getStartPosition() > node
-                              .getStartPosition()) {
-                     assert !inverseTrailing.containsKey(commentList.get(pos));
-                     inverseTrailing.put(commentList.get(pos), node);
-                     pos--;
-                  }
-               }
-
-               return super.visitNode(node);
-            }
-         });
-
-         // for (final Entry<Comment, ASTNode> comments : inverse.entrySet()) {
-         // System.out.println("Assigned: " + comments.getKey() + " to "
-         // + comments.getValue());
-         // }
-         final JMLValidationContext jmlContext = new JMLValidationContext(
-               inverse, inverseTrailing, jmlCommentToComment, source,
-               jmlComments, ast, jmlParser);
-         final JMLValidationEngine engine = new JMLValidationEngine(
-               JMLPreferencesHelper
-                     .getProjectActiveJMLProfile(res.getProject()),
-               jmlContext);
+         final JMLValidationEngine engine = this.prepareValidation(ast,
+               jmlComments, jmlParser, res, source);
          // End of Preparation
-         final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
+         final List<JMLError> allErrors = new ArrayList<JMLError>();
          for (final CommentRange jmlComment : jmlComments) {
             try {
-               // System.out.println(""
-               // + this.findCorrespondingNode(jmlComment.getBeginOffset(),
-               // jmlComment.getEndOffset(), ast));
                final IASTNode node = jmlParser.parse(source, jmlComment);
-               errors.addAll(engine.validateComment(jmlComment, node));
-               // Throw away the result, here only a parse exception is
-               // interesting
+               allErrors.addAll(engine.validateComment(jmlComment, node));
+               // addAll ValidationErrors
             }
             catch (final ParserException e) {
                // Add error markers for all parser exceptions
-               ParseErrorMarkerUpdater.createErrorMarkers(res, source, e);
+               allErrors.addAll(this.convertParseException(e));
+
             }
          }
-         // TODO: Unify ErrorMarkerUpdater
-         ValidationErrorMarkerUpdater.createErrorMarkers(res, source, errors);
+         // Create ALL ErrorMarkers
+         ErrorMarkerUpdater.createErrorMarker(allErrors, res, source);
       }
+   }
+
+   /**
+    * Prepares Validation. Sets up the ValidationEngine and the Validation
+    * Context.
+    *
+    * @param jdtAST
+    *           The JDT AST
+    * @param jmlComments
+    *           the List of JML Comments as CommentRanges
+    * @param jmlParser
+    *           the JML parser
+    * @param res
+    *           the Resource to operate on
+    * @param src
+    *           the Source
+    * @return a JML Validation Engine, locked and fully loaded
+    */
+   private JMLValidationEngine prepareValidation(final CompilationUnit jdtAST,
+         final List<CommentRange> jmlComments, final IJMLParser jmlParser,
+         final IResource res, final String src) {
+      final List<Comment> commentList = jdtAST.getCommentList();
+      final Map<Comment, ASTNode> inverse = new HashMap<Comment, ASTNode>();
+      final Map<Comment, ASTNode> inverseTrailing = new HashMap<Comment, ASTNode>();
+      final Map<CommentRange, Comment> jmlCommentToComment = new HashMap<CommentRange, Comment>();
+
+      // Map JMLComments to JDTComments
+      for (final CommentRange c : jmlComments) {
+         for (final Comment jdtComment : commentList) {
+            if (c.getBeginOffset() == jdtComment.getStartPosition()) {
+               jmlCommentToComment.put(c, jdtComment);
+            }
+         }
+
+      }
+      jdtAST.accept(new GenericVisitor() {
+         @Override
+         protected boolean visitNode(final ASTNode node) {
+            // Maps All Leading Comments to its node
+            // Also Maps JML comments to Comments, which are mapped to nodes
+            final int start = jdtAST.firstLeadingCommentIndex(node);
+            final int end = jdtAST.lastTrailingCommentIndex(node);
+
+            if (start != -1) {
+               int pos = start;
+               while (pos < commentList.size()
+                     && commentList.get(pos).getStartPosition() < node
+                           .getStartPosition()) {
+                  assert !inverse.containsKey(commentList.get(pos));
+                  inverse.put(commentList.get(pos), node);
+                  pos++;
+
+               }
+
+            }
+            // Same as above for Trailing Comments
+            if (end != -1) {
+               int pos = end;
+               while (pos >= 0
+                     && commentList.get(pos).getStartPosition() > node
+                           .getStartPosition()) {
+                  assert !inverseTrailing.containsKey(commentList.get(pos));
+                  inverseTrailing.put(commentList.get(pos), node);
+                  pos--;
+               }
+            }
+
+            return super.visitNode(node);
+         }
+      });
+      final JMLValidationContext jmlContext = new JMLValidationContext(inverse,
+            inverseTrailing, jmlCommentToComment, src, jmlComments, jdtAST,
+            jmlParser);
+      return new JMLValidationEngine(
+            JMLPreferencesHelper.getProjectActiveJMLProfile(res.getProject()),
+            jmlContext);
+   }
+
+   /**
+    * Converts Parse Exceptions to JMLErrors.
+    *
+    * @param e
+    *           the parse Exception
+    * @return the List of JML Errors extracted from e
+    */
+   private List<JMLError> convertParseException(final ParserException e) {
+      final List<JMLError> converted = new ArrayList<JMLError>();
+      for (final ParserError err : e.getAllErrors()) {
+         converted.add(new JMLError(ErrorTypes.ParseError, err
+               .getErrorMessage(), err.getErrorOffset()));
+      }
+      return converted;
    }
 }

@@ -8,10 +8,11 @@ import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.profile.syntax.AbstractKeywordValidator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
-import org.key_project.jmlediting.core.utilities.JMLValidationError;
+import org.key_project.jmlediting.core.utilities.JMLError;
+import org.key_project.jmlediting.core.utilities.ErrorTypes;
 import org.key_project.jmlediting.core.validation.IJMLValidationContext;
-import org.key_project.jmlediting.core.validation.IKeywordValidator;
 
 /**
  * This Class checks if Loop Invariant specifications in JML are placed valid,
@@ -22,24 +23,37 @@ import org.key_project.jmlediting.core.validation.IKeywordValidator;
  * @author David Giessing
  *
  */
-public class LoopInvariantValidator extends IKeywordValidator {
+public class LoopInvariantValidator extends AbstractKeywordValidator {
+   /**
+    * Initializes the Validator with its errorType
+    */
+   public LoopInvariantValidator() {
+      super("LoopValidationError: ");
+   }
 
    @Override
-   public List<JMLValidationError> validate(final CommentRange c,
+   public List<JMLError> validate(final CommentRange c,
          final IJMLValidationContext context, final IASTNode node) {
-      final List<JMLValidationError> errors = new ArrayList<JMLValidationError>();
+      final List<JMLError> errors = new ArrayList<JMLError>();
       // Validate the Loop Keyword
       if (!isLoop(context.getNodeForLeadingComment(context
             .getCommentForJMLComment(c)))) {
-         // TODO do not encode marker ID here
-         errors.add(new JMLValidationError(
-               "org.key_project.jmlediting.core.validationerror",
-               "Loop Specification followed by a non Loop Java Statement", node));
+         errors.add(new JMLError(
+               ErrorTypes.ValidationError,
+               super.generateErrorMessage("Loop Specification followed by a non Loop Java Statement"),
+               node.getEndOffset()));
       }
 
       return errors;
    }
 
+   /**
+    * Checks whether a given ASTNode represents a Loop.
+    *
+    * @param node
+    *           the ASTNode
+    * @return true if node is a Loop else false
+    */
    public static boolean isLoop(final ASTNode node) {
       return (node instanceof ForStatement) || (node instanceof WhileStatement)
             || (node instanceof DoStatement);

@@ -10,8 +10,8 @@ import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordAutoProposer;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordValidator;
 import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
-import org.key_project.jmlediting.core.validation.IKeywordValidator;
 import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
 
 /**

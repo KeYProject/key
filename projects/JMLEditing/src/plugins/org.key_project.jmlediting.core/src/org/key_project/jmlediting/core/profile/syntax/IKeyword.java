@@ -2,8 +2,6 @@ package org.key_project.jmlediting.core.profile.syntax;
 
 import java.util.Set;
 
-import org.key_project.jmlediting.core.validation.IKeywordValidator;
-
 /**
  * The {@link IKeyword} specifies an JML keyword.
  *

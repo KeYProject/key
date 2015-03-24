@@ -1,27 +1,25 @@
 package org.key_project.jmlediting.core.utilities;
 
-import org.key_project.jmlediting.core.dom.IASTNode;
-
 /**
  * Container class for ValidationErrors.
  *
  * @author David Giessing
  *
  */
-public class JMLValidationError {
+public class JMLError {
 
    /**
     * Represents the errorType.
     */
-   private final String errorType;
+   private final ErrorTypes errorType;
    /**
     * represents the errorMessage.
     */
    private final String errorMessage;
    /**
-    * represents the Invalid Node.
+    * represents the offset of the Error.
     */
-   private final IASTNode invalidSpec;
+   private final int offset;
 
    /**
     * creates a new JMLValidationError.
@@ -30,20 +28,20 @@ public class JMLValidationError {
     *           the ErrorType
     * @param errorMessage
     *           the ErrorMessage
-    * @param invalidSpec
-    *           the Invalid JML Node
+    * @param offset
+    *           the offset of the Error
     */
-   public JMLValidationError(final String errorType, final String errorMessage,
-         final IASTNode invalidSpec) {
+   public JMLError(final ErrorTypes errorType, final String errorMessage,
+         final int offset) {
       this.errorType = errorType;
       this.errorMessage = errorMessage;
-      this.invalidSpec = invalidSpec;
+      this.offset = offset;
    }
 
    /**
     * @return the errorType
     */
-   public String getErrorType() {
+   public ErrorTypes getErrorType() {
       return this.errorType;
    }
 
@@ -57,7 +55,7 @@ public class JMLValidationError {
    /**
     * @return the invalidSpec
     */
-   public IASTNode getInvalidSpec() {
-      return this.invalidSpec;
+   public int getOffset() {
+      return this.offset;
    }
 }
