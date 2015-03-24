@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.rule.join;
 
+import java.util.HashSet;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.core.DefaultTaskFinishedInfo;
@@ -20,6 +22,7 @@ import de.uka.ilkd.key.gui.joinrule.JoinPartnerSelectionDialog;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -27,8 +30,11 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
@@ -71,6 +77,17 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
     * equivalence in the respective contexts.
     */
    protected static final boolean RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL = true;
+   
+   /**
+    * Thresholds the maximum depth of right sides in updates for
+    * which an equivalence proof is started.
+    * 
+    * We skip the check for equal valuation of this variable if
+    * the depth threshold is exceeded by one of the right sides.
+    * Experiments show a very big time overhead from a depth of
+    * about 8-10 on, or sometimes even earlier.
+    */
+   private static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
    
    @Override
    public ImmutableList<Goal> apply(Goal goal, final Services services,
@@ -196,10 +213,256 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
     * @return A new joined SE state (U*,C*) which is a weakening
     *    of the original states.
     */
-   protected abstract SymbolicExecutionState joinStates(
+   @SuppressWarnings("unused")
+   protected SymbolicExecutionState joinStates(
          SymbolicExecutionState state1,
          SymbolicExecutionState state2,
          Term programCounter,
+         Services services) {
+      
+      final TermBuilder tb = services.getTermBuilder();
+      
+      // Construct path condition as (optimized) disjunction
+      Term newPathCondition =
+            createSimplifiedDisjunctivePathCondition(state1.second, state2.second, services);
+               
+      HashSet<LocationVariable> progVars =
+            new HashSet<LocationVariable>();
+      
+      // Collect program variables in Java block
+      progVars.addAll(getLocationVariables(programCounter));
+      // Collect program variables in update
+      progVars.addAll(getUpdateLeftSideLocations(state1.first));
+      progVars.addAll(getUpdateLeftSideLocations(state2.first));
+      
+      ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
+      
+      for (LocationVariable v : progVars) {
+         
+         Term rightSide1 = getUpdateRightSideFor(state1.first, v);
+         Term rightSide2 = getUpdateRightSideFor(state2.first, v);
+         
+         if (rightSide1 == null) {
+            rightSide1 = tb.var(v);
+         }
+         
+         if (rightSide2 == null) {
+            rightSide2 = tb.var(v);
+         }
+         
+         // Check if location v is set to different value in both states.
+         
+         // Easy check: Term equality
+         boolean proofClosed = rightSide1.equalsModRenaming(rightSide2);
+         
+         // We skip the check for equal valuation of this variable if
+         // the depth threshold is exceeded by one of the right sides.
+         // Experiments show a very big time overhead from a depth of
+         // about 8-10 on, or sometimes even earlier.
+         if (rightSide1.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING &&
+             rightSide2.depth() <= MAX_UPDATE_TERM_DEPTH_FOR_CHECKING &&
+             !proofClosed &&
+             !JoinRule.RIGHT_SIDE_EQUIVALENCE_ONLY_SYNTACTICAL) {
+            
+            Term predicateTerm = tb.func(new Function(new Name("P"), Sort.FORMULA, v.sort()), tb.var(v));
+            Term appl1 = tb.apply(state1.first, predicateTerm);
+            Term appl2 = tb.apply(state2.first, predicateTerm);
+            Term toProve = tb.and(
+                  tb.imp(appl1, appl2),
+                  tb.imp(appl2, appl1));
+            
+            proofClosed = isProvableWithSplitting(toProve, services);
+            
+         }
+         
+         if (proofClosed) {
+            
+            // Arbitrary choice: Take value of first state
+            newElementaryUpdates = newElementaryUpdates.prepend(
+                  tb.elementary(
+                        v,
+                        rightSide1));
+            
+         } else {
+            
+            // Apply if-then-else construction: Different values
+            
+            Sort heapSort = (Sort) services.getNamespaces().sorts().lookup("Heap");
+            
+            if (v.sort().equals(heapSort)) {
+               
+               Pair<HashSet<Term>, Term> joinedHeaps = joinHeaps(v, rightSide1, rightSide2, state1, state2, services);
+               newElementaryUpdates = newElementaryUpdates.prepend(tb.elementary(v, joinedHeaps.second));
+               newPathCondition = tb.and(newPathCondition, tb.and(joinedHeaps.first));
+               
+            } else {
+               
+               Pair<HashSet<Term>, Term> joinedVal =
+                     joinValuesInStates(v, state1, rightSide1, state2, rightSide2, services);
+               
+               newElementaryUpdates = newElementaryUpdates.prepend(
+                     tb.elementary(
+                           v,
+                           joinedVal.second));
+               
+               newPathCondition = tb.and(
+                     newPathCondition,
+                     tb.and(joinedVal.first));
+               
+            } // end else of if (v.sort().equals(heapSort))
+            
+         } // end else of if (proofClosed)
+         
+      } // end for (LocationVariable v : progVars)
+      
+      // Construct weakened symbolic state
+      Term newSymbolicState = tb.parallel(newElementaryUpdates);
+      
+      return new SymbolicExecutionState(newSymbolicState, newPathCondition);
+      
+   }
+   
+   /**
+    * Joins two heaps in a zip-like procedure. The fallback
+    * is an if-then-else construct that is tried to be shifted
+    * as far inwards as possible.
+    * 
+    * @param heapVar The heap variable for which the
+    *    values should be joined.
+    * @param heap1 The first heap term.
+    * @param heap2 The second heap term.
+    * @param state1 SE state for the first heap term.
+    * @param state2 SE state for the second heap term
+    * @param services The services object.
+    * @return A joined heap term.
+    */
+   protected Pair<HashSet<Term>, Term> joinHeaps(
+         LocationVariable heapVar,
+         Term heap1,
+         Term heap2,
+         SymbolicExecutionState state1,
+         SymbolicExecutionState state2,
+         Services services) {
+      
+      TermBuilder tb = services.getTermBuilder();      
+      HashSet<Term> newConstraints = new HashSet<Term>();
+      
+      if (heap1.equals(heap2)) {
+         // Keep equal heaps
+         return new Pair<HashSet<Term>, Term>(newConstraints, heap1);
+      }
+      
+      if (!(heap1.op() instanceof Function) ||
+            !(heap2.op() instanceof Function)) {
+         // Covers the case of two different symbolic heaps
+         return new Pair<HashSet<Term>, Term>(
+               newConstraints,
+               JoinIfThenElse.createIfThenElseTerm(state1, state2, heap1, heap2, services));
+      }
+      
+      Function storeFunc = (Function) services.getNamespaces().functions().lookup("store");
+      Function createFunc = (Function) services.getNamespaces().functions().lookup("create");
+      //Note: Check if there are other functions that should be covered.
+      //      Unknown functions are treated by if-then-else procedure.
+      
+      if (((Function) heap1.op()).equals(storeFunc) &&
+            ((Function) heap2.op()).equals(storeFunc)) {
+         
+         // Store operations.
+         
+         // Decompose the heap operations.
+         Term subHeap1 = heap1.sub(0);
+         LocationVariable pointer1 = (LocationVariable) heap1.sub(1).op();
+         Function field1 = (Function) heap1.sub(2).op();
+         Term value1 = heap1.sub(3);
+         
+         Term subHeap2 = heap2.sub(0);
+         LocationVariable pointer2 = (LocationVariable) heap2.sub(1).op();
+         Function field2 = (Function) heap2.sub(2).op();
+         Term value2 = heap2.sub(3);
+         
+         if (pointer1.equals(pointer2) && field1.equals(field2)) {
+            // Potential for deep merge: Access of same object / field.
+            
+            Pair<HashSet<Term>, Term> joinedSubHeap = joinHeaps(heapVar, subHeap1, subHeap2, state1, state2, services);
+            newConstraints.addAll(joinedSubHeap.first);
+            
+            Term joinedVal = null;
+            
+            if (value1.equals(value2)) {
+               // Idempotency...
+               joinedVal = value1;
+               
+            } else {
+               
+               Pair<HashSet<Term>, Term> joinedValAndConstr =
+                     joinValuesInStates(heapVar, state1, value1, state2, value2, services);
+
+               newConstraints.addAll(joinedValAndConstr.first);
+               joinedVal = joinedValAndConstr.second;
+               
+            }
+            
+            return new Pair<HashSet<Term>, Term>(
+                  newConstraints,
+                  tb.func((Function) heap1.op(), joinedSubHeap.second, tb.var(pointer1), tb.func(field1), joinedVal));
+            
+         } // end if (pointer1.equals(pointer2) && field1.equals(field2))
+         
+      } else if (((Function) heap1.op()).equals(createFunc) &&
+            ((Function) heap2.op()).equals(createFunc)) {
+         
+         // Create operations.
+         
+         // Decompose the heap operations.
+         Term subHeap1 = heap1.sub(0);
+         LocationVariable pointer1 = (LocationVariable) heap1.sub(1).op();
+         
+         Term subHeap2 = heap2.sub(0);
+         LocationVariable pointer2 = (LocationVariable) heap2.sub(1).op();
+         
+         if (pointer1.equals(pointer2)) {
+            // Same objects are created: Join.
+            
+            Pair<HashSet<Term>, Term> joinedSubHeap =
+                  joinHeaps(heapVar, subHeap1, subHeap2, state1, state2, services);
+            newConstraints.addAll(joinedSubHeap.first);
+            
+            return new Pair<HashSet<Term>, Term>(
+                  newConstraints,
+                  tb.func((Function) heap1.op(), joinedSubHeap.second, tb.var(pointer1)));
+         }
+         
+         // "else" case is fallback at end of method:
+         // if-then-else of heaps.
+         
+      } // end else of else if (((Function) heap1.op()).equals(createFunc) && ((Function) heap2.op()).equals(createFunc))
+
+      return new Pair<HashSet<Term>, Term>(
+            newConstraints,
+            JoinIfThenElse.createIfThenElseTerm(state1, state2, heap1, heap2, services));
+      
+   }
+         
+   
+   /**
+    * Joins two values valueInState1 and valueInState2 of corresponding
+    * SE states state1 and state2 to a new value of a join state.
+    * 
+    * @param v The variable for which the values should be joined
+    * @param state1 First SE state.
+    * @param valueInState1 Value in state1.
+    * @param state2 Second SE state.
+    * @param valueInState2 Value in state2.
+    * @param services The services object.
+    * @return A joined value for valueInState1 and valueInState2.
+    */
+   protected abstract Pair<HashSet<Term>, Term> joinValuesInStates(
+         LocationVariable v,
+         SymbolicExecutionState state1,
+         Term valueInState1,
+         SymbolicExecutionState state2,
+         Term valueInState2,
          Services services);
 
    /**
