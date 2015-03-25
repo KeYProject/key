@@ -676,8 +676,8 @@ public final class ParserBuilder {
             if (nodeEnd == end) {
                return node;
             }
-            final int whiteEnd = LexicalHelper.skipWhiteSpaces(text, nodeEnd,
-                  end);
+            final int whiteEnd = LexicalHelper.skipWhiteSpacesOrAt(text,
+                  nodeEnd, end);
             if (whiteEnd < end) {
                final IASTNode errorNode = Nodes.createErrorNode(node, Nodes
                      .createUnparsedTextNode(text.substring(whiteEnd, end),

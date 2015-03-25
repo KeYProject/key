@@ -556,39 +556,38 @@ public final class LexicalHelper {
       ParserUtils.validatePositions(text, start, end);
       int position = start;
       boolean inNewLine = beginAtNewLine;
-      while (position < end
-            && ((inNewLine && text.charAt(position) == '@') || Character
-                  .isWhitespace(text.charAt(position)))) {
-         if (text.charAt(position) == '\n') {
+      boolean nonWhiteSpaceFound = false;
+      while (!nonWhiteSpaceFound && position < end) {
+
+         final char c = text.charAt(position);
+
+         if (c == '\n') {
             inNewLine = true;
+            position++;
          }
-         position++;
+         else if (Character.isWhitespace(c)) {
+            position++;
+         }
+         else if (c == '@') {
+            if (!inNewLine) {
+               nonWhiteSpaceFound = true;
+            }
+            else {
+               position++;
+            }
+         }
+         else if (c == '/' && position + 1 < end
+               && text.charAt(position + 1) == '/') {
+            // Single line comment
+            final int singleCommentEnd = text.indexOf('\n', position);
+            position = Math.min(end, singleCommentEnd);
+         }
+         else {
+            nonWhiteSpaceFound = true;
+         }
       }
       // Accept an @ at the very last position of the comment
       if (position < end && text.charAt(position) == '@' && position + 1 == end) {
-         position++;
-      }
-      return position;
-   }
-
-   /**
-    * Skips the following whitespaces.
-    *
-    * @param text
-    *           the text to skip in
-    * @param start
-    *           the start position of skipping
-    * @param end
-    *           the maximum (exclusive) position
-    * @return the index of the first not skipped character
-    * @throws ParserException
-    *            invalid indices
-    */
-   public static int skipWhiteSpaces(final String text, final int start,
-         final int end) throws ParserException {
-      ParserUtils.validatePositions(text, start, end);
-      int position = start;
-      while (position < end && Character.isWhitespace(text.charAt(position))) {
          position++;
       }
       return position;
