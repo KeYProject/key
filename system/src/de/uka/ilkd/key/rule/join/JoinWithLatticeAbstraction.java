@@ -15,13 +15,9 @@ package de.uka.ilkd.key.rule.join;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.axiom_abstraction.signanalysis.Top;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -53,116 +49,50 @@ public abstract class JoinWithLatticeAbstraction extends JoinRule {
    protected abstract AbstractDomainLattice<?> getAbstractDomainForSort(Sort s, Services services);
    
    @Override
-   protected SymbolicExecutionState joinStates(
+   protected Pair<HashSet<Term>, Term> joinValuesInStates(
+         LocationVariable v,
          SymbolicExecutionState state1,
+         Term valueInState1,
          SymbolicExecutionState state2,
-         Term programCounter,
+         Term valueInState2,
          Services services) {
       
       final TermBuilder tb = services.getTermBuilder();
-         
-      HashSet<LocationVariable> progVars =
-            new HashSet<LocationVariable>();
       
-      // Collect program variables in Java block
-      progVars.addAll(getLocationVariables(programCounter));
-      // Collect program variables in update
-      progVars.addAll(getUpdateLeftSideLocations(state1.first));
+      HashSet<Term> newConstraints = new HashSet<Term>();
       
-      ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
-      Term newConstraints = tb.tt();
+      AbstractDomainLattice<?> lattice = getAbstractDomainForSort(valueInState1.sort(), services);
       
-      for (LocationVariable v : progVars) {
+      if (lattice != null) {
          
-         Function skolemConstant = null;
+         // Join with abstract domain lattice.
+         AbstractDomainElement abstrElem1 = determineAbstractElem(state1, valueInState1, lattice, services);
+         AbstractDomainElement abstrElem2 = determineAbstractElem(state2, valueInState2, lattice, services);
          
-         Term rightSide1 = getUpdateRightSideFor(state1.first, v);
-         Term rightSide2 = getUpdateRightSideFor(state2.first, v);
+         AbstractDomainElement joinElem = lattice.join(abstrElem1, abstrElem2);
          
-         if (rightSide1 == null) {
-            rightSide1 = tb.var(v);
-         }
+         Function skolemConstant =
+               getNewSkolemConstantForPrefix(joinElem.toString(), valueInState1.sort(), services);
          
-         if (rightSide2 == null) {
-            rightSide2 = tb.var(v);
-         }
+         newConstraints.add(joinElem.getDefiningAxiom(tb.func(skolemConstant), services));
+         //NOTE: We also remember the precise values by if-then-else construction. This
+         //      preserves completeness and should also not be harmful to performance in
+         //      cases where completeness is also preserved by the lattice. However, if
+         //      there are lattices where this construction is bad, it may be safely
+         //      removed (no harm to soundness!).
+         newConstraints.add(tb.equals(tb.func(skolemConstant),
+               JoinIfThenElse.createIfThenElseTerm(state1, state2, valueInState1, valueInState2, services)));
          
-         AbstractDomainLattice<?> lattice = getAbstractDomainForSort(v.sort(), services);
-         Sort heapSort = (Sort) services.getNamespaces().sorts().lookup("Heap");
+         return new Pair<HashSet<Term>, Term>(newConstraints, tb.func(skolemConstant));
          
-         if (rightSide1.equals(rightSide2)) {
-            
-            // For equal right sides, we just keep those for
-            // preserving idempotency
-            
-            newElementaryUpdates = newElementaryUpdates.prepend(
-                  tb.elementary(
-                        v,
-                        rightSide1));
-            
-         } else if (v.sort().equals(heapSort)) {
-            
-            // Heaps are specially joined
-            
-            Pair<Term, LinkedList<Term>> joinedHeaps =
-                  joinHeaps(rightSide1, rightSide2, state1, state2, services);
-            
-            newElementaryUpdates = newElementaryUpdates.prepend(
-                  tb.elementary(
-                        tb.var(v),
-                        joinedHeaps.first));
-            
-            if (joinedHeaps.second.size() > 0) {
-               newConstraints = tb.and(newConstraints, tb.and(joinedHeaps.second));
-            }
-            
-         } else if (lattice != null) {
-            
-            // Join with abstract domain lattice.
-            
-            AbstractDomainElement abstrElem1 = determineAbstractElem(state1, tb.var(v), lattice, services);
-            AbstractDomainElement abstrElem2 = determineAbstractElem(state2, tb.var(v), lattice, services);
-            
-            AbstractDomainElement joinElem = lattice.join(abstrElem1, abstrElem2);
-            
-            skolemConstant =
-                  getNewSkolemConstantForPrefix(joinElem.toString(), v.sort(), services);
-            
-            newConstraints = tb.and(newConstraints, joinElem.getDefiningAxiom(tb.func(skolemConstant), services));
-            //NOTE: We also remember the precise values by if-then-else construction. This
-            //      preserves completeness and should also not be harmful to performance in
-            //      cases where completeness is also preserved by the lattice. However, if
-            //      there are lattices where this construction is bad, it may be safely
-            //      removed (no harm to soundness!).
-            newConstraints = tb.and(newConstraints, tb.equals(tb.func(skolemConstant),
-                  JoinIfThenElse.createIfThenElseTerm(state1, state2, rightSide1, rightSide2, services)));
-            
-            newElementaryUpdates = newElementaryUpdates.prepend(
-                  tb.elementary(
-                        v,
-                        tb.func(skolemConstant)));
-            
-         } else {
-            
-            // Apply if-then-else construction
-            
-            newElementaryUpdates = newElementaryUpdates.prepend(
-                  JoinIfThenElse.createIfThenElseUpdate(v, state1, state2, services));
-            
-         }
+      } else {
+         
+         return new Pair<HashSet<Term>, Term>(
+               new HashSet<Term>(),
+               JoinIfThenElse.createIfThenElseTerm(state1, state2, valueInState1, valueInState2, services));
          
       }
       
-      // Construct weakened symbolic state
-      Term newSymbolicState = tb.parallel(newElementaryUpdates);
-      
-      // Construct path condition as disjunction
-      Term newPathCondition =
-            tb.and(
-                  createSimplifiedDisjunctivePathCondition(state1.second, state2.second, services),
-                  newConstraints);
-      
-      return new SymbolicExecutionState(newSymbolicState, newPathCondition);
    }
    
    /**
@@ -202,142 +132,4 @@ public abstract class JoinWithLatticeAbstraction extends JoinRule {
       return Top.getInstance();
    }
    
-   /**
-    * Joins two heaps by if-then-else construction. Tries to shift
-    * the if-then-else as deeply into the heap as possible.
-    * 
-    * @param heap1 The first heap term.
-    * @param heap2 The second heap term.
-    * @param state1 SE state for the first heap term.
-    * @param state2 SE state for the second heap term
-    * @param services The services object.
-    * @return A joined heap term.
-    */
-   private Pair<Term, LinkedList<Term>> joinHeaps(
-         Term heap1,
-         Term heap2,
-         SymbolicExecutionState state1,
-         SymbolicExecutionState state2,
-         Services services) {
-      
-      //TODO: Parts of this code appear redundantly in different join rules;
-      //      it could be sensible to extract those into an own method.
-      
-      TermBuilder tb = services.getTermBuilder();      
-      LinkedList<Term> newConstraints = new LinkedList<Term>();
-      
-      if (heap1.equals(heap2)) {
-         // Keep equal heaps
-         return new Pair<Term, LinkedList<Term>>(heap1, newConstraints);
-      }
-      
-      if (!(heap1.op() instanceof Function) ||
-            !(heap2.op() instanceof Function)) {
-         // Covers the case of two different symbolic heaps
-         return new Pair<Term, LinkedList<Term>>(
-               JoinIfThenElse.createIfThenElseTerm(state1, state2, heap1, heap2, services),
-               newConstraints);
-      }
-      
-      Function storeFunc = (Function) services.getNamespaces().functions().lookup("store");
-      Function createFunc = (Function) services.getNamespaces().functions().lookup("create");
-      //Note: Check if there are other functions that should be covered.
-      //      Unknown functions are treated by if-then-else procedure.
-      
-      if (((Function) heap1.op()).equals(storeFunc) &&
-            ((Function) heap2.op()).equals(storeFunc)) {
-         
-         // Store operations.
-         
-         // Decompose the heap operations.
-         Term subHeap1 = heap1.sub(0);
-         LocationVariable pointer1 = (LocationVariable) heap1.sub(1).op();
-         Function field1 = (Function) heap1.sub(2).op();
-         Term value1 = heap1.sub(3);
-         
-         Term subHeap2 = heap2.sub(0);
-         LocationVariable pointer2 = (LocationVariable) heap2.sub(1).op();
-         Function field2 = (Function) heap2.sub(2).op();
-         Term value2 = heap2.sub(3);
-         
-         if (pointer1.equals(pointer2) && field1.equals(field2)) {
-            // Potential for deep merge: Access of same object / field.
-            
-            Pair<Term, LinkedList<Term>> joinedSubHeap = joinHeaps(subHeap1, subHeap2, state1, state2, services);
-            newConstraints.addAll(joinedSubHeap.second);
-            
-            Term joinedVal = null;
-            AbstractDomainLattice<?> lattice = null;
-            
-            if (value1.equals(value2)) {
-               // Idempotency...
-               joinedVal = value1;
-               
-            } else if ((lattice = getAbstractDomainForSort(((Function) value1.op()).sort(), services)) != null) {
-               
-               // Join with abstract domain lattice.
-               AbstractDomainElement abstrElem1 = determineAbstractElem(state1, value1, lattice, services);
-               AbstractDomainElement abstrElem2 = determineAbstractElem(state2, value2, lattice, services);
-               
-               AbstractDomainElement joinElem = lattice.join(abstrElem1, abstrElem2);
-               
-               Function skolemConstant =
-                     getNewSkolemConstantForPrefix(joinElem.toString(), ((Function) value1.op()).sort(), services);
-               
-               newConstraints.add(joinElem.getDefiningAxiom(tb.func(skolemConstant), services));
-               //NOTE: We also remember the precise values by if-then-else construction. This
-               //      preserves completeness and should also not be harmful to performance in
-               //      cases where completeness is also preserved by the lattice. However, if
-               //      there are lattices where this construction is bad, it may be safely
-               //      removed (no harm to soundness!).
-               newConstraints.add(tb.equals(tb.func(skolemConstant),
-                     JoinIfThenElse.createIfThenElseTerm(state1, state2, value1, value2, services)));
-               
-               joinedVal = tb.func(skolemConstant);
-               
-            } else {
-               
-               // No lattice, fall back to if-then-else
-               joinedVal = JoinIfThenElse.createIfThenElseTerm(state1, state2, value1, value2, services);
-               
-            }
-            
-            return new Pair<Term, LinkedList<Term>>(
-                  tb.func((Function) heap1.op(), joinedSubHeap.first, tb.var(pointer1), tb.func(field1), joinedVal),
-                  newConstraints);
-         }
-         
-      } else if (((Function) heap1.op()).equals(createFunc) &&
-            ((Function) heap2.op()).equals(createFunc)) {
-         
-         // Create operations.
-         
-         // Decompose the heap operations.
-         Term subHeap1 = heap1.sub(0);
-         LocationVariable pointer1 = (LocationVariable) heap1.sub(1).op();
-         
-         Term subHeap2 = heap2.sub(0);
-         LocationVariable pointer2 = (LocationVariable) heap2.sub(1).op();
-         
-         if (pointer1.equals(pointer2)) {
-            // Same objects are created: Join.
-            
-            Pair<Term, LinkedList<Term>> joinedSubHeap =
-                  joinHeaps(subHeap1, subHeap2, state1, state2, services);
-            newConstraints.addAll(joinedSubHeap.second);
-            
-            return new Pair<Term, LinkedList<Term>>(
-                  tb.func((Function) heap1.op(), joinedSubHeap.first, tb.var(pointer1)),
-                  newConstraints);
-         }
-         
-         // "else" case is fallback at end of method:
-         // if-then-else of heaps.
-         
-      }
-
-      return new Pair<Term, LinkedList<Term>>(
-            JoinIfThenElse.createIfThenElseTerm(state1, state2, heap1, heap2, services),
-            newConstraints);
-   }
 }
