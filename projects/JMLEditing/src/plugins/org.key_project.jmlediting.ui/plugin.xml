@@ -33,7 +33,7 @@
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
-            class="org.key_project.jmlediting.ui.preferencepages.JMLProjectPropertiesPage"
+            class="org.key_project.jmlediting.ui.preferencepages.JMLPropertiesParentPage"
             id="org.key_project.jmlediting.ui.properties.jml"
             name="JML">
             <enabledWhen>
@@ -57,7 +57,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="org.key_project.jmlediting.ui.preferencepages.JMLProjectPropertiesPage"
+            class="org.key_project.jmlediting.ui.preferencepages.JMLPropertiesParentPage"
             id="org.key_project.jmlediting.ui.preferences.jml"
             name="JML">
       </page>
