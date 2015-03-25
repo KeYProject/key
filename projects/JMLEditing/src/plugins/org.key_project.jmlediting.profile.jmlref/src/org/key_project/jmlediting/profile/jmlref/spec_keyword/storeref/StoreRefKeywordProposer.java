@@ -53,14 +53,10 @@ public class StoreRefKeywordProposer implements IKeywordAutoProposer {
       // empty KeywordContent
       if (tmpNode.getChildren().isEmpty()) {
          result.addAll(new JMLStoreRefProposer(context, this.proposeFinal)
-               .propose(null, false));
+         .propose(null, false));
          return result;
       }
       IASTNode content = tmpNode.getChildren().get(0);
-
-      System.out.println("node: " + node.prettyPrintAST());
-      System.out.println("content: " + content);
-
       if (content.getType() == NodeTypes.ERROR_NODE) {
          // Toplevel error node is for missing semicolon. Try get content of
          // error
@@ -89,9 +85,8 @@ public class StoreRefKeywordProposer implements IKeywordAutoProposer {
                   }
                }, false);
 
-         System.out.println("hasExpr == " + hasExpr);
          result.addAll(new JMLStoreRefProposer(context, this.proposeFinal)
-               .propose(exprInOffset, hasExpr));
+         .propose(exprInOffset, hasExpr));
       }
       return result;
    }

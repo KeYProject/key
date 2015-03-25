@@ -87,24 +87,15 @@ public class UITestUtils {
 
    public static void createEmptyClass(final SWTWorkbenchBot bot,
          final String packageName, final String className) {
-      System.out.println("--------------start createEmptyClass");
-      System.out.println(bot.activeShell().getText());
       try {
          bot.activeShell().setFocus();
          bot.menu("File").setFocus();
-         System.out.println(bot.menu("File"));
          bot.menu("File").menu("New").menu("Class").click();
       }
       catch (final Exception e) {
          e.printStackTrace();
       }
       bot.sleep(2000);
-      // bot.textWithLabel("&Package:").setText(packageName);
-      // bot.textWithLabel("&Name:").setText(className);
-      // SWTBotShell activeShell = bot.activeShell();
-      // bot.sleep(2000);
-      // bot.button("Finish").click();
-      // bot.waitUntil(shellCloses(activeShell));
    }
 
    public static void openJMLProfileProperties(final SWTWorkbenchBot bot,
@@ -145,7 +136,7 @@ public class UITestUtils {
          bot.sleep(1000);
       }
       item.getNode(nodeHierachy[nodeHierachy.length - 1]).select()
-            .doubleClick();
+      .doubleClick();
       bot.sleep(1000);
    }
 
@@ -195,7 +186,7 @@ public class UITestUtils {
       public TestProject(final SWTWorkbenchBot bot, final String projectName,
             final String packageName, final String className,
             final String classLoc, final SaveGuarantee guarantee)
-            throws CoreException, InterruptedException {
+                  throws CoreException, InterruptedException {
          super();
          this.bot = bot;
          this.classLocation = classLoc;
@@ -243,7 +234,7 @@ public class UITestUtils {
          // Otherwise try to do something faster
          if (this.openedEditor != null
                && (this.saveGuarantee == SaveGuarantee.NO_SAVE || (this.saveGuarantee == SaveGuarantee.SAVE_BUT_NO_CHANGES_LATER && this.openedEditor
-                     .isDirty()))) {
+               .isDirty()))) {
             // if NO_SAVE and not dirty -> everything fine
             // else revert to saved
             if (this.saveGuarantee == SaveGuarantee.SAVE_BUT_NO_CHANGES_LATER
@@ -265,9 +256,9 @@ public class UITestUtils {
             this.copyData();
             // Open the editor
             this.bot.tree().getTreeItem(this.projectName).select().expand()
-                  .getNode("src").select().expand().getNode(this.packageName)
-                  .select().expand().getNode(this.className + ".java").select()
-                  .doubleClick();
+            .getNode("src").select().expand().getNode(this.packageName)
+            .select().expand().getNode(this.className + ".java").select()
+            .doubleClick();
             this.openedEditor = this.bot.activeEditor().toTextEditor();
          }
       }
@@ -303,14 +294,14 @@ public class UITestUtils {
    public static TestProject createProjectWithFile(final SWTWorkbenchBot bot,
          final String projectName, final String packageName,
          final String className, final SaveGuarantee guarantee)
-         throws CoreException, InterruptedException {
+               throws CoreException, InterruptedException {
       return createProjectWithFile(bot, projectName, packageName, className,
             "data/template/" + className + ".java", guarantee);
    }
 
    public static TestProject createProjectWithFile(final SWTWorkbenchBot bot,
          final Class<?> testClass, final SaveGuarantee guarantee)
-         throws CoreException, InterruptedException {
+               throws CoreException, InterruptedException {
       return createProjectWithFile(bot, testClass.getSimpleName(), testClass
             .getPackage().getName(), testClass.getSimpleName(), guarantee);
    }

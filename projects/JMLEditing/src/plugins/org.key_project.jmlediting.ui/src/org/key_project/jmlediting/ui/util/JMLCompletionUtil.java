@@ -92,8 +92,6 @@ public final class JMLCompletionUtil {
             // check for all spellings
             for (final String keyword : keywords) {
                // ignore not possible suggestions
-               System.out.println("\"" + keyword + "\".startsWith(\"\\"
-                     + prefix + "\") == " + keyword.startsWith("\\" + prefix));
                if (keyword.startsWith(prefix)
                      || keyword.startsWith("\\" + prefix)) {
                   result.add(new CompletionProposal(keyword, proposalOffset,
@@ -146,7 +144,6 @@ public final class JMLCompletionUtil {
          final IASTNode wordNode = Nodes.getDepthMostNodeWithPosition(
                context.getInvocationOffset() - 1, node);
          // the cursor is in the current Node => substring
-         System.out.println("im offset ");
          prefix = context
                .getDocument()
                .get()
@@ -156,7 +153,6 @@ public final class JMLCompletionUtil {
       else if (node.getStartOffset() >= context.getInvocationOffset()) {
          // the node is after the cursor => empty prefix and break the
          // recursion
-         System.out.println("zu sp�t...");
          prefix = "";
       }
 
@@ -164,9 +160,6 @@ public final class JMLCompletionUtil {
       if (prefix != null && prefix.equals(".")) {
          prefix = "";
       }
-
-      System.out.println("prefix == " + prefix);
-
       return prefix;
    }
 }

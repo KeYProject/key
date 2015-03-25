@@ -23,7 +23,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
-import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
@@ -218,7 +217,7 @@ public class JMLStoreRefProposer {
       if (method != null && method.parameters() != null) {
          @SuppressWarnings("unchecked")
          final List<SingleVariableDeclaration> methodParams = method
-               .parameters();
+         .parameters();
          final int replacementOffset = this.context.getInvocationOffset()
                - prefix.length();
          final int prefixLength = prefix.length();
@@ -254,8 +253,6 @@ public class JMLStoreRefProposer {
             .getDocument().get());
 
       final CommentRange range = locator.getJMLComment(offset);
-      System.out.println("commentRange: " + range.getBeginOffset() + "-"
-            + range.getEndOffset());
 
       return this.parameterMap.get(range.getBeginOffset());
    }
@@ -313,10 +310,6 @@ public class JMLStoreRefProposer {
          final boolean allowKeywords, final boolean withProtectedOrInline) {
       final int type = node.getType();
 
-      System.out.println("------------------------------------------------");
-      System.out.println("node == " + node);
-      System.out.println("restNodes == " + restNodes);
-
       // cut the prefix to the cursor position
       final String prefix = JMLCompletionUtil.computePrefix(this.context, node);
 
@@ -326,7 +319,6 @@ public class JMLStoreRefProposer {
       // if prefix != null the cursor is in or before the currentNode ->
       // compute the proposals
       if (restNodes.isEmpty() || prefix != null) {
-         System.out.println("MAKING PROPOSALS");
          final List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
          // don't accept * as a prefix
          if (prefix.equals("*")) {
@@ -365,11 +357,8 @@ public class JMLStoreRefProposer {
          return result;
       }
       else {
-         System.out.println("GO DEEPER (with Type: "
-               + NodeTypes.getTypeName(type) + ")");
          if (type == StoreRefNodeTypes.STORE_REF_NAME
                || type == StoreRefNodeTypes.STORE_REF_NAME_SUFFIX) {
-            System.out.println("in store_ref_name[_suffix]");
             final String name = ((IStringNode) node.getChildren().get(0))
                   .getString();
 
@@ -390,18 +379,15 @@ public class JMLStoreRefProposer {
             }
             // check for Method parameters
             if (nextType == null) {
-               System.out.println("checking MethodParameters");
                nextType = this.getMethodParameterTypeForName(name);
             }
 
             // check for fields
             if (nextType == null) {
-               System.out.println("searchingType for: " + name);
                nextType = resolver.getTypeForName(activeType, name);
             }
 
             if (nextType == null) {
-               System.out.println("AAAAaaahhhhh, nextType is null!");
                return Collections.emptyList();
             }
             return this.proposeStoreRefVariables(nextType, restNodes.get(0),
