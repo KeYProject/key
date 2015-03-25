@@ -174,6 +174,13 @@ IJavaCompletionProposalComputer {
 
    }
 
+   /**
+    * Checks whether the given Node has an ErrorNode on the Top Level.
+    *
+    * @param keywordApplNode
+    *           the Node to check
+    * @return true if there is an Toplevel ErrorNode, else false
+    */
    private static boolean hasToplevelError(final IASTNode keywordApplNode) {
       if (keywordApplNode.getChildren().size() == 1) {
          // EmptyKeyword
@@ -191,6 +198,15 @@ IJavaCompletionProposalComputer {
       return topContentNode.getType() == NodeTypes.ERROR_NODE;
    }
 
+   /**
+    * Checks whether a given caret is on a given Keywords Content.
+    * 
+    * @param keywordApplNode
+    *           the KeywordNode
+    * @param caret
+    *           the caret
+    * @return true if the given Caret is on the keywords content.
+    */
    private static boolean isCaretOnKeywordContent(
          final IASTNode keywordApplNode, final int caret) {
       if (keywordApplNode.getChildren().size() == 1) {
