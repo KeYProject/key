@@ -91,7 +91,7 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
    private static final int MAX_UPDATE_TERM_DEPTH_FOR_CHECKING = 8;
    
    @Override
-   public ImmutableList<Goal> apply(Goal goal, final Services services,
+   public final ImmutableList<Goal> apply(Goal goal, final Services services,
          RuleApp ruleApp) throws RuleAbortException {
       
       boolean stoppedInterface = false;
@@ -203,8 +203,11 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
    }
    
    /**
-    * Joins two SE states (U1,C1,p) and (U2,C2,p). p must
-    * be the same in both states, so it is supplied separately.
+    * Joins two SE states (U1,C1,p) and (U2,C2,p) according to the method
+    * {@link JoinRule#joinValuesInStates(LocationVariable, SymbolicExecutionState, Term, SymbolicExecutionState, Term, Services)}.
+    * p must be the same in both states, so it is supplied separately.<p>
+    * 
+    * Override this method for special join procedures.
     * 
     * @param state1 First state to join.
     * @param state2 Second state to join.
@@ -329,7 +332,9 @@ public abstract class JoinRule extends JoinRuleUtils implements BuiltInRule {
    /**
     * Joins two heaps in a zip-like procedure. The fallback
     * is an if-then-else construct that is tried to be shifted
-    * as far inwards as possible.
+    * as far inwards as possible.<p>
+    * 
+    * Override this method for specialized heap join procedures.
     * 
     * @param heapVar The heap variable for which the
     *    values should be joined.
