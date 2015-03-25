@@ -14,6 +14,7 @@ import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordCo
 import org.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
 import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
 import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
+import org.key_project.jmlediting.profile.jmlref.primary.ReachKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.MeasuredByKeyword;
@@ -44,6 +45,7 @@ import org.key_project.jmlediting.profile.key.other.InvKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAccessibleKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAssignableKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyMeasuredByKeyword;
+import org.key_project.jmlediting.profile.key.other.KeyReachKeyword;
 import org.key_project.jmlediting.profile.key.other.LessThanNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyPureKeyword;
@@ -98,6 +100,7 @@ public class KeyProfile extends JMLReferenceProfile {
 
       replace(supportedKeywords, MeasuredByKeyword.class,
             new KeyMeasuredByKeyword());
+      replace(supportedKeywords, ReachKeyword.class, new KeyReachKeyword());
 
       // Key specific behaviors
       supportedKeywords.addAll(Arrays.asList(new BreakBehaviorKeyword(),
