@@ -15,8 +15,6 @@ public class MethodDeclarationFinder extends ASTVisitor {
 
    @Override
    public boolean visit(final MethodDeclaration node) {
-      System.out.println("nodeStart for " + node.getName() + ": "
-            + node.getStartPosition());
       this.decls.add(node);
       return super.visit(node);
    }

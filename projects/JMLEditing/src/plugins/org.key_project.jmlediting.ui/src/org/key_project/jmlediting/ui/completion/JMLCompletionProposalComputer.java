@@ -37,7 +37,7 @@ import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
  * @author Thomas Glaser
  */
 public class JMLCompletionProposalComputer implements
-      IJavaCompletionProposalComputer {
+IJavaCompletionProposalComputer {
 
    /**
     * lazy loading of the KeY Image to display in Keyword-Proposals.
@@ -55,7 +55,7 @@ public class JMLCompletionProposalComputer implements
       try {
          return new Image(Display.getCurrent(), new ImageLoader().load(new URL(
                "platform:/plugin/org.key_project.jmlediting.ui/icons/jml.png")
-               .openStream())[0]);
+         .openStream())[0]);
       }
       catch (final IOException ioe) {
          return null;
@@ -141,7 +141,6 @@ public class JMLCompletionProposalComputer implements
                   // autoproposals
                   final IKeyword activeKeyword = ((IKeywordNode) keywordApplNode
                         .getChildren().get(0)).getKeyword();
-                  System.out.println("activeKeyword == " + activeKeyword);
 
                   final IKeywordAutoProposer proposer = activeKeyword
                         .createAutoProposer();
@@ -162,7 +161,6 @@ public class JMLCompletionProposalComputer implements
                }
             }
             else {
-               System.out.println("no activeKeyword");
                return this.proposeToplevelKeywords(javaContext);
             }
 
@@ -170,7 +168,6 @@ public class JMLCompletionProposalComputer implements
          }
          // Fallback Method to display all JML Keyword-Proposals, if
          // no active Keyword was discovered.
-         System.out.println("no parseResult");
          return this.proposeToplevelKeywords(javaContext);
       }
       return result;
@@ -212,7 +209,6 @@ public class JMLCompletionProposalComputer implements
     */
    private List<ICompletionProposal> proposeToplevelKeywords(
          final JavaContentAssistInvocationContext javaContext) {
-      System.out.println("fallback");
       return JMLCompletionUtil.getStandardKeywordProposals(javaContext,
             getJMLImg());
    }

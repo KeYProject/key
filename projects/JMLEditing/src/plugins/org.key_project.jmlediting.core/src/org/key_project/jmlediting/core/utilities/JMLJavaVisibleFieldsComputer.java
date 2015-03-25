@@ -13,9 +13,9 @@ import org.eclipse.jdt.core.dom.Modifier;
  *
  * <code>
  * class T {
- * 
- *   class Y{}
  *
+ *   class Y{}
+ * 
  *   void foo() {
  *     Y y;
  *     y.[test here];
@@ -92,19 +92,6 @@ public class JMLJavaVisibleFieldsComputer {
       final boolean isPrivate = Modifier.isPrivate(modifier);
       final boolean isProtected = Modifier.isProtected(modifier);
       final boolean isPackage = !isPublic && !isPrivate && !isProtected;
-      if (debugVisibility) {
-         System.out.println("VISIBILITY for " + variable.getName() + " from "
-               + variable.getDeclaringClass().getName());
-         System.out.println();
-         System.out.println("declaring: "
-               + variable.getDeclaringClass().getName());
-         System.out.println("top: " + this.contextType.getName());
-         System.out.println();
-         System.out.println("isPrivate?\t\t" + isPrivate);
-         System.out.println("isPublic?\t\t" + isPublic);
-         System.out.println("isProtected?\t\t" + isProtected);
-         System.out.println("isPackage?\t\t" + isPackage);
-      }
 
       // Public is always visible
       if (isPublic) {

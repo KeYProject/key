@@ -13,7 +13,6 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.core.test.Activator;
@@ -35,8 +34,6 @@ public class JMLJavaVisibleFieldsComputerTest {
 
    @BeforeClass
    public static void beforeClass() throws Exception {
-      System.out
-            .println("________________________begin________________________");
       project = TestUtilsUtil.createJavaProject("TestProject");
       final IFolder srcFolder = project.getProject().getFolder("src");
       final IFolder testFolder = TestUtilsUtil.createFolder(srcFolder, "test");
@@ -61,19 +58,12 @@ public class JMLJavaVisibleFieldsComputerTest {
       parser.setResolveBindings(true);
       final org.eclipse.jdt.core.dom.CompilationUnit ast = (org.eclipse.jdt.core.dom.CompilationUnit) parser
             .createAST(null);
-      System.out.println(ast.toString());
       final TypeDeclarationFinder finder = new TypeDeclarationFinder();
       ast.accept(finder);
       final List<TypeDeclaration> decls = finder.getDecls();
       final TypeDeclaration topDecl = decls.get(num);
 
       return topDecl.resolveBinding();
-   }
-
-   @AfterClass
-   public static void afterClass() {
-      System.out
-            .println("_________________________end_________________________");
    }
 
    @After
@@ -84,7 +74,7 @@ public class JMLJavaVisibleFieldsComputerTest {
    private static int getNumVisibleVarsFor(final ITypeBinding context,
          final ITypeBinding type) {
       return new JMLJavaVisibleFieldsComputer(context)
-            .getAllVisibleFields(type).size();
+      .getAllVisibleFields(type).size();
    }
 
    @Test
@@ -149,8 +139,7 @@ public class JMLJavaVisibleFieldsComputerTest {
             firstClass);
 
       assertEquals("Not the right amount of visible Variables was found", 4,
-            secondResolver.getAllVisibleFields(secondClassBinding)
-                  .size());
+            secondResolver.getAllVisibleFields(secondClassBinding).size());
 
    }
 }

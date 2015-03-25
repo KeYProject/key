@@ -42,7 +42,7 @@ public class ValidationErrorMarkerTest {
 
    @BeforeClass
    public static void initializeProjectAndOpenEditor() throws CoreException,
-         InterruptedException {
+   InterruptedException {
       final TestProject result = UITestUtils.createProjectWithFile(bot,
             PROJECT_NAME, PACKAGE_NAME, CLASS_NAME,
             SaveGuarantee.SAVE_BUT_NO_CHANGES_LATER);
@@ -61,7 +61,6 @@ public class ValidationErrorMarkerTest {
       bot.sleep(5000);
       List<Integer> errorLines = UITestUtils.getAllErrorLines(bot, CLASS_NAME
             + ".java");
-      System.out.println(errorLines);
       assertTrue("No error marker for line 8", errorLines.contains(8));
       assertFalse("Error marker for line 13", errorLines.contains(13));
       this.removeText(new Position(12, 4), 46);

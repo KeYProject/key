@@ -87,7 +87,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
    private void uninstallListener() {
       JMLPreferencesHelper
-            .removeDefaultProfilePreferencesListener(this.currentPreferenceListener);
+      .removeDefaultProfilePreferencesListener(this.currentPreferenceListener);
       JMLProfileManagement.instance().removeListener(
             this.profileManagementListener);
    }
@@ -168,7 +168,6 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       exportButton.addSelectionListener(new SelectionListener() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            System.out.println("click Export");
          }
 
          @Override
@@ -178,7 +177,6 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       importButton.addSelectionListener(new SelectionListener() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            System.out.println("click Import");
          }
 
          @Override
@@ -281,7 +279,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
                   }
                   if (nothingChecked) {
                      JMLProfilePropertiesPage.this
-                           .setErrorMessage("Please select an active profile");
+                     .setErrorMessage("Please select an active profile");
                   }
                }
 
@@ -445,7 +443,6 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          // Can only have one selection
          if (this.profilesListTable.getItem(i).getChecked()) {
             final IJMLProfile result = this.allProfiles.get(i);
-            System.out.println("returning: " + result.getName());
             return result;
          }
       }
@@ -460,11 +457,9 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       // Only write into properties if a selection is available (user is forced
       // to),
       if (selectedProfile == null && !this.useProjectSettings()) {
-         System.out.println("returning false due to not selected...");
          return false;
       }
 
-      System.out.println("project? " + this.isProjectPreferencePage());
       if (this.isProjectPreferencePage()) {
          // Project preferences
          final IProject project = this.getProject();
@@ -474,8 +469,6 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
                // is forced
                // to)
                if (selectedProfile == null) {
-                  System.out
-                        .println("returning false due to selected == null...");
                   return false;
                }
                // Set property

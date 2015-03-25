@@ -30,7 +30,7 @@ public class ParseErrorMarkerTest {
 
    @BeforeClass
    public static void initializeProjectAndOpenEditor() throws CoreException,
-         InterruptedException {
+   InterruptedException {
       final TestProject result = UITestUtils.createProjectWithFile(bot,
             PROJECT_NAME, PACKAGE_NAME, CLASS_NAME,
             SaveGuarantee.SAVE_BUT_NO_CHANGES_LATER);
@@ -49,7 +49,6 @@ public class ParseErrorMarkerTest {
       bot.sleep(5000);
       final List<Integer> errorLines = UITestUtils.getAllErrorLines(bot,
             CLASS_NAME + ".java");
-      System.out.println(errorLines);
       assertTrue("No error marker for line 8", errorLines.contains(8));
       assertTrue("No error marker for line 10", errorLines.contains(10));
    }
