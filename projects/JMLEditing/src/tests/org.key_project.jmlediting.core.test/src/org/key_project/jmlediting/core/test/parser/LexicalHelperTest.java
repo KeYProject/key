@@ -214,6 +214,18 @@ public class LexicalHelperTest {
       testParseInvalidString("\"\\\"");
    }
 
+   @Test
+   public void testParseSingleLineComment() throws ParserException {
+      testParseComplete(" //    \n  123  ", integerLiteral(),
+            "String[10-13](123)");
+   }
+
+   @Test
+   public void testParseSingleLineCommentInLastLine() throws ParserException {
+      testParseComplete(" //    \n  123 //  ", integerLiteral(),
+            "String[10-13](123)");
+   }
+
    public static void parseIntegerConstantTest(final String constant)
          throws ParserException {
       parseIntegerConstantTest(constant, constant.length());

@@ -69,8 +69,7 @@ public class DynamicLogicPrimary implements IJMLPrimary {
    @Override
    public IASTNode parse(final String text, final int start, final int end)
          throws ParserException {
-      final int keywordBegin = LexicalHelper.skipWhiteSpacesOrAt(text, start,
-            end);
+      final int keywordBegin = LexicalHelper.skipLayout(text, start, end);
       final int keywordLength = DLKeyword.getKeyword().length();
       // Check for the beginning \dl_
       if (end - keywordBegin < keywordLength

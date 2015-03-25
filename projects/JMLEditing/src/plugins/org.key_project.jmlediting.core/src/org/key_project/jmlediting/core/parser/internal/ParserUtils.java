@@ -1,7 +1,7 @@
 package org.key_project.jmlediting.core.parser.internal;
 
 import static org.key_project.jmlediting.core.parser.LexicalHelper.getJMLKeywordIdentifier;
-import static org.key_project.jmlediting.core.parser.LexicalHelper.skipWhiteSpacesOrAt;
+import static org.key_project.jmlediting.core.parser.LexicalHelper.skipLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -309,7 +309,7 @@ public class ParserUtils {
       ParserUtils.validatePositions(text, start, end);
 
       // Find keyword in text
-      final int keywordStart = skipWhiteSpacesOrAt(text, start, end, false);
+      final int keywordStart = skipLayout(text, start, end, false);
       final int keywordEnd = getJMLKeywordIdentifier(text, keywordStart, end);
       final String keyword = text.substring(keywordStart, keywordEnd);
 

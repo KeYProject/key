@@ -520,24 +520,6 @@ public final class LexicalHelper {
       }
    }
 
-   /**
-    * Skips the following whitespaces and @ signs, if a new line is encountered.
-    *
-    * @param text
-    *           the text to skip in
-    * @param start
-    *           the start position of skipping
-    * @param end
-    *           the maximum (exclusive) position
-    * @return the index of the first not skipped character
-    * @throws ParserException
-    *            invalid indices
-    */
-   public static int skipWhiteSpacesOrAt(final String text, final int start,
-         final int end) throws ParserException {
-      return skipWhiteSpacesOrAt(text, start, end, false);
-   }
-
    public static int findNextWhitespace(final String text, final int start,
          final int end) throws ParserException {
       ParserUtils.validatePositions(text, start, end);
@@ -551,7 +533,43 @@ public final class LexicalHelper {
       return position;
    }
 
-   public static int skipWhiteSpacesOrAt(final String text, final int start,
+   /**
+    * Shortcut for {@link #skipLayout(String, int, int, boolean)} with
+    * beginNewLine = false.
+    *
+    * @param text
+    *           the text to skip in
+    * @param start
+    *           the start position
+    * @param end
+    *           the maximum end position
+    * @return the exclusive end position of the layout
+    * @throws ParserException
+    *            if the positions are invalid
+    */
+   public static int skipLayout(final String text, final int start,
+         final int end) throws ParserException {
+      return skipLayout(text, start, end, false);
+   }
+
+   /**
+    * Skips layout in the given text at the given start position. Layout is
+    * whitespaces, the at sign after a new line and single line comments.
+    *
+    * @param text
+    *           the text to skip in
+    * @param start
+    *           the start position
+    * @param end
+    *           the maximum end position
+    * @param beginAtNewLine
+    *           whether skipLayout is called in a new line, such a at sign is
+    *           valid at the begin
+    * @return the exclusive end position of the layout
+    * @throws ParserException
+    *            if the positions are invalid
+    */
+   public static int skipLayout(final String text, final int start,
          final int end, final boolean beginAtNewLine) throws ParserException {
       ParserUtils.validatePositions(text, start, end);
       int position = start;
@@ -562,13 +580,16 @@ public final class LexicalHelper {
          final char c = text.charAt(position);
 
          if (c == '\n') {
+            // Remember new lines because @ are layout only after newlines
             inNewLine = true;
             position++;
          }
          else if (Character.isWhitespace(c)) {
+            // White space is always layout
             position++;
          }
          else if (c == '@') {
+            // @ are only layout after a new line
             if (!inNewLine) {
                nonWhiteSpaceFound = true;
             }
@@ -576,11 +597,29 @@ public final class LexicalHelper {
                position++;
             }
          }
-         else if (c == '/' && position + 1 < end
-               && text.charAt(position + 1) == '/') {
-            // Single line comment
-            final int singleCommentEnd = text.indexOf('\n', position);
-            position = Math.min(end, singleCommentEnd);
+         else if (c == '/') {
+            // Oh, could be a comment, need to check that
+            if (position + 1 < end) {
+               final char nextC = text.charAt(position + 1);
+               if (nextC == '/') {
+                  // Single line comment: skip until the next newline
+                  final int singleCommentEnd = text.indexOf('\n', position);
+                  if (singleCommentEnd == -1) {
+                     position = end;
+                  }
+                  else {
+                     position = Math.min(end, singleCommentEnd);
+                  }
+               }
+               else {
+                  // No comment
+                  nonWhiteSpaceFound = true;
+               }
+            }
+            else {
+               // No comment
+               nonWhiteSpaceFound = true;
+            }
          }
          else {
             nonWhiteSpaceFound = true;
@@ -592,5 +631,4 @@ public final class LexicalHelper {
       }
       return position;
    }
-
 }
