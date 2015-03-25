@@ -71,7 +71,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
     private final Constraint metavariableInst;
     private ImmutableMap<SchemaVariable,Term> newInstantiations =
                                 DefaultImmutableMap.<SchemaVariable,Term>nilMap();
-    private Services services;
+    private final Services services;
     private Term computedResult = null;
     private final TypeConverter typeConverter;
     private final boolean allowPartialReplacement;
