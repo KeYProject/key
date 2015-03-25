@@ -37,6 +37,7 @@ import org.key_project.jmlediting.profile.key.locset.LocSetKeyword;
 import org.key_project.jmlediting.profile.key.locset.LocSetSuffix;
 import org.key_project.jmlediting.profile.key.locset.ReachLocsKeyword;
 import org.key_project.jmlediting.profile.key.locset.SetMinusOperatorKeyword;
+import org.key_project.jmlediting.profile.key.locset.SetTypeKeyword;
 import org.key_project.jmlediting.profile.key.locset.SetUnionOperatorKeyword;
 import org.key_project.jmlediting.profile.key.locset.SubsetKeyword;
 import org.key_project.jmlediting.profile.key.other.AccessibleMeasuredByKeyword;
@@ -58,7 +59,6 @@ import org.key_project.jmlediting.profile.key.seq.IndexOfKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqConcatKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqDefKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqEmptyKeyword;
-import org.key_project.jmlediting.profile.key.seq.SeqKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqLengthKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqPrimary;
 import org.key_project.jmlediting.profile.key.seq.SeqPrimaryParser;
@@ -67,6 +67,7 @@ import org.key_project.jmlediting.profile.key.seq.SeqPutKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqReverseKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqSingletonKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqSubKeyword;
+import org.key_project.jmlediting.profile.key.seq.SeqTypeKeyword;
 import org.key_project.jmlediting.profile.key.seq.SingletonKeyword;
 import org.key_project.jmlediting.profile.key.seq.ValuesKeyword;
 import org.key_project.jmlediting.profile.key.spec_statement.KeyBreaksClauseKeyword;
@@ -113,20 +114,19 @@ public class KeyProfile extends JMLReferenceProfile {
       // Add everything for a different sort
       supportedKeywords.add(new LocSetEverythingKeyword());
       // All other keywords
-      supportedKeywords
-            .addAll(Arrays.asList(new EmptyKeywod(),
-                  new InfiniteUnionKeyword(), new IntersetOperatorKeyword(),
-                  new ReachLocsKeyword(), new SetMinusOperatorKeyword(),
-                  new SetUnionOperatorKeyword(), new LocSetKeyword(),
-                  new AllFieldsKeyword(), new DisjointKeyword(),
-                  new SubsetKeyword()));
+      supportedKeywords.addAll(Arrays.asList(new EmptyKeywod(),
+            new InfiniteUnionKeyword(), new IntersetOperatorKeyword(),
+            new ReachLocsKeyword(), new SetMinusOperatorKeyword(),
+            new SetUnionOperatorKeyword(), new LocSetKeyword(),
+            new AllFieldsKeyword(), new DisjointKeyword(), new SubsetKeyword(),
+            new SetTypeKeyword()));
       this.additionalPrimarySuffixes.add(LocSetSuffix.locSetSuffixes());
 
       // Allows \inv as access on a not toplevel object just as for x[3].\inv
       this.additionalPrimarySuffixes.add(InvKeyword.invSuffix(this));
 
       // Support for seq expression
-      supportedKeywords.addAll(Arrays.asList(new SeqKeyword(),
+      supportedKeywords.addAll(Arrays.asList(new SeqTypeKeyword(),
             new SeqConcatKeyword(), new SeqDefKeyword(), new SeqEmptyKeyword(),
             new SeqSingletonKeyword(), new ValuesKeyword(),
             new ContainsKeyword(), new IndexOfKeyword(), new SeqSubKeyword(),

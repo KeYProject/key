@@ -16,7 +16,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqDefKeyword;
-import org.key_project.jmlediting.profile.key.seq.SeqKeyword;
+import org.key_project.jmlediting.profile.key.seq.SeqTypeKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqPrimitiveKeywordSort;
 import org.key_project.jmlediting.profile.key.test.KeyProfileTestUtils;
 
@@ -54,7 +54,7 @@ public class SeqExprTest {
       expectedKeywords.addAll(JMLProfileHelper.filterKeywords(keyProfile,
             SeqDefKeyword.class));
       expectedKeywords.addAll(JMLProfileHelper.filterKeywords(keyProfile,
-            SeqKeyword.class));
+            SeqTypeKeyword.class));
 
       for (final IKeyword expectedKeyword : expectedKeywords) {
          assertTrue("Parsed seq comment does not contains expected keyword "
