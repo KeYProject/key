@@ -50,15 +50,12 @@ import de.uka.ilkd.key.util.joinrule.SymbolicExecutionStateWithProgCnt;
 
 /**
  * Base for implementing join rules. Extend this class,
- * implement method joinStates(...) and register in
+ * implement method joinValuesInStates(...) and register in
  * class JavaProfile.<p>
  * 
  * The rule is applicable if the chosen subterm has the
- * form { x := v || ... } \&lt;{ ... }\&gt; PHI and there
- * are potential join candidates. In automatic mode, all
- * candidates are chosen for a merge; in interactive mode
- * (set selected goal to interactive), a GUI dialog pops
- * up and asks for a manual selection.
+ * form { x := v || ... } PHI and there are potential join
+ * candidates.
  * 
  * @author Dominic Scheurer
  * 
