@@ -14,12 +14,27 @@ import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
 
+/**
+ * Implementation of the Key \dl_ dynamic logic keyword.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public class DynamicLogicPrimary implements IJMLPrimary {
 
-   private static class DL_Keyword extends AbstractEmptyKeyword {
+   /**
+    * private class for the \dl_ keyword part to get syntax highlighting.
+    *
+    * @author Moritz Lichter
+    *
+    */
+   private static final class DLKeyword extends AbstractEmptyKeyword {
 
-      public DL_Keyword() {
-         super("\\dl_");
+      /**
+       * Only instances in this class.
+       */
+      private DLKeyword() {
+         super(getKeyword());
       }
 
       @Override
@@ -32,9 +47,23 @@ public class DynamicLogicPrimary implements IJMLPrimary {
          return null;
       }
 
+      /**
+       *
+       * @return the \dl_ prefix
+       */
+      private static String getKeyword() {
+         return "\\dl_";
+      }
+
    }
 
-   private static DL_Keyword keyword = new DL_Keyword();
+   /**
+    * Shared instance for the \dl_ keyword.
+    */
+   private static final DLKeyword DL_KEYWORD = new DLKeyword();
+   /**
+    * Current profile to parse for.
+    */
    private IJMLExpressionProfile profile;
 
    @Override
@@ -42,16 +71,17 @@ public class DynamicLogicPrimary implements IJMLPrimary {
          throws ParserException {
       final int keywordBegin = LexicalHelper.skipWhiteSpacesOrAt(text, start,
             end);
+      final int keywordLength = DLKeyword.getKeyword().length();
       // Check for the beginning \dl_
-      if (end - keywordBegin < 4
-            || !text.subSequence(keywordBegin, keywordBegin + 4)
-                  .equals("\\dl_")) {
+      if (end - keywordBegin < keywordLength
+            || !text.subSequence(keywordBegin, keywordBegin + keywordLength)
+                  .equals(DLKeyword.getKeyword())) {
          throw new ParserException(
                "Requires \\dl_ for introducing dynamic logic", text,
                keywordBegin);
       }
       // Get the following identifier without whitespaces
-      final int identifierStart = keywordBegin + 4;
+      final int identifierStart = keywordBegin + keywordLength;
       final int identifierEnd = LexicalHelper.getIdentifier(text,
             identifierStart, end);
 
@@ -63,7 +93,7 @@ public class DynamicLogicPrimary implements IJMLPrimary {
 
       // Create the nodes
       final IASTNode keywordNode = Nodes.createKeyword(keywordBegin,
-            identifierStart, keyword, "\\dl_");
+            identifierStart, DL_KEYWORD, DLKeyword.getKeyword());
       final IASTNode identifier = Nodes.createString(identifierStart,
             identifierEnd, text.substring(identifierStart, identifierEnd));
       final IASTNode content = Nodes.createNode(identifierStart,

@@ -28,7 +28,8 @@ public class InvKeyword extends AbstractJMLPrimaryKeyword {
 
    @Override
    public String getDescription() {
-      return "The \\inv operator returns true just when the invariant of the object where \\inv is accessed for is valid.";
+      return "The \\inv operator returns true just when the invariant of"
+            + "the object where \\inv is accessed for is valid.";
    }
 
    @Override

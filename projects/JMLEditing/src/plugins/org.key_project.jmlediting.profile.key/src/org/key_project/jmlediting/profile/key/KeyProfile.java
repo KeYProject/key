@@ -16,6 +16,7 @@ import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
 import org.key_project.jmlediting.profile.jmlref.primary.IJMLPrimary;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.MeasuredByKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_statement.BreakClauseKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_statement.ContinuesClauseKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_statement.ReturnsClauseKeyword;
@@ -39,10 +40,10 @@ import org.key_project.jmlediting.profile.key.locset.SetUnionOperatorKeyword;
 import org.key_project.jmlediting.profile.key.locset.SubsetKeyword;
 import org.key_project.jmlediting.profile.key.other.AccessibleMeasuredByKeyword;
 import org.key_project.jmlediting.profile.key.other.DynamicLogicPrimary;
-import org.key_project.jmlediting.profile.key.other.IndexKeyword;
 import org.key_project.jmlediting.profile.key.other.InvKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAccessibleKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAssignableKeyword;
+import org.key_project.jmlediting.profile.key.other.KeyMeasuredByKeyword;
 import org.key_project.jmlediting.profile.key.other.LessThanNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyPureKeyword;
@@ -50,6 +51,7 @@ import org.key_project.jmlediting.profile.key.parser.KeyTargetLabelPredicatePars
 import org.key_project.jmlediting.profile.key.primary.NewElemsFreshKeyword;
 import org.key_project.jmlediting.profile.key.primary.NonNullElementsKeyword;
 import org.key_project.jmlediting.profile.key.seq.ContainsKeyword;
+import org.key_project.jmlediting.profile.key.seq.IndexKeyword;
 import org.key_project.jmlediting.profile.key.seq.IndexOfKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqConcatKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqDefKeyword;
@@ -93,6 +95,9 @@ public class KeyProfile extends JMLReferenceProfile {
             new KeyAccessibleKeyword());
       supportedKeywords.addAll(Arrays.asList(new AccessibleMeasuredByKeyword(),
             new LessThanNothingKeyword()));
+
+      replace(supportedKeywords, MeasuredByKeyword.class,
+            new KeyMeasuredByKeyword());
 
       // Key specific behaviors
       supportedKeywords.addAll(Arrays.asList(new BreakBehaviorKeyword(),
