@@ -17,7 +17,7 @@ public class EmptyKeywordContent implements
    }
 
    @Override
-   public IKeywordParser getKeywordParser() {
+   public IKeywordParser createKeywordParser() {
       return EmptyKeywordParser.getInstance();
    }
 

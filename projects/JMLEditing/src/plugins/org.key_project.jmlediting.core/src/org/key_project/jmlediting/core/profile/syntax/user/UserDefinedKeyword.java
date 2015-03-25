@@ -2,15 +2,16 @@ package org.key_project.jmlediting.core.profile.syntax.user;
 
 import java.util.Set;
 
+import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserBuilder;
+import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordAutoProposer;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
-import org.key_project.jmlediting.core.profile.syntax.ParseFunctionKeywordParser;
 
 /**
  * An implementation of the {@link IUserDefinedKeyword}.
@@ -77,22 +78,28 @@ public class UserDefinedKeyword extends AbstractKeyword implements
 
    @Override
    public IKeywordParser createParser() {
-      // Get the parse function from the content description.
-      return new ParseFunctionKeywordParser<IJMLProfile>(IJMLProfile.class) {
+      // Get the parse function from the content description
+      // and append the content description
+      final IKeywordParser content = UserDefinedKeyword.this.contentDescription
+            .createKeywordParser();
+      if (UserDefinedKeyword.this.closingCharacter == null) {
+         return content;
+      }
+
+      final ParseFunction closed = ParserBuilder.closedBy(NodeTypes.NODE,
+            content, UserDefinedKeyword.this.closingCharacter);
+
+      return new IKeywordParser() {
 
          @Override
-         protected ParseFunction createParseFunction(final IJMLProfile profile) {
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            return closed.parse(text, start, end);
+         }
 
-            final ParseFunction content = UserDefinedKeyword.this.contentDescription
-                  .getKeywordParser();
-            if (UserDefinedKeyword.this.closingCharacter == null) {
-               return UserDefinedKeyword.this.contentDescription
-                     .getKeywordParser();
-            }
-            else {
-               return ParserBuilder.closedBy(NodeTypes.NODE, content,
-                     UserDefinedKeyword.this.closingCharacter);
-            }
+         @Override
+         public void setProfile(final IJMLProfile profile) {
+            content.setProfile(profile);
          }
       };
    }
