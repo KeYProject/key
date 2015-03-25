@@ -94,8 +94,8 @@ public final class Lexicals {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            final int identifierStart = LexicalHelper.skipWhiteSpacesOrAt(text,
-                  start, end);
+            final int identifierStart = LexicalHelper.skipLayout(text, start,
+                  end);
             final int identifierEnd = LexicalHelper.getIntegerConstant(text,
                   identifierStart, end);
             return Nodes.createString(identifierStart, identifierEnd,
@@ -118,8 +118,8 @@ public final class Lexicals {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            final int identifierStart = LexicalHelper.skipWhiteSpacesOrAt(text,
-                  start, end);
+            final int identifierStart = LexicalHelper.skipLayout(text, start,
+                  end);
             final int identifierEnd = LexicalHelper.getFloatConstant(text,
                   identifierStart, end);
             return Nodes.createString(identifierStart, identifierEnd,
@@ -141,8 +141,8 @@ public final class Lexicals {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            final int identifierStart = LexicalHelper.skipWhiteSpacesOrAt(text,
-                  start, end);
+            final int identifierStart = LexicalHelper.skipLayout(text, start,
+                  end);
             final int identifierEnd = LexicalHelper.getCharacterConstant(text,
                   identifierStart, end);
             return Nodes.createString(identifierStart, identifierEnd,
@@ -164,8 +164,8 @@ public final class Lexicals {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            final int identifierStart = LexicalHelper.skipWhiteSpacesOrAt(text,
-                  start, end);
+            final int identifierStart = LexicalHelper.skipLayout(text, start,
+                  end);
             final int identifierEnd = LexicalHelper.getStringConstant(text,
                   identifierStart, end);
             return Nodes.createString(identifierStart, identifierEnd,

@@ -10,12 +10,12 @@ import org.key_project.jmlediting.profile.jmlref.type.TypeKeywordSort;
  * @author Moritz Lichter
  *
  */
-public class SeqKeyword extends AbstractEmptyKeyword {
+public class SeqTypeKeyword extends AbstractEmptyKeyword {
 
    /**
     * Creates a new seq keyword instance.
     */
-   public SeqKeyword() {
+   public SeqTypeKeyword() {
       super("\\seq");
    }
 

@@ -10,6 +10,12 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefKeywordSort;
 
+/**
+ * Overrides the content of the JML Reference keyword to support expressions.
+ * 
+ * @author Moritz Lichter
+ *
+ */
 public class KeyAssignableKeyword extends AssignableKeyword {
 
    @Override

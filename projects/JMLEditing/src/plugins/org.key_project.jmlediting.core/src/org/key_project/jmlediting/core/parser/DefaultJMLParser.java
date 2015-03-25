@@ -1,6 +1,6 @@
 package org.key_project.jmlediting.core.parser;
 
-import static org.key_project.jmlediting.core.parser.LexicalHelper.skipWhiteSpacesOrAt;
+import static org.key_project.jmlediting.core.parser.LexicalHelper.skipLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +61,7 @@ public class DefaultJMLParser implements IJMLParser {
 
       final List<ParserError> keywordErrors = new ArrayList<ParserError>();
 
-      int position = skipWhiteSpacesOrAt(text, start, end, true);
+      int position = skipLayout(text, start, end, true);
 
       // Whether there is a parse error in the current node
       boolean error = false;
@@ -92,14 +92,13 @@ public class DefaultJMLParser implements IJMLParser {
                // whitespace because this token is not parseable
                // This is faster than just removing one char at one
                // First determine where unparseable keyword starts
-               final int textStart = skipWhiteSpacesOrAt(text, position, end);
+               final int textStart = skipLayout(text, position, end);
                // Then skip until the next whitespace from there
                int nextPosition;
                try {
                   nextPosition = LexicalHelper.findNextWhitespace(text,
                         textStart, end);
-                  nextPosition = skipWhiteSpacesOrAt(text, nextPosition, end,
-                        false);
+                  nextPosition = skipLayout(text, nextPosition, end, false);
                }
                catch (final ParserException e2) {
                   // No whitespace anymore, so take rest of the text
@@ -130,7 +129,7 @@ public class DefaultJMLParser implements IJMLParser {
          // Skip whites
          position = keywordNode.getEndOffset();
          if (position < end) {
-            position = skipWhiteSpacesOrAt(text, position, end, false);
+            position = skipLayout(text, position, end, false);
          }
          lastError = error;
       }

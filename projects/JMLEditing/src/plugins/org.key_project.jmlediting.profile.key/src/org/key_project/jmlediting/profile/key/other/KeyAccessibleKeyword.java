@@ -11,11 +11,14 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefKeywordSort;
 
+/**
+ * Overrides the content of the accessible keyword to contains key specific
+ * content.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public class KeyAccessibleKeyword extends AccessibleKeyword {
-
-   public KeyAccessibleKeyword() {
-
-   }
 
    @Override
    public IKeywordParser createParser() {

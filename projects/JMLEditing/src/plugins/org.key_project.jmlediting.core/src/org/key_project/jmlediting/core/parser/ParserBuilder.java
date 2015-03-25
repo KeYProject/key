@@ -274,8 +274,7 @@ public final class ParserBuilder {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            final int sepStart = LexicalHelper.skipWhiteSpacesOrAt(text, start,
-                  end);
+            final int sepStart = LexicalHelper.skipLayout(text, start, end);
             if (sepStart >= end) {
                throw new ParserException("Reached end of text", text, end);
             }
@@ -366,7 +365,7 @@ public final class ParserBuilder {
                throw new ParserException("Expected a " + close, end, text,
                      Nodes.createNode(type, Nodes.createErrorNode(node)));
             }
-            final int semicolonPos = LexicalHelper.skipWhiteSpacesOrAt(text,
+            final int semicolonPos = LexicalHelper.skipLayout(text,
                   node.getEndOffset(), end);
             if (semicolonPos >= end || text.charAt(semicolonPos) != close) {
                // error
@@ -521,8 +520,8 @@ public final class ParserBuilder {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            final int identifierStart = LexicalHelper.skipWhiteSpacesOrAt(text,
-                  start, end);
+            final int identifierStart = LexicalHelper.skipLayout(text, start,
+                  end);
             final int identifierEnd = LexicalHelper.getIdentifier(text,
                   identifierStart, end);
             return Nodes.createString(identifierStart, identifierEnd,
@@ -558,8 +557,8 @@ public final class ParserBuilder {
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
             // Skip whitespaces
-            final int constantStart = LexicalHelper.skipWhiteSpacesOrAt(text,
-                  start, end);
+            final int constantStart = LexicalHelper
+                  .skipLayout(text, start, end);
             // Check that enough characters are left for the constant
             if (constantStart + constant.length() > end) {
                throw new ParserException("Expected a \"" + constant + "\"",
@@ -676,8 +675,7 @@ public final class ParserBuilder {
             if (nodeEnd == end) {
                return node;
             }
-            final int whiteEnd = LexicalHelper.skipWhiteSpaces(text, nodeEnd,
-                  end);
+            final int whiteEnd = LexicalHelper.skipLayout(text, nodeEnd, end);
             if (whiteEnd < end) {
                final IASTNode errorNode = Nodes.createErrorNode(node, Nodes
                      .createUnparsedTextNode(text.substring(whiteEnd, end),
@@ -771,8 +769,8 @@ public final class ParserBuilder {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            final int startAfterWhitespaces = LexicalHelper
-                  .skipWhiteSpacesOrAt(text, start, end);
+            final int startAfterWhitespaces = LexicalHelper.skipLayout(text,
+                  start, end);
             return function.parse(text, startAfterWhitespaces, end);
          }
       };
