@@ -1,6 +1,8 @@
 package org.key_project.jmlediting.ui.preferencepages;
 
+import java.util.Collections;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -26,8 +28,12 @@ import org.key_project.jmlediting.core.profile.IDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.IProfileManagementListener;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
+import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
+import org.key_project.jmlediting.ui.Activator;
+import org.key_project.jmlediting.ui.preferencepages.RebuildHelper.UserMessage;
 import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLProfileDialog;
+import org.key_project.util.eclipse.Logger;
 
 /**
  * The {@link JMLProfilePropertiesPage} implements a properties and preferences
@@ -87,7 +93,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
    private void uninstallListener() {
       JMLPreferencesHelper
-      .removeDefaultProfilePreferencesListener(this.currentPreferenceListener);
+            .removeDefaultProfilePreferencesListener(this.currentPreferenceListener);
       JMLProfileManagement.instance().removeListener(
             this.profileManagementListener);
    }
@@ -279,7 +285,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
                   }
                   if (nothingChecked) {
                      JMLProfilePropertiesPage.this
-                     .setErrorMessage("Please select an active profile");
+                           .setErrorMessage("Please select an active profile");
                   }
                }
 
@@ -438,6 +444,16 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       return cancel;
    }
 
+   private IJMLProfile getCurrentProfile() {
+      if (this.isProjectPreferencePage()) {
+         return JMLPreferencesHelper.getProjectActiveJMLProfile(this
+               .getProject());
+      }
+      else {
+         return JMLPreferencesHelper.getDefaultJMLProfile();
+      }
+   }
+
    private IJMLProfile getSelectedProfile() {
       for (int i = 0; i < this.profilesListTable.getItemCount(); i++) {
          // Can only have one selection
@@ -449,52 +465,96 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       return null;
    }
 
-   @Override
-   public boolean performOk() {
+   private boolean updatePreferences() {
 
       final IJMLProfile selectedProfile = this.getSelectedProfile();
 
       // Only write into properties if a selection is available (user is forced
       // to),
       if (selectedProfile == null && !this.useProjectSettings()) {
+
          return false;
       }
 
-      if (this.isProjectPreferencePage()) {
-         // Project preferences
-         final IProject project = this.getProject();
-         try {
-            if (this.useProjectSettings()) {
-               // Only write into properties if a selection is available (user
-               // is forced
-               // to)
-               if (selectedProfile == null) {
-                  return false;
-               }
-               // Set property
-               JMLPreferencesHelper.setProjectJMLProfile(project,
-                     selectedProfile);
-            }
-            else {
-               // Remove property
-               JMLPreferencesHelper.setProjectJMLProfile(project, null);
-            }
-         }
-         catch (final CoreException e) {
-            e.printStackTrace();
-            return false;
-         }
-      }
-      else {
-         JMLPreferencesHelper.setDefaultJMLProfile(selectedProfile);
+      // Create a runnable which applies to changes to the preferences
+      final Runnable preferencesUpdater;
+      Set<IProject> affectedProjects = null;
+
+      // Check whether the affective profile has changed
+      if (selectedProfile == this.getCurrentProfile()) {
+         // Then we do not need to do a rebuild
+         affectedProjects = Collections.emptySet();
       }
 
-      final boolean ok = super.performOk();
+      if (this.isProjectPreferencePage()) {
+         // Only write into properties if a selection is available (user
+         // is forced
+         // to)
+         if (this.useProjectSettings() && selectedProfile == null) {
+            return false;
+         }
+         // Project preferences
+         final IProject project = this.getProject();
+         // Check whether the effective profile for the project changed
+         if (affectedProjects == null) {
+            affectedProjects = Collections.singleton(project);
+         }
+         preferencesUpdater = new Runnable() {
+
+            @Override
+            public void run() {
+               try {
+                  if (JMLProfilePropertiesPage.this.useProjectSettings()) {
+                     // Set property
+                     JMLPreferencesHelper.setProjectJMLProfile(project,
+                           selectedProfile);
+                  }
+                  else {
+                     // Remove property
+                     JMLPreferencesHelper.setProjectJMLProfile(project, null);
+                  }
+
+               }
+               catch (final CoreException e) {
+                  new Logger(Activator.getDefault(), Activator.PLUGIN_ID)
+                        .logError("Failed to store preferences", e);
+               }
+            }
+         };
+      }
+      else {
+         if (affectedProjects == null) {
+            affectedProjects = JMLProfileHelper
+                  .getProjectsUsingWorkspaceProfile();
+         }
+         preferencesUpdater = new Runnable() {
+            @Override
+            public void run() {
+
+               JMLPreferencesHelper
+
+               .setDefaultJMLProfile(selectedProfile);
+            }
+         };
+      }
+
+      // Now trigger a rebuild for these projects and update the preferences
+      return RebuildHelper.triggerRebuild(affectedProjects, this.getShell(),
+            UserMessage.ACTIVE_PROFILE_CHANGED, preferencesUpdater);
+   }
+
+   @Override
+   public void performApply() {
+      this.updatePreferences();
+   }
+
+   @Override
+   public boolean performOk() {
+      final boolean ok = this.updatePreferences();
       if (ok) {
          // Window is closed, remove listener
          this.uninstallListener();
       }
       return ok;
    }
-
 }

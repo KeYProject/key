@@ -78,6 +78,10 @@ public class ProfilePropertiesTest {
       // Apply the properties
       bot.button("OK").click();
 
+      // Want to do the rebuild
+      bot.sleep(50);
+      bot.activeShell().bot().button("Yes").click();
+
       // Now check that this is ok
       final IJMLProfile projectProfile = JMLPreferencesHelper
             .getProjectJMLProfile(project);

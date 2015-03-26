@@ -53,6 +53,10 @@ public class ProfilePropertiesTest2 {
 
       bot.button("Apply").click();
 
+      // Want to do rebuild
+      bot.sleep(50);
+      bot.activeShell().bot().button("Yes").click();
+
       bot.sleep(100);
 
       assertTrue("List is enabled when project specific settings are disabled",
