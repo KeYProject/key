@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.DoStatement;
+import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.key_project.jmlediting.core.dom.IASTNode;
@@ -43,6 +44,7 @@ public class LoopInvariantValidator extends AbstractKeywordValidator {
    @Override
    public boolean isFollowingJavaElementValid(final ASTNode node) {
       return (node instanceof ForStatement) || (node instanceof WhileStatement)
-            || (node instanceof DoStatement);
+            || (node instanceof DoStatement)
+            || (node instanceof EnhancedForStatement);
    }
 }
