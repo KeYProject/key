@@ -19,7 +19,7 @@ public class CommentRange {
    private final int beginOffset;
    /**
     * The Comments end offset including end signs (Not the eol sign for
-    * Singleline Comments).
+    * SingleLine Comments).
     */
    private final int endOffset;
 
@@ -122,7 +122,7 @@ public class CommentRange {
    }
 
    /**
-    * Returns the type of the comment
+    * Returns the type of the comment.
     *
     * @return the type
     */

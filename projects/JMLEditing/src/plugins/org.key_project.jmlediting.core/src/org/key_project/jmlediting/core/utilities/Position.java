@@ -1,7 +1,19 @@
 package org.key_project.jmlediting.core.utilities;
 
+/**
+ * Class Representing a Position in a Document by ints line and column.
+ *
+ * @author David Giessing
+ *
+ */
 public class Position {
+   /**
+    * The line.
+    */
    private final int line;
+   /**
+    * The column.
+    */
    private final int column;
 
    /**
@@ -18,6 +30,14 @@ public class Position {
       return this.column;
    }
 
+   /**
+    * Creates a new Position.
+    *
+    * @param line
+    *           the line
+    * @param column
+    *           the column
+    */
    public Position(final int line, final int column) {
       super();
       this.line = line;

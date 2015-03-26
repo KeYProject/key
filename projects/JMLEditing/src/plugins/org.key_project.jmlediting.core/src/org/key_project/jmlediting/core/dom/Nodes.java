@@ -13,6 +13,20 @@ import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 
 public final class Nodes {
 
+   /**
+    * creates an IASTNode of Type type with startOffset, end Offset and Children
+    * children.
+    *
+    * @param startOffset
+    *           the startOffset of the new Node
+    * @param endOffset
+    *           the endOffset of the new Node
+    * @param type
+    *           the Type for the new Node
+    * @param children
+    *           the children of the new Node
+    * @return the new IASTNode
+    */
    public static IASTNode createNode(final int startOffset,
          final int endOffset, final int type, final IASTNode... children) {
       return new ASTNode(startOffset, endOffset, type, Arrays.asList(children));
@@ -37,11 +51,30 @@ public final class Nodes {
             children.size() - 1).getEndOffset(), type, children);
    }
 
+   /**
+    * Creates a new IASTNode from type StringNode from startOffset to endOffset
+    * with Content content.
+    *
+    * @param startOffset
+    *           the startOffset
+    * @param endOffset
+    *           the endOffset
+    * @param content
+    *           the content
+    * @return the StringNode
+    */
    public static IASTNode createString(final int startOffset,
          final int endOffset, final String content) {
       return new StringNode(startOffset, endOffset, content);
    }
 
+   /**
+    * Creates a IASTNode of Type List containing all given children.
+    *
+    * @param children
+    *           the list of children to be contained in the List Node
+    * @return the ListNode
+    */
    public static IASTNode createList(final IASTNode... children) {
       return createNode(NodeTypes.LIST, children);
    }
@@ -50,6 +83,20 @@ public final class Nodes {
       return createNode(NodeTypes.LIST, children);
    }
 
+   /**
+    * Creates a new KeywordNode from start to end offset with keyword keyword
+    * and the concrete instance Keywordinstance.
+    *
+    * @param startOffset
+    *           the startoffset
+    * @param endOffset
+    *           the endoffset
+    * @param keyword
+    *           the IKeyword
+    * @param keywordInstance
+    *           the concrete Keyword instance
+    * @return the KeywordNode
+    */
    public static IASTNode createKeyword(final int startOffset,
          final int endOffset, final IKeyword keyword,
          final String keywordInstance) {
@@ -74,6 +121,17 @@ public final class Nodes {
       return createNode(NodeTypes.ERROR_NODE, content);
    }
 
+   /**
+    * Creates a new error node
+    * 
+    * @param start
+    *           startOffset
+    * @param end
+    *           endOffset
+    * @param content
+    *           the content of the ErrorNode
+    * @return an ErrorNode
+    */
    public static IASTNode createErrorNode(final int start, final int end,
          final IASTNode... content) {
       return createNode(start, end, NodeTypes.ERROR_NODE, content);
@@ -91,6 +149,16 @@ public final class Nodes {
       return node.getType() == NodeTypes.KEYWORD;
    }
 
+   /**
+    * Returns the deepest node in node that contains position.
+    *
+    * @param position
+    *           the position that has to be contained
+    * @param node
+    *           the AST to operate on
+    * @return the deepest AST node that contains position, or null if node does
+    *         not contain position.
+    */
    public static IASTNode getDepthMostNodeWithPosition(final int position,
          final IASTNode node) {
       return node.search(new INodeSearcher<IASTNode>() {
@@ -134,6 +202,14 @@ public final class Nodes {
       return null;
    }
 
+   /**
+    * Gets all IKeywordNodes from AST node.
+    *
+    * @param node
+    *           the AST to operate on
+    * @return a List of all IKeywordNodes in node or an empty List if there are
+    *         none.
+    */
    public static List<IKeywordNode> getAllKeywords(final IASTNode node) {
       return node.traverse(new INodeTraverser<List<IKeywordNode>>() {
 
@@ -149,6 +225,16 @@ public final class Nodes {
       }, new LinkedList<IKeywordNode>());
    }
 
+   /**
+    * Returns a List of all Nodes of Type type in the AST node.
+    *
+    * @param node
+    *           the ast to search in
+    * @param type
+    *           the desired Type
+    * @return a List of Nodes of Type type in node or an empty List if there are
+    *         none
+    */
    public static List<IASTNode> getAllNodesOfType(final IASTNode node,
          final int type) {
       return node.traverse(new INodeTraverser<List<IASTNode>>() {
@@ -164,6 +250,19 @@ public final class Nodes {
       }, new LinkedList<IASTNode>());
    }
 
+   /**
+    * Returns the IASTNode of Type type at Position position, if there is one.
+    * If not returns null.
+    *
+    * @param root
+    *           the AST to operate on
+    * @param position
+    *           the searched position
+    * @param type
+    *           the desired type
+    * @return an IASTNode of Type type at Position position if there is one,
+    *         else null.
+    */
    public static IASTNode getNodeAtPosition(final IASTNode root,
          final int position, final int type) {
       return root.search(new INodeSearcher<IASTNode>() {
