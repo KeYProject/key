@@ -7,7 +7,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -33,9 +35,12 @@ import org.eclipse.swt.widgets.Text;
 import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.InvalidProfileException;
+import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeyword;
+import org.key_project.jmlediting.ui.preferencepages.RebuildHelper;
+import org.key_project.jmlediting.ui.preferencepages.RebuildHelper.UserMessage;
 import org.key_project.jmlediting.ui.util.JMLSWTUtil;
 
 /**
@@ -210,7 +215,7 @@ public class JMLProfileDialog extends TitleAreaDialog {
                               !JMLProfileDialog.this.derivedProfile
                                     .isParentKeywordDisabled(selectedKeyword));
                }
-            }
+            };
 
             @Override
             public void widgetDefaultSelected(final SelectionEvent e) {
@@ -753,7 +758,24 @@ public class JMLProfileDialog extends TitleAreaDialog {
       }
 
       if (ok) {
+         this.triggerRebuild();
          super.okPressed();
       }
+   }
+
+   private void triggerRebuild() {
+      if (this.derivedProfile == null) {
+         return;
+      }
+      final Set<IProject> affectedProjects = JMLProfileHelper
+            .getProjectsUsingProfile(this.derivedProfile);
+      final Runnable preferencesUpdater = new Runnable() {
+         @Override
+         public void run() {
+            // write on derived Profiles already called;
+         }
+      };
+      RebuildHelper.triggerRebuild(affectedProjects, this.getShell(),
+            UserMessage.PROFILE_EDITED, preferencesUpdater);
    }
 }
