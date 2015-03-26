@@ -1,5 +1,6 @@
 package org.key_project.jmlediting.core.profile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -20,6 +21,11 @@ import org.key_project.jmlediting.core.PropertyNames;
  *
  */
 public final class JMLPreferencesHelper {
+
+   /**
+    * List of associated listener.
+    */
+   private static List<IProjectProfileListener> projectListener = new ArrayList<IProjectProfileListener>();
 
    /**
     * No instantiations.
@@ -151,6 +157,10 @@ public final class JMLPreferencesHelper {
          profileIdentifier = profile.getIdentifier();
       }
       project.setPersistentProperty(PropertyNames.PROFILE, profileIdentifier);
+
+      for (final IProjectProfileListener profileListener : projectListener) {
+         profileListener.profileChanged(project, profile);
+      }
    }
 
    /**
@@ -180,6 +190,33 @@ public final class JMLPreferencesHelper {
             .addPreferenceChangeListener(filteredlistener);
 
       return listener;
+   }
+
+   /**
+    * Adds a {@link IProjectProfileListener} to the preferences management.
+    *
+    * @param listener
+    *           the new listener, not allowed to be null
+    */
+   public static void addProjectProfileListener(
+         final IProjectProfileListener listener) {
+      if (listener == null) {
+         throw new IllegalArgumentException(
+               "listener is not allowed to be null");
+      }
+      projectListener.add(listener);
+   }
+
+   /**
+    * Removes the given {@link IProjectProfileListener} from the preferences
+    * management.
+    *
+    * @param listener
+    *           the listener to remove
+    */
+   public static void removeProjectProfileListener(
+         final IProjectProfileListener listener) {
+      projectListener.remove(listener);
    }
 
    /**
@@ -226,7 +263,7 @@ public final class JMLPreferencesHelper {
 
    /**
     * Returns whether JML Editing is enabled. True is the default
-    * 
+    *
     * @return whether JML Editing is enabled
     */
    public static boolean isExtensionEnabled() {
