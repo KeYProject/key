@@ -212,4 +212,26 @@ public final class JMLPreferencesHelper {
       }
       return result;
    }
+
+   /**
+    * Sets the JML Editing extension enabled or not.
+    *
+    * @param enabled
+    *           whether to enable JML Editing
+    */
+   public static void setExtensionEnabled(final boolean enabled) {
+      InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put(
+            PropertyNames.JML_EDITING_ENABLED, Boolean.toString(enabled));
+   }
+
+   /**
+    * Returns whether JML Editing is enabled. True is the default
+    * 
+    * @return whether JML Editing is enabled
+    */
+   public static boolean isExtensionEnabled() {
+      final String enabledString = InstanceScope.INSTANCE.getNode(
+            Activator.PLUGIN_ID).get(PropertyNames.JML_EDITING_ENABLED, "true");
+      return Boolean.parseBoolean(enabledString);
+   }
 }
