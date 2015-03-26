@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="SED Example Category"
+            id="org.key_project.sed.example.ui.commands.category">
+      </category>
+      <command
+            name="Launch Example"
+            categoryId="org.key_project.sed.example.ui.commands.category"
+            id="org.key_project.sed.example.ui.commands.launchCommand">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.key_project.sed.example.ui.commands.launchCommand"
+            icon="icons/sample.gif">
+      </image>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="org.key_project.sed.example.ui.commands.launchCommand"
+            class="org.key_project.sed.example.ui.handlers.LaunchExampleHandler">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.key_project.sed.example.ui.commands.launchCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+9"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               label="SED Example"
+               mnemonic="S"
+               id="org.key_project.sed.example.ui.menus.sampleMenu">
+            <command
+                  commandId="org.key_project.sed.example.ui.commands.launchCommand"
+                  icon="icons/sample.gif"
+                  id="org.key_project.sed.example.ui.menus.sampleCommand"
+                  mnemonic="S">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="org.key_project.sed.example.ui.toolbars.sampleToolbar">
+            <command
+                  commandId="org.key_project.sed.example.ui.commands.launchCommand"
+                  icon="icons/sample.gif"
+                  tooltip="Launch Example providing a fixed symbolic execution tree."
+                  id="org.key_project.sed.example.ui.toolbars.sampleCommand">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="org.key_project.sed.example.core.exampleLaunchType"
+            icon="icons/sample.gif"
+            id="org.key_project.sed.example.core.exampleLaunchType.typeImage">
+      </launchConfigurationTypeImage>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.key_project.sed.example.ui.launch.ExampleLaunchConfigurationTabGroup"
+            id="org.key_project.sed.example.core.exampleLaunchType.tabGroup"
+            type="org.key_project.sed.example.core.exampleLaunchType">
+      </launchConfigurationTabGroup>
+   </extension>
+</plugin>
