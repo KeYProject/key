@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.compiler.BuildContext;
@@ -39,12 +41,9 @@ import org.key_project.util.eclipse.Logger;
 /**
  * This class takes part in the compilation process of the JDT to validate the
  * JML comments in the Java files. It does not modify anything in the
- * compilation process. Currently this class reports parse errors only, but
- * later on it could be used to report other problems (e.g. not available
- * variables).
+ * compilation process.
  *
- *
- * @author Moritz Lichter
+ * @author Moritz Lichter, David Giessing
  *
  */
 @SuppressWarnings("restriction")
@@ -52,11 +51,41 @@ public class JMLCompilationParticipant extends CompilationParticipant {
 
    @Override
    public boolean isActive(final IJavaProject project) {
+      // Always enabled, even though JML Editing is not enabled to get clean
+      // requests
+      // to remove old markers after JML Editing has been disabled
       return true;
    }
 
    @Override
+   public void cleanStarting(final IJavaProject project) {
+      super.cleanStarting(project);
+      // Remove all JML Marks from all files in the project
+      try {
+         project.getProject().accept(new IResourceVisitor() {
+
+            @Override
+            public boolean visit(final IResource resource) throws CoreException {
+               if (resource instanceof IFile) {
+                  ErrorMarkerUpdater.removeErrorMarkers(resource);
+               }
+               return true;
+            }
+         });
+      }
+      catch (final CoreException e) {
+         // If this occurs, something really strange happened (
+         final Logger logger = new Logger(Activator.getDefault(),
+               Activator.PLUGIN_ID);
+         logger.logError("Unexpected exception when cleaning JML", e);
+      }
+   }
+
+   @Override
    public void reconcile(final ReconcileContext context) {
+      if (!JMLPreferencesHelper.isExtensionEnabled()) {
+         return;
+      }
       /*
        * In this method parse errors are reported as annotations. This method is
        * called for a source file when it changes (not as often as reconciling
@@ -92,7 +121,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                         new String[] { error.getErrorMessage() },
                         new String[] { error.getErrorMessage() },
                         ProblemSeverities.Error, error.getErrorOffset(), error
-                        .getErrorOffset(), -1, -1));
+                              .getErrorOffset(), -1, -1));
                }
 
                // And now put the problems to the context to make them visible
@@ -104,7 +133,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          }
       }
       catch (final JavaModelException e) {
-         // If this occurs, something really strange happened (
+         // If this occurs, something really strange happened
          final Logger logger = new Logger(Activator.getDefault(),
                Activator.PLUGIN_ID);
          logger.logError("Unexpected exception when reconciling JML", e);
@@ -114,14 +143,13 @@ public class JMLCompilationParticipant extends CompilationParticipant {
 
    @Override
    public void buildStarting(final BuildContext[] files, final boolean isBatch) {
+      if (!JMLPreferencesHelper.isExtensionEnabled()) {
+         return;
+      }
       /*
        * Here the errors are reported as error markers which appear in the
        * problems list.
        */
-
-      if (isBatch) {
-         return;
-      }
       for (final BuildContext context : files) {
          final IFile res = context.getFile();
          final String source = new String(context.getContents());
@@ -131,6 +159,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          final CommentLocator locator = new CommentLocator(source);
          final List<CommentRange> jmlComments = locator.findJMLCommentRanges();
          // Start Preparation for Validation
+         // Setup JDT Parser and Create JDT AST
          final org.eclipse.jdt.core.dom.CompilationUnit ast;
          final ASTParser parser = ASTParser
                .newParser(ASTParser.K_COMPILATION_UNIT);
@@ -139,9 +168,10 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          parser.setResolveBindings(true);
          ast = (org.eclipse.jdt.core.dom.CompilationUnit) parser
                .createAST(null);
+         // Setup jmlParser
          final IJMLParser jmlParser = JMLPreferencesHelper
                .getProjectActiveJMLProfile(res.getProject()).createParser();
-
+         // Setup JML Validation engine
          final JMLValidationEngine engine = this.prepareValidation(ast,
                jmlComments, jmlParser, res, source);
          // End of Preparation
@@ -208,7 +238,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                int pos = start;
                while (pos < commentList.size()
                      && commentList.get(pos).getStartPosition() < node
-                     .getStartPosition()) {
+                           .getStartPosition()) {
                   assert !inverse.containsKey(commentList.get(pos));
                   inverse.put(commentList.get(pos), node);
                   pos++;
@@ -221,7 +251,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
                int pos = end;
                while (pos >= 0
                      && commentList.get(pos).getStartPosition() > node
-                     .getStartPosition()) {
+                           .getStartPosition()) {
                   assert !inverseTrailing.containsKey(commentList.get(pos));
                   inverseTrailing.put(commentList.get(pos), node);
                   pos--;
@@ -240,7 +270,8 @@ public class JMLCompilationParticipant extends CompilationParticipant {
    }
 
    /**
-    * Converts Parse Exceptions to JMLErrors.
+    * Converts Parse Exceptions to JMLErrors. Needed to unify
+    * ErrorMarkerUpdater.
     *
     * @param e
     *           the parse Exception

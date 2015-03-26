@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
@@ -89,5 +91,35 @@ public class JMLProfileHelper {
          }
       }
       return null;
+   }
+
+   /**
+    * Returns a set of projects of the current workspace, which used the given
+    * profile.
+    *
+    * @param profile
+    *           the profile to query for projects
+    * @return a non null set of projects using the given profile
+    */
+   public static Set<IProject> getProjectsUsingProfile(final IJMLProfile profile) {
+      final Set<IProject> affectedProjects = new HashSet<IProject>();
+      for (final IProject project : ResourcesPlugin.getWorkspace().getRoot()
+            .getProjects()) {
+         if (JMLPreferencesHelper.getProjectActiveJMLProfile(project) == profile) {
+            affectedProjects.add(project);
+         }
+      }
+      return affectedProjects;
+   }
+
+   public static Set<IProject> getProjectsUsingWorkspaceProfile() {
+      final Set<IProject> affectedProjects = new HashSet<IProject>();
+      for (final IProject project : ResourcesPlugin.getWorkspace().getRoot()
+            .getProjects()) {
+         if (JMLPreferencesHelper.getProjectJMLProfile(project) == null) {
+            affectedProjects.add(project);
+         }
+      }
+      return affectedProjects;
    }
 }

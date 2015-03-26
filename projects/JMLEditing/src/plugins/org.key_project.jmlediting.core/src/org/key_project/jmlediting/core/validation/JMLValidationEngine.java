@@ -61,8 +61,10 @@ public class JMLValidationEngine {
          final IASTNode node) {
       final List<JMLError> errors = new ArrayList<JMLError>();
       for (final IKeywordNode keywordNode : Nodes.getAllKeywords(node)) {
+         // For each Keyword get its specific Validator
          final IKeywordValidator validator = keywordNode.getKeyword()
                .getKeywordValidator();
+         // If there is a validator, then validate
          if (validator != null) {
             errors.addAll(validator.validate(c, this.context, node));
          }

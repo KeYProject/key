@@ -39,9 +39,6 @@ public final class ParserBuilder {
 
    }
 
-   // With Java 8 Lambda syntax the following would be much more readable, no
-   // anonymous classes, they just wrap the functions implementing the tasks
-
    /**
     * Creates a {@link ParseFunction} which is able to parse a list of items
     * which are parsed by the given function. That means that the generated

@@ -36,6 +36,7 @@ import org.key_project.jmlediting.core.profile.syntax.user.UserDefinedKeyword;
  *
  */
 public class JMLKeywordDialog extends TitleAreaDialog {
+   public static final String CLOSING_CHARACTER_ID = "ClosingCharacter";
    /**
     * the Profile to define the keyword for.
     */
@@ -228,8 +229,10 @@ public class JMLKeywordDialog extends TitleAreaDialog {
       for (final IKeywordSort sort : sorts) {
          this.sortCombo.add(sort.getDescription());
          this.sortCombo.setData(sort.getDescription(), sort);
+         if (sort.getDescription().equals("Toplevel Keyword")) {
+            this.sortCombo.select(this.sortCombo.getItemCount() - 1);
+         }
       }
-      this.sortCombo.select(0);
 
       this.closingCharacterCombo.add("");
       this.closingCharacterCombo.add(";");
