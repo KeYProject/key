@@ -239,7 +239,7 @@ public final class JMLProfileManagement {
             // skip parsing and loading it
             if (!this.profileCache.containsKey(profileKey)) {
 
-               // Get the XML string from the prferences
+               // Get the XML string from the preferences
                final String xmlContent = p.get(profileKey, null);
                if (xmlContent == null) {
                   throw new InvalidProfileException("Profile with id "
@@ -260,7 +260,7 @@ public final class JMLProfileManagement {
                   if (!profile.getIdentifier().equals(profileKey)) {
                      throw new InvalidProfileException(
                            "Profile has a wrong id. Expected " + profileKey
-                                 + " but got " + profile.getIdentifier());
+                           + " but got " + profile.getIdentifier());
                   }
                   // Remember the user defined profiles because they need to be
                   // written back eventually

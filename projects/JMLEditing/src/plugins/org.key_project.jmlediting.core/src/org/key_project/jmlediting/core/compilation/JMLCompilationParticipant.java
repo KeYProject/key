@@ -39,12 +39,9 @@ import org.key_project.util.eclipse.Logger;
 /**
  * This class takes part in the compilation process of the JDT to validate the
  * JML comments in the Java files. It does not modify anything in the
- * compilation process. Currently this class reports parse errors only, but
- * later on it could be used to report other problems (e.g. not available
- * variables).
+ * compilation process.
  *
- *
- * @author Moritz Lichter
+ * @author Moritz Lichter, David Giessing
  *
  */
 @SuppressWarnings("restriction")
@@ -104,7 +101,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          }
       }
       catch (final JavaModelException e) {
-         // If this occurs, something really strange happened (
+         // If this occurs, something really strange happened
          final Logger logger = new Logger(Activator.getDefault(),
                Activator.PLUGIN_ID);
          logger.logError("Unexpected exception when reconciling JML", e);
@@ -131,6 +128,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          final CommentLocator locator = new CommentLocator(source);
          final List<CommentRange> jmlComments = locator.findJMLCommentRanges();
          // Start Preparation for Validation
+         // Setup JDT Parser and Create JDT AST
          final org.eclipse.jdt.core.dom.CompilationUnit ast;
          final ASTParser parser = ASTParser
                .newParser(ASTParser.K_COMPILATION_UNIT);
@@ -139,9 +137,10 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          parser.setResolveBindings(true);
          ast = (org.eclipse.jdt.core.dom.CompilationUnit) parser
                .createAST(null);
+         // Setup jmlParser
          final IJMLParser jmlParser = JMLPreferencesHelper
                .getProjectActiveJMLProfile(res.getProject()).createParser();
-
+         // Setup JML Validation engine
          final JMLValidationEngine engine = this.prepareValidation(ast,
                jmlComments, jmlParser, res, source);
          // End of Preparation
@@ -240,7 +239,8 @@ public class JMLCompilationParticipant extends CompilationParticipant {
    }
 
    /**
-    * Converts Parse Exceptions to JMLErrors.
+    * Converts Parse Exceptions to JMLErrors. Needed to unify
+    * ErrorMarkerUpdater.
     *
     * @param e
     *           the parse Exception

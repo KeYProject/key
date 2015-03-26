@@ -9,6 +9,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.key_project.jmlediting.core.Activator;
 import org.key_project.util.eclipse.Logger;
 
+/**
+ * Class responsible for updating the ErrorMarkers in a Resource.
+ *
+ * @author David Giessing
+ *
+ */
 public class ErrorMarkerUpdater {
 
    /**
@@ -76,6 +82,16 @@ public class ErrorMarkerUpdater {
       }
    }
 
+   /**
+    * Creates the Errormarkers for errors on the Resource res.
+    * 
+    * @param errors
+    *           the errors to be displayed
+    * @param res
+    *           the Resource to operate on
+    * @param text
+    *           the source of the Resource
+    */
    public static void createErrorMarker(final List<JMLError> errors,
          final IFile res, final String text) {
       for (final JMLError e : errors) {
