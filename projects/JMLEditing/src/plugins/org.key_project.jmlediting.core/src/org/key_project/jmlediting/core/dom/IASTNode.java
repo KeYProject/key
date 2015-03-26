@@ -60,7 +60,7 @@ public interface IASTNode {
     * to have overlapping start and end offsets. Also they need to be ordered.
     * The end offset of the child at position i is less than the start offset of
     * the child at position i +1. This list must not be modified and is
-    * guaranteed not the be null (but maybe empty).
+    * guaranteed not to be null (but maybe empty).
     *
     * @return the list of all children
     */
@@ -70,7 +70,7 @@ public interface IASTNode {
     * Searches to this node and to all children. If the searcher returns a non
     * null result from calling {@link INodeSearcher#searchNode(IASTNode)}, this
     * result is returned. Otherwise the searcher is first asked to select a
-    * child note to continue searching using
+    * child node to continue searching using
     * {@link INodeSearcher#selectChild(List)}. If the result it not null, the
     * search returns null. Otherwise, the search is continued in the selected
     * child.
@@ -99,6 +99,12 @@ public interface IASTNode {
     */
    <T> T traverse(INodeTraverser<T> traverser, T init);
 
+   /**
+    * Method to print the AST in a human readable Form. Used for debugging
+    * purposes only
+    * 
+    * @return the AST in a pretty String representation.
+    */
    String prettyPrintAST();
 
 }

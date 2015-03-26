@@ -4,7 +4,7 @@ import org.eclipse.core.runtime.QualifiedName;
 
 /**
  * This class contains property and preferences key used for JML.
- * 
+ *
  * @author Moritz Lichter
  *
  */
@@ -15,11 +15,15 @@ public final class PropertyNames {
     */
    public static final QualifiedName PROFILE = new QualifiedName(
          "org.key_project.jmleiditing.ui", "profile");
-   
+
    /**
     * The name of the global preference for the default JML profile.
     */
    public static final String DEFAULT_JML_PROFILE = "default_jml_profile";
+   /**
+    * Key to store whether the extension is enabled.
+    */
+   public static final String JML_EDITING_ENABLED = "enabled";
 
    /**
     * No instantiations.

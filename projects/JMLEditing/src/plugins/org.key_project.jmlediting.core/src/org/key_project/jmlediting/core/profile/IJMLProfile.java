@@ -72,7 +72,7 @@ public interface IJMLProfile {
    Set<IUserDefinedKeywordContentDescription> getSupportedContentDescriptions();
 
    /**
-    * Returns a set of all {@link IKeywordSort}s defined in this profile
+    * Returns a set of all {@link IKeywordSort}s defined in this profile.
     *
     * @return an immutable non null set
     */

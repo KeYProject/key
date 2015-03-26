@@ -9,7 +9,8 @@ package org.key_project.jmlediting.core.utilities;
 public class JMLError {
 
    /**
-    * The Specific ErrorType of the JMLError
+    * The Specific ErrorType of the JMLError. Used for Validators to differ
+    * between different validation errors.
     */
    private final String specificErrorType;
 
@@ -28,6 +29,9 @@ public class JMLError {
 
    /**
     * creates a new JMLValidationError.
+    *
+    * @param specificError
+    *           the specific error to differ between different validation errors
     *
     * @param errorType
     *           the ErrorType

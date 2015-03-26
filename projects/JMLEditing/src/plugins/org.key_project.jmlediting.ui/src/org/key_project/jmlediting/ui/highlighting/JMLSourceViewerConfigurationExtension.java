@@ -3,6 +3,7 @@ package org.key_project.jmlediting.ui.highlighting;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jdt.internal.ui.text.javadoc.JavaDocAutoIndentStrategy;
@@ -17,8 +18,12 @@ import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.javaeditor.extension.DefaultJavaSourceViewerConfigurationExtension;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.IProjectProfileListener;
+import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.ui.Activator;
 import org.key_project.jmlediting.ui.format.JMLContentFormatter;
 import org.key_project.jmlediting.ui.format.JavaJMLMultilineCommentAutoIndentStrategy;
@@ -48,6 +53,7 @@ public class JMLSourceViewerConfigurationExtension extends
     * changed.
     */
    private IPreferenceChangeListener listener = null;
+   private IProjectProfileListener projectListener = null;
 
    /**
     * A Method for instantiating the listener.
@@ -63,6 +69,7 @@ public class JMLSourceViewerConfigurationExtension extends
          return;
       }
       final SourceViewer sViewer = (SourceViewer) viewer;
+      // Listen to changed colors
       this.listener = JMLUiPreferencesHelper
             .addPreferencesListener(new IPreferenceChangeListener() {
 
@@ -71,6 +78,25 @@ public class JMLSourceViewerConfigurationExtension extends
                   sViewer.invalidateTextPresentation();
                }
             });
+      // Listen to changed profiles
+      this.projectListener = new IProjectProfileListener() {
+
+         @Override
+         public void profileChanged(final IProject project,
+               final IJMLProfile newProfile) {
+            if (JMLSourceViewerConfigurationExtension.this.getEditor()
+                  .getEditorInput() instanceof IFileEditorInput) {
+               final IFileEditorInput input = (IFileEditorInput) JMLSourceViewerConfigurationExtension.this
+                     .getEditor().getEditorInput();
+               final IProject fileProject = input.getFile().getProject();
+               if (project == fileProject) {
+                  sViewer.invalidateTextPresentation();
+               }
+            }
+         }
+      };
+
+      JMLPreferencesHelper.addProjectProfileListener(this.projectListener);
    }
 
    /**
