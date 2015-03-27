@@ -183,6 +183,12 @@ public class JMLProfileDialog extends TitleAreaDialog {
    }
 
    @Override
+   protected void createButtonsForButtonBar(final Composite parent) {
+      this.createButton(parent, IDialogConstants.OK_ID,
+            IDialogConstants.OK_LABEL, true);
+   }
+
+   @Override
    protected Control createDialogArea(final Composite parent) {
       final Composite composite = (Composite) super.createDialogArea(parent);
       final Composite myComposite = new Composite(composite, SWT.NONE);
