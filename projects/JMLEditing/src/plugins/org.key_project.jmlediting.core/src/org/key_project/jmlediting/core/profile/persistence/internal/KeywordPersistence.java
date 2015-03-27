@@ -66,7 +66,7 @@ public abstract class KeywordPersistence {
 
    /**
     * Loads the coded keyword from its class.
-    * 
+    *
     * @param keywordClass
     *           the keyword class to load
     * @return the loaded keyword
@@ -173,6 +173,7 @@ public abstract class KeywordPersistence {
       final Element descriptionElement = doc.createElement(DESCRIPTION);
       descriptionElement.appendChild(doc.createTextNode(userKeyword
             .getDescription()));
+      System.out.println(descriptionElement);
       userDefinedKeywordElem.appendChild(descriptionElement);
 
       // Then write the keyword strings
@@ -229,7 +230,13 @@ public abstract class KeywordPersistence {
          // Branch over the name of the element
          if (cElem.getNodeName().equals(DESCRIPTION)) {
             if (description == null) {
-               description = cElem.getFirstChild().getTextContent();
+               if (cElem.getChildNodes().getLength() == 0) {
+                  // No text content
+                  description = "";
+               }
+               else {
+                  description = cElem.getFirstChild().getTextContent();
+               }
             }
             else {
                // Only allow one description

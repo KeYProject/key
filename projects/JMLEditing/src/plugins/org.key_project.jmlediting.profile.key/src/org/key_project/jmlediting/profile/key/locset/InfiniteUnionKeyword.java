@@ -9,6 +9,7 @@ import org.key_project.jmlediting.core.profile.syntax.AbstractKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
+import org.key_project.jmlediting.profile.jmlref.bound_mod.BoundVarModifierKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.parser.JMLRefParseFunctionKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.primary.JMLPrimaryKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
@@ -32,11 +33,14 @@ public class InfiniteUnionKeyword extends AbstractKeyword {
          protected ParseFunction createParseFunction(
                final IJMLExpressionProfile profile) {
             /**
-             * \infinite_union ( type id; [bool-expr ;] loc-set-expr)
+             * \infinite_union ( [bound-var-mod]? type id; [bool-expr ;]
+             * loc-set-expr)
              */
+            final ParseFunction boundVarMod = keywords(
+                  BoundVarModifierKeywordSort.INSTANCE, profile);
             final ExpressionParser expr = new ExpressionParser(profile);
-            return brackets(seq(expr.typeSpec(), ident(), constant(";"),
-                  opt(closedBy(NodeTypes.NODE, expr, ';')), expr));
+            return brackets(seq(opt(boundVarMod), expr.typeSpec(), ident(),
+                  constant(";"), opt(closedBy(NodeTypes.NODE, expr, ';')), expr));
          }
       };
    }

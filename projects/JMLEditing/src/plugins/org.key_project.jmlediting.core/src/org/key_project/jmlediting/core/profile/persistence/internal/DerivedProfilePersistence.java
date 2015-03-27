@@ -7,8 +7,19 @@ import static org.key_project.jmlediting.core.profile.persistence.internal.XMLCo
 import static org.key_project.jmlediting.core.profile.persistence.internal.XMLConstants.NAME;
 import static org.key_project.jmlediting.core.profile.persistence.internal.XMLConstants.PARENT_IDENTIFIER;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.key_project.jmlediting.core.profile.DerivedProfile;
 import org.key_project.jmlediting.core.profile.IDerivedProfile;
@@ -21,6 +32,8 @@ import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * Class implementing the persistence of derived profiles.
@@ -31,7 +44,7 @@ import org.w3c.dom.NodeList;
 public class DerivedProfilePersistence implements IDerivedProfilePersistence {
 
    @Override
-   public Document persist(final IDerivedProfile profile)
+   public String persist(final IDerivedProfile profile)
          throws ProfilePersistenceException {
       // Create document
       final Document doc;
@@ -66,13 +79,41 @@ public class DerivedProfilePersistence implements IDerivedProfilePersistence {
       }
 
       doc.appendChild(topElement);
-      return doc;
+      // Write to string
+      try {
+         final TransformerFactory tf = TransformerFactory.newInstance();
+         final Transformer transformer = tf.newTransformer();
+         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+         final StringWriter writer = new StringWriter();
+         transformer.transform(new DOMSource(doc), new StreamResult(writer));
+         return writer.toString();
+      }
+      catch (final TransformerConfigurationException e) {
+         throw new ProfilePersistenceException(e);
+      }
+      catch (final TransformerException e) {
+         throw new ProfilePersistenceException(e);
+      }
 
    }
 
    @Override
-   public IDerivedProfile read(final Document doc)
+   public IDerivedProfile read(final String content)
          throws ProfilePersistenceException {
+      Document doc;
+      try {
+         doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+               .parse(new InputSource(new StringReader(content)));
+      }
+      catch (final SAXException e) {
+         throw new ProfilePersistenceException("Unable to parse XML", e);
+      }
+      catch (final IOException e) {
+         throw new ProfilePersistenceException(e);
+      }
+      catch (final ParserConfigurationException e) {
+         throw new ProfilePersistenceException(e);
+      }
       // Need one top node
       final NodeList topNodes = doc.getElementsByTagName(DERIVED_PROFILE);
       if (topNodes.getLength() != 1) {
