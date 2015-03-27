@@ -685,15 +685,6 @@ public class JMLProfileDialog extends TitleAreaDialog {
       }
       this.derivedProfile.setName(profileName);
 
-      if (onOkPressed) {
-         try {
-            JMLProfileManagement.instance().writeDerivedProfiles();
-         }
-         catch (final InvalidProfileException ipe) {
-            ipe.printStackTrace();
-            return false;
-         }
-      }
       return true;
    }
 
@@ -731,17 +722,6 @@ public class JMLProfileDialog extends TitleAreaDialog {
          this.derivedProfile = parentProfile.derive(profileId, profileName);
       }
 
-      if (onOkPressed) {
-         try {
-            JMLProfileManagement.instance().addUserDefinedProfile(
-                  this.derivedProfile);
-            JMLProfileManagement.instance().writeDerivedProfiles();
-         }
-         catch (final InvalidProfileException ipe) {
-            ipe.printStackTrace();
-            return false;
-         }
-      }
       return true;
    }
 
@@ -772,7 +752,17 @@ public class JMLProfileDialog extends TitleAreaDialog {
       final Runnable preferencesUpdater = new Runnable() {
          @Override
          public void run() {
-            // write on derived Profiles already called;
+            try {
+               if (JMLProfileDialog.this.profile == null) {
+                  JMLProfileManagement.instance().addUserDefinedProfile(
+                        JMLProfileDialog.this.derivedProfile);
+               }
+               JMLProfileManagement.instance().writeDerivedProfiles();
+            }
+            catch (final InvalidProfileException ipe) {
+               ipe.printStackTrace();
+               return;
+            }
          }
       };
       RebuildHelper.triggerRebuild(affectedProjects, this.getShell(),

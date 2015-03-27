@@ -62,9 +62,10 @@ public class JMLProfileDialogTest {
       try {
          bot.button("Cancel").click();
          bot.button("Cancel").click();
+         bot.button("Cancel").click();
       }
       catch (final Exception e) {
-         // close all dialogs, not clear how much, max 3.
+         // close all dialogs, not clear how much, max 4.
       }
    }
 
@@ -97,6 +98,9 @@ public class JMLProfileDialogTest {
             PROFILETABLE_LABEL).getTableItem(PROFILENAME_TO_SELECT);
       newProfileItem.check();
       bot.button("Apply").click();
+      bot.sleep(100);
+      bot.button("Yes").click();
+      bot.sleep(500);
       final String selectedProfileName = this.getCheckedItemFirstColumn(bot
             .tableWithLabel(PROFILETABLE_LABEL));
       assertEquals("The newly checked Profile gets not ",
@@ -143,11 +147,10 @@ public class JMLProfileDialogTest {
 
       final SWTBotTable keywordTable = bot.tableWithLabel(KEYWORDTABLE_EDIT);
 
-      assertFalse("Disabled Keywords are not saved!", keywordTable
-            .getTableItem(0).isChecked()
-            || keywordTable.getTableItem(1).isChecked());
+      assertFalse("Disabled Keyword is not saved!", keywordTable
+            .getTableItem(0).isChecked());
       boolean allOtherChecked = true;
-      for (int i = 2; i < keywordTable.rowCount(); i++) {
+      for (int i = 1; i < keywordTable.rowCount(); i++) {
          if (allOtherChecked) {
             allOtherChecked = keywordTable.getTableItem(2).isChecked();
          }
@@ -189,7 +192,6 @@ public class JMLProfileDialogTest {
             keywordTable.rowCount());
 
       keywordTable.getTableItem(0).uncheck();
-      keywordTable.getTableItem(1).uncheck();
       this.clickOK();
 
       assertTrue(
