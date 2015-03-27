@@ -94,6 +94,7 @@ public class ExampleLaunchConfigurationDelegate extends LaunchConfigurationDeleg
        // Target
        SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(launch, false);
        target.setName("this.add(MyInteger)");
+       target.setModelIdentifier("org.key_project.sed.example.core");
        // Thread
        SEDMemoryThread thread = new SEDMemoryThread(target, false);
        thread.setName("<start>");
