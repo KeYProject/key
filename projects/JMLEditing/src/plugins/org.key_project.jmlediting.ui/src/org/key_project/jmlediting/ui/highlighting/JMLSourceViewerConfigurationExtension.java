@@ -18,6 +18,7 @@ import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.javaeditor.extension.DefaultJavaSourceViewerConfigurationExtension;
@@ -75,7 +76,13 @@ public class JMLSourceViewerConfigurationExtension extends
 
                @Override
                public void preferenceChange(final PreferenceChangeEvent event) {
-                  sViewer.invalidateTextPresentation();
+                  Display.getDefault().asyncExec(new Runnable() {
+
+                     @Override
+                     public void run() {
+                        sViewer.invalidateTextPresentation();
+                     }
+                  });
                }
             });
       // Listen to changed profiles
@@ -90,7 +97,13 @@ public class JMLSourceViewerConfigurationExtension extends
                      .getEditor().getEditorInput();
                final IProject fileProject = input.getFile().getProject();
                if (project == fileProject) {
-                  sViewer.invalidateTextPresentation();
+                  Display.getDefault().asyncExec(new Runnable() {
+
+                     @Override
+                     public void run() {
+                        sViewer.invalidateTextPresentation();
+                     }
+                  });
                }
             }
          }
