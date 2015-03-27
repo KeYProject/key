@@ -35,7 +35,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.key_project.jmlediting.core.profile.IDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.IProfileManagementListener;
 import org.key_project.jmlediting.core.profile.InvalidProfileException;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
@@ -90,8 +89,6 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     */
    private IPreferenceChangeListener currentPreferenceListener;
 
-   private IProfileManagementListener profileManagementListener;
-
    /**
     * needs to be global to change label-text
     */
@@ -108,8 +105,6 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    private void uninstallListener() {
       JMLPreferencesHelper
             .removeDefaultProfilePreferencesListener(this.currentPreferenceListener);
-      JMLProfileManagement.instance().removeListener(
-            this.profileManagementListener);
    }
 
    private void installListener() {
@@ -123,15 +118,6 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
                   }
                }
             });
-      this.profileManagementListener = new IProfileManagementListener() {
-
-         @Override
-         public void newProfileAdded(final IJMLProfile newProfile) {
-            JMLProfilePropertiesPage.this.fillTable();
-         }
-      };
-      JMLProfileManagement.instance().addListener(
-            this.profileManagementListener);
    }
 
    @Override
@@ -397,9 +383,12 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    }
 
    private IJMLProfile getSelectedProfile() {
-      return JMLProfilePropertiesPage.this.allProfiles
-            .get(JMLProfilePropertiesPage.this.profilesListTable
-                  .getSelectionIndex());
+      final int index = JMLProfilePropertiesPage.this.profilesListTable
+            .getSelectionIndex();
+      if (index == -1) {
+         return this.getCheckedProfile();
+      }
+      return JMLProfilePropertiesPage.this.allProfiles.get(index);
    }
 
    private void fillTable() {

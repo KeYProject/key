@@ -98,9 +98,14 @@ public class JMLProfileDialogTest {
             PROFILETABLE_LABEL).getTableItem(PROFILENAME_TO_SELECT);
       newProfileItem.check();
       bot.button("Apply").click();
-      bot.sleep(100);
-      bot.button("Yes").click();
-      bot.sleep(500);
+      try {
+         bot.sleep(100);
+         bot.button("Yes").click();
+         bot.sleep(500);
+      }
+      catch (final WidgetNotFoundException wnfe) {
+         // when run single no dialog appears, in suite it does...
+      }
       final String selectedProfileName = this.getCheckedItemFirstColumn(bot
             .tableWithLabel(PROFILETABLE_LABEL));
       assertEquals("The newly checked Profile gets not ",
@@ -108,6 +113,14 @@ public class JMLProfileDialogTest {
       bot.tableWithLabel(PROFILETABLE_LABEL).getTableItem(currentProfileName)
             .check();
       bot.button("Apply").click();
+      try {
+         bot.sleep(100);
+         bot.button("Yes").click();
+         bot.sleep(500);
+      }
+      catch (final WidgetNotFoundException wnfe) {
+         // when run single no dialog appears, in suite it does...
+      }
    }
 
    @Test
