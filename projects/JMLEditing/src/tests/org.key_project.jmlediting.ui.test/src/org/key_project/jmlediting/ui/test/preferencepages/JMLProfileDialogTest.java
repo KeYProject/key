@@ -58,11 +58,11 @@ public class JMLProfileDialogTest {
 
    @After
    public void closeProfileSettings() {
-      bot.button("Cancel").click();
+      bot.button("OK").click();
       try {
-         bot.button("Cancel").click();
-         bot.button("Cancel").click();
-         bot.button("Cancel").click();
+         bot.button("OK").click();
+         bot.button("OK").click();
+         bot.button("OK").click();
       }
       catch (final Exception e) {
          // close all dialogs, not clear how much, max 4.
