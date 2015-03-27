@@ -23,7 +23,6 @@ import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.core.profile.syntax.user.UserDefinedKeyword;
-import org.w3c.dom.Document;
 
 public class DerivedProfilePersistenceTest {
 
@@ -37,7 +36,7 @@ public class DerivedProfilePersistenceTest {
          throws ProfilePersistenceException {
       final IDerivedProfile profile = this.availableProfile.derive(
             "org.test.test", "Test");
-      final Document doc = this.persistence.persist(profile);
+      final String doc = this.persistence.persist(profile);
       final IDerivedProfile readProfile = this.persistence.read(doc);
 
       assertEquals("Read name does not match original one", profile.getName(),
@@ -69,7 +68,7 @@ public class DerivedProfilePersistenceTest {
       }
 
       // Persist
-      final Document doc = this.persistence.persist(profile);
+      final String doc = this.persistence.persist(profile);
       final IDerivedProfile readProfile = this.persistence.read(doc);
 
       // Validate
@@ -128,7 +127,7 @@ public class DerivedProfilePersistenceTest {
             "org.test.test", "Test");
       profile.addKeyword(new TestKeyword());
 
-      final Document doc = this.persistence.persist(profile);
+      final String doc = this.persistence.persist(profile);
       final IDerivedProfile readProfile = this.persistence.read(doc);
 
       assertEquals("Wrong number of additional keywords", 1, readProfile
@@ -151,18 +150,38 @@ public class DerivedProfilePersistenceTest {
    @Test
    public void testPersistUserDefinedKeyword()
          throws ProfilePersistenceException {
-      final IEditableDerivedProfile profile = this.availableProfile.derive(
-            "org.test.userdef", "IllegalTest");
       final IUserDefinedKeywordContentDescription contentDescription = this.availableProfile
             .getSupportedContentDescriptions().iterator().next();
       final Character closingChar = ';';
       final String keyword = "mykeyword";
       final String keywrodDescription = "My own keyword.";
-      profile.addKeyword(new UserDefinedKeyword(Collections.singleton(keyword),
-            ToplevelKeywordSort.INSTANCE, contentDescription,
-            keywrodDescription, closingChar));
+      this.testPersistUserDefinedKeyword(new UserDefinedKeyword(Collections
+            .singleton(keyword), ToplevelKeywordSort.INSTANCE,
+            contentDescription, keywrodDescription, closingChar));
 
-      final Document doc = this.persistence.persist(profile);
+   }
+
+   @Test
+   public void testPersistUserDefinedKeywordEmptyDescription()
+         throws ProfilePersistenceException {
+      final IUserDefinedKeywordContentDescription contentDescription = this.availableProfile
+            .getSupportedContentDescriptions().iterator().next();
+      final Character closingChar = ';';
+      final String keyword = "mykeyword";
+      final String keywrodDescription = "";
+      this.testPersistUserDefinedKeyword(new UserDefinedKeyword(Collections
+            .singleton(keyword), ToplevelKeywordSort.INSTANCE,
+            contentDescription, keywrodDescription, closingChar));
+   }
+
+   private void testPersistUserDefinedKeyword(final IUserDefinedKeyword keyword)
+         throws ProfilePersistenceException {
+      final IEditableDerivedProfile profile = this.availableProfile.derive(
+            "org.test.userdef", "IllegalTest");
+
+      profile.addKeyword(keyword);
+
+      final String doc = this.persistence.persist(profile);
       final IDerivedProfile readProfile = this.persistence.read(doc);
 
       assertEquals("User defined keyword not loaded", 1, readProfile
@@ -174,13 +193,14 @@ public class DerivedProfilePersistenceTest {
       final IUserDefinedKeyword newUserKeyword = (IUserDefinedKeyword) newKeyword;
       assertEquals("Wrong number of keywords", 1, newKeyword.getKeywords()
             .size());
-      assertEquals("Wrong keyword", keyword, newKeyword.getKeywords()
-            .iterator().next());
-      assertEquals("Wrong description", keywrodDescription,
+      assertEquals("Wrong keyword", keyword.getKeywords(),
+            newKeyword.getKeywords());
+      assertEquals("Wrong description", keyword.getDescription(),
             newKeyword.getDescription());
-      assertEquals("Wrong content description", contentDescription,
+      assertEquals("Wrong content description",
+            keyword.getContentDescription(),
             newUserKeyword.getContentDescription());
-      assertEquals("Wrong closing character", closingChar,
+      assertEquals("Wrong closing character", keyword.getClosingCharacter(),
             newUserKeyword.getClosingCharacter());
       assertEquals("Wrong sort", ToplevelKeywordSort.INSTANCE,
             newUserKeyword.getSort());

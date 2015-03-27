@@ -1,8 +1,5 @@
 package org.key_project.jmlediting.core.profile;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,16 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -36,9 +23,6 @@ import org.key_project.jmlediting.core.profile.syntax.AbstractKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * This class helps managing the available JML profiles.
@@ -248,37 +232,21 @@ public final class JMLProfileManagement {
 
                try {
                   // Parse the profile
-                  final Document xmlDoc = DocumentBuilderFactory.newInstance()
-                        .newDocumentBuilder()
-                        .parse(new InputSource(new StringReader(xmlContent)));
 
                   // and load the profile
                   final IDerivedProfile profile = ProfilePersistenceFactory
-                        .createDerivedProfilePersistence().read(xmlDoc);
+                        .createDerivedProfilePersistence().read(xmlContent);
                   // Check that the profile has the same id as the preference
                   // key
                   if (!profile.getIdentifier().equals(profileKey)) {
                      throw new InvalidProfileException(
                            "Profile has a wrong id. Expected " + profileKey
-                           + " but got " + profile.getIdentifier());
+                                 + " but got " + profile.getIdentifier());
                   }
                   // Remember the user defined profiles because they need to be
                   // written back eventually
                   this.cacheUserDefinedProfile(profile);
 
-               }
-               catch (final ParserConfigurationException e) {
-                  // Should not occur
-                  throw new InvalidProfileException(e);
-               }
-               catch (final SAXException e) {
-                  throw new InvalidProfileException(
-                        "Unable to parse the persisted profile " + profileKey,
-                        e);
-               }
-               catch (final IOException e) {
-                  throw new InvalidProfileException(
-                        "Unable to read the profile " + profileKey, e);
                }
                catch (final ProfilePersistenceException e) {
                   throw new InvalidProfileException(
@@ -310,29 +278,14 @@ public final class JMLProfileManagement {
 
          try {
             // Create the XML Document and convert it to a string
-            final Document document = ProfilePersistenceFactory
+            final String document = ProfilePersistenceFactory
                   .createDerivedProfilePersistence().persist(profile);
-            final TransformerFactory tf = TransformerFactory.newInstance();
-            final Transformer transformer = tf.newTransformer();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,
-                  "yes");
-            final StringWriter writer = new StringWriter();
-            transformer.transform(new DOMSource(document), new StreamResult(
-                  writer));
             // Put the string in the prferences
-            p.put(profile.getIdentifier(), writer.toString());
+            p.put(profile.getIdentifier(), document);
          }
          catch (final ProfilePersistenceException e) {
             throw new InvalidProfileException(
                   "Unable to persist the given profile", e);
-         }
-         catch (final TransformerConfigurationException e) {
-            // Should not occur
-            throw new InvalidProfileException("Unable to write XML document");
-         }
-         catch (final TransformerException e) {
-            // Should not occur
-            throw new InvalidProfileException("Unable to write XML document");
          }
       }
    }
