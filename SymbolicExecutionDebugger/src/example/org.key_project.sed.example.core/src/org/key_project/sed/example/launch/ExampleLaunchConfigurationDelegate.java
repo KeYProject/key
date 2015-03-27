@@ -20,6 +20,8 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStep;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
+import org.key_project.sed.core.annotation.impl.BreakpointAnnotation;
+import org.key_project.sed.core.annotation.impl.BreakpointAnnotationLink;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodCall;
@@ -38,6 +40,8 @@ import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
+import org.key_project.sed.core.model.memory.SEDMemoryValue;
+import org.key_project.sed.core.model.memory.SEDMemoryVariable;
 
 /**
  * A {@link LaunchConfigurationDelegate} is responsible to start the symbolic 
@@ -163,6 +167,24 @@ public class ExampleLaunchConfigurationDelegate extends LaunchConfigurationDeleg
        exceptionalTermination.setName("<uncaught java.lang.NullPointerException>");
        exceptionalTermination.setPathCondition("other == null");
        exceptionalReturn.addChild(exceptionalTermination);
+       
+       // May add ISEDVariable with ISEDValue to each ISEDDebugNode
+       SEDMemoryVariable variable = new SEDMemoryVariable(target, thread);
+       variable.setName("Hello");
+       SEDMemoryValue value = new SEDMemoryValue(target, variable);
+       value.setValueString("World!");
+       variable.setValue(value);
+       thread.addVariable(variable);
+
+       // Fill the source model to highlight reached code parts during symbolic execution 
+       //target.getSourceModel();
+
+       // Use ISEDAnnotation and ISEDAnnotationLink instances to label an ISEDDebugNode, e.g. with hit breakpoints
+       BreakpointAnnotation annotation = new BreakpointAnnotation();
+       target.registerAnnotation(annotation);
+       BreakpointAnnotationLink link = new BreakpointAnnotationLink(annotation, normalReturn);
+       link.setBreakpointName("My Breakpoint");
+       annotation.addLink(link);
        
        return target;
     }
