@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -167,6 +168,12 @@ public class JMLProfileDialog extends TitleAreaDialog {
       else {
          this.setMessage(this.message);
       }
+   }
+
+   @Override
+   protected void createButtonsForButtonBar(final Composite parent) {
+      this.createButton(parent, IDialogConstants.OK_ID,
+            IDialogConstants.OK_LABEL, true);
    }
 
    @Override
