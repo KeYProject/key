@@ -47,7 +47,7 @@ public class LocSetExprTest {
 
    @Test
    public void testInfiniteUnionNoBool() {
-      this.testParse("\\infinite_union( String s; a)");
+      this.testParse("\\infinite_union(nullable String s; a)");
    }
 
    @Test
