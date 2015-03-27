@@ -129,7 +129,7 @@ public final class WhileInvariantTransformer {
     
     
     /** calculates the resulting term. */
-    public Term transform(TermLabelState termLabelState, WhileInvariantRule rule, Goal goal, Sequent applicationSequent, PosInOccurrence applicationPos, Term initialPost, Term invariantFramingTermination, SVInstantiations svInst, Services services) {
+    public Term transform(TermLabelState termLabelState, Rule rule, Goal goal, Sequent applicationSequent, PosInOccurrence applicationPos, Term initialPost, Term invariantFramingTermination, SVInstantiations svInst, Services services) {
         
         // global initialisation
         init(initialPost, invariantFramingTermination, services);
@@ -420,7 +420,7 @@ public final class WhileInvariantTransformer {
                             KeYJavaType returnType,
                             ProgramVariable returnExpression,
                             Term post,
-                            WhileInvariantRule rule, 
+                            Rule rule,
                             Goal goal,
                             PosInOccurrence applicationPos, 
                             Services services) {
@@ -451,7 +451,7 @@ public final class WhileInvariantTransformer {
                            ProgramVariable breakFlag,
                            Term post,
                            ArrayList<If> breakIfCascade,
-                           WhileInvariantRule rule, 
+                           Rule rule,
                            Goal goal,
                            PosInOccurrence applicationPos, 
                            Services services) {
@@ -538,7 +538,7 @@ public final class WhileInvariantTransformer {
                            ProgramVariable excFlag,
                            ProgramVariable thrownException,
                            Term post,
-                           WhileInvariantRule rule, 
+                           Rule rule,
                            Goal goal,
                            PosInOccurrence applicationPos, 
                            Services services) {
