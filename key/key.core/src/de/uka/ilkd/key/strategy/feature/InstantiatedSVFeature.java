@@ -21,8 +21,9 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 
 /**
- * Feature that returns zero iff a certain schema variable is instantiated (or
- * does not occur in the taclet at hand)
+ * Feature that returns zero iff a certain schema variable is instantiated.
+ * If the schemavariable is not instantiated schema variable or does not occur 
+ * in the taclet infinity costs are returned.
  */
 public class InstantiatedSVFeature extends BinaryTacletAppFeature {
 
@@ -32,7 +33,7 @@ public class InstantiatedSVFeature extends BinaryTacletAppFeature {
         return new InstantiatedSVFeature ( svName );
     }
 
-    private InstantiatedSVFeature(Name svName) {
+    protected InstantiatedSVFeature(Name svName) {
         instProj = SVInstantiationProjection.create ( svName, false );
     }
 
