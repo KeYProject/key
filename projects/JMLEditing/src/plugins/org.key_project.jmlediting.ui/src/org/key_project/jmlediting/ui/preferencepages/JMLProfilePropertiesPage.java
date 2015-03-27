@@ -1,14 +1,22 @@
 package org.key_project.jmlediting.ui.preferencepages;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jdt.internal.ui.preferences.PropertyAndPreferencePage;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -19,6 +27,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
@@ -27,9 +36,12 @@ import org.eclipse.swt.widgets.TableItem;
 import org.key_project.jmlediting.core.profile.IDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.IProfileManagementListener;
+import org.key_project.jmlediting.core.profile.InvalidProfileException;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
+import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceException;
+import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceFactory;
 import org.key_project.jmlediting.ui.Activator;
 import org.key_project.jmlediting.ui.preferencepages.RebuildHelper.UserMessage;
 import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLProfileDialog;
@@ -84,6 +96,8 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     * needs to be global to change label-text
     */
    private Button editViewButton;
+   private Button exportButton;
+   private Button importButton;
 
    /**
     * Creates a new {@link JMLProfilePropertiesPage}.
@@ -113,7 +127,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
          @Override
          public void newProfileAdded(final IJMLProfile newProfile) {
-            // JMLProfilePropertiesPage.this.fillTable();
+            JMLProfilePropertiesPage.this.fillTable();
          }
       };
       JMLProfileManagement.instance().addListener(
@@ -164,25 +178,108 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       final Button newButton = this
             .createTableSideButton(myComposite, "New...");
       this.editViewButton = this.createTableSideButton(myComposite, "Edit...");
-      final Button exportButton = this.createTableSideButton(myComposite,
-            "Export...");
-      final Button importButton = this.createTableSideButton(myComposite,
-            "Import...");
+      this.exportButton = this.createTableSideButton(myComposite, "Export...");
+      this.importButton = this.createTableSideButton(myComposite, "Import...");
 
       this.updateSelection();
 
-      exportButton.addSelectionListener(new SelectionListener() {
+      this.exportButton.addSelectionListener(new SelectionListener() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
+
+            final IJMLProfile profile = JMLProfilePropertiesPage.this
+                  .getSelectedProfile();
+            if (!(profile instanceof IDerivedProfile)) {
+               // Cannot occur because button is disabled, but prevent cast
+               // exception altough
+               return;
+            }
+            final FileDialog dialog = new FileDialog(
+                  JMLProfilePropertiesPage.this.getShell(), SWT.SAVE);
+            final String[] filterNames = new String[] { "XML File" };
+            final String[] filterExtensions = new String[] { "*.xml" };
+            dialog.setFilterNames(filterNames);
+            dialog.setFilterExtensions(filterExtensions);
+            final String file = dialog.open();
+            if (file != null) {
+               try {
+                  final String xmlFileContent = ProfilePersistenceFactory
+                        .createDerivedProfilePersistence().persist(
+                              (IDerivedProfile) profile);
+                  final FileWriter writer = new FileWriter(new File(file));
+                  writer.write(xmlFileContent);
+                  writer.flush();
+                  writer.close();
+               }
+               catch (final ProfilePersistenceException e1) {
+                  new Logger(Activator.getDefault(), Activator.PLUGIN_ID)
+                        .logError(e1);
+               }
+               catch (final IOException e1) {
+                  ErrorDialog.openError(JMLProfilePropertiesPage.this
+                        .getShell(), "Failed to write the exported file",
+                        "Due to an error: " + e1.getMessage(), new Status(
+                              IStatus.ERROR, Activator.PLUGIN_ID,
+                              "IO Exception", e1));
+               }
+            }
          }
 
          @Override
          public void widgetDefaultSelected(final SelectionEvent e) {
          }
       });
-      importButton.addSelectionListener(new SelectionListener() {
+      this.importButton.addSelectionListener(new SelectionListener() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
+            final FileDialog dialog = new FileDialog(
+                  JMLProfilePropertiesPage.this.getShell(), SWT.OPEN);
+            final String[] filterNames = new String[] { "XML File" };
+            final String[] filterExtensions = new String[] { "*.xml" };
+            dialog.setFilterNames(filterNames);
+            dialog.setFilterExtensions(filterExtensions);
+            final String file = dialog.open();
+            if (file != null) {
+               try {
+                  final BufferedReader reader = new BufferedReader(
+                        new FileReader(new File(file)));
+                  String content = "";
+                  String line;
+                  while ((line = reader.readLine()) != null) {
+                     content += line;
+                  }
+                  reader.close();
+                  final IDerivedProfile profile = ProfilePersistenceFactory
+                        .createDerivedProfilePersistence().read(content);
+                  JMLProfileManagement.instance()
+                        .addUserDefinedProfile(profile);
+
+               }
+               catch (final ProfilePersistenceException e1) {
+                  ErrorDialog.openError(
+                        JMLProfilePropertiesPage.this.getShell(),
+                        "Failed to load the profile",
+                        "The given profile cannot be loaded.",
+                        new Status(IStatus.ERROR, Activator.PLUGIN_ID, e1
+                              .getMessage(), e1));
+               }
+               catch (final IOException e1) {
+                  ErrorDialog.openError(
+                        JMLProfilePropertiesPage.this.getShell(),
+                        "Failed to read the file",
+                        "The selected file cannot be read to load the profile.",
+                        new Status(IStatus.ERROR, Activator.PLUGIN_ID, e1
+                              .getMessage(), e1));
+               }
+               catch (final InvalidProfileException e1) {
+                  ErrorDialog.openError(
+                        JMLProfilePropertiesPage.this.getShell(),
+                        "Cannot import the profile",
+                        "Failed to add the read profile to the list of available profiles in the workspace.",
+                        new Status(IStatus.ERROR, Activator.PLUGIN_ID, e1
+                              .getMessage(), e1));
+               }
+            }
          }
 
          @Override
@@ -209,7 +306,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          public void widgetSelected(final SelectionEvent e) {
             if (JMLProfilePropertiesPage.this.profile2EditView == null) {
                JMLProfilePropertiesPage.this.profile2EditView = JMLProfilePropertiesPage.this
-                     .getSelectedProfile();
+                     .getCheckedProfile();
             }
 
             final JMLProfileDialog dialog = new JMLProfileDialog(
@@ -261,9 +358,8 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          @Override
          public void handleEvent(final Event event) {
             final TableItem item = (TableItem) event.item;
-            final IJMLProfile profile = JMLProfilePropertiesPage.this.allProfiles
-                  .get(JMLProfilePropertiesPage.this.profilesListTable
-                        .indexOf(item));
+            final IJMLProfile profile = JMLProfilePropertiesPage.this
+                  .getSelectedProfile();
             if (event.detail == SWT.CHECK) {
                if (item.getChecked()) {
                   for (final TableItem item2 : JMLProfilePropertiesPage.this.profilesListTable
@@ -291,12 +387,19 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
             }
             else {
-               JMLProfilePropertiesPage.this.updateEditViewButtonLabel(profile);
+               JMLProfilePropertiesPage.this.updateButtons(profile);
                JMLProfilePropertiesPage.this.profile2EditView = profile;
             }
          }
+
       });
 
+   }
+
+   private IJMLProfile getSelectedProfile() {
+      return JMLProfilePropertiesPage.this.allProfiles
+            .get(JMLProfilePropertiesPage.this.profilesListTable
+                  .getSelectionIndex());
    }
 
    private void fillTable() {
@@ -323,17 +426,19 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       return profile instanceof IDerivedProfile;
    }
 
-   private void updateEditViewButtonLabel(final IJMLProfile profile) {
+   private void updateButtons(final IJMLProfile profile) {
       if (this.editViewButton == null) {
          return;
       }
 
-      if (this.isProfileDerived(profile)) {
+      final boolean profileDerived = this.isProfileDerived(profile);
+      if (profileDerived) {
          JMLProfilePropertiesPage.this.editViewButton.setText("Edit...");
       }
       else {
          JMLProfilePropertiesPage.this.editViewButton.setText("View...");
       }
+      this.exportButton.setEnabled(profileDerived);
    }
 
    @Override
@@ -428,7 +533,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
                + "\" is not available.");
       }
 
-      this.updateEditViewButtonLabel(currentProfile);
+      this.updateButtons(currentProfile);
 
       // Redraw the list because selection is otherwise not always cleared
       this.profilesListTable.redraw();
@@ -454,7 +559,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       }
    }
 
-   private IJMLProfile getSelectedProfile() {
+   private IJMLProfile getCheckedProfile() {
       for (int i = 0; i < this.profilesListTable.getItemCount(); i++) {
          // Can only have one selection
          if (this.profilesListTable.getItem(i).getChecked()) {
@@ -467,7 +572,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
    private boolean updatePreferences() {
 
-      final IJMLProfile selectedProfile = this.getSelectedProfile();
+      final IJMLProfile selectedProfile = this.getCheckedProfile();
 
       // Only write into properties if a selection is available (user is forced
       // to),

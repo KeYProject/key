@@ -302,7 +302,7 @@ public final class JMLProfileManagement {
    public void addUserDefinedProfile(final IDerivedProfile newProfile)
          throws InvalidProfileException {
       if (this.getProfileFromIdentifier(newProfile.getIdentifier()) != null) {
-         throw new IllegalArgumentException(
+         throw new InvalidProfileException(
                "A profile with the given id is already known.");
       }
       this.cacheUserDefinedProfile(newProfile);
