@@ -8,11 +8,10 @@ import org.eclipse.jdt.internal.ui.util.CoreUtility;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.key_project.jmlediting.ui.preferencepages.RebuildHelper.UserMessage;
 
 /**
  * Helper class to trigger rebuilds on projects.
- * 
+ *
  * @author Moritz Lichter
  *
  */
@@ -46,6 +45,17 @@ public final class RebuildHelper {
          @Override
          public String getMessage() {
             return "The active JML Profile has changed. A full rebuild of the affected projects is required for changes to take effect. Do the full rebuild now?";
+         }
+      },
+      PROFILE_EDITED {
+         @Override
+         public String getTitle() {
+            return "Profile edited";
+         }
+
+         @Override
+         public String getMessage() {
+            return "The derived JML Profile has changed. A full rebuild of the affected projects is required for changes to take effect. Do the full rebuild now?";
          }
       };
 
