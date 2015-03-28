@@ -79,7 +79,7 @@ public class HelperClassForTests {
             //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
 	    public RuleCollection getStandardRules() {
                 return new RuleCollection(
-                                RuleSourceFactory.fromBuildInRule(ldtFile), 
+                                RuleSourceFactory.fromBuiltInRule(ldtFile), 
                                 ImmutableSLList.<BuiltInRule>nil());
             }
         };
