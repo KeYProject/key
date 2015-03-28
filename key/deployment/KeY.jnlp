@@ -16,7 +16,11 @@ University, TU Darmstadt</vendor>
 <all-permissions/> 
 </security> 
 <resources> 
-<j2se version="1.7+" initial-heap-size="128m" max-heap-size="2048m"/> 
+<!-- Windows 32-bit -->
+<j2se version="1.7+" initial-heap-size="128m" max-heap-size="1024m" os="Windows" arch="x86"/>
+<j2se version="1.7+" initial-heap-size="128m" max-heap-size="1024m" os="Windows" arch="i386"/>
+<!-- Default -->
+<j2se version="1.7+" initial-heap-size="128m" max-heap-size="2048m"/>
 
 <jar href="components/key.ui.jar" /> 
 <jar href="components/key.core.testgen.jar" /> 

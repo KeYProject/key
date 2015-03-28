@@ -789,8 +789,7 @@ public class KeYProjectPropertyPage extends AbstractProjectPropertyPage {
         try {
             IProject project = getProject();
             KeYResourceProperties.setSourceClassPath(project, sourceClassPathText.getText());
-            KeYResourceProperties.setUseBootClassPathKind(project, getUseKind());
-            KeYResourceProperties.setBootClassPath(project, bootClassPathText.getText());
+            KeYResourceProperties.setBootClassPath(project, getUseKind(), bootClassPathText.getText());
             KeYResourceProperties.setClassPathEntries(project, classPathEntries);
             return super.performOk();
         }

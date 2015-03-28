@@ -18,11 +18,13 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
@@ -113,9 +115,9 @@ public abstract class AbstractTestGenerator {
              }
              selectProof(ui, proof);
 
-             ptl.taskStarted(macro.getName(), 0);
+             ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
              synchronized(macro) {
-                          info = macro.applyTo(proof, proof.openEnabledGoals(), null, ptl);
+                          info = macro.applyTo(ui, proof, proof.openEnabledGoals(), null, ptl);
              }
              problems.addAll(SMTProblem.createSMTProblems(proof));
           } catch (final InterruptedException e) {

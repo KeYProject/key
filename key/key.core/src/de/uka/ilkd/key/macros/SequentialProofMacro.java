@@ -21,11 +21,14 @@ import java.util.List;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 
 /**
  * The abstract class SequentialProofMacro can be used to create compound macros
@@ -88,10 +91,11 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      *             if one of the wrapped macros is interrupted.
      */
     @Override
-    public ProofMacroFinishedInfo applyTo(Proof proof,
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+                                          Proof proof,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException {
+                                          ProverTaskListener listener) throws InterruptedException, Exception {
         final List<Node> initNodes = new ArrayList<Node>(goals.size());
         for (Goal goal : goals) {
             initNodes.add(goal.node());
@@ -105,10 +109,10 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
                 if (macro.canApplyTo(initNode, posInOcc)) {
                     final ProverTaskListener pml =
                             new ProofMacroListener(macro, listener);
-                    pml.taskStarted(macro.getName(), 0);
+                    pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
                     synchronized(macro) {
                         // wait for macro to terminate
-                        info = macro.applyTo(initNode, posInOcc, pml);
+                        info = macro.applyTo(uic, initNode, posInOcc, pml);
                     }
                     pml.taskFinished(info);
                     info = new ProofMacroFinishedInfo(this, info);

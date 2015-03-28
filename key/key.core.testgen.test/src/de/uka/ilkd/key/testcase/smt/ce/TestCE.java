@@ -3,7 +3,6 @@ package de.uka.ilkd.key.testcase.smt.ce;
 import java.io.File;
 
 import org.junit.Test;
-import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -14,13 +13,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.test.TestCommons;
+import de.uka.ilkd.key.suite.util.HelperClassForTestgenTests;
 
 public class TestCE extends TestCommons {
-   public static final String TESTCASE_DIRECTORY = IOUtil.getProjectRoot(TestCE.class) + 
-                                                   File.separator + "resources" + 
-                                                   File.separator + "testcase";
-   
-	public static final String testFile = TESTCASE_DIRECTORY
+	public static final String testFile = HelperClassForTestgenTests.TESTCASE_DIRECTORY
 	        + File.separator + "smt" + File.separator + "ce" + File.separator;
 	private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
 	private static boolean isInstalled = false;
@@ -125,15 +121,15 @@ public class TestCE extends TestCommons {
 		   Proof proof = env.getLoadedProof();
 		   assertNotNull(proof);
 			FinishSymbolicExecutionMacro se = new FinishSymbolicExecutionMacro();
-			se.applyTo(proof, proof.openEnabledGoals(), null, null);
+			se.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, null);
 			TryCloseMacro close = new TryCloseMacro();
-			close.applyTo(proof, proof.openEnabledGoals(), null, null);
+			close.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, null);
 			// should not be provable
 			assertTrue(proof.openGoals().size() > 0);
 			// there should be a counterexample for each goal...
 			for (Goal g : proof.openGoals()) {
 				SemanticsBlastingMacro sb = new SemanticsBlastingMacro();
-				sb.applyTo(g.node(), null, null);
+				sb.applyTo(env.getUi(), g.node(), null, null);
 				assertTrue(correctResult(g, false));
 			}
 		}

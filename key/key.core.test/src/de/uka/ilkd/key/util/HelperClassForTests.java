@@ -57,9 +57,22 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 
 public class HelperClassForTests {
-   public static final String TESTCASE_DIRECTORY = IOUtil.getProjectRoot(HelperClassForTests.class) + 
-                                                   File.separator + "resources"+ 
-                                                   File.separator + "testcase";
+   public static final String TESTCASE_DIRECTORY;
+   
+   static {
+      File projectRoot = IOUtil.getProjectRoot(HelperClassForTests.class);
+      // Update path in Eclipse Plug-ins executed as JUnit Test.
+      if ("org.key_project.core.test".equals(projectRoot.getName())) {
+         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile().getParentFile();
+         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.test");
+      }
+      // Update path in Eclipse Plug-ins executed as JUnit Plug-in Test.
+      else if ("tests".equals(projectRoot.getName())) {
+         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile();
+         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.test");
+      }
+      TESTCASE_DIRECTORY = projectRoot + File.separator + "resources"+ File.separator + "testcase";
+   }
 
     
     private static final Profile profile = new JavaProfile() {

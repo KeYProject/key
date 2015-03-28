@@ -54,6 +54,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -74,6 +75,7 @@ import de.uka.ilkd.key.ui.MediatorProofControl;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 /**
  * Implementation of {@link UserInterfaceControl} which controls the {@link MainWindow}
@@ -81,7 +83,6 @@ import de.uka.ilkd.key.util.Pair;
  * @author Mattias Ulbrich
  */
 public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceControl {
-
     private final MainWindow mainWindow;
 
     private final LinkedList<InteractiveRuleApplicationCompletion> completions =
@@ -107,7 +108,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
           }          
        };
     }
-
+    
     /**
      * loads the problem or proof from the given file
      *
@@ -158,6 +159,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void taskFinished(TaskFinishedInfo info) {
+        super.taskFinished(info);
         if (info.getSource() instanceof ApplyStrategy) {
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
@@ -233,13 +235,15 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
     @Override
     public void taskProgress(int position) {
+        super.taskProgress(position);
         mainWindow.getStatusLine().setProgress(position);
 
     }
 
     @Override
-    public void taskStarted(String message, int size) {
-        mainWindow.setStatusLine(message, size);
+    public void taskStarted(TaskStartedInfo info) {
+        super.taskStarted(info);
+        mainWindow.setStatusLine(info.getMessage(), info.getSize());
     }
 
     @Override
@@ -397,10 +401,15 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     * {@inheritDoc}
     */
    @Override
-   public void proofDisposing(ProofDisposedEvent e) {
+   public void proofDisposing(final ProofDisposedEvent e) {
       super.proofDisposing(e);
       // Remove proof from user interface
-      mainWindow.getProofList().removeProof(e.getSource());
+      ThreadUtilities.invokeAndWait(new Runnable() {
+         @Override
+         public void run() {
+            mainWindow.getProofList().removeProof(e.getSource());
+         }
+      });
       // Run the garbage collector.
       Runtime r = Runtime.getRuntime();
       r.gc();
@@ -500,7 +509,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       }
       AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, null, forceNewProfileOfNewProofs);
       InitConfig initConfig = loader.getInitConfig();
-      return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig, loader.getProof());
+      return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig, loader.getProof(), loader.getResult());
    }
 
    @Override

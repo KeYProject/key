@@ -61,8 +61,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             // Create boot folder
             IFolder bootFolder = TestUtilsUtil.createFolder(project, "boot");
             BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/sameNamesSourceLocationTest/boot", bootFolder);
-            KeYResourceProperties.setBootClassPath(project, bootFolder.getFullPath().toString());
-            KeYResourceProperties.setUseBootClassPathKind(project, UseBootClassPathKind.WORKSPACE);
+            KeYResourceProperties.setBootClassPath(project, UseBootClassPathKind.WORKSPACE, bootFolder.getFullPath().toString());
             // Create specs folder
             IFolder specsFolder = TestUtilsUtil.createFolder(project, "specs");
             BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/sameNamesSourceLocationTest/specs", specsFolder);
@@ -148,6 +147,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE,
+                           Boolean.FALSE,
                            Boolean.FALSE,
                            14, 
                            executor);

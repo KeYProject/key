@@ -25,6 +25,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
@@ -37,17 +38,17 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
    /**
     * The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
     */
-   private U ui;
+   private final U ui;
    
    /**
     * The loaded project.
     */
-   private InitConfig initConfig;
+   private final InitConfig initConfig;
    
    /**
     * An optional {@link Proof} which was loaded by the specified proof file. 
     */
-   private Proof loadedProof;
+   private final Proof loadedProof;
    
    /**
     * Indicates that this {@link KeYEnvironment} is disposed.
@@ -55,12 +56,17 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
    private boolean disposed;
 
    /**
+    * The {@link ReplayResult} if available.
+    */
+   private final ReplayResult replayResult;
+
+   /**
     * Constructor
     * @param ui The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
     * @param initConfig The loaded project.
     */
    public KeYEnvironment(U ui, InitConfig initConfig) {
-      this(ui, initConfig, null);
+      this(ui, initConfig, null, null);
    }
 
    /**
@@ -68,10 +74,11 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     * @param ui The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
     * @param initConfig The loaded project.
     */
-   public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof) {
+   public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof, ReplayResult replayResult) {
       this.ui = ui;
       this.initConfig = initConfig;
       this.loadedProof = loadedProof;
+      this.replayResult = replayResult;
    }
 
    /**
@@ -132,6 +139,14 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     */
    public Proof getLoadedProof() {
       return loadedProof;
+   }
+
+   /**
+    * Returns the {@link ReplayResult} if available.
+    * @return The {@link ReplayResult} or {@code null} if not available.
+    */
+   public ReplayResult getReplayResult() {
+      return replayResult;
    }
 
    /**
@@ -218,7 +233,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
       DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(ruleCompletionHandler);
       AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, poPropertiesToForce, forceNewProfileOfNewProofs); 
       InitConfig initConfig = loader.getInitConfig();
-      return new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig, loader.getProof());
+      return new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig, loader.getProof(), loader.getResult());
    }
 
    /**

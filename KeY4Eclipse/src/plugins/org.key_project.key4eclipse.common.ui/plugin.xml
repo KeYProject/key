@@ -601,6 +601,12 @@
             class="org.key_project.key4eclipse.common.ui.setup.TacletOptionsSetupParticipant">
       </participant>
    </extension>
+   <extension
+         point="org.key_project.stubby.ui.customizations">
+      <customization
+            class="org.key_project.key4eclipse.common.ui.stubby.KeYStubGenerationCustomization">
+      </customization>
+   </extension>
    <!--
    <extension
          point="org.eclipse.core.contenttype.contentTypes">

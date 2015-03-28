@@ -19,7 +19,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
+import org.key_project.ui.test.util.TestKeYUIUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
@@ -70,7 +70,7 @@ public class SWTBotKeyOperationContractTest extends AbstractSetupTestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                TestKeY4EclipseUtil.createCompleteAxiomContractId("test.B", "java.lang.Object::<inv>()", "0"),
+                                TestKeYUIUtil.createCompleteAxiomContractId("test.B", "java.lang.Object::<inv>()", "0"),
                                 false,
                                 MethodTreatment.CONTRACTS,
                                 new IDSProvableReferenceSelector() {
@@ -111,7 +111,7 @@ public class SWTBotKeyOperationContractTest extends AbstractSetupTestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                TestKeY4EclipseUtil.createAxiomContractId("ModelFieldTest", "$f()", "0"),
+                                TestKeYUIUtil.createAxiomContractId("ModelFieldTest", "$f()", "0"),
                                 true,
                                 MethodTreatment.CONTRACTS,
                                 new IDSProvableReferenceSelector() {
@@ -152,7 +152,7 @@ public class SWTBotKeyOperationContractTest extends AbstractSetupTestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                TestKeY4EclipseUtil.createOperationContractId("Main", "Main", "main()", "0", "normal_behavior"),
+                                TestKeYUIUtil.createOperationContractId("Main", "Main", "main()", "0", "normal_behavior"),
                                 true,
                                 MethodTreatment.EXPAND,
                                 new IDSProvableReferenceSelector() {
@@ -218,7 +218,7 @@ public class SWTBotKeyOperationContractTest extends AbstractSetupTestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                TestKeY4EclipseUtil.createOperationContractId("MCDemo", "MCDemo", "init(int)", "0", "normal_behavior"),
+                                TestKeYUIUtil.createOperationContractId("MCDemo", "MCDemo", "init(int)", "0", "normal_behavior"),
                                 true,
                                 MethodTreatment.CONTRACTS,
                                 new IDSProvableReferenceSelector() {
@@ -265,7 +265,7 @@ public class SWTBotKeyOperationContractTest extends AbstractSetupTestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                TestKeY4EclipseUtil.createOperationContractId("MCDemo", "MCDemo", "init(int)", "0", "normal_behavior"),
+                                TestKeYUIUtil.createOperationContractId("MCDemo", "MCDemo", "init(int)", "0", "normal_behavior"),
                                 true,
                                 MethodTreatment.EXPAND,
                                 new IDSProvableReferenceSelector() {
@@ -312,7 +312,7 @@ public class SWTBotKeyOperationContractTest extends AbstractSetupTestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                TestKeY4EclipseUtil.createOperationContractId("paycard.PayCard", "paycard.PayCard", "isValid()", "0", "normal_behavior"),
+                                TestKeYUIUtil.createOperationContractId("paycard.PayCard", "paycard.PayCard", "isValid()", "0", "normal_behavior"),
                                 true,
                                 MethodTreatment.EXPAND,
                                 null,
@@ -339,7 +339,7 @@ public class SWTBotKeyOperationContractTest extends AbstractSetupTestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                TestKeY4EclipseUtil.createOperationContractId("paycard.PayCard", "paycard.PayCard", "isValid()", "0", "normal_behavior"),
+                                TestKeYUIUtil.createOperationContractId("paycard.PayCard", "paycard.PayCard", "isValid()", "0", "normal_behavior"),
                                 true,
                                 MethodTreatment.EXPAND,
                                 null,

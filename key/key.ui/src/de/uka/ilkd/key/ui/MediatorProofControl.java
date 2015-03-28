@@ -25,12 +25,13 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
  * A {@link ProofControl} which performs the automode in a {@link SwingWorker}.
  * @author Martin Hentschel
  */
-// TODO: This class should not know/use the AbstractMediatorUserInterfaceControl and the KeYMediator. Refactor the implementation and use events to update the user interface.
+// TODO: This class should not know/use the AbstractMediatorUserInterfaceControl and the KeYMediator.
+// Refactor the implementation and use events to update the user interface.
 public class MediatorProofControl extends AbstractProofControl {
    private final AbstractMediatorUserInterfaceControl ui;
 
    public MediatorProofControl(AbstractMediatorUserInterfaceControl ui) {
-      super(ui.getListener(), ui);
+      super(ui, ui);
       this.ui = ui;
    }
 
@@ -56,15 +57,6 @@ public class MediatorProofControl extends AbstractProofControl {
    @Override
    public void fireAutoModeStopped(ProofEvent e) {
       super.fireAutoModeStopped(e);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void startAndWaitForAutoMode(Proof proof) {
-      startAutoMode(proof);
-      waitWhileAutoMode();
    }
 
    /**
@@ -167,7 +159,7 @@ public class MediatorProofControl extends AbstractProofControl {
        @Override
        protected void done() {
            try {
-               get();
+              ApplyStrategyInfo result = get();
            } catch (final InterruptedException exception) {
                notifyException(exception);
            } catch (final ExecutionException exception) {

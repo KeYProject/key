@@ -21,9 +21,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.security.CodeSource;
 import java.security.MessageDigest;
@@ -166,12 +169,29 @@ public final class IOUtil {
        if (file != null && file.exists()) {
            if (file.isDirectory()) {
                File[] children = file.listFiles();
-               for (File child : children) {
-                   delete(child);
+               if (children != null) {
+                  for (File child : children) {
+                     delete(child);
+                 }
                }
            }
            file.delete();
        }
+   }
+
+   /**
+    * Reads the complete content from the {@link URL}.
+    * @param file The {@link URL} to read from.
+    * @return The read content or {@code null} if the {@link URL} is {@code null}.
+    * @throws IOException Occurred Exception.
+    */
+   public static String readFrom(URL url) throws IOException {
+      if (url != null) {
+         return readFrom(url.openStream());
+      }
+      else {
+         return null;
+      }
    }
 
    /**
@@ -707,7 +727,29 @@ public final class IOUtil {
    }
    
    public static URI toURI(URL url) {
-      return url != null ? URI.create(url.toString()) : null;
+      try {
+         if (url != null) {
+            String protocol = url.getProtocol();
+            String userInfo = url.getUserInfo();
+            String host = url.getHost();
+            String path = URLDecoder.decode(url.getPath(), "UTF-8");
+            String query = url.getQuery();
+            String ref = url.getRef();
+            return new URI(!StringUtil.isEmpty(protocol) ? protocol : null, 
+                           !StringUtil.isEmpty(userInfo) ? userInfo : null, 
+                           !StringUtil.isEmpty(host) ? host : null, 
+                           url.getPort(), 
+                           !StringUtil.isEmpty(path) ? path : null, 
+                           !StringUtil.isEmpty(query) ? query : null, 
+                           !StringUtil.isEmpty(ref) ? ref : null);
+         }
+         else {
+            return null;
+         }
+      }
+      catch (URISyntaxException | UnsupportedEncodingException e) {
+         return null;
+      }
    }
 
    /**

@@ -109,7 +109,9 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
          child.dispose();
       }
       childGlobalEnablements.clear();
-      super.dispose();
+      if (getEditingDomain() != null) { // Check if already disposed
+         super.dispose();
+      }
    }
    
    /**

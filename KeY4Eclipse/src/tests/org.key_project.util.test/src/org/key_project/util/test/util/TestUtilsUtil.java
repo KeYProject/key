@@ -220,8 +220,7 @@ public class TestUtilsUtil {
    }
 
    /**
-    * Creates a new {@link IJavaProject} that is an {@link IProject} with
-    * a JDT nature.
+    * Creates a new {@link IJavaProject} that is an {@link IProject} with a JDT nature.
     * @param name The project name.
     * @return The created {@link IJavaProject}.
     * @throws CoreException Occurred Exception.
@@ -229,6 +228,18 @@ public class TestUtilsUtil {
     */
    public static IJavaProject createJavaProject(String name) throws CoreException, InterruptedException {
       return JDTUtil.createJavaProject(name);
+   }
+   
+   /**
+    * Creates a new {@link IJavaProject} that is an {@link IProject} with a JDT nature. 
+    * @param name The project name.
+    * @param sourceFolderNames The name of the project source folders.
+    * @return The created {@link IJavaProject}.
+    * @throws CoreException Occurred Exception.
+    * @throws InterruptedException Occurred Exception.
+    */
+   public static IJavaProject createJavaProject(String name, String... sourceFolderNames) throws CoreException, InterruptedException {
+      return JDTUtil.createJavaProject(name, JDTUtil.getOutputFolderName(), sourceFolderNames);
    }
 
    /**
@@ -1673,5 +1684,40 @@ public class TestUtilsUtil {
     */
    public static IPerspectiveDescriptor getResourcePerspective() {
       return TestUtilsUtil.getPerspective("org.eclipse.ui.resourcePerspective");
+   }
+
+   /**
+    * Waits until the given {@link SWTBotTree} has items.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @param tree THe {@link SWTBotTree} to wait for.
+    */
+   public static void waitUntilTreeHasItems(SWTWorkbenchBot bot, final SWTBotTree tree) {
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            SWTBotTreeItem[] items = tree.getAllItems();
+            return !ArrayUtil.isEmpty(items);
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "Tree has no items.";
+         }
+      });
+   }
+   
+   /**
+    * Compares the given {@link String}s ignoring whitespace.
+    * @param expected The expected value.
+    * @param actual The current value.
+    */
+   public static void assertEqualsIgnoreWhitespace(String expected, String actual) {
+      if (!StringUtil.equalIgnoreWhiteSpace(expected, actual)) {
+         TestCase.assertEquals(expected, actual);
+      }
    }
 }

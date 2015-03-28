@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -40,7 +43,19 @@ public class SumFeature implements Feature {
     }
     
     private SumFeature(Feature[] p_features) {
-        features = p_features;
+        LinkedHashSet<Feature> featureSet = new LinkedHashSet<>();
+        flatten(p_features, featureSet);
+        features = featureSet.toArray(new Feature[featureSet.size()]);
+    }
+
+    static void flatten(Feature[] sumF, LinkedHashSet<Feature> p_features) {
+        for (Feature f : sumF) {
+            if (f instanceof SumFeature) {
+                flatten(((SumFeature) f).features, p_features);
+            } else {
+                p_features.add(f);
+            }
+        }
     }
 
     public static Feature createSum (Feature... fs) {
@@ -52,4 +67,9 @@ public class SumFeature implements Feature {
     }
 
     private final Feature[] features;
+    
+    @Override
+    public String toString() {
+        return "SumFeature: " + Arrays.toString(features);
+    }
 }

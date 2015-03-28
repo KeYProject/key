@@ -25,6 +25,7 @@ import java.util.Iterator;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -506,7 +507,7 @@ public class ApplyStrategy {
 
     private synchronized void fireTaskStarted (int maxSteps) {
         for (ProverTaskListener ptl : proverTaskObservers) {
-            ptl.taskStarted(PROCESSING_STRATEGY, maxSteps);
+            ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Strategy, PROCESSING_STRATEGY, maxSteps));
         }
     }
 

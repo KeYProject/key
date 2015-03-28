@@ -14,6 +14,8 @@
 package org.key_project.util;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.key_project.util.reflection.ClassLoaderUtil;
+import org.key_project.util.reflection.OSGIClassLoader;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -40,6 +42,7 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		ClassLoaderUtil.setClassLoader(new OSGIClassLoader());
 	}
 
 	/*

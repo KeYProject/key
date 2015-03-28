@@ -125,6 +125,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               null,
+                              Boolean.FALSE,
                               8, 
                               executor);
       }
@@ -197,10 +198,11 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.FALSE,
-                              null,
+                              Boolean.FALSE,
                               Boolean.TRUE,
                               Boolean.TRUE,
                               Boolean.FALSE,
+                              null,
                               8, 
                               executor);
       }
@@ -281,6 +283,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.TRUE,
                               Boolean.TRUE,
                               Boolean.FALSE,
+                              Boolean.FALSE,
                               8, 
                               executor);
       }
@@ -359,6 +362,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               null,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               Boolean.FALSE,
                               8, 
                               executor);
@@ -439,6 +443,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.TRUE,
                               Boolean.FALSE,
+                              Boolean.FALSE,
                               8, 
                               executor);
       }
@@ -505,6 +510,9 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                TestUtilsUtil.waitForJobs();
                // Get variables
                SWTBotTree variablesTree = variablesView.bot().tree();
+               if (showVariableValues) {
+                  TestUtilsUtil.waitUntilTreeHasItems(bot, variablesTree);
+               }
                SWTBotTreeItem[] items = variablesTree.getAllItems();
                assertEquals(items != null ? "items found: " + items.length : "items are null", showVariableValues, !ArrayUtil.isEmpty(items));
             }
@@ -524,6 +532,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.TRUE,
                               Boolean.FALSE,
+                              Boolean.FALSE,
                               8, 
                               executor);
       }
@@ -533,7 +542,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          assertEquals(originalShowVariableValues, KeYSEDPreferences.isShowVariablesOfSelectedDebugNode());
       }
    }
-   
+
    /**
     * Tests a launch in which KeY's main window is shown.
     */
@@ -607,6 +616,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               Boolean.FALSE,
                               8, 
                               executor);
@@ -716,6 +726,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               null,
                               Boolean.FALSE,
+                              Boolean.FALSE,
                               8, 
                               executor);
       }
@@ -791,6 +802,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               null,
                               Boolean.FALSE,
                               Boolean.TRUE,
+                              Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.FALSE,

@@ -17,13 +17,17 @@ import java.io.StringWriter;
 
 import javax.swing.JMenuItem;
 
+import org.key_project.util.collection.ImmutableList;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.pp.WriterBackend;
 
@@ -98,6 +102,23 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
 
         setToolTipText(taclet_sb.toString());
         
+        // This is a GUI improvement proposed by Stijn: Show the formula
+        // you add instead of "Insert hidden"
+        // TODO do this not by name but differently ...
+        if(getText().equals("insert_hidden")) {
+            ImmutableList<TacletGoalTemplate> templates = connectedTo.taclet().goalTemplates();
+            if(templates.size() == 1) {
+                final LogicPrinter printer =
+                        new LogicPrinter(new ProgramPrinter(), new NotationInfo(), services, true);
+                printer.setInstantiation(connectedTo.instantiations());
+                printer.printSequent(templates.head().sequent());
+                String s = printer.toString();
+                if(s.length() > 40) {
+                    s = s.substring(0, 37) + "...";
+                }
+                setText(s);
+            }
+        }
 
     } 
     

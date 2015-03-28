@@ -48,7 +48,22 @@ import de.uka.ilkd.key.util.HelperClassForTests;
  * @author Martin Hentschel
  */
 public abstract class AbstractProofReferenceTestCase extends TestCase {
-   public static final String TESTCASE_DIRECTORY = IOUtil.getProjectRoot(AbstractProofReferenceTestCase.class) + File.separator + "resources"+  File.separator + "testcase";
+   public static final String TESTCASE_DIRECTORY;
+   
+   static {
+      File projectRoot = IOUtil.getProjectRoot(AbstractProofReferenceTestCase.class);
+      // Update path in Eclipse Plug-ins executed as JUnit Test.
+      if ("org.key_project.core.proof_references.test".equals(projectRoot.getName())) {
+         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile().getParentFile();
+         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.proof_references.test");
+      }
+      // Update path in Eclipse Plug-ins executed as JUnit Plug-in Test.
+      else if ("tests".equals(projectRoot.getName())) {
+         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile();
+         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.proof_references.test");
+      }
+      TESTCASE_DIRECTORY = projectRoot + File.separator + "resources"+  File.separator + "testcase";
+   }
    
    /**
     * Executes the test steps of test methods. 

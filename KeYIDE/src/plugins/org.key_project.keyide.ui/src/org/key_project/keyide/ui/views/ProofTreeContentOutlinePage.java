@@ -39,6 +39,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.KeYSelectionModel;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -49,9 +50,9 @@ import de.uka.ilkd.key.proof.ProofEvent;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class ProofTreeContentOutlinePage extends ContentOutlinePage implements ITabbedPropertySheetPageContributor {
-   private Proof proof;
+   private final Proof proof;
    
-   private KeYEnvironment<?> environment;
+   private final KeYEnvironment<?> environment;
 
    private LazyProofTreeContentProvider contentProvider;
    
@@ -62,7 +63,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
    /**
     * {@link KeYSelectionListener} to sync the KeYSelection with the {@link TreeSelection}.
     */
-   private KeYSelectionListener listener = new KeYSelectionListener() {
+   private final KeYSelectionListener listener = new KeYSelectionListener() {
       @Override
       public void selectedProofChanged(KeYSelectionEvent e) {
          updateSelectedNodeThreadSafe();
@@ -76,7 +77,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
       }
    };
    
-   private AutoModeListener autoModeListener = new AutoModeListener() {
+   private final AutoModeListener autoModeListener = new AutoModeListener() {
       @Override
       public void autoModeStarted(ProofEvent e) {
          handleAutoModeStarted(e);
@@ -134,7 +135,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
       getTreeViewer().setUseHashlookup(true);
       contentProvider = new LazyProofTreeContentProvider();
       getTreeViewer().setContentProvider(contentProvider);
-      labelProvider = new ProofTreeLabelProvider(getTreeViewer(), proof);
+      labelProvider = new ProofTreeLabelProvider(getTreeViewer(), environment.getProofControl(), proof);
       getTreeViewer().setLabelProvider(labelProvider);
       getTreeViewer().setInput(proof);
       contentProvider.injectTopLevelElements();

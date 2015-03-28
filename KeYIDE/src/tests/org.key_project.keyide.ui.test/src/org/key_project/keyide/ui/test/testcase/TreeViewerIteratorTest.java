@@ -24,11 +24,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.junit.Test;
-import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
 import org.key_project.keyide.ui.test.Activator;
 import org.key_project.keyide.ui.test.util.TreeViewerIterator;
+import org.key_project.ui.test.util.TestKeYUIUtil;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -61,7 +61,7 @@ public class TreeViewerIteratorTest extends AbstractSetupTestCase {
       File location = ResourceUtil.getLocation(src);
       // Load source code in KeY and get contract to proof which is the first contract of PayCard#isValid().
       KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, null, null);
-      IProgramMethod pm = TestKeY4EclipseUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
+      IProgramMethod pm = TestKeYUIUtil.searchProgramMethod(environment.getServices(), "PayCard", "isValid");
       ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
       FunctionalOperationContract foc = CollectionUtil.getFirst(operationContracts);
       Proof proof = environment.createProof(foc.createProofObl(environment.getInitConfig(), foc));
@@ -77,7 +77,7 @@ public class TreeViewerIteratorTest extends AbstractSetupTestCase {
          TreeViewer viewer = new TreeViewer(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
          viewer.setUseHashlookup(true);
          viewer.setContentProvider(new LazyProofTreeContentProvider());
-         viewer.setLabelProvider(new ProofTreeLabelProvider(viewer, proof));
+         viewer.setLabelProvider(new ProofTreeLabelProvider(viewer, environment.getProofControl(), proof));
          viewer.setInput(proof);
          shell.setVisible(true);
          viewer.expandAll();

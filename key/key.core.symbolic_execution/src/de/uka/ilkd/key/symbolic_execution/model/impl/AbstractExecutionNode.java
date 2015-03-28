@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeSymbolicLayoutExtractor;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
@@ -438,8 +439,10 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * @throws ProofInputException Occurred Exception
     */
    protected Object lazyComputeBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode, boolean returnFormatedCondition) throws ProofInputException {
-      if (!isDisposed() && completedBlocks.contains(completedNode)) {
-         final Services services = getServices();
+      final InitConfig initConfig = getInitConfig();
+      if (initConfig != null && // Ohterwise Proof is disposed.
+          completedBlocks.contains(completedNode)) {
+         final Services services = initConfig.getServices();
          // Collect branch conditions
          List<Term> bcs = new LinkedList<Term>();
          AbstractExecutionNode<?> parent = getParent();
@@ -452,7 +455,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
          // Add current branch condition to path
          Term condition = services.getTermBuilder().and(bcs);
          // Simplify path condition
-         condition = SymbolicExecutionUtil.simplify(getProof(), condition);
+         condition = SymbolicExecutionUtil.simplify(initConfig, getProof(), condition);
          condition = SymbolicExecutionUtil.improveReadability(condition, services);
          // Format path condition
          String formatedCondition = formatTerm(condition, services);

@@ -1,7 +1,10 @@
 package de.uka.ilkd.key.macros;
 
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 
 /**
  * Listener for the application of proof macros (which may be run in
@@ -26,14 +29,15 @@ public class ProofMacroListener implements ProverTaskListener {
     }
 
     @Override
-    public void taskStarted(String message, int size) {
+    public void taskStarted(TaskStartedInfo info) {
         numOfInvokedMacros++;
         final String macroName = getMacro().getName();
         if (superordinateListener != null) {
-            superordinateListener.taskStarted(macroName
+            superordinateListener.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, 
+                                            macroName
                                             + (macroName.length() == 0
                                                 ? "" : " -- ")
-                                            + message, size);
+                                            + info.getMessage(), info.getSize()));
         }
     }
 

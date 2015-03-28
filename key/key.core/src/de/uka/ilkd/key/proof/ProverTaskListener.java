@@ -20,12 +20,9 @@ package de.uka.ilkd.key.proof;
  */
 public interface ProverTaskListener {
     /**
-     * Called when a task is started.
-     * @param message a description of the task, example: "Processing Strategy"
-     * @param size indicates the amount of work needed to complete the task,
-     * used to display a progress bar. Pass 0 to indicate unknown size.
+     
      */
-    void taskStarted ( String message, int size );
+    void taskStarted ( TaskStartedInfo info );
     
     /**
      * Called when progress is made on a task.

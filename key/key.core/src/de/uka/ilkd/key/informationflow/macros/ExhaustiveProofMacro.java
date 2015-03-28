@@ -19,6 +19,7 @@ import java.util.Map;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
@@ -27,10 +28,12 @@ import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.ProofMacroListener;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 
 /**
  * The abstract class ExhaustiveProofMacro can be used to create compound macros
@@ -110,10 +113,11 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(Proof proof,
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+                                          Proof proof,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException {
+                                          ProverTaskListener listener) throws InterruptedException, Exception {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         final ProofMacro macro = getProofMacro();
         for (final Goal goal : goals) {
@@ -132,10 +136,10 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
             if (applicableAt != null) {
                 final ProverTaskListener pml =
                         new ProofMacroListener(macro, listener);
-                pml.taskStarted(getName(), 0);
+                pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, getName(), 0));
                 synchronized(macro) {
                     // wait for macro to terminate
-                    info = macro.applyTo(proof, ImmutableSLList.<Goal>nil().prepend(goal),
+                    info = macro.applyTo(uic, proof, ImmutableSLList.<Goal>nil().prepend(goal),
                                          applicableAt, pml);
                 }
                 pml.taskFinished(info);

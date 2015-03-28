@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
+  <types xsi:type="dependencymodel:Type" name="java.util.Collections" extends="//@types.0" package="java.util" simpleName="Collections">
+    <methods name="emptyList" static="true" final="true" returnType="//@types.20">
+      <typeVariables name="T" type="//@types.0"/>
+    </methods>
+  </types>
+  <types xsi:type="dependencymodel:Type" name="java.util.Map" kind="INTERFACE" package="java.util" simpleName="Map">
+    <typeVariables name="K" type="//@types.0"/>
+    <typeVariables name="V" type="//@types.0"/>
+    <methods name="size" abstract="true" returnType="//@types.15"/>
+  </types>
+  <types xsi:type="dependencymodel:GenericType" name="Map" baseType="//@types.2" typeArguments="//@types.4/@typeVariables.0 //@types.4/@typeVariables.1"/>
+  <types xsi:type="dependencymodel:Type" name="java.util.AbstractMap" extends="//@types.0" implements="//@types.3" abstract="true" package="java.util" simpleName="AbstractMap">
+    <typeVariables name="K" type="//@types.0"/>
+    <typeVariables name="V" type="//@types.0"/>
+  </types>
+  <types xsi:type="dependencymodel:GenericType" name="AbstractMap" baseType="//@types.4" typeArguments="//@types.8/@typeVariables.0 //@types.8/@typeVariables.1"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Cloneable" kind="INTERFACE" package="java.lang" simpleName="Cloneable"/>
+  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
+  <types xsi:type="dependencymodel:Type" name="java.util.HashMap" extends="//@types.5" implements="//@types.3 //@types.6 //@types.7" package="java.util" simpleName="HashMap">
+    <typeVariables name="K" type="//@types.0"/>
+    <typeVariables name="V" type="//@types.0"/>
+    <methods name="HashMap" returnType="//@types.23"/>
+  </types>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Iterable" kind="INTERFACE" package="java.lang" simpleName="Iterable">
+    <typeVariables name="T" type="//@types.0"/>
+  </types>
+  <types xsi:type="dependencymodel:GenericType" name="Iterable" baseType="//@types.9" typeArguments="//@types.11/@typeVariables.0"/>
+  <types xsi:type="dependencymodel:Type" name="java.util.Collection" kind="INTERFACE" extends="//@types.10" package="java.util" simpleName="Collection">
+    <typeVariables name="E" type="//@types.0"/>
+  </types>
+  <types xsi:type="dependencymodel:GenericType" name="Collection" baseType="//@types.11" typeArguments="//@types.13/@typeVariables.0"/>
+  <types xsi:type="dependencymodel:Type" name="java.util.List" kind="INTERFACE" extends="//@types.12" package="java.util" simpleName="List">
+    <typeVariables name="E" type="//@types.0"/>
+  </types>
+  <types xsi:type="dependencymodel:Type" name="GenericParamTest" source="true" extends="//@types.0" package="" simpleName="GenericParamTest">
+    <methods name="main" returnType="//@types.15"/>
+  </types>
+  <types xsi:type="dependencymodel:Datatype" name="int"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Comparable" kind="INTERFACE" package="java.lang" simpleName="Comparable">
+    <typeVariables name="T" type="//@types.0"/>
+  </types>
+  <types xsi:type="dependencymodel:GenericType" name="Comparable" baseType="//@types.16" typeArguments="//@types.19"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.CharSequence" kind="INTERFACE" package="java.lang" simpleName="CharSequence"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.String" final="true" extends="//@types.0" implements="//@types.7 //@types.17 //@types.18" package="java.lang" simpleName="String"/>
+  <types xsi:type="dependencymodel:GenericType" name="List" baseType="//@types.13" typeArguments="//@types.19"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Boolean" final="true" extends="//@types.0" implements="//@types.7 //@types.17" package="java.lang" simpleName="Boolean"/>
+  <types xsi:type="dependencymodel:GenericType" name="HashMap" baseType="//@types.8" typeArguments="//@types.19 //@types.21"/>
+  <types xsi:type="dependencymodel:Datatype" name="void"/>
+</dependencymodel:DependencyModel>

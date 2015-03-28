@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -47,14 +48,15 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
     protected abstract Set<String> getAllowedPullOut();
 
     @Override
-    public ProofMacroFinishedInfo applyTo(Proof proof,
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+                                          Proof proof,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
        for (Goal goal : goals) {
           addInvariantFormula(goal);
        }
-       return super.applyTo(proof, goals, posInOcc, listener);
+       return super.applyTo(uic, proof, goals, posInOcc, listener);
     }
     
     protected void addInvariantFormula(Goal goal) {

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Comparable" kind="INTERFACE" package="java.lang" simpleName="Comparable"/>
+  <types xsi:type="dependencymodel:Type" name="MultiInterfaceInheritance" source="true" kind="INTERFACE" extends="//@types.0 //@types.1" package="" simpleName="MultiInterfaceInheritance"/>
+</dependencymodel:DependencyModel>

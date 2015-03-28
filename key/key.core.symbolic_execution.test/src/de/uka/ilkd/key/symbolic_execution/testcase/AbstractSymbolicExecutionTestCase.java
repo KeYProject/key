@@ -150,7 +150,22 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    /**
     * The directory which contains the KeY repository.
     */
-   public static final File testCaseDirectory = new File(IOUtil.getProjectRoot(AbstractSymbolicExecutionTestCase.class) + File.separator + "resources"+ File.separator + "testcase");
+   public static final File testCaseDirectory;
+   
+   static {
+      File projectRoot = IOUtil.getProjectRoot(AbstractSymbolicExecutionTestCase.class);
+      // Update path in Eclipse Plug-ins executed as JUnit Test.
+      if ("org.key_project.core.symbolic_execution.test".equals(projectRoot.getName())) {
+         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile().getParentFile();
+         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.symbolic_execution.test");
+      }
+      // Update path in Eclipse Plug-ins executed as JUnit Plug-in Test.
+      else if ("tests".equals(projectRoot.getName())) {
+         projectRoot = projectRoot.getParentFile().getParentFile().getParentFile();
+         projectRoot = new File(projectRoot, "key" + File.separator + "key.core.symbolic_execution.test");
+      }
+      testCaseDirectory = new File(projectRoot + File.separator + "resources"+ File.separator + "testcase");
+   }
    
    /**
     * Creates the temporary oracle directory if required.

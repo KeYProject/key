@@ -16,7 +16,7 @@ package de.hentschel.visualdbc.datasource.key.test.testCase.swtbot;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
+import org.key_project.ui.test.util.TestKeYUIUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
 
@@ -56,7 +56,7 @@ public class SWTBotKeyAxiomContractTest extends AbstractSetupTestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                TestKeY4EclipseUtil.createAxiomContractId("ModelFieldTest", "$f()", "0"),
+                                TestKeYUIUtil.createAxiomContractId("ModelFieldTest", "$f()", "0"),
                                 true,
                                 MethodTreatment.EXPAND,
                                 null,
@@ -83,7 +83,7 @@ public class SWTBotKeyAxiomContractTest extends AbstractSetupTestCase {
                                    }
                                 },
                                 KeyConnection.PROOF_OBLIGATION_OPERATION_CONTRACT,
-                                TestKeY4EclipseUtil.createAxiomContractId("ModelFieldTest", "$f()", "0"),
+                                TestKeYUIUtil.createAxiomContractId("ModelFieldTest", "$f()", "0"),
                                 true,
                                 MethodTreatment.EXPAND,
                                 null,

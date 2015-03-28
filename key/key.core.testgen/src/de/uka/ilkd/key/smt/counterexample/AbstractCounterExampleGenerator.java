@@ -7,9 +7,11 @@ import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
@@ -60,11 +62,11 @@ public abstract class AbstractCounterExampleGenerator {
       final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
       TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
       final ProverTaskListener ptl = ui.getProofControl().getDefaultProverTaskListener();
-      ptl.taskStarted(macro.getName(), 0);
+      ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
 
       try {
           synchronized(macro) { // TODO: Useless? No other thread has access to macro wait for macro to terminate
-              info = macro.applyTo(proof, proof.openEnabledGoals(), null, ptl);
+              info = macro.applyTo(ui, proof, proof.openEnabledGoals(), null, ptl);
           }
       } catch (InterruptedException e) {
           Debug.out("Semantics blasting interrupted");

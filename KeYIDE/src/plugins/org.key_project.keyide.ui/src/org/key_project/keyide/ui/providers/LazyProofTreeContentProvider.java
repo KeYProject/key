@@ -376,8 +376,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
     */
    public int getIndexOf(Object parent, Object element) {
       // Make sure that parameters are valid
-      Assert.isTrue(element instanceof BranchFolder || element instanceof Node, "Unsupported element \"" + element + "\".");
-      Assert.isTrue(parent instanceof Proof || parent instanceof BranchFolder || parent instanceof Node, "Unsupported parent \"" + parent + "\".");
+      Assert.isTrue(element instanceof BranchFolder || element instanceof Node, "Unsupported element \"" + element.getClass() + "\".");
+      Assert.isTrue(parent instanceof Proof || parent instanceof BranchFolder || parent instanceof Node, "Unsupported parent \"" + parent.getClass() + "\".");
       // Find first shown child node of the given parent
       Node current = null;
       if (parent instanceof Proof) {

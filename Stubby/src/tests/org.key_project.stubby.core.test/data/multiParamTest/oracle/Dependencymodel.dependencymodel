@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
+  <types xsi:type="dependencymodel:Type" name="java.awt.Transparency" kind="INTERFACE" package="java.awt" simpleName="Transparency"/>
+  <types xsi:type="dependencymodel:Type" name="java.awt.Paint" kind="INTERFACE" extends="//@types.1" package="java.awt" simpleName="Paint"/>
+  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
+  <types xsi:type="dependencymodel:Type" name="java.awt.Color" extends="//@types.0" implements="//@types.2 //@types.3" package="java.awt" simpleName="Color">
+    <methods name="Color" returnType="//@types.6" parameterTypes="//@types.7 //@types.8" constructor="true"/>
+    <methods name="getColor" static="true" returnType="//@types.4" parameterTypes="//@types.12"/>
+    <methods name="getColor" static="true" returnType="//@types.4" parameterTypes="//@types.12 //@types.7"/>
+    <methods name="getHSBColor" static="true" returnType="//@types.4" parameterTypes="//@types.13 //@types.13 //@types.13"/>
+  </types>
+  <types xsi:type="dependencymodel:Type" name="MultiParamTest" source="true" extends="//@types.4" package="" simpleName="MultiParamTest">
+    <methods name="MultiParamTest" returnType="//@types.6" constructor="true"/>
+  </types>
+  <types xsi:type="dependencymodel:Datatype" name="void"/>
+  <types xsi:type="dependencymodel:Datatype" name="int"/>
+  <types xsi:type="dependencymodel:Datatype" name="boolean"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Comparable" kind="INTERFACE" package="java.lang" simpleName="Comparable">
+    <typeVariables name="T" type="//@types.0"/>
+  </types>
+  <types xsi:type="dependencymodel:GenericType" name="Comparable" baseType="//@types.9" typeArguments="//@types.12"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.CharSequence" kind="INTERFACE" package="java.lang" simpleName="CharSequence"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.String" final="true" extends="//@types.0" implements="//@types.3 //@types.10 //@types.11" package="java.lang" simpleName="String"/>
+  <types xsi:type="dependencymodel:Datatype" name="float"/>
+</dependencymodel:DependencyModel>

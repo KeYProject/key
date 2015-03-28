@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/org.key_project.stubby.model/src" modelPluginID="org.key_project.stubby.model"
+    modelName="Dependencymodel" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="7.0" copyrightFields="false"
+    operationReflection="true" importOrganizing="true">
+  <foreignModel>dependencymodel.ecore</foreignModel>
+  <genPackages prefix="Dependencymodel" basePackage="org.key_project.stubby.model"
+      disposableProviderFactory="true" ecorePackage="dependencymodel.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="dependencymodel.ecore#//TypeKind">
+      <genEnumLiterals ecoreEnumLiteral="dependencymodel.ecore#//TypeKind/CLASS"/>
+      <genEnumLiterals ecoreEnumLiteral="dependencymodel.ecore#//TypeKind/INTERFACE"/>
+      <genEnumLiterals ecoreEnumLiteral="dependencymodel.ecore#//TypeKind/ENUM"/>
+      <genEnumLiterals ecoreEnumLiteral="dependencymodel.ecore#//TypeKind/ANNOTATION"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="dependencymodel.ecore#//Visibility">
+      <genEnumLiterals ecoreEnumLiteral="dependencymodel.ecore#//Visibility/PUBLIC"/>
+      <genEnumLiterals ecoreEnumLiteral="dependencymodel.ecore#//Visibility/PROTECTED"/>
+      <genEnumLiterals ecoreEnumLiteral="dependencymodel.ecore#//Visibility/DEFAULT"/>
+      <genEnumLiterals ecoreEnumLiteral="dependencymodel.ecore#//Visibility/PRIVATE"/>
+    </genEnums>
+    <genClasses ecoreClass="dependencymodel.ecore#//Type">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference dependencymodel.ecore#//Type/methods"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference dependencymodel.ecore#//Type/fields"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//Type/kind"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//Type/visibility"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//Type/final"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//Type/static"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference dependencymodel.ecore#//Type/extends"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference dependencymodel.ecore#//Type/implements"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference dependencymodel.ecore#//Type/innerTypes"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//Type/abstract"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//Type/package"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//Type/simpleName"/>
+    </genClasses>
+    <genClasses ecoreClass="dependencymodel.ecore#//Method">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//Method/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//Method/visibility"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//Method/static"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//Method/final"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//Method/abstract"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference dependencymodel.ecore#//Method/returnType"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference dependencymodel.ecore#//Method/parameterTypes"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference dependencymodel.ecore#//Method/throws"/>
+    </genClasses>
+    <genClasses ecoreClass="dependencymodel.ecore#//Field">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//Field/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//Field/visibility"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//Field/final"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//Field/static"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//Field/constantValue"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference dependencymodel.ecore#//Field/type"/>
+    </genClasses>
+    <genClasses ecoreClass="dependencymodel.ecore#//DependencyModel">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference dependencymodel.ecore#//DependencyModel/types"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="dependencymodel.ecore#//AbstractType">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//AbstractType/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute dependencymodel.ecore#//AbstractType/source"/>
+    </genClasses>
+    <genClasses ecoreClass="dependencymodel.ecore#//ArrayType">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference dependencymodel.ecore#//ArrayType/baseType"/>
+    </genClasses>
+    <genClasses ecoreClass="dependencymodel.ecore#//Datatype"/>
+    <genClasses ecoreClass="dependencymodel.ecore#//GenericType">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference dependencymodel.ecore#//GenericType/baseType"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference dependencymodel.ecore#//GenericType/typeArguments"/>
+    </genClasses>
+    <genClasses ecoreClass="dependencymodel.ecore#//TypeVariable">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference dependencymodel.ecore#//TypeVariable/type"/>
+    </genClasses>
+    <genClasses ecoreClass="dependencymodel.ecore#//WildcardType"/>
+    <genClasses image="false" ecoreClass="dependencymodel.ecore#//ITypeVariableContainer">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference dependencymodel.ecore#//ITypeVariableContainer/typeVariables"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

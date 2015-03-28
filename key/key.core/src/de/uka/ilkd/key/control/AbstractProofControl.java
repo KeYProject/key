@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -547,6 +548,24 @@ public abstract class AbstractProofControl implements ProofControl {
     public void startAutoMode(Proof proof) {
        startAutoMode(proof, proof.openGoals());
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void startAndWaitForAutoMode(Proof proof) {
+       startAutoMode(proof);
+       waitWhileAutoMode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void stopAndWaitAutoMode() {
+       stopAutoMode();
+       waitWhileAutoMode();
+    }
     
     /**
      * {@inheritDoc}
@@ -586,7 +605,7 @@ public abstract class AbstractProofControl implements ProofControl {
         }
 
         @Override
-        public void taskStarted(String message, int size) {
+        public void taskStarted(TaskStartedInfo info) {
         }
 
         @Override

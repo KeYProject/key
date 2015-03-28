@@ -18,10 +18,10 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.junit.Test;
-import org.key_project.key4eclipse.test.util.SuspendingStopCondition;
-import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
+import org.key_project.core.test.util.SuspendingStopCondition;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.handlers.StartAutoModeHandler;
+import org.key_project.ui.test.util.TestKeYUIUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -68,14 +68,14 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
             //start auto mode
             sleepCondition.setSleep(true);
             TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Start Auto Mode"));
-            TestKeY4EclipseUtil.waitUntilAutoMode(bot, keyEditor.getUI());
+            TestKeYUIUtil.waitUntilAutoMode(bot, keyEditor.getUI());
             //check that auto mode is not available while auto mode is running
             assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
             //stop auto mode is enabled
             assertTrue(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
             sleepCondition.setSleep(false);
             // Make sure that the proof is not closed
-            TestKeY4EclipseUtil.waitWhileAutoMode(bot, keyEditor.getUI());
+            TestKeYUIUtil.waitWhileAutoMode(bot, keyEditor.getUI());
             assertFalse(keyEditor.getCurrentProof().closed());
             // Make sure that start is enabled and stop is disabled
             bot.waitWhile(Conditions.widgetIsEnabled(bot.toolbarButtonWithTooltip("Stop Auto Mode")));
@@ -87,7 +87,7 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
       doEditorTest("SWTBotStartAutoModeHandlerTest_testStartAutoMode_proofOpen", 
                    "data/paycard", 
                    true, 
-                   TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"),
+                   TestKeYUIUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"),
                    5,
                    false, 
                    steps);
@@ -118,14 +118,14 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
             //start auto mode
             sleepCondition.setSleep(true);
             TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Start Auto Mode"));
-            TestKeY4EclipseUtil.waitUntilAutoMode(bot, keyEditor.getUI());
+            TestKeYUIUtil.waitUntilAutoMode(bot, keyEditor.getUI());
             //check that auto mode is not available while auto mode is running
             assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
             //stop auto mode is enabled
             assertTrue(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
             // Make sure that the proof is closed
             sleepCondition.setSleep(false);
-            TestKeY4EclipseUtil.waitWhileAutoMode(bot, keyEditor.getUI());
+            TestKeYUIUtil.waitWhileAutoMode(bot, keyEditor.getUI());
             assertTrue(keyEditor.getCurrentProof().closed());
             // Make sure that start/stop are both disabled
             bot.waitWhile(Conditions.widgetIsEnabled(bot.toolbarButtonWithTooltip("Stop Auto Mode")));
@@ -137,7 +137,7 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
       doEditorTest("SWTBotStartAutoModeHandlerTest_testStartAutoMode", 
                    "data/paycard", 
                    true, 
-                   TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "isValid()", "0", "normal_behavior"),
+                   TestKeYUIUtil.createOperationContractId("PayCard", "PayCard", "isValid()", "0", "normal_behavior"),
                    5,
                    false, 
                    steps);
@@ -166,7 +166,7 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
             sleepCondition.setMaxRules(10);
             sleepCondition.setSleep(true);
             TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Start Auto Mode"));
-            TestKeY4EclipseUtil.waitUntilAutoMode(bot, keyEditor.getUI());
+            TestKeYUIUtil.waitUntilAutoMode(bot, keyEditor.getUI());
             //check that auto mode is not available while auto mode is running
             assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
             //stop auto mode is enabled
@@ -175,7 +175,7 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
             //stop auto mode and wait until it has stopped
             TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Stop Auto Mode"));
             sleepCondition.setSleep(false);
-            TestKeY4EclipseUtil.waitWhileAutoMode(bot, keyEditor.getUI());
+            TestKeYUIUtil.waitWhileAutoMode(bot, keyEditor.getUI());
             //check that auto mode is available again
             assertTrue(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
             //stop auto mode is disabled
@@ -186,13 +186,13 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
             sleepCondition.setMaxRules(Integer.MAX_VALUE);
             sleepCondition.setSleep(true);
             TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Start Auto Mode"));
-            TestKeY4EclipseUtil.waitUntilAutoMode(bot, keyEditor.getUI());
+            TestKeYUIUtil.waitUntilAutoMode(bot, keyEditor.getUI());
             //check that auto mode is not available while auto mode is running
             assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
             //stop auto mode is enabled
             assertTrue(bot.toolbarButtonWithTooltip("Stop Auto Mode").isEnabled());
             sleepCondition.setSleep(false);
-            TestKeY4EclipseUtil.waitWhileAutoMode(bot, keyEditor.getUI());
+            TestKeYUIUtil.waitWhileAutoMode(bot, keyEditor.getUI());
             //make sure proof is closed
             assertTrue(keyEditor.getCurrentProof().closed());
             //check that the start and stop buttons are both disabled
@@ -205,7 +205,7 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
       doEditorTest("SWTBotStopAutoModeHandlerTest_testStopAutoMode_RestartAutoMode_ProofClosed", 
                    "data/paycard", 
                    true, 
-                   TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "charge(int)", "0", "normal_behavior"),
+                   TestKeYUIUtil.createOperationContractId("PayCard", "PayCard", "charge(int)", "0", "normal_behavior"),
                    5,
                    false, 
                    steps);
@@ -233,7 +233,7 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
             //start auto mode
             sleepCondition.setSleep(true);
             TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Start Auto Mode"));
-            TestKeY4EclipseUtil.waitUntilAutoMode(bot, keyEditor.getUI());
+            TestKeYUIUtil.waitUntilAutoMode(bot, keyEditor.getUI());
             //check that auto mode is not available while auto mode is running
             assertFalse(bot.toolbarButtonWithTooltip("Start Auto Mode").isEnabled());
             //stop auto mode is enabled
@@ -242,7 +242,7 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
             //stop auto mode and wait until it has stopped
             TestUtilsUtil.clickDirectly(bot.toolbarButtonWithTooltip("Stop Auto Mode"));
             sleepCondition.setSleep(false);
-            TestKeY4EclipseUtil.waitWhileAutoMode(bot, keyEditor.getUI());
+            TestKeYUIUtil.waitWhileAutoMode(bot, keyEditor.getUI());
             //make sure proof is still open
             assertFalse(keyEditor.getCurrentProof().closed());
             //check that auto mode is available again
@@ -256,7 +256,7 @@ public class SWTBotAutoModeHandlerTest extends AbstractSWTBotKeYEditorTest {
       doEditorTest("SWTBotStopAutoModeHandlerTest_testStopAutoMode_ProofOpen", 
                    "data/paycard", 
                    true, 
-                   TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"),
+                   TestKeYUIUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"),
                    5,
                    false, 
                    steps);

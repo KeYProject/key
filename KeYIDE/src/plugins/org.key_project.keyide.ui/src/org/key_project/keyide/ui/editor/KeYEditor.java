@@ -79,11 +79,18 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.KeYSelectionModel;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.ApplyStrategy;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -197,7 +204,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       
       @Override
       public void proofPruned(ProofTreeEvent e) {
-         handleProofChanged(e);
+         handleProofPruned(e);
       }
       
       @Override
@@ -227,7 +234,6 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       
       @Override
       public void proofClosed(ProofTreeEvent e) {
-         handleProofChanged(e);
          handleProofClosed(e);
       }
    };
@@ -244,6 +250,34 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       @Override
       public void selectedNodeChanged(KeYSelectionEvent e) {
          handleSelectedNodeChanged(e);
+      }
+   };
+   
+   /**
+    * Listens for applied rules.
+    */
+   private final RuleAppListener ruleAppListener = new RuleAppListener() {
+      @Override
+      public void ruleApplied(ProofEvent e) {
+         handleRuleApplied(e);
+      }
+   };
+   
+   /**
+    * Listens for prover tasks.
+    */
+   private final ProverTaskListener proverTaskListener = new ProverTaskListener() {
+      @Override
+      public void taskStarted(TaskStartedInfo info) {
+      }
+      
+      @Override
+      public void taskProgress(int position) {
+      }
+      
+      @Override
+      public void taskFinished(TaskFinishedInfo info) {
+         handleTaskFinished(info);
       }
    };
    
@@ -297,6 +331,9 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       if(breakpointManager!=null){
          DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(breakpointManager);
       }
+      if (getUI() != null) {
+         getUI().removeProverTaskListener(proverTaskListener);
+      }
       if (getProofControl() != null) {
          getProofControl().removeAutoModeListener(autoModeListener);
       }
@@ -305,6 +342,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       }
       if (currentProof != null) {
          currentProof.removeProofTreeListener(proofTreeListener);
+         currentProof.removeRuleAppListener(ruleAppListener);
       }
       if (outlinePage != null) {
          outlinePage.dispose();         
@@ -378,6 +416,13 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
                selectionModel = new KeYSelectionModel();
                selectionModel.setProof(currentProof);
             }
+            getUI().addProverTaskListener(proverTaskListener);
+            if (getEnvironment().getReplayResult() != null) {
+               selectionModel.setSelectedNode(getEnvironment().getReplayResult().getNode());
+            }
+            else {
+               selectionModel.setSelectedNode(currentProof.root());                         
+            }
             breakpointManager = new KeYBreakpointManager(currentProof);
             DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(breakpointManager);
             ProofUserManager.getInstance().addUser(currentProof, environment, this);
@@ -417,6 +462,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
          }
       });
       getCurrentProof().addProofTreeListener(proofTreeListener);
+      getCurrentProof().addRuleAppListener(ruleAppListener);
       sourceViewer.setEditable(false);
       setCurrentNode(getCurrentNode());
    }
@@ -527,13 +573,15 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * @param dirtyFlag The new dirty flag to set.
     */
    private void setDirtyFlag(boolean dirtyFlag) {
-      this.dirtyFlag = dirtyFlag;
-      getSite().getShell().getDisplay().syncExec(new Runnable() {
-         @Override
-         public void run() {
-            firePropertyChange(PROP_DIRTY);
-         }
-      });
+      if (this.dirtyFlag != dirtyFlag) {
+         this.dirtyFlag = dirtyFlag;
+         getSite().getShell().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               firePropertyChange(PROP_DIRTY);
+            }
+         });
+      }
    }
 
    /**
@@ -541,6 +589,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * @param e The {@link ProofTreeEvent}.
     */
    protected void handleProofClosed(ProofTreeEvent e) {
+      handleProofChanged(e);
       ProofPropertyTester.updateProperties(); // Make sure that start/stop auto mode buttons are disabled when the proof is closed interactively.
    }
 
@@ -550,6 +599,33 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    protected void handleProofChanged(ProofTreeEvent e) {
       setDirtyFlag(true);
+   }
+
+   /**
+    * When a node was pruned.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleProofPruned(ProofTreeEvent e) {
+      if (!currentNode.find(selectionModel.getSelectedNode())) {
+         selectionModel.setSelectedNode(e.getNode());
+      }
+      if (selectionModel.getSelectedNode() == e.getNode()) {
+         getEditorSite().getShell().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               setCurrentNode(selectionModel.getSelectedNode());
+            }
+         });
+      }
+      handleProofChanged(e);
+   }
+
+   /**
+    * When a rule was applied.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleRuleApplied(ProofEvent e) {
+      selectionModel.defaultSelection();
    }
 
    /**
@@ -565,6 +641,24 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             }
          }
       });
+   }
+
+   /**
+    * When a task has finished.
+    * @param info The {@link TaskFinishedInfo}.
+    */
+   protected void handleTaskFinished(TaskFinishedInfo info) {
+      if (info.getSource() instanceof ApplyStrategy &&
+          currentProof == info.getProof()) {
+         ApplyStrategy.ApplyStrategyInfo result = (ApplyStrategyInfo) info.getResult();
+         if (!currentProof.closed()) {
+            Goal g = result.nonCloseableGoal();
+            if (g == null) {
+                g = currentProof.openGoals().head();
+            }
+            selectionModel.setSelectedGoal(g);
+         }
+      }
    }
    
    /**
@@ -589,6 +683,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
+      currentProof.addRuleAppListener(ruleAppListener);
       AutoModePropertyTester.updateProperties(); // Make sure that start/stop auto mode buttons are disabled when the proof is closed interactively.
    }
 
@@ -597,6 +692,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStarted(ProofEvent e) {
+      currentProof.removeRuleAppListener(ruleAppListener);
       AutoModePropertyTester.updateProperties(); // Make sure that start/stop auto mode buttons are disabled when the proof is closed interactively.
    }
    

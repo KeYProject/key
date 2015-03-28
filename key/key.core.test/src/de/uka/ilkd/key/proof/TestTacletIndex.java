@@ -14,11 +14,12 @@
 /** tests the TacletIndex class.*/
 package de.uka.ilkd.key.proof;
 
+import java.io.File;
+
 import junit.framework.TestCase;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -37,7 +38,7 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletForTests;
-import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.HelperClassForTests;
 
 
 public class TestTacletIndex extends TestCase{   
@@ -65,7 +66,9 @@ public class TestTacletIndex extends TestCase{
     }
     
     public void setUp() {
-	TacletForTests.parse(IOUtil.toFile(KeYResourceManager.getManager().getResourceFile(getClass(), "ruleForTestTacletIndex.taclet")));
+       File tacletFile = new File(HelperClassForTests.TESTCASE_DIRECTORY + "/../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
+       assertTrue("File '" + tacletFile + "' does not exist.", tacletFile.exists());
+	TacletForTests.parse(tacletFile);
 
 	h1 = (RuleSet)TacletForTests.getHeuristics().lookup(new Name("h1"));
 	h2 = (RuleSet)TacletForTests.getHeuristics().lookup(new Name("h2"));

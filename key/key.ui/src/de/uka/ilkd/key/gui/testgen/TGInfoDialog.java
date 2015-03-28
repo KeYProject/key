@@ -46,7 +46,7 @@ public class TGInfoDialog extends JDialog implements TestGenerationLog {
 			public void actionPerformed(ActionEvent e) {
 				// This method delegates the request only to the UserInterfaceControl which implements the functionality.
             // No functionality is allowed in this method body!
-            MainWindow.getInstance().getMediator().getUI().getProofControl().stopAutoMode();
+            MainWindow.getInstance().getMediator().getUI().getProofControl().stopAndWaitAutoMode();
 				exitButton.setEnabled(true);
 			}
 		});

@@ -16,6 +16,7 @@ package de.uka.ilkd.key.gui.nodeviews;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
@@ -25,11 +26,13 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
@@ -53,6 +56,9 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
      * 
      */
     private static final long serialVersionUID = 1874640339950617746L;
+    /** The number of items that are to be shown in the dialog before a message referring to
+     * the dialog is issued. There are always "Open Dialog" and a {@link JSeparator}" */
+    private static final int MAX_ITEM_NUMBER = 30;
     /** all taclet apps the user can choose from */
     private Collection<TacletAppListItem> insertionTaclets;
     /** the added action listeners */
@@ -113,6 +119,16 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
      */
     public void add(TacletApp app) {
         insertionTaclets.add(createListItem(app));
+
+        if(getItemCount() >= MAX_ITEM_NUMBER) {
+            if(getItemCount() == MAX_ITEM_NUMBER) {
+                JLabel l = new JLabel("For more hidden formulas, see 'Open Dialog'");
+                l.setFont(l.getFont().deriveFont(Font.ITALIC));
+                add(l);
+            }
+return;
+        }
+
         final DefaultTacletMenuItem appItem = 
             new DefaultTacletMenuItem(this, app, notInfo, services);
         appItem.addActionListener(new ActionListener() {

@@ -1065,7 +1065,7 @@ public final class MainWindow extends JFrame  {
         public synchronized void selectedProofChanged(KeYSelectionEvent e) {
             Debug.out("Main: initialize with new proof");
 
-            if ( proof != null ) {
+            if ( proof != null  && !proof.isDisposed()) {
                 proof.getSettings().getStrategySettings().removeSettingsListener ( this );
             }
             proof = e.getSource().getSelectedProof();

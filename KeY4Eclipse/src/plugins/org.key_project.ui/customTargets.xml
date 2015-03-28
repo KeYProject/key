@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- see: http://help.eclipse.org/indigo/topic/org.eclipse.pde.doc.user/reference/pde_feature_generating_build.htm -->
+<!-- see: http://help.eclipse.org/indigo/topic/org.eclipse.pde.doc.user/tasks/pde_custom_callbacks.htm -->
+<project name="org.key_project.ui" basedir=".">
+	<!-- Before PDE compilation -->
+	<target name="pre.@dot" description="Called before source files are compiled.">
+		<!-- Create temporary local folder 'key.src' for compilation -->
+		<mkdir dir="${basedir}/key.src"/>
+		<copy todir="${basedir}/key.src" failonerror="true" overwrite="true">
+			<fileset dir="${basedir}/../../../../key/key.ui/src">
+				<include name="*/"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- After PDE compilation -->
+	<target name="post.@dot" description="Called at the end of the compilation target after the results are copied to the build result folder.">
+		<!-- Delete temporary created local folder 'key.src' after compilation -->
+		<delete includeemptydirs="true">
+			<fileset dir="${basedir}/key.src"/>
+		</delete>
+	</target>
+
+	<!-- Before compiled files are copied to target directory -->
+	<target name="pre.gather.bin.parts" description="gather.bin.parts: This target copies the build results (i.e. the jars and any other files being included in the bundle) to the final destination directory.  It is also the target where the version qualifiers are replaced in the manifest file (see Version Qualifiers). It supports pre.gather.bin.parts and post.gather.bin.parts targets.">
+		<!-- Copy resources into target directory -->
+		<copy todir="${target.folder}" failonerror="true" overwrite="true">
+			<fileset dir="${basedir}/../../../../key/key.ui/resources">
+				<include name="*/"/>
+			</fileset>
+		</copy>
+		<!-- Copy examples into target directory -->
+		<mkdir dir="${target.folder}/examples"/>
+		<copy todir="${target.folder}/examples" failonerror="true" overwrite="true">
+			<fileset dir="${basedir}/../../../../key/key.ui/examples">
+				<include name="*/"/>
+			</fileset>
+		</copy>
+	</target>
+</project>

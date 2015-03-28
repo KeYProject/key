@@ -80,26 +80,18 @@ public final class TestSEDKeyCoreUtil {
          public void run() {
             try {
                ILaunchConfiguration config = getKeYLaunchConfiguration(file);
-               ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
-               if (showMethodReturnValues != null) {
-                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
-               }
-               if (showVariablesOfSelectedDebugNode != null) {
-                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, showVariablesOfSelectedDebugNode);
-               }
-               if (showKeYMainWindow != null) {
-                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindow);
-               }
-               if (mergeBranchConditions != null) {
-                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
-               }
-               if (usePrettyPrinting != null) {
-                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrinting);
-               }
-               if (truthValueEvaluationEnabled != null) {
-                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, truthValueEvaluationEnabled);
-               }
-               config = wc.doSave();
+               config = updateLaunchConfiguration(config, 
+                                                  Boolean.FALSE, 
+                                                  null, 
+                                                  showMethodReturnValues, 
+                                                  showVariablesOfSelectedDebugNode, 
+                                                  showKeYMainWindow, 
+                                                  mergeBranchConditions, 
+                                                  Boolean.FALSE, 
+                                                  usePrettyPrinting, 
+                                                  Boolean.FALSE, 
+                                                  Boolean.FALSE,
+                                                  truthValueEvaluationEnabled);
                DebugUITools.launch(config, KeySEDUtil.MODE);
             }
             catch (Exception e) {
@@ -144,6 +136,7 @@ public final class TestSEDKeyCoreUtil {
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param higlightReachedSourceCode Highlight reached source code?
+    * @param truthValueEvaluationEnabled Truth value evaluation enabled?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IMethod method,
@@ -156,54 +149,25 @@ public final class TestSEDKeyCoreUtil {
                                 final Boolean useUnicode,
                                 final Boolean usePrettyPrinting,
                                 final Boolean showSignatureOnMethodReturnNodes,
-                                final Boolean higlightReachedSourceCode) throws Exception {
+                                final Boolean higlightReachedSourceCode,
+                                final Boolean truthValueEvaluationEnabled) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
             try {
                ILaunchConfiguration config = getKeYLaunchConfiguration(method);
-               ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
-               if (useExistingContract != null) {
-                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, useExistingContract);
-                  if (preconditionOrExistingContract != null) {
-                     if (useExistingContract) {
-                        wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT, preconditionOrExistingContract);
-                     }
-                     else {
-                        wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
-                     }
-                  }
-               }
-               else {
-                  if (preconditionOrExistingContract != null) {
-                     wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
-                  }
-               }
-               if (showMethodReturnValues != null) {
-                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
-               }
-               if (showVariablesOfSelectedDebugNode != null) {
-                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, showVariablesOfSelectedDebugNode);
-               }
-               if (showKeYMainWindow != null) {
-                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindow);
-               }
-               if (mergeBranchConditions != null) {
-                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
-               }
-               if (useUnicode != null) {
-                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_UNICODE, useUnicode);
-               }
-               if (usePrettyPrinting != null) {
-                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrinting);
-               }
-               if (showSignatureOnMethodReturnNodes != null) {
-                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, showSignatureOnMethodReturnNodes);
-               }
-               if (higlightReachedSourceCode != null) {
-                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, higlightReachedSourceCode);
-               }
-               config = wc.doSave();
+               config = updateLaunchConfiguration(config, 
+                                                  useExistingContract, 
+                                                  preconditionOrExistingContract, 
+                                                  showMethodReturnValues, 
+                                                  showVariablesOfSelectedDebugNode, 
+                                                  showKeYMainWindow, 
+                                                  mergeBranchConditions, 
+                                                  useUnicode, 
+                                                  usePrettyPrinting, 
+                                                  showSignatureOnMethodReturnNodes, 
+                                                  higlightReachedSourceCode,
+                                                  truthValueEvaluationEnabled);
                DebugUITools.launch(config, KeySEDUtil.MODE);
             }
             catch (Exception e) {
@@ -215,6 +179,66 @@ public final class TestSEDKeyCoreUtil {
       if (run.getException() != null) {
          throw run.getException();
       }
+   }
+   
+   protected static ILaunchConfiguration updateLaunchConfiguration(ILaunchConfiguration config,
+                                                                   Boolean useExistingContract,
+                                                                   String preconditionOrExistingContract,
+                                                                   Boolean showMethodReturnValues,
+                                                                   Boolean showVariablesOfSelectedDebugNode,
+                                                                   Boolean showKeYMainWindow,
+                                                                   Boolean mergeBranchConditions,
+                                                                   Boolean useUnicode,
+                                                                   Boolean usePrettyPrinting,
+                                                                   Boolean showSignatureOnMethodReturnNodes,
+                                                                   Boolean higlightReachedSourceCode,
+                                                                   Boolean truthValueEvaluationEnabled) throws CoreException {
+      ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
+      if (useExistingContract != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, useExistingContract);
+         if (preconditionOrExistingContract != null) {
+            if (useExistingContract) {
+               wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT, preconditionOrExistingContract);
+            }
+            else {
+               wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
+            }
+         }
+      }
+      else {
+         if (preconditionOrExistingContract != null) {
+            wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
+         }
+      }
+      if (showMethodReturnValues != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
+      }
+      if (showVariablesOfSelectedDebugNode != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, showVariablesOfSelectedDebugNode);
+      }
+      if (showKeYMainWindow != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindow);
+      }
+      if (mergeBranchConditions != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
+      }
+      if (useUnicode != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_UNICODE, useUnicode);
+      }
+      if (usePrettyPrinting != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrinting);
+      }
+      if (showSignatureOnMethodReturnNodes != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, showSignatureOnMethodReturnNodes);
+      }
+      if (higlightReachedSourceCode != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, higlightReachedSourceCode);
+      }
+      if (truthValueEvaluationEnabled != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, truthValueEvaluationEnabled);
+      }
+      config = wc.doSave();
+      return config;
    }
    
    /**

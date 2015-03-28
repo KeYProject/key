@@ -6,15 +6,16 @@ package de.uka.ilkd.key.informationflow.macros;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.informationflow.po.BlockExecutionPO;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
+import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
-import de.uka.ilkd.key.macros.IFProofMacroConstants;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -29,7 +30,7 @@ import de.uka.ilkd.key.speclang.BlockContract;
  *
  * @author christoph
  */
-public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro {
+public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro implements StartSideProofMacro {
 
     @Override
     public String getName() {
@@ -87,10 +88,11 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro {
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(Proof proof,
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
+                                          Proof proof,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) {
+                                          ProverTaskListener listener) throws Exception {
         final BlockContractBuiltInRuleApp blockRuleApp = 
                 (BlockContractBuiltInRuleApp) goals.head().node().parent().getAppliedRuleApp();
 
@@ -105,10 +107,14 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro {
                                      goals.head(), blockRuleApp.getExecutionContext(),
                                      proof.getServices());
         
+        final InfFlowProof p;
+        synchronized (blockExecPO) {
+            p = (InfFlowProof) uic.createProof(initConfig, blockExecPO);
+        }
+        p.unionIFSymbols(((InfFlowProof) proof).getIFSymbols());
         
-        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, proof);
-        info.addInfo(IFProofMacroConstants.PO_FOR_NEW_SIDE_PROOF, blockExecPO);
-
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, p);
+        info.addInfo(PROOF_MACRO_FINISHED_INFO_KEY_ORIGINAL_PROOF, proof);
         return info;
     }
 }

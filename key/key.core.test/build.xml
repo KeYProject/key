@@ -27,7 +27,7 @@
 				<pathelement path="${build.dir}"/>
 			</classpath>
 			<formatter type="xml"/>
-			<test name="TestKey" todir="${test.reports}" />
+			<test name="de.uka.ilkd.key.suite.TestKey" todir="${test.reports}" />
 		</junit>
 		<fail message="Test failure detected, check test results." if="test.failedOrError" />
 	</target>
@@ -51,7 +51,7 @@
 				<pathelement path="${build.dir}"/>
 			</classpath>
 			<formatter type="brief" usefile="false" />
-			<test name="TestKey" />
+			<test name="de.uka.ilkd.key.suite.TestKey" />
 		</junit>
 	</target>
 

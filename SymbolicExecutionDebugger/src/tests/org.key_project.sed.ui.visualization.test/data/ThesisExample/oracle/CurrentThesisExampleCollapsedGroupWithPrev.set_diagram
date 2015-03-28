@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ASCII"?>
-<pi:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:al="http://eclipse.org/graphiti/mm/algorithms" xmlns:pi="http://eclipse.org/graphiti/mm/pictograms" visible="true" gridUnit="10" diagramTypeId="symbolicExecutionTreeDiagram" name="Empty Diagram" snapToGrid="true" showGuides="true">
+<pi:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:al="http://eclipse.org/graphiti/mm/algorithms" xmlns:pi="http://eclipse.org/graphiti/mm/pictograms" visible="true" gridUnit="10" diagramTypeId="symbolicExecutionTreeDiagram" name="Empty Diagram" snapToGrid="true" version="0.11.0">
   <properties key="independentObject" value="_b81e7e61-0f3f-4742-9fd0-68a5264edb0f"/>
   <properties key="domainModelFile" value="platform:/resource/SWTBotSymbolicExecutionTreeLayoutTest_testCollapseExpandGroupWithPrev/CurrentThesisExampleCollapsedGroupWithPrev.set"/>
   <graphicsAlgorithm xsi:type="al:Rectangle" background="//@colors.1" foreground="//@colors.0" lineWidth="1" transparency="0.0" width="1000" height="1000"/>
@@ -13,7 +13,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_7fcaf8df-6ba2-40d3-a253-070380d23096"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="&lt;start>"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="39" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="&lt;start>"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -30,7 +30,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_ea659fb6-7ef4-4635-878c-1bb7a3685c4f"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="119" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="&lt;call self.magic(other)>"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="119" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="&lt;call self.magic(other)>"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -47,7 +47,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_e816ca40-7cac-4648-b3e2-c59e908455cc"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="159" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="if (this.intValue==other.intValue)"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="159" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="if (this.intValue==other.intValue)"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -60,7 +60,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_f4ccbf14-8ab1-4df5-a291-14a77ebaaec5"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="59" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="!other = null"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="59" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="!other = null"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -73,7 +73,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_a43205f6-b28b-44fc-846d-cf66feab9b38"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="139" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="self.intValue = other.intValue"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="139" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="self.intValue = other.intValue"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -90,7 +90,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_8484cbb7-c523-4464-a507-752c897999dd"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="109" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="for ( int j = 0; j&lt;1; j++ )"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="109" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="for ( int j = 0; j&lt;1; j++ )"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -103,7 +103,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_85c071f8-e0e7-46ca-9e5c-7ea3b9e01e06"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="int j = 0;"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="39" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="int j = 0;"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -120,7 +120,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_1498fa5a-bd85-4dc8-a6aa-652795589513"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="19" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="j&lt;1"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="19" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="j&lt;1"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -133,7 +133,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_4f568c11-f6c7-4f5b-b2e8-64f147a6d96b"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="139" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="this.intValue-=j*this.intValue;"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="139" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="this.intValue-=j*this.intValue;"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -146,7 +146,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_86f7e3d4-662d-4da4-bc66-52d3eef0f33a"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="19" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="j++;"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="19" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="j++;"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -159,7 +159,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_8699757a-6bd0-4392-adc6-031b0541cb4e"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="19" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="j&lt;1"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="19" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="j&lt;1"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -172,7 +172,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_51c5bafc-1b23-4bec-9dbf-6db8a1f56fc2"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="99" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="return this.intValue;"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="99" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="return this.intValue;"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -185,7 +185,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_4e4c3baa-b26e-46de-8d77-3734b530d662"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="199" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="&lt;return other.intValue as result of magic>"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="199" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="&lt;return other.intValue as result of magic>"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -198,7 +198,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_433171e2-7a35-4e9f-bf3f-5fd3af41038d"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="&lt;end>"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="39" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="&lt;end>"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -211,7 +211,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_8f80d68d-a6c2-42cc-a6b8-828adda4995d"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="139" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="!self.intValue = other.intValue"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="139" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="!self.intValue = other.intValue"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -228,7 +228,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_83b5ebda-2ff0-4ff2-bdb0-30c4804f51f3"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="109" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="for ( int i = 0; i&lt;2; i++ )"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="109" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="for ( int i = 0; i&lt;2; i++ )"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -241,7 +241,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_cafffa2e-6c0e-4265-89fd-cd4fe7198529"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="19" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="i&lt;2"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="19" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="i&lt;2"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -254,7 +254,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_eecc50c9-d258-45f1-b4cb-9437c807e87f"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="99" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="return this.intValue;"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="99" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="return this.intValue;"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -267,7 +267,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_60dd5c9b-56f2-48a1-afbb-91d7faa5de59"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="209" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="&lt;return self.intValue * 2 as result of magic>"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="209" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="&lt;return self.intValue * 2 as result of magic>"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -280,7 +280,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_4c1f9583-ddfb-49dc-adbf-61c806a6bf16"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="&lt;end>"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="39" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="&lt;end>"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -293,7 +293,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_aad22693-e375-4af7-9a50-d43a51ac301e"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="59" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="other = null"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="59" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="other = null"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -306,7 +306,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_0ea50d95-eb28-458f-be80-87de8945852b"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="189" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="&lt;throw java.lang.NullPointerException>"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="189" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="&lt;throw java.lang.NullPointerException>"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -319,7 +319,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_5e1eff16-d972-4c19-b66e-d140cbdae331"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="209" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="&lt;uncaught java.lang.NullPointerException>"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="209" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="&lt;uncaught java.lang.NullPointerException>"/>
     </children>
   </children>
   <children xsi:type="pi:ContainerShape" visible="true" active="true">
@@ -332,7 +332,7 @@
     </children>
     <children visible="true">
       <properties key="independentObject" value="_ebee5c83-3d1e-49f2-93bf-a265edadb330"/>
-      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="19" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="true"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" filled="false" transparency="0.0" width="19" height="20" x="26" style="//@styles.1" font="//@fonts.1" value="true"/>
     </children>
   </children>
   <styles foreground="//@colors.2" lineWidth="2" id="debugNode" font="//@fonts.0">

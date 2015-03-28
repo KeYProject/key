@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
@@ -135,8 +136,9 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     * @throws ProofInputException Occurred Exception
     */
    protected void lazyComputeBranchCondition() throws ProofInputException {
-      if (!isDisposed()) {
-         final Services services = getServices();
+      final InitConfig initConfig = getInitConfig();
+      if (initConfig != null) { // Otherwise proof is disposed.
+         final Services services = initConfig.getServices();
          // Compute branch condition
          if (isMergedBranchCondition()) {
             // Add all merged branch conditions
@@ -144,7 +146,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
             branchCondition = services.getTermBuilder().and(mergedBranchCondtions);
             // Simplify merged branch conditions
             if (mergedConditions.length >= 2) {
-               branchCondition = SymbolicExecutionUtil.simplify(getProof(), branchCondition);
+               branchCondition = SymbolicExecutionUtil.simplify(initConfig, getProof(), branchCondition);
                branchCondition = SymbolicExecutionUtil.improveReadability(branchCondition, services);
             }
          }
@@ -192,8 +194,9 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     * @throws ProofInputException Occurred Exception
     */
    protected void lazyComputePathCondition() throws ProofInputException {
-      if (!isDisposed()) {
-         final Services services = getServices();
+      InitConfig initConfig = getInitConfig();
+      if (initConfig != null) { // Otherwise proof is disposed.
+         final Services services = initConfig.getServices();
          // Get path to parent
          Term parentPath;
          if (getParent() != null) {
@@ -205,7 +208,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
          // Add current branch condition to path
          pathCondition = services.getTermBuilder().and(parentPath, getBranchCondition());
          // Simplify path condition
-         pathCondition = SymbolicExecutionUtil.simplify(getProof(), pathCondition);
+         pathCondition = SymbolicExecutionUtil.simplify(initConfig, getProof(), pathCondition);
          pathCondition = SymbolicExecutionUtil.improveReadability(pathCondition, services);
          // Format path condition
          formatedPathCondition = formatTerm(pathCondition, services);

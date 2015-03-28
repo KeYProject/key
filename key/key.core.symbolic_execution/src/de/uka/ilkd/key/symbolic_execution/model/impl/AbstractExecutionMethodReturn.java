@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
@@ -120,8 +121,9 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
     * @throws ProofInputException Occurred Exception
     */
    protected void lazyComputeMethodReturnCondition() throws ProofInputException {
-      if (!isDisposed()) {
-         final Services services = getServices();
+      final InitConfig initConfig = getProof().getInitConfig();
+      if (initConfig != null) { // Otherwise Proof is disposed.
+         final Services services = initConfig.getServices();
          // Collect branch conditions
          List<Term> bcs = new LinkedList<Term>();
          AbstractExecutionNode<?> parent = getParent();
@@ -134,7 +136,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
          // Add current branch condition to path
          methodReturnCondition = services.getTermBuilder().and(bcs);
          // Simplify path condition
-         methodReturnCondition = SymbolicExecutionUtil.simplify(getProof(), methodReturnCondition);
+         methodReturnCondition = SymbolicExecutionUtil.simplify(initConfig, getProof(), methodReturnCondition);
          methodReturnCondition = SymbolicExecutionUtil.improveReadability(methodReturnCondition, services);
          // Format path condition
          formatedMethodReturnCondition = formatTerm(methodReturnCondition, services);
