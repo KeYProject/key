@@ -18,8 +18,8 @@ import de.uka.ilkd.key.rule.RuleApp;
  * <ol> 
  * <li>can be found in the sequent</li>
  * <li>are top level in the sense that they are not part of a larger term expression</li>
- * <li>depending on the mode: heaps just occuring in updates are included or ignored</li>  
- *</ol>
+ * <li>depending on the mode: heaps just occurring in updates are included or ignored</li>  
+ * </ol>
  */
 public class HeapGenerator implements TermGenerator {
 
