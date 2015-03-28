@@ -7,13 +7,13 @@ import org.antlr.runtime.Token;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-class FileWithTestProperty {
+public class FileWithTestProperty {
 
     private final TestProperty testProperty;
     private final Token pathToken;
     private final File keyFile;
 
-    FileWithTestProperty(TestProperty testProperty, Token pathToken) {
+    public FileWithTestProperty(TestProperty testProperty, Token pathToken) {
         this.pathToken = pathToken;
         this.testProperty = testProperty;
         String initialDirecotry = System.getenv("KEY_HOME") + "/key/key.ui/examples/";

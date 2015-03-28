@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
@@ -11,6 +12,9 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
 import org.key_project.util.java.IOUtil;
+
+import de.uka.ilkd.key.parser.test.ProofCollectionLexer;
+import de.uka.ilkd.key.parser.test.ProofCollectionParser;
 
 class TestProofCollectionParser {
 

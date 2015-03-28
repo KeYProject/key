@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <project name="key.core.test" default="compile" basedir=".">
 	<property name="src.dir"   value="${basedir}/src" />
+	<property name="gen.dir"  value="${basedir}/genSrc" />
 	<property name="build.dir" value="${basedir}/bin" />
 	<property name="dist.dir"  value="${basedir}/../deployment/components" />
 	<property name="lib.dir"  value="${basedir}/../key.core/lib/" />
@@ -31,6 +32,19 @@
 		</junit>
 		<fail message="Test failure detected, check test results." if="test.failedOrError" />
 	</target>
+	
+   <uptodate property="generateproofcollectionparser.required"
+      targetFile="${gen.dir}/de/uka/ilkd/key/parser/test/ProofCollectionParser.java"
+      srcFile="${src.dir}/de/uka/ilkd/key/parser/test/ProofCollection.g"/>
+	
+   <target name="generateproofcollectionparser" unless="generateproofcollectionparser.required">
+   	<echo message="Generating proof collection parser."/>
+      <java jar="${lib.dir}/antlr.jar" fork="true" failonerror="true">
+         <arg value="-o" />
+		   <arg value="${gen.dir}/de/uka/ilkd/key/parser/test/" />
+         <arg value="${src.dir}/de/uka/ilkd/key/parser/test/ProofCollection.g" />
+      </java>
+   </target>
 
 	<target name="runTests" depends="compile">
 		<junit printsummary="withOutAndErr" haltonfailure="yes"
@@ -62,9 +76,9 @@
 	    </copy>
 	  </target>
 
-	<target name="compile" depends="copy" description="Compile all source files into the build directory.">
+	<target name="compile" depends="copy, generateproofcollectionparser" description="Compile all source files into the build directory.">
 		<mkdir dir="${build.dir}"/>
-		<javac srcdir= "${src.dir}" 
+		<javac srcdir= "${src.dir}:${gen.dir}" 
 		       destdir="${build.dir}" 
 		       sourcepath="${src.dir}" 
 		       includeantruntime="false" 
@@ -88,6 +102,7 @@
 	<target name="clean" description="Deletes all generated files and folders.">
 		<delete failonerror="false" includeemptydirs="true"> 
 		  <fileset dir="${build.dir}" includes="**/*" />
+		  <fileset dir="${gen.dir}"/>
    		  <fileset dir="${test.reports}" includes="**/*" />
 		</delete>
 	</target>

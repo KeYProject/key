@@ -277,7 +277,7 @@ public class RunAllProofsTest {
            }
         }
         else {
-           System.out.println("Skipping \"" + indexFile + "\" becaue it is no existing file.");
+           System.out.println("Skipping \"" + indexFile + "\" because it is no existing file.");
         }
         return result;
     }

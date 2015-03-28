@@ -8,7 +8,7 @@ import org.antlr.runtime.Token;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-class GroupedProofCollectionUnit implements ProofCollectionUnit {
+public class GroupedProofCollectionUnit implements ProofCollectionUnit {
 
     final String groupName;
     List<FileWithTestProperty> files;

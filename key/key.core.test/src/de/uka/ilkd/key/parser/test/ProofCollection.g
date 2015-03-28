@@ -1,12 +1,13 @@
 grammar ProofCollection;
 
 @lexer::header {
-package de.uka.ilkd.key.experimental;
+package de.uka.ilkd.key.parser.test;
 }
 
 @parser::header {
-package de.uka.ilkd.key.experimental;
+package de.uka.ilkd.key.parser.test;
 
+import de.uka.ilkd.key.experimental.*;
 import java.util.Map;
 import java.util.HashMap;
 }
