@@ -2470,20 +2470,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "partialInvAxiom",
     	      NonDuplicateAppModPositionFeature.INSTANCE );         
                 
-        // isInstantiated approves also when sv_heap does not occur
-        if (classAxiomApplicationEnabled()) {        
-            final Feature needsInstantiation = SVNeedsInstantiation.create("sv_heap");
-            if (classAxiomDelayedApplication()) {
-                bindRuleSet (d, "classAxiom", add(sequentContainsNoPrograms(), not ( needsInstantiation ), 
-                        NonDuplicateAppFeature.INSTANCE ) );
-            } else {
-                bindRuleSet (d, "classAxiom", add( not ( needsInstantiation ), NonDuplicateAppFeature.INSTANCE ) );                
-            }
-        } else {
-            bindRuleSet(d, "classAxiom", inftyConst());
-        }
+        setupClassAxiomApproval(d);
         
         setupQuantifierInstantiationApproval ( d );
+        
         setupSplittingApproval ( d );
 
         bindRuleSet ( d, "apply_select_eq",
@@ -2503,6 +2493,47 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                     instOf("t1") ) ) ) );
 
         return d;
+    }
+
+    private void setupClassAxiomApproval(final RuleSetDispatchFeature d) {
+        // isInstantiated approves also when sv_heap does not occur
+        if (classAxiomApplicationEnabled()) {        
+            TermBuffer tb = new TermBuffer();
+            final Feature needsInstantiation = SVNeedsInstantiation.create("sv_heap");
+            /* if 'sv_heap' is present and instantiated, 
+             * allow application only if the heap used to 
+             * instantiate 'sv_heap' still occurs in the sequent. 
+             * Otherwise this was a rather short lived heap term
+             * which has been rewritten since. Hence, we discard 
+             * it to avoid too many most likely useless
+             * applications. 
+             */
+            final Feature approveInst =
+                    ifZero (isInstantiated ("sv_heap"),  
+                    /* the sum expression is 0 if the heap does not occur and
+                       infinite if it does occur, 
+                       the outer 'not' then ensures that the costs are infinite
+                       in the first and 0 in the latter case */
+                    not ( sum(tb, HeapGenerator.INSTANCE, 
+                            not ( eq(instOf("sv_heap"), tb) ) ) ),
+                    longConst(0));            
+            
+            if (classAxiomDelayedApplication()) {
+                bindRuleSet (d, "classAxiom", add(sequentContainsNoPrograms(), 
+                        /* can be applied if sv_heap is instantiated or not present */
+                        not ( needsInstantiation ), 
+                        approveInst, 
+                        NonDuplicateAppFeature.INSTANCE ) );
+            } else {
+                bindRuleSet (d, "classAxiom", add( 
+                        /* can be applied if sv_heap is instantiated or not present */
+                        not ( needsInstantiation ), 
+                        approveInst,
+                        NonDuplicateAppFeature.INSTANCE ) );                
+            }
+        } else {
+            bindRuleSet(d, "classAxiom", inftyConst());
+        }
     }
     
     
@@ -2542,11 +2573,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final Feature needsInstantiation = SVNeedsInstantiation.create("sv_heap");
 
         final Feature heapInstantiator = ifZero(needsInstantiation, 
-                forEach ( heapVar, HeapGenerator.INSTANCE, add ( instantiate ( "sv_heap", heapVar ), 
-                        applyTF( heapVar, rec(not(tf.atom), longTermConst(10) ) ) ) ), longConst(0));
+                forEach ( heapVar, HeapGenerator.INSTANCE_EXCLUDE_UPDATES, 
+                        add ( instantiate ( "sv_heap", heapVar ), 
+                        // prefer simpler heap terms before more complicated ones
+                        applyTF( heapVar, rec(not(tf.atom), longTermConst(10) ) ) ) ), 
+                        longConst(0));
 
         bindRuleSet(d, "classAxiom", heapInstantiator);
-        
     }
 
 
