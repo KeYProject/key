@@ -11,9 +11,18 @@ import java.util.Map;
 import java.util.HashMap;
 }
 
-parserEntryPoint returns [List<ProofCollectionUnit> units]
-@init{units = new ArrayList<>();}
-    : (g=group {units.add(g);} | t=testDeclaration {units.add(new SingletonProofCollectionUnit(t));} )*
+/*
+ * Section for parser rules. Parser rules start with lowercase letters.
+ */
+
+parserEntryPoint returns [List<ProofCollectionUnit> units, Map<Token, Token> settingsMap]
+@init{
+    $units = new ArrayList<>();
+    $settingsMap = new HashMap<Token, Token>();
+}
+    : (g=group {$units.add(g);}
+      | t=testDeclaration {$units.add(new SingletonProofCollectionUnit(t));} 
+      | settingAssignment[$settingsMap])*
 ;
 
 group returns [ProofCollectionUnit unit]
@@ -45,6 +54,12 @@ testDeclaration returns [FileWithTestProperty file]
       }
 ;
 
+/*
+ * Section for non-whitespace lexer rules. Lexer rules start with uppercase letters.
+ * Whitespace rules can be found at the end of the file. I put them in a separate section, since
+ * they are written to hidden channel.
+ */
+
 Identifier
     :  IdentifierStart( IdentifierStart | Digit | '.')*
 ;
@@ -57,9 +72,21 @@ QuotedString
     : '"' (EscapedQuote | ~('\\' | '"'))* '"'
 ;
 
+/*
+ * This lexer rule is for a string that is neither quoted, nor an identifier or a number.
+ * As its name suggests, intended use is to allow specifying path names.
+ * Note: There is a (seemingly inevitable) overlap with Number and Identifier lexer rules.
+ *       Depending on input, lexer might create an Identifier token at a place where a path name is expected.
+ *       This is considered in parser rule testDeclaration.
+ */
 PathString
     : (~('\n' | '\r' | '}' | '{' | '=' | ' ' | '\t' | ':' | '"' | '\\') | EscapedQuote)+
 ;
+
+/*
+ * Fragment rules. Those are neither parser nor lexer rules. No token types are created from them.
+ * Those are merely reusable parts of lexer code, to help keeping the code clean.
+ */
 
 fragment EscapedQuote
     : '\\' ('\\' | '"')
@@ -73,8 +100,9 @@ fragment Digit
     : '0'..'9'
 ;
 
-// whitespace treatment (vorerst) kopiert von den antlr beispielen
-// https://github.com/antlr/examples-v3/blob/master/java/java/Java.g
+/*
+ * Whitespace rules. Template from: https://github.com/antlr/examples-v3/blob/master/java/java/Java.g
+ */
 
 WS
     : (' '|'\r'|'\t'|'\u000C'|'\n')+ {$channel=HIDDEN;}
