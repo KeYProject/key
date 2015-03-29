@@ -41,30 +41,38 @@ import static org.junit.Assert.assertSame;
 
 /**
  * <p>
- * This class uses the provided example files from KeY for test purpose
- * on the same way as the bin/runAllProofs.pl does it.
+ * This class uses the provided example files from KeY for test purpose on the
+ * same way as the bin/runAllProofs.pl does it.
  * </p>
+ * 
  * <p>
- * The files to test are listed in files:
- * <ul>
- *    <li>examples/index/automaticJAVADL.txt (Proof should pass)</li>
- *    <li>examples/index/notProvableJavaDL.txt (Proof should fail)</li>
- * </ul>
+ * The files to test are listed in: <br />
+ * $KEY_HOME/key/key.core.test/resources/testcase/runallproofs/automaticJAVADL.txt <br />
+ * During build, ant will copy this file to location: <br />
+ * $KEY_HOME/key/key.core.test/bin/testcase/runallproofs/automaticJAVADL.txt
  * </p>
+ * 
  * <p>
  * The test steps for each defined test file are:
  * <ol>
- *    <li>Create a copy with extension ".auto.key". The file contains the default settings from examples/index/headerJavaDL.txt if required.</li>
- *    <li>A new Java process is started for each test file. It executes {@link Main#main(String[])} with the file as parameter and additional parameter {@code auto}.</li>
- *    <li>The process termination result must be {@code 0} if the proof is closed and something different otherwise. This value is used to determine the test result.</li>
- * </ol> 
+ * <li>Create a copy with extension ".auto.key". The file contains the default
+ * settings from examples/index/headerJavaDL.txt if required.</li>
+ * <li>A new Java process is started for each test file. It executes
+ * {@link Main#main(String[])} with the file as parameter and additional
+ * parameter {@code auto}.</li>
+ * <li>The process termination result must be {@code 0} if the proof is closed
+ * and something different otherwise. This value is used to determine the test
+ * result.</li>
+ * </ol>
  * </p>
  * <p>
- * This class can be executed as "JUnit plug-in test" without extra configurations.
- * For execution as normal "Junit test" it is required to define the system
- * properties "key.home" and "key.lib" like:
- * {@code "-Dkey.home=D:/Forschung/GIT/KeY" "-Dkey.lib=D:/Forschung/Tools/KeY-External Libs"}.
+ * This class can be executed as "JUnit plug-in test" without extra
+ * configurations. For execution as normal "Junit test" it is required to define
+ * the system properties "key.home" and "key.lib" like:
+ * {@code "-Dkey.home=D:/Forschung/GIT/KeY" "-Dkey.lib=D:/Forschung/Tools/KeY-External Libs"}
+ * .
  * </p>
+ * 
  * @author Martin Hentschel
  */
 @RunWith(CustomParameterized.class)
