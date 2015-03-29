@@ -145,9 +145,23 @@ public class JMLProfileDialogTest {
     * default there is no derived profile...
     */
    @Test
-   public void testNewAndEditProfile() {
+   public void testNewAndEditAndDeleteProfile() {
       this.testNewProfileAndSave();
       this.testEditProfile();
+      this.testDeleteProfile();
+   }
+
+   private void testDeleteProfile() {
+      bot.tableWithLabel(PROFILETABLE_LABEL)
+            .getTableItem(SECOND_NEW_PROFILE_NAME).select();
+      bot.button("Delete").click();
+
+      assertTrue(
+            "Delete Profile was not successfull!",
+            !bot.tableWithLabel(PROFILETABLE_LABEL).containsItem(
+                  SECOND_NEW_PROFILE_NAME)
+                  && !bot.tableWithLabel(PROFILETABLE_LABEL).containsItem(
+                        NEW_PROFILE_NAME));
    }
 
    private void testEditProfile() {
