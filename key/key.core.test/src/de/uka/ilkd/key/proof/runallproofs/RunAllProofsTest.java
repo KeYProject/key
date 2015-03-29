@@ -223,7 +223,7 @@ public class RunAllProofsTest {
         assertFalse("KEY_HOME is not defined.", StringUtil.isTrimmedEmpty(KEY_HOME));
         assertTrue("KEY_HOME directory \"" + KEY_HOME + "\" does not exist.", new File(KEY_HOME).isDirectory());
         // Get example directory
-        File exampleDir = new File(KEY_HOME, "examples");
+        File exampleDir = new File(KEY_HOME, "key.ui" + File.separator + "examples");
         assertTrue("Directory \"" + exampleDir + "\" does not exist.", exampleDir.isDirectory());
         // Read default header
         String defaultHeader = IOUtil.readFrom(new FileInputStream(new File(exampleDir, "index/headerJavaDL.txt")));
