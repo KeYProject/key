@@ -443,8 +443,8 @@ public class VMTacletMatcher implements TacletMatcher {
             if (stack.isEmpty()) {
                 return;
             }
-            MutablePair<Term, Integer> el = stack.peek();            
             do {
+                MutablePair<Term, Integer> el = stack.peek();            
                 if (el.second < el.first.arity()) {
                     final int oldPos = el.second;
                     el.second += 1;
@@ -456,7 +456,7 @@ public class VMTacletMatcher implements TacletMatcher {
                     el = new MutablePair<Term, Integer>(el.first.sub(oldPos), 0);
                     stack.push(el);
                 } else {
-                    stack.pop();                    
+                    stack.pop();  
                 }
             } while (!stack.isEmpty() && stack.peek().second != 0);
         }
