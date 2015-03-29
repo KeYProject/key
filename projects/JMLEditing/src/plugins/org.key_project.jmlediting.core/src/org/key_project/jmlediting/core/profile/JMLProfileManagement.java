@@ -273,7 +273,12 @@ public final class JMLProfileManagement {
       final IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
       final Preferences p = preferences.node(JML_DERIVED_PROFILES);
-
+      try {
+         p.clear();
+      }
+      catch (final BackingStoreException e1) {
+         throw new InvalidProfileException(e1);
+      }
       for (final IDerivedProfile profile : this.userDefinedProfiles) {
 
          try {
@@ -308,6 +313,18 @@ public final class JMLProfileManagement {
       this.cacheUserDefinedProfile(newProfile);
       this.writeDerivedProfiles();
       this.fireNewProfileAddedEvent(newProfile);
+   }
+
+   public boolean isUserDefinedProfile(final IDerivedProfile profile) {
+      return this.userDefinedProfiles.contains(profile);
+   }
+
+   public void removeUserDefinedProfile(final IDerivedProfile profile)
+         throws InvalidProfileException {
+      final boolean rem = this.userDefinedProfiles.remove(profile);
+      System.out.println("Profile removed: " + rem);
+      this.profileCache.remove(profile.getIdentifier());
+      this.writeDerivedProfiles();
    }
 
    /**

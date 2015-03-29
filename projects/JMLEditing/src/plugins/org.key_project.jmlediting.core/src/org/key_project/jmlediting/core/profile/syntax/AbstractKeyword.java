@@ -96,6 +96,8 @@ public abstract class AbstractKeyword implements IKeyword {
    /**
     * Default Implementation, returns null so there is no Validator. Subclasses
     * have to override if there is a Validator.
+    *
+    * @return null
     */
    @Override
    public IKeywordValidator getKeywordValidator() {

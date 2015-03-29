@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChang
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jdt.internal.ui.preferences.PropertyAndPreferencePage;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -78,7 +79,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
    /**
     * keep the difference between the selected (checked) Profile and the
-    * selected (highlighted) profile to view/edit
+    * selected (highlighted) profile to view/edit.
     */
    private IJMLProfile profile2EditView;
 
@@ -90,11 +91,12 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    private IPreferenceChangeListener currentPreferenceListener;
 
    /**
-    * needs to be global to change label-text
+    * needs to be global to change label-text.
     */
    private Button editViewButton;
    private Button exportButton;
    private Button importButton;
+   private Button deleteButton;
 
    /**
     * Creates a new {@link JMLProfilePropertiesPage}.
@@ -150,7 +152,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
       data = new GridData(SWT.FILL, SWT.TOP, true, true);
       data.horizontalSpan = 1;
-      data.verticalSpan = 4;
+      data.verticalSpan = 5;
       data.heightHint = 300;
 
       this.profilesListTable = new Table(myComposite, SWT.H_SCROLL
@@ -164,6 +166,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       final Button newButton = this
             .createTableSideButton(myComposite, "New...");
       this.editViewButton = this.createTableSideButton(myComposite, "Edit...");
+      this.deleteButton = this.createTableSideButton(myComposite, "Delete");
       this.exportButton = this.createTableSideButton(myComposite, "Export...");
       this.importButton = this.createTableSideButton(myComposite, "Import...");
 
@@ -239,7 +242,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
                         .createDerivedProfilePersistence().read(content);
                   JMLProfileManagement.instance()
                         .addUserDefinedProfile(profile);
-
+                  JMLProfilePropertiesPage.this.fillTable();
                }
                catch (final ProfilePersistenceException e1) {
                   ErrorDialog.openError(
@@ -270,6 +273,50 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
          @Override
          public void widgetDefaultSelected(final SelectionEvent e) {
+         }
+      });
+      this.deleteButton.addSelectionListener(new SelectionListener() {
+
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            final IJMLProfile profile = JMLProfilePropertiesPage.this
+                  .getSelectedProfile();
+            if (!(profile instanceof IDerivedProfile)
+                  || !JMLProfileManagement.instance().isUserDefinedProfile(
+                        (IDerivedProfile) profile)) {
+               // Cannot occur because button is disabled, but prevent cast
+               // exception altough
+               return;
+            }
+            if (!JMLProfileHelper.getProjectsUsingProfile(profile).isEmpty()) {
+               MessageDialog.openError(
+                     JMLProfilePropertiesPage.this.getShell(),
+                     "Cannot delete profile",
+                     "Cannot delete the profile \""
+                           + profile.getName()
+                           + "\" because some projects in the workspace are using it.");
+            }
+            else {
+               try {
+                  JMLProfileManagement.instance().removeUserDefinedProfile(
+                        (IDerivedProfile) profile);
+                  JMLProfilePropertiesPage.this.fillTable();
+               }
+               catch (final InvalidProfileException ie) {
+                  // Should not occur here, but in the case that, handle it
+                  new Logger(Activator.getDefault(), Activator.PLUGIN_ID)
+                        .logError(ie);
+                  MessageDialog.openError(
+                        JMLProfilePropertiesPage.this.getShell(),
+                        "Failed to write profiles", ie.getMessage());
+               }
+            }
+         }
+
+         @Override
+         public void widgetDefaultSelected(final SelectionEvent e) {
+            // TODO Auto-generated method stub
+
          }
       });
       newButton.addSelectionListener(new SelectionListener() {
@@ -399,7 +446,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       for (final IJMLProfile profile : this.allProfiles) {
          final TableItem item = new TableItem(this.profilesListTable, 0);
          final String type;
-         if (this.isProfileDerived(profile)) {
+         if (isProfileDerived(profile)) {
             type = "derived from "
                   + ((IDerivedProfile) profile).getParentProfile().getName();
          }
@@ -411,7 +458,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       this.updateSelection();
    }
 
-   private boolean isProfileDerived(final IJMLProfile profile) {
+   private static boolean isProfileDerived(final IJMLProfile profile) {
       return profile instanceof IDerivedProfile;
    }
 
@@ -420,7 +467,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          return;
       }
 
-      final boolean profileDerived = this.isProfileDerived(profile);
+      final boolean profileDerived = isProfileDerived(profile);
       if (profileDerived) {
          JMLProfilePropertiesPage.this.editViewButton.setText("Edit...");
       }
@@ -428,6 +475,9 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          JMLProfilePropertiesPage.this.editViewButton.setText("View...");
       }
       this.exportButton.setEnabled(profileDerived);
+      this.deleteButton.setEnabled(profileDerived
+            && JMLProfileManagement.instance().isUserDefinedProfile(
+                  (IDerivedProfile) profile));
    }
 
    @Override
