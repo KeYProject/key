@@ -84,24 +84,12 @@ public class RunAllProofsTest {
     private static final String KEY_HOME;
     
     /**
-     * The path to the KeY external libraries. 
-     * Configurable via system property {@code key.lib}.
-     */
-    private static final String KEY_LIB_DIR;
-    
-    /**
      * Computes the constant values.
      */
     static {
         KEY_HOME = System.getenv("KEY_HOME");
         if (KEY_HOME == null) {
             throw new RuntimeException("Environment variable KEY_HOME not set. "
-                    + "Cannot test proofs.");
-        }
-
-        KEY_LIB_DIR = System.getenv("KEY_LIB");
-        if (KEY_HOME == null) {
-            throw new RuntimeException("Environment variable KEY_LIB not set. "
                     + "Cannot test proofs.");
         }
     }
@@ -148,18 +136,15 @@ public class RunAllProofsTest {
         assertNotNull(testFile);
         assertTrue(testFile.exists());
         assertFalse("KEY_HOME is not defined.", StringUtil.isTrimmedEmpty(KEY_HOME));
-        assertFalse("KEY_LIB_DIR is not defined.", StringUtil.isTrimmedEmpty(KEY_LIB_DIR));
         assertTrue("KEY_HOME directory \"" + KEY_HOME + "\" does not exist.", new File(KEY_HOME).isDirectory());
-        assertTrue("KEY_LIB_DIR directory \"" + KEY_LIB_DIR + "\" does not exist.", new File(KEY_LIB_DIR).isDirectory());
         // Prepare file for testing
         File fileToTest = prepareFile(testFile);
         // Compute directory that contains the compiled KeY classes
         String keyBinaries = KEY_HOME + File.separator + "system" + File.separator + "binary";
         // Start process
-        ProcessBuilder pb = new ProcessBuilder("java", 
-                "-cp", keyBinaries + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "antlr.jar" + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "javacc.jar" + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "junit.jar" + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "recoderKey.jar" + System.getProperty("path.separator") + KEY_LIB_DIR + File.separator + "hamcrest.jar",
-                "de.uka.ilkd.key.core.Main", "--auto",
-                fileToTest.getAbsolutePath());
+        ProcessBuilder pb = new ProcessBuilder(KEY_HOME + File.separator + "scripts" + File.separator + "key",
+              "--auto",
+              fileToTest.getAbsolutePath());
         System.out.println("Starting process: " + pb.command());
         Process process = pb.inheritIO().start();
         process.waitFor();
