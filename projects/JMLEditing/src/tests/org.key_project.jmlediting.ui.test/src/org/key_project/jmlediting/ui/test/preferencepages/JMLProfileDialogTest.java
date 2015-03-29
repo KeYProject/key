@@ -30,8 +30,12 @@ public class JMLProfileDialogTest {
    private static final String PROFILETABLE_LABEL = "Choose active JML Profile from available ones:";
 
    private static final String NEW_PROFILE_NAME = "TestProfile123";
+   private static final String THIRD_NEW_PROFILE_NAME = "ThirdProfile456";
    private static final String SECOND_NEW_PROFILE_NAME = "SecondProfile";
    private static final String PROFILENAME_TO_SELECT = "KeY Profile";
+
+   private static final String PROJECT_NAME = "ProfileDialogTestProject";
+   private static final String PROJECT_SETTINGS_LABEL = "Enable project specific settings";
 
    /**
     * Types to test whether widget is added
@@ -146,14 +150,49 @@ public class JMLProfileDialogTest {
     */
    @Test
    public void testNewAndEditAndDeleteProfile() {
-      this.testNewProfileAndSave();
+      this.testNewProfileAndSave(NEW_PROFILE_NAME);
       this.testEditProfile();
       this.testDeleteProfile();
    }
 
-   private void testDeleteProfile() {
+   @Test
+   public void testDeleteUsedProfile() {
+      System.out.println("testNew");
+      this.testNewProfileAndSave(THIRD_NEW_PROFILE_NAME);
+      System.out.println("close");
+      this.closeProfileSettings();
+
+      UITestUtils.createEmptyJavaProject(bot, PROJECT_NAME);
+
+      System.out.println("open");
+      UITestUtils.openJMLProfileProperties(bot, PROJECT_NAME);
+      bot.checkBox(PROJECT_SETTINGS_LABEL).click();
+
       bot.tableWithLabel(PROFILETABLE_LABEL)
-            .getTableItem(SECOND_NEW_PROFILE_NAME).select();
+            .getTableItem(THIRD_NEW_PROFILE_NAME).check();
+
+      bot.button("OK").click();
+      bot.button("Yes").click();
+
+      this.openGlobalProfileSettings();
+      this.navigateToJMLProfileSettings();
+
+      bot.tableWithLabel(PROFILETABLE_LABEL)
+            .getTableItem(THIRD_NEW_PROFILE_NAME).select();
+      bot.button("Delete").click();
+
+      assertEquals("Profile can be deleted, but should not!",
+            "Cannot delete profile", bot.activeShell().getText());
+   }
+
+   private void testDeleteProfile() {
+      final SWTBotTable profileTable = bot.tableWithLabel(PROFILETABLE_LABEL);
+
+      profileTable.getTableItem(PROFILENAME_TO_SELECT).select();
+      assertFalse("Delete Button is enabled on KeY Profile!",
+            bot.button("Delete").isEnabled());
+
+      profileTable.getTableItem(SECOND_NEW_PROFILE_NAME).select();
       bot.button("Delete").click();
 
       assertTrue(
@@ -197,19 +236,19 @@ public class JMLProfileDialogTest {
                         NEW_PROFILE_NAME));
    }
 
-   private void testNewProfileAndSave() {
+   private void testNewProfileAndSave(final String profileName) {
       bot.button("New...").click();
 
       // first check validation
       this.clickOK();
-      bot.textWithLabel(PROFILE_NAME).setText(NEW_PROFILE_NAME);
+      bot.textWithLabel(PROFILE_NAME).setText(profileName);
       this.clickOK();
       // no recycling of variables, so we can test, that the dialog is not
       // closed.
       bot.textWithLabel(PROFILE_NAME).setText("");
       bot.comboBoxWithLabel(DERIVED_FROM).setSelection(PROFILENAME_TO_SELECT);
       this.clickOK();
-      bot.textWithLabel(PROFILE_NAME).setText(NEW_PROFILE_NAME);
+      bot.textWithLabel(PROFILE_NAME).setText(profileName);
 
       final IJMLProfile selectedProfile = JMLProfileManagement.instance()
             .getProfileFromName(PROFILENAME_TO_SELECT);
@@ -221,10 +260,8 @@ public class JMLProfileDialogTest {
       keywordTable.getTableItem(0).uncheck();
       this.clickOK();
 
-      assertTrue(
-            "New Profile is not saved!",
-            bot.tableWithLabel(PROFILETABLE_LABEL).containsItem(
-                  NEW_PROFILE_NAME));
+      assertTrue("New Profile is not saved!",
+            bot.tableWithLabel(PROFILETABLE_LABEL).containsItem(profileName));
    }
 
    private void testWidgetNotThere(final Type type, final String name) {
