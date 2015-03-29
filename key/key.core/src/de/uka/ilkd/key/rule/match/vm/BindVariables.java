@@ -6,11 +6,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher.TermNavigator;
 
-public class BindVariables implements IMatchInstruction<SVSubstitute> {
+public class BindVariables implements IMatchInstruction {
 
     private final ImmutableArray<QuantifiableVariable> boundVars;
 
@@ -26,7 +25,7 @@ public class BindVariables implements IMatchInstruction<SVSubstitute> {
                 termPosition.getCurrentSubterm().boundVars();
 
         matchConditions = matchConditions.extendRenameTable();
-
+        
         if (variablesToMatchAndBind.size() == boundVars.size()) {
             for (int i = 0; i < boundVars.size() && matchConditions != null; i++) {      
                 final QuantifiableVariable templateQVar = boundVars.get(i);

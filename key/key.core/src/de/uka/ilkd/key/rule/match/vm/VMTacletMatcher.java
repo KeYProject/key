@@ -26,7 +26,6 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateSV;
@@ -79,7 +78,7 @@ public class VMTacletMatcher implements TacletMatcher {
             findExp = null;
         }     
 
-        ArrayList<IMatchInstruction<?>> prgList = new ArrayList<>();
+        ArrayList<IMatchInstruction> prgList = new ArrayList<>();
         if (findExp != null) { 
             createProgram(findExp, prgList);
         }
@@ -87,7 +86,7 @@ public class VMTacletMatcher implements TacletMatcher {
         prgList.toArray(findMatchProgram);
         
         for (SequentFormula sf : assumesSequent) {
-            ArrayList<IMatchInstruction<?>> assumeFmlProgramList = new ArrayList<>();
+            ArrayList<IMatchInstruction> assumeFmlProgramList = new ArrayList<>();
             createProgram(sf.formula(), assumeFmlProgramList);
             IMatchInstruction[] assumeFmlMatchProgram = new IMatchInstruction[assumeFmlProgramList.size()];
             assumeFmlProgramList.toArray(assumeFmlMatchProgram);
@@ -103,7 +102,7 @@ public class VMTacletMatcher implements TacletMatcher {
         prgList.toArray(program);
     } */
     
-    private void createProgram(Term pattern, ArrayList<IMatchInstruction<? extends SVSubstitute>> program) {
+    private void createProgram(Term pattern, ArrayList<IMatchInstruction> program) {
         final Operator op = pattern.op();
 
         final JavaProgramElement patternPrg = pattern.javaBlock().program();
@@ -120,6 +119,10 @@ public class VMTacletMatcher implements TacletMatcher {
             program.add(Instruction.matchProgram(patternPrg));
         }
 
+        if (pattern.hasLabels()) {
+            program.add(Instruction.matchTermLabelSV(pattern.getLabels()));
+        }
+        
         if (op instanceof SchemaVariable) {
             if (op instanceof ModalOperatorSV) {
                 program.add(Instruction
@@ -140,11 +143,7 @@ public class VMTacletMatcher implements TacletMatcher {
             }
             else if (op instanceof UpdateSV) {
                 program.add(Instruction.matchUpdateSV((UpdateSV) op));
-            }
-            else if (op instanceof TermLabelSV) {
-                program.add(Instruction
-                        .matchTermLabelSV((TermLabelSV) op));
-            }
+            }            
             else {
                 throw new IllegalArgumentException("Do not know how to match "
                         + op + " of type " + op.getClass());
@@ -168,7 +167,7 @@ public class VMTacletMatcher implements TacletMatcher {
     }
 
     public MatchConditions match(Term p_toMatch, 
-            @SuppressWarnings("rawtypes") IMatchInstruction[] program, 
+            IMatchInstruction[] p_program, 
             MatchConditions p_matchCond,
             Services services) {
 
@@ -178,8 +177,8 @@ public class VMTacletMatcher implements TacletMatcher {
         final TermNavigator navi = new TermNavigator(p_toMatch);
         
 
-        while (mc != null && instrPtr < program.length && navi.hasNext()) {
-            mc = program[instrPtr].match(navi, mc, services);
+        while (mc != null && instrPtr < p_program.length && navi.hasNext()) {
+            mc = p_program[instrPtr].match(navi, mc, services);
             instrPtr++;
         }
 
@@ -193,7 +192,7 @@ public class VMTacletMatcher implements TacletMatcher {
             Term                             p_template,
             MatchConditions                  p_matchCond,
             Services                         p_services ) {
-        IMatchInstruction<SVSubstitute>[] prg = getProgramFor(p_template);
+        IMatchInstruction[] prg = getProgramFor(p_template);
 
         
         ImmutableList<IfFormulaInstantiation> resFormulas = ImmutableSLList.<IfFormulaInstantiation>nil();
@@ -206,23 +205,27 @@ public class VMTacletMatcher implements TacletMatcher {
         
         if (updateContextPresent) { 
             context = p_matchCond.getInstantiations().getUpdateContext();   
-            if (context.size() > 1) throw new IllegalStateException();
         }
         
-        for (IfFormulaInstantiation cf: p_toMatch) {
+        outer: for (IfFormulaInstantiation cf: p_toMatch) {
             Term formula = cf.getConstrainedFormula().formula();
-            if (updateContextPresent) {
-                 if (formula.op() instanceof UpdateApplication) {
-                     Term update = UpdateApplication.getUpdate(formula);
-                     formula = UpdateApplication.getTarget(formula); 
-                     ImmutableArray<TermLabel> updateLabel = update.getLabels();
-                     if (!context.head().getUpdate().equalsModRenaming(update) ||
-                             !context.head().getUpdateApplicationlabels().equals(updateLabel)) {
-                         continue;
-                     }
-                 } else {
-                     continue;
-                 }
+            ImmutableList<UpdateLabelPair> curContext = context;
+            if (updateContextPresent) {                 
+                for (int i = 0; i<context.size(); i++) {
+                    if (formula.op() instanceof UpdateApplication) {
+                        Term update = UpdateApplication.getUpdate(formula);
+                        formula = UpdateApplication.getTarget(formula); 
+                        ImmutableArray<TermLabel> updateLabel = update.getLabels();
+                        UpdateLabelPair ulp = curContext.head();
+                        curContext = curContext.tail();
+                        if (!ulp.getUpdate().equalsModRenaming(update) ||
+                                !ulp.getUpdateApplicationlabels().equals(updateLabel)) {
+                            continue outer;
+                        }
+                    } else {
+                        continue outer;
+                    }
+                }
             }
             
             final MatchConditions newMC = 
@@ -237,7 +240,7 @@ public class VMTacletMatcher implements TacletMatcher {
     }
 
 
-    private IMatchInstruction<SVSubstitute>[] getProgramFor(Term p_template) {
+    private IMatchInstruction[] getProgramFor(Term p_template) {
         return assumesMatchPrograms.get(p_template);
     }
 
@@ -422,7 +425,6 @@ public class VMTacletMatcher implements TacletMatcher {
         public TermNavigator(Term term) {
             stack.push(new MutablePair<Term,Integer>(term, 0));
         }
-        
         
         public boolean hasNext() {
             return !stack.isEmpty();

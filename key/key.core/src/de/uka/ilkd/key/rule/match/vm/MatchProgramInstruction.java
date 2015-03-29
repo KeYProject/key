@@ -6,8 +6,7 @@ import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher.TermNavigator;
 
-public class MatchProgramInstruction implements
-        IMatchInstruction<ProgramElement> {
+public class MatchProgramInstruction implements IMatchInstruction {
 
     private final ProgramElement pe;
 
@@ -16,11 +15,11 @@ public class MatchProgramInstruction implements
     }
 
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions matchCond,
+    public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
             Services services) {
         final MatchConditions result = pe.match(
                 new SourceData(termPosition.getCurrentSubterm().javaBlock().program(), -1, services),
-                matchCond);
+                matchConditions);
         return result;
     }
 }
