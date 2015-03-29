@@ -34,15 +34,15 @@
 	</target>
 	
    <uptodate property="generateproofcollectionparser.required"
-      targetFile="${gen.dir}/de/uka/ilkd/key/parser/test/ProofCollectionParser.java"
-      srcFile="${src.dir}/de/uka/ilkd/key/parser/test/ProofCollection.g"/>
+      targetFile="${gen.dir}/de/uka/ilkd/key/proof/runallproofs/ProofCollectionParser.java"
+      srcFile="${src.dir}/de/uka/ilkd/key/proof/runallproofs/ProofCollection.g"/>
 	
    <target name="generateproofcollectionparser" unless="generateproofcollectionparser.required">
    	<echo message="Generating proof collection parser."/>
       <java jar="${lib.dir}/antlr.jar" fork="true" failonerror="true">
          <arg value="-o" />
-		   <arg value="${gen.dir}/de/uka/ilkd/key/parser/test/" />
-         <arg value="${src.dir}/de/uka/ilkd/key/parser/test/ProofCollection.g" />
+		   <arg value="${gen.dir}/de/uka/ilkd/key/proof/runallproofs/" />
+         <arg value="${src.dir}/de/uka/ilkd/key/proof/runallproofs/ProofCollection.g" />
       </java>
    </target>
 

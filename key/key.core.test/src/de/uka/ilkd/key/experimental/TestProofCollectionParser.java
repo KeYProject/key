@@ -13,8 +13,8 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
 import org.key_project.util.java.IOUtil;
 
-import de.uka.ilkd.key.parser.test.ProofCollectionLexer;
-import de.uka.ilkd.key.parser.test.ProofCollectionParser;
+import de.uka.ilkd.key.proof.runallproofs.ProofCollectionLexer;
+import de.uka.ilkd.key.proof.runallproofs.ProofCollectionParser;
 
 class TestProofCollectionParser {
 
@@ -24,7 +24,7 @@ class TestProofCollectionParser {
         CharStream charStream = new ANTLRStringStream(IOUtil.readFrom(file));
         ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
         TokenStream tokenStream = new CommonTokenStream(lexer);
-//        printTokenStream(tokenStream);
+        // printTokenStream(tokenStream); // calling this will empty the token stream
         ProofCollectionParser parser = new ProofCollectionParser(tokenStream);
         ProofCollectionParser.parserEntryPoint_return parserEntryPoint = parser.parserEntryPoint();
         List<ProofCollectionUnit> units = parserEntryPoint.units;
