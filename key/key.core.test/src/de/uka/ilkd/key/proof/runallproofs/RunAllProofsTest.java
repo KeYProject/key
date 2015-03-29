@@ -13,31 +13,36 @@
 
 package de.uka.ilkd.key.proof.runallproofs;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Map;
 
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CharStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.TokenStream;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
+import org.junit.runners.Parameterized;
 
-import de.uka.ilkd.key.proof.runallproofs.CustomParameterized.CustomParameters;
+import de.uka.ilkd.key.proof.runallproofs.ProofCollectionParser.parserEntryPoint_return;
 
 import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.StringUtil;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 /**
  * <p>
@@ -47,9 +52,8 @@ import static org.junit.Assert.assertSame;
  * 
  * <p>
  * The files to test are listed in: <br />
- * $KEY_HOME/key/key.core.test/resources/testcase/runallproofs/automaticJAVADL.txt <br />
- * During build, ant will copy this file to location: <br />
- * $KEY_HOME/key/key.core.test/bin/testcase/runallproofs/automaticJAVADL.txt
+ * $KEY_HOME/key.core.test/resources/testcase/runallproofs/automaticJAVADL.txt <br />
+ * The paths specified in this file are treated relative to path $KEY_HOME/key.ui/examples
  * </p>
  * 
  * <p>
@@ -75,13 +79,15 @@ import static org.junit.Assert.assertSame;
  * 
  * @author Martin Hentschel
  */
-@RunWith(CustomParameterized.class)
+@RunWith(Parameterized.class)
 public class RunAllProofsTest {
     /**
      * The path to the KeY repository. 
      * Configurable via system property {@code key.home}.
      */
     private static final String KEY_HOME;
+    
+    static final File EXAMPLE_DIR;
     
     /**
      * Computes the constant values.
@@ -92,22 +98,12 @@ public class RunAllProofsTest {
             throw new RuntimeException("Environment variable KEY_HOME not set. "
                     + "Cannot test proofs.");
         }
+        
+        EXAMPLE_DIR = new File(KEY_HOME, "key.ui" + File.separator + "examples");
     }
     
-    /**
-     * The current file to test.
-     */
-    private File testFile;
-
-    /**
-     * The default header to use.
-     */
-    private String defaultHeader;
-    
-    /**
-     * The expected result.
-     */
-    private boolean successExpected;
+    private final String defaultHeader;
+    private final ProofCollectionUnit unit;
 
     /**
      * Constructor.
@@ -115,10 +111,9 @@ public class RunAllProofsTest {
      * @param defaultHeader The default header to use.
      * @param successExpected The expected result.
      */
-    public RunAllProofsTest(File testFile, String defaultHeader, boolean successExpected) {
-        this.testFile = testFile;
-        this.defaultHeader = defaultHeader;
-        this.successExpected = successExpected;
+    public RunAllProofsTest(ProofCollectionUnit unit, String defaultHeader, Map<String, Object> settings) {
+       this.unit = unit;
+       this.defaultHeader = defaultHeader;
     }
 
     /**
@@ -126,34 +121,44 @@ public class RunAllProofsTest {
      * are described in the constructor of this class.
      * @throws Exception
      */
-    @Test
-    public void testWithKeYAutoMode() throws Exception {
-        // Print information for user
-        System.out.println();
-        System.out.println();
-        System.out.println("Testing: " + testFile.getAbsolutePath());
-        // Make sure that valid file is defined
-        assertNotNull(testFile);
-        assertTrue(testFile.exists());
-        assertFalse("KEY_HOME is not defined.", StringUtil.isTrimmedEmpty(KEY_HOME));
-        assertTrue("KEY_HOME directory \"" + KEY_HOME + "\" does not exist.", new File(KEY_HOME).isDirectory());
-        // Prepare file for testing
-        File fileToTest = prepareFile(testFile);
-        // Compute directory that contains the compiled KeY classes
-        String keyBinaries = KEY_HOME + File.separator + "system" + File.separator + "binary";
-        // Start process
-        ProcessBuilder pb = new ProcessBuilder(KEY_HOME + File.separator + "scripts" + File.separator + "key",
-              "--auto",
-              fileToTest.getAbsolutePath());
-        System.out.println("Starting process: " + pb.command());
-        Process process = pb.inheritIO().start();
-        process.waitFor();
-        if (successExpected) {
-            assertSame(0, process.exitValue());
-        }
-        else {
-            assertNotSame(0, process.exitValue());
-        }
+   @Test
+   public void testWithKeYAutoMode() throws Exception {
+      File tmpFolder = new File(KEY_HOME + File.separator + "key.core.test" + File.separator + "tmp_runallproofs");
+      if(!tmpFolder.exists()){
+         System.out.println("Creating directory for temporary files: " + tmpFolder);
+         Files.createDirectory(tmpFolder.toPath());
+         tmpFolder.deleteOnExit();
+      }
+      Path tmpFile = Files.createTempFile(tmpFolder.toPath(), null, null);
+      tmpFile.toFile().deleteOnExit(); // deletes the temporary file when JVM terminates
+      Files.write(tmpFile, convertToByteArray(unit));
+      ProcessBuilder pb = new ProcessBuilder("java", "-classpath",
+            System.getProperty("java.class.path"),
+            this.getClass().getName(),
+            tmpFile.toString());
+//      System.out.println("Starting process: " + pb.command());
+      Process process = pb.inheritIO().start();
+      process.waitFor();
+      assertEquals("Executed process terminated with non-zero exit value.", process.exitValue(),0);
+   }
+    
+   private static Object convertToObject(byte[] bytes) throws IOException, ClassNotFoundException {
+      ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+      ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+      return objectInputStream.readObject();
+   }
+
+    private static byte[] convertToByteArray(Serializable o) throws IOException {
+       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+       ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+       objectOutputStream.writeObject(o);
+       objectOutputStream.flush();
+       return byteArrayOutputStream.toByteArray();
+    }
+    
+    public static void main(String[] args) throws Exception{
+        ProofCollectionUnit unit = (ProofCollectionUnit)convertToObject(Files.readAllBytes(new File(args[0]).toPath()));
+        unit.processProofObligations();
     }
     
     /**
@@ -177,38 +182,6 @@ public class RunAllProofsTest {
         IOUtil.writeTo(new FileOutputStream(preparedFile, false), originalContent);
         return preparedFile;
     }
-
-    /**
-     * Checks if the given {@link Process} is still alive.
-     * @param process The {@link Process} to check.
-     * @return {@code true} alive, {@code false} finished.
-     */
-    protected boolean isAlive(Process process) {
-        try {
-            process.exitValue();
-            return false;
-        }
-        catch (Exception e) {
-            return true;
-        }
-    }
-
-    /**
-     * Copies the content from the given {@link InputStream} to
-     * the {@link OutputStream}.
-     * @param in The {@link InputStream} to read from.
-     * @param out The {@link OutputStream} to copy to.
-     * @throws IOException Occurred Exception.
-     */
-    protected void copyStream(InputStream in, OutputStream out) throws IOException {
-        while (in.available() >= 1) {
-            byte[] buffer = new byte[1024];
-            int read = 0;
-            while ((read = in.read(buffer)) > 0) {
-                out.write(buffer, 0, read);
-            }
-        }
-    }
     
     /**
      * Collects all test files. Instances of this class are automatically
@@ -216,62 +189,38 @@ public class RunAllProofsTest {
      * {@link CustomParameters}.
      * @return The parameters. Each row will be one test case.
      * @throws IOException Occurred Exception.
+    * @throws RecognitionException 
      */
-    @CustomParameters
-    public static Collection<Object[]> data() throws IOException {
-        // Make sure that required parameters are defined
-        assertFalse("KEY_HOME is not defined.", StringUtil.isTrimmedEmpty(KEY_HOME));
-        assertTrue("KEY_HOME directory \"" + KEY_HOME + "\" does not exist.", new File(KEY_HOME).isDirectory());
-        // Get example directory
-        File exampleDir = new File(KEY_HOME, "key.ui" + File.separator + "examples");
-        assertTrue("Directory \"" + exampleDir + "\" does not exist.", exampleDir.isDirectory());
+    @Parameters
+    public static Collection<Object[]> data() throws IOException, RecognitionException {
+        
         // Read default header
-        String defaultHeader = IOUtil.readFrom(new FileInputStream(new File(exampleDir, "index/headerJavaDL.txt")));
-        // Collect test files
+        String defaultHeader = IOUtil.readFrom(new FileInputStream(new File(EXAMPLE_DIR, "index/headerJavaDL.txt")));
+        
+        // parse index file containing declarations for proof obligations
+        File automaticJAVADL = new File(EXAMPLE_DIR, "index/automaticJAVADL_new.txt");
+        parserEntryPoint_return parseResult= parseFile(automaticJAVADL);
+        
+        Map<String, Object> settings = getSettings();
+        
+        // create list of constructor parameters that will be returned by this method
         Collection<Object[]> data = new LinkedList<Object[]>();
-        data.addAll(dataFromFile(defaultHeader, exampleDir, new File(exampleDir, "index/automaticJAVADL.txt")));
+        for(ProofCollectionUnit unit : parseResult.units){
+           data.add(new Object[]{unit, defaultHeader, settings});
+        }
         return data;
     }
     
-    /**
-     * Lists the contained test files.
-     * @param defaultHeader The default header to use.
-     * @param exampleDir The example directory to use.
-     * @param indexFile The index file to read test files from.
-     * @return The created parameters.
-     * @throws IOException Occurred Exception.
-     */
-    protected static List<Object[]> dataFromFile(String defaultHeader, File exampleDir, File indexFile) throws IOException {
-        List<Object[]> result = new LinkedList<Object[]>();
-        if (indexFile.isFile()) {
-           BufferedReader reader = new BufferedReader(new FileReader(indexFile));
-           try {
-               String line = null;
-               while ((line = reader.readLine()) != null) {
-                   if (line.startsWith("./")) {
-                       line = line.substring("./".length());
-                   }
-                   int indexSeparator = line.indexOf(":");
-                   if (indexSeparator >= 0) {
-                      String successString = line.substring(0, indexSeparator).trim();
-                      String fileString = line.substring(indexSeparator + 1).trim();
-                      boolean successExpected = "provable".equals(successString);
-                      File testFile = new File(exampleDir, fileString);
-                      if (testFile.isFile()) {
-                          result.add(new Object[] {testFile, defaultHeader, successExpected});
-                      }
-                   }
-               }
-           } 
-           finally {
-               if (reader != null) {
-                   reader.close();
-               }
-           }
-        }
-        else {
-           System.out.println("Skipping \"" + indexFile + "\" because it is no existing file.");
-        }
-        return result;
-    }
+    private static Map<String, Object> getSettings() {
+      Map<String, Object> ret = new HashMap<>();
+      return ret;
+   }
+
+   private static parserEntryPoint_return parseFile(File file) throws IOException, RecognitionException {
+       CharStream charStream = new ANTLRStringStream(IOUtil.readFrom(file));
+       ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
+       TokenStream tokenStream = new CommonTokenStream(lexer);
+       ProofCollectionParser parser = new ProofCollectionParser(tokenStream);
+       return parser.parserEntryPoint();
+   }
 }

@@ -1,12 +1,22 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
+//import de.uka.ilkd.key.ui.ConsoleUserInterfaceControl;
+
 /**
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class SingletonProofCollectionUnit implements ProofCollectionUnit {
+public class SingletonProofCollectionUnit extends ProofCollectionUnit {
 
-    public SingletonProofCollectionUnit(FileWithTestProperty t) {
-    }
-    
+   private final FileWithTestProperty file;
+
+   public SingletonProofCollectionUnit(FileWithTestProperty fileWithTestProperty) {
+      this.file = fileWithTestProperty;
+   }
+
+   @Override
+   public boolean processProofObligations() {
+      return true;
+   }
+
 }

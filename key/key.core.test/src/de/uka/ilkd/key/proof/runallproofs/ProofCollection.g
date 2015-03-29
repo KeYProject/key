@@ -7,7 +7,6 @@ package de.uka.ilkd.key.proof.runallproofs;
 @parser::header {
 package de.uka.ilkd.key.proof.runallproofs;
 
-import de.uka.ilkd.key.experimental.*;
 import java.util.Map;
 import java.util.HashMap;
 }
@@ -116,4 +115,3 @@ COMMENT
 LINE_COMMENT
     : ('//' | '#') ~('\n'|'\r')* '\r'? '\n' {$channel=HIDDEN;}
 ;
-

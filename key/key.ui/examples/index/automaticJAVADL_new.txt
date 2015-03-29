@@ -1,0 +1,31 @@
+# This file is part of KeY - Integrated Deductive Software Design
+# Copyright (C) 2001-2011 Universitaet Karlsruhe Germany
+#                         Universitaet Koblenz-Landau, Germany
+#                         and Chalmers University of Technology, Sweden
+#
+# The KeY system is protected by the GNU General Public License. 
+# See LICENSE.TXT for details.
+
+#
+# This file describes the benchmark problems.
+# Files marked as provable should be closed automatically.
+# Files marked as nonprovable should be not closable.
+#
+# It is used by bin/runAllProofs.pl.
+#
+
+# Examples used in the new book
+group newBook {
+notprovable: ./newBook/09.list_modelfield/ArrayList.empty.key
+provable: ./newBook/09.list_modelfield/ArrayList.size.key
+provable: ./newBook/09.list_modelfield/ArrayList.get.key
+provable ./newBook/09.list_modelfield/INVALIDFILE
+}
+
+# Comprehension Tests
+group comprehensions {
+notprovable: ./heap/comprehensions/bsumSplitInvalid.key
+}
+
+provable: ./heap/permissions/threads/Sampler_run.key
+
