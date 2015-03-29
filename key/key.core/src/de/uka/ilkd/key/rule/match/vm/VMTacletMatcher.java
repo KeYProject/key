@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.rule.match.vm;
 
+import java.util.ArrayList;
+import java.util.Stack;
+
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.ContextStatementBlock;
@@ -25,9 +28,16 @@ import de.uka.ilkd.key.rule.TacletMatcher;
 
 public class VMTacletMatcher implements TacletMatcher {
 
-    private IMatchInstruction[] program = new IMatchInstruction[100];
+    private final IMatchInstruction[] program;
 
-    protected void createProgram(Term pattern, int instrPtr) {
+    public VMTacletMatcher(Term pattern) {
+        ArrayList<IMatchInstruction<?>> prgList = new ArrayList<>();
+        createProgram(pattern, prgList);
+        program = new IMatchInstruction[prgList.size()];
+        prgList.toArray(program);
+    }
+    
+    private void createProgram(Term pattern, ArrayList<IMatchInstruction<? extends SVSubstitute>> program) {
         final Operator op = pattern.op();
 
         final JavaProgramElement patternPrg = pattern.javaBlock().program();
@@ -35,40 +45,38 @@ public class VMTacletMatcher implements TacletMatcher {
         final ImmutableArray<QuantifiableVariable> boundVars = pattern
                 .boundVars();
         if (!boundVars.isEmpty()) {
-            program[instrPtr] = Instruction.matchAndBindVariables(boundVars);
-            ++instrPtr;
+            program.add(Instruction.matchAndBindVariables(boundVars));
         }
 
         if (!pattern.javaBlock().isEmpty()
                 || patternPrg instanceof ContextStatementBlock) {
-            program[instrPtr] = Instruction.matchProgram(patternPrg);
-            ++instrPtr;
+            program.add(Instruction.matchProgram(patternPrg));
         }
 
         if (op instanceof SchemaVariable) {
             if (op instanceof ModalOperatorSV) {
-                program[instrPtr] = Instruction
-                        .matchModalOperatorSV((ModalOperatorSV) op);
+                program.add(Instruction
+                        .matchModalOperatorSV((ModalOperatorSV) op));
             }
             else if (op instanceof FormulaSV) {
-                program[instrPtr] = Instruction.matchFormulaSV((FormulaSV) op);
+                program.add(Instruction.matchFormulaSV((FormulaSV) op));
             }
             else if (op instanceof TermSV) {
-                program[instrPtr] = Instruction.matchTermSV((TermSV) op);
+                program.add(Instruction.matchTermSV((TermSV) op));
             }
             else if (op instanceof VariableSV) {
-                program[instrPtr] = Instruction
-                        .matchVariableSV((VariableSV) op);
+                program.add(Instruction
+                        .matchVariableSV((VariableSV) op));
             }
             else if (op instanceof ProgramSV) {
-                program[instrPtr] = Instruction.matchProgramSV((ProgramSV) op);
+                program.add(Instruction.matchProgramSV((ProgramSV) op));
             }
             else if (op instanceof UpdateSV) {
-                program[instrPtr] = Instruction.matchUpdateSV((UpdateSV) op);
+                program.add(Instruction.matchUpdateSV((UpdateSV) op));
             }
             else if (op instanceof TermLabelSV) {
-                program[instrPtr] = Instruction
-                        .matchTermLabelSV((TermLabelSV) op);
+                program.add(Instruction
+                        .matchTermLabelSV((TermLabelSV) op));
             }
             else {
                 throw new IllegalArgumentException("Do not know how to match "
@@ -76,38 +84,37 @@ public class VMTacletMatcher implements TacletMatcher {
             }
         }
         else if (op instanceof SortDependingFunction) {
-            program[instrPtr] = Instruction
-                    .matchSortDependingFunction((SortDependingFunction) op);
+            program.add(Instruction
+                    .matchSortDependingFunction((SortDependingFunction) op));
         }
         else {
-            program[instrPtr] = Instruction.matchOp(op);
+            program.add(Instruction.matchOp(op));
         }
 
-        ++instrPtr;
         for (int i = 0; i < pattern.arity(); i++) {
-            createProgram(pattern.sub(i), instrPtr);
+            createProgram(pattern.sub(i), program);
         }
 
         if (!boundVars.isEmpty()) {
-            program[instrPtr] = Instruction.unbindVariables(boundVars);
-            ++instrPtr;
+            program.add(Instruction.unbindVariables(boundVars));
         }
     }
 
-    private MatchConditions match(Term p_toMatch, MatchConditions p_matchCond,
+    public MatchConditions match(Term p_toMatch, MatchConditions p_matchCond,
             Services services) {
 
         MatchConditions mc = p_matchCond;
-
         int instrPtr = 0;
+        
+        final TermNavigator navi = new TermNavigator(p_toMatch);
+        
 
-        mc = program[instrPtr].match(p_toMatch, mc, services);
-        if (mc != null) {
-            // p_toMatch = program[instrPtr].progress(p_toMatch);
-
+        while (mc != null && instrPtr < program.length && navi.hasNext()) {
+            mc = program[instrPtr].match(navi, mc, services);
+            instrPtr++;
         }
 
-        return null;
+        return mc;
     }
 
     @Override
@@ -141,4 +148,87 @@ public class VMTacletMatcher implements TacletMatcher {
         return null;
     }
 
+    
+    static class TermNavigator {
+
+        /** 
+         * top element on stack contains always the pair whose
+         * first component is the element to be returned by 
+         * {@link #next()} while the second points to the child to 
+         * be visited next (or equals the arity of the first component 
+         * if no such child exists)
+         * For all elements on the stack that are not the top element
+         * the second component is less than the arity of the term in the 
+         * first component
+         */
+        private final Stack<MutablePair<Term,Integer>> stack = new Stack<>();
+        
+        public TermNavigator(Term term) {
+            stack.push(new MutablePair<Term,Integer>(term, 0));
+        }
+        
+        
+        public boolean hasNext() {
+            return !stack.isEmpty();
+        }
+
+        public boolean hasNextSibling() {
+            return stack.size() > 1;
+        }
+
+        
+        public Term getCurrentSubterm() {
+            return stack.peek().first; 
+        }
+        
+        private /*@ helper @*/ void gotoNextHelper() { 
+            if (stack.isEmpty()) {
+                return;
+            }
+            MutablePair<Term, Integer> el = stack.peek();            
+            do {
+                if (el.second < el.first.arity()) {
+                    final int oldPos = el.second;
+                    el.second += 1;
+                    if (el.second >= el.first.arity()) {
+                        // we visited all children of that term
+                        // so it can be removed from the stack
+                        stack.pop();
+                    }
+                    el = new MutablePair<Term, Integer>(el.first.sub(oldPos), 0);
+                    stack.push(el);
+                } else {
+                    stack.pop();                    
+                }
+            } while (!stack.isEmpty() && stack.peek().second != 0);
+        }
+        
+        public void gotoNext() {
+            gotoNextHelper();
+        }
+        
+        public void gotoNextSibling() {
+            stack.pop();
+            gotoNextHelper();            
+        }
+     
+        
+        private static class MutablePair<Fst,Snd> {
+            private Fst first;
+            private Snd second;
+            
+            public MutablePair(Fst first, Snd second) {
+                this.first = first;
+                this.second = second;
+            }
+
+            @Override
+            public String toString() {
+                return "MutablePair [first=" + first + ", second=" + second
+                        + "]";
+            }
+        }
+        
+    }
+    
 }

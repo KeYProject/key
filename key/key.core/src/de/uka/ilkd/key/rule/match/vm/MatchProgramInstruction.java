@@ -3,8 +3,8 @@ package de.uka.ilkd.key.rule.match.vm;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher.TermNavigator;
 
 public class MatchProgramInstruction implements
         IMatchInstruction<ProgramElement> {
@@ -16,10 +16,11 @@ public class MatchProgramInstruction implements
     }
 
     @Override
-    public MatchConditions match(Term p_pe, MatchConditions matchCond,
+    public MatchConditions match(TermNavigator termPosition, MatchConditions matchCond,
             Services services) {
-        return pe.match(
-                new SourceData(p_pe.javaBlock().program(), -1, services),
+        final MatchConditions result = pe.match(
+                new SourceData(termPosition.getCurrentSubterm().javaBlock().program(), -1, services),
                 matchCond);
+        return result;
     }
 }

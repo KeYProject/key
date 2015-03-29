@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.rule.match.vm;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher.TermNavigator;
 
 public class MatchUpdateSVInstruction extends Instruction<UpdateSV> {
 
@@ -12,9 +12,13 @@ public class MatchUpdateSVInstruction extends Instruction<UpdateSV> {
     }
 
     @Override
-    public MatchConditions match(Term p_updateCandidate, MatchConditions mc,
+    public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
             Services services) {
-        return op.match(p_updateCandidate, mc, services);
+        MatchConditions result = op.match(termPosition.getCurrentSubterm(), mc, services);
+        if (result != null) {
+            termPosition.gotoNextSibling();
+        }
+        return result;
     }
 
 }

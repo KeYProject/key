@@ -50,6 +50,7 @@ public final class VariableSV extends AbstractSV implements QuantifiableVariable
             Debug.out("Strange Exit of match in VariableSV. Check for bug");
             return null;
         }
+        
         final Term foundMapping 
         	= (Term)mc.getInstantiations().getInstantiation(this);
         if(foundMapping == null) {
