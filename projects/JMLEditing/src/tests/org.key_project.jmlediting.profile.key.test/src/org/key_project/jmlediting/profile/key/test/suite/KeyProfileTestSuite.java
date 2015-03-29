@@ -8,16 +8,20 @@ import org.key_project.jmlediting.profile.key.test.locset.KeyAccessibleTest;
 import org.key_project.jmlediting.profile.key.test.locset.LocSetExprTest;
 import org.key_project.jmlediting.profile.key.test.other.DynamicLogicPrimaryTest;
 import org.key_project.jmlediting.profile.key.test.other.ElemsTest;
+import org.key_project.jmlediting.profile.key.test.other.KeyBehaviorTest;
 import org.key_project.jmlediting.profile.key.test.other.KeyInvariantTest;
+import org.key_project.jmlediting.profile.key.test.other.OverridenKeywordTest;
 import org.key_project.jmlediting.profile.key.test.seq.IndexTest;
 import org.key_project.jmlediting.profile.key.test.seq.SeqExprTest;
+import org.key_project.jmlediting.profile.key.test.seq.SeqTest;
 import org.key_project.jmlediting.profile.key.test.spec_statement.SpecStatementsTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({ KeyAccessibleTest.class, LocSetExprTest.class,
-      KeyInvariantTest.class, SeqExprTest.class, IndexTest.class,
-      SeqExprTest.class, DynamicLogicPrimaryTest.class,
-      SpecStatementsTest.class, BSumProdTest.class, ElemsTest.class })
+      KeyInvariantTest.class, SeqExprTest.class, SeqTest.class,
+      IndexTest.class, SeqExprTest.class, DynamicLogicPrimaryTest.class,
+      SpecStatementsTest.class, BSumProdTest.class, ElemsTest.class,
+      KeyBehaviorTest.class, OverridenKeywordTest.class })
 public class KeyProfileTestSuite {
 
 }

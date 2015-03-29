@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ ASTSearchTest.class, ASTTraversalTest.class })
+@SuiteClasses({ ASTSearchTest.class, ASTTraversalTest.class, ASTNodeTest.class })
 public class DOMTestSuite {
 
 }
