@@ -69,7 +69,7 @@ public class TacletForTests {
             //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
             public RuleCollection getStandardRules() {
                 return new RuleCollection(
-                                RuleSourceFactory.fromBuiltInRule(ldtFile), 
+                                RuleSourceFactory.fromDefaultLocation(ldtFile), 
                                 ImmutableSLList.<BuiltInRule>nil());
             }
         };
