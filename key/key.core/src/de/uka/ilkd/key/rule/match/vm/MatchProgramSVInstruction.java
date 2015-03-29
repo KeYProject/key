@@ -14,7 +14,7 @@ public class MatchProgramSVInstruction extends Instruction<ProgramSV> {
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
             Services services) {
-        MatchConditions result = op.match(termPosition.getCurrentSubterm().op(), mc, services);
+        MatchConditions result = op.match(termPosition.getCurrentSubterm(), mc, services);
         if (result != null) {
             termPosition.gotoNextSibling();
         }
