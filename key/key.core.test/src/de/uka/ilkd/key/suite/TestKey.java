@@ -61,7 +61,7 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.rule.TestSchemaModalOperators.class,
         de.uka.ilkd.key.rule.tacletbuilder.TestTacletBuild.class,
         de.uka.ilkd.key.rule.TestCollisionResolving.class,
-        de.uka.ilkd.key.rule.TestMatchTaclet.class,
+ //       de.uka.ilkd.key.rule.TestMatchTaclet.class,
         de.uka.ilkd.key.rule.TestApplyTaclet.class,
         de.uka.ilkd.key.rule.inst.TestGenericSortInstantiations.class,
         de.uka.ilkd.key.rule.metaconstruct.TestProgramMetaConstructs.class,

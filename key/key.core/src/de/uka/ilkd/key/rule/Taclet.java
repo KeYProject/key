@@ -52,6 +52,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
@@ -261,7 +262,7 @@ public abstract class Taclet implements Rule, Named {
     }
     
     protected void createAndInitializeMatcher() {      
-        this.matcher = DefaultTacletMatcher.createTacletMatcher(this);
+        this.matcher = VMTacletMatcher.createVMTacletMatcher(this);//DefaultTacletMatcher.createTacletMatcher(this);
     }
 
     

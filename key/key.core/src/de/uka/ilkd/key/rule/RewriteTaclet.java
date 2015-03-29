@@ -155,7 +155,7 @@ public class RewriteTaclet extends FindTaclet {
      * @return true if top level updates shall be ignored 
      */
     @Override
-    protected boolean ignoreTopLevelUpdates() {
+    public boolean ignoreTopLevelUpdates() {
 	return false;
     }
     

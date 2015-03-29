@@ -56,7 +56,7 @@ public abstract class FindTaclet extends Taclet {
      * SuccTaclet but not for a RewriteTaclet
      * @return true if top level updates shall be ignored 
      */
-    protected abstract boolean ignoreTopLevelUpdates();
+    public abstract boolean ignoreTopLevelUpdates();
 
     
     /** creates a FindTaclet 

@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.logic.op.TermSV;
@@ -19,41 +20,41 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 public abstract class Instruction<OP extends Operator> implements
         IMatchInstruction<OP> {
 
-    public static Instruction<Operator> matchOp(Operator op) {
+    public static IMatchInstruction<Operator> matchOp(Operator op) {
         return new MatchOpIdentityInstr(op);
     }
 
-    public static Instruction<SortDependingFunction> matchSortDependingFunction(
+    public static IMatchInstruction<SortDependingFunction> matchSortDependingFunction(
             SortDependingFunction op) {
         return new MatchSortDependingFunctionInstr(op);
     }
 
-    public static Instruction<ModalOperatorSV> matchModalOperatorSV(
+    public static IMatchInstruction<ModalOperatorSV> matchModalOperatorSV(
             ModalOperatorSV sv) {
         return new MatchModalOperatorSVInstruction(sv);
     }
 
-    public static Instruction<FormulaSV> matchFormulaSV(FormulaSV sv) {
+    public static IMatchInstruction<FormulaSV> matchFormulaSV(FormulaSV sv) {
         return new MatchFormulaSVInstruction(sv);
     }
 
-    public static Instruction<TermSV> matchTermSV(TermSV sv) {
+    public static IMatchInstruction<TermSV> matchTermSV(TermSV sv) {
         return new MatchTermSVInstruction(sv);
     }
 
-    public static Instruction<VariableSV> matchVariableSV(VariableSV sv) {
+    public static IMatchInstruction<VariableSV> matchVariableSV(VariableSV sv) {
         return new MatchVariableSVInstr(sv);
     }
 
-    public static Instruction<ProgramSV> matchProgramSV(ProgramSV sv) {
+    public static IMatchInstruction<ProgramSV> matchProgramSV(ProgramSV sv) {
         return new MatchProgramSVInstruction(sv);
     }
 
-    public static Instruction<UpdateSV> matchUpdateSV(UpdateSV sv) {
+    public static IMatchInstruction<UpdateSV> matchUpdateSV(UpdateSV sv) {
         return new MatchUpdateSVInstruction(sv);
     }
 
-    public static Instruction<TermLabelSV> matchTermLabelSV(TermLabelSV sv) {
+    public static IMatchInstruction<TermLabelSV> matchTermLabelSV(TermLabelSV sv) {
         return new MatchTermLabelSVInstruction(sv);
     }
 
@@ -62,20 +63,22 @@ public abstract class Instruction<OP extends Operator> implements
         return new MatchProgramInstruction(prg);
     }
 
+    public static IMatchInstruction<SVSubstitute> matchAndBindVariables(
+            ImmutableArray<QuantifiableVariable> boundVars) {
+        return new BindVariables(boundVars);
+    }
+
+    public static IMatchInstruction<SVSubstitute> unbindVariables(
+            ImmutableArray<QuantifiableVariable> boundVars) {
+        return new UnbindVariables();
+    }
+
+
     protected final OP op;
 
     protected Instruction(OP op) {
         this.op = op;
     }
 
-    public static IMatchInstruction matchAndBindVariables(
-            ImmutableArray<QuantifiableVariable> boundVars) {
-        return null;
-    }
-
-    public static IMatchInstruction unbindVariables(
-            ImmutableArray<QuantifiableVariable> boundVars) {
-        return null;
-    }
 
 }

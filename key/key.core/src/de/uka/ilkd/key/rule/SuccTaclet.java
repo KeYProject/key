@@ -73,7 +73,7 @@ public class SuccTaclet extends FindTaclet{
      * @return true if top level updates shall be ignored 
      */
     @Override
-    protected boolean ignoreTopLevelUpdates() {
+    public boolean ignoreTopLevelUpdates() {
 	return ignoreTopLevelUpdates;
     }
 
