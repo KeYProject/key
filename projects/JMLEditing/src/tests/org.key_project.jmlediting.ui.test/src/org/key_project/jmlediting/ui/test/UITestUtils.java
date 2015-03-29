@@ -109,6 +109,14 @@ public class UITestUtils {
       bot.tree().getTreeItem("JML").expand().getNode("Profile").select();
    }
 
+   public static void openJMLProperties(final SWTWorkbenchBot bot,
+         final String projectName) {
+      openGlobalSettings(bot);
+      bot.sleep(500);
+      bot.tree().getTreeItem("JML").doubleClick();
+      bot.sleep(1000);
+   }
+
    public static void validateProfileListSelection(
          final IJMLProfile expectedProfile, final SWTBotTable profileList) {
       // Now the global default should be selected
