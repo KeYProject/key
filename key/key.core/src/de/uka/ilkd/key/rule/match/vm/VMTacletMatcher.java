@@ -13,6 +13,7 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -114,7 +115,7 @@ public class VMTacletMatcher implements TacletMatcher {
             program.add(Instruction.matchAndBindVariables(boundVars));
         }
 
-        if (!pattern.javaBlock().isEmpty()
+        if (pattern.javaBlock() != JavaBlock.EMPTY_JAVABLOCK
                 || patternPrg instanceof ContextStatementBlock) {
             program.add(Instruction.matchProgram(patternPrg));
         }
