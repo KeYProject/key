@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.experimental;
+package de.uka.ilkd.key.proof.runallproofs;
 
 import java.util.List;
 import java.util.Map;

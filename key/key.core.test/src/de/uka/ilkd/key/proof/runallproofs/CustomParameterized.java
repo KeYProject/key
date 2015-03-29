@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package de.uka.ilkd.key.experimental;
+package de.uka.ilkd.key.proof.runallproofs;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

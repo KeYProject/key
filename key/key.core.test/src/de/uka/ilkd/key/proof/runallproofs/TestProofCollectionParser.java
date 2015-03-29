@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.experimental;
+package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,13 +13,14 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
 import org.key_project.util.java.IOUtil;
 
-import de.uka.ilkd.key.proof.runallproofs.ProofCollectionLexer;
-import de.uka.ilkd.key.proof.runallproofs.ProofCollectionParser;
+import de.uka.ilkd.key.util.HelperClassForTests;
 
 class TestProofCollectionParser {
 
     public static void main(String[] args) throws IOException, RecognitionException {
-        String fileName = System.getenv("KEY_HOME") + "/key/key.core.test/src/de/uka/ilkd/key/experimental/automaticJAVADL.txt";
+        String fileName = HelperClassForTests.TESTCASE_DIRECTORY +
+              File.separator + "runallproofs" +
+              File.separator + "automaticJAVADL.txt";
         File file = new File(fileName);
         CharStream charStream = new ANTLRStringStream(IOUtil.readFrom(file));
         ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);

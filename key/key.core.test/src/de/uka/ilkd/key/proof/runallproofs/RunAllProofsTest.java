@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package de.uka.ilkd.key.experimental;
+package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,7 +28,7 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import de.uka.ilkd.key.experimental.CustomParameterized.CustomParameters;
+import de.uka.ilkd.key.proof.runallproofs.CustomParameterized.CustomParameters;
 
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
