@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.rule.match.legacy;
 
 import java.util.Iterator;
 
@@ -23,6 +23,14 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.IfMatchResult;
+import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.NotFreeIn;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletMatcher;
+import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.util.Pair;
 
 /** 
