@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -52,6 +54,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.match.legacy.DefaultTacletMatcher;
 import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -103,6 +106,12 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 public abstract class Taclet implements Rule, Named {
     
     private static final String AUTONAME = "_taclet";
+
+    private static final String TACLET_MACTHER_SELECTION = "taclet.match";
+    private static final String TACLET_MATCHER_SELECTION_VALUE=""+System.getProperties().get(TACLET_MACTHER_SELECTION);
+    static {
+        System.out.println(TACLET_MATCHER_SELECTION_VALUE);
+    }
 
     /** name of the taclet */
     private final Name name;
@@ -262,7 +271,14 @@ public abstract class Taclet implements Rule, Named {
     }
     
     protected void createAndInitializeMatcher() {      
-        this.matcher = VMTacletMatcher.createVMTacletMatcher(this);//DefaultTacletMatcher.createTacletMatcher(this);
+        if ("legacy".equals(TACLET_MATCHER_SELECTION_VALUE)) {
+            this.matcher = DefaultTacletMatcher.createTacletMatcher(this);
+        } else if ("vm".equals(TACLET_MATCHER_SELECTION_VALUE)) {
+            this.matcher = VMTacletMatcher.createVMTacletMatcher(this);
+        } else {
+            Logger.getLogger("de.uka.ilkd.key.rule.Taclet").log(Level.FINE, "Unknown or no matcher specified. Falling back to legacy");
+            this.matcher = DefaultTacletMatcher.createTacletMatcher(this);
+        }
     }
 
     

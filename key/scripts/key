@@ -111,7 +111,7 @@ list_help(){
 #
 
 
-keysysprops=""
+keysysprops="-Dtaclet.match=legacy"
 keyoptions=""
 
 #default values for Java Options Xmx and Xms
