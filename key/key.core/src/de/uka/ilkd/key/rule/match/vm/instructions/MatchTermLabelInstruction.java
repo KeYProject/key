@@ -7,8 +7,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher;
-import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher.TermNavigator;
+import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 public class MatchTermLabelInstruction implements IMatchInstruction {
 

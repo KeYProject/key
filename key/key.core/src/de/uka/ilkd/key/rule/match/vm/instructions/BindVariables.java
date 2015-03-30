@@ -7,8 +7,7 @@ import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher;
-import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher.TermNavigator;
+import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 public class BindVariables implements IMatchInstruction {
 

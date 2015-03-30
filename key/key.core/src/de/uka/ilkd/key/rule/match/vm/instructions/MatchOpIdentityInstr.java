@@ -3,8 +3,7 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher;
-import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher.TermNavigator;
+import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
 public class MatchOpIdentityInstr extends Instruction<Operator> {
 

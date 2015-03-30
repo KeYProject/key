@@ -20,7 +20,6 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher.TermNavigator;
 import de.uka.ilkd.key.rule.match.vm.instructions.IMatchInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.Instruction;
 
