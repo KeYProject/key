@@ -17,10 +17,13 @@
 	  <path refid="key.ui.class.path"/>
 	</path>
 
+	<condition property="taclet.match" value="${taclet.match}" else="legacy">
+                <isset property="taclet.match"/>
+        </condition>
 	  
 	<target name="start" depends="compile" description="Starts KeY.">
 		<java classname="de.uka.ilkd.key.core.Main"
-		      classpathref="key.ui.run.class.path" fork="true" jvmargs="-Xmx2048m -XX:MaxPermSize=256m -ea" />
+		      classpathref="key.ui.run.class.path" fork="true" jvmargs="-Xmx2048m -XX:MaxPermSize=256m -ea -Dtaclet.match=${taclet.match}" />
 	</target>
 
 	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">

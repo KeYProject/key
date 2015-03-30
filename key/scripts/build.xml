@@ -8,6 +8,10 @@
 		<isset property="env.KEY_VERSION"/>
 	</condition>
 
+	<condition property="taclet.match" value="${taclet.match}" else="legacy">
+		<isset property="taclet.match"/>
+	</condition>
+
 	 <!-- The following tasks are for KeY -->
 	<target name="start" depends="compileAll" description="Starts KeY.">
 		<ant antfile="${key.dir}/key.ui/build.xml" target="start" dir="${key.dir}/key.ui" inheritall="false"/>

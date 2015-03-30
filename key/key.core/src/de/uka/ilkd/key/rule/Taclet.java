@@ -109,9 +109,6 @@ public abstract class Taclet implements Rule, Named {
 
     private static final String TACLET_MACTHER_SELECTION = "taclet.match";
     private static final String TACLET_MATCHER_SELECTION_VALUE=""+System.getProperties().get(TACLET_MACTHER_SELECTION);
-    static {
-        System.out.println(TACLET_MATCHER_SELECTION_VALUE);
-    }
 
     /** name of the taclet */
     private final Name name;
