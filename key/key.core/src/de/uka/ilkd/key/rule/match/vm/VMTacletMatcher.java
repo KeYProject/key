@@ -3,7 +3,7 @@ package de.uka.ilkd.key.rule.match.vm;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Stack;
+import java.util.LinkedList;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -95,14 +94,6 @@ public class VMTacletMatcher implements TacletMatcher {
         }
     }
     
-    
-/*    public VMTacletMatcher(Term pattern) {
-        ArrayList<IMatchInstruction<?>> prgList = new ArrayList<>();
-        createProgram(pattern, prgList);
-        program = new IMatchInstruction[prgList.size()];
-        prgList.toArray(program);
-    } */
-    
     private void createProgram(Term pattern, ArrayList<IMatchInstruction> program) {
         final Operator op = pattern.op();
 
@@ -173,11 +164,9 @@ public class VMTacletMatcher implements TacletMatcher {
             Services services) {
 
         MatchConditions mc = p_matchCond;
-        int instrPtr = 0;
         
         final TermNavigator navi = new TermNavigator(p_toMatch);
-        
-
+        int instrPtr = 0;
         while (mc != null && instrPtr < p_program.length && navi.hasNext()) {
             mc = p_program[instrPtr].match(navi, mc, services);
             instrPtr++;
@@ -210,33 +199,31 @@ public class VMTacletMatcher implements TacletMatcher {
         
         outer: for (IfFormulaInstantiation cf: p_toMatch) {
             Term formula = cf.getConstrainedFormula().formula();
-            ImmutableList<UpdateLabelPair> curContext = context;
             if (updateContextPresent) {                 
-                for (int i = 0; i<context.size(); i++) {
+                ImmutableList<UpdateLabelPair> curContext = context;
+                for (int i = 0, size = context.size(); i<size; i++) {
                     if (formula.op() instanceof UpdateApplication) {
-                        Term update = UpdateApplication.getUpdate(formula);
-                        formula = UpdateApplication.getTarget(formula); 
-                        ImmutableArray<TermLabel> updateLabel = update.getLabels();
-                        UpdateLabelPair ulp = curContext.head();
-                        curContext = curContext.tail();
-                        if (!ulp.getUpdate().equalsModRenaming(update) ||
-                                !ulp.getUpdateApplicationlabels().equals(updateLabel)) {
-                            continue outer;
-                        }
-                    } else {
-                        continue outer;
-                    }
+                        final Term update = UpdateApplication.getUpdate(formula);
+                        final UpdateLabelPair ulp = curContext.head();
+                        if (ulp.getUpdate().equalsModRenaming(update) &&
+                                ulp.getUpdateApplicationlabels().equals(update.getLabels())) {  
+                            curContext = curContext.tail();
+                            formula = UpdateApplication.getTarget(formula);
+                            continue;
+                        } 
+                    } 
+                    continue outer;
                 }
             }
-            
+
             final MatchConditions newMC = 
-            checkConditions(match(formula, prg, p_matchCond, p_services), p_services);
+                    checkConditions(match(formula, prg, p_matchCond, p_services), p_services);
+            
             if (newMC != null) {
                 resFormulas = resFormulas.prepend(cf);
                 resMC       = resMC.prepend(newMC);
             }
         }
-
         return new IfMatchResult ( resFormulas, resMC );
     }
 
@@ -421,7 +408,7 @@ public class VMTacletMatcher implements TacletMatcher {
          * the second component is less than the arity of the term in the 
          * first component
          */
-        private final Stack<MutablePair<Term,Integer>> stack = new Stack<>();
+        private final LinkedList<MutablePair<Term,Integer>> stack = new LinkedList<>();
         
         public TermNavigator(Term term) {
             stack.push(new MutablePair<Term,Integer>(term, 0));
