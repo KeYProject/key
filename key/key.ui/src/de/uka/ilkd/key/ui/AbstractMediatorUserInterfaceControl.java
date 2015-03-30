@@ -172,7 +172,11 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
             saveSideProof(sideProof);
             // make everyone listen to the proof remove
             getMediator().startInterface(true);
-            getMediator().getSelectionModel().setSelectedGoal(initiatingInfo.getGoals().head());
+            if (initiatingProof.closed()) {
+                getMediator().getSelectionModel().setSelectedNode(initiatingProof.root());
+            } else {
+                getMediator().getSelectionModel().setSelectedGoal(initiatingProof.openGoals().head());            
+            }
             // go into automode again
             getMediator().stopInterface(true);
          }
