@@ -182,14 +182,14 @@ public class Statistics {
         final long time = sideProofs ? stat.autoModeTimeInNano : proof.getAutoModeTime();
         
         summaryList.add(new Pair<String, String>("Automode time",
-                        EnhancedStringBuffer.formatTime(time).toString()));
-        if (time >= 10000) {
+                        EnhancedStringBuffer.formatTime(time/1000000).toString()));
+        if (time >= 10000000000L) {
             summaryList.add(new Pair<String, String>("Automode time", "" +
-                            time +
+                            (time/1000000) +
                             "ms"));
         }
         if (stat.nodes > 0) {
-            String avgTime = "" + stat.timePerStepInNano;
+            String avgTime = "" + (stat.timePerStepInNano/1000000);
             // round to 3 digits after point
             int i = avgTime.indexOf('.')+4;
             if (i > avgTime.length()) i = avgTime.length();
