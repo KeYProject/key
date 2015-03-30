@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Shell;
  * @author Moritz Lichter
  *
  */
+@SuppressWarnings("restriction")
 public final class RebuildHelper {
 
    /**

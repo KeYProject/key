@@ -5,8 +5,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jdt.internal.ui.preferences.PropertyAndPreferencePage;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.swt.SWT;
@@ -14,7 +12,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.key_project.jmlediting.ui.Activator;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper.ColorProperty;
 

@@ -56,8 +56,7 @@ public class ParserTestUtils {
    private static void testRecovery(final String text,
          final ParseFunction parser, final Object expectedErrorNode) {
       try {
-         final IASTNode node = ParserBuilder.requireComplete(parser).parse(
-               text, 0, text.length());
+         ParserBuilder.requireComplete(parser).parse(text, 0, text.length());
          fail("Parser was able to parse");
       }
       catch (final ParserException e) {

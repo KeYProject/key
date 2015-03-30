@@ -103,9 +103,6 @@ public class SpecificationStatementParserTest {
 
       final IASTNode keywordNode = statement.getChildren().get(0).getChildren()
             .get(0);
-      final IASTNode keywordContentNode = statement.getChildren().get(0)
-            .getChildren().get(1);
-      final IASTNode contentNode = keywordContentNode.getChildren().get(0);
 
       assertTrue("Keyword node is not keyword", Nodes.isKeyword(keywordNode));
 

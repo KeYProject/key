@@ -49,10 +49,6 @@ public class BasicDerivedProfileTest {
    private static final IKeyword derivedKeyword1 = new SimpleKeyword("Derived1");
    private static final IKeyword derivedKeyword2 = new SimpleKeyword("Derived2");
 
-   private static final Object key = new Object();
-   private static final Object baseValue = new Object();
-   private static final Object derivedValue = new Object();
-
    private static final class BaseProfile extends AbstractJMLProfile {
 
       public BaseProfile() {

@@ -37,7 +37,7 @@ import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
  * @author Thomas Glaser
  */
 public class JMLCompletionProposalComputer implements
-IJavaCompletionProposalComputer {
+      IJavaCompletionProposalComputer {
 
    /**
     * lazy loading of the KeY Image to display in Keyword-Proposals.
@@ -55,7 +55,7 @@ IJavaCompletionProposalComputer {
       try {
          return new Image(Display.getCurrent(), new ImageLoader().load(new URL(
                "platform:/plugin/org.key_project.jmlediting.ui/icons/jml.png")
-         .openStream())[0]);
+               .openStream())[0]);
       }
       catch (final IOException ioe) {
          return null;
@@ -200,7 +200,7 @@ IJavaCompletionProposalComputer {
 
    /**
     * Checks whether a given caret is on a given Keywords Content.
-    * 
+    *
     * @param keywordApplNode
     *           the KeywordNode
     * @param caret

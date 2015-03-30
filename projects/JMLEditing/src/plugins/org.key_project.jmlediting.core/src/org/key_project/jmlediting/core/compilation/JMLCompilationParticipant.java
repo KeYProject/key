@@ -212,6 +212,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
    private JMLValidationEngine prepareValidation(final CompilationUnit jdtAST,
          final List<CommentRange> jmlComments, final IJMLParser jmlParser,
          final IResource res, final String src) {
+      @SuppressWarnings("unchecked")
       final List<Comment> commentList = jdtAST.getCommentList();
       final Map<Comment, ASTNode> inverse = new HashMap<Comment, ASTNode>();
       final Map<Comment, ASTNode> inverseTrailing = new HashMap<Comment, ASTNode>();

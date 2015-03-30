@@ -71,4 +71,8 @@ public class JMLValidationEngine {
       }
       return errors;
    }
+
+   public IJMLProfile getActiveProfile() {
+      return this.activeProfile;
+   }
 }
