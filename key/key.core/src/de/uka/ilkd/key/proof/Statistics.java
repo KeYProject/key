@@ -50,7 +50,7 @@ public class Statistics {
                        int operationContractApps,
                        int loopInvApps,
                        long autoModeTime,
-                       long time,
+                       long timeInNano,
                        float timePerStep) {
         this.nodes = nodes;
         this.branches = branches;
@@ -63,7 +63,7 @@ public class Statistics {
         this.operationContractApps = operationContractApps;
         this.loopInvApps = loopInvApps;
         this.autoModeTime = autoModeTime;
-        this.time = time;
+        this.time = time/1000000;
         this.timePerStep = timePerStep;
     }
 
@@ -79,7 +79,7 @@ public class Statistics {
                                   side.operationContractApps,
                                   side.loopInvApps,
                                   side.autoModeTime,
-                                  System.currentTimeMillis() - creationTime,
+                                  System.nanoTime() - creationTime,
                                   side.timePerStep);
     }
 
@@ -150,7 +150,7 @@ public class Statistics {
         this.operationContractApps = tmpContr;
         this.loopInvApps = tmpInv;
         this.autoModeTime = proof.getAutoModeTime();
-        this.time = System.currentTimeMillis() - proof.creationTime;
+        this.time = (System.nanoTime() - proof.creationTime)/1000000;
         timePerStep = nodes<=1? .0f: (autoModeTime/(float)(nodes-1));
 
         generateSummary(proof);
