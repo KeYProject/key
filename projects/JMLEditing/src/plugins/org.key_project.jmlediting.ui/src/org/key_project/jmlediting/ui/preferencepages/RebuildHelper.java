@@ -4,10 +4,10 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.jdt.internal.ui.util.CoreUtility;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.key_project.util.jdt.JDTUtil;
 
 /**
  * Helper class to trigger rebuilds on projects.
@@ -118,11 +118,11 @@ public final class RebuildHelper {
       updater.run();
       if (doBuild) {
          if (affectedProjects == null) {
-            CoreUtility.getBuildJob(null).schedule();
+            JDTUtil.buildInBackground((IProject)null);
          }
          else {
             for (final IProject project : affectedProjects) {
-               CoreUtility.getBuildJob(project).schedule();
+               JDTUtil.buildInBackground(project);
             }
          }
       }
