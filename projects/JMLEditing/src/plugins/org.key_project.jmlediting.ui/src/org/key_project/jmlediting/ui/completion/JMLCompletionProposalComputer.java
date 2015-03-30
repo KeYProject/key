@@ -1,7 +1,5 @@
 package org.key_project.jmlediting.ui.completion;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,8 +12,6 @@ import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageLoader;
-import org.eclipse.swt.widgets.Display;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IKeywordNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
@@ -29,6 +25,7 @@ import org.key_project.jmlediting.core.profile.syntax.IKeywordAutoProposer;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
+import org.key_project.jmlediting.ui.util.JMLEditingImages;
 
 /**
  * An {@link IJavaCompletionProposalComputer} to support JML.
@@ -40,26 +37,11 @@ public class JMLCompletionProposalComputer implements
 IJavaCompletionProposalComputer {
 
    /**
-    * lazy loading of the KeY Image to display in Keyword-Proposals.
-    */
-   private static Image img = null;
-
-   /**
     *
     * @return the KeY-Image for the Keyword-Proposals
     */
    public static Image getJMLImg() {
-      if (img != null) {
-         return img;
-      }
-      try {
-         return new Image(Display.getCurrent(), new ImageLoader().load(new URL(
-               "platform:/plugin/org.key_project.jmlediting.ui/icons/jml.png")
-         .openStream())[0]);
-      }
-      catch (final IOException ioe) {
-         return null;
-      }
+      return JMLEditingImages.getImage(JMLEditingImages.JML_LOGO);
    }
 
    @Override
