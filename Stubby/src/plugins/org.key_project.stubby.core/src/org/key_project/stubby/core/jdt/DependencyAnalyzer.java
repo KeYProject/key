@@ -218,12 +218,17 @@ public class DependencyAnalyzer extends ASTVisitor {
          genericType.setName(typeBinding.getJavaElement().getElementName());
          genericType.setSource(typeBinding.isFromSource());
          ITypeBinding baseType = typeBinding.getTypeDeclaration();
-         if(baseType != null){
-         genericType.setBaseType(ensureTypeExists(containerType, baseType));
+         AbstractType baseTypeInstance = null;
+         if (baseType != null) {
+            baseTypeInstance = ensureTypeExists(containerType, baseType);
+            genericType.setBaseType(baseTypeInstance);
          }
          ITypeBinding[] arguments = typeBinding.getTypeArguments();
          for (ITypeBinding argument : arguments) {
-            AbstractType argumentType = ensureTypeExists(containerType, argument);
+            AbstractType argumentType = ensureTypeExists(containerType != null ? 
+                                                         containerType : // In case of extends/implements the container type is known and needs to be used
+                                                         (ITypeVariableContainer) baseTypeInstance, // In case of the type declaration itself the containerType is null
+                                                         argument);
             genericType.getTypeArguments().add(argumentType);
          }
          types.put(typeName, genericType);
@@ -497,7 +502,7 @@ public class DependencyAnalyzer extends ASTVisitor {
    protected void ensureFieldExists(IVariableBinding variableBinding) {
       ITypeBinding typeBinding = variableBinding.getDeclaringClass();
       if (typeBinding != null) { // In case of local variables the type binding is null
-         AbstractType type = ensureTypeExists((Type)null, variableBinding.getDeclaringClass());
+         AbstractType type = ensureTypeExists((Type)null, typeBinding);
          type = findBaseType(type);
          if (type instanceof Type) { // Nothing needs to be done if Type is not available
             if (!containsField((Type) type, variableBinding.getName())) {

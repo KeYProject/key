@@ -83,6 +83,13 @@ public class StubGeneratorUtilTest extends TestCase {
    }
 
    @Test
+   public void testExtractReferences_LRUCache() throws Exception{
+      doDependencyModelTest("JDTUtilTest_testExtractReferences_LRUCache", 
+                            "data/LRUCache/test",
+                            "data/LRUCache/oracle/Dependencymodel.dependencymodel");
+   }
+
+   @Test
    public void testExtractReferences_wildcardTest() throws Exception{
       doDependencyModelTest("JDTUtilTest_testExtractReferences_wildcardTest", 
                             "data/wildcardTest/test",
