@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <equivalenceClass representativeTerm="null">
+      <term term="obj"/>
+      <term term="null"/>
+   </equivalenceClass>
+   <state name="return obj.x;">
+      <value name="obj" programVariable="obj" isArrayIndex="false" value="null" type="Null" condition="true"/>
+      <value name="exc" programVariable="exc" isArrayIndex="false" value="null" type="Null" condition="true"/>
+   </state>
+</model>

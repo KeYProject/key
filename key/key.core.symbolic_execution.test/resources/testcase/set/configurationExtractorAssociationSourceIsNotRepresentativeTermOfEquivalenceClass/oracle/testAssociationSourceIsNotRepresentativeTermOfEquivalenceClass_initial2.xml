@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <equivalenceClass representativeTerm="current">
+      <term term="current"/>
+      <term term="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right)"/>
+   </equivalenceClass>
+   <equivalenceClass representativeTerm="null">
+      <term term="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$parent)"/>
+      <term term="null"/>
+   </equivalenceClass>
+   <state name="One Step Simplification resulting in return current;">
+      <value name="exc" programVariable="exc" isArrayIndex="false" value="exc" type="java.lang.Throwable" condition="true"/>
+      <association name="current" programVariable="current" isArrayIndex="false" target="o1" condition="true"/>
+      <association name="self" programVariable="self" isArrayIndex="false" target="o3" condition="true"/>
+   </state>
+   <object xml:id="o1" name="current" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
+      <value name="parent" programVariable="parent" isArrayIndex="false" value="null" type="Null" condition="true"/>
+      <association name="right" programVariable="right" isArrayIndex="false" target="o1" condition="true"/>
+      <association name="left" programVariable="left" isArrayIndex="false" target="o2" condition="true"/>
+   </object>
+   <object xml:id="o2" name="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$left)" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
+   </object>
+   <object xml:id="o3" name="self" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass">
+   </object>
+</model>

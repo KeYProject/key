@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
+  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Cloneable" kind="INTERFACE" package="java.lang" simpleName="Cloneable"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Comparable" kind="INTERFACE" package="java.lang" simpleName="Comparable">
+    <typeVariables name="T" type="//@types.0"/>
+  </types>
+  <types xsi:type="dependencymodel:GenericType" name="Comparable" baseType="//@types.3" typeArguments="//@types.5"/>
+  <types xsi:type="dependencymodel:Type" name="java.util.Date" extends="//@types.0" implements="//@types.1 //@types.2 //@types.4" package="java.util" simpleName="Date"/>
+  <types xsi:type="dependencymodel:Type" name="java.util.Iterator" kind="INTERFACE" package="java.util" simpleName="Iterator">
+    <typeVariables name="E" type="//@types.0"/>
+  </types>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Iterable" kind="INTERFACE" package="java.lang" simpleName="Iterable">
+    <typeVariables name="T" type="//@types.0"/>
+  </types>
+  <types xsi:type="dependencymodel:GenericType" name="Comparable" baseType="//@types.3" typeArguments="//@types.10"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.CharSequence" kind="INTERFACE" package="java.lang" simpleName="CharSequence"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.String" final="true" extends="//@types.0" implements="//@types.1 //@types.8 //@types.9" package="java.lang" simpleName="String"/>
+  <types xsi:type="dependencymodel:GenericType" name="Iterable" baseType="//@types.7" typeArguments="//@types.10"/>
+  <types xsi:type="dependencymodel:Type" name="SimpleGenericTest" source="true" extends="//@types.0" implements="//@types.11" package="" simpleName="SimpleGenericTest">
+    <typeVariables name="T" type="//@types.5"/>
+    <methods name="iterator" returnType="//@types.15"/>
+  </types>
+  <types xsi:type="dependencymodel:Type" name="java.lang.annotation.Annotation" kind="INTERFACE" package="java.lang.annotation" simpleName="Annotation"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Override" kind="INTERFACE" extends="//@types.13" package="java.lang" simpleName="Override"/>
+  <types xsi:type="dependencymodel:GenericType" name="Iterator" baseType="//@types.6" typeArguments="//@types.10"/>
+</dependencymodel:DependencyModel>

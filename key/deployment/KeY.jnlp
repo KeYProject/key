@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- JNLP file for KeY -->
+<jnlp spec="1.0+" codebase="http://i12www.iti.kit.edu/~bubel/nightly/webstart/" href="KeY.jnlp">
+<information> 
+<title>KeY 2.5 Nightly Build</title>
+<vendor>KeY Project, Karlsruhe Institute of Technology, Chalmers
+University, TU Darmstadt</vendor> 
+<homepage href="http://www.key-project.org"/> 
+<description>
+  The KeY tool.
+</description> 
+<icon href="http://www.key-project.org/keylogo.gif"/> 
+<offline-allowed/> 
+</information> 
+<security> 
+<all-permissions/> 
+</security> 
+<resources> 
+<!-- Windows 32-bit -->
+<j2se version="1.7+" initial-heap-size="128m" max-heap-size="1024m" os="Windows" arch="x86"/>
+<j2se version="1.7+" initial-heap-size="128m" max-heap-size="1024m" os="Windows" arch="i386"/>
+<!-- Default -->
+<j2se version="1.7+" initial-heap-size="128m" max-heap-size="2048m"/>
+
+<jar href="components/key.ui.jar" /> 
+<jar href="components/key.core.testgen.jar" /> 
+<jar href="components/key.core.jar" /> 
+<jar href="components/key.util.jar" /> 
+<jar href="libs/antlr.jar" /> 
+<jar href="libs/recoderKey.jar" /> 
+</resources> 
+
+<application-desc main-class="de.uka.ilkd.key.core.WebstartMain"/> 
+</jnlp> 

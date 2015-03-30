@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <state name="One Step Simplification resulting in return obj.x;">
+      <value name="exc" programVariable="exc" isArrayIndex="false" value="exc" type="java.lang.Throwable" condition="true"/>
+      <association name="obj" programVariable="obj" isArrayIndex="false" target="o1" condition="true"/>
+   </state>
+   <object xml:id="o1" name="obj" type="EmptyPathConditionAndNoUpdates">
+   </object>
+</model>

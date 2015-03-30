@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
+  <types xsi:type="dependencymodel:Type" name="SimpleGenericMethodArgument" source="true" extends="//@types.1" package="" simpleName="SimpleGenericMethodArgument">
+    <methods name="magic" static="true" returnType="//@types.2/@methods.0/@typeVariables.1" parameterTypes="//@types.2/@methods.0/@typeVariables.0">
+      <typeVariables name="T" type="//@types.0"/>
+      <typeVariables name="X" type="//@types.1"/>
+    </methods>
+  </types>
+</dependencymodel:DependencyModel>

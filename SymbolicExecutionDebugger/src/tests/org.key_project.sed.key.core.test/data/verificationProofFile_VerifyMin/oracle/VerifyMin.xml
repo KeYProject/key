@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_d004845d-028a-430f-a294-ee11e42322b9" name="VerifyMin[VerifyMin::min(int,int)].JML normal_behavior operation contract.0" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_bb7b74e8-66d2-435b-8ed2-c2dda32ccc19" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+         <sedMethodCall xml:id="_f34686e7-4773-41a3-9c1d-dfa9b1880442" name="&lt;call VerifyMin.min(_x,_y)&gt;" pathCondition="true" lineNumber="-1" charStart="202" charEnd="205" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java" groupable="true">
+            <sedBranchStatement xml:id="_e50c0320-5a95-42f7-a240-53ad500237f1" name="if (_x&lt;_y)" pathCondition="true" lineNumber="-1" charStart="229" charEnd="240" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java" groupable="true">
+               <sedBranchCondition xml:id="_9e3cf449-b411-4dd4-b168-121463c5d491" name="gt(y,x)" pathCondition="gt(y,x)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+                  <sedStatement xml:id="_e5c31d46-b2e1-4fb6-8df7-3cb7d564adf7" name="return _x;" pathCondition="gt(y,x)" lineNumber="-1" charStart="252" charEnd="261" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+                     <sedMethodReturn xml:id="_f082cb2d-3c3f-4250-ab13-5265831def86" name="&lt;return of min&gt;" pathCondition="gt(y,x)" lineNumber="-1" charStart="202" charEnd="205" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java" methodReturnConditionRef="_4bcbae4b-0b65-4a7c-958b-e54d4fc093ce">
+                        <sedCallStateVariable xml:id="_02a607c4-78d8-4f1a-a605-5c89f28b22fe" name="_x" referenceTypeName="int">
+                           <sedValue xml:id="_ce197b1e-c67e-4752-af6f-7621e6d9690b" referenceTypeName="int" valueString="x" allocated="true" multiValued="false">
+                           </sedValue>
+                        </sedCallStateVariable>
+                        <sedCallStateVariable xml:id="_4d0e6bd8-8b97-4987-86dd-1de2029aaaef" name="_y" referenceTypeName="int">
+                           <sedValue xml:id="_1504ef13-25d5-4d6f-a80d-e7806f90cdf5" referenceTypeName="int" valueString="y" allocated="true" multiValued="false">
+                           </sedValue>
+                        </sedCallStateVariable>
+                        <sedCallStateVariable xml:id="_36e3a775-2d5f-4bc0-9e91-564666389009" name="heapAtPre" referenceTypeName="Heap">
+                           <sedValue xml:id="_a01266a7-4c84-4ef6-a1e9-b4306a90fc6c" referenceTypeName="Heap" valueString="heap" allocated="true" multiValued="false">
+                           </sedValue>
+                        </sedCallStateVariable>
+                        <sedCallStateVariable xml:id="_9f0969aa-b46e-491a-8417-87ce1d88394a" name="exc" referenceTypeName="Null">
+                           <sedValue xml:id="_c42529d3-23f4-4c9b-9376-2ee4bab82a0a" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                           </sedValue>
+                        </sedCallStateVariable>
+                        <sedCallStateVariable xml:id="_e5122651-fb2b-4f10-b0fd-d99449aaf6f0" name="heapBefore_min" referenceTypeName="Heap">
+                           <sedValue xml:id="_b708dfaf-f105-452b-a5d5-3420e2574f75" referenceTypeName="Heap" valueString="heap" allocated="true" multiValued="false">
+                           </sedValue>
+                        </sedCallStateVariable>
+                        <sedCallStateVariable xml:id="_ceed22da-8b73-4174-bddb-7319526a8c27" name="savedHeapBefore_min" referenceTypeName="Heap">
+                           <sedValue xml:id="_84e65e25-8b18-4205-a25b-7f6b73be8dfe" referenceTypeName="Heap" valueString="savedHeap" allocated="true" multiValued="false">
+                           </sedValue>
+                        </sedCallStateVariable>
+                        <sedTermination xml:id="_93b9d61b-eced-44f9-ac27-9e3203436a6e" name="&lt;end&gt;" pathCondition="gt(y,x)" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
+                        </sedTermination>
+                        <sedGroupEndConditionReference nodeIdRef="_4bcbae4b-0b65-4a7c-958b-e54d4fc093ce"/>
+                     </sedMethodReturn>
+                     <sedGroupEndConditionReference nodeIdRef="_b47e296d-ef8b-4457-a2c1-40a95688ca9a"/>
+                  </sedStatement>
+               </sedBranchCondition>
+               <sedBranchCondition xml:id="_da136682-076b-4b37-84be-8ee0fd1bf511" name="leq(y,x)" pathCondition="leq(y,x)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+                  <sedStatement xml:id="_3e9daef9-cc56-4aa7-8491-06de571171fd" name="return _y;" pathCondition="leq(y,x)" lineNumber="-1" charStart="295" charEnd="304" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+                     <sedMethodReturn xml:id="_dd1d5beb-4216-406a-a137-5ddf9fa4076a" name="&lt;return of min&gt;" pathCondition="leq(y,x)" lineNumber="-1" charStart="202" charEnd="205" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java" methodReturnConditionRef="_809cdea4-2b39-4ac2-a2c8-3874e6895b55">
+                        <sedCallStateVariable xml:id="_98794270-7bfb-49c0-8354-79d6d5ef3f30" name="_x" referenceTypeName="int">
+                           <sedValue xml:id="_2357706c-3a38-45fc-a6fe-7e39b135d360" referenceTypeName="int" valueString="x" allocated="true" multiValued="false">
+                           </sedValue>
+                        </sedCallStateVariable>
+                        <sedCallStateVariable xml:id="_3590b4fc-6581-4c0a-b350-682afecb3c8f" name="_y" referenceTypeName="int">
+                           <sedValue xml:id="_857e9403-89b0-4715-9ea3-079283c365ec" referenceTypeName="int" valueString="y" allocated="true" multiValued="false">
+                           </sedValue>
+                        </sedCallStateVariable>
+                        <sedCallStateVariable xml:id="_3a277c88-7006-4c43-ad6c-7cd55240c8aa" name="heapAtPre" referenceTypeName="Heap">
+                           <sedValue xml:id="_ee6b8f16-9193-431e-b1b3-92c2167dfa24" referenceTypeName="Heap" valueString="heap" allocated="true" multiValued="false">
+                           </sedValue>
+                        </sedCallStateVariable>
+                        <sedCallStateVariable xml:id="_cbf95e74-1653-4d49-8bf5-51a5553ddc46" name="exc" referenceTypeName="Null">
+                           <sedValue xml:id="_dcb7ed91-60f1-4fbf-ac94-a325369a7549" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                           </sedValue>
+                        </sedCallStateVariable>
+                        <sedCallStateVariable xml:id="_b42452b8-98ab-482c-8dbe-5d59617ef859" name="heapBefore_min" referenceTypeName="Heap">
+                           <sedValue xml:id="_b5b73f9c-3adc-4fb0-b7c3-a48b2c71e900" referenceTypeName="Heap" valueString="heap" allocated="true" multiValued="false">
+                           </sedValue>
+                        </sedCallStateVariable>
+                        <sedCallStateVariable xml:id="_1ed92542-b5ea-4b22-93b8-39ceac0d3c93" name="savedHeapBefore_min" referenceTypeName="Heap">
+                           <sedValue xml:id="_61fff754-a8b5-45c6-b11e-90a753e6ef25" referenceTypeName="Heap" valueString="savedHeap" allocated="true" multiValued="false">
+                           </sedValue>
+                        </sedCallStateVariable>
+                        <sedTermination xml:id="_8aabca3f-5549-4e20-aea6-5d29f3168e79" name="&lt;end&gt;" pathCondition="leq(y,x)" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
+                        </sedTermination>
+                        <sedGroupEndConditionReference nodeIdRef="_809cdea4-2b39-4ac2-a2c8-3874e6895b55"/>
+                     </sedMethodReturn>
+                     <sedGroupEndConditionReference nodeIdRef="_9c8c8a11-8b3a-4712-89e2-77c04af048ce"/>
+                  </sedStatement>
+               </sedBranchCondition>
+               <sedGroupEndCondition xml:id="_b47e296d-ef8b-4457-a2c1-40a95688ca9a" name="gt(y,x)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+                  <sedChildReference nodeIdRef="_e5c31d46-b2e1-4fb6-8df7-3cb7d564adf7"/>
+               </sedGroupEndCondition>
+               <sedGroupEndCondition xml:id="_9c8c8a11-8b3a-4712-89e2-77c04af048ce" name="leq(y,x)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+                  <sedChildReference nodeIdRef="_3e9daef9-cc56-4aa7-8491-06de571171fd"/>
+               </sedGroupEndCondition>
+            </sedBranchStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_4bcbae4b-0b65-4a7c-958b-e54d4fc093ce" name="gt(y,x)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+               <sedChildReference nodeIdRef="_f082cb2d-3c3f-4250-ab13-5265831def86"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedMethodCallMethodReturnCondition xml:id="_809cdea4-2b39-4ac2-a2c8-3874e6895b55" name="leq(y,x)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+               <sedChildReference nodeIdRef="_dd1d5beb-4216-406a-a137-5ddf9fa4076a"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndCondition xml:id="_4bcbae4b-0b65-4a7c-958b-e54d4fc093ce" name="gt(y,x)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+               <sedChildReference nodeIdRef="_f082cb2d-3c3f-4250-ab13-5265831def86"/>
+            </sedGroupEndCondition>
+            <sedGroupEndCondition xml:id="_809cdea4-2b39-4ac2-a2c8-3874e6895b55" name="leq(y,x)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+               <sedChildReference nodeIdRef="_dd1d5beb-4216-406a-a137-5ddf9fa4076a"/>
+            </sedGroupEndCondition>
+         </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_93b9d61b-eced-44f9-ac27-9e3203436a6e"/>
+         <sedTerminationEntry nodeIdRef="_8aabca3f-5549-4e20-aea6-5d29f3168e79"/>
+      </sedThread>
+   </sedTarget>
+</launch>

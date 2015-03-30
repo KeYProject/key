@@ -1,0 +1,546 @@
+\profile "Java Profile for Symbolic Execution";
+
+\settings {
+"#Proof-Settings-Config-File
+#Wed Feb 04 11:29:17 CET 2015
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_INSTANTIATE
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_EXPAND
+[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_RESTRICTED
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=1000
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=Strings-Strings\\:on , reach-reach\\:on , JavaCard-JavaCard\\:off , assertions-assertions\\:on , bigint-bigint\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , modelFields-modelFields\\:showSatisfiability , initialisation-initialisation\\:disableStaticInitialisation , sequences-sequences\\:on , runtimeExceptions-runtimeExceptions\\:allow , integerSimplificationRules-integerSimplificationRules\\:full , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , moreSeqRules-moreSeqRules\\:off
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]invariantForall=false
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=Symbolic Execution Strategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\javaSource "";
+
+\proofObligation "#Proof Obligation Settings
+#Wed Feb 04 11:29:17 CET 2015
+name=main(Figure2Param.A, Figure2Param.A, Figure2Param.B, Figure2Param.A, Figure2Param.B)
+addSymbolicExecutionLabel=true
+addUninterpretedPredicate=true
+class=de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO
+method=Figure2Param\\#main(Figure2Param.A, Figure2Param.A, Figure2Param.B, Figure2Param.A, Figure2Param.B)
+";
+
+\proof {
+(keyLog "0" (keyUser "Martin" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+
+(autoModeTime "1000")
+
+(branch "dummy ID"
+(builtin "One Step Simplification" (formula "1") (newnames "heapAtPre"))
+(rule "impRight" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "2"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "3"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "4"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "5"))
+(rule "notLeft" (formula "2"))
+(rule "assignment" (formula "10"))
+(rule "methodBodyExpand" (formula "10") (term "1") (newnames "heapBefore_main,savedHeapBefore_main"))
+(builtin "One Step Simplification" (formula "10"))
+(rule "instanceCreationAssignment" (formula "10") (term "1") (inst "#v0=a"))
+(rule "variableDeclarationAssign" (formula "10") (term "1"))
+(rule "variableDeclaration" (formula "10") (term "1") (newnames "a"))
+(rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "10") (term "1") (inst "#v0=a_1"))
+(rule "variableDeclaration" (formula "10") (term "1") (newnames "a_1"))
+(rule "methodBodyExpand" (formula "10") (term "1") (newnames "heapBefore_<createObject>,savedHeapBefore_<createObject>"))
+(builtin "One Step Simplification" (formula "10"))
+(rule "variableDeclaration" (formula "10") (term "1") (newnames "__NEW__"))
+(rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "10") (term "1") (inst "#v0=a_2"))
+(rule "variableDeclaration" (formula "10") (term "1") (newnames "a_2"))
+(rule "allocateInstance" (formula "10"))
+(builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "2")))
+(builtin "One Step Simplification" (formula "11"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "notLeft" (formula "2"))
+(rule "notLeft" (formula "1"))
+(rule "blockEmpty" (formula "13") (term "1"))
+(rule "assignment" (formula "13") (term "1"))
+(builtin "One Step Simplification" (formula "13"))
+(rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_<create>,savedHeapBefore_<create>"))
+(builtin "One Step Simplification" (formula "13"))
+(rule "assignment_write_attribute_this" (formula "13") (term "1"))
+(builtin "One Step Simplification" (formula "13"))
+(rule "methodCallWithinClass" (formula "13") (term "1"))
+(rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_<prepareEnter>,savedHeapBefore_<prepareEnter>"))
+(builtin "One Step Simplification" (formula "13"))
+(rule "methodCallSuper" (formula "13") (term "1"))
+(rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_<prepare>,savedHeapBefore_<prepare>"))
+(builtin "One Step Simplification" (formula "13"))
+(rule "methodCallEmpty" (formula "13") (term "1"))
+(rule "blockEmpty" (formula "13") (term "1"))
+(rule "assignment_write_attribute_this" (formula "13") (term "1"))
+(builtin "One Step Simplification" (formula "13"))
+(rule "methodCallEmpty" (formula "13") (term "1"))
+(rule "blockEmpty" (formula "13") (term "1"))
+(rule "methodCallReturnIgnoreResult" (formula "13") (term "1"))
+(rule "methodCallReturn" (formula "13") (term "1"))
+(rule "assignment" (formula "13") (term "1"))
+(builtin "One Step Simplification" (formula "13"))
+(rule "methodCallEmpty" (formula "13") (term "1"))
+(rule "blockEmpty" (formula "13") (term "1"))
+(rule "assignment" (formula "13") (term "1"))
+(builtin "One Step Simplification" (formula "13"))
+(rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_<init>,savedHeapBefore_<init>"))
+(builtin "One Step Simplification" (formula "13"))
+(rule "methodCallSuper" (formula "13") (term "1"))
+(rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_<init>_0,savedHeapBefore_<init>_0"))
+(builtin "One Step Simplification" (formula "13"))
+(rule "methodCallEmpty" (formula "13") (term "1"))
+(rule "methodCallEmpty" (formula "13") (term "1"))
+(rule "blockEmpty" (formula "13") (term "1"))
+(rule "assignment_write_attribute" (formula "13") (term "1"))
+(branch "Normal Execution (a != null)"
+   (builtin "One Step Simplification" (formula "13") (ifInst ""  (formula "10")))
+   (rule "false_right" (formula "13"))
+   (builtin "One Step Simplification" (formula "13"))
+   (rule "assignment" (formula "13") (term "1"))
+   (builtin "One Step Simplification" (formula "13"))
+   (rule "assignment" (formula "13") (term "1"))
+   (builtin "One Step Simplification" (formula "13"))
+   (rule "instanceCreationAssignment" (formula "13") (term "1") (inst "#v0=b"))
+   (rule "variableDeclarationAssign" (formula "13") (term "1"))
+   (rule "variableDeclaration" (formula "13") (term "1") (newnames "b"))
+   (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "13") (term "1") (inst "#v0=b_1"))
+   (rule "variableDeclaration" (formula "13") (term "1") (newnames "b_1"))
+   (rule "methodBodyExpand" (formula "13") (term "1") (newnames "heapBefore_<createObject>_0,savedHeapBefore_<createObject>_0"))
+   (builtin "One Step Simplification" (formula "13"))
+   (rule "variableDeclaration" (formula "13") (term "1") (newnames "__NEW___1"))
+   (rule "staticMethodCallStaticWithAssignmentViaTypereference" (formula "13") (term "1") (inst "#v0=b_2"))
+   (rule "variableDeclaration" (formula "13") (term "1") (newnames "b_2"))
+   (rule "allocateInstance" (formula "13"))
+   (builtin "One Step Simplification" (formula "1"))
+   (rule "wellFormedStorePrimitive" (formula "1") (term "0,1,0"))
+   (builtin "One Step Simplification" (formula "14"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "notLeft" (formula "1"))
+   (rule "dismissNonSelectedField" (formula "1") (term "0,0,1"))
+   (rule "dismissNonSelectedField" (formula "1") (term "0,0,1"))
+   (rule "wellFormedStoreObject" (formula "1") (term "0"))
+   (builtin "One Step Simplification" (formula "1"))
+   (rule "wellFormedCreate" (formula "1") (term "0,0"))
+   (rule "replace_known_left" (formula "1") (term "0,0") (ifseqformula "4"))
+   (builtin "One Step Simplification" (formula "1"))
+   (rule "notLeft" (formula "1"))
+   (rule "pullOutSelect" (formula "11") (term "0") (inst "selectSK=java_lang_Object_created__0"))
+   (rule "simplifySelectOfCreate" (formula "1"))
+   (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "14")))
+   (rule "castDel" (formula "1") (term "1,0"))
+   (rule "eqSymm" (formula "1") (term "0,0"))
+   (rule "sortsDisjointModuloNull" (formula "1") (term "0,0"))
+   (rule "replace_known_right" (formula "1") (term "1,0,0") (ifseqformula "14"))
+   (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "13")))
+   (rule "applyEqReverse" (formula "12") (term "0") (ifseqformula "1"))
+   (rule "hideAuxiliaryEq" (formula "1"))
+   (rule "blockEmpty" (formula "16") (term "1"))
+   (rule "assignment" (formula "16") (term "1"))
+   (builtin "One Step Simplification" (formula "16"))
+   (rule "methodBodyExpand" (formula "16") (term "1") (newnames "heapBefore_<create>_0,savedHeapBefore_<create>_0"))
+   (builtin "One Step Simplification" (formula "16"))
+   (rule "assignment_write_attribute_this" (formula "16") (term "1"))
+   (builtin "One Step Simplification" (formula "16"))
+   (rule "methodCallWithinClass" (formula "16") (term "1"))
+   (rule "methodBodyExpand" (formula "16") (term "1") (newnames "heapBefore_<prepareEnter>_0,savedHeapBefore_<prepareEnter>_0"))
+   (builtin "One Step Simplification" (formula "16"))
+   (rule "methodCallSuper" (formula "16") (term "1"))
+   (rule "methodBodyExpand" (formula "16") (term "1") (newnames "heapBefore_<prepare>_0,savedHeapBefore_<prepare>_0"))
+   (builtin "One Step Simplification" (formula "16"))
+   (rule "methodCallEmpty" (formula "16") (term "1"))
+   (rule "methodCallEmpty" (formula "16") (term "1"))
+   (rule "blockEmpty" (formula "16") (term "1"))
+   (rule "methodCallReturnIgnoreResult" (formula "16") (term "1"))
+   (rule "methodCallReturn" (formula "16") (term "1"))
+   (rule "assignment" (formula "16") (term "1"))
+   (builtin "One Step Simplification" (formula "16"))
+   (rule "methodCallEmpty" (formula "16") (term "1"))
+   (rule "blockEmpty" (formula "16") (term "1"))
+   (rule "assignment" (formula "16") (term "1"))
+   (builtin "One Step Simplification" (formula "16"))
+   (rule "methodBodyExpand" (formula "16") (term "1") (newnames "heapBefore_<init>_1,savedHeapBefore_<init>_1"))
+   (builtin "One Step Simplification" (formula "16"))
+   (rule "methodCallSuper" (formula "16") (term "1"))
+   (rule "methodBodyExpand" (formula "16") (term "1") (newnames "heapBefore_<init>_2,savedHeapBefore_<init>_2"))
+   (builtin "One Step Simplification" (formula "16"))
+   (rule "methodCallEmpty" (formula "16") (term "1"))
+   (rule "methodCallEmpty" (formula "16") (term "1"))
+   (rule "blockEmpty" (formula "16") (term "1"))
+   (rule "assignment_write_attribute" (formula "16") (term "1"))
+   (branch "Normal Execution (b != null)"
+      (builtin "One Step Simplification" (formula "16") (ifInst ""  (formula "12")))
+      (rule "false_right" (formula "16"))
+      (builtin "One Step Simplification" (formula "16"))
+      (rule "assignment" (formula "16") (term "1"))
+      (builtin "One Step Simplification" (formula "16"))
+      (rule "assignment" (formula "16") (term "1"))
+      (builtin "One Step Simplification" (formula "16"))
+      (rule "assignment_write_attribute" (formula "16") (term "1"))
+      (branch "Normal Execution (w != null)"
+         (builtin "One Step Simplification" (formula "16") (ifInst ""  (formula "13")))
+         (rule "false_right" (formula "16"))
+         (builtin "One Step Simplification" (formula "16"))
+         (rule "ifUnfold" (formula "16") (term "1") (inst "#boolv=x"))
+         (rule "variableDeclaration" (formula "16") (term "1") (newnames "x_1"))
+         (rule "equality_comparison_simple" (formula "16") (term "1"))
+         (builtin "One Step Simplification" (formula "16"))
+         (rule "ifSplit" (formula "16"))
+         (branch "if x_1 true"
+            (builtin "One Step Simplification" (formula "1"))
+            (rule "true_left" (formula "1"))
+            (builtin "One Step Simplification" (formula "16"))
+            (rule "assignment_read_attribute" (formula "16") (term "1"))
+            (branch "Normal Execution (z != null)"
+               (builtin "One Step Simplification" (formula "16") (ifInst ""  (formula "13")))
+               (rule "false_right" (formula "16"))
+               (builtin "One Step Simplification" (formula "16"))
+               (rule "pullOutSelect" (formula "16") (term "0,1,0") (inst "selectSK=Figure2Param_A_f_0"))
+               (rule "simplifySelectOfStore" (formula "1"))
+               (builtin "One Step Simplification" (formula "1"))
+               (rule "castDel" (formula "1") (term "0"))
+               (rule "applyEqReverse" (formula "17") (term "0,1,0") (ifseqformula "1"))
+               (rule "hideAuxiliaryEq" (formula "1"))
+               (rule "methodCallEmpty" (formula "16") (term "1"))
+               (rule "tryEmpty" (formula "16") (term "1"))
+               (rule "emptyModality" (formula "16") (term "1"))
+               (builtin "One Step Simplification" (formula "16"))
+               (rule "cut_direct" (formula "9") (term "0"))
+               (branch "CUT: w = null TRUE"
+                  (builtin "One Step Simplification" (formula "10"))
+                  (rule "true_left" (formula "10"))
+                  (rule "cut_direct" (formula "8") (term "0"))
+                  (branch "CUT: y = null TRUE"
+                     (builtin "One Step Simplification" (formula "9"))
+                     (rule "true_left" (formula "9"))
+                     (rule "cut_direct" (formula "7") (term "0"))
+                     (branch "CUT: z = null TRUE"
+                        (builtin "One Step Simplification" (formula "8"))
+                        (rule "true_left" (formula "8"))
+                        (rule "cut_direct" (formula "6") (term "0"))
+                        (branch "CUT: x = null TRUE"
+                           (builtin "One Step Simplification" (formula "7"))
+                           (rule "true_left" (formula "7"))
+                           (rule "cut_direct" (formula "10") (term "0"))
+                           (branch "CUT: v = null TRUE"
+                              (builtin "One Step Simplification" (formula "11"))
+                              (rule "true_left" (formula "11"))
+                              (opengoal " ")
+                           )
+                           (branch "CUT: v = null FALSE"
+                              (builtin "One Step Simplification" (formula "10"))
+                              (opengoal " ")
+                           )
+                        )
+                        (branch "CUT: x = null FALSE"
+                           (builtin "One Step Simplification" (formula "6"))
+                           (rule "cut_direct" (formula "10") (term "0"))
+                           (branch "CUT: v = null TRUE"
+                              (builtin "One Step Simplification" (formula "11"))
+                              (rule "true_left" (formula "11"))
+                              (opengoal " ")
+                           )
+                           (branch "CUT: v = null FALSE"
+                              (builtin "One Step Simplification" (formula "10"))
+                              (opengoal " ")
+                           )
+                        )
+                     )
+                     (branch "CUT: z = null FALSE"
+                        (builtin "One Step Simplification" (formula "7"))
+                        (rule "cut_direct" (formula "6") (term "0"))
+                        (branch "CUT: x = null TRUE"
+                           (builtin "One Step Simplification" (formula "7"))
+                           (rule "true_left" (formula "7"))
+                           (rule "cut_direct" (formula "10") (term "0"))
+                           (branch "CUT: v = null TRUE"
+                              (builtin "One Step Simplification" (formula "11"))
+                              (rule "true_left" (formula "11"))
+                              (opengoal " ")
+                           )
+                           (branch "CUT: v = null FALSE"
+                              (builtin "One Step Simplification" (formula "10"))
+                              (opengoal " ")
+                           )
+                        )
+                        (branch "CUT: x = null FALSE"
+                           (builtin "One Step Simplification" (formula "6"))
+                           (rule "cut_direct" (formula "10") (term "0"))
+                           (branch "CUT: v = null TRUE"
+                              (builtin "One Step Simplification" (formula "11"))
+                              (rule "true_left" (formula "11"))
+                              (opengoal " ")
+                           )
+                           (branch "CUT: v = null FALSE"
+                              (builtin "One Step Simplification" (formula "10"))
+                              (opengoal " ")
+                           )
+                        )
+                     )
+                  )
+                  (branch "CUT: y = null FALSE"
+                     (builtin "One Step Simplification" (formula "8"))
+                     (rule "cut_direct" (formula "7") (term "0"))
+                     (branch "CUT: z = null TRUE"
+                        (builtin "One Step Simplification" (formula "8"))
+                        (rule "true_left" (formula "8"))
+                        (rule "cut_direct" (formula "6") (term "0"))
+                        (branch "CUT: x = null TRUE"
+                           (builtin "One Step Simplification" (formula "7"))
+                           (rule "true_left" (formula "7"))
+                           (rule "cut_direct" (formula "10") (term "0"))
+                           (branch "CUT: v = null TRUE"
+                              (builtin "One Step Simplification" (formula "11"))
+                              (rule "true_left" (formula "11"))
+                              (opengoal " ")
+                           )
+                           (branch "CUT: v = null FALSE"
+                              (builtin "One Step Simplification" (formula "10"))
+                              (opengoal " ")
+                           )
+                        )
+                        (branch "CUT: x = null FALSE"
+                           (builtin "One Step Simplification" (formula "6"))
+                           (rule "cut_direct" (formula "10") (term "0"))
+                           (branch "CUT: v = null TRUE"
+                              (builtin "One Step Simplification" (formula "11"))
+                              (rule "true_left" (formula "11"))
+                              (opengoal " ")
+                           )
+                           (branch "CUT: v = null FALSE"
+                              (builtin "One Step Simplification" (formula "10"))
+                              (opengoal " ")
+                           )
+                        )
+                     )
+                     (branch "CUT: z = null FALSE"
+                        (builtin "One Step Simplification" (formula "7"))
+                        (rule "cut_direct" (formula "6") (term "0"))
+                        (branch "CUT: x = null TRUE"
+                           (builtin "One Step Simplification" (formula "7"))
+                           (rule "true_left" (formula "7"))
+                           (rule "cut_direct" (formula "10") (term "0"))
+                           (branch "CUT: v = null TRUE"
+                              (builtin "One Step Simplification" (formula "11"))
+                              (rule "true_left" (formula "11"))
+                              (opengoal " ")
+                           )
+                           (branch "CUT: v = null FALSE"
+                              (builtin "One Step Simplification" (formula "10"))
+                              (opengoal " ")
+                           )
+                        )
+                        (branch "CUT: x = null FALSE"
+                           (builtin "One Step Simplification" (formula "6"))
+                           (rule "cut_direct" (formula "10") (term "0"))
+                           (branch "CUT: v = null TRUE"
+                              (builtin "One Step Simplification" (formula "11"))
+                              (rule "true_left" (formula "11"))
+                              (opengoal " ")
+                           )
+                           (branch "CUT: v = null FALSE"
+                              (builtin "One Step Simplification" (formula "10"))
+                              (opengoal " ")
+                           )
+                        )
+                     )
+                  )
+               )
+               (branch "CUT: w = null FALSE"
+                  (builtin "One Step Simplification" (formula "9"))
+                  (rule "cut_direct" (formula "8") (term "0"))
+                  (branch "CUT: y = null TRUE"
+                     (builtin "One Step Simplification" (formula "9"))
+                     (rule "true_left" (formula "9"))
+                     (rule "cut_direct" (formula "7") (term "0"))
+                     (branch "CUT: z = null TRUE"
+                        (builtin "One Step Simplification" (formula "8"))
+                        (rule "true_left" (formula "8"))
+                        (rule "cut_direct" (formula "6") (term "0"))
+                        (branch "CUT: x = null TRUE"
+                           (builtin "One Step Simplification" (formula "7"))
+                           (rule "true_left" (formula "7"))
+                           (rule "cut_direct" (formula "10") (term "0"))
+                           (branch "CUT: v = null TRUE"
+                              (builtin "One Step Simplification" (formula "11"))
+                              (rule "true_left" (formula "11"))
+                              (opengoal " ")
+                           )
+                           (branch "CUT: v = null FALSE"
+                              (builtin "One Step Simplification" (formula "10"))
+                              (opengoal " ")
+                           )
+                        )
+                        (branch "CUT: x = null FALSE"
+                           (builtin "One Step Simplification" (formula "6"))
+                           (rule "cut_direct" (formula "10") (term "0"))
+                           (branch "CUT: v = null TRUE"
+                              (builtin "One Step Simplification" (formula "11"))
+                              (rule "true_left" (formula "11"))
+                              (opengoal " ")
+                           )
+                           (branch "CUT: v = null FALSE"
+                              (builtin "One Step Simplification" (formula "10"))
+                              (opengoal " ")
+                           )
+                        )
+                     )
+                     (branch "CUT: z = null FALSE"
+                        (builtin "One Step Simplification" (formula "7"))
+                        (rule "cut_direct" (formula "6") (term "0"))
+                        (branch "CUT: x = null TRUE"
+                           (builtin "One Step Simplification" (formula "7"))
+                           (rule "true_left" (formula "7"))
+                           (rule "cut_direct" (formula "10") (term "0"))
+                           (branch "CUT: v = null TRUE"
+                              (builtin "One Step Simplification" (formula "11"))
+                              (rule "true_left" (formula "11"))
+                              (opengoal " ")
+                           )
+                           (branch "CUT: v = null FALSE"
+                              (builtin "One Step Simplification" (formula "10"))
+                              (opengoal " ")
+                           )
+                        )
+                        (branch "CUT: x = null FALSE"
+                           (builtin "One Step Simplification" (formula "6"))
+                           (rule "cut_direct" (formula "10") (term "0"))
+                           (branch "CUT: v = null TRUE"
+                              (builtin "One Step Simplification" (formula "11"))
+                              (rule "true_left" (formula "11"))
+                              (opengoal " ")
+                           )
+                           (branch "CUT: v = null FALSE"
+                              (builtin "One Step Simplification" (formula "10"))
+                              (opengoal " ")
+                           )
+                        )
+                     )
+                  )
+                  (branch "CUT: y = null FALSE"
+                     (builtin "One Step Simplification" (formula "8"))
+                     (rule "cut_direct" (formula "7") (term "0"))
+                     (branch "CUT: z = null TRUE"
+                        (builtin "One Step Simplification" (formula "8"))
+                        (rule "true_left" (formula "8"))
+                        (rule "cut_direct" (formula "6") (term "0"))
+                        (branch "CUT: x = null TRUE"
+                           (builtin "One Step Simplification" (formula "7"))
+                           (rule "true_left" (formula "7"))
+                           (rule "cut_direct" (formula "10") (term "0"))
+                           (branch "CUT: v = null TRUE"
+                              (builtin "One Step Simplification" (formula "11"))
+                              (rule "true_left" (formula "11"))
+                              (opengoal " ")
+                           )
+                           (branch "CUT: v = null FALSE"
+                              (builtin "One Step Simplification" (formula "10"))
+                              (opengoal " ")
+                           )
+                        )
+                        (branch "CUT: x = null FALSE"
+                           (builtin "One Step Simplification" (formula "6"))
+                           (rule "cut_direct" (formula "10") (term "0"))
+                           (branch "CUT: v = null TRUE"
+                              (builtin "One Step Simplification" (formula "11"))
+                              (rule "true_left" (formula "11"))
+                              (opengoal " ")
+                           )
+                           (branch "CUT: v = null FALSE"
+                              (builtin "One Step Simplification" (formula "10"))
+                              (opengoal " ")
+                           )
+                        )
+                     )
+                     (branch "CUT: z = null FALSE"
+                        (builtin "One Step Simplification" (formula "7"))
+                        (rule "cut_direct" (formula "6") (term "0"))
+                        (branch "CUT: x = null TRUE"
+                           (builtin "One Step Simplification" (formula "7"))
+                           (rule "true_left" (formula "7"))
+                           (rule "cut_direct" (formula "10") (term "0"))
+                           (branch "CUT: v = null TRUE"
+                              (builtin "One Step Simplification" (formula "11"))
+                              (rule "true_left" (formula "11"))
+                              (opengoal " ")
+                           )
+                           (branch "CUT: v = null FALSE"
+                              (builtin "One Step Simplification" (formula "10"))
+                              (opengoal " ")
+                           )
+                        )
+                        (branch "CUT: x = null FALSE"
+                           (builtin "One Step Simplification" (formula "6"))
+                           (rule "cut_direct" (formula "10") (term "0"))
+                           (branch "CUT: v = null TRUE"
+                              (builtin "One Step Simplification" (formula "11"))
+                              (rule "true_left" (formula "11"))
+                              (opengoal " ")
+                           )
+                           (branch "CUT: v = null FALSE"
+                              (builtin "One Step Simplification" (formula "10"))
+                              (opengoal " ")
+                           )
+                        )
+                     )
+                  )
+               )
+            )
+            (branch "Null Reference (z = null)"
+               (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "14")))
+               (rule "closeFalse" (formula "1"))
+            )
+         )
+         (branch "if x_1 false"
+            (builtin "One Step Simplification" (formula "1"))
+            (rule "closeFalse" (formula "1"))
+         )
+      )
+      (branch "Null Reference (w = null)"
+         (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "14")))
+         (rule "closeFalse" (formula "1"))
+      )
+   )
+   (branch "Null Reference (b = null)"
+      (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "13")))
+      (rule "closeFalse" (formula "1"))
+   )
+)
+(branch "Null Reference (a = null)"
+   (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "11")))
+   (rule "closeFalse" (formula "1"))
+)
+)
+
+}

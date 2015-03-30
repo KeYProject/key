@@ -1,0 +1,35 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KeY UI
+Bundle-SymbolicName: org.key_project.ui
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.ui.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.key_project.util;bundle-version="1.0.0",
+ org.key_project.core;bundle-version="1.0.0",
+ org.key_project.core.testgen;bundle-version="1.0.0",
+ org.key_project.core.symbolic_execution;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: KeY Project
+Export-Package: de.uka.ilkd.key.core,
+ de.uka.ilkd.key.gui,
+ de.uka.ilkd.key.gui.actions,
+ de.uka.ilkd.key.gui.configuration,
+ de.uka.ilkd.key.gui.join,
+ de.uka.ilkd.key.gui.lemmatagenerator,
+ de.uka.ilkd.key.gui.nodeviews,
+ de.uka.ilkd.key.gui.notification,
+ de.uka.ilkd.key.gui.notification.actions,
+ de.uka.ilkd.key.gui.notification.events,
+ de.uka.ilkd.key.gui.proofdiff,
+ de.uka.ilkd.key.gui.prooftree,
+ de.uka.ilkd.key.gui.smt,
+ de.uka.ilkd.key.gui.testgen,
+ de.uka.ilkd.key.gui.utilities,
+ de.uka.ilkd.key.proof.io,
+ de.uka.ilkd.key.proof.mgt,
+ de.uka.ilkd.key.ui,
+ de.uka.ilkd.key.util,
+ org.key_project.ui.util

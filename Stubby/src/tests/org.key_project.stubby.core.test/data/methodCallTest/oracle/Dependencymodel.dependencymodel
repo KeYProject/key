@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
+  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Cloneable" kind="INTERFACE" package="java.lang" simpleName="Cloneable"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Comparable" kind="INTERFACE" package="java.lang" simpleName="Comparable">
+    <typeVariables name="T" type="//@types.0"/>
+  </types>
+  <types xsi:type="dependencymodel:GenericType" name="Comparable" baseType="//@types.3" typeArguments="//@types.5"/>
+  <types xsi:type="dependencymodel:Type" name="java.util.Date" extends="//@types.0" implements="//@types.1 //@types.2 //@types.4" package="java.util" simpleName="Date">
+    <methods name="after" returnType="//@types.8" parameterTypes="//@types.5"/>
+  </types>
+  <types xsi:type="dependencymodel:Type" name="MethodCallTest" source="true" extends="//@types.0" package="" simpleName="MethodCallTest">
+    <methods name="testmethod1" returnType="//@types.7" parameterTypes="//@types.5"/>
+  </types>
+  <types xsi:type="dependencymodel:Datatype" name="void"/>
+  <types xsi:type="dependencymodel:Datatype" name="boolean"/>
+</dependencymodel:DependencyModel>
