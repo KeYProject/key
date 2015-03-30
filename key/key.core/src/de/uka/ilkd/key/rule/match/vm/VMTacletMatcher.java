@@ -197,34 +197,42 @@ public class VMTacletMatcher implements TacletMatcher {
             context = p_matchCond.getInstantiations().getUpdateContext();   
         }
         
-        outer: for (IfFormulaInstantiation cf: p_toMatch) {
+        for (IfFormulaInstantiation cf: p_toMatch) {
             Term formula = cf.getConstrainedFormula().formula();
             if (updateContextPresent) {                 
-                ImmutableList<UpdateLabelPair> curContext = context;
-                for (int i = 0, size = context.size(); i<size; i++) {
-                    if (formula.op() instanceof UpdateApplication) {
-                        final Term update = UpdateApplication.getUpdate(formula);
-                        final UpdateLabelPair ulp = curContext.head();
-                        if (ulp.getUpdate().equalsModRenaming(update) &&
-                                ulp.getUpdateApplicationlabels().equals(update.getLabels())) {  
-                            curContext = curContext.tail();
-                            formula = UpdateApplication.getTarget(formula);
-                            continue;
-                        } 
-                    } 
-                    continue outer;
-                }
+                formula = matchUpdateContext(context, formula);
             }
+            if (formula != null) {// update context not present or update context match succeeded
+                final MatchConditions newMC = 
+                        checkConditions(match(formula, prg, p_matchCond, p_services), p_services);
 
-            final MatchConditions newMC = 
-                    checkConditions(match(formula, prg, p_matchCond, p_services), p_services);
-            
-            if (newMC != null) {
-                resFormulas = resFormulas.prepend(cf);
-                resMC       = resMC.prepend(newMC);
+                if (newMC != null) {
+                    resFormulas = resFormulas.prepend(cf);
+                    resMC       = resMC.prepend(newMC);
+                }
             }
         }
         return new IfMatchResult ( resFormulas, resMC );
+    }
+
+    private Term matchUpdateContext(ImmutableList<UpdateLabelPair> context,
+            Term formula) {
+        ImmutableList<UpdateLabelPair> curContext = context;
+        for (int i = 0, size = context.size(); i<size; i++) {
+            if (formula.op() instanceof UpdateApplication) {
+                final Term update = UpdateApplication.getUpdate(formula);
+                final UpdateLabelPair ulp = curContext.head();
+                if (ulp.getUpdate().equalsModRenaming(update) &&
+                        ulp.getUpdateApplicationlabels().equals(update.getLabels())) {  
+                    curContext = curContext.tail();
+                    formula = UpdateApplication.getTarget(formula);                    
+                    continue;
+                }
+            } 
+            // update context does not match update prefix of formula
+            return null;
+        }
+        return formula;
     }
 
 
