@@ -62,17 +62,16 @@ public interface BasicPOSnippetFactory {
         //      exc = excAtPost)
         METHOD_CALL_RELATION (MethodCallPredicateSnippet.class),
 
-        // RELATED_BY_package.class::m(self, localIn1, ..., LocalInN, heap,
+        // RELATED_BY_LOOP_at_line_n_in_package.class::m(self, localIn1, ..., LocalInN, heap,
         // localOut1, ..., LocalOutN, heapAtPost)
         // This predicate is semantically equivalent to:
         // [P] (heap = heapAtPost & self = selfAtPost & localOuts = localOutsAtPost)
         LOOP_CALL_RELATION (LoopCallPredicateSnippet.class),
 
-        // EXECUTION_OF_package.class::m_WITH_PRE(self, param1, ..., paramN, heap, result, exc, heapAtPost)
-        // RELATED_BY_package.class::m(self, localIn1, ..., localInN, heap, localOut1, ..., localOutN, result, exc, heapAtPost)
+        // RELATED_BY_BLOCK_at_line_n_in_package.class::m(self, localIn1, ..., localInN, heap,
+        // localOut1, ..., localOutN, result, exc, heapAtPost)
         // This predicate is semantically equivalent to:
-        // [P] (heap = heapAtPost & self = selfAtPost & result = resultAtPost &
-        //      exc = excAtPost)
+        // [P] (heap = heapAtPost & self = selfAtPost & result = resultAtPost & exc = excAtPost)
         BLOCK_CALL_RELATION (BlockCallPredicateSnippet.class),
 
         // miscellaneous snippets
