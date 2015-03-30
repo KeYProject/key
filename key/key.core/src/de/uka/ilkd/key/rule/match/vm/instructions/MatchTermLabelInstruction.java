@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.rule.match.vm;
+package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher;
 import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher.TermNavigator;
 
 public class MatchTermLabelInstruction implements IMatchInstruction {

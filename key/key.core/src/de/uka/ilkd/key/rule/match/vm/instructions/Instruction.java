@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.rule.match.vm;
+package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import org.key_project.util.collection.ImmutableArray;
 

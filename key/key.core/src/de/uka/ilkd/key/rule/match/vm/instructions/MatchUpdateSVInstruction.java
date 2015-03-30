@@ -1,20 +1,21 @@
-package de.uka.ilkd.key.rule.match.vm;
+package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher;
 import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher.TermNavigator;
 
-public class MatchTermSVInstruction extends Instruction<TermSV> {
+public class MatchUpdateSVInstruction extends Instruction<UpdateSV> {
 
-    protected MatchTermSVInstruction(TermSV op) {
+    protected MatchUpdateSVInstruction(UpdateSV op) {
         super(op);
     }
 
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
             Services services) {
-        final MatchConditions result = op.match(termPosition.getCurrentSubterm(), mc, services);
+        MatchConditions result = op.match(termPosition.getCurrentSubterm(), mc, services);
         if (result != null) {
             termPosition.gotoNextSibling();
         }
