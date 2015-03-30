@@ -321,7 +321,7 @@ public final class JMLProfileManagement {
 
    public void removeUserDefinedProfile(final IDerivedProfile profile)
          throws InvalidProfileException {
-      final boolean rem = this.userDefinedProfiles.remove(profile);
+      this.userDefinedProfiles.remove(profile);
       this.profileCache.remove(profile.getIdentifier());
       this.writeDerivedProfiles();
    }

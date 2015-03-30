@@ -27,8 +27,6 @@ public class JMLJavaVisibleFieldsComputerTest {
 
    private static ITypeBinding firstClass;
    private static ITypeBinding nestedInFirstClass;
-   private static ITypeBinding secondClass;
-   private static ITypeBinding nestedInSecondClass;
    private static ITypeBinding superClass;
    private static ITypeBinding nestedInSuperClass;
 
@@ -41,8 +39,6 @@ public class JMLJavaVisibleFieldsComputerTest {
             "data/template/resolverTest", testFolder);
       firstClass = getTypeBinding("src/test/FirstClass", 0);
       nestedInFirstClass = getTypeBinding("src/test/FirstClass", 1);
-      secondClass = getTypeBinding("src/test/subpackage/SecondClass", 0);
-      nestedInSecondClass = getTypeBinding("src/test/subpackage/SecondClass", 1);
       superClass = getTypeBinding("src/test/SuperClass", 0);
       nestedInSuperClass = getTypeBinding("src/test/SuperClass", 1);
 
@@ -74,7 +70,7 @@ public class JMLJavaVisibleFieldsComputerTest {
    private static int getNumVisibleVarsFor(final ITypeBinding context,
          final ITypeBinding type) {
       return new JMLJavaVisibleFieldsComputer(context)
-      .getAllVisibleFields(type).size();
+            .getAllVisibleFields(type).size();
    }
 
    @Test
