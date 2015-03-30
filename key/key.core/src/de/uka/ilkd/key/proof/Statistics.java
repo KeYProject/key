@@ -63,7 +63,7 @@ public class Statistics {
         this.operationContractApps = operationContractApps;
         this.loopInvApps = loopInvApps;
         this.autoModeTime = autoModeTime;
-        this.time = time/1000000;
+        this.time = timeInNano/1000000;
         this.timePerStep = timePerStep;
     }
 
