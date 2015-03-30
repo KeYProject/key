@@ -314,7 +314,6 @@ public class JMLKeywordDialog extends TitleAreaDialog {
       final Set<String> keywords = new HashSet<String>();
       for (final String kw : formattedKeyword.split(",\\s")) {
          if (!kw.isEmpty() && this.checkNoWhitespace(kw)) {
-            System.out.println("adding Keyword: \"" + kw + "\"");
             keywords.add(kw);
          }
       }

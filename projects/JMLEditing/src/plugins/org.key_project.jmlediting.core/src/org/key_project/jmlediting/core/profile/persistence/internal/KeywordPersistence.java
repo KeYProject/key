@@ -173,7 +173,6 @@ public abstract class KeywordPersistence {
       final Element descriptionElement = doc.createElement(DESCRIPTION);
       descriptionElement.appendChild(doc.createTextNode(userKeyword
             .getDescription()));
-      System.out.println(descriptionElement);
       userDefinedKeywordElem.appendChild(descriptionElement);
 
       // Then write the keyword strings

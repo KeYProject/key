@@ -198,7 +198,6 @@ public class JMLProfileDialog extends TitleAreaDialog {
 
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  System.out.println("selected derivedFromCombo");
                   JMLProfileDialog.this.fillKeywordTable();
                }
 
@@ -649,7 +648,6 @@ public class JMLProfileDialog extends TitleAreaDialog {
    private IUserDefinedKeyword getSelectedDerivedKeyword() {
       final TableItem selectedItem = this.getSelectedDerivedTableItem();
       if (selectedItem == null) {
-         System.out.println("noKeyword...");
          return null;
       }
       return (IUserDefinedKeyword) selectedItem.getData();
@@ -666,7 +664,6 @@ public class JMLProfileDialog extends TitleAreaDialog {
 
    private TableItem getSelectedDerivedTableItem() {
       if (this.derivedTable.getSelection().length == 0) {
-         System.out.println("noItem...");
          return null;
       }
       return this.derivedTable.getSelection()[0];
@@ -688,7 +685,6 @@ public class JMLProfileDialog extends TitleAreaDialog {
     * @return whether validation had success
     */
    private boolean saveEditProfile(final boolean onOkPressed) {
-      System.out.println("saveEditProfile(" + onOkPressed + ")");
       final String profileName = this.profileNameText.getText();
 
       if (!profileName.equals(this.derivedProfile.getName())
@@ -709,7 +705,6 @@ public class JMLProfileDialog extends TitleAreaDialog {
     * @return whether validation had success
     */
    private boolean saveNewProfile(final boolean onOkPressed) {
-      System.out.println("saveNewProfile(" + onOkPressed + ")");
       final String profileName = this.profileNameText.getText();
       final String profileId = this.generateId(profileName);
       final IJMLProfile parentProfile = this.getSelectedProfileFromCombo();
@@ -741,8 +736,6 @@ public class JMLProfileDialog extends TitleAreaDialog {
    @Override
    protected void okPressed() {
       boolean ok = true;
-      System.out.println("profile == " + this.profile);
-      System.out.println("derivedProfile == " + this.derivedProfile);
       if (this.profile == null) {
          ok = this.saveNewProfile(true);
       }

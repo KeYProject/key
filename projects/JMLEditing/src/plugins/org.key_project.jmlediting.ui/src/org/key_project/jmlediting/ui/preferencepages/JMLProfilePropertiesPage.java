@@ -83,6 +83,8 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     */
    private IJMLProfile profile2EditView;
 
+   private IJMLProfile newCheckedProfile;
+
    /**
     * The {@link IPreferenceChangeListener} which listens to changes of the
     * profile property for properties. This is used to change the selection in
@@ -391,10 +393,10 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          @Override
          public void handleEvent(final Event event) {
             final TableItem item = (TableItem) event.item;
-            final IJMLProfile profile = JMLProfilePropertiesPage.this
-                  .getSelectedProfile();
+            final IJMLProfile profile = (IJMLProfile) item.getData();
             if (event.detail == SWT.CHECK) {
                if (item.getChecked()) {
+                  JMLProfilePropertiesPage.this.newCheckedProfile = profile;
                   for (final TableItem item2 : JMLProfilePropertiesPage.this.profilesListTable
                         .getItems()) {
                      if (item != item2) {
@@ -432,9 +434,6 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    private IJMLProfile getSelectedProfile() {
       final int index = JMLProfilePropertiesPage.this.profilesListTable
             .getSelectionIndex();
-      if (index == -1) {
-         return this.getCheckedProfile();
-      }
       return JMLProfilePropertiesPage.this.allProfiles.get(index);
    }
 
@@ -454,6 +453,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
             type = "standalone";
          }
          item.setText(new String[] { profile.getName(), type });
+         item.setData(profile);
       }
       this.updateSelection();
    }
@@ -534,7 +534,11 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     */
    private void updateSelection() {
       IJMLProfile currentProfile = null;
-      if ((this.isProjectPreferencePage() && this.useProjectSettings())) {
+      if (this.newCheckedProfile != null) {
+         currentProfile = this.newCheckedProfile;
+      }
+      if (currentProfile == null
+            && (this.isProjectPreferencePage() && this.useProjectSettings())) {
          // Read local project properties if we are in a properties pane and
          // project specific settings are enabled
          currentProfile = JMLPreferencesHelper.getProjectJMLProfile(this
@@ -558,6 +562,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
       }
       assert currentProfile != null;
+
       // Select profile in the list
       for (final TableItem item : this.profilesListTable.getItems()) {
          item.setChecked(false);
@@ -681,7 +686,6 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
             }
          };
       }
-
       // Now trigger a rebuild for these projects and update the preferences
       return RebuildHelper.triggerRebuild(affectedProjects, this.getShell(),
             UserMessage.ACTIVE_PROFILE_CHANGED, preferencesUpdater);
