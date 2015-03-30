@@ -1,11 +1,8 @@
 package de.uka.ilkd.key.rule.match.vm;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
+
+import junit.framework.TestCase;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,13 +17,17 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
-public class VMTacletMatcherTest {
+public class VMTacletMatcherTest extends TestCase {
 
     private static int NR_TACLETS = 6;
     
     private static Services services;
     private static Taclet[] taclet = new Taclet[NR_TACLETS]; 
     private static VMTacletMatcher[] matcher = new VMTacletMatcher[NR_TACLETS];
+
+    static {// for JUnit 3
+        init();
+    }
     
     @BeforeClass
     public static void init() {
@@ -44,7 +45,7 @@ public class VMTacletMatcherTest {
     }
     
     @Test
-    public void matchPropositionalFormula() throws ParserException {
+    public void testMatchPropositionalFormula() throws ParserException {
         Term findTerm = ((FindTaclet)taclet[0]).find();
         
         final String[] matchingFormulas = {"A & B", "(!A | (A<->B)) & B",
@@ -74,7 +75,7 @@ public class VMTacletMatcherTest {
     }
     
     @Test
-    public void matchFunctionTerm() throws ParserException {
+    public void testMatchFunctionTerm() throws ParserException {
         
         Term findTerm = ((FindTaclet)taclet[1]).find();
                 
@@ -118,7 +119,7 @@ public class VMTacletMatcherTest {
     }
 
     @Test
-    public void matchVarBindingTermNested() throws ParserException {
+    public void testMatchVarBindingTermNested() throws ParserException {
         Term findTerm = ((FindTaclet)taclet[3]).find();
         
         final String[] matchingFormulas = {"\\forall int x; \\forall int y; x + y > 0"};
@@ -144,7 +145,7 @@ public class VMTacletMatcherTest {
     }
 
     @Test
-    public void matchVarBindingTermHiding() throws ParserException {
+    public void testMatchVarBindingTermHiding() throws ParserException {
         Term findTerm = ((FindTaclet)taclet[4]).find();
         
         final String[] matchingFormulas = {
@@ -173,7 +174,7 @@ public class VMTacletMatcherTest {
     }
 
     @Test
-    public void matchVarBindingTermMoreHiding() throws ParserException {
+    public void testMatchVarBindingTermMoreHiding() throws ParserException {
         Term findTerm = ((FindTaclet)taclet[5]).find();
         
         final String[] matchingFormulas = {
