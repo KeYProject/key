@@ -34,7 +34,7 @@ import org.key_project.jmlediting.ui.util.JMLEditingImages;
  * @author Thomas Glaser
  */
 public class JMLCompletionProposalComputer implements
-IJavaCompletionProposalComputer {
+      IJavaCompletionProposalComputer {
 
    /**
     *
@@ -83,11 +83,12 @@ IJavaCompletionProposalComputer {
 
          final IJMLParser parser = currentJMLProfile.createParser();
          IASTNode parseResult = null;
+         final String docText = context.getDocument().get();
          try {
             // Parse the text
             // End index of comment is inclusive, but input end for parser
             // exclusive
-            parseResult = parser.parse(context.getDocument().get(), comment);
+            parseResult = parser.parse(docText, comment);
 
          }
          catch (final ParserException e) {
@@ -118,7 +119,6 @@ IJavaCompletionProposalComputer {
                      || hasToplevelError(keywordApplNode);
 
                if (!caretOnKeyword && onContent) {
-
                   // Get the keyword from the node and get result of
                   // autoproposals
                   final IKeyword activeKeyword = ((IKeywordNode) keywordApplNode
@@ -135,6 +135,12 @@ IJavaCompletionProposalComputer {
                      else {
                         result.addAll(this.proposeToplevelKeywords(javaContext));
                      }
+                  }
+                  else if (caretPosition == keywordApplNode.getEndOffset()
+                        && docText.charAt(caretPosition - 1) == ';') {
+                     // Default case: no specific auto proposer and semicolon
+                     // closed keyword
+                     return this.proposeToplevelKeywords(javaContext);
                   }
                }
                else {
@@ -182,7 +188,7 @@ IJavaCompletionProposalComputer {
 
    /**
     * Checks whether a given caret is on a given Keywords Content.
-    * 
+    *
     * @param keywordApplNode
     *           the KeywordNode
     * @param caret
@@ -191,11 +197,15 @@ IJavaCompletionProposalComputer {
     */
    private static boolean isCaretOnKeywordContent(
          final IASTNode keywordApplNode, final int caret) {
+
       if (keywordApplNode.getChildren().size() == 1) {
          // EmptyKeyword
          return keywordApplNode.containsCaret(caret);
       }
-      return keywordApplNode.getChildren().get(1).containsCaret(caret);
+      final IASTNode keywordNode = keywordApplNode.getChildren().get(0);
+      final IASTNode keywordContentNode = keywordApplNode.getChildren().get(1);
+      return keywordNode.getEndOffset() <= caret
+            && keywordContentNode.getEndOffset() >= caret;
    }
 
    /**

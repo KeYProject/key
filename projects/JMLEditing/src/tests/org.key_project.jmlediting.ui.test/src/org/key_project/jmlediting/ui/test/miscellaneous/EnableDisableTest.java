@@ -56,7 +56,6 @@ public class EnableDisableTest {
 
       UITestUtils.prepareWorkbench(bot);
 
-      final IProject project = testProject;
       this.jmlColors = new HashSet<RGB>(Arrays.asList(JMLUiPreferencesHelper
             .getWorkspaceJMLColor(ColorProperty.COMMENT),
             JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.KEYWORD),
@@ -110,8 +109,8 @@ public class EnableDisableTest {
 
    private void checkColors(final int line, final int column, final int length,
          final Set<RGB> colors, final String message) {
-      final StyleRange[] textColors = this.openEditor.getStyles(line, column,
-            length);
+      final StyleRange[] textColors = openEditor
+            .getStyles(line, column, length);
       for (final StyleRange r : textColors) {
          assertTrue(message + " at " + r.start + " with length " + r.length,
                colors.contains(r.foreground.getRGB()));

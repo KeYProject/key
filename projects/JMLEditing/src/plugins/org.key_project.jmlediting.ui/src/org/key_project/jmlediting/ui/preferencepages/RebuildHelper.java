@@ -15,7 +15,6 @@ import org.key_project.util.jdt.JDTUtil;
  * @author Moritz Lichter
  *
  */
-@SuppressWarnings("restriction")
 public final class RebuildHelper {
 
    /**
@@ -118,7 +117,7 @@ public final class RebuildHelper {
       updater.run();
       if (doBuild) {
          if (affectedProjects == null) {
-            JDTUtil.buildInBackground((IProject)null);
+            JDTUtil.buildInBackground((IProject) null);
          }
          else {
             for (final IProject project : affectedProjects) {
