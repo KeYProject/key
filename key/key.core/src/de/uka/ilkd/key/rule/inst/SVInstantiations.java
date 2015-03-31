@@ -583,12 +583,20 @@ public class SVInstantiations {
     }
     
     public SVInstantiations addUpdateList(ImmutableList<UpdateLabelPair> updates) {
-       return new SVInstantiations(map, interesting(), updates,
+        if (updates.isEmpty() && updateContext.isEmpty()) {
+            // avoid unnecessary creation of SVInstantiations
+            return this;
+        }       
+        return new SVInstantiations(map, interesting(), updates,
                getGenericSortInstantiations(), getGenericSortConditions());
    }
 
 
     public SVInstantiations clearUpdateContext() {
+        if (updateContext.isEmpty()) {
+            // avoid unnecessary creation of SVInstantiations
+            return this;
+        }       
         return new SVInstantiations(map, interesting(),
                 ImmutableSLList.<UpdateLabelPair>nil(), getGenericSortInstantiations(),
                 getGenericSortConditions());

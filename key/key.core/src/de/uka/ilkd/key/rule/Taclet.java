@@ -805,6 +805,7 @@ public abstract class Taclet implements Rule, Named {
           SVInstantiations neededInstances = SVInstantiations.
                 EMPTY_SVINSTANTIATIONS.addUpdateList
                 (matchCond.getInstantiations ().getUpdateContext());
+          
           final TacletSchemaVariableCollector collector = new
                 TacletSchemaVariableCollector(); 
           collector.visit(tacletToAdd, true);// true, because
