@@ -11,7 +11,7 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.keyide.ui.breakpoints;
+package org.key_project.key4eclipse.common.ui.breakpoints;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,8 +44,10 @@ import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpoin
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.strategy.BreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.ExceptionBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.FieldWatchpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.LineBreakpoint;
@@ -395,7 +397,6 @@ public class KeYBreakpointManager implements IBreakpointListener {
       }
    }
 
-
    /**
     * creates a new factory that should be used by others afterwards
     * @return 
@@ -410,4 +411,26 @@ public class KeYBreakpointManager implements IBreakpointListener {
       return programVariableCollectorFactory;
    }
 
+   /**
+    * Configures the current {@link Proof} to use breakpoints or not.
+    */
+   public void setEnabled(boolean enabled) {
+      if (enabled) {
+         proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(getBreakpointStopCondition());
+         proof.getServices().setFactory(KeYBreakpointManager.createNewFactory(getBreakpointStopCondition()));
+         StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+         proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
+      }
+      else {
+         proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(null);
+      }
+   }
+
+   /**
+    * Returns the target {@link Proof}.
+    * @return The target {@link Proof}.
+    */
+   public Proof getProof() {
+      return proof;
+   }
 }

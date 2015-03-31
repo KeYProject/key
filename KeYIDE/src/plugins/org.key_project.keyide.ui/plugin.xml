@@ -275,7 +275,7 @@
                  </command>
                  <command
                        commandId="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand"
-                       icon="icons/breakpoints.gif"
+                       icon="icons/suspendAtBreakpoints.gif"
                        id="org.key_project.keyide.ui.commands.stopAtBreakpointsCommand"
                        label="Stop at Breakpoints"
                        style="toggle">

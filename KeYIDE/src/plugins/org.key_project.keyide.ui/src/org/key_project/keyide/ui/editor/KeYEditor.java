@@ -49,6 +49,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
+import org.key_project.key4eclipse.common.ui.breakpoints.KeYBreakpointManager;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
 import org.key_project.key4eclipse.common.ui.util.EclipseUserInterfaceCustomization;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
@@ -56,7 +57,6 @@ import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
-import org.key_project.keyide.ui.breakpoints.KeYBreakpointManager;
 import org.key_project.keyide.ui.editor.input.ProofEditorInput;
 import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
 import org.key_project.keyide.ui.handlers.BreakpointToggleHandler;
@@ -80,6 +80,7 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.KeYSelectionModel;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.ApplyStrategy;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -89,10 +90,7 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
-import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ProofUserManager;
@@ -915,15 +913,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * Configures the current {@link Proof} to use breakpoints or not.
     */
    protected void configureProofForBreakpoints() {
-      if (isBreakpointsActivated()) {
-         currentProof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(breakpointManager.getBreakpointStopCondition());
-         currentProof.getServices().setFactory(KeYBreakpointManager.createNewFactory(breakpointManager.getBreakpointStopCondition()));
-         StrategyProperties strategyProperties = currentProof.getSettings().getStrategySettings().getActiveStrategyProperties();
-         currentProof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(currentProof, strategyProperties));
-      }
-      else {
-         currentProof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(null);
-      }
+      breakpointManager.setEnabled(isBreakpointsActivated());
    }
 
    /**

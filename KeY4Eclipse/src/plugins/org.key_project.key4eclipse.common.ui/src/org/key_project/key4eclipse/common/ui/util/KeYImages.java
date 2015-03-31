@@ -15,6 +15,7 @@ package org.key_project.key4eclipse.common.ui.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -58,6 +59,11 @@ public final class KeYImages {
      * The key for the image that is used for the new KeY Java project wizard.
      */
     public static final String NEW_KEY_JAVA_PROJECT_WIZARD = "org.key_project.key4eclipse.common.ui.newKeYJavaProjectWizard";
+
+    /**
+     * The key for suspend at breakpoints icon.
+     */
+    public static final String SUSPEND_AT_BREAKPOINTS = "org.key_project.key4eclipse.common.ui.suspendAtbreakpoints";
     
     /**
      * Forbid instances.
@@ -110,6 +116,16 @@ public final class KeYImages {
        }
        return descriptor;
     }
+    
+    /**
+     * Returns the {@link URL} to the given key.
+     * @param key The key.
+     * @return The {@link URL} to the given key.
+     */
+    public static URL getURL(String key) {
+       String path = getPath(key);
+       return Activator.getDefault().getBundle().getEntry(path);
+    }
 
     /**
      * Creates an {@link Image} for the given key.
@@ -118,22 +134,7 @@ public final class KeYImages {
      */
     protected static Image createImage(String key) {
         // Compute path to image in bundle.
-        String path = null;
-        if (KEY_LOGO.equals(key)) {
-           path = "icons/logo16.gif";
-        }
-        else if (TEST_GENERATION.equals(key)) {
-           path = "icons/testGeneration.png";
-        }
-        else if (STARTER_WIZARD.equals(key)) {
-           path = "icons/start_wizard.png";
-        }
-        else if (INTERACTIVE_WIZARD.equals(key)) {
-           path = "icons/interactive_wizard.png";
-        }
-        else if (NEW_KEY_JAVA_PROJECT_WIZARD.equals(key)) {
-           path = "icons/new_key_java_wizard.png";
-        }
+        String path = getPath(key);
         // Load image if possible
         if (path != null) {
            InputStream in = null;
@@ -162,6 +163,34 @@ public final class KeYImages {
     }
     
     /**
+     * Returns the path to the given key.
+     * @param key The key.
+     * @return The path.
+     */
+    protected static String getPath(String key) {
+       String path = null;
+       if (KEY_LOGO.equals(key)) {
+          path = "icons/logo16.gif";
+       }
+       else if (TEST_GENERATION.equals(key)) {
+          path = "icons/testGeneration.png";
+       }
+       else if (STARTER_WIZARD.equals(key)) {
+          path = "icons/start_wizard.png";
+       }
+       else if (INTERACTIVE_WIZARD.equals(key)) {
+          path = "icons/interactive_wizard.png";
+       }
+       else if (NEW_KEY_JAVA_PROJECT_WIZARD.equals(key)) {
+          path = "icons/new_key_java_wizard.png";
+       }
+       else if (SUSPEND_AT_BREAKPOINTS.equals(key)) {
+          path = "icons/suspendAtBreakpoints.gif";
+       }
+       return path;
+    }
+    
+    /**
      * Disposes all contained images. This method is automatically called
      * when the plug-in is unloaded from the {@link Activator}.
      * There is no need to call it from any other place!
@@ -177,6 +206,7 @@ public final class KeYImages {
                registry.remove(INTERACTIVE_WIZARD);
                registry.remove(NEW_KEY_JAVA_PROJECT_WIZARD);
                registry.remove(STARTER_WIZARD);
+               registry.remove(SUSPEND_AT_BREAKPOINTS);
                registry.remove(TEST_GENERATION);
             }
          });
