@@ -84,6 +84,7 @@ import de.uka.ilkd.key.util.Debug;
  * be completed using meta variables) complete, so that is can be applied.
  */
 public abstract class TacletApp implements RuleApp {
+    
     /** the taclet for which the application information is collected */
     private final Taclet taclet;
 
@@ -91,6 +92,8 @@ public abstract class TacletApp implements RuleApp {
      * contains the instantiations of the schema variables of the Taclet
      */
     protected final SVInstantiations instantiations;
+    /** caches a created match condition (instantiations, RenameTable.EMPTY) */
+    private MatchConditions matchConditions;
 
     /**
      * chosen instantiations for the if sequent formulas
@@ -238,7 +241,10 @@ public abstract class TacletApp implements RuleApp {
     }
 
     public MatchConditions matchConditions() {
-	return new MatchConditions(instantiations(), RenameTable.EMPTY_TABLE);
+        if (matchConditions == null) {
+            matchConditions = new MatchConditions(instantiations, RenameTable.EMPTY_TABLE);
+        }
+        return matchConditions;
     }
 
     public ImmutableList<IfFormulaInstantiation> ifFormulaInstantiations() {

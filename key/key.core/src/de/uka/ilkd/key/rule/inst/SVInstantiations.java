@@ -635,7 +635,9 @@ public class SVInstantiations {
      * returns true iff no instantiation of SchemaVariables are known
      */
     public boolean isEmpty() {
-        return map.isEmpty();
+        // the interesting map needs not to be checked
+        return this == EMPTY_SVINSTANTIATIONS || 
+                (map.isEmpty() && updateContext.isEmpty() && genericSortConditions.isEmpty() && genericSortInstantiations.isEmpty());
     }
 
     /**

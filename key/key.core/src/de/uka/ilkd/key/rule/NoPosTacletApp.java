@@ -413,9 +413,13 @@ public class NoPosTacletApp extends TacletApp {
 	SVInstantiations svInst = taclet() instanceof NoFindTaclet ? 
                 instantiations   () : instantiations   ().clearUpdateContext ();
         
-                MatchConditions mc  =
-	    new MatchConditions ( svInst,
-				  RenameTable.EMPTY_TABLE);
+        MatchConditions mc;
+        if (svInst.isEmpty()) {
+            mc = MatchConditions.EMPTY_MATCHCONDITIONS;
+        } else {
+            mc = new MatchConditions ( svInst,
+                    RenameTable.EMPTY_TABLE);
+        }
         
 	if ( taclet() instanceof RewriteTaclet ) {
 	    mc = ((RewriteTaclet)taclet ()).checkPrefix ( pos,

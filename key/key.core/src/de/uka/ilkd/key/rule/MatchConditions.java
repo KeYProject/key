@@ -23,7 +23,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * Taclet.match-call 
  */
 public class MatchConditions {
-
+    
     public static final MatchConditions EMPTY_MATCHCONDITIONS =
 	new MatchConditions ( SVInstantiations.EMPTY_SVINSTANTIATIONS,
 			      RenameTable.EMPTY_TABLE);
