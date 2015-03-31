@@ -20,9 +20,7 @@
   <types xsi:type="dependencymodel:GenericType" name="Iterable" baseType="//@types.7" typeArguments="//@types.10"/>
   <types xsi:type="dependencymodel:Type" name="SimpleGenericTest" source="true" extends="//@types.0" implements="//@types.11" package="" simpleName="SimpleGenericTest">
     <typeVariables name="T" type="//@types.5"/>
-    <methods name="iterator" returnType="//@types.15"/>
+    <methods name="iterator" returnType="//@types.13"/>
   </types>
-  <types xsi:type="dependencymodel:Type" name="java.lang.annotation.Annotation" kind="INTERFACE" package="java.lang.annotation" simpleName="Annotation"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Override" kind="INTERFACE" extends="//@types.13" package="java.lang" simpleName="Override"/>
   <types xsi:type="dependencymodel:GenericType" name="Iterator" baseType="//@types.6" typeArguments="//@types.10"/>
 </dependencymodel:DependencyModel>

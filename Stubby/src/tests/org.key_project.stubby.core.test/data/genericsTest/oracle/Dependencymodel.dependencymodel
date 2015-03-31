@@ -14,7 +14,6 @@
     <methods name="main" static="true" returnType="//@types.11" throws="//@types.3/@methods.2/@typeVariables.0">
       <typeVariables name="S" type="//@types.16"/>
     </methods>
-    <fields name="cloneable" visibility="PRIVATE" type="//@types.3/@typeVariables.0"/>
   </types>
   <types xsi:type="dependencymodel:Type" name="java.lang.Iterable" kind="INTERFACE" package="java.lang" simpleName="Iterable">
     <typeVariables name="T" type="//@types.0"/>

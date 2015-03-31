@@ -14,13 +14,14 @@ import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.QualifiedName;
-import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.key_project.stubby.model.dependencymodel.AbstractType;
 import org.key_project.stubby.model.dependencymodel.ArrayType;
 import org.key_project.stubby.model.dependencymodel.Datatype;
@@ -59,15 +60,6 @@ public class DependencyAnalyzer extends ASTVisitor {
       ensureMembersExist(node.resolveBinding());
       return true;
    }
-  
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean visit(SimpleName node) {
-      ensureMembersExist(node.resolveBinding());
-      return true;
-   }
    
    /**
     * Ensures that the representation of the given {@link IBinding} exist.
@@ -83,7 +75,7 @@ public class DependencyAnalyzer extends ASTVisitor {
       else if (binding instanceof ITypeBinding) {
          ITypeBinding typeBinding = (ITypeBinding) binding;
          if (!typeBinding.isTypeVariable()) {
-            ensureTypeExists((Type)null, typeBinding);
+            ensureTypeExists(null, typeBinding);
          }
       }
    }
@@ -98,8 +90,8 @@ public class DependencyAnalyzer extends ASTVisitor {
          AbstractType result = searchTypeVariable(containerType.getTypeVariables(), typeBinding);
          if (result == null) {
             EObject parent = containerType.eContainer();
-            if (parent instanceof Type) {
-               result = ensureTypeExists((Type) parent, typeBinding);
+            if (parent instanceof ITypeVariableContainer) {
+               result = ensureTypeExists((ITypeVariableContainer) parent, typeBinding);
             }
          }
          return result;
@@ -152,13 +144,19 @@ public class DependencyAnalyzer extends ASTVisitor {
     * @return The created {@link WildcardType} representing the given {@link ITypeBinding}.
     */
    protected WildcardType createWildcardType(ITypeBinding typeBinding) {
+      // Ensure that the single wildcardtyp exists.
       WildcardType wildcardtyp = (WildcardType)types.get("?");
       if (wildcardtyp == null) {
          wildcardtyp = DependencymodelFactory.eINSTANCE.createWildcardType();
          wildcardtyp.setName("?");
-         wildcardtyp.setSource(typeBinding.isFromSource());
+         wildcardtyp.setSource(false);
          types.put("?", wildcardtyp);
          outerTypes.add(wildcardtyp);
+      }
+      // Ensure that the bound of the wildcard type exists.
+      ITypeBinding comp = typeBinding.getBound();
+      if (comp != null) {
+         ensureTypeExists(null, comp);
       }
       return wildcardtyp;
    }
@@ -229,6 +227,7 @@ public class DependencyAnalyzer extends ASTVisitor {
                                                          containerType : // In case of extends/implements the container type is known and needs to be used
                                                          (ITypeVariableContainer) baseTypeInstance, // In case of the type declaration itself the containerType is null
                                                          argument);
+            assert argumentType != null;
             genericType.getTypeArguments().add(argumentType);
          }
          types.put(typeName, genericType);
@@ -332,7 +331,7 @@ public class DependencyAnalyzer extends ASTVisitor {
          return Visibility.DEFAULT;
       }
    }
-   
+
    /**
     * {@inheritDoc}
     */
@@ -352,7 +351,7 @@ public class DependencyAnalyzer extends ASTVisitor {
     */
    protected void ensureMethodExist(IMethodBinding methodBinding) {
       methodBinding = methodBinding.getMethodDeclaration();
-      AbstractType methodType = ensureTypeExists((Type)null, methodBinding.getDeclaringClass());
+      AbstractType methodType = ensureTypeExists(null, methodBinding.getDeclaringClass());
       methodType = findBaseType(methodType);
       if (methodType instanceof Type) { // Nothing needs to be done if Typ is not available
          Type typ = (Type)methodType;
@@ -455,7 +454,27 @@ public class DependencyAnalyzer extends ASTVisitor {
       ensureFieldExists(variableBinding);
       return true;
    }
-   
+
+   @Override
+   public boolean visit(TypeDeclaration node) {
+      ITypeBinding typeBinding = node.resolveBinding();
+      if (typeBinding == null) {
+         throw new IllegalStateException("Can't resolve type declaration '" + node + "' in the Java build path.");
+      }
+      ensureTypeExists(null, typeBinding);
+      return super.visit(node);
+   }
+
+   @Override
+   public boolean visit(MethodDeclaration node) {
+      IMethodBinding methodBinding = node.resolveBinding();
+      if (methodBinding == null) {
+         throw new IllegalStateException("Can't resolve method declaration '" + node + "' in the Java build path.");
+      }
+      ensureMethodExist(methodBinding);
+      return super.visit(node);
+   }
+
    /**
     * {@inheritDoc}
     */
@@ -502,7 +521,7 @@ public class DependencyAnalyzer extends ASTVisitor {
    protected void ensureFieldExists(IVariableBinding variableBinding) {
       ITypeBinding typeBinding = variableBinding.getDeclaringClass();
       if (typeBinding != null) { // In case of local variables the type binding is null
-         AbstractType type = ensureTypeExists((Type)null, typeBinding);
+         AbstractType type = ensureTypeExists(null, typeBinding);
          type = findBaseType(type);
          if (type instanceof Type) { // Nothing needs to be done if Type is not available
             if (!containsField((Type) type, variableBinding.getName())) {

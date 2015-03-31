@@ -2,12 +2,12 @@
 <dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
   <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
   <types xsi:type="dependencymodel:Type" name="SuperFieldCall" source="true" extends="//@types.0" package="" simpleName="SuperFieldCall">
-    <fields name="integerfieldA" visibility="DEFAULT" type="//@types.2"/>
+    <fields name="integerfieldA" visibility="DEFAULT" type="//@types.4"/>
   </types>
-  <types xsi:type="dependencymodel:Datatype" name="int"/>
   <types xsi:type="dependencymodel:Type" name="SuperFieldB" source="true" visibility="DEFAULT" extends="//@types.1" package="" simpleName="SuperFieldB">
-    <methods name="superFieldBAccess" visibility="DEFAULT" returnType="//@types.4"/>
-    <fields name="integerfieldA" visibility="PROTECTED" type="//@types.2"/>
+    <methods name="superFieldBAccess" visibility="DEFAULT" returnType="//@types.3"/>
+    <fields name="integerfieldA" visibility="PROTECTED" type="//@types.4"/>
   </types>
   <types xsi:type="dependencymodel:Datatype" name="void"/>
+  <types xsi:type="dependencymodel:Datatype" name="int"/>
 </dependencymodel:DependencyModel>

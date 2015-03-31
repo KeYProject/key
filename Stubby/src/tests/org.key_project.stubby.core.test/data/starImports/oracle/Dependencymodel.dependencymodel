@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ASCII"?>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
+  <types xsi:type="dependencymodel:Type" name="StarImports" source="true" extends="//@types.0" package="" simpleName="StarImports">
+    <methods name="main" static="true" returnType="//@types.2"/>
+  </types>
+  <types xsi:type="dependencymodel:Datatype" name="void"/>
+  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Comparable" kind="INTERFACE" package="java.lang" simpleName="Comparable">
+    <typeVariables name="T" type="//@types.0"/>
+  </types>
+  <types xsi:type="dependencymodel:GenericType" name="Comparable" baseType="//@types.4" typeArguments="//@types.6"/>
+  <types xsi:type="dependencymodel:Type" name="java.io.File" extends="//@types.0" implements="//@types.3 //@types.5" package="java.io" simpleName="File">
+    <methods name="listRoots" static="true" returnType="//@types.7"/>
+  </types>
+  <types xsi:type="dependencymodel:ArrayType" name="java.io.File[]" baseType="//@types.6"/>
+  <types xsi:type="dependencymodel:Type" name="java.lang.Cloneable" kind="INTERFACE" package="java.lang" simpleName="Cloneable"/>
+  <types xsi:type="dependencymodel:GenericType" name="Comparable" baseType="//@types.4" typeArguments="//@types.10"/>
+  <types xsi:type="dependencymodel:Type" name="java.util.Date" extends="//@types.0" implements="//@types.3 //@types.8 //@types.9" package="java.util" simpleName="Date">
+    <methods name="Date" returnType="//@types.2" parameterTypes="//@types.11" constructor="true"/>
+  </types>
+  <types xsi:type="dependencymodel:Datatype" name="long"/>
+</dependencymodel:DependencyModel>

@@ -3,7 +3,7 @@ package java.util;
 /**
  * @generated
  */
-public interface Map<K extends java.lang.Object, V extends java.lang.Object> {
+public class Date extends java.lang.Object implements java.io.Serializable, java.lang.Cloneable, Comparable<java.util.Date> {
    /**
     * @generated
     */
@@ -12,5 +12,5 @@ public interface Map<K extends java.lang.Object, V extends java.lang.Object> {
      @ ensures true;
      @ assignable \everything;
      @*/
-   public abstract int size();
+   public Date(long param0);
 }

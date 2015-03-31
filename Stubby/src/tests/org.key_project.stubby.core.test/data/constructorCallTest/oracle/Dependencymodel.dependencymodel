@@ -10,9 +10,7 @@
   <types xsi:type="dependencymodel:Type" name="java.util.Date" extends="//@types.0" implements="//@types.1 //@types.2 //@types.4" package="java.util" simpleName="Date">
     <methods name="Date" returnType="//@types.10" parameterTypes="//@types.9" constructor="true"/>
   </types>
-  <types xsi:type="dependencymodel:Type" name="ConstructorCallTest" source="true" extends="//@types.0" package="" simpleName="ConstructorCallTest">
-    <fields name="testDate" visibility="DEFAULT" type="//@types.5"/>
-  </types>
+  <types xsi:type="dependencymodel:Type" name="ConstructorCallTest" source="true" extends="//@types.0" package="" simpleName="ConstructorCallTest"/>
   <types xsi:type="dependencymodel:GenericType" name="Comparable" baseType="//@types.3" typeArguments="//@types.9"/>
   <types xsi:type="dependencymodel:Type" name="java.lang.CharSequence" kind="INTERFACE" package="java.lang" simpleName="CharSequence"/>
   <types xsi:type="dependencymodel:Type" name="java.lang.String" final="true" extends="//@types.0" implements="//@types.1 //@types.7 //@types.8" package="java.lang" simpleName="String"/>

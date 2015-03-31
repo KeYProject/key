@@ -83,6 +83,20 @@ public class StubGeneratorUtilTest extends TestCase {
    }
 
    @Test
+   public void testExtractReferences_starImports() throws Exception{
+      doDependencyModelTest("JDTUtilTest_testExtractReferences_starImports", 
+                            "data/starImports/test",
+                            "data/starImports/oracle/Dependencymodel.dependencymodel");
+   }
+
+   @Test
+   public void testExtractReferences_ImmutableMap() throws Exception{
+      doDependencyModelTest("JDTUtilTest_testExtractReferences_ImmutableMap", 
+                            "data/ImmutableMap/test",
+                            "data/ImmutableMap/oracle/Dependencymodel.dependencymodel");
+   }
+
+   @Test
    public void testExtractReferences_LRUCache() throws Exception{
       doDependencyModelTest("JDTUtilTest_testExtractReferences_LRUCache", 
                             "data/LRUCache/test",
@@ -252,6 +266,13 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    @Test
+   public void testStubs_starImports() throws Exception {
+      doTestStubs("StubGeneratorUtil_testStubs_starImports",
+                  "data/starImports/test",
+                  "data/starImports/oracleStubs");
+   }
+   
+   @Test
    public void testStubs_constructorCallTest() throws Exception {
       doTestStubs("StubGeneratorUtil_testStubs_constructorCallTest",
                   "data/constructorCallTest/test",
@@ -344,6 +365,13 @@ public class StubGeneratorUtilTest extends TestCase {
                   "data/parameterTypesTest/oracleStubs");
    }
    
+   @Test
+   public void testStubs_GenericParamTest() throws Exception {
+      doTestStubs("StubGeneratorUtil_testStubs_GenericParamTest",
+                  "data/GenericParamTest/test",
+                  "data/GenericParamTest/oracleStubs");
+   }
+   
    @Test 
    public void testExtractReferences_fullInheritenceTest() throws Exception {
       doDependencyModelTest("JDTUtilTest_testGetReferenceMap_fullInheritenceTest",
@@ -377,6 +405,13 @@ public class StubGeneratorUtilTest extends TestCase {
       doDependencyModelTest("JDTUtilTest_testGetReferenceMap_genericsTest",
                             "data/genericsTest/test", 
                             "data/genericsTest/oracle/Dependencymodel.dependencymodel");                           
+   }
+   
+   @Test
+   public void testExtractReferences_genericParamTest() throws Exception {
+      doDependencyModelTest("JDTUtilTest_testExtractReferences_genericParamTest",
+                            "data/GenericParamTest/test", 
+                            "data/GenericParamTest/oracle/Dependencymodel.dependencymodel");                           
    }
    
    @Test
