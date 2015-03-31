@@ -47,6 +47,7 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -280,7 +281,7 @@ public class TestMatchTaclet extends TestCase {
 	     (0, new SequentFormula(closeable_one)).semisequent(), 
 	     Semisequent.EMPTY_SEMISEQUENT.insert
 	     (0, new SequentFormula(closeable_two)).semisequent()); 	
-	TacletIndex index = new TacletIndex();
+	TacletIndex index = TacletIndexKit.getKit().createTacletIndex();
 	index.add(close_rule.taclet());
         PosInOccurrence pio = new PosInOccurrence(new SequentFormula(closeable_two),
                 PosInTerm.getTopLevel(), false);

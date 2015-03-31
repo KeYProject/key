@@ -126,7 +126,7 @@ public class TestLegacyTacletMatch extends TestCase {
         FindTaclet break_while =  (FindTaclet)TacletForTests
                 .getTaclet("TestMatchTaclet_break_while").taclet();   
 
-        MatchConditions svi = ((DefaultTacletMatcher)DefaultTacletMatcher.createTacletMatcher(break_while)).matchJavaBlock
+        MatchConditions svi = new LegacyTacletMatcher(break_while).matchJavaBlock
                 (match, break_while.find(), 
                         MatchConditions.EMPTY_MATCHCONDITIONS, 
                         services);
@@ -145,7 +145,7 @@ public class TestLegacyTacletMatch extends TestCase {
                 +"int k=1;}} }\\> true");
         FindTaclet taclet=(FindTaclet)TacletForTests
                 .getTaclet("TestMatchTaclet_whileright").taclet();   
-        MatchConditions svi = ((DefaultTacletMatcher)DefaultTacletMatcher.createTacletMatcher(taclet)).matchJavaBlock
+        MatchConditions svi = new LegacyTacletMatcher(taclet).matchJavaBlock
                 (match, taclet.find(),
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
 
@@ -162,7 +162,7 @@ public class TestLegacyTacletMatch extends TestCase {
         FindTaclet tacletTwo=(FindTaclet)TacletForTests
                 .getTaclet("TestMatchTaclet_whileright_labeled").taclet(); 
 
-        svi = ((DefaultTacletMatcher)DefaultTacletMatcher.createTacletMatcher(tacletTwo)).matchJavaBlock
+        svi = new LegacyTacletMatcher(tacletTwo).matchJavaBlock
                 (matchTwo, tacletTwo.find(),
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
         assertNotNull(svi);
@@ -179,7 +179,7 @@ public class TestLegacyTacletMatch extends TestCase {
         FindTaclet taclet3=(FindTaclet)TacletForTests
                 .getTaclet("TestMatchTaclet_whileright_labeled").taclet(); 
 
-        svi = ((DefaultTacletMatcher)DefaultTacletMatcher.createTacletMatcher(taclet3)).matchJavaBlock
+        svi = new LegacyTacletMatcher(taclet3).matchJavaBlock
                 (match3, taclet3.find(),
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
         assertNull(svi);
@@ -189,7 +189,7 @@ public class TestLegacyTacletMatch extends TestCase {
         FindTaclet empty_block_taclet=(FindTaclet)TacletForTests
                 .getTaclet("TestMatchTaclet_empty_block").taclet(); 
 
-        svi = ((DefaultTacletMatcher)DefaultTacletMatcher.createTacletMatcher(empty_block_taclet)).matchJavaBlock
+        svi = new LegacyTacletMatcher(empty_block_taclet).matchJavaBlock
                 (emptyBlock, empty_block_taclet.find(),
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
         assertTrue(svi != null);
@@ -197,7 +197,7 @@ public class TestLegacyTacletMatch extends TestCase {
         Term emptyBlock2 = 
                 TacletForTests.parseTerm("\\<{ { {} } }\\> true");
 
-        svi = ((DefaultTacletMatcher)DefaultTacletMatcher.createTacletMatcher(empty_block_taclet)).matchJavaBlock
+        svi = new LegacyTacletMatcher(empty_block_taclet).matchJavaBlock
                 (emptyBlock2, empty_block_taclet.find(),
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
 
@@ -206,7 +206,7 @@ public class TestLegacyTacletMatch extends TestCase {
         Debug.out("%%%%%%%%%%%%");
         Term emptyBlock3 = 
                 TacletForTests.parseTerm("\\<{ { {} l1:{} } }\\> true");
-        svi = ((DefaultTacletMatcher)DefaultTacletMatcher.createTacletMatcher(empty_block_taclet)).matchJavaBlock
+        svi = new LegacyTacletMatcher(empty_block_taclet).matchJavaBlock
                 (emptyBlock3, empty_block_taclet.find(),
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
         assertNotNull(svi);
@@ -215,7 +215,7 @@ public class TestLegacyTacletMatch extends TestCase {
         FindTaclet var_decl_taclet=(FindTaclet)TacletForTests
                 .getTaclet("TestMatchTaclet_variable_declaration").taclet(); 
 
-        svi = ((DefaultTacletMatcher)DefaultTacletMatcher.createTacletMatcher(var_decl_taclet)).matchJavaBlock
+        svi = new LegacyTacletMatcher(var_decl_taclet).matchJavaBlock
                 (emptyBlock, var_decl_taclet.find(),
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
         assertNull(svi);    
@@ -224,7 +224,7 @@ public class TestLegacyTacletMatch extends TestCase {
                 TacletForTests.parseTerm("\\<{ { l1:{} } }\\> true");
         FindTaclet empty_label_taclet=(FindTaclet)TacletForTests
                 .getTaclet("TestMatchTaclet_empty_label").taclet(); 
-        svi = ((DefaultTacletMatcher)DefaultTacletMatcher.createTacletMatcher(empty_label_taclet)).matchJavaBlock
+        svi = new LegacyTacletMatcher(empty_label_taclet).matchJavaBlock
                 (emptyLabel, 
                         empty_label_taclet.find(),
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
@@ -232,7 +232,7 @@ public class TestLegacyTacletMatch extends TestCase {
 
         Term emptyLabel2 = 
                 TacletForTests.parseTerm("\\<{ l2:{ l1:{} } }\\> true");
-        svi = ((DefaultTacletMatcher)DefaultTacletMatcher.createTacletMatcher(empty_label_taclet)).matchJavaBlock
+        svi = new LegacyTacletMatcher(empty_label_taclet).matchJavaBlock
                 (emptyLabel2, 
                         empty_label_taclet.find(),
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
@@ -240,7 +240,7 @@ public class TestLegacyTacletMatch extends TestCase {
 
         Term emptyLabel3 = 
                 TacletForTests.parseTerm("\\<{ {l3:{{l2:{l1:{}}}} int i = 0;} }\\> true");
-        svi = ((DefaultTacletMatcher)DefaultTacletMatcher.createTacletMatcher(empty_label_taclet)).matchJavaBlock
+        svi = new LegacyTacletMatcher(empty_label_taclet).matchJavaBlock
                 (emptyLabel3, 
                         empty_label_taclet.find(),
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
@@ -275,7 +275,7 @@ public class TestLegacyTacletMatch extends TestCase {
                 .getTaclet("TestMatchTaclet_preincrement").taclet();   
 
         MatchConditions svi =
-                ((DefaultTacletMatcher)DefaultTacletMatcher.createTacletMatcher(taclet)).matchJavaBlock
+                new LegacyTacletMatcher(taclet).matchJavaBlock
                 (match, taclet.find(), 
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
 
@@ -292,7 +292,7 @@ public class TestLegacyTacletMatch extends TestCase {
                 +"int k=1; }\\> true)");
         FindTaclet taclet
         =(FindTaclet)TacletForTests.getTaclet("TestMatchTaclet_for_right").taclet();   
-        MatchConditions svi = ((DefaultTacletMatcher)DefaultTacletMatcher.createTacletMatcher(taclet)).matchJavaBlock
+        MatchConditions svi = new LegacyTacletMatcher(taclet).matchJavaBlock
                 (match.sub(0), taclet.find(), 
                         MatchConditions.EMPTY_MATCHCONDITIONS, services); 
 

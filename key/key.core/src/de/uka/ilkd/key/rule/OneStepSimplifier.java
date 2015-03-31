@@ -45,6 +45,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -185,7 +186,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                 ImmutableSet<Taclet> taclets = tacletsForRuleSet(proof,
                                 ruleSet,
                                 done);
-                indices[i] = new TacletIndex(taclets);
+                indices[i] = TacletIndexKit.getKit().createTacletIndex(taclets);
                 notSimplifiableCaches[i] = new LRUCache<Term,Term>(DEFAULT_CACHE_SIZE);
                 i++;
                 done = done.prepend(ruleSet);

@@ -41,6 +41,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.SVInstantiationException;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -69,7 +70,7 @@ public class TestCollisionResolving extends TestCase {
     	Sequent seq = Sequent.createSequent(empty, empty);
 	
 	Node node = new Node(proof, seq);
-	TacletIndex tacletIndex = new TacletIndex();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	BuiltInRuleAppIndex builtInRuleAppIndex = new BuiltInRuleAppIndex(null);
 	RuleAppIndex ruleAppIndex = new RuleAppIndex(tacletIndex,
 						     builtInRuleAppIndex, proof.getServices());

@@ -39,6 +39,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.TacletIndex;
+import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.AntecTaclet;
@@ -111,7 +112,7 @@ public class TestVariableNamer extends TestCase {
     	Sequent seq = Sequent.createSequent(ante, succ);
 	Node node = new Node(proof, seq);
 
-	TacletIndex tacletIndex = new TacletIndex();
+	TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
 	BuiltInRuleAppIndex builtInRuleAppIndex = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
 	RuleAppIndex ruleAppIndex = new RuleAppIndex(tacletIndex,
 						     builtInRuleAppIndex, proof.getServices());
