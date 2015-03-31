@@ -307,6 +307,15 @@ public class DependencymodelPackageImpl extends EPackageImpl implements Dependen
     * <!-- end-user-doc -->
     * @generated
     */
+   public EReference getType_DeclaringMethod() {
+      return (EReference)typeEClass.getEStructuralFeatures().get(12);
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
    public EClass getMethod() {
       return methodEClass;
    }
@@ -658,6 +667,7 @@ public class DependencymodelPackageImpl extends EPackageImpl implements Dependen
       createEAttribute(typeEClass, TYPE__ABSTRACT);
       createEAttribute(typeEClass, TYPE__PACKAGE);
       createEAttribute(typeEClass, TYPE__SIMPLE_NAME);
+      createEReference(typeEClass, TYPE__DECLARING_METHOD);
 
       methodEClass = createEClass(METHOD);
       createEAttribute(methodEClass, METHOD__NAME);
@@ -758,6 +768,7 @@ public class DependencymodelPackageImpl extends EPackageImpl implements Dependen
       initEAttribute(getType_Abstract(), ecorePackage.getEBoolean(), "abstract", null, 0, 1, Type.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
       initEAttribute(getType_Package(), ecorePackage.getEString(), "package", null, 0, 1, Type.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
       initEAttribute(getType_SimpleName(), ecorePackage.getEString(), "simpleName", null, 0, 1, Type.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+      initEReference(getType_DeclaringMethod(), this.getMethod(), null, "declaringMethod", null, 0, 1, Type.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
       initEClass(methodEClass, Method.class, "Method", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
       initEAttribute(getMethod_Name(), ecorePackage.getEString(), "name", null, 0, 1, Method.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

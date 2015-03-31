@@ -48,6 +48,7 @@ import org.key_project.stubby.model.dependencymodel.Visibility;
  *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl#isAbstract <em>Abstract</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl#getPackage <em>Package</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl#getSimpleName <em>Simple Name</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeImpl#getDeclaringMethod <em>Declaring Method</em>}</li>
  * </ul>
  * </p>
  *
@@ -253,6 +254,16 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
     * @ordered
     */
    protected String simpleName = SIMPLE_NAME_EDEFAULT;
+
+   /**
+    * The cached value of the '{@link #getDeclaringMethod() <em>Declaring Method</em>}' reference.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getDeclaringMethod()
+    * @generated
+    * @ordered
+    */
+   protected Method declaringMethod;
 
    /**
     * <!-- begin-user-doc -->
@@ -497,6 +508,44 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
     * <!-- end-user-doc -->
     * @generated
     */
+   public Method getDeclaringMethod() {
+      if (declaringMethod != null && declaringMethod.eIsProxy()) {
+         InternalEObject oldDeclaringMethod = (InternalEObject)declaringMethod;
+         declaringMethod = (Method)eResolveProxy(oldDeclaringMethod);
+         if (declaringMethod != oldDeclaringMethod) {
+            if (eNotificationRequired())
+               eNotify(new ENotificationImpl(this, Notification.RESOLVE, DependencymodelPackage.TYPE__DECLARING_METHOD, oldDeclaringMethod, declaringMethod));
+         }
+      }
+      return declaringMethod;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public Method basicGetDeclaringMethod() {
+      return declaringMethod;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public void setDeclaringMethod(Method newDeclaringMethod) {
+      Method oldDeclaringMethod = declaringMethod;
+      declaringMethod = newDeclaringMethod;
+      if (eNotificationRequired())
+         eNotify(new ENotificationImpl(this, Notification.SET, DependencymodelPackage.TYPE__DECLARING_METHOD, oldDeclaringMethod, declaringMethod));
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
    @Override
    public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
       switch (featureID) {
@@ -546,6 +595,9 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
             return getPackage();
          case DependencymodelPackage.TYPE__SIMPLE_NAME:
             return getSimpleName();
+         case DependencymodelPackage.TYPE__DECLARING_METHOD:
+            if (resolve) return getDeclaringMethod();
+            return basicGetDeclaringMethod();
       }
       return super.eGet(featureID, resolve, coreType);
    }
@@ -604,6 +656,9 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
          case DependencymodelPackage.TYPE__SIMPLE_NAME:
             setSimpleName((String)newValue);
             return;
+         case DependencymodelPackage.TYPE__DECLARING_METHOD:
+            setDeclaringMethod((Method)newValue);
+            return;
       }
       super.eSet(featureID, newValue);
    }
@@ -655,6 +710,9 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
          case DependencymodelPackage.TYPE__SIMPLE_NAME:
             setSimpleName(SIMPLE_NAME_EDEFAULT);
             return;
+         case DependencymodelPackage.TYPE__DECLARING_METHOD:
+            setDeclaringMethod((Method)null);
+            return;
       }
       super.eUnset(featureID);
    }
@@ -693,6 +751,8 @@ public class TypeImpl extends AbstractTypeImpl implements Type {
             return PACKAGE_EDEFAULT == null ? package_ != null : !PACKAGE_EDEFAULT.equals(package_);
          case DependencymodelPackage.TYPE__SIMPLE_NAME:
             return SIMPLE_NAME_EDEFAULT == null ? simpleName != null : !SIMPLE_NAME_EDEFAULT.equals(simpleName);
+         case DependencymodelPackage.TYPE__DECLARING_METHOD:
+            return declaringMethod != null;
       }
       return super.eIsSet(featureID);
    }

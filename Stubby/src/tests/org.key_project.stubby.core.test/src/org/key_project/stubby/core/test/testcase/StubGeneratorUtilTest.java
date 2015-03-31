@@ -83,6 +83,27 @@ public class StubGeneratorUtilTest extends TestCase {
    }
 
    @Test
+   public void testExtractReferences_typeSetByDeclaringMethod() throws Exception{
+      doDependencyModelTest("JDTUtilTest_testExtractReferences_typeSetByDeclaringMethod", 
+                            "data/typeSetByDeclaringMethod/test",
+                            "data/typeSetByDeclaringMethod/oracle/Dependencymodel.dependencymodel");
+   }
+
+   @Test
+   public void testExtractReferences_missingTypeParameters() throws Exception{
+      doDependencyModelTest("JDTUtilTest_testExtractReferences_missingTypeParameters", 
+                            "data/missingTypeParameters/test",
+                            "data/missingTypeParameters/oracle/Dependencymodel.dependencymodel");
+   }
+
+   @Test
+   public void testExtractReferences_genericTypeUsedInDeclaration() throws Exception{
+      doDependencyModelTest("JDTUtilTest_testExtractReferences_genericTypeUsedInDeclaration", 
+                            "data/genericTypeUsedInDeclaration/test",
+                            "data/genericTypeUsedInDeclaration/oracle/Dependencymodel.dependencymodel");
+   }
+
+   @Test
    public void testExtractReferences_starImports() throws Exception{
       doDependencyModelTest("JDTUtilTest_testExtractReferences_starImports", 
                             "data/starImports/test",

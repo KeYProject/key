@@ -88,6 +88,12 @@ public class DependencyAnalyzer extends ASTVisitor {
    protected AbstractType ensureTypeExists(ITypeVariableContainer containerType, ITypeBinding typeBinding) {
       if (typeBinding.isTypeVariable()) {
          AbstractType result = searchTypeVariable(containerType.getTypeVariables(), typeBinding);
+         if (result == null && containerType instanceof Type) {
+            Type type = (Type) containerType;
+            if (type.getDeclaringMethod() != null) {
+               result = ensureTypeExists(type.getDeclaringMethod(), typeBinding);
+            }
+         }
          if (result == null) {
             EObject parent = containerType.eContainer();
             if (parent instanceof ITypeVariableContainer) {
@@ -243,6 +249,7 @@ public class DependencyAnalyzer extends ASTVisitor {
     * @return The created {@link Type} representing the given {@link ITypeBinding}.
     */
    protected Type createType(ITypeVariableContainer containerType, ITypeBinding typeBinding) {
+      typeBinding = typeBinding.getTypeDeclaration(); // Otherwise type parameters are missing.
       String typeName = typeBinding.getQualifiedName();
       Type type = (Type)types.get(typeName);
       if (type == null) {
@@ -261,9 +268,7 @@ public class DependencyAnalyzer extends ASTVisitor {
          types.put(typeName, type);
          ITypeBinding[] typeParameters = typeBinding.getTypeParameters();
          for (ITypeBinding typeParameter : typeParameters) {
-            if(typeParameter != null){
-               type.getTypeVariables().add(createTypeVariable(containerType, typeParameter));
-            }
+            addTypeVariable(type, typeParameter);
          }
          ITypeBinding superClass = typeBinding.getSuperclass();
          if (superClass != null) {
@@ -276,6 +281,10 @@ public class DependencyAnalyzer extends ASTVisitor {
             } else {
                type.getImplements().add(ensureTypeExists(type, interfaceType));
             }
+         }
+         IMethodBinding declaringMethod = typeBinding.getDeclaringMethod();
+         if (declaringMethod != null) {
+            type.setDeclaringMethod(ensureMethodExist(declaringMethod));
          }
          ITypeBinding declaringClass = typeBinding.getDeclaringClass();
          if (declaringClass != null) {
@@ -349,55 +358,62 @@ public class DependencyAnalyzer extends ASTVisitor {
     * Ensures that the {@link Method} representation of the given {@link IMethodBinding} exist.
     * @param methodBinding The {@link IMethodBinding} to represent as {@link Method}.
     */
-   protected void ensureMethodExist(IMethodBinding methodBinding) {
+   protected Method ensureMethodExist(IMethodBinding methodBinding) {
       methodBinding = methodBinding.getMethodDeclaration();
       AbstractType methodType = ensureTypeExists(null, methodBinding.getDeclaringClass());
       methodType = findBaseType(methodType);
       if (methodType instanceof Type) { // Nothing needs to be done if Typ is not available
          Type typ = (Type)methodType;
-         if (!containsMethod(typ, methodBinding.getName(), methodBinding.getParameterTypes())) {
-            createMethodFromDeclaration(typ, methodBinding);
-         }              
+         Method method = searchMethod(typ, methodBinding.getName(), methodBinding.getParameterTypes());
+         if (method == null) {
+            method = createMethodFromDeclaration(typ, methodBinding);
+         }
+         return method;
+      }
+      else {
+         return null;
       }
    }
 
    /**
-    * Proves if declaration {@link String} of a {@link Method} is already filed in typ {@link Type} 
-    * @param typ {@link Type} 
-    * @param declaration {@link String} of a {@link Method}
-    * @return true {@link Boolean} if declaration {@link String} already exists and false {@link Boolean} if not
+    * Searches the {@link Method} of the given signature.
+    * @param typ The declaring {@link Type} to search method in. 
+    * @param methodName {@link String} of a {@link Method}.
+    * @param parameterTypes The parameter types.
+    * @return The found {@link Method} or {@code null} if not available.
     */
-   protected static boolean containsMethod(Type typ, String declaration, ITypeBinding[] typeparams) {
+   protected static Method searchMethod(Type typ, String methodName, ITypeBinding[] parameterTypes) {
       for (Method currentMethod : typ.getMethods()) {
-         if (currentMethod.getName().equals(declaration)) { 
+         if (currentMethod.getName().equals(methodName)) { 
             List<AbstractType> paramTyps = currentMethod.getParameterTypes();
-            if (paramTyps.size() == typeparams.length) {
+            if (paramTyps.size() == parameterTypes.length) {
                int i = 0;
                boolean allParamEquals = true;
                for (AbstractType paramTyp : paramTyps) {
-                  if (!paramTyp.getName().equals(typeparams[i].getQualifiedName())) {
+                  if (!paramTyp.getName().equals(parameterTypes[i].getQualifiedName())) {
                      allParamEquals = false;
                   }
                   i++;
                }
                if (allParamEquals) {
-                  return true;
+                  return currentMethod;
                }
             }
          }
       }
-      return false;
+      return null;
    }
    
    /**
     * Method creates {@link Method} from given {@link String} for given {@link Type}
     * @param typ {@link Type}
     * @param superMethodDeclaration {@link String}
+    * @return The created {@link Method}.
     */
-   protected void createMethodFromDeclaration(Type typ, IMethodBinding methodBinding) {
+   protected Method createMethodFromDeclaration(Type typ, IMethodBinding methodBinding) {
+      methodBinding = methodBinding.getMethodDeclaration();
       Method method = DependencymodelFactory.eINSTANCE.createMethod();
       typ.getMethods().add(method);
-      methodBinding = methodBinding.getMethodDeclaration();
       method.setName(methodBinding.getName());
       method.setVisibility(createVisibility(methodBinding.getModifiers()));
       method.setAbstract(Modifier.isAbstract(methodBinding.getModifiers()));
@@ -405,7 +421,7 @@ public class DependencyAnalyzer extends ASTVisitor {
       method.setStatic(Modifier.isStatic(methodBinding.getModifiers()));
       method.setConstructor(methodBinding.isConstructor());
       for (ITypeBinding typeParameter : methodBinding.getTypeParameters()) {
-         method.getTypeVariables().add(createTypeVariable(typ, typeParameter));
+         addTypeVariable(method, typeParameter);
       }
       for (ITypeBinding paramType : methodBinding.getParameterTypes()) {
          AbstractType emfParamType = ensureTypeExists(method, paramType);
@@ -417,6 +433,7 @@ public class DependencyAnalyzer extends ASTVisitor {
          method.getThrows().add(methodThrow);
       }
       method.setReturnType(ensureTypeExists(method, methodBinding.getReturnType()));
+      return method;
    }
    
    /**
@@ -425,9 +442,10 @@ public class DependencyAnalyzer extends ASTVisitor {
     * @param typeParameter The {@link ITypeBinding}.
     * @return The created {@link TypeVariable} representing the given {@link ITypeBinding}.
     */
-   protected TypeVariable createTypeVariable(ITypeVariableContainer containerType, ITypeBinding typeParameter) {
+   protected void addTypeVariable(ITypeVariableContainer containerType, ITypeBinding typeParameter) {
       TypeVariable typeVar = DependencymodelFactory.eINSTANCE.createTypeVariable();
       typeVar.setName(typeParameter.getQualifiedName());
+      containerType.getTypeVariables().add(typeVar);
       ITypeBinding[] boundBindings = typeParameter.getTypeBounds();
       if (boundBindings.length == 0) {
          ITypeBinding superBinding = typeParameter.getSuperclass();
@@ -439,7 +457,6 @@ public class DependencyAnalyzer extends ASTVisitor {
       else {
          throw new IllegalStateException("Type variable with not exactly one bound is not supported.");
       }
-      return typeVar;
    }
    
    /**
@@ -519,6 +536,7 @@ public class DependencyAnalyzer extends ASTVisitor {
     * @param variableBinding The {@link IVariableBinding} to represent as {@link Field}.
     */
    protected void ensureFieldExists(IVariableBinding variableBinding) {
+      variableBinding = variableBinding.getVariableDeclaration();
       ITypeBinding typeBinding = variableBinding.getDeclaringClass();
       if (typeBinding != null) { // In case of local variables the type binding is null
          AbstractType type = ensureTypeExists(null, typeBinding);

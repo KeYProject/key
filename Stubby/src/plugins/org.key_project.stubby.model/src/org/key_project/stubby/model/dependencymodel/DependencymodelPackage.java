@@ -249,13 +249,22 @@ public interface DependencymodelPackage extends EPackage {
    int TYPE__SIMPLE_NAME = ABSTRACT_TYPE_FEATURE_COUNT + 12;
 
    /**
+    * The feature id for the '<em><b>Declaring Method</b></em>' reference.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE__DECLARING_METHOD = ABSTRACT_TYPE_FEATURE_COUNT + 13;
+
+   /**
     * The number of structural features of the '<em>Type</em>' class.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int TYPE_FEATURE_COUNT = ABSTRACT_TYPE_FEATURE_COUNT + 13;
+   int TYPE_FEATURE_COUNT = ABSTRACT_TYPE_FEATURE_COUNT + 14;
 
    /**
     * The number of operations of the '<em>Type</em>' class.
@@ -970,6 +979,17 @@ public interface DependencymodelPackage extends EPackage {
    EAttribute getType_SimpleName();
 
    /**
+    * Returns the meta object for the reference '{@link org.key_project.stubby.model.dependencymodel.Type#getDeclaringMethod <em>Declaring Method</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the reference '<em>Declaring Method</em>'.
+    * @see org.key_project.stubby.model.dependencymodel.Type#getDeclaringMethod()
+    * @see #getType()
+    * @generated
+    */
+   EReference getType_DeclaringMethod();
+
+   /**
     * Returns the meta object for class '{@link org.key_project.stubby.model.dependencymodel.Method <em>Method</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -1470,6 +1490,14 @@ public interface DependencymodelPackage extends EPackage {
        * @generated
        */
       EAttribute TYPE__SIMPLE_NAME = eINSTANCE.getType_SimpleName();
+
+      /**
+       * The meta object literal for the '<em><b>Declaring Method</b></em>' reference feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EReference TYPE__DECLARING_METHOD = eINSTANCE.getType_DeclaringMethod();
 
       /**
        * The meta object literal for the '{@link org.key_project.stubby.model.dependencymodel.impl.MethodImpl <em>Method</em>}' class.

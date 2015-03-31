@@ -24,6 +24,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link org.key_project.stubby.model.dependencymodel.Type#isAbstract <em>Abstract</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.Type#getPackage <em>Package</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.Type#getSimpleName <em>Simple Name</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.Type#getDeclaringMethod <em>Declaring Method</em>}</li>
  * </ul>
  * </p>
  *
@@ -299,5 +300,31 @@ public interface Type extends AbstractType, ITypeVariableContainer {
     * @generated
     */
    void setSimpleName(String value);
+
+   /**
+    * Returns the value of the '<em><b>Declaring Method</b></em>' reference.
+    * <!-- begin-user-doc -->
+    * <p>
+    * If the meaning of the '<em>Declaring Method</em>' reference isn't clear,
+    * there really should be more of a description here...
+    * </p>
+    * <!-- end-user-doc -->
+    * @return the value of the '<em>Declaring Method</em>' reference.
+    * @see #setDeclaringMethod(Method)
+    * @see org.key_project.stubby.model.dependencymodel.DependencymodelPackage#getType_DeclaringMethod()
+    * @model
+    * @generated
+    */
+   Method getDeclaringMethod();
+
+   /**
+    * Sets the value of the '{@link org.key_project.stubby.model.dependencymodel.Type#getDeclaringMethod <em>Declaring Method</em>}' reference.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @param value the new value of the '<em>Declaring Method</em>' reference.
+    * @see #getDeclaringMethod()
+    * @generated
+    */
+   void setDeclaringMethod(Method value);
 
 } // Type

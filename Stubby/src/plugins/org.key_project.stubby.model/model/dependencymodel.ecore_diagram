@@ -630,4 +630,16 @@
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_EXmJQqe-EeSY2PZx5aRc3A" points="[-13, 21, 38, -63]$[-46, 58, 5, -26]"/>
     <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_EXnXYKe-EeSY2PZx5aRc3A" id="(0.5724137931034483,0.864516129032258)"/>
   </edges>
+  <edges xmi:type="notation:Connector" xmi:id="_bXrmUNe5EeSOs81eZsSIgw" type="4002" source="_uWN7sHopEeSmHruTPZhjmA" target="_uWXsunopEeSmHruTPZhjmA">
+    <children xmi:type="notation:DecorationNode" xmi:id="_bXsNYNe5EeSOs81eZsSIgw" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_bXsNYde5EeSOs81eZsSIgw" x="-65" y="-15"/>
+    </children>
+    <children xmi:type="notation:DecorationNode" xmi:id="_bXsNYte5EeSOs81eZsSIgw" type="6003">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_bXsNY9e5EeSOs81eZsSIgw" y="60"/>
+    </children>
+    <styles xmi:type="notation:FontStyle" xmi:id="_bXrmUde5EeSOs81eZsSIgw" fontName="Segoe UI"/>
+    <element xmi:type="ecore:EReference" href="dependencymodel.ecore#//Type/declaringMethod"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_bXrmUte5EeSOs81eZsSIgw" points="[15, 1, -299, -18]$[242, 69, -72, 50]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_bXv3wNe5EeSOs81eZsSIgw" id="(0.896551724137931,0.5548387096774193)"/>
+  </edges>
 </notation:Diagram>

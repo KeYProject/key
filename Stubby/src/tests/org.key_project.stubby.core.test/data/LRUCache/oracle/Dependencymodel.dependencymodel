@@ -33,13 +33,12 @@
     <typeVariables name="K" type="//@types.0"/>
     <typeVariables name="V" type="//@types.0"/>
     <methods name="LRUCache" returnType="//@types.13" parameterTypes="//@types.12" constructor="true"/>
-    <methods name="removeEldestEntry" visibility="PROTECTED" returnType="//@types.15" parameterTypes="//@types.17"/>
+    <methods name="removeEldestEntry" visibility="PROTECTED" returnType="//@types.15" parameterTypes="//@types.16"/>
     <fields name="maxEntries" visibility="PRIVATE" final="true" type="//@types.12"/>
   </types>
   <types xsi:type="dependencymodel:Datatype" name="int"/>
   <types xsi:type="dependencymodel:Datatype" name="void"/>
   <types xsi:type="dependencymodel:Datatype" name="float"/>
   <types xsi:type="dependencymodel:Datatype" name="boolean"/>
-  <types xsi:type="dependencymodel:GenericType" name="LRUCache" source="true" baseType="//@types.11" typeArguments="//@types.11/@typeVariables.0 //@types.11/@typeVariables.1"/>
   <types xsi:type="dependencymodel:GenericType" name="Entry" baseType="//@types.1/@innerTypes.0" typeArguments="//@types.11/@typeVariables.0 //@types.11/@typeVariables.1"/>
 </dependencymodel:DependencyModel>

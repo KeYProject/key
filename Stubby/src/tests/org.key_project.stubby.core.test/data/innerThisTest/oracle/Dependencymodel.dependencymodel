@@ -21,7 +21,7 @@
   <types xsi:type="dependencymodel:Type" name="javax.swing.JRootPane" extends="//@types.13" implements="//@types.6" package="javax.swing" simpleName="JRootPane"/>
   <types xsi:type="dependencymodel:Type" name="InnerThis" source="true" extends="//@types.0" package="" simpleName="InnerThis">
     <methods name="main" static="true" returnType="//@types.16"/>
-    <innerTypes name="" source="true" visibility="DEFAULT" extends="//@types.12" package="" simpleName="">
+    <innerTypes name="" source="true" visibility="DEFAULT" extends="//@types.12" package="" simpleName="" declaringMethod="//@types.15/@methods.0">
       <methods name="" visibility="DEFAULT" returnType="//@types.16" throws="//@types.21" constructor="true"/>
       <methods name="inner" returnType="//@types.14"/>
     </innerTypes>
