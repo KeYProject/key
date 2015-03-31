@@ -10,7 +10,7 @@ public abstract class TacletIndexKit {
     private static final TacletIndexKit ACTIVE_TACLET_INDEX_KIT;
     
     static {
-        final String threading = System.getProperty("tacletindex.threading.enabled", "true");
+        final String threading = System.getProperty("tacletindex.threading.enabled", "false");
         if ("true".equals(threading)) {
             ACTIVE_TACLET_INDEX_KIT = new MultiThreadedTacletIndexKit();
         } else {

@@ -28,19 +28,18 @@ import de.uka.ilkd.key.rule.TacletMatcher;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
+import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.util.Pair;
 
 /** 
  * Matching algorithm using a virtual machine based approach inspired by Voronkonv et al.
  * It matches exactly one taclet and does not produce code trees.
  * 
- * An instance of this class is created using teh factory method {@link #createVMTacletMatcher(Taclet)}.
+ * Instances of this class should <strong>not</strong> be created directly, use
+ * {@link TacletMatcherKit#createTacletMatcher(Taclet)} instead.
+ * @see TacletMatcherKit
  */
 public class VMTacletMatcher implements TacletMatcher {
-
-    public static VMTacletMatcher createVMTacletMatcher(Taclet taclet) {
-        return new VMTacletMatcher(taclet);
-    }
 
     /** the matcher for the find expression of the taclet */
     private final TacletMatchProgram findMatchProgram;
@@ -74,7 +73,7 @@ public class VMTacletMatcher implements TacletMatcher {
     /**
      * @param taclet the Taclet matched by this matcher
      */
-    private VMTacletMatcher(Taclet taclet) {
+    public VMTacletMatcher(Taclet taclet) {
         varconditions = taclet.getVariableConditions();
         assumesSequent = taclet.ifSequent();
         boundVars = taclet.getBoundVariables();

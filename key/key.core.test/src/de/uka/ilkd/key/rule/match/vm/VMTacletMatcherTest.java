@@ -39,7 +39,7 @@ public class VMTacletMatcherTest extends TestCase {
                     lookupActiveTaclet(new Name("taclet_match_rule_"+(i+1)));
             assertNotNull("Taclet required for test not found", taclet[i]);
             assertTrue("Taclet should be a FindTaclet, but is not.", taclet[i] instanceof FindTaclet);
-            matcher[i] = VMTacletMatcher.createVMTacletMatcher(taclet[i]);
+            matcher[i] = new VMTacletMatcher(taclet[i]);
         }
         services = pa.getFirstProof().getServices();
     }

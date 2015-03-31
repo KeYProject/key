@@ -31,18 +31,18 @@ import de.uka.ilkd.key.rule.NotFreeIn;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletMatcher;
 import de.uka.ilkd.key.rule.VariableCondition;
+import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.util.Pair;
 
 /** 
  * This class encapsulates the matching logic for taclet's.
+ * 
+ * Instances of this class should <strong>not</strong> be created directly, use
+ * {@link TacletMatcherKit#createTacletMatcher(Taclet)} instead.
+ * @see TacletMatcherKit
  */
-public final class DefaultTacletMatcher implements TacletMatcher {
+public final class LegacyTacletMatcher implements TacletMatcher {
 
-    public static TacletMatcher createTacletMatcher(Taclet taclet) {
-        return new DefaultTacletMatcher(taclet);
-    }
-
-    
     private final ImmutableList<VariableCondition> varconditions;
     private final Sequent assumesSequent;
     private final ImmutableSet<QuantifiableVariable> boundVars;
@@ -54,7 +54,7 @@ public final class DefaultTacletMatcher implements TacletMatcher {
     /**
      * @param taclet the Taclet matched by this matcher
      */
-    private DefaultTacletMatcher(Taclet taclet) {
+    public LegacyTacletMatcher(Taclet taclet) {
         varconditions = taclet.getVariableConditions();
         assumesSequent = taclet.ifSequent();
         boundVars = taclet.getBoundVariables();

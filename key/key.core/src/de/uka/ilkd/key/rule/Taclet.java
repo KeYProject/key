@@ -13,14 +13,10 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -56,8 +52,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.match.legacy.DefaultTacletMatcher;
-import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher;
+import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
@@ -108,19 +103,6 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 public abstract class Taclet implements Rule, Named {
     
     private static final String AUTONAME = "_taclet";
-
-    private static final String TACLET_MACTHER_SELECTION = "taclet.match";
-    private static final String TACLET_MATCHER_SELECTION_VALUE=""+System.getProperties().get(TACLET_MACTHER_SELECTION);
-    private static final String[] TACLET_MATCH_SUPPORTED = {"legacy", "vm"};
-    private static Logger logger;
-    static {
-        logger = Logger.getLogger("de.uka.ilkd.key.rule.Taclet");
-        logger.addHandler(new ConsoleHandler());
-        logger.log(Level.INFO, "Matching algorithm: " + TACLET_MATCHER_SELECTION_VALUE);
-        if (Arrays.binarySearch(TACLET_MATCH_SUPPORTED, TACLET_MATCHER_SELECTION_VALUE) < 0) {
-            logger.log(Level.WARNING, "Matching algorithm " + TACLET_MATCHER_SELECTION_VALUE + " unknown.");
-        }
-    }
 
     /** name of the taclet */
     private final Name name;
@@ -280,14 +262,8 @@ public abstract class Taclet implements Rule, Named {
     }
     
     protected void createAndInitializeMatcher() {      
-        if (TACLET_MATCH_SUPPORTED[0].equals(TACLET_MATCHER_SELECTION_VALUE)) {
-            this.matcher = DefaultTacletMatcher.createTacletMatcher(this);
-        } else if (TACLET_MATCH_SUPPORTED[1].equals(TACLET_MATCHER_SELECTION_VALUE)) {
-            this.matcher = VMTacletMatcher.createVMTacletMatcher(this);
-        } else {
-            logger.log(Level.FINE, "Unknown or no matcher specified. Falling back to legacy");
-            this.matcher = DefaultTacletMatcher.createTacletMatcher(this);
-        }
+      
+        this.matcher = TacletMatcherKit.getKit().createTacletMatcher(this);
     }
 
     
