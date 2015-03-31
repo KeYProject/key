@@ -49,8 +49,6 @@ public class SynchronizedBlock extends JavaStatement
     
     private final ImmutableArray<ProgramPrefix> prefixElementArray;
     
-    private PosInProgram firstActiveChildPos = null;
-
     /**
  *      Synchronized block.
  *      @param body a statement block.
@@ -60,7 +58,6 @@ public class SynchronizedBlock extends JavaStatement
         this.body=body;
 	this.expression=null;
         prefixElementArray = computePrefix(body);
-        
     }
 
     /**
@@ -73,7 +70,6 @@ public class SynchronizedBlock extends JavaStatement
         expression=e;
         this.body=body;
         prefixElementArray = computePrefix(body);
-        
     }
 
     /**
@@ -85,7 +81,7 @@ public class SynchronizedBlock extends JavaStatement
         super(children);
 	expression = children.get(Expression.class);
 	body = children.get(StatementBlock.class);
-        prefixElementArray = computePrefix(body);        
+        prefixElementArray = computePrefix(body); 
     }
 
 
@@ -109,10 +105,7 @@ public class SynchronizedBlock extends JavaStatement
     
     
     public PosInProgram getFirstActiveChildPos() {
-        if (firstActiveChildPos == null) {
-            firstActiveChildPos = getStatementCount() == 0 ? PosInProgram.TOP : PosInProgram.TOP.down(1);
-        } 
-        return firstActiveChildPos;
+        return getStatementCount() == 0 ? PosInProgram.TOP : PosInProgram.ONE;
     }
     
     /**

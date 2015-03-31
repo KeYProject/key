@@ -32,7 +32,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
  */
 public class Try extends BranchStatement 
     implements StatementContainer, ProgramPrefix {
-
+    
     /**
      * Body.
      */
@@ -46,8 +46,6 @@ public class Try extends BranchStatement
     private final ImmutableArray<Branch> branches;
 
     private final ImmutableArray<ProgramPrefix> prefixElementArray;
-
-    private PosInProgram firstActiveChildPos = null;
     
     /**
  *      Try.
@@ -55,9 +53,9 @@ public class Try extends BranchStatement
      */
 
     public Try(StatementBlock body) {
-        this.body=body;
-	this.branches=null;
-        prefixElementArray = computePrefix(body);
+        this.body           = body;
+        this.branches       = null;
+        prefixElementArray  = computePrefix(body);
     }
 
     /**
@@ -67,9 +65,9 @@ public class Try extends BranchStatement
      */
 
     public Try(StatementBlock body, Branch[] branches) {
-        this.body=body;
-	this.branches=new ImmutableArray<Branch>(branches);
-        prefixElementArray = computePrefix(body);
+        this.body           = body;
+        this.branches       = new ImmutableArray<Branch>(branches);
+        prefixElementArray  = computePrefix(body);
     }
 
     /**
@@ -80,7 +78,7 @@ public class Try extends BranchStatement
 
     public Try(StatementBlock body, ImmutableArray<Branch> branches) {
         this.body=body;
-	this.branches = branches;
+        this.branches = branches;
         prefixElementArray = computePrefix(body);
     }
 
@@ -235,11 +233,6 @@ public class Try extends BranchStatement
     }
 
     public PosInProgram getFirstActiveChildPos() {
-        
-        if (firstActiveChildPos == null) {
-            firstActiveChildPos = body.isEmpty() ? PosInProgram.TOP : PosInProgram.TOP.down(0).down(0);            
-        }
-        
-        return firstActiveChildPos;
+        return body.isEmpty() ? PosInProgram.TOP : PosInProgram.ZERO_ZERO;            
     }
 }

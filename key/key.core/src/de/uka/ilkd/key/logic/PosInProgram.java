@@ -26,6 +26,14 @@ public class PosInProgram {
     /** pos at the beginning of the program */
     public static final PosInProgram TOP = new PosInProgram();
 
+    /** often used positions */
+    public static final PosInProgram ZERO = TOP.down(0);
+    public static final PosInProgram ZERO_ZERO = ZERO.down(0);
+    public static final PosInProgram ZERO_ONE  = ZERO.down(1);
+    public static final PosInProgram ONE = TOP.down(1);
+    public static final PosInProgram ONE_ZERO = ONE.down(0);
+    public static final PosInProgram ONE_ONE  = ONE.down(1);
+
 
     private final PosInProgram prev;
     
@@ -42,7 +50,7 @@ public class PosInProgram {
     /**
      * caches iterator for performance reasons
      */
-    private int[] cache;
+    private volatile int[] cache;
 
     private final int hashCode;
 
@@ -68,6 +76,7 @@ public class PosInProgram {
 	    result = 
                 ((JavaNonTerminalProgramElement)result).getChildAt(it.next());
 	}
+
 	return result;
     }
 
@@ -224,16 +233,20 @@ public class PosInProgram {
      * @return an iterator over the list defining the position in a term.
      */
     public IntIterator iterator() {	
-	if (cache == null) {	
-            fillCache();
-	} 	
+        if (cache == null) {
+            synchronized(this) {
+                if (cache == null) {	
+                    fillCache();
+                } 	
+            }
+        }
 	return new PosArrayIntIterator(cache);
     }
     
   
 
     private void fillCache() {
-	cache = new int[depth];
+        int[] cache = new int[depth];
         if (prev != null &&
                 prev.cache != null) {
             System.arraycopy(prev.cache, 0, cache, 0, prev.cache.length);
@@ -246,6 +259,7 @@ public class PosInProgram {
                 at--;
             }
         }
+        this.cache = cache;
     }
 
     

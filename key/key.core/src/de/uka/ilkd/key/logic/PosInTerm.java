@@ -36,7 +36,7 @@ public final class PosInTerm {
     // to save memory, we use 16bit integers (unsigned) instead of 32bit
     private final char[] positions;
     private final char size;
-    private char hash = (char)-1;
+    private volatile char hash = (char)-1;
     private boolean copy;
 
     
@@ -196,11 +196,15 @@ public final class PosInTerm {
 
     public int hashCode() {        
         if (hash == (char)-1) {
-            hash = 13;
-            for (int i = 0; i < size; i++) {
-                hash = (char) (13 * hash + positions[i]);
-            }        
-            hash = hash == -1 ? 0 : hash;
+            synchronized(this) {
+                if (hash == (char)-1) {
+                    hash = 13;
+                    for (int i = 0; i < size; i++) {
+                        hash = (char) (13 * hash + positions[i]);
+                    }        
+                    hash = hash == -1 ? 0 : hash;
+                }
+            }
         } 
         return hash;
     }
