@@ -7,6 +7,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -29,6 +30,7 @@ import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
+import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
 import de.uka.ilkd.key.util.Pair;
 
 /** 
@@ -323,6 +325,40 @@ public class VMTacletMatcher implements TacletMatcher {
         }
         
         return matchCond; 
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MatchConditions matchSV(SchemaVariable sv, Term term,
+            MatchConditions matchCond, Services services) {
+
+        final MatchSchemaVariableInstruction<? extends SchemaVariable> instr = TacletMatchProgram.getMatchInstructionForSV(sv);
+        
+        matchCond = instr.match(term, matchCond, services);
+
+        if (matchCond != null) {
+            matchCond = checkVariableConditions(sv, term, matchCond, services);
+        }
+
+        return matchCond; 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+   @Override
+    public MatchConditions matchSV(SchemaVariable sv, ProgramElement pe, MatchConditions matchCond, Services services) {
+       final MatchSchemaVariableInstruction<? extends SchemaVariable> instr = TacletMatchProgram.getMatchInstructionForSV(sv);
+       matchCond = instr.match(pe, matchCond, services);
+       
+       if (matchCond != null) {
+           matchCond = checkConditions(matchCond, services);
+       }
+       
+       return matchCond;
     }
     
 }

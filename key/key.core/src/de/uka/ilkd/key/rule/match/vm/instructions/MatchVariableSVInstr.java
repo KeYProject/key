@@ -13,7 +13,11 @@ public class MatchVariableSVInstr extends MatchSchemaVariableInstruction<Variabl
         super(op);
     }
 
-    private MatchConditions match(Term subst, MatchConditions mc, Services services) {                
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MatchConditions match(Term subst, MatchConditions mc, Services services) {                
         if (subst.op() instanceof QuantifiableVariable) {
             final Term foundMapping = (Term) mc.getInstantiations().getInstantiation(op);
             if(foundMapping == null) {

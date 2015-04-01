@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
@@ -26,28 +27,28 @@ public abstract class Instruction<OP extends Operator> implements IMatchInstruct
         return new MatchSortDependingFunctionInstr(op);
     }
 
-    public static Instruction<ModalOperatorSV> matchModalOperatorSV(
+    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchModalOperatorSV(
             ModalOperatorSV sv) {
         return new MatchModalOperatorSVInstruction(sv);
     }
 
-    public static Instruction<FormulaSV> matchFormulaSV(FormulaSV sv) {
+    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchFormulaSV(FormulaSV sv) {
         return new MatchFormulaSVInstruction(sv);
     }
 
-    public static Instruction<TermSV> matchTermSV(TermSV sv) {
+    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchTermSV(TermSV sv) {
         return new MatchTermSVInstruction(sv);
     }
 
-    public static Instruction<VariableSV> matchVariableSV(VariableSV sv) {
+    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchVariableSV(VariableSV sv) {
         return new MatchVariableSVInstr(sv);
     }
 
-    public static Instruction<ProgramSV> matchProgramSV(ProgramSV sv) {
+    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchProgramSV(ProgramSV sv) {
         return new MatchProgramSVInstruction(sv);
     }
 
-    public static Instruction<UpdateSV> matchUpdateSV(UpdateSV sv) {
+    public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchUpdateSV(UpdateSV sv) {
         return new MatchUpdateSVInstruction(sv);
     }
 

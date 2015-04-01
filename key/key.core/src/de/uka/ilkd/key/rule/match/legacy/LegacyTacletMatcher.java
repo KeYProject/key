@@ -8,6 +8,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.ContextStatementBlock;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -407,6 +408,44 @@ public final class LegacyTacletMatcher implements TacletMatcher {
         }
         
         return matchCond; 
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MatchConditions matchSV(SchemaVariable sv, Term term,
+            MatchConditions matchCond, Services services) {
+        MatchConditions cond = matchCond;
+
+        if (sv.arity() == 0) {
+            cond = sv.match(term, cond, services);
+        } else {
+            cond = sv.match(term.op(), cond, services);
+        }
+
+        if (cond != null) {
+            cond = checkVariableConditions(sv, term, cond, services); 
+        }
+
+        return cond; 
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MatchConditions matchSV(SchemaVariable sv, ProgramElement pe,
+            MatchConditions matchCond, Services services) {        
+        matchCond = sv.match(pe, matchCond, services);
+        
+        if (matchCond != null) {
+            matchCond = checkConditions(matchCond, services);
+        }
+        
+        return matchCond;
     }
 
 }

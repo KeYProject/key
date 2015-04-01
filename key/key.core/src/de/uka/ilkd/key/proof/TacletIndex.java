@@ -339,7 +339,9 @@ public abstract class TacletIndex  {
     protected abstract ImmutableList<NoPosTacletApp> matchTaclets(ImmutableList<NoPosTacletApp> tacletApps,
             final RuleFilter           p_filter,
             final PosInOccurrence      pos,
-            final Services             services);    /**
+            final Services             services);   
+    
+    /**
      * returns a selection from the given map with NoPosTacletApps relevant for
      * the given program element. Occurring prefix elements are tracked and
      * taclet applications for them are added.

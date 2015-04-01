@@ -12,9 +12,11 @@ public class MatchTermSVInstruction extends  MatchSchemaVariableInstruction<Term
         super(op);
     }
   
-    private MatchConditions match(Term subst, 
-                     MatchConditions mc,
-                     Services services) {   
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MatchConditions match(Term subst, MatchConditions mc, Services services) {   
         return addInstantiation(subst, mc, services);
     }
 

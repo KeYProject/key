@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.instructions.IMatchInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.Instruction;
+import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
 
 /**
  * Instances of this class represent programs for matching a term against a given pattern. The programs are 
@@ -57,6 +58,41 @@ public class TacletMatchProgram {
     }
     
     /**
+     * returns the  instruction for the specified variable
+     * @param sv the {@link SchemaVariable} for which to get the instruction
+     * @return the  instruction for the specified variable
+     */
+    static MatchSchemaVariableInstruction<? extends SchemaVariable> getMatchInstructionForSV(SchemaVariable op) {
+        MatchSchemaVariableInstruction<? extends SchemaVariable> instruction = null;
+        
+        if (op instanceof ModalOperatorSV) {
+            instruction = Instruction.matchModalOperatorSV((ModalOperatorSV) op);
+        }
+        else if (op instanceof FormulaSV) {
+            instruction = Instruction.matchFormulaSV((FormulaSV) op);
+        }
+        else if (op instanceof TermSV) {
+            instruction = Instruction.matchTermSV((TermSV) op);
+        }
+        else if (op instanceof VariableSV) {
+            instruction = Instruction.matchVariableSV((VariableSV) op);
+        }
+        else if (op instanceof ProgramSV) {
+            instruction = Instruction.matchProgramSV((ProgramSV) op);
+        }
+        else if (op instanceof UpdateSV) {
+            instruction = Instruction.matchUpdateSV((UpdateSV) op);
+        }            
+        else {
+            throw new IllegalArgumentException("Do not know how to match "
+                    + op + " of type " + op.getClass());
+        }        
+        return instruction;
+    }
+
+
+    
+    /**
      * creates a matching program for the given pattern. It appends the necessary match instruction
      * to the given list of instructions
      * @param pattern the Term used as pattern for which to create a matcher
@@ -85,30 +121,7 @@ public class TacletMatchProgram {
         }
         
         if (op instanceof SchemaVariable) {
-            if (op instanceof ModalOperatorSV) {
-                program.add(Instruction
-                        .matchModalOperatorSV((ModalOperatorSV) op));
-            }
-            else if (op instanceof FormulaSV) {
-                program.add(Instruction.matchFormulaSV((FormulaSV) op));
-            }
-            else if (op instanceof TermSV) {
-                program.add(Instruction.matchTermSV((TermSV) op));
-            }
-            else if (op instanceof VariableSV) {
-                program.add(Instruction
-                        .matchVariableSV((VariableSV) op));
-            }
-            else if (op instanceof ProgramSV) {
-                program.add(Instruction.matchProgramSV((ProgramSV) op));
-            }
-            else if (op instanceof UpdateSV) {
-                program.add(Instruction.matchUpdateSV((UpdateSV) op));
-            }            
-            else {
-                throw new IllegalArgumentException("Do not know how to match "
-                        + op + " of type " + op.getClass());
-            }
+            program.add(getMatchInstructionForSV((SchemaVariable)op));
         }
         else if (op instanceof SortDependingFunction) {
             program.add(Instruction

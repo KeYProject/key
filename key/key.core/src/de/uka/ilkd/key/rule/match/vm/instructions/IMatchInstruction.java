@@ -8,4 +8,5 @@ public interface IMatchInstruction {
 
     public MatchConditions match(TermNavigator termPosition,
             MatchConditions matchConditions, Services services);
+
 }

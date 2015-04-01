@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -83,5 +84,29 @@ public interface TacletMatcher {
     * the matching failed
     */
    public abstract MatchConditions matchFind(Term term, MatchConditions matchCond, Services services);
+   
+   
+   /** 
+    * checks whether the given {@link SchemaVariable} {@code sv} matches the {@link Term} {@code term} w.r.t.
+    * the constraints (e.g., previous matches of {@code sv}) specified in the {@link MatchConditions} {@code matchCond}
+    * @param sv the {@link SchemaVariable} 
+    * @param term the {@link Term} as a candidate for instantition of {@code sv} 
+    * @param matchCond the {@link MatchConditions} with additional constraints that need to be considered
+    * @param services the {@link Services}
+    * @return {@code null} if the match is not possible or the new {@link MatchConditions} with the instantiation {@code sv <- term} added
+    */
+   public abstract MatchConditions matchSV(SchemaVariable sv, Term term, MatchConditions matchCond, Services services);
+
+   /** 
+    * checks whether the given {@link SchemaVariable} {@code sv} matches the {@link ProgramElement} {@code pe} w.r.t.
+    * the constraints (e.g., previous matches of {@code sv}) specified in the {@link MatchConditions} {@code matchCond}
+    * @param sv the {@link SchemaVariable} 
+    * @param pe the {@link ProgramElement} as a candidate for instantition of {@code sv} 
+    * @param matchCond the {@link MatchConditions} with additional constraints that need to be considered
+    * @param services the {@link Services}
+    * @return {@code null} if the match is not possible or the new {@link MatchConditions} with the instantiation {@code sv <- term} added
+    */
+   public abstract MatchConditions matchSV(SchemaVariable sv, ProgramElement term, MatchConditions matchCond, Services services);
+
 
 }
