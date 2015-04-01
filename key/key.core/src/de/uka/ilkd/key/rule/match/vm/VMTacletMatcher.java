@@ -304,7 +304,6 @@ public class VMTacletMatcher implements TacletMatcher {
         }
     }
 
-    
     /**
      * {@inheritDoc}
      */
@@ -319,7 +318,7 @@ public class VMTacletMatcher implements TacletMatcher {
                 term = resultUpdateMatch.first;
                 matchCond = resultUpdateMatch.second;
             }
-            matchCond = checkConditions(findMatchProgram.match(term, matchCond, services), services); 
+            matchCond = checkConditions(findMatchProgram.match(term, matchCond, services), services);
         } else {
             matchCond = null;
         }

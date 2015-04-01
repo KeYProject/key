@@ -168,7 +168,7 @@ public final class PosInTerm {
             } else {
                 positions[size] = (char)i;
                 copy   = true;
-                result = new PosInTerm(positions, (char)(size + 1), true);            
+                result = new PosInTerm(positions, (char)(size + 1), size >= positions.length - 1);            
             }
         }
         return result;
