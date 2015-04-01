@@ -2,11 +2,10 @@ package org.key_project.stubby.core.template;
 
 import java.util.List;
 
-import org.key_project.stubby.model.dependencymodel.AbstractType;
 import org.key_project.stubby.model.dependencymodel.Field;
-import org.key_project.stubby.model.dependencymodel.GenericType;
 import org.key_project.stubby.model.dependencymodel.Method;
 import org.key_project.stubby.model.dependencymodel.Type;
+import org.key_project.stubby.model.dependencymodel.TypeUsage;
 import org.key_project.stubby.model.dependencymodel.TypeVariable;
 import org.key_project.stubby.model.dependencymodel.Visibility;
 import org.key_project.util.java.StringUtil;
@@ -93,34 +92,34 @@ public class TypeTemplate {
             }
             sb.append(var.getName());
             sb.append(" extends ");
-            sb.append(var.getType().getName());
+            sb.append(var.getType().getType());
          }
          sb.append(">");
       }
       if (!type.getExtends().isEmpty()) {
          sb.append(" extends ");
          boolean afterFirst = false;
-         for (AbstractType extendType : type.getExtends()) {
+         for (TypeUsage extendType : type.getExtends()) {
             if (afterFirst) {
                sb.append(", ");
             }
             else {
                afterFirst = true;
             }
-            appendTypeName(extendType, sb);
+            sb.append(extendType.getType());
          }
       }
       if (!type.getImplements().isEmpty()) {
          sb.append(" implements ");
          boolean afterFirst = false;
-         for (AbstractType implementsType : type.getImplements()) {
+         for (TypeUsage implementsType : type.getImplements()) {
             if (afterFirst) {
                sb.append(", ");
             }
             else {
                afterFirst = true;
             }
-            appendTypeName(implementsType, sb);
+            sb.append(implementsType.getType());
          }
       }
       sb.append(" {" + NL);
@@ -146,32 +145,6 @@ public class TypeTemplate {
          sb.append(NL);
       }
       sb.append(INDENT +"}");
-   }
-
-   /**
-    * Appends the name of the given {@link AbstractType}.
-    * @param type The {@link AbstractType} to append its name.
-    * @param sb The {@link StringBuffer} to append to.
-    */
-   protected void appendTypeName(AbstractType type, StringBuffer sb) {
-      sb.append(type.getName());
-      if (type instanceof GenericType) {
-         GenericType genericType = (GenericType) type;
-         if (!genericType.getTypeArguments().isEmpty()) {
-            sb.append("<");
-            boolean afterFirst = false;
-            for (AbstractType arg : genericType.getTypeArguments()) {
-               if (afterFirst) {
-                  sb.append(", ");
-               }
-               else {
-                  afterFirst = true;
-               }
-               appendTypeName(arg, sb);
-            }
-            sb.append(">");
-         }
-      }
    }
 
    /**
@@ -201,23 +174,37 @@ public class TypeTemplate {
          sb.append("final ");
       }
       if (!method.isConstructor()) {
-         sb.append(method.getReturnType().getName() + " ");
+         sb.append(method.getReturnType().getType() + " ");
       }
       sb.append(method.getName() + "(");
       int paramCount = 0;
       boolean afterFirst = false;
-      for (AbstractType paramType : method.getParameterTypes()) {
+      for (TypeUsage paramType : method.getParameterTypes()) {
          if (afterFirst) {
             sb.append(", ");
          }
          else {
             afterFirst = true;
          }
-         sb.append(paramType.getName());
+         sb.append(paramType.getType());
          sb.append(" param");
          sb.append(paramCount++);
       }
-      sb.append(");");
+      sb.append(")");
+      if (!method.getThrows().isEmpty()) {
+         sb.append(" throws ");
+         afterFirst = false;
+         for (TypeUsage thrownType : method.getThrows()) {
+            if (afterFirst) {
+               sb.append(", ");
+            }
+            else {
+               afterFirst = true;
+            }
+            sb.append(thrownType.getType());
+         }
+      }
+      sb.append(";");
    }
 
    /**
@@ -238,7 +225,7 @@ public class TypeTemplate {
       if (field.isFinal()) {
          sb.append( "final ");
       }
-      sb.append(field.getType().getName() + " " + field.getName());
+      sb.append(field.getType().getType() + " " + field.getName());
       if (!StringUtil.isTrimmedEmpty(field.getConstantValue())) {
          sb.append("= ");
          sb.append(field.getConstantValue());

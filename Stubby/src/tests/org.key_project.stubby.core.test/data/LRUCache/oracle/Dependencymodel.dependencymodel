@@ -1,44 +1,83 @@
 <?xml version="1.0" encoding="ASCII"?>
-<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
-  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.Map" kind="INTERFACE" package="java.util" simpleName="Map">
-    <typeVariables name="K" type="//@types.0"/>
-    <typeVariables name="V" type="//@types.0"/>
-    <innerTypes name="java.util.Map.Entry" kind="INTERFACE" static="true" package="java.util" simpleName="Entry">
-      <typeVariables name="K" type="//@types.0"/>
-      <typeVariables name="V" type="//@types.0"/>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.util" name="java.util.Map" simpleName="Map">
+    <typeVariables name="K">
+      <type type="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="V">
+      <type type="java.lang.Object"/>
+    </typeVariables>
+    <innerTypes kind="INTERFACE" static="true" package="java.util" name="java.util.Map.Entry" simpleName="Entry">
+      <typeVariables name="K">
+        <type type="java.lang.Object"/>
+      </typeVariables>
+      <typeVariables name="V">
+        <type type="java.lang.Object"/>
+      </typeVariables>
     </innerTypes>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="Map" baseType="//@types.1" typeArguments="//@types.3/@typeVariables.0 //@types.3/@typeVariables.1"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.AbstractMap" extends="//@types.0" implements="//@types.2" abstract="true" package="java.util" simpleName="AbstractMap">
-    <typeVariables name="K" type="//@types.0"/>
-    <typeVariables name="V" type="//@types.0"/>
+  <types abstract="true" package="java.util" name="java.util.AbstractMap" simpleName="AbstractMap">
+    <typeVariables name="K">
+      <type type="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="V">
+      <type type="java.lang.Object"/>
+    </typeVariables>
+    <implements type="java.util.Map&lt;K,V>"/>
+    <extends type="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="AbstractMap" baseType="//@types.3" typeArguments="//@types.7/@typeVariables.0 //@types.7/@typeVariables.1"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Cloneable" kind="INTERFACE" package="java.lang" simpleName="Cloneable"/>
-  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.HashMap" extends="//@types.4" implements="//@types.2 //@types.5 //@types.6" package="java.util" simpleName="HashMap">
-    <typeVariables name="K" type="//@types.0"/>
-    <typeVariables name="V" type="//@types.0"/>
-    <methods name="size" returnType="//@types.12"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Cloneable" simpleName="Cloneable"/>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types package="java.util" name="java.util.HashMap" simpleName="HashMap">
+    <typeVariables name="K">
+      <type type="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="V">
+      <type type="java.lang.Object"/>
+    </typeVariables>
+    <methods name="size">
+      <returnType type="int"/>
+    </methods>
+    <implements type="java.util.Map&lt;K,V>"/>
+    <implements type="java.lang.Cloneable"/>
+    <implements type="java.io.Serializable"/>
+    <extends type="java.util.AbstractMap&lt;K,V>"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="HashMap" baseType="//@types.7" typeArguments="//@types.9/@typeVariables.0 //@types.9/@typeVariables.1"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.LinkedHashMap" extends="//@types.8" implements="//@types.2" package="java.util" simpleName="LinkedHashMap">
-    <typeVariables name="K" type="//@types.0"/>
-    <typeVariables name="V" type="//@types.0"/>
-    <methods name="LinkedHashMap" returnType="//@types.13" parameterTypes="//@types.12 //@types.14 //@types.15" constructor="true"/>
+  <types package="java.util" name="java.util.LinkedHashMap" simpleName="LinkedHashMap">
+    <typeVariables name="K">
+      <type type="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="V">
+      <type type="java.lang.Object"/>
+    </typeVariables>
+    <methods name="LinkedHashMap" constructor="true">
+      <returnType type="void"/>
+      <parameterTypes type="int"/>
+      <parameterTypes type="float"/>
+      <parameterTypes type="boolean"/>
+    </methods>
+    <implements type="java.util.Map&lt;K,V>"/>
+    <extends type="java.util.HashMap&lt;K,V>"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="LinkedHashMap" baseType="//@types.9" typeArguments="//@types.11/@typeVariables.0 //@types.11/@typeVariables.1"/>
-  <types xsi:type="dependencymodel:Type" name="org.key_project.util.LRUCache" source="true" extends="//@types.10" package="org.key_project.util" simpleName="LRUCache">
-    <typeVariables name="K" type="//@types.0"/>
-    <typeVariables name="V" type="//@types.0"/>
-    <methods name="LRUCache" returnType="//@types.13" parameterTypes="//@types.12" constructor="true"/>
-    <methods name="removeEldestEntry" visibility="PROTECTED" returnType="//@types.15" parameterTypes="//@types.16"/>
-    <fields name="maxEntries" visibility="PRIVATE" final="true" type="//@types.12"/>
+  <types package="org.key_project.util" name="org.key_project.util.LRUCache" source="true" simpleName="LRUCache">
+    <typeVariables name="K">
+      <type type="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="V">
+      <type type="java.lang.Object"/>
+    </typeVariables>
+    <methods name="LRUCache" constructor="true">
+      <returnType type="void"/>
+      <parameterTypes type="int"/>
+    </methods>
+    <methods name="removeEldestEntry" visibility="PROTECTED">
+      <returnType type="boolean"/>
+      <parameterTypes type="java.util.Map.Entry&lt;K,V>"/>
+    </methods>
+    <fields name="maxEntries" visibility="PRIVATE" final="true">
+      <type type="int"/>
+    </fields>
+    <extends type="java.util.LinkedHashMap&lt;K,V>"/>
   </types>
-  <types xsi:type="dependencymodel:Datatype" name="int"/>
-  <types xsi:type="dependencymodel:Datatype" name="void"/>
-  <types xsi:type="dependencymodel:Datatype" name="float"/>
-  <types xsi:type="dependencymodel:Datatype" name="boolean"/>
-  <types xsi:type="dependencymodel:GenericType" name="Entry" baseType="//@types.1/@innerTypes.0" typeArguments="//@types.11/@typeVariables.0 //@types.11/@typeVariables.1"/>
 </dependencymodel:DependencyModel>

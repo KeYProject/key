@@ -3,7 +3,7 @@ package java.io;
 /**
  * @generated
  */
-public class File extends java.lang.Object implements java.io.Serializable, Comparable<java.io.File> {
+public class File extends java.lang.Object implements java.io.Serializable, java.lang.Comparable<java.io.File> {
    /**
     * @generated
     */

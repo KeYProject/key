@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="ASCII"?>
-<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
-  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.Comparator" kind="INTERFACE" package="java.util" simpleName="Comparator">
-    <typeVariables name="T" type="//@types.0"/>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.util" name="java.util.Comparator" simpleName="Comparator">
+    <typeVariables name="T">
+      <type type="java.lang.Object"/>
+    </typeVariables>
   </types>
-  <types xsi:type="dependencymodel:Type" name="ObjectUtil" source="true" final="true" extends="//@types.0" package="" simpleName="ObjectUtil">
-    <methods name="createEqualsComparator" static="true" returnType="//@types.3">
-      <typeVariables name="T" type="//@types.0"/>
+  <types final="true" package="" name="ObjectUtil" source="true" simpleName="ObjectUtil">
+    <methods name="createEqualsComparator" static="true">
+      <typeVariables name="T">
+        <type type="java.lang.Object"/>
+      </typeVariables>
+      <returnType type="java.util.Comparator&lt;T>"/>
     </methods>
-    <innerTypes name="" source="true" visibility="DEFAULT" extends="//@types.0" implements="//@types.3" package="" simpleName="" declaringMethod="//@types.2/@methods.0">
-      <methods name="" visibility="DEFAULT" returnType="//@types.4" constructor="true"/>
-      <methods name="compare" returnType="//@types.5" parameterTypes="//@types.2/@methods.0/@typeVariables.0 //@types.2/@methods.0/@typeVariables.0"/>
+    <innerTypes visibility="DEFAULT" package="" name="" source="true" simpleName="">
+      <methods name="" visibility="DEFAULT" constructor="true">
+        <returnType type="void"/>
+      </methods>
+      <methods name="compare">
+        <returnType type="int"/>
+        <parameterTypes type="T"/>
+        <parameterTypes type="T"/>
+      </methods>
+      <implements type="java.util.Comparator&lt;T>"/>
+      <extends type="java.lang.Object"/>
     </innerTypes>
+    <extends type="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="Comparator" baseType="//@types.1" typeArguments="//@types.2/@methods.0/@typeVariables.0"/>
-  <types xsi:type="dependencymodel:Datatype" name="void"/>
-  <types xsi:type="dependencymodel:Datatype" name="int"/>
 </dependencymodel:DependencyModel>

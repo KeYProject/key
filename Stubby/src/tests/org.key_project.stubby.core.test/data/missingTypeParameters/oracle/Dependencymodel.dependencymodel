@@ -1,32 +1,45 @@
 <?xml version="1.0" encoding="ASCII"?>
-<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
-  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Comparable" kind="INTERFACE" package="java.lang" simpleName="Comparable">
-    <typeVariables name="T" type="//@types.0"/>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Comparable" simpleName="Comparable">
+    <typeVariables name="T">
+      <type type="java.lang.Object"/>
+    </typeVariables>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="Comparable" baseType="//@types.1" typeArguments="//@types.4/@typeVariables.0"/>
-  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
-  <types xsi:type="dependencymodel:Type" name="ImmutableHeap" source="true" kind="INTERFACE" extends="//@types.3" package="" simpleName="ImmutableHeap">
-    <typeVariables name="T" type="//@types.2"/>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types kind="INTERFACE" package="" name="ImmutableHeap" source="true" simpleName="ImmutableHeap">
+    <typeVariables name="T">
+      <type type="java.lang.Comparable&lt;T>"/>
+    </typeVariables>
+    <extends type="java.io.Serializable"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="ImmutableHeap" source="true" baseType="//@types.4" typeArguments="//@types.6/@typeVariables.0"/>
-  <types xsi:type="dependencymodel:Type" name="ImmutableLeftistHeap" source="true" extends="//@types.0" implements="//@types.5" abstract="true" package="" simpleName="ImmutableLeftistHeap">
-    <typeVariables name="T" type="//@types.2"/>
-    <methods name="nilHeap" static="true" returnType="//@types.7">
-      <typeVariables name="T" type="//@types.2"/>
+  <types abstract="true" package="" name="ImmutableLeftistHeap" source="true" simpleName="ImmutableLeftistHeap">
+    <typeVariables name="T">
+      <type type="java.lang.Comparable&lt;T>"/>
+    </typeVariables>
+    <methods name="nilHeap" static="true">
+      <typeVariables name="T">
+        <type type="java.lang.Comparable&lt;T>"/>
+      </typeVariables>
+      <returnType type="ImmutableLeftistHeap&lt;T>"/>
     </methods>
-    <innerTypes name="ImmutableLeftistHeap.Empty" source="true" visibility="PRIVATE" static="true" extends="//@types.9" package="" simpleName="Empty">
-      <typeVariables name="S" type="//@types.8"/>
-      <methods name="Empty" visibility="PRIVATE" returnType="//@types.12" constructor="true"/>
-      <methods name="insert" returnType="//@types.13" parameterTypes="//@types.6/@innerTypes.0/@typeVariables.0"/>
-      <fields name="EMPTY_HEAP" visibility="PRIVATE" final="true" static="true" type="//@types.11"/>
+    <innerTypes visibility="PRIVATE" static="true" package="" name="ImmutableLeftistHeap.Empty" source="true" simpleName="Empty">
+      <typeVariables name="S">
+        <type type="java.lang.Comparable&lt;S>"/>
+      </typeVariables>
+      <methods name="Empty" visibility="PRIVATE" constructor="true">
+        <returnType type="void"/>
+      </methods>
+      <methods name="insert">
+        <returnType type="ImmutableHeap&lt;S>"/>
+        <parameterTypes type="S"/>
+      </methods>
+      <fields name="EMPTY_HEAP" visibility="PRIVATE" final="true" static="true">
+        <type type="ImmutableLeftistHeap&lt;?>"/>
+      </fields>
+      <extends type="ImmutableLeftistHeap&lt;S>"/>
     </innerTypes>
+    <implements type="ImmutableHeap&lt;T>"/>
+    <extends type="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="ImmutableLeftistHeap" source="true" baseType="//@types.6" typeArguments="//@types.6/@methods.0/@typeVariables.0"/>
-  <types xsi:type="dependencymodel:GenericType" name="Comparable" baseType="//@types.1" typeArguments="//@types.6/@innerTypes.0/@typeVariables.0"/>
-  <types xsi:type="dependencymodel:GenericType" name="ImmutableLeftistHeap" source="true" baseType="//@types.6" typeArguments="//@types.6/@innerTypes.0/@typeVariables.0"/>
-  <types xsi:type="dependencymodel:WildcardType" name="?"/>
-  <types xsi:type="dependencymodel:GenericType" name="ImmutableLeftistHeap" source="true" baseType="//@types.6" typeArguments="//@types.10"/>
-  <types xsi:type="dependencymodel:Datatype" name="void"/>
-  <types xsi:type="dependencymodel:GenericType" name="ImmutableHeap" source="true" baseType="//@types.4" typeArguments="//@types.6/@innerTypes.0/@typeVariables.0"/>
 </dependencymodel:DependencyModel>

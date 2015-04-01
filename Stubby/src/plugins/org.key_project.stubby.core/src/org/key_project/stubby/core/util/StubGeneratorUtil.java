@@ -36,7 +36,6 @@ import org.key_project.stubby.core.Activator;
 import org.key_project.stubby.core.customization.IGeneratorCustomization;
 import org.key_project.stubby.core.jdt.DependencyAnalyzer;
 import org.key_project.stubby.core.template.TypeTemplate;
-import org.key_project.stubby.model.dependencymodel.AbstractType;
 import org.key_project.stubby.model.dependencymodel.DependencyModel;
 import org.key_project.stubby.model.dependencymodel.DependencymodelFactory;
 import org.key_project.stubby.model.dependencymodel.Type;
@@ -199,18 +198,18 @@ public final class StubGeneratorUtil {
       List<IgnoredType> ignoredTypes = new LinkedList<IgnoredType>();
       if (dependencyModel != null && JDTUtil.isJavaProject(javaProject)) {
          monitor.beginTask("Creating stub files", dependencyModel.getTypes().size());
-         for (AbstractType abstractType : dependencyModel.getTypes()) {
+         for (Type type : dependencyModel.getTypes()) {
             SWTUtil.checkCanceled(monitor);
-            if (abstractType instanceof Type && !abstractType.isSource()) {
+            if (!type.isSource()) {
                String ignoreReason = null;
                for (int i = 0; ignoreReason == null && i < customizations.length; i++) {
-                  ignoreReason = customizations[i].getIgnoreReason(javaProject, stubFolderPath, abstractType);
+                  ignoreReason = customizations[i].getIgnoreReason(javaProject, stubFolderPath, type);
                }
                if (ignoreReason == null) {
-                  generateType((Type) abstractType, javaProject.getProject(), stubFolderPath);
+                  generateType(type, javaProject.getProject(), stubFolderPath);
                }
                else {
-                  ignoredTypes.add(new IgnoredType((Type) abstractType, ignoreReason));
+                  ignoredTypes.add(new IgnoredType(type, ignoreReason));
                }
             }
             monitor.worked(1);

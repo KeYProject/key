@@ -1,12 +1,10 @@
 package org.key_project.stubby.core.jdt;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.FieldAccess;
@@ -22,19 +20,15 @@ import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.key_project.stubby.model.dependencymodel.AbstractType;
-import org.key_project.stubby.model.dependencymodel.ArrayType;
-import org.key_project.stubby.model.dependencymodel.Datatype;
 import org.key_project.stubby.model.dependencymodel.DependencymodelFactory;
 import org.key_project.stubby.model.dependencymodel.Field;
-import org.key_project.stubby.model.dependencymodel.GenericType;
 import org.key_project.stubby.model.dependencymodel.ITypeVariableContainer;
 import org.key_project.stubby.model.dependencymodel.Method;
 import org.key_project.stubby.model.dependencymodel.Type;
 import org.key_project.stubby.model.dependencymodel.TypeKind;
+import org.key_project.stubby.model.dependencymodel.TypeUsage;
 import org.key_project.stubby.model.dependencymodel.TypeVariable;
 import org.key_project.stubby.model.dependencymodel.Visibility;
-import org.key_project.stubby.model.dependencymodel.WildcardType;
 
 /**
  * An {@link ASTVisitor} used to analyze dependencies.
@@ -42,15 +36,15 @@ import org.key_project.stubby.model.dependencymodel.WildcardType;
  */
 public class DependencyAnalyzer extends ASTVisitor {
    /**
-    * Utility {@link Map} which maps a full qualified name to its {@link AbstractType}.
+    * Utility {@link Map} which maps a full qualified name to its {@link Type}.
     */
-   private final Map<String, AbstractType> types = new LinkedHashMap<String, AbstractType>();
+   private final Map<String, Type> types = new LinkedHashMap<String, Type>();
    
    /**
-    * A {@link List} which contains only created outer {@link AbstractType} and
-    * not the representation of inner {@link AbstractType}s.
+    * A {@link List} which contains only created outer {@link Type} and
+    * not the representation of inner {@link Type}s.
     */
-   private final List<AbstractType> outerTypes = new LinkedList<AbstractType>();
+   private final List<Type> outerTypes = new LinkedList<Type>();
 
    /**
     * {@inheritDoc}
@@ -59,286 +53,6 @@ public class DependencyAnalyzer extends ASTVisitor {
    public boolean visit(QualifiedName node) {
       ensureMembersExist(node.resolveBinding());
       return true;
-   }
-   
-   /**
-    * Ensures that the representation of the given {@link IBinding} exist.
-    * @param binding The {@link IBinding} to represent.
-    */
-   protected void ensureMembersExist(IBinding binding) {
-      if (binding instanceof IVariableBinding) {
-         ensureFieldExists((IVariableBinding) binding);
-      }
-      else if (binding instanceof IMethodBinding) {
-         ensureMethodExist((IMethodBinding) binding);
-      }
-      else if (binding instanceof ITypeBinding) {
-         ITypeBinding typeBinding = (ITypeBinding) binding;
-         if (!typeBinding.isTypeVariable()) {
-            ensureTypeExists(null, typeBinding);
-         }
-      }
-   }
-
-   /**
-    * Ensures that the {@link AbstractType} representation of the given {@link ITypeBinding} exist.
-    * @param typeBinding The {@link ITypeBinding} to represent as {@link Type}.
-    * @return The created {@link AbstractType} if it does not exist before or the already existing instance.
-    */
-   protected AbstractType ensureTypeExists(ITypeVariableContainer containerType, ITypeBinding typeBinding) {
-      if (typeBinding.isTypeVariable()) {
-         AbstractType result = searchTypeVariable(containerType.getTypeVariables(), typeBinding);
-         if (result == null && containerType instanceof Type) {
-            Type type = (Type) containerType;
-            if (type.getDeclaringMethod() != null) {
-               result = ensureTypeExists(type.getDeclaringMethod(), typeBinding);
-            }
-         }
-         if (result == null) {
-            EObject parent = containerType.eContainer();
-            if (parent instanceof ITypeVariableContainer) {
-               result = ensureTypeExists((ITypeVariableContainer) parent, typeBinding);
-            }
-         }
-         return result;
-      }
-      else {
-         if (typeBinding.isWildcardType()) {
-            WildcardType wildcardType = createWildcardType(typeBinding);
-            return wildcardType;
-         }
-         else if (typeBinding.isPrimitive()) {
-            Datatype datatyp = createDataTyp(typeBinding);
-            return datatyp;
-         }
-         else if (typeBinding.isArray()) {
-            ArrayType arrayTyp = createArrayType(containerType, typeBinding);
-            return arrayTyp;
-         }
-         else if (typeBinding.isParameterizedType()) {
-            GenericType genericType = createGenericType(containerType, typeBinding);
-            return genericType;
-         }
-         else {
-            Type type = createType(containerType, typeBinding);
-            return type;
-         }
-      }
-   }
-   
-   /**
-    * Searches the {@link TypeVariable} representing the given {@link ITypeBinding}.
-    * @param list The available {@link TypeVariable}s.
-    * @param typeBinding The {@link ITypeBinding} to search its representation.
-    * @return The found {@link TypeVariable} or {@code null} if non was found.
-    */
-   protected TypeVariable searchTypeVariable(List<TypeVariable> list, ITypeBinding typeBinding) {
-      TypeVariable result = null;
-      Iterator<TypeVariable> iter = list.iterator();
-      while (result == null && iter.hasNext()) {
-         TypeVariable next = iter.next();
-         if (next.getName().equals(typeBinding.getName())) {
-            result = next;
-         }
-      }
-      return result;
-   }
-   
-   /**
-    * Creates the {@link WildcardType} representing the given {@link ITypeBinding}.
-    * @param typeBinding The {@link ITypeBinding}.
-    * @return The created {@link WildcardType} representing the given {@link ITypeBinding}.
-    */
-   protected WildcardType createWildcardType(ITypeBinding typeBinding) {
-      // Ensure that the single wildcardtyp exists.
-      WildcardType wildcardtyp = (WildcardType)types.get("?");
-      if (wildcardtyp == null) {
-         wildcardtyp = DependencymodelFactory.eINSTANCE.createWildcardType();
-         wildcardtyp.setName("?");
-         wildcardtyp.setSource(false);
-         types.put("?", wildcardtyp);
-         outerTypes.add(wildcardtyp);
-      }
-      // Ensure that the bound of the wildcard type exists.
-      ITypeBinding comp = typeBinding.getBound();
-      if (comp != null) {
-         ensureTypeExists(null, comp);
-      }
-      return wildcardtyp;
-   }
-
-   /**
-    * Creates the {@link Datatype} representing the given {@link ITypeBinding}.
-    * @param typeBinding The {@link ITypeBinding}.
-    * @return The created {@link Datatype} representing the given {@link ITypeBinding}.
-    */
-   protected Datatype createDataTyp(ITypeBinding typeBinding) {
-      String typeName = typeBinding.getQualifiedName();
-      Datatype datatyp = (Datatype)types.get(typeName);
-      if (datatyp == null) {
-         datatyp = DependencymodelFactory.eINSTANCE.createDatatype();
-         datatyp.setName(typeBinding.getName());
-         datatyp.setSource(typeBinding.isFromSource());
-         types.put(typeName, datatyp);
-         outerTypes.add(datatyp);
-      }
-      return datatyp;
-   }
-   
-   /**
-    * Creates the {@link ArrayType} representing the given {@link ITypeBinding}.
-    * @param containerType The parent {@link ITypeVariableContainer}.
-    * @param typeBinding The {@link ITypeBinding}.
-    * @return The created {@link ArrayType} representing the given {@link ITypeBinding}.
-    */
-   protected ArrayType createArrayType(ITypeVariableContainer containerType, ITypeBinding typeBinding) {
-      String typeName = typeBinding.getQualifiedName();
-      ArrayType arrayTyp = (ArrayType)types.get(typeName);
-      if(arrayTyp == null) {
-         arrayTyp = DependencymodelFactory.eINSTANCE.createArrayType();
-         arrayTyp.setName(typeBinding.getQualifiedName());
-         arrayTyp.setSource(typeBinding.isFromSource());
-         ITypeBinding baseType = typeBinding.getComponentType();
-         if (baseType != null) {
-            arrayTyp.setBaseType(ensureTypeExists(containerType, baseType));
-         }
-         types.put(typeName, arrayTyp);
-         outerTypes.add(arrayTyp);
-      }
-      return arrayTyp;
-   }
-   
-   /**
-    * Creates the {@link GenericType} representing the given {@link ITypeBinding}.
-    * @param containerType The parent {@link ITypeVariableContainer}.
-    * @param typeBinding The {@link ITypeBinding}.
-    * @return The created {@link GenericType} representing the given {@link ITypeBinding}.
-    */
-   protected GenericType createGenericType(ITypeVariableContainer containerType, ITypeBinding typeBinding) {
-      String typeName = typeBinding.getQualifiedName();
-      GenericType genericType = (GenericType)types.get(typeName);
-      if (genericType == null) {
-         genericType = DependencymodelFactory.eINSTANCE.createGenericType();
-         genericType.setName(typeBinding.getJavaElement().getElementName());
-         genericType.setSource(typeBinding.isFromSource());
-         ITypeBinding baseType = typeBinding.getTypeDeclaration();
-         AbstractType baseTypeInstance = null;
-         if (baseType != null) {
-            baseTypeInstance = ensureTypeExists(containerType, baseType);
-            genericType.setBaseType(baseTypeInstance);
-         }
-         ITypeBinding[] arguments = typeBinding.getTypeArguments();
-         for (ITypeBinding argument : arguments) {
-            AbstractType argumentType = ensureTypeExists(containerType != null ? 
-                                                         containerType : // In case of extends/implements the container type is known and needs to be used
-                                                         (ITypeVariableContainer) baseTypeInstance, // In case of the type declaration itself the containerType is null
-                                                         argument);
-            assert argumentType != null;
-            genericType.getTypeArguments().add(argumentType);
-         }
-         types.put(typeName, genericType);
-         outerTypes.add(genericType);
-      }
-      return genericType;
-   }
-
-   /**
-    * Creates the {@link Type} representing the given {@link ITypeBinding}.
-    * @param containerType The parent {@link ITypeVariableContainer}.
-    * @param typeBinding The {@link ITypeBinding}.
-    * @return The created {@link Type} representing the given {@link ITypeBinding}.
-    */
-   protected Type createType(ITypeVariableContainer containerType, ITypeBinding typeBinding) {
-      typeBinding = typeBinding.getTypeDeclaration(); // Otherwise type parameters are missing.
-      String typeName = typeBinding.getQualifiedName();
-      Type type = (Type)types.get(typeName);
-      if (type == null) {
-         type = DependencymodelFactory.eINSTANCE.createType();
-         type.setName(typeName);
-         type.setSimpleName(typeBinding.getName());
-         if (typeBinding.getPackage() != null) {
-            type.setPackage(typeBinding.getPackage().getName());
-         }
-         type.setVisibility(createVisibility(typeBinding.getModifiers()));
-         type.setKind(createKind(typeBinding));
-         type.setFinal(Modifier.isFinal(typeBinding.getModifiers()));
-         type.setStatic(Modifier.isStatic(typeBinding.getModifiers()));
-         type.setAbstract(Modifier.isAbstract(typeBinding.getModifiers()));
-         type.setSource(typeBinding.isFromSource());
-         types.put(typeName, type);
-         ITypeBinding[] typeParameters = typeBinding.getTypeParameters();
-         for (ITypeBinding typeParameter : typeParameters) {
-            addTypeVariable(type, typeParameter);
-         }
-         ITypeBinding superClass = typeBinding.getSuperclass();
-         if (superClass != null) {
-            type.getExtends().add(ensureTypeExists(type, superClass));                     
-         }
-         ITypeBinding[] interfaceArray = typeBinding.getInterfaces();
-         for (ITypeBinding interfaceType : interfaceArray) {
-            if(interfaceType.getSuperclass() == typeBinding.getSuperclass()) {
-               type.getExtends().add(ensureTypeExists(type, interfaceType));
-            } else {
-               type.getImplements().add(ensureTypeExists(type, interfaceType));
-            }
-         }
-         IMethodBinding declaringMethod = typeBinding.getDeclaringMethod();
-         if (declaringMethod != null) {
-            type.setDeclaringMethod(ensureMethodExist(declaringMethod));
-         }
-         ITypeBinding declaringClass = typeBinding.getDeclaringClass();
-         if (declaringClass != null) {
-            Type parentType = (Type)ensureTypeExists(type, declaringClass);
-            parentType.getInnerTypes().add(type);                                                                                                       
-         }
-         else {
-            outerTypes.add(type);
-         }
-      }
-      return type;
-   }
-   
-   /**
-    * Creates the {@link TypeKind} of the given {@link ITypeBinding}.
-    * @param typeBinding The {@link ITypeBinding}.
-    * @return The {@link TypeKind} of the given {@link ITypeBinding}.
-    */
-   protected TypeKind createKind(ITypeBinding typeBinding) {
-      if (typeBinding.isClass()) {
-         return TypeKind.CLASS;
-      }
-      else if (typeBinding.isInterface()) {
-         return TypeKind.INTERFACE;
-      }
-      else if (typeBinding.isAnnotation()) {
-         return TypeKind.ANNOTATION;
-      }
-      else if (typeBinding.isEnum()) {
-         return TypeKind.ENUM;
-      }
-      else {
-         return null;
-      }
-   }
-   
-   /**
-    * Creates the {@link Visibility} of the given modifiers.
-    * @param modifiers The modifiers.
-    * @return The {@link Visibility} of the given modifiers.
-    */
-   protected Visibility createVisibility(int modifiers) {
-      if (Modifier.isPublic(modifiers)) {
-         return Visibility.PUBLIC;
-      }
-      else if (Modifier.isProtected(modifiers)) {
-         return Visibility.PROTECTED;
-      }
-      else if (Modifier.isPrivate(modifiers)) {
-         return Visibility.PRIVATE;
-      }
-      else {
-         return Visibility.DEFAULT;
-      }
    }
 
    /**
@@ -355,111 +69,6 @@ public class DependencyAnalyzer extends ASTVisitor {
    }
 
    /**
-    * Ensures that the {@link Method} representation of the given {@link IMethodBinding} exist.
-    * @param methodBinding The {@link IMethodBinding} to represent as {@link Method}.
-    */
-   protected Method ensureMethodExist(IMethodBinding methodBinding) {
-      methodBinding = methodBinding.getMethodDeclaration();
-      AbstractType methodType = ensureTypeExists(null, methodBinding.getDeclaringClass());
-      methodType = findBaseType(methodType);
-      if (methodType instanceof Type) { // Nothing needs to be done if Typ is not available
-         Type typ = (Type)methodType;
-         Method method = searchMethod(typ, methodBinding.getName(), methodBinding.getParameterTypes());
-         if (method == null) {
-            method = createMethodFromDeclaration(typ, methodBinding);
-         }
-         return method;
-      }
-      else {
-         return null;
-      }
-   }
-
-   /**
-    * Searches the {@link Method} of the given signature.
-    * @param typ The declaring {@link Type} to search method in. 
-    * @param methodName {@link String} of a {@link Method}.
-    * @param parameterTypes The parameter types.
-    * @return The found {@link Method} or {@code null} if not available.
-    */
-   protected static Method searchMethod(Type typ, String methodName, ITypeBinding[] parameterTypes) {
-      for (Method currentMethod : typ.getMethods()) {
-         if (currentMethod.getName().equals(methodName)) { 
-            List<AbstractType> paramTyps = currentMethod.getParameterTypes();
-            if (paramTyps.size() == parameterTypes.length) {
-               int i = 0;
-               boolean allParamEquals = true;
-               for (AbstractType paramTyp : paramTyps) {
-                  if (!paramTyp.getName().equals(parameterTypes[i].getQualifiedName())) {
-                     allParamEquals = false;
-                  }
-                  i++;
-               }
-               if (allParamEquals) {
-                  return currentMethod;
-               }
-            }
-         }
-      }
-      return null;
-   }
-   
-   /**
-    * Method creates {@link Method} from given {@link String} for given {@link Type}
-    * @param typ {@link Type}
-    * @param superMethodDeclaration {@link String}
-    * @return The created {@link Method}.
-    */
-   protected Method createMethodFromDeclaration(Type typ, IMethodBinding methodBinding) {
-      methodBinding = methodBinding.getMethodDeclaration();
-      Method method = DependencymodelFactory.eINSTANCE.createMethod();
-      typ.getMethods().add(method);
-      method.setName(methodBinding.getName());
-      method.setVisibility(createVisibility(methodBinding.getModifiers()));
-      method.setAbstract(Modifier.isAbstract(methodBinding.getModifiers()));
-      method.setFinal(Modifier.isFinal(methodBinding.getModifiers()));
-      method.setStatic(Modifier.isStatic(methodBinding.getModifiers()));
-      method.setConstructor(methodBinding.isConstructor());
-      for (ITypeBinding typeParameter : methodBinding.getTypeParameters()) {
-         addTypeVariable(method, typeParameter);
-      }
-      for (ITypeBinding paramType : methodBinding.getParameterTypes()) {
-         AbstractType emfParamType = ensureTypeExists(method, paramType);
-         assert emfParamType != null;
-         method.getParameterTypes().add(emfParamType);
-      }
-      for (ITypeBinding methodThrows : methodBinding.getExceptionTypes()) {
-         AbstractType methodThrow = ensureTypeExists(method, methodThrows);
-         method.getThrows().add(methodThrow);
-      }
-      method.setReturnType(ensureTypeExists(method, methodBinding.getReturnType()));
-      return method;
-   }
-   
-   /**
-    * Creates the {@link TypeVariable} representing the given {@link ITypeBinding}.
-    * @param containerType The parent {@link ITypeVariableContainer}.
-    * @param typeParameter The {@link ITypeBinding}.
-    * @return The created {@link TypeVariable} representing the given {@link ITypeBinding}.
-    */
-   protected void addTypeVariable(ITypeVariableContainer containerType, ITypeBinding typeParameter) {
-      TypeVariable typeVar = DependencymodelFactory.eINSTANCE.createTypeVariable();
-      typeVar.setName(typeParameter.getQualifiedName());
-      containerType.getTypeVariables().add(typeVar);
-      ITypeBinding[] boundBindings = typeParameter.getTypeBounds();
-      if (boundBindings.length == 0) {
-         ITypeBinding superBinding = typeParameter.getSuperclass();
-         typeVar.setType(ensureTypeExists(containerType, superBinding));
-      }
-      else if (boundBindings.length == 1) {
-         typeVar.setType(ensureTypeExists(containerType, boundBindings[0]));
-      }
-      else {
-         throw new IllegalStateException("Type variable with not exactly one bound is not supported.");
-      }
-   }
-   
-   /**
     * {@inheritDoc}
     */
    @Override
@@ -472,16 +81,22 @@ public class DependencyAnalyzer extends ASTVisitor {
       return true;
    }
 
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public boolean visit(TypeDeclaration node) {
       ITypeBinding typeBinding = node.resolveBinding();
       if (typeBinding == null) {
          throw new IllegalStateException("Can't resolve type declaration '" + node + "' in the Java build path.");
       }
-      ensureTypeExists(null, typeBinding);
+      ensureTypeExists(typeBinding);
       return super.visit(node);
    }
 
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public boolean visit(MethodDeclaration node) {
       IMethodBinding methodBinding = node.resolveBinding();
@@ -532,60 +147,6 @@ public class DependencyAnalyzer extends ASTVisitor {
    }
    
    /**
-    * Ensures that the {@link Field} representation of the given {@link IVariableBinding} exist.
-    * @param variableBinding The {@link IVariableBinding} to represent as {@link Field}.
-    */
-   protected void ensureFieldExists(IVariableBinding variableBinding) {
-      variableBinding = variableBinding.getVariableDeclaration();
-      ITypeBinding typeBinding = variableBinding.getDeclaringClass();
-      if (typeBinding != null) { // In case of local variables the type binding is null
-         AbstractType type = ensureTypeExists(null, typeBinding);
-         type = findBaseType(type);
-         if (type instanceof Type) { // Nothing needs to be done if Type is not available
-            if (!containsField((Type) type, variableBinding.getName())) {
-               createFieldFromDeclaration((Type) type, variableBinding);
-            }
-         }
-      }
-   }
-   
-   /**
-    * Proves if declaration {@link String} of a {@link Field} is already filed in typ {@link Type} 
-    * @param typ {@link Type}
-    * @param declaration {@link String} of a {@link Field}
-    * @return true {@link Boolean} if declaration {@link String} already exists and false {@link Boolean} if not
-    */
-   protected static boolean containsField(Type typ, String declaration) {
-      for (Field currentField : typ.getFields()) {
-         if(currentField.getName().equals(declaration)) {
-            return true;
-         }
-      }
-      return false;
-   }
-   
-   /**
-    * Method creates {@link Field} from given {@link String} for given {@link Type} 
-    * @param typ {@link Type}
-    * @param superFieldDeclaration {@link String}
-    */
-   protected void createFieldFromDeclaration(Type typ, IVariableBinding variableBinding) {
-      Field field = DependencymodelFactory.eINSTANCE.createField();  
-      field.setName(variableBinding.getName());
-      field.setVisibility(createVisibility(variableBinding.getModifiers()));
-      field.setFinal(Modifier.isFinal(variableBinding.getModifiers()));
-      field.setStatic(Modifier.isStatic(variableBinding.getModifiers()));
-      if (variableBinding.getConstantValue() != null) {
-         field.setConstantValue(variableBinding.getConstantValue().toString());
-      }
-      AbstractType varType = ensureTypeExists(typ, variableBinding.getType());
-      if (varType != null) {
-         field.setType(varType);
-      }
-      typ.getFields().add(field);
-   }
-
-   /**
     * {@inheritDoc}
     */
    @Override
@@ -599,22 +160,294 @@ public class DependencyAnalyzer extends ASTVisitor {
    }
 
    /**
-    * Finds the base type of the given {@link AbstractType}.
-    * @param baseType The current {@link AbstractType}.
-    * @return The base {@link AbstractType}.
+    * Returns all created outer {@link Type}s.
+    * @return All created outer {@link Type}s.
     */
-   protected static AbstractType findBaseType(AbstractType baseType) {
-      while (baseType instanceof GenericType) {
-         baseType = ((GenericType) baseType).getBaseType();
+   public List<Type> getOuterTypes() {
+      return outerTypes;
+   }
+   
+   /**
+    * Ensures that the given {@link IBinding} is correctly represented in the dependency model.
+    * @param binding The {@link IBinding} to represent.
+    */
+   protected void ensureMembersExist(IBinding binding) {
+      if (binding instanceof IVariableBinding) {
+         ensureFieldExists((IVariableBinding) binding);
       }
-      return baseType;
+      else if (binding instanceof IMethodBinding) {
+         ensureMethodExist((IMethodBinding) binding);
+      }
+      else if (binding instanceof ITypeBinding) {
+         ITypeBinding typeBinding = (ITypeBinding) binding;
+         if (!typeBinding.isTypeVariable()) {
+            ensureTypeExists(typeBinding);
+         }
+      }
    }
 
    /**
-    * Returns all created outer {@link AbstractType}s.
-    * @return All created outer {@link AbstractType}s.
+    * Ensures that the given {@link IVariableBinding} is part of dependency model.
+    * @param variableBinding The {@link IVariableBinding} to represent.
     */
-   public List<AbstractType> getOuterTypes() {
-      return outerTypes;
+   protected void ensureFieldExists(IVariableBinding variableBinding) {
+      variableBinding = variableBinding.getVariableDeclaration();
+      ITypeBinding declaringClass = variableBinding.getDeclaringClass();
+      if (declaringClass != null) { // In case of local variables the type binding is null
+         Type declaringType = ensureTypeExists(declaringClass);
+         if (declaringType instanceof Type) { // Nothing needs to be done if Type is not available
+            if (!declaringType.containsField(variableBinding.getName())) {
+               addField((Type) declaringType, variableBinding);
+            }
+         }
+      }
+   }
+   
+   /**
+    * Adds the {@link Field} representation of the given {@link IVariableBinding} to the declaring {@link Type}.
+    * @param declaringType The declaring {@link Type} to add {@link Field} to.
+    * @param variableBinding The {@link IVariableBinding} to represent as {@link Field}.
+    */
+   protected void addField(Type declaringType, IVariableBinding variableBinding) {
+      Field field = DependencymodelFactory.eINSTANCE.createField();  
+      field.setName(variableBinding.getName());
+      field.setVisibility(createVisibility(variableBinding.getModifiers()));
+      field.setFinal(Modifier.isFinal(variableBinding.getModifiers()));
+      field.setStatic(Modifier.isStatic(variableBinding.getModifiers()));
+      if (variableBinding.getConstantValue() != null) {
+         field.setConstantValue(variableBinding.getConstantValue().toString());
+      }
+      field.setType(createTypeUsage(variableBinding.getType()));
+      declaringType.getFields().add(field);
+   }
+
+   /**
+    * Ensures that the given {@link IMethodBinding} is part of dependency model.
+    * @param methodBinding The {@link IMethodBinding} to represent.
+    */
+   protected void ensureMethodExist(IMethodBinding methodBinding) {
+      methodBinding = methodBinding.getMethodDeclaration();
+      Type declaringType = ensureTypeExists(methodBinding.getDeclaringClass());
+      if (!declaringType.containsMethod(methodBinding.getName(), computeTypeUsages(methodBinding.getParameterTypes()))) {
+         addMethod(declaringType, methodBinding);
+      }
+   }
+
+   /**
+    * Computes all type usage names.
+    * @param parameterTypes The {@link ITypeBinding}s.
+    * @return The type usage names.
+    */
+   protected String[] computeTypeUsages(ITypeBinding[] parameterTypes) {
+      String[] result = new String[parameterTypes.length];
+      for (int i = 0; i < result.length; i++) {
+         result[i] = computeTypeUsage(parameterTypes[i]);
+      }
+      return result;
+   }
+
+   /**
+    * Adds the {@link Method} representation of the given {@link IMethodBinding} to the declaring {@link Type}.
+    * @param declaringType The declaring {@link Type} to add {@link Method} to.
+    * @param methodBinding The {@link IMethodBinding} to represent as {@link Method}.
+    */
+   protected void addMethod(Type declaringType, IMethodBinding methodBinding) {
+      Method method = DependencymodelFactory.eINSTANCE.createMethod();
+      declaringType.getMethods().add(method);
+      method.setName(methodBinding.getName());
+      method.setVisibility(createVisibility(methodBinding.getModifiers()));
+      method.setAbstract(Modifier.isAbstract(methodBinding.getModifiers()));
+      method.setFinal(Modifier.isFinal(methodBinding.getModifiers()));
+      method.setStatic(Modifier.isStatic(methodBinding.getModifiers()));
+      method.setConstructor(methodBinding.isConstructor());
+      for (ITypeBinding typeParameter : methodBinding.getTypeParameters()) {
+         addTypeVariable(method, typeParameter);
+      }
+      for (ITypeBinding parameterType : methodBinding.getParameterTypes()) {
+         method.getParameterTypes().add(createTypeUsage(parameterType));
+      }
+      for (ITypeBinding thrownException : methodBinding.getExceptionTypes()) {
+         method.getThrows().add(createTypeUsage(thrownException));
+      }
+      method.setReturnType(createTypeUsage(methodBinding.getReturnType()));
+   }
+
+   /**
+    * Ensures that the given {@link ITypeBinding} is part of dependency model.
+    * @param typeBinding The {@link ITypeBinding} to represent.
+    */
+   protected Type ensureTypeExists(ITypeBinding typeBinding) {
+      typeBinding = toTypeDeclaration(typeBinding);
+      String typeName = typeBinding.getQualifiedName();
+      Type type = (Type)types.get(typeName);
+      if (type == null) {
+         type = DependencymodelFactory.eINSTANCE.createType();
+         type.setName(typeName);
+         type.setSimpleName(typeBinding.getName());
+         type.setVisibility(createVisibility(typeBinding.getModifiers()));
+         type.setKind(createTypeKind(typeBinding));
+         type.setFinal(Modifier.isFinal(typeBinding.getModifiers()));
+         type.setStatic(Modifier.isStatic(typeBinding.getModifiers()));
+         type.setAbstract(Modifier.isAbstract(typeBinding.getModifiers()));
+         type.setSource(typeBinding.isFromSource());
+         types.put(typeName, type);
+         ITypeBinding[] typeParameters = typeBinding.getTypeParameters();
+         for (ITypeBinding typeParameter : typeParameters) {
+            addTypeVariable(type, typeParameter);
+         }
+         ITypeBinding superClass = typeBinding.getSuperclass();
+         if (superClass != null) {
+            type.getExtends().add(createTypeUsage(superClass));                     
+         }
+         ITypeBinding[] interfaceArray = typeBinding.getInterfaces();
+         for (ITypeBinding interfaceType : interfaceArray) {
+            if (interfaceType.getSuperclass() == typeBinding.getSuperclass()) {
+               type.getExtends().add(createTypeUsage(interfaceType));
+            } 
+            else {
+               type.getImplements().add(createTypeUsage(interfaceType));
+            }
+         }
+         ITypeBinding declaringClass = typeBinding.getDeclaringClass();
+         if (declaringClass != null) {
+            Type parentType = (Type)ensureTypeExists(declaringClass);
+            parentType.getInnerTypes().add(type);                                                                                                       
+         }
+         else {
+            outerTypes.add(type);
+         }
+         if (typeBinding.getPackage() != null) {
+            type.setPackage(typeBinding.getPackage().getName());
+         }
+      }
+      return type;
+   }
+   
+   /**
+    * Computes the type declaration of the given {@link ITypeBinding}.
+    * @param typeBinding The {@link ITypeBinding}.
+    * @return The type declaration of the given {@link ITypeBinding}.
+    */
+   protected ITypeBinding toTypeDeclaration(ITypeBinding typeBinding) {
+      if (typeBinding.isArray()) {
+         typeBinding = typeBinding.getComponentType();
+      }
+      return typeBinding.getTypeDeclaration();
+   }
+
+   /**
+    * Adds the {@link TypeVariable} representation of the given {@link ITypeBinding} to the container {@link ITypeVariableContainer}.
+    * @param containerType The container {@link ITypeVariableContainer} to add {@link TypeVariable} to.
+    * @param typeParameter The {@link ITypeBinding} to represent as {@link TypeVariable}.
+    */
+   protected void addTypeVariable(ITypeVariableContainer containerType, ITypeBinding typeParameter) {
+      TypeVariable typeVar = DependencymodelFactory.eINSTANCE.createTypeVariable();
+      typeVar.setName(typeParameter.getQualifiedName());
+      containerType.getTypeVariables().add(typeVar);
+      ITypeBinding[] boundBindings = typeParameter.getTypeBounds();
+      if (boundBindings.length == 0) {
+         ITypeBinding superBinding = typeParameter.getSuperclass();
+         typeVar.setType(createTypeUsage(superBinding));
+      }
+      else if (boundBindings.length == 1) {
+         typeVar.setType(createTypeUsage(boundBindings[0]));
+      }
+      else {
+         throw new IllegalStateException("Type variables with not exactly one bound are not supported.");
+      }
+   }
+   
+   /**
+    * Creates a {@link TypeUsage} representing the given {@link ITypeBinding}.
+    * @param typeBinding The {@link ITypeBinding} to represent.
+    * @return The created {@link TypeUsage}.
+    */
+   protected TypeUsage createTypeUsage(ITypeBinding typeBinding) {
+      // Ensure that the type exists.
+      ensureUsedTypesExist(typeBinding);
+      // Create type usage.
+      TypeUsage tu = DependencymodelFactory.eINSTANCE.createTypeUsage();
+      tu.setType(computeTypeUsage(typeBinding));
+      return tu;
+   }
+   
+   /**
+    * Ensures that all involved {@link ITypeBinding} are part of the dependency model.
+    * @param typeBinding The starting {@link ITypeBinding}.
+    */
+   protected void ensureUsedTypesExist(ITypeBinding typeBinding) {
+      // Treat arrays
+      if (typeBinding.isArray()) {
+         typeBinding = typeBinding.getComponentType();
+      }
+      // Treat generic types (only of array components)
+      if (typeBinding.isParameterizedType()) {
+         ITypeBinding[] arguments = typeBinding.getTypeArguments();
+         for (ITypeBinding argument : arguments) {
+            ensureUsedTypesExist(argument);
+         }
+         ensureTypeExists(typeBinding);
+      }
+      else if (typeBinding.isWildcardType()) {
+         ensureTypeExists(typeBinding.getErasure());
+      }
+      else if (typeBinding.isTypeVariable()) {
+         ensureTypeExists(typeBinding.getErasure());
+      }
+      else if (!typeBinding.isPrimitive()) {
+         ensureTypeExists(typeBinding);
+      }
+   }
+
+   /**
+    * Computes the type usage name.
+    * @param typeBinding The {@link ITypeBinding} to compute its type usage name.
+    * @return The computed type usage name.
+    */
+   protected String computeTypeUsage(ITypeBinding typeBinding) {
+      return typeBinding.getQualifiedName();
+   }
+   
+   /**
+    * Creates the {@link Visibility} of the given modifiers.
+    * @param modifiers The modifiers.
+    * @return The {@link Visibility} of the given modifiers.
+    */
+   protected Visibility createVisibility(int modifiers) {
+      if (Modifier.isPublic(modifiers)) {
+         return Visibility.PUBLIC;
+      }
+      else if (Modifier.isProtected(modifiers)) {
+         return Visibility.PROTECTED;
+      }
+      else if (Modifier.isPrivate(modifiers)) {
+         return Visibility.PRIVATE;
+      }
+      else {
+         return Visibility.DEFAULT;
+      }
+   }
+   
+   /**
+    * Creates the {@link TypeKind} of the given {@link ITypeBinding}.
+    * @param typeBinding The {@link ITypeBinding}.
+    * @return The {@link TypeKind} of the given {@link ITypeBinding}.
+    */
+   protected TypeKind createTypeKind(ITypeBinding typeBinding) {
+      if (typeBinding.isClass()) {
+         return TypeKind.CLASS;
+      }
+      else if (typeBinding.isInterface()) {
+         return TypeKind.INTERFACE;
+      }
+      else if (typeBinding.isAnnotation()) {
+         return TypeKind.ANNOTATION;
+      }
+      else if (typeBinding.isEnum()) {
+         return TypeKind.ENUM;
+      }
+      else {
+         return null;
+      }
    }
 }

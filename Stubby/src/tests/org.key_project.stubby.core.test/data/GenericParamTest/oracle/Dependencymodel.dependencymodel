@@ -1,27 +1,48 @@
 <?xml version="1.0" encoding="ASCII"?>
-<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
-  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.Map" kind="INTERFACE" package="java.util" simpleName="Map">
-    <typeVariables name="K" type="//@types.0"/>
-    <typeVariables name="V" type="//@types.0"/>
-    <methods name="size" abstract="true" returnType="//@types.9"/>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.util" name="java.util.Map" simpleName="Map">
+    <typeVariables name="K">
+      <type type="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="V">
+      <type type="java.lang.Object"/>
+    </typeVariables>
+    <methods name="size" abstract="true">
+      <returnType type="int"/>
+    </methods>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="Map" baseType="//@types.1" typeArguments="//@types.3/@typeVariables.0 //@types.3/@typeVariables.1"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.AbstractMap" extends="//@types.0" implements="//@types.2" abstract="true" package="java.util" simpleName="AbstractMap">
-    <typeVariables name="K" type="//@types.0"/>
-    <typeVariables name="V" type="//@types.0"/>
+  <types abstract="true" package="java.util" name="java.util.AbstractMap" simpleName="AbstractMap">
+    <typeVariables name="K">
+      <type type="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="V">
+      <type type="java.lang.Object"/>
+    </typeVariables>
+    <implements type="java.util.Map&lt;K,V>"/>
+    <extends type="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="AbstractMap" baseType="//@types.3" typeArguments="//@types.7/@typeVariables.0 //@types.7/@typeVariables.1"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Cloneable" kind="INTERFACE" package="java.lang" simpleName="Cloneable"/>
-  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
-  <types xsi:type="dependencymodel:Type" name="java.util.HashMap" extends="//@types.4" implements="//@types.2 //@types.5 //@types.6" package="java.util" simpleName="HashMap">
-    <typeVariables name="K" type="//@types.0"/>
-    <typeVariables name="V" type="//@types.0"/>
-    <methods name="HashMap" returnType="//@types.10" constructor="true"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Cloneable" simpleName="Cloneable"/>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types package="java.util" name="java.util.HashMap" simpleName="HashMap">
+    <typeVariables name="K">
+      <type type="java.lang.Object"/>
+    </typeVariables>
+    <typeVariables name="V">
+      <type type="java.lang.Object"/>
+    </typeVariables>
+    <methods name="HashMap" constructor="true">
+      <returnType type="void"/>
+    </methods>
+    <implements type="java.util.Map&lt;K,V>"/>
+    <implements type="java.lang.Cloneable"/>
+    <implements type="java.io.Serializable"/>
+    <extends type="java.util.AbstractMap&lt;K,V>"/>
   </types>
-  <types xsi:type="dependencymodel:Type" name="GenericParamTest" source="true" extends="//@types.0" package="" simpleName="GenericParamTest">
-    <methods name="main" returnType="//@types.9"/>
+  <types package="" name="GenericParamTest" source="true" simpleName="GenericParamTest">
+    <methods name="main">
+      <returnType type="int"/>
+    </methods>
+    <extends type="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:Datatype" name="int"/>
-  <types xsi:type="dependencymodel:Datatype" name="void"/>
 </dependencymodel:DependencyModel>

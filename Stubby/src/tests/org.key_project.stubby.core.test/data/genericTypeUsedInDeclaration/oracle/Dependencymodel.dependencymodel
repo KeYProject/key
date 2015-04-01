@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="ASCII"?>
-<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
-  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Comparable" kind="INTERFACE" package="java.lang" simpleName="Comparable">
-    <typeVariables name="T" type="//@types.0"/>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Comparable" simpleName="Comparable">
+    <typeVariables name="T">
+      <type type="java.lang.Object"/>
+    </typeVariables>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="Comparable" baseType="//@types.1" typeArguments="//@types.3/@typeVariables.0"/>
-  <types xsi:type="dependencymodel:Type" name="ImmutableLeftistHeap" source="true" extends="//@types.0" abstract="true" package="" simpleName="ImmutableLeftistHeap">
-    <typeVariables name="T" type="//@types.2"/>
-    <innerTypes name="ImmutableLeftistHeap.Node" source="true" visibility="PRIVATE" static="true" extends="//@types.5" package="" simpleName="Node">
-      <typeVariables name="S" type="//@types.4"/>
+  <types abstract="true" package="" name="ImmutableLeftistHeap" source="true" simpleName="ImmutableLeftistHeap">
+    <typeVariables name="T">
+      <type type="java.lang.Comparable&lt;T>"/>
+    </typeVariables>
+    <innerTypes visibility="PRIVATE" static="true" package="" name="ImmutableLeftistHeap.Node" source="true" simpleName="Node">
+      <typeVariables name="S">
+        <type type="java.lang.Comparable&lt;S>"/>
+      </typeVariables>
+      <extends type="ImmutableLeftistHeap&lt;S>"/>
     </innerTypes>
+    <extends type="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:GenericType" name="Comparable" baseType="//@types.1" typeArguments="//@types.3/@innerTypes.0/@typeVariables.0"/>
-  <types xsi:type="dependencymodel:GenericType" name="ImmutableLeftistHeap" source="true" baseType="//@types.3" typeArguments="//@types.3/@innerTypes.0/@typeVariables.0"/>
 </dependencymodel:DependencyModel>

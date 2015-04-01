@@ -5,44 +5,53 @@ package org.key_project.stubby.model.dependencymodel.impl;
 import org.eclipse.emf.common.notify.Notification;
 
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 
-import org.key_project.stubby.model.dependencymodel.AbstractType;
-import org.key_project.stubby.model.dependencymodel.ArrayType;
 import org.key_project.stubby.model.dependencymodel.DependencymodelPackage;
+import org.key_project.stubby.model.dependencymodel.TypeUsage;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Array Type</b></em>'.
+ * An implementation of the model object '<em><b>Type Usage</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.ArrayTypeImpl#getBaseType <em>Base Type</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.TypeUsageImpl#getType <em>Type</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class ArrayTypeImpl extends AbstractTypeImpl implements ArrayType {
+public class TypeUsageImpl extends MinimalEObjectImpl.Container implements TypeUsage {
    /**
-    * The cached value of the '{@link #getBaseType() <em>Base Type</em>}' reference.
+    * The default value of the '{@link #getType() <em>Type</em>}' attribute.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
-    * @see #getBaseType()
+    * @see #getType()
     * @generated
     * @ordered
     */
-   protected AbstractType baseType;
+   protected static final String TYPE_EDEFAULT = null;
+
+   /**
+    * The cached value of the '{@link #getType() <em>Type</em>}' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getType()
+    * @generated
+    * @ordered
+    */
+   protected String type = TYPE_EDEFAULT;
 
    /**
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     */
-   protected ArrayTypeImpl() {
+   protected TypeUsageImpl() {
       super();
    }
 
@@ -53,7 +62,7 @@ public class ArrayTypeImpl extends AbstractTypeImpl implements ArrayType {
     */
    @Override
    protected EClass eStaticClass() {
-      return DependencymodelPackage.Literals.ARRAY_TYPE;
+      return DependencymodelPackage.Literals.TYPE_USAGE;
    }
 
    /**
@@ -61,16 +70,8 @@ public class ArrayTypeImpl extends AbstractTypeImpl implements ArrayType {
     * <!-- end-user-doc -->
     * @generated
     */
-   public AbstractType getBaseType() {
-      if (baseType != null && baseType.eIsProxy()) {
-         InternalEObject oldBaseType = (InternalEObject)baseType;
-         baseType = (AbstractType)eResolveProxy(oldBaseType);
-         if (baseType != oldBaseType) {
-            if (eNotificationRequired())
-               eNotify(new ENotificationImpl(this, Notification.RESOLVE, DependencymodelPackage.ARRAY_TYPE__BASE_TYPE, oldBaseType, baseType));
-         }
-      }
-      return baseType;
+   public String getType() {
+      return type;
    }
 
    /**
@@ -78,20 +79,11 @@ public class ArrayTypeImpl extends AbstractTypeImpl implements ArrayType {
     * <!-- end-user-doc -->
     * @generated
     */
-   public AbstractType basicGetBaseType() {
-      return baseType;
-   }
-
-   /**
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    */
-   public void setBaseType(AbstractType newBaseType) {
-      AbstractType oldBaseType = baseType;
-      baseType = newBaseType;
+   public void setType(String newType) {
+      String oldType = type;
+      type = newType;
       if (eNotificationRequired())
-         eNotify(new ENotificationImpl(this, Notification.SET, DependencymodelPackage.ARRAY_TYPE__BASE_TYPE, oldBaseType, baseType));
+         eNotify(new ENotificationImpl(this, Notification.SET, DependencymodelPackage.TYPE_USAGE__TYPE, oldType, type));
    }
 
    /**
@@ -102,9 +94,8 @@ public class ArrayTypeImpl extends AbstractTypeImpl implements ArrayType {
    @Override
    public Object eGet(int featureID, boolean resolve, boolean coreType) {
       switch (featureID) {
-         case DependencymodelPackage.ARRAY_TYPE__BASE_TYPE:
-            if (resolve) return getBaseType();
-            return basicGetBaseType();
+         case DependencymodelPackage.TYPE_USAGE__TYPE:
+            return getType();
       }
       return super.eGet(featureID, resolve, coreType);
    }
@@ -117,8 +108,8 @@ public class ArrayTypeImpl extends AbstractTypeImpl implements ArrayType {
    @Override
    public void eSet(int featureID, Object newValue) {
       switch (featureID) {
-         case DependencymodelPackage.ARRAY_TYPE__BASE_TYPE:
-            setBaseType((AbstractType)newValue);
+         case DependencymodelPackage.TYPE_USAGE__TYPE:
+            setType((String)newValue);
             return;
       }
       super.eSet(featureID, newValue);
@@ -132,8 +123,8 @@ public class ArrayTypeImpl extends AbstractTypeImpl implements ArrayType {
    @Override
    public void eUnset(int featureID) {
       switch (featureID) {
-         case DependencymodelPackage.ARRAY_TYPE__BASE_TYPE:
-            setBaseType((AbstractType)null);
+         case DependencymodelPackage.TYPE_USAGE__TYPE:
+            setType(TYPE_EDEFAULT);
             return;
       }
       super.eUnset(featureID);
@@ -147,10 +138,26 @@ public class ArrayTypeImpl extends AbstractTypeImpl implements ArrayType {
    @Override
    public boolean eIsSet(int featureID) {
       switch (featureID) {
-         case DependencymodelPackage.ARRAY_TYPE__BASE_TYPE:
-            return baseType != null;
+         case DependencymodelPackage.TYPE_USAGE__TYPE:
+            return TYPE_EDEFAULT == null ? type != null : !TYPE_EDEFAULT.equals(type);
       }
       return super.eIsSet(featureID);
    }
 
-} //ArrayTypeImpl
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   @Override
+   public String toString() {
+      if (eIsProxy()) return super.toString();
+
+      StringBuffer result = new StringBuffer(super.toString());
+      result.append(" (type: ");
+      result.append(type);
+      result.append(')');
+      return result.toString();
+   }
+
+} //TypeUsageImpl

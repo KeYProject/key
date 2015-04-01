@@ -26,8 +26,8 @@ import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYCl
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
 import org.key_project.stubby.core.customization.IGeneratorCustomization;
-import org.key_project.stubby.model.dependencymodel.AbstractType;
 import org.key_project.stubby.model.dependencymodel.DependencyModel;
+import org.key_project.stubby.model.dependencymodel.Type;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
@@ -262,7 +262,7 @@ public class KeYGeneratorCustomization implements IGeneratorCustomization {
    @Override
    public String getIgnoreReason(IJavaProject javaProject, 
                                  String stubFolderPath, 
-                                 AbstractType abstractType) throws CoreException {
+                                 Type abstractType) throws CoreException {
       if (bootTypes != null &&
           bootTypes.contains(abstractType.getName())) {
          return "Type is part of KeY's boot class path.";

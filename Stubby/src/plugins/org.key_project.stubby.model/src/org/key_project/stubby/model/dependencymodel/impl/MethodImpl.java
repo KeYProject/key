@@ -16,12 +16,11 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
-import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
-import org.key_project.stubby.model.dependencymodel.AbstractType;
 import org.key_project.stubby.model.dependencymodel.DependencymodelPackage;
 import org.key_project.stubby.model.dependencymodel.Method;
+import org.key_project.stubby.model.dependencymodel.TypeUsage;
 import org.key_project.stubby.model.dependencymodel.TypeVariable;
 import org.key_project.stubby.model.dependencymodel.Visibility;
 
@@ -38,10 +37,10 @@ import org.key_project.stubby.model.dependencymodel.Visibility;
  *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.MethodImpl#isStatic <em>Static</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.MethodImpl#isFinal <em>Final</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.MethodImpl#isAbstract <em>Abstract</em>}</li>
- *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.MethodImpl#getReturnType <em>Return Type</em>}</li>
- *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.MethodImpl#getParameterTypes <em>Parameter Types</em>}</li>
- *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.MethodImpl#getThrows <em>Throws</em>}</li>
  *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.MethodImpl#isConstructor <em>Constructor</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.MethodImpl#getReturnType <em>Return Type</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.MethodImpl#getThrows <em>Throws</em>}</li>
+ *   <li>{@link org.key_project.stubby.model.dependencymodel.impl.MethodImpl#getParameterTypes <em>Parameter Types</em>}</li>
  * </ul>
  * </p>
  *
@@ -159,36 +158,6 @@ public class MethodImpl extends MinimalEObjectImpl.Container implements Method {
    protected boolean abstract_ = ABSTRACT_EDEFAULT;
 
    /**
-    * The cached value of the '{@link #getReturnType() <em>Return Type</em>}' reference.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @see #getReturnType()
-    * @generated
-    * @ordered
-    */
-   protected AbstractType returnType;
-
-   /**
-    * The cached value of the '{@link #getParameterTypes() <em>Parameter Types</em>}' reference list.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @see #getParameterTypes()
-    * @generated
-    * @ordered
-    */
-   protected EList<AbstractType> parameterTypes;
-
-   /**
-    * The cached value of the '{@link #getThrows() <em>Throws</em>}' reference list.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @see #getThrows()
-    * @generated
-    * @ordered
-    */
-   protected EList<AbstractType> throws_;
-
-   /**
     * The default value of the '{@link #isConstructor() <em>Constructor</em>}' attribute.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -207,6 +176,36 @@ public class MethodImpl extends MinimalEObjectImpl.Container implements Method {
     * @ordered
     */
    protected boolean constructor = CONSTRUCTOR_EDEFAULT;
+
+   /**
+    * The cached value of the '{@link #getReturnType() <em>Return Type</em>}' containment reference.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getReturnType()
+    * @generated
+    * @ordered
+    */
+   protected TypeUsage returnType;
+
+   /**
+    * The cached value of the '{@link #getThrows() <em>Throws</em>}' containment reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getThrows()
+    * @generated
+    * @ordered
+    */
+   protected EList<TypeUsage> throws_;
+
+   /**
+    * The cached value of the '{@link #getParameterTypes() <em>Parameter Types</em>}' containment reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getParameterTypes()
+    * @generated
+    * @ordered
+    */
+   protected EList<TypeUsage> parameterTypes;
 
    /**
     * <!-- begin-user-doc -->
@@ -349,78 +348,6 @@ public class MethodImpl extends MinimalEObjectImpl.Container implements Method {
     * <!-- end-user-doc -->
     * @generated
     */
-   public AbstractType getReturnType() {
-      if (returnType != null && returnType.eIsProxy()) {
-         InternalEObject oldReturnType = (InternalEObject)returnType;
-         returnType = (AbstractType)eResolveProxy(oldReturnType);
-         if (returnType != oldReturnType) {
-            if (eNotificationRequired())
-               eNotify(new ENotificationImpl(this, Notification.RESOLVE, DependencymodelPackage.METHOD__RETURN_TYPE, oldReturnType, returnType));
-         }
-      }
-      return returnType;
-   }
-
-   /**
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    */
-   public AbstractType basicGetReturnType() {
-      return returnType;
-   }
-
-   /**
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    */
-   public void setReturnType(AbstractType newReturnType) {
-      AbstractType oldReturnType = returnType;
-      returnType = newReturnType;
-      if (eNotificationRequired())
-         eNotify(new ENotificationImpl(this, Notification.SET, DependencymodelPackage.METHOD__RETURN_TYPE, oldReturnType, returnType));
-   }
-
-   /**
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated NOT
-    */
-   public EList<AbstractType> getParameterTypes() {
-      if (parameterTypes == null) {
-         parameterTypes = new EObjectResolvingEList<AbstractType>(AbstractType.class, this, DependencymodelPackage.METHOD__PARAMETER_TYPES) {
-            /**
-             * Generated UID.
-             */
-            private static final long serialVersionUID = -2463062453442464680L;
-
-            @Override
-            protected boolean isUnique() {
-               return false;
-            }
-         };
-      }
-      return parameterTypes;
-   }
-
-   /**
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    */
-   public EList<AbstractType> getThrows() {
-      if (throws_ == null) {
-         throws_ = new EObjectResolvingEList<AbstractType>(AbstractType.class, this, DependencymodelPackage.METHOD__THROWS);
-      }
-      return throws_;
-   }
-
-   /**
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    */
    public boolean isConstructor() {
       return constructor;
    }
@@ -442,11 +369,84 @@ public class MethodImpl extends MinimalEObjectImpl.Container implements Method {
     * <!-- end-user-doc -->
     * @generated
     */
+   public TypeUsage getReturnType() {
+      return returnType;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public NotificationChain basicSetReturnType(TypeUsage newReturnType, NotificationChain msgs) {
+      TypeUsage oldReturnType = returnType;
+      returnType = newReturnType;
+      if (eNotificationRequired()) {
+         ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, DependencymodelPackage.METHOD__RETURN_TYPE, oldReturnType, newReturnType);
+         if (msgs == null) msgs = notification; else msgs.add(notification);
+      }
+      return msgs;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public void setReturnType(TypeUsage newReturnType) {
+      if (newReturnType != returnType) {
+         NotificationChain msgs = null;
+         if (returnType != null)
+            msgs = ((InternalEObject)returnType).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - DependencymodelPackage.METHOD__RETURN_TYPE, null, msgs);
+         if (newReturnType != null)
+            msgs = ((InternalEObject)newReturnType).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - DependencymodelPackage.METHOD__RETURN_TYPE, null, msgs);
+         msgs = basicSetReturnType(newReturnType, msgs);
+         if (msgs != null) msgs.dispatch();
+      }
+      else if (eNotificationRequired())
+         eNotify(new ENotificationImpl(this, Notification.SET, DependencymodelPackage.METHOD__RETURN_TYPE, newReturnType, newReturnType));
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public EList<TypeUsage> getThrows() {
+      if (throws_ == null) {
+         throws_ = new EObjectContainmentEList<TypeUsage>(TypeUsage.class, this, DependencymodelPackage.METHOD__THROWS);
+      }
+      return throws_;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public EList<TypeUsage> getParameterTypes() {
+      if (parameterTypes == null) {
+         parameterTypes = new EObjectContainmentEList<TypeUsage>(TypeUsage.class, this, DependencymodelPackage.METHOD__PARAMETER_TYPES);
+      }
+      return parameterTypes;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
    @Override
    public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
       switch (featureID) {
          case DependencymodelPackage.METHOD__TYPE_VARIABLES:
             return ((InternalEList<?>)getTypeVariables()).basicRemove(otherEnd, msgs);
+         case DependencymodelPackage.METHOD__RETURN_TYPE:
+            return basicSetReturnType(null, msgs);
+         case DependencymodelPackage.METHOD__THROWS:
+            return ((InternalEList<?>)getThrows()).basicRemove(otherEnd, msgs);
+         case DependencymodelPackage.METHOD__PARAMETER_TYPES:
+            return ((InternalEList<?>)getParameterTypes()).basicRemove(otherEnd, msgs);
       }
       return super.eInverseRemove(otherEnd, featureID, msgs);
    }
@@ -471,15 +471,14 @@ public class MethodImpl extends MinimalEObjectImpl.Container implements Method {
             return isFinal();
          case DependencymodelPackage.METHOD__ABSTRACT:
             return isAbstract();
-         case DependencymodelPackage.METHOD__RETURN_TYPE:
-            if (resolve) return getReturnType();
-            return basicGetReturnType();
-         case DependencymodelPackage.METHOD__PARAMETER_TYPES:
-            return getParameterTypes();
-         case DependencymodelPackage.METHOD__THROWS:
-            return getThrows();
          case DependencymodelPackage.METHOD__CONSTRUCTOR:
             return isConstructor();
+         case DependencymodelPackage.METHOD__RETURN_TYPE:
+            return getReturnType();
+         case DependencymodelPackage.METHOD__THROWS:
+            return getThrows();
+         case DependencymodelPackage.METHOD__PARAMETER_TYPES:
+            return getParameterTypes();
       }
       return super.eGet(featureID, resolve, coreType);
    }
@@ -512,19 +511,19 @@ public class MethodImpl extends MinimalEObjectImpl.Container implements Method {
          case DependencymodelPackage.METHOD__ABSTRACT:
             setAbstract((Boolean)newValue);
             return;
-         case DependencymodelPackage.METHOD__RETURN_TYPE:
-            setReturnType((AbstractType)newValue);
+         case DependencymodelPackage.METHOD__CONSTRUCTOR:
+            setConstructor((Boolean)newValue);
             return;
-         case DependencymodelPackage.METHOD__PARAMETER_TYPES:
-            getParameterTypes().clear();
-            getParameterTypes().addAll((Collection<? extends AbstractType>)newValue);
+         case DependencymodelPackage.METHOD__RETURN_TYPE:
+            setReturnType((TypeUsage)newValue);
             return;
          case DependencymodelPackage.METHOD__THROWS:
             getThrows().clear();
-            getThrows().addAll((Collection<? extends AbstractType>)newValue);
+            getThrows().addAll((Collection<? extends TypeUsage>)newValue);
             return;
-         case DependencymodelPackage.METHOD__CONSTRUCTOR:
-            setConstructor((Boolean)newValue);
+         case DependencymodelPackage.METHOD__PARAMETER_TYPES:
+            getParameterTypes().clear();
+            getParameterTypes().addAll((Collection<? extends TypeUsage>)newValue);
             return;
       }
       super.eSet(featureID, newValue);
@@ -556,17 +555,17 @@ public class MethodImpl extends MinimalEObjectImpl.Container implements Method {
          case DependencymodelPackage.METHOD__ABSTRACT:
             setAbstract(ABSTRACT_EDEFAULT);
             return;
-         case DependencymodelPackage.METHOD__RETURN_TYPE:
-            setReturnType((AbstractType)null);
+         case DependencymodelPackage.METHOD__CONSTRUCTOR:
+            setConstructor(CONSTRUCTOR_EDEFAULT);
             return;
-         case DependencymodelPackage.METHOD__PARAMETER_TYPES:
-            getParameterTypes().clear();
+         case DependencymodelPackage.METHOD__RETURN_TYPE:
+            setReturnType((TypeUsage)null);
             return;
          case DependencymodelPackage.METHOD__THROWS:
             getThrows().clear();
             return;
-         case DependencymodelPackage.METHOD__CONSTRUCTOR:
-            setConstructor(CONSTRUCTOR_EDEFAULT);
+         case DependencymodelPackage.METHOD__PARAMETER_TYPES:
+            getParameterTypes().clear();
             return;
       }
       super.eUnset(featureID);
@@ -592,14 +591,14 @@ public class MethodImpl extends MinimalEObjectImpl.Container implements Method {
             return final_ != FINAL_EDEFAULT;
          case DependencymodelPackage.METHOD__ABSTRACT:
             return abstract_ != ABSTRACT_EDEFAULT;
-         case DependencymodelPackage.METHOD__RETURN_TYPE:
-            return returnType != null;
-         case DependencymodelPackage.METHOD__PARAMETER_TYPES:
-            return parameterTypes != null && !parameterTypes.isEmpty();
-         case DependencymodelPackage.METHOD__THROWS:
-            return throws_ != null && !throws_.isEmpty();
          case DependencymodelPackage.METHOD__CONSTRUCTOR:
             return constructor != CONSTRUCTOR_EDEFAULT;
+         case DependencymodelPackage.METHOD__RETURN_TYPE:
+            return returnType != null;
+         case DependencymodelPackage.METHOD__THROWS:
+            return throws_ != null && !throws_.isEmpty();
+         case DependencymodelPackage.METHOD__PARAMETER_TYPES:
+            return parameterTypes != null && !parameterTypes.isEmpty();
       }
       return super.eIsSet(featureID);
    }

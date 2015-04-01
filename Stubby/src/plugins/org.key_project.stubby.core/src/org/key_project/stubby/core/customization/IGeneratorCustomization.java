@@ -4,7 +4,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.key_project.stubby.core.util.StubGeneratorUtil;
-import org.key_project.stubby.model.dependencymodel.AbstractType;
+import org.key_project.stubby.model.dependencymodel.Type;
 import org.key_project.stubby.model.dependencymodel.DependencyModel;
 
 /**
@@ -34,16 +34,16 @@ public interface IGeneratorCustomization {
    public void stubFolderCreated(IFolder stubFolder) throws CoreException;
 
    /**
-    * Returns the reason why the given {@link AbstractType} should be ignored.
+    * Returns the reason why the given {@link Type} should be ignored.
     * @param javaProject The {@link IJavaProject} to generate stubs for.
     * @param stubFolderPath The path to the stub folder.
-    * @param abstractType The {@link AbstractType} to check.
-    * @return The reason why the given {@link AbstractType} should be ignored or {@code null} if not be ignored.
+    * @param Type The {@link Type} to check.
+    * @return The reason why the given {@link Type} should be ignored or {@code null} if not be ignored.
     * @throws CoreException Occurred Exception.
     */
    public String getIgnoreReason(IJavaProject javaProject, 
                                  String stubFolderPath, 
-                                 AbstractType abstractType) throws CoreException;
+                                 Type Type) throws CoreException;
    
    /**
     * Is called by {@link StubGeneratorUtil#generateStubs(IJavaProject, String, org.eclipse.core.runtime.IProgressMonitor, IGeneratorCustomization...)}

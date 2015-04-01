@@ -1,17 +1,33 @@
 <?xml version="1.0" encoding="ASCII"?>
-<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dependencymodel="http://key-project.org/dependencymodel">
-  <types xsi:type="dependencymodel:Type" name="java.lang.Object" package="java.lang" simpleName="Object"/>
-  <types xsi:type="dependencymodel:Type" name="java.awt.Transparency" kind="INTERFACE" package="java.awt" simpleName="Transparency"/>
-  <types xsi:type="dependencymodel:Type" name="java.awt.Paint" kind="INTERFACE" extends="//@types.1" package="java.awt" simpleName="Paint"/>
-  <types xsi:type="dependencymodel:Type" name="java.io.Serializable" kind="INTERFACE" package="java.io" simpleName="Serializable"/>
-  <types xsi:type="dependencymodel:Type" name="java.awt.Color" extends="//@types.0" implements="//@types.2 //@types.3" package="java.awt" simpleName="Color">
-    <fields name="BLACK" final="true" static="true" type="//@types.4"/>
+<dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
+  <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
+  <types kind="INTERFACE" package="java.awt" name="java.awt.Transparency" simpleName="Transparency"/>
+  <types kind="INTERFACE" package="java.awt" name="java.awt.Paint" simpleName="Paint">
+    <extends type="java.awt.Transparency"/>
   </types>
-  <types xsi:type="dependencymodel:Type" name="FieldDeclarationTest" source="true" extends="//@types.0" package="" simpleName="FieldDeclarationTest"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Throwable" extends="//@types.0" implements="//@types.3" package="java.lang" simpleName="Throwable"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.Exception" extends="//@types.6" package="java.lang" simpleName="Exception"/>
-  <types xsi:type="dependencymodel:Type" name="java.lang.RuntimeException" extends="//@types.7" package="java.lang" simpleName="RuntimeException">
-    <methods name="RuntimeException" returnType="//@types.9" constructor="true"/>
+  <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
+  <types package="java.awt" name="java.awt.Color" simpleName="Color">
+    <fields name="BLACK" final="true" static="true">
+      <type type="java.awt.Color"/>
+    </fields>
+    <implements type="java.awt.Paint"/>
+    <implements type="java.io.Serializable"/>
+    <extends type="java.lang.Object"/>
   </types>
-  <types xsi:type="dependencymodel:Datatype" name="void"/>
+  <types package="" name="FieldDeclarationTest" source="true" simpleName="FieldDeclarationTest">
+    <extends type="java.lang.Object"/>
+  </types>
+  <types package="java.lang" name="java.lang.Throwable" simpleName="Throwable">
+    <implements type="java.io.Serializable"/>
+    <extends type="java.lang.Object"/>
+  </types>
+  <types package="java.lang" name="java.lang.Exception" simpleName="Exception">
+    <extends type="java.lang.Throwable"/>
+  </types>
+  <types package="java.lang" name="java.lang.RuntimeException" simpleName="RuntimeException">
+    <methods name="RuntimeException" constructor="true">
+      <returnType type="void"/>
+    </methods>
+    <extends type="java.lang.Exception"/>
+  </types>
 </dependencymodel:DependencyModel>

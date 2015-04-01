@@ -58,33 +58,6 @@ public interface DependencymodelFactory extends EFactory {
    DependencyModel createDependencyModel();
 
    /**
-    * Returns a new object of class '<em>Array Type</em>'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return a new object of class '<em>Array Type</em>'.
-    * @generated
-    */
-   ArrayType createArrayType();
-
-   /**
-    * Returns a new object of class '<em>Datatype</em>'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return a new object of class '<em>Datatype</em>'.
-    * @generated
-    */
-   Datatype createDatatype();
-
-   /**
-    * Returns a new object of class '<em>Generic Type</em>'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return a new object of class '<em>Generic Type</em>'.
-    * @generated
-    */
-   GenericType createGenericType();
-
-   /**
     * Returns a new object of class '<em>Type Variable</em>'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -94,13 +67,13 @@ public interface DependencymodelFactory extends EFactory {
    TypeVariable createTypeVariable();
 
    /**
-    * Returns a new object of class '<em>Wildcard Type</em>'.
+    * Returns a new object of class '<em>Type Usage</em>'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
-    * @return a new object of class '<em>Wildcard Type</em>'.
+    * @return a new object of class '<em>Type Usage</em>'.
     * @generated
     */
-   WildcardType createWildcardType();
+   TypeUsage createTypeUsage();
 
    /**
     * Returns the package supported by this factory.

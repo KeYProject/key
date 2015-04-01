@@ -64,6 +64,7 @@ public class GenerateStubsWizard extends Wizard {
       this.customizations = StubGenerationCustomizationUtil.createCustomizations(javaProject);
       this.generatePage = new GenerateStubsWizardPage("generatePage", javaProject, customizations);
       setWindowTitle("Generate Stubs");
+      setNeedsProgressMonitor(true);
    }
 
    /**

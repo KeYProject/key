@@ -25,7 +25,7 @@ import org.eclipse.emf.ecore.EObject;
 public interface DependencyModel extends EObject {
    /**
     * Returns the value of the '<em><b>Types</b></em>' containment reference list.
-    * The list contents are of type {@link org.key_project.stubby.model.dependencymodel.AbstractType}.
+    * The list contents are of type {@link org.key_project.stubby.model.dependencymodel.Type}.
     * <!-- begin-user-doc -->
     * <p>
     * If the meaning of the '<em>Types</em>' containment reference list isn't clear,
@@ -37,6 +37,6 @@ public interface DependencyModel extends EObject {
     * @model containment="true"
     * @generated
     */
-   EList<AbstractType> getTypes();
+   EList<Type> getTypes();
 
 } // DependencyModel

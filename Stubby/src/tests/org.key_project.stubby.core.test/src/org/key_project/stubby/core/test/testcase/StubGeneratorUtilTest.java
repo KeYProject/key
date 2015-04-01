@@ -3,10 +3,8 @@ package org.key_project.stubby.core.test.testcase;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -23,16 +21,12 @@ import org.junit.Test;
 import org.key_project.stubby.core.test.Activator;
 import org.key_project.stubby.core.util.StubGeneratorUtil;
 import org.key_project.stubby.core.util.StubGeneratorUtil.IgnoredType;
-import org.key_project.stubby.model.dependencymodel.AbstractType;
-import org.key_project.stubby.model.dependencymodel.ArrayType;
-import org.key_project.stubby.model.dependencymodel.Datatype;
 import org.key_project.stubby.model.dependencymodel.DependencyModel;
 import org.key_project.stubby.model.dependencymodel.Field;
-import org.key_project.stubby.model.dependencymodel.GenericType;
 import org.key_project.stubby.model.dependencymodel.Method;
 import org.key_project.stubby.model.dependencymodel.Type;
+import org.key_project.stubby.model.dependencymodel.TypeUsage;
 import org.key_project.stubby.model.dependencymodel.TypeVariable;
-import org.key_project.stubby.model.dependencymodel.WildcardType;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.IOUtil;
@@ -920,7 +914,7 @@ public class StubGeneratorUtilTest extends TestCase {
    protected void assertDependenyModel(DependencyModel expected, DependencyModel current) {
       if (expected != null) {
          assertNotNull(current);
-         assertAbstractTypes(expected.getTypes(), current.getTypes(), new HashSet<AbstractType>());
+         assertTypes(expected.getTypes(), current.getTypes());
       }
       else {
          assertNull(current);
@@ -928,177 +922,96 @@ public class StubGeneratorUtilTest extends TestCase {
    }
    
    /**
-    * Ensures the same content of the given {@link AbstractType}s.
-    * @param expected The expected {@link AbstractType}s.
-    * @param current The current {@link AbstractType}s.
-    * @param nownAbstractTypes The already tested {@link AbstractType}s.
+    * Ensures the same content of the given {@link Type}s.
+    * @param expected The expected {@link Type}s.
+    * @param current The current {@link Type}s.
     * @throws Exception Occurred Exception.
     */
-   protected void assertAbstractTypes(List<? extends AbstractType> expected, 
-                                      List<? extends AbstractType> current, 
-                                      Set<AbstractType> nownAbstractTypes) {
+   protected void assertTypes(List<Type> expected, 
+                              List<Type> current) {
       assertEquals("Number of types", expected.size(), current.size());
-      Iterator<? extends AbstractType> expectTypIter = expected.iterator();
-      Iterator<? extends AbstractType> actualTypIter = current.iterator();
+      Iterator<Type> expectTypIter = expected.iterator();
+      Iterator<Type> actualTypIter = current.iterator();
       while( expectTypIter.hasNext() && actualTypIter.hasNext()){
-         AbstractType expectedType = expectTypIter.next();
-         AbstractType actualType = actualTypIter.next();
-         assertAbstractType(expectedType, actualType, nownAbstractTypes);
+         Type expectedType = expectTypIter.next();
+         Type actualType = actualTypIter.next();
+         assertType(expectedType, actualType);
       }
       assertFalse(expectTypIter.hasNext());
       assertFalse(actualTypIter.hasNext());
    }
 
    /**
-    * Ensures the same content of the given {@link AbstractType}s.
-    * @param expected The expected {@link AbstractType}.
-    * @param current The current {@link AbstractType}.
-    * @param nownAbstractTypes The already tested {@link AbstractType}s.
-    * @throws Exception Occurred Exception.
-    */
-   protected void assertAbstractType(AbstractType expected, 
-                                     AbstractType current, 
-                                     Set<AbstractType> nownAbstractTypes) {
-      if (nownAbstractTypes.add(current)) {
-         if (expected instanceof Type) {
-            assertTrue(current instanceof Type);
-            assertType((Type) expected, (Type) current, nownAbstractTypes);
-         }
-         else if (expected instanceof GenericType) {
-            assertTrue(current instanceof GenericType);
-            assertGenericType((GenericType) expected, (GenericType) current, nownAbstractTypes);
-         }
-         else if (expected instanceof Datatype) {
-            assertTrue(current instanceof Datatype);
-            assertDatatype((Datatype) expected, (Datatype) current);
-         }
-         else if (expected instanceof WildcardType) {
-            assertTrue(current instanceof WildcardType);
-            assertWildcardType((WildcardType) expected, (WildcardType) current);
-         }
-         else if (expected instanceof ArrayType) {
-            assertTrue(current instanceof ArrayType);
-            assertArrayType((ArrayType) expected, (ArrayType) current, nownAbstractTypes);
-         }
-         else if (expected instanceof TypeVariable) {
-            assertTrue(current instanceof TypeVariable);
-            assertTypeVariables((TypeVariable) expected, (TypeVariable) current, nownAbstractTypes);
-         }
-         else if (expected == null) {
-            assertNull(current); 
-         }
-         else{
-           fail("Unsupported type");
-         }
-      }
-   }
-   
-   /**
-    * Ensures the same content of the given {@link ArrayType}s.
-    * @param expected The expected {@link ArrayType}.
-    * @param current The current {@link ArrayType}.
-    * @param nownAbstractTypes The already tested {@link AbstractType}s.
-    * @throws Exception Occurred Exception.
-    */
-   protected void assertArrayType(ArrayType expected, 
-                                  ArrayType current, 
-                                  Set<AbstractType> nownAbstractTypes) {
-      internalAbstractType(expected, current);
-      assertAbstractType(expected.getBaseType(), current.getBaseType(), nownAbstractTypes);
-   }
-
-   /**
-    * Ensures the same content of the given {@link WildcardType}s.
-    * @param expected The expected {@link WildcardType}.
-    * @param current The current {@link WildcardType}.
-    * @throws Exception Occurred Exception.
-    */
-   protected void assertWildcardType(WildcardType expectedType, WildcardType actualType) {
-      internalAbstractType(expectedType, actualType);
-   }
-
-   /**
-    * Ensures the same content of the given {@link Datatype}s.
-    * @param expected The expected {@link Datatype}.
-    * @param current The current {@link Datatype}.
-    * @throws Exception Occurred Exception.
-    */
-   protected void assertDatatype(Datatype expectedType, Datatype actualType) {
-      internalAbstractType(expectedType, actualType);
-   }
-   
-   /**
-    * Ensures the same content of the given {@link TypeVariable}s.
-    * @param expected The expected {@link TypeVariable}.
-    * @param current The current {@link TypeVariable}.
-    * @param nownAbstractTypes The already tested {@link AbstractType}s.
-    * @throws Exception Occurred Exception.
-    */
-   protected void assertTypeVariables(TypeVariable expected, 
-                                      TypeVariable current, 
-                                      Set<AbstractType> nownAbstractTypes) {
-      internalAbstractType(expected, current);
-      assertAbstractType(expected.getType(), current.getType(), nownAbstractTypes);
-   }
-
-   /**
-    * Ensures the same content of the given {@link GenericType}s.
-    * @param expected The expected {@link GenericType}.
-    * @param current The current {@link GenericType}.
-    * @param nownAbstractTypes The already tested {@link AbstractType}s.
-    * @throws Exception Occurred Exception.
-    */
-   protected void assertGenericType(GenericType expected, 
-                                    GenericType current, 
-                                    Set<AbstractType> nownAbstractTypes) {
-      internalAbstractType(expected, current);
-      assertAbstractTypes(expected.getTypeArguments(), current.getTypeArguments(), nownAbstractTypes);
-      assertAbstractType(expected.getBaseType(), current.getBaseType(), nownAbstractTypes);
-   }
-
-   /**
     * Ensures the same content of the given {@link Type}s.
     * @param expected The expected {@link Type}.
     * @param current The current {@link Type}.
-    * @param nownAbstractTypes The already tested {@link AbstractType}s.
     * @throws Exception Occurred Exception.
     */
    protected void assertType(Type expected, 
-                             Type current, 
-                             Set<AbstractType> nownAbstractTypes) {
-      internalAbstractType(expected, current);
+                             Type current) {
       assertEquals(expected.isAbstract(), current.isAbstract());
       assertEquals(expected.isFinal(), current.isFinal());
+      assertEquals(expected.isSource(), current.isSource());
       assertEquals(expected.isStatic(), current.isStatic());
+      assertTypeUsages(expected.getExtends(), current.getExtends());
+      assertFields(expected.getFields(), current.getFields());
+      assertTypeUsages(expected.getImplements(), current.getImplements());
+      assertTypes(expected.getInnerTypes(), current.getInnerTypes());
       assertEquals(expected.getKind(), current.getKind());
+      assertMethods(expected.getMethods(), current.getMethods());
+      assertEquals(expected.getName(), current.getName());
       assertEquals(expected.getPackage(), current.getPackage());
       assertEquals(expected.getSimpleName(), current.getSimpleName());
+      assertTypeVariables(expected.getTypeVariables(), current.getTypeVariables());
       assertEquals(expected.getVisibility(), current.getVisibility());
-      assertAbstractTypes(expected.getExtends(), current.getExtends(), nownAbstractTypes);
-      assertAbstractTypes(expected.getImplements(), current.getImplements(), nownAbstractTypes);
-      assertAbstractTypes(expected.getInnerTypes(), current.getInnerTypes(), nownAbstractTypes);
-      assertMethods(expected.getMethods(), current.getMethods(), nownAbstractTypes);
-      assertFields(expected.getFields(), current.getFields(), nownAbstractTypes);
-      assertTypeVariables(expected.getTypeVariables(), current.getTypeVariables(), nownAbstractTypes);
+   }
+   
+   /**
+    * Ensures the same content of the given {@link TypeUsage}s.
+    * @param expected The expected {@link TypeUsage}s.
+    * @param current The current {@link TypeUsage}s.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertTypeUsages(List<TypeUsage> expected, 
+                                   List<TypeUsage> current) {
+      assertEquals("Number of type usages", expected.size(), current.size());
+      Iterator<TypeUsage> expectTypIter = expected.iterator();
+      Iterator<TypeUsage> actualTypIter = current.iterator();
+      while( expectTypIter.hasNext() && actualTypIter.hasNext()){
+         TypeUsage expectedType = expectTypIter.next();
+         TypeUsage actualType = actualTypIter.next();
+         assertTypeUsage(expectedType, actualType);
+      }
+      assertFalse(expectTypIter.hasNext());
+      assertFalse(actualTypIter.hasNext());
+   }
+   
+   /**
+    * Ensures the same content of the given {@link TypeUsage}s.
+    * @param expected The expected {@link TypeUsage}.
+    * @param current The current {@link TypeUsage}.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertTypeUsage(TypeUsage expected,
+                                  TypeUsage current) {
+      assertEquals(expected.getType(), current.getType());
    }
 
    /**
     * Ensures the same content of the given {@link Method}s.
     * @param expected The expected {@link Method}s.
     * @param current The current {@link Method}s.
-    * @param nownAbstractTypes The already tested {@link AbstractType}s.
     * @throws Exception Occurred Exception.
     */
    protected void assertMethods(List<Method> expected, 
-                                List<Method> current, 
-                                Set<AbstractType> nownAbstractTypes) {
+                                List<Method> current) {
       assertEquals("Number of methods", expected.size(), current.size());
       Iterator<Method> expectTypIter = expected.iterator();
       Iterator<Method> actualTypIter = current.iterator();
       while( expectTypIter.hasNext() && actualTypIter.hasNext()){
          Method expectedMethod = expectTypIter.next();
          Method actualMethod = actualTypIter.next();
-         assertMethod(expectedMethod, actualMethod, nownAbstractTypes);
+         assertMethod(expectedMethod, actualMethod);
       }
       assertFalse(expectTypIter.hasNext());
       assertFalse(actualTypIter.hasNext());
@@ -1108,41 +1021,37 @@ public class StubGeneratorUtilTest extends TestCase {
     * Ensures the same content of the given {@link Method}s.
     * @param expected The expected {@link Method}.
     * @param current The current {@link Method}.
-    * @param nownAbstractTypes The already tested {@link AbstractType}s.
     * @throws Exception Occurred Exception.
     */
    protected void assertMethod(Method expected, 
-                               Method current, 
-                               Set<AbstractType> nownAbstractTypes) {
+                               Method current) {
       assertEquals(expected.isAbstract(), current.isAbstract());
+      assertEquals(expected.isConstructor(), current.isConstructor());
       assertEquals(expected.isFinal(), current.isFinal());
       assertEquals(expected.isStatic(), current.isStatic());
       assertEquals(expected.getName(), current.getName());
+      assertTypeUsages(expected.getParameterTypes(), current.getParameterTypes());
+      assertTypeUsage(expected.getReturnType(), current.getReturnType());
+      assertTypeUsages(expected.getThrows(), current.getThrows());
+      assertTypeVariables(expected.getTypeVariables(), current.getTypeVariables());
       assertEquals(expected.getVisibility(), current.getVisibility());
-      assertEquals(expected.isConstructor(), current.isConstructor());
-      assertAbstractTypes(expected.getParameterTypes(), current.getParameterTypes(), nownAbstractTypes);
-      assertAbstractTypes(expected.getThrows(), current.getThrows(), nownAbstractTypes);
-      assertAbstractType(expected.getReturnType(), current.getReturnType(), nownAbstractTypes);
-      assertTypeVariables(expected.getTypeVariables(), current.getTypeVariables(), nownAbstractTypes);
    }
 
    /**
     * Ensures the same content of the given {@link Field}s.
     * @param expected The expected {@link Field}s.
     * @param current The current {@link Field}s.
-    * @param nownAbstractTypes The already tested {@link AbstractType}s.
     * @throws Exception Occurred Exception.
     */
    protected void assertFields(List<Field> expected, 
-                               List<Field> current, 
-                               Set<AbstractType> nownAbstractTypes) {
+                               List<Field> current) {
       assertEquals("Number of fields", expected.size(), current.size());
       Iterator<Field> expectTypIter = expected.iterator();
       Iterator<Field> actualTypIter = current.iterator();
       while( expectTypIter.hasNext() && actualTypIter.hasNext()){
          Field expectedField = expectTypIter.next();
          Field actualField = actualTypIter.next();
-         assertField(expectedField, actualField, nownAbstractTypes);
+         assertField(expectedField, actualField);
       }
       assertFalse(expectTypIter.hasNext());
       assertFalse(actualTypIter.hasNext());
@@ -1152,37 +1061,33 @@ public class StubGeneratorUtilTest extends TestCase {
     * Ensures the same content of the given {@link Field}s.
     * @param expected The expected {@link Field}.
     * @param current The current {@link Field}.
-    * @param nownAbstractTypes The already tested {@link AbstractType}s.
     * @throws Exception Occurred Exception.
     */
    protected void assertField(Field expected, 
-                              Field current, 
-                              Set<AbstractType> nownAbstractTypes) {
+                              Field current) {
       assertEquals(expected.isFinal(), current.isFinal());
       assertEquals(expected.isStatic(), current.isStatic());
       assertEquals(expected.getConstantValue(), current.getConstantValue());
       assertEquals(expected.getName(), current.getName());
+      assertTypeUsage(expected.getType(), current.getType());
       assertEquals(expected.getVisibility(), current.getVisibility());
-      assertAbstractType(expected.getType(), current.getType(), nownAbstractTypes);
    }
 
    /**
     * Ensures the same content of the given {@link TypeVariable}s.
     * @param expected The expected {@link TypeVariable}s.
     * @param current The current {@link TypeVariable}s.
-    * @param nownAbstractTypes The already tested {@link AbstractType}s.
     * @throws Exception Occurred Exception.
     */
    protected void assertTypeVariables(List<TypeVariable> expected, 
-                                      List<TypeVariable> current, 
-                                      Set<AbstractType> nownAbstractTypes) {
+                                      List<TypeVariable> current) {
       assertEquals("Number of fields", expected.size(), current.size());
       Iterator<TypeVariable> expectTypIter = expected.iterator();
       Iterator<TypeVariable> actualTypIter = current.iterator();
       while( expectTypIter.hasNext() && actualTypIter.hasNext()){
          TypeVariable expectedVar = expectTypIter.next();
          TypeVariable actualVar = actualTypIter.next();
-         assertTypeVariable(expectedVar, actualVar, nownAbstractTypes);
+         assertTypeVariable(expectedVar, actualVar);
       }
       assertFalse(expectTypIter.hasNext());
       assertFalse(actualTypIter.hasNext());
@@ -1192,23 +1097,11 @@ public class StubGeneratorUtilTest extends TestCase {
     * Ensures the same content of the given {@link TypeVariable}s.
     * @param expected The expected {@link TypeVariable}.
     * @param current The current {@link TypeVariable}.
-    * @param nownAbstractTypes The already tested {@link AbstractType}s.
     * @throws Exception Occurred Exception.
     */
    protected void assertTypeVariable(TypeVariable expected, 
-                                     TypeVariable current, 
-                                     Set<AbstractType> nownAbstractTypes) {
+                                     TypeVariable current) {
       assertEquals(expected.getName(), current.getName());
-      assertAbstractType(expected.getType(), current.getType(), nownAbstractTypes);
-   }
-
-   /**
-    * Utility test method comparing the same content of all {@link AbstractType}s.
-    * @param expected The exepcted {@link AbstractType}.
-    * @param current The current {@link AbstractType}.
-    */
-   private void internalAbstractType(AbstractType expected, AbstractType current) {
-      assertEquals(expected.isSource(), current.isSource());
-      assertEquals(expected.getName(), current.getName());
+      assertTypeUsage(expected.getType(), current.getType());
    }
 }
