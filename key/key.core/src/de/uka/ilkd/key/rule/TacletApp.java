@@ -596,8 +596,7 @@ public abstract class TacletApp implements RuleApp {
 		    ProgramElement pe = app.getProgramElement(proposal, sv, services);
 		    proposals = proposals.prepend(proposal);
 		    try {
-			app = app.addCheckedInstantiation(sv, pe, services,
-				true);
+			app = app.addCheckedInstantiation(sv, pe, services, true);
 		    } catch (IllegalInstantiationException iie) {
 			// name clash
 			nameclash = true;

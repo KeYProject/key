@@ -16,7 +16,6 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.util.Debug;
 
 /** 
  * this class describes the position of a statement in a program.
@@ -46,11 +45,6 @@ public class PosInProgram {
      * the depth
      */
     private final int depth;
-
-    /**
-     * caches iterator for performance reasons
-     */
-    private volatile int[] cache;
 
     private final int hashCode;
 
@@ -199,22 +193,17 @@ public class PosInProgram {
 
 
     public int get(int i) {
-	if (i >= depth || i < 0) {
-	    throw new ArrayIndexOutOfBoundsException();
-	}
-	if (cache != null) {
-	    return cache[i];
-	}
-	
-	PosInProgram previous = this;
-	int result = this.pos;
+        if (i >= depth || i < 0) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
 
-	for (int k = 0; k < depth - i; k++) {	    
-	    result = previous.pos;
-	    previous = previous.prev;
-	}
-
-	return result;
+        PosInProgram previous = this;        
+        while ((depth - 1) - i > 0) {
+            previous = previous.prev;  
+            i++;
+        }
+        
+        return previous.pos;
     }
 
     /**
@@ -233,34 +222,10 @@ public class PosInProgram {
      * @return an iterator over the list defining the position in a term.
      */
     public IntIterator iterator() {	
-        if (cache == null) {
-            synchronized(this) {
-                if (cache == null) {	
-                    fillCache();
-                } 	
-            }
-        }
-	return new PosArrayIntIterator(cache);
+        return new PosArrayIntIterator(this);
     }
     
   
-
-    private void fillCache() {
-        int[] cache = new int[depth];
-        if (prev != null &&
-                prev.cache != null) {
-            System.arraycopy(prev.cache, 0, cache, 0, prev.cache.length);
-            cache[cache.length-1] = pos;
-        } else {
-            final IntIterator it = reverseIterator();
-            int at = depth - 1;	    
-            while (it.hasNext()) {
-                cache[at] = it.next();
-                at--;
-            }
-        }
-        this.cache = cache;
-    }
 
     
     /** toString */
@@ -290,7 +255,6 @@ public class PosInProgram {
 	}
 
 	public int next() {
-	    Debug.assertTrue(p != TOP && p!=null);
 	    int result = p.pos; 
 	    p = p.prev;
 	    return result;
@@ -302,10 +266,18 @@ public class PosInProgram {
 	private final int[] pos;
 	private int next;
 
-	public PosArrayIntIterator(int[] pos) {
-	    this.pos = pos;
+	public PosArrayIntIterator(PosInProgram pip) {
+        pos = new int[pip.depth];
+	    fillCache(pip);
 	    next = 0;
 	    
+	}
+
+	private void fillCache(PosInProgram pip) {
+	    for (int at = pip.depth - 1; at >= 0; at--) {
+	        pos[at] = pip.pos;
+	        pip = pip.prev;
+	    }
 	}
 
 	public boolean hasNext() {
