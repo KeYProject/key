@@ -329,7 +329,7 @@ public class DependencyAnalyzer extends ASTVisitor {
     * @return The type declaration of the given {@link ITypeBinding}.
     */
    protected ITypeBinding toTypeDeclaration(ITypeBinding typeBinding) {
-      if (typeBinding.isArray()) {
+      while (typeBinding.isArray()) {
          typeBinding = typeBinding.getComponentType();
       }
       return typeBinding.getTypeDeclaration();
@@ -377,7 +377,7 @@ public class DependencyAnalyzer extends ASTVisitor {
     */
    protected void ensureUsedTypesExist(ITypeBinding typeBinding) {
       // Treat arrays
-      if (typeBinding.isArray()) {
+      while (typeBinding.isArray()) {
          typeBinding = typeBinding.getComponentType();
       }
       // Treat generic types (only of array components)
