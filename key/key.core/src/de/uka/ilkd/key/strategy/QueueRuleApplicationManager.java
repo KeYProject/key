@@ -19,6 +19,7 @@ import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.SingletonIterator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
@@ -112,8 +113,9 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             // rule app is not of interest for us
             return;
         
-        final Iterator<RuleAppContainer> iterator = RuleAppContainer.createAppContainers
-        	           ( rule, pos, getGoal (), getStrategy () ).iterator ();
+        final Iterator<RuleAppContainer> iterator = 
+                new SingletonIterator<RuleAppContainer>(RuleAppContainer.createAppContainer
+        	           ( rule, pos, getGoal (), getStrategy () ) );
         ensureQueueExists();
         push ( iterator,  PRIMARY_QUEUE );
     }
@@ -129,11 +131,11 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             // rule app is not of interest for us
             return;
 
-        final ImmutableList<ImmutableList<RuleAppContainer>> containers = 
+        final ImmutableList<RuleAppContainer> containers = 
                 RuleAppContainer.createAppContainers( rules, pos, getGoal (), getStrategy () );        
         ensureQueueExists();        
-        for (ImmutableList<RuleAppContainer> rac : containers) {
-            push ( rac.iterator(),  PRIMARY_QUEUE );
+        for (RuleAppContainer rac : containers) {
+            push ( new SingletonIterator<RuleAppContainer>(rac),  PRIMARY_QUEUE );
         }
     }
     

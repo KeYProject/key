@@ -111,11 +111,11 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     //-------------------------------------------------------------------------
     
     /**
-     * Create containers for RuleApps.
-     * @return list of containers for currently applicable BuiltInRuleApps,
+     * Create container for RuleApp.
+     * @return container for the currently applicable BuiltInRuleApp,
      * the cost may be an instance of <code>TopRuleAppCost</code>.
      */
-    static ImmutableList<RuleAppContainer> createAppContainers( 
+    static RuleAppContainer createAppContainer( 
 	    					IBuiltInRuleApp bir,
 	    					PosInOccurrence pio,
 	    					Goal goal,
@@ -125,7 +125,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         final BuiltInRuleAppContainer container 
         	= new BuiltInRuleAppContainer(bir, pio, cost, goal);
 
-        return ImmutableSLList.<RuleAppContainer>nil().prepend(container);
+        return container;
     }    
     
 
@@ -139,14 +139,11 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         
         final PosInOccurrence pio = getPosInOccurrence(goal);
         
-        ImmutableList<RuleAppContainer> result 
-        	= createAppContainers(bir, pio, goal, strategy);
-        for(RuleAppContainer container : result) {
-            if(container.getCost() instanceof TopRuleAppCost) {
-        	result = result.removeFirst(container);
-            }
+        RuleAppContainer container = createAppContainer(bir, pio, goal, strategy);
+        if(container.getCost() instanceof TopRuleAppCost) {
+            return ImmutableSLList.<RuleAppContainer>nil();
         }
-        return result;
+        return ImmutableSLList.<RuleAppContainer>nil().prepend(container);
     }
     
 

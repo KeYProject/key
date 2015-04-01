@@ -203,9 +203,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         if (lastProof != null) {
             if (!lastProof.isDisposed()) {
                 for(Goal g : lastProof.openGoals()) {
-                    for(NoPosTacletApp app : appsTakenOver) {
-                        g.ruleAppIndex().addNoPosTacletApp(app);
-                    }
+                    g.ruleAppIndex().addNoPosTacletApp(appsTakenOver);
                     g.getRuleAppManager().clearCache();
                     g.ruleAppIndex().clearIndexes();
                 }

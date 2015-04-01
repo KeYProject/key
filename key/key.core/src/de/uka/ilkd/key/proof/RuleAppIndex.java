@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -322,6 +323,22 @@ public final class RuleAppIndex  {
 	 return builtInRuleAppIndex().getBuiltInRule(g, pos);
      }
 
+    
+    /**
+     * adds a new Taclet with instantiation information to the Taclet Index 
+     * of this TacletAppIndex.
+     * @param tacletApp the NoPosTacletApp describing a partial instantiated Taclet to add
+     */
+    public void addNoPosTacletApp(ImmutableSet<NoPosTacletApp> tacletApps) {
+        tacletIndex.addTaclets ( tacletApps );
+
+        if ( autoMode )
+            interactiveTacletAppIndex.clearIndexes ();
+    
+        interactiveTacletAppIndex.addedNoPosTacletApps ( tacletApps );
+        automatedTacletAppIndex.addedNoPosTacletApps ( tacletApps );
+    }
+    
     /**
      * adds a new Taclet with instantiation information to the Taclet Index 
      * of this TacletAppIndex.

@@ -34,6 +34,5 @@ public interface NewRuleListener {
      */
     void rulesAdded( ImmutableList<? extends RuleApp>  rule,
                      PosInOccurrence pos );
-    
 
 }

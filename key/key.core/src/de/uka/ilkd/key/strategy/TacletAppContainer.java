@@ -244,7 +244,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     /**
      * Create containers for NoFindTaclets.
      */
-    static ImmutableList<RuleAppContainer> createAppContainers
+    static RuleAppContainer createAppContainers
         ( NoPosTacletApp p_app, Goal p_goal, Strategy  p_strategy ) {
 	return createAppContainers ( p_app, null, p_goal, p_strategy );
     }
@@ -257,7 +257,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * @return list of containers for currently applicable TacletApps, the cost
      * may be an instance of <code>TopRuleAppCost</code>.
      */
-    static ImmutableList<RuleAppContainer> createAppContainers
+    static RuleAppContainer createAppContainers
         ( NoPosTacletApp  p_app,
           PosInOccurrence p_pio,
           Goal            p_goal,
@@ -270,12 +270,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
         // Create an initial container for the given taclet; the if-formulas of
         // the taclet are only matched lazy (by <code>createFurtherApps()</code>
-        return ImmutableSLList.<RuleAppContainer>nil()
-                    .prepend ( createContainer ( p_app,
-                                                 p_pio,
-                                                 p_goal,
-                                                 p_strategy,
-                                                 true ) );
+        return createContainer ( p_app, p_pio, p_goal, p_strategy, true );
     }
 
     /**

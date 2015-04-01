@@ -32,4 +32,8 @@ public class SetRuleFilter implements RuleFilter {
     public boolean filter( Rule rule ) {
         return set.contains ( rule );
     }
+
+    public boolean isEmpty() {
+        return set.isEmpty();
+    }
 }

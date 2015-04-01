@@ -74,11 +74,11 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
 
 
     /**
-     * Create containers for RuleApps.
-     * @return list of containers for currently applicable RuleApps, the cost
+     * Create container for a RuleApp.
+     * @return container for the currently applicable RuleApp, the cost
      * may be an instance of <code>TopRuleAppCost</code>.
      */
-    public static ImmutableList<RuleAppContainer> createAppContainers
+    public static RuleAppContainer createAppContainer
         ( RuleApp p_app, PosInOccurrence p_pio, Goal p_goal, Strategy p_strategy ) {
 
 	if ( p_app instanceof NoPosTacletApp )
@@ -86,21 +86,30 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
 		( (NoPosTacletApp)p_app, p_pio, p_goal, p_strategy );
 
 	if ( p_app instanceof IBuiltInRuleApp )
-	    return BuiltInRuleAppContainer.createAppContainers
+	    return BuiltInRuleAppContainer.createAppContainer
 		( (IBuiltInRuleApp)p_app, p_pio, p_goal, p_strategy );
 
 	Debug.fail ( "Unexpected kind of rule." );
 
-	return ImmutableSLList.<RuleAppContainer>nil();
+	return null;
     }
 
-    public static ImmutableList<ImmutableList<RuleAppContainer>> createAppContainers(
+    /**
+     * Create containers for RuleApps.
+     * @return list of containers for the currently applicable RuleApps, the cost
+     * may be an instance of <code>TopRuleAppCost</code>.
+     */
+    public static ImmutableList<RuleAppContainer> createAppContainers(
             ImmutableList<? extends RuleApp> rules, PosInOccurrence pos,
             Goal goal, Strategy strategy) {
         
-        ImmutableList<ImmutableList<RuleAppContainer>> result = ImmutableSLList.<ImmutableList<RuleAppContainer>>nil();
+        ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
+        
         for (RuleApp rule : rules) {
-            result = result.prepend(createAppContainers(rule, pos, goal, strategy));
+            RuleAppContainer container = createAppContainer(rule, pos, goal, strategy);
+            if (container != null) {
+                result = result.prepend(container);
+            }
         }
 
         return result;
