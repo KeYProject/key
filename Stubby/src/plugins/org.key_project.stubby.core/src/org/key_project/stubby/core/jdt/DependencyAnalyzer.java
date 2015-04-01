@@ -46,6 +46,8 @@ public class DependencyAnalyzer extends ASTVisitor {
     */
    private final List<Type> outerTypes = new LinkedList<Type>();
 
+   // TODO: Do we need SimpleName to support used classes in java.lang?
+   
    /**
     * {@inheritDoc}
     */
@@ -190,7 +192,7 @@ public class DependencyAnalyzer extends ASTVisitor {
     * Ensures that the given {@link IVariableBinding} is part of dependency model.
     * @param variableBinding The {@link IVariableBinding} to represent.
     */
-   protected void ensureFieldExists(IVariableBinding variableBinding) {
+   public void ensureFieldExists(IVariableBinding variableBinding) {
       variableBinding = variableBinding.getVariableDeclaration();
       ITypeBinding declaringClass = variableBinding.getDeclaringClass();
       if (declaringClass != null) { // In case of local variables the type binding is null
@@ -225,7 +227,7 @@ public class DependencyAnalyzer extends ASTVisitor {
     * Ensures that the given {@link IMethodBinding} is part of dependency model.
     * @param methodBinding The {@link IMethodBinding} to represent.
     */
-   protected void ensureMethodExist(IMethodBinding methodBinding) {
+   public void ensureMethodExist(IMethodBinding methodBinding) {
       methodBinding = methodBinding.getMethodDeclaration();
       Type declaringType = ensureTypeExists(methodBinding.getDeclaringClass());
       if (!declaringType.containsMethod(methodBinding.getName(), computeTypeUsages(methodBinding.getParameterTypes()))) {
@@ -276,7 +278,7 @@ public class DependencyAnalyzer extends ASTVisitor {
     * Ensures that the given {@link ITypeBinding} is part of dependency model.
     * @param typeBinding The {@link ITypeBinding} to represent.
     */
-   protected Type ensureTypeExists(ITypeBinding typeBinding) {
+   public Type ensureTypeExists(ITypeBinding typeBinding) {
       typeBinding = toTypeDeclaration(typeBinding);
       String typeName = typeBinding.getQualifiedName();
       Type type = (Type)types.get(typeName);

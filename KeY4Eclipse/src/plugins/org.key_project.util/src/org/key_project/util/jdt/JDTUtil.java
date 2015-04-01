@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.IClassFile;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -1104,6 +1105,27 @@ public class JDTUtil {
          ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
          parser.setResolveBindings(true);
          parser.setSource(compilationUnit);
+         Map<?, ?> options = JavaCore.getOptions();
+         JavaCore.setComplianceOptions(JavaModelUtil.VERSION_LATEST, options);
+         parser.setCompilerOptions(options);
+         ASTNode result = parser.createAST(null);
+         return result;
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Parses the given {@link IClassFile}.
+    * @param classFile The {@link IClassFile} to parse.
+    * @return The parsed {@link ASTNode} or {@code null} if no {@link ICompilationUnit} is defined.
+    */
+   public static ASTNode parse(IClassFile classFile) {
+      if (classFile != null) {
+         ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
+         parser.setResolveBindings(true);
+         parser.setSource(classFile);
          Map<?, ?> options = JavaCore.getOptions();
          JavaCore.setComplianceOptions(JavaModelUtil.VERSION_LATEST, options);
          parser.setCompilerOptions(options);

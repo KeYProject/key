@@ -3,9 +3,10 @@ package org.key_project.stubby.core.customization;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
+import org.key_project.stubby.core.jdt.DependencyAnalyzer;
 import org.key_project.stubby.core.util.StubGeneratorUtil;
-import org.key_project.stubby.model.dependencymodel.Type;
 import org.key_project.stubby.model.dependencymodel.DependencyModel;
+import org.key_project.stubby.model.dependencymodel.Type;
 
 /**
  * Instances of this class can be used by {@link StubGeneratorUtil} to
@@ -13,6 +14,16 @@ import org.key_project.stubby.model.dependencymodel.DependencyModel;
  * @author Martin Hentschel
  */
 public interface IGeneratorCustomization {
+   /**
+    * Is called by {@link StubGeneratorUtil#createDependencyModel(IJavaProject, org.eclipse.core.runtime.IProgressMonitor, IGeneratorCustomization...)}
+    * before the {@link DependencyModel} is created to add additional content to the {@link DependencyAnalyzer}.
+    * @param javaProject The {@link IJavaProject} to generate stubs for.
+    * @param analyzer The {@link DependencyAnalyzer} which might be extended.
+    * @throws CoreException Occurred Exception.
+    */
+   public void addAdditionalContent(IJavaProject javaProject, 
+                                    DependencyAnalyzer analyzer) throws CoreException;
+   
    /**
     * Is called by {@link StubGeneratorUtil#generateStubs(IJavaProject, String, org.eclipse.core.runtime.IProgressMonitor, IGeneratorCustomization...)}
     * after the {@link DependencyModel} has been created.

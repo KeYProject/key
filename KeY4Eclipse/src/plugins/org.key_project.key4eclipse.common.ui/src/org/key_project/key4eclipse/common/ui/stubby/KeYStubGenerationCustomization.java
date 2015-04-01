@@ -123,7 +123,7 @@ public class KeYStubGenerationCustomization extends AbstractStubGenerationCustom
       }
       else if (bootClassPathButton.getSelection()) {
          explanationLabel.setText("Stub folder is the boot class path of KeY.\n\n" + 
-                                  "An empty stub folder will be filled with types of KeY's default boot class path.");
+                                  "General Java types and methods required for verification with KeY are included.");
       }
       else {
          explanationLabel.setText("Stub folder is not used by KeY.\n\n ");

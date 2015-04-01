@@ -94,7 +94,7 @@ public final class StubGeneratorUtil {
             monitor = new NullProgressMonitor();
          }
          // Create dependency model
-         DependencyModel dependencyModel = createDependencyModel(project, monitor);
+         DependencyModel dependencyModel = createDependencyModel(project, monitor, customizations);
          // Inform customizations
          for (IGeneratorCustomization customization : customizations) {
             customization.dependencyModelCreated(project, stubFolderPath, dependencyModel);
@@ -127,10 +127,13 @@ public final class StubGeneratorUtil {
     * Creates the {@link DependencyModel} of the given {@link IJavaProject}.
     * @param project The {@link IJavaProject} to create its {@link DependencyModel}.
     * @param monitor The {@link IProgressMonitor} to use.
+    * @param customizations Optional {@link IGeneratorCustomization} to consider.
     * @return The {@link DependencyModel} or {@code null} if no {@link IJavaProject} was given.
     * @throws CoreException Occurred Exception.
     */
-   public static DependencyModel createDependencyModel(IJavaProject project, IProgressMonitor monitor) throws CoreException {
+   public static DependencyModel createDependencyModel(IJavaProject project, 
+                                                       IProgressMonitor monitor,
+                                                       IGeneratorCustomization... customizations) throws CoreException {
       try {
          if (monitor == null) {
             monitor = new NullProgressMonitor();
@@ -141,7 +144,7 @@ public final class StubGeneratorUtil {
             List<IPackageFragmentRoot> sourceFolders = JDTUtil.getSourceFolders(project);
             List<ICompilationUnit> compilationUnits = JDTUtil.listCompilationUnit(sourceFolders);
             monitor.done();
-            // Create dependency model
+            // Analyze dependencies of found source files
             monitor.beginTask("Analyzing dependencies", compilationUnits.size());
             DependencyModel dependencyModel = DependencymodelFactory.eINSTANCE.createDependencyModel();
             DependencyAnalyzer analyzer = new DependencyAnalyzer();
@@ -154,6 +157,15 @@ public final class StubGeneratorUtil {
                monitor.worked(1);
             }
             monitor.done();
+            // Inform customizations
+            if (!ArrayUtil.isEmpty(customizations)) {
+               monitor.beginTask("Adding additional content", IProgressMonitor.UNKNOWN);
+               for (IGeneratorCustomization customization : customizations) {
+                  customization.addAdditionalContent(project, analyzer);
+               }
+               monitor.done();
+            }
+            // Create dependency model
             monitor.beginTask("Creating dependency model", IProgressMonitor.UNKNOWN);
             dependencyModel.getTypes().addAll(analyzer.getOuterTypes());
             monitor.done();
