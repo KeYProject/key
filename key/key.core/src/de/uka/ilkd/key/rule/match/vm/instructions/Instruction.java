@@ -3,6 +3,8 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
@@ -14,17 +16,18 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.rule.MatchConditions;
 
 /** enum encoding the instructions of the matching vm */
 public abstract class Instruction<OP extends Operator> implements IMatchInstruction {
 
     public static Instruction<Operator> matchOp(Operator op) {
-        return new MatchOpIdentityInstr(op);
+        return new MatchOpIdentityInstruction(op);
     }
 
     public static Instruction<SortDependingFunction> matchSortDependingFunction(
             SortDependingFunction op) {
-        return new MatchSortDependingFunctionInstr(op);
+        return new MatchSortDependingFunctionInstruction(op);
     }
 
     public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchModalOperatorSV(
@@ -41,7 +44,7 @@ public abstract class Instruction<OP extends Operator> implements IMatchInstruct
     }
 
     public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchVariableSV(VariableSV sv) {
-        return new MatchVariableSVInstr(sv);
+        return new MatchVariableSVInstruction(sv);
     }
 
     public static MatchSchemaVariableInstruction<? extends SchemaVariable> matchProgramSV(ProgramSV sv) {
@@ -61,11 +64,11 @@ public abstract class Instruction<OP extends Operator> implements IMatchInstruct
     }
 
     public static IMatchInstruction matchAndBindVariables(ImmutableArray<QuantifiableVariable> boundVars) {
-        return new BindVariables(boundVars);
+        return new BindVariablesInstruction(boundVars);
     }
 
     public static IMatchInstruction unbindVariables(ImmutableArray<QuantifiableVariable> boundVars) {
-        return new UnbindVariables();
+        return new UnbindVariablesInstruction();
     }
 
 
@@ -74,6 +77,16 @@ public abstract class Instruction<OP extends Operator> implements IMatchInstruct
     protected Instruction(OP op) {
         this.op = op;
     }
+
+    /**
+     * tries to match the schema variable of this instruction with the specified {@link Term} {@code instantiationCandidate}
+     * w.r.t. the given constraints by {@link MatchConditions} 
+     * @param instantiationCandidate the {@link Term} to be matched
+     * @param matchCond the {@link MatchConditions} with additional constraints (e.g. previous matches of this schemavariable)
+     * @param services the {@link Services}
+     * @return {@code null} if no matches have been found or the new {@link MatchConditions} with the pair {@link (sv, instantiationCandidate)} added
+     */
+    public abstract MatchConditions match(Term instantiationCandidate, MatchConditions matchCond, Services services);
 
 
 }

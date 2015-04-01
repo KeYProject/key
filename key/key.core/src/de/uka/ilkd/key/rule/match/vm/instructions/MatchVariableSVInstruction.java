@@ -7,9 +7,9 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
-public class MatchVariableSVInstr extends MatchSchemaVariableInstruction<VariableSV> {
+public class MatchVariableSVInstruction extends MatchSchemaVariableInstruction<VariableSV> {
 
-    protected MatchVariableSVInstr(VariableSV op) {
+    protected MatchVariableSVInstruction(VariableSV op) {
         super(op);
     }
 

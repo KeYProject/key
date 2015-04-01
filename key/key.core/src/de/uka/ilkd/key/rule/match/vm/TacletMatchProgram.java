@@ -62,7 +62,7 @@ public class TacletMatchProgram {
      * @param sv the {@link SchemaVariable} for which to get the instruction
      * @return the  instruction for the specified variable
      */
-    static MatchSchemaVariableInstruction<? extends SchemaVariable> getMatchInstructionForSV(SchemaVariable op) {
+    public static MatchSchemaVariableInstruction<? extends SchemaVariable> getMatchInstructionForSV(SchemaVariable op) {
         MatchSchemaVariableInstruction<? extends SchemaVariable> instruction = null;
         
         if (op instanceof ModalOperatorSV) {

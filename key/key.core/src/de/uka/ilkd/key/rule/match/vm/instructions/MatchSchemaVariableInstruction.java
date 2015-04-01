@@ -49,16 +49,6 @@ public abstract class MatchSchemaVariableInstruction<SV extends SchemaVariable> 
     }
 
     /**
-     * tries to match the schema variable of this instruction with the specified {@link Term} {@code instantiationCandidate}
-     * w.r.t. the given constraints by {@link MatchConditions} 
-     * @param instantiationCandidate the {@link Term} to be matched
-     * @param matchCond the {@link MatchConditions} with additional constraints (e.g. previous matches of this schemavariable)
-     * @param services the {@link Services}
-     * @return {@code null} if no matches have been found or the new {@link MatchConditions} with the pair {@link (sv, instantiationCandidate)} added
-     */
-    public abstract MatchConditions match(Term instantiationCandidate, MatchConditions matchCond, Services services);
-
-    /**
      * tries to match the schema variable of this instruction with the specified {@link ProgramElement} {@code instantiationCandidate}
      * w.r.t. the given constraints by {@link MatchConditions} 
      * @param instantiationCandidate the {@link ProgramElement} to be matched
