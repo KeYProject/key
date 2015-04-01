@@ -6,7 +6,6 @@ import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TacletMatchProgram;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
@@ -31,8 +30,8 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
         final Operator instantiationCandidateOp = instantiationCandidate.op();
         if (instantiationCandidateOp != op) {
             if (instantiationCandidateOp instanceof ElementaryUpdate) {
-                ElementaryUpdate instElUpdate = (ElementaryUpdate) instantiationCandidateOp;
-                matchCond = leftHandSide.match((ProgramVariable)instElUpdate.lhs(), matchCond, services);
+                final ElementaryUpdate instElUpdate = (ElementaryUpdate) instantiationCandidateOp;
+                matchCond = leftHandSide.match(instElUpdate.lhs(), matchCond, services);
             } else {
                 matchCond = null;
             }
