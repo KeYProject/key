@@ -157,19 +157,26 @@ public final class PosInTerm {
     public PosInTerm down(int i) {
         if (i > Character.MAX_VALUE) throw new ArithmeticException("Position "+i+" out of bounds");
         
-        final PosInTerm result; 
-        synchronized(positions) { 
-            if (copy) {        
-                final char[] newPositions = 
-                        new char[positions.length <= size ? size + 4 : positions.length];
-                System.arraycopy(positions, 0, newPositions, 0, size);
-                newPositions[size] = (char)i;
-                result = new PosInTerm(newPositions, (char)(size + 1), false);
-            } else {
-                positions[size] = (char)i;
-                copy   = true;
-                result = new PosInTerm(positions, (char)(size + 1), size >= positions.length - 1);            
+        boolean localCopy = true;
+        if (!copy) { // at most one thread is allowed to enter the non-copy branch
+            synchronized (positions) {
+                localCopy = copy; 
+                if (copy == false) {
+                    copy = true;
+                }
             }
+        }
+        final PosInTerm result;        
+        if (localCopy) {        
+            final char[] newPositions = 
+                    new char[positions.length <= size ? size + 4 : positions.length];
+            System.arraycopy(positions, 0, newPositions, 0, size);
+            newPositions[size] = (char)i;
+            result = new PosInTerm(newPositions, (char)(size + 1), false);
+        } else {
+            copy   = true;
+            positions[size] = (char)i;
+            result = new PosInTerm(positions, (char)(size + 1), size >= positions.length - 1);            
         }
         return result;
     }
