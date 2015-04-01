@@ -106,6 +106,12 @@ public final class RuleAppIndex  {
         			   PosInOccurrence pos ) {
         	informNewRuleListener(taclet, pos);			   	
             }
+
+            @Override
+            public void rulesAdded(ImmutableList<? extends RuleApp> rules,
+                    PosInOccurrence pos) {
+                informNewRuleListener(rules, pos);
+            }
         };
         interactiveTacletAppIndex.setNewRuleListener ( newRuleListener );
         automatedTacletAppIndex  .setNewRuleListener ( newRuleListener );
@@ -417,6 +423,17 @@ public final class RuleAppIndex  {
 	for (final NewRuleListener listener : listenerList) {
 	    listener.ruleAdded(p_app, p_pos);
 	}
+    }
+
+    /** 
+     * informs all observers, if a formula has been added, changed or 
+     * removed
+     */ 
+    private void informNewRuleListener(ImmutableList<? extends RuleApp> p_apps,
+                                       PosInOccurrence p_pos) {
+        for (final NewRuleListener listener : listenerList) {
+            listener.rulesAdded(p_apps, p_pos);
+        }
     }
 
     

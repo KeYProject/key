@@ -602,6 +602,13 @@ public class TermTacletAppIndex {
                 }
             }
         }
+
+        @Override
+        public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
+            for (RuleApp r : rules) {
+                ruleAdded(r, pos);
+            }
+        }
     }
     
     /**
@@ -678,7 +685,6 @@ public class TermTacletAppIndex {
     private static void fireRulesAdded(NewRuleListener listener,
                                        ImmutableList<NoPosTacletApp> taclets,
                                        PosInOccurrence pos) {
-
         for (NoPosTacletApp taclet : taclets) {
             listener.ruleAdded(taclet, pos);
         }

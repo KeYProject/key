@@ -479,8 +479,6 @@ public class TacletAppIndex  {
         if ( antecIndex != null ) antecIndex.reportRuleApps ( l );
         if ( succIndex != null ) succIndex.reportRuleApps ( l );
 
-        for (NoPosTacletApp noPosTacletApp : getNoFindTaclet(TacletFilter.TRUE,
-                services))
-            l.ruleAdded(noPosTacletApp, null);
+        l.rulesAdded(getNoFindTaclet(TacletFilter.TRUE, services), null);
     }
 }

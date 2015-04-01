@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.strategy;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -90,7 +91,19 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
 
 	Debug.fail ( "Unexpected kind of rule." );
 
-	return null;
+	return ImmutableSLList.<RuleAppContainer>nil();
+    }
+
+    public static ImmutableList<ImmutableList<RuleAppContainer>> createAppContainers(
+            ImmutableList<? extends RuleApp> rules, PosInOccurrence pos,
+            Goal goal, Strategy strategy) {
+        
+        ImmutableList<ImmutableList<RuleAppContainer>> result = ImmutableSLList.<ImmutableList<RuleAppContainer>>nil();
+        for (RuleApp rule : rules) {
+            result = result.prepend(createAppContainers(rule, pos, goal, strategy));
+        }
+
+        return result;
     }
 
 }

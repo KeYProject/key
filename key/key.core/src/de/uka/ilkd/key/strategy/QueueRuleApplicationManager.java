@@ -111,12 +111,33 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
             return;
+        
         final Iterator<RuleAppContainer> iterator = RuleAppContainer.createAppContainers
         	           ( rule, pos, getGoal (), getStrategy () ).iterator ();
         ensureQueueExists();
         push ( iterator,  PRIMARY_QUEUE );
     }
 
+    /**
+     * Implementation of the method from <code>NewRuleListener</code>. The new
+     * rule app is added to the heap
+     */
+    @Override
+    public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
+        if ( queue == null )
+            // then the heap has to be rebuilt completely anyway, and the new
+            // rule app is not of interest for us
+            return;
+
+        final ImmutableList<ImmutableList<RuleAppContainer>> containers = 
+                RuleAppContainer.createAppContainers( rules, pos, getGoal (), getStrategy () );        
+        ensureQueueExists();        
+        for (ImmutableList<RuleAppContainer> rac : containers) {
+            push ( rac.iterator(),  PRIMARY_QUEUE );
+        }
+    }
+    
+    
 
     /**
      * Add a number of new rule apps to the heap
@@ -374,4 +395,5 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     public AutomatedRuleApplicationManager getDelegate() {
         return null;
     }
+
 }
