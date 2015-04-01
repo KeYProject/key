@@ -30,7 +30,7 @@ public class Semisequent implements Iterable<SequentFormula> {
 
     /** the empty semisequent (using singleton pattern) */
     public static final Semisequent EMPTY_SEMISEQUENT = new Empty();
-    /** list with the Constraintformulae of the Semisequent */
+    /** list with the {@link SequentFormula}s of the Semisequent */
     private final ImmutableList<SequentFormula> seqList; 
  
     /** used by inner class Empty*/
@@ -59,12 +59,12 @@ public class Semisequent implements Iterable<SequentFormula> {
      * checks, this may result in returning same semisequent if
      * inserting would create redundancies 
      * @param idx int encoding the place the element has to be put	
-     * @param conForm SequentFormula to be inserted
+     * @param sequentFormula {@link SequentFormula} to be inserted
      * @return a semi sequent change information object with the new semisequent
      * and information which formulas have been added or removed
      */    
-    public SemisequentChangeInfo insert(int idx, SequentFormula conForm) {	
-	return removeRedundance(idx, conForm);
+    public SemisequentChangeInfo insert(int idx, SequentFormula sequentFormula) {	
+	return removeRedundance(idx, sequentFormula);
     }
 
     /** inserts the elements of the list at the specified index
@@ -82,12 +82,12 @@ public class Semisequent implements Iterable<SequentFormula> {
     /** inserts element at index 0 performing redundancy
      * checks, this may result in returning same semisequent if
      * inserting would create redundancies 
-     * @param conForm SequentFormula to be inserted
+     * @param sequentFormula SequentFormula to be inserted
      * @return a semi sequent change information object with the new semisequent
      * and information which formulas have been added or removed
      */
-    public SemisequentChangeInfo insertFirst(SequentFormula conForm) {
-	return insert(0,conForm);
+    public SemisequentChangeInfo insertFirst(SequentFormula sequentFormula) {
+	return insert(0,sequentFormula);
     }
 
     /** 
@@ -105,12 +105,12 @@ public class Semisequent implements Iterable<SequentFormula> {
     /** inserts element at the end of the semisequent performing
      * redundancy checks, this may result in returning same
      * semisequent if inserting would create redundancies 
-     * @param conForm SequentFormula to be inserted
+     * @param sequentFormula {@link SequentFormula} to be inserted
      * @return a semi sequent change information object with the new semisequent
      * and information which formulas have been added or removed
      */	
-    public SemisequentChangeInfo insertLast(SequentFormula conForm) {
-	return insert(size(), conForm);
+    public SemisequentChangeInfo insertLast(SequentFormula sequentFormula) {
+	return insert(size(), sequentFormula);
     }
 
     /** 
@@ -141,9 +141,9 @@ public class Semisequent implements Iterable<SequentFormula> {
      * and information which formulas have been added or removed
      */
     private SemisequentChangeInfo removeRedundanceHelp(int idx, 
-						       SequentFormula conForm,
+						       SequentFormula sequentFormula,
 						       SemisequentChangeInfo semiCI) {
-	return removeRedundanceHelp ( idx, conForm, semiCI, null );
+	return removeRedundanceHelp ( idx, sequentFormula, semiCI, null );
     }
 
     /** .
@@ -151,13 +151,13 @@ public class Semisequent implements Iterable<SequentFormula> {
      * duplicates, perform simplifications etc.
      * @param fci null if the formula to be added is new, otherwise an
      * object telling which formula is replaced with the new formula
-     * <code>conForm</code>, and what are the differences between the
+     * <code>sequentFormula</code>, and what are the differences between the
      * two formulas
      * @return a semi sequent change information object with the new semisequent
      * and information which formulas have been added or removed
      */
     private SemisequentChangeInfo removeRedundanceHelp(int idx, 
-						       SequentFormula conForm,
+						       SequentFormula sequentFormula,
 						       SemisequentChangeInfo semiCI,
 						       FormulaChangeInfo fci) {
 
@@ -172,7 +172,7 @@ public class Semisequent implements Iterable<SequentFormula> {
 	    cf         = searchList.head ();
 	    searchList = searchList.tail();
 
-	    if (conForm != null && cf.formula().equalsModRenaming(conForm.formula())) {
+	    if (sequentFormula != null && cf.formula().equalsModRenaming(sequentFormula.formula())) {
 
 	    semiCI.rejectedFormula( cf );
 		return semiCI; // semisequent already contains formula
@@ -184,19 +184,19 @@ public class Semisequent implements Iterable<SequentFormula> {
 
 	// compose resulting formula list
 	if ( fci == null )
-	    semiCI.addedFormula(idx, conForm);
+	    semiCI.addedFormula(idx, sequentFormula);
 	else
 	    semiCI.modifiedFormula(idx, fci);
 
 	if ( idx > pos ) {
-	    searchList = searchList.prepend ( conForm );
+	    searchList = searchList.prepend ( sequentFormula );
 	}
 
 	while ( !newSeqList.isEmpty() ) {
 	    searchList = searchList.prepend ( newSeqList.head () );
 	    newSeqList = newSeqList.tail ();
 	    if ( idx == pos ) {
-		searchList = searchList.prepend ( conForm );
+		searchList = searchList.prepend ( sequentFormula );
 	    }
 	    --pos;
 	}      
@@ -210,20 +210,20 @@ public class Semisequent implements Iterable<SequentFormula> {
     /** .
      * inserts new ConstrainedFormulas starting at index idx and removes
      * duplicates, perform simplifications etc.
-     * @param conForm the IList<SequentFormula> to be inserted at position idx
-     * @param idx an int that means insert conForm at the idx-th
+     * @param sequentFormula the IList<SequentFormula> to be inserted at position idx
+     * @param idx an int that means insert sequentFormula at the idx-th
      * position in the semisequent 
      * @return a semi sequent change information object with the new semisequent
      * and information which formulas have been added or removed
      */
     private SemisequentChangeInfo removeRedundance
-	(int idx, ImmutableList<SequentFormula> conForm, SemisequentChangeInfo sci) {
+	(int idx, ImmutableList<SequentFormula> sequentFormula, SemisequentChangeInfo sci) {
 
 	int pos = idx;	
 	ImmutableList<SequentFormula> oldFormulas = sci.getFormulaList();
 
-        for (SequentFormula aConForm : conForm) {
-            sci = removeRedundanceHelp(pos, aConForm, sci);
+        for (SequentFormula asequentFormula : sequentFormula) {
+            sci = removeRedundanceHelp(pos, asequentFormula, sci);
 
             if (sci.getFormulaList() != oldFormulas) {
                 pos = sci.getIndex() + 1;
@@ -237,63 +237,63 @@ public class Semisequent implements Iterable<SequentFormula> {
     /** .
      * inserts new ConstrainedFormulas starting at index idx and removes
      * duplicates, perform simplifications etc.
-     * @param conForm the IList<SequentFormula> to be inserted at position idx
-     * @param idx an int that means insert conForm at the idx-th
+     * @param sequentFormula the IList<SequentFormula> to be inserted at position idx
+     * @param idx an int that means insert sequentFormula at the idx-th
      * position in the semisequent 
      * @return a semi sequent change information object with the new semisequent
      * and information which formulas have been added or removed
      */
     private SemisequentChangeInfo removeRedundance
-	(int idx, ImmutableList<SequentFormula> conForm) {
-	return removeRedundance(idx, conForm, new SemisequentChangeInfo(seqList));
+	(int idx, ImmutableList<SequentFormula> sequentFormula) {
+	return removeRedundance(idx, sequentFormula, new SemisequentChangeInfo(seqList));
     }
 
 
     /** .
      * inserts new SequentFormula at index idx and removes
      * duplicates, perform simplifications etc.
-     * @param conForm the SequentFormula to be inserted at position idx
-     * @param idx an int that means insert conForm at the idx-th
+     * @param sequentFormula the SequentFormula to be inserted at position idx
+     * @param idx an int that means insert sequentFormula at the idx-th
      * position in the semisequent 
-     * @return new Semisequent with conForm at index idx and removed
+     * @return new Semisequent with sequentFormula at index idx and removed
      * redundancies 
      */
     private SemisequentChangeInfo removeRedundance(int idx, 
-						   SequentFormula conForm) {
+						   SequentFormula sequentFormula) {
 	return complete
-	    (removeRedundanceHelp(idx, conForm, 
+	    (removeRedundanceHelp(idx, sequentFormula, 
 				  new SemisequentChangeInfo(seqList)));
     }
 
 
     /**
-     * replaces the element at place idx with conForm
+     * replaces the element at place idx with sequentFormula
      * 
      * @param pos
      *            the PosInOccurrence describing the position of and within the
      *            formula below which the formula differs from the new formula
-     *            <code>conForm</code>
-     * @param conForm
+     *            <code>sequentFormula</code>
+     * @param sequentFormula
      *            the SequentFormula replacing the old element at index idx
      * @return a semi sequent change information object with the new semisequent
      *         and information which formulas have been added or removed
      */
     public SemisequentChangeInfo replace(PosInOccurrence pos,
-					 SequentFormula conForm) {	
+					 SequentFormula sequentFormula) {	
 	final int idx = indexOf(pos.constrainedFormula());
-	final FormulaChangeInfo fci = new FormulaChangeInfo ( pos, conForm );
-	return complete(removeRedundanceHelp(idx, conForm, remove(idx), fci));
+	final FormulaChangeInfo fci = new FormulaChangeInfo ( pos, sequentFormula );
+	return complete(removeRedundanceHelp(idx, sequentFormula, remove(idx), fci));
     }
     
     /**
-     * replaces the <tt>idx</tt>-th formula by <tt>conForm</tt>
+     * replaces the <tt>idx</tt>-th formula by <tt>sequentFormula</tt>
      * @param idx the int with the position of the formula to be replaced
-     * @param conForm the SequentFormula replacing the formula at the given position
+     * @param sequentFormula the SequentFormula replacing the formula at the given position
      * @return a SemisequentChangeInfo containing the new sequent and a diff to the old
      *  one
      */
-    public SemisequentChangeInfo replace(int idx, SequentFormula conForm) {	
-        return complete(removeRedundanceHelp(idx, conForm, remove(idx)));
+    public SemisequentChangeInfo replace(int idx, SequentFormula sequentFormula) {	
+        return complete(removeRedundanceHelp(idx, sequentFormula, remove(idx)));
     }
 
     /** 
@@ -384,33 +384,29 @@ public class Semisequent implements Iterable<SequentFormula> {
     }
 
     /**
-     * returns index of a SequentFormula. An identity check ('==')
-     * is used when searching for the SequentFormula, NOT equals on
-     * SequentFormula, because a ConstrainedFormulae identifies the origin
-     * of a formula.
-     * @param conForm the SequentFormula the index want to be
-     * determined 
-     * @return index of conForm (-1 if not found)
+     * returns the index of the given {@link SequentFormula} or {@code -1} 
+     * if the sequent formula is not found. Equality of sequent formulas
+     * is checked sing the identy check (i.e.,{@link ==})
+     * 
+     * @param sequentFormula the {@link SequentFormula} to look for
+     * @return index of sequentFormula (-1 if not found)
      */
-    public int indexOf(SequentFormula conForm) {
-	ImmutableList<SequentFormula> searchList = seqList;  
-	int index=0;
-	while (!searchList.isEmpty())
-	    { 
-		if (searchList.head()==conForm) {
-		    return index;
-		} else {
-		    index++;
-		}
-		searchList=searchList.tail();
-	    } 
-	return -1;
+    public int indexOf(SequentFormula sequentFormula) {
+        ImmutableList<SequentFormula> searchList = seqList;  
+        while (!searchList.isEmpty())
+        { 
+            if (searchList.head() == sequentFormula) {
+                return seqList.size() - searchList.size();
+            }
+            searchList = searchList.tail();
+        } 
+        return -1;
     }
 
     /** gets the element at a specific index
      * @param idx int representing the index of the element we
      * want to have
-     * @return SequentFormula found at index idx
+     * @return {@link SequentFormula} found at index idx
      * @throws IndexOutOfBoundsException if idx is negative or 
      * greater or equal to {@link Sequent#size()}
      */
@@ -421,29 +417,29 @@ public class Semisequent implements Iterable<SequentFormula> {
         return seqList.take(idx).head();	
     }
 
-    /** @return the first SequentFormula of this Semisequent */
+    /** @return the first {@link SequentFormula} of this Semisequent */
     public SequentFormula getFirst() {
 	return seqList.head();
     }
 
-    /** checks if a SequentFormula is in this Semisequent
-     * (identity check)
-     * @param conForm the ConstraintForumla to look for
-     * @return true iff. conForm has been found in this
+    /** checks if the {@link SequentFormula} occurs in this 
+     * Semisequent (identity check)
+     * @param sequentFormula the {@link SequentFormula} to look for
+     * @return true iff. sequentFormula has been found in this
      * Semisequent 
      */
-    public boolean contains(SequentFormula conForm) {
-	return indexOf(conForm)!=-1;
+    public boolean contains(SequentFormula sequentFormula) {
+	return indexOf(sequentFormula)!=-1;
     }
     
-    /** checks if a SequentFormula is in this Semisequent
+    /** checks if a {@link SequentFormula} is in this Semisequent
      * (equality check)
-     * @param conForm the ConstraintForumla to look for
-     * @return true iff. conForm has been found in this
+     * @param sequentFormula the {@link SequentFormula} to look for
+     * @return true iff. sequentFormula has been found in this
      * Semisequent 
      */
-    public boolean containsEqual(SequentFormula conForm) {
-	return seqList.contains(conForm);        
+    public boolean containsEqual(SequentFormula sequentFormula) {
+        return seqList.contains(sequentFormula);        
     }
 
     /** 
@@ -487,33 +483,33 @@ public class Semisequent implements Iterable<SequentFormula> {
 	/** inserts the element always at index 0 ignores the first
 	 * argument 
 	 * @param idx int encoding the place the element has to be put	
-	 * @param conForm SequentFormula to be inserted
+	 * @param sequentFormula {@link SequentFormula} to be inserted
 	 * @return semisequent change information object with new semisequent
-	 * with conForm at place idx 
+	 * with sequentFormula at place idx 
 	 */
-	public SemisequentChangeInfo insert(int idx, SequentFormula conForm) {	
-	    return insertFirst(conForm);
+	public SemisequentChangeInfo insert(int idx, SequentFormula sequentFormula) {	
+	    return insertFirst(sequentFormula);
 	}
 
 	/** inserts the element at index 0
-	 * @param conForm SequentFormula to be inserted
+	 * @param sequentFormula {@link SequentFormula} to be inserted
 	 * @return semisequent change information object with new semisequent
-	 * with conForm at place idx 
+	 * with sequentFormula at place idx 
 	 */
-	public SemisequentChangeInfo insertFirst(SequentFormula conForm) {
+	public SemisequentChangeInfo insertFirst(SequentFormula sequentFormula) {
 	  final SemisequentChangeInfo sci = new SemisequentChangeInfo
-	  (ImmutableSLList.<SequentFormula>nil().prepend(conForm));
-	  sci.addedFormula(0, conForm);
+	  (ImmutableSLList.<SequentFormula>nil().prepend(sequentFormula));
+	  sci.addedFormula(0, sequentFormula);
 	  return complete(sci);
 	}
 
 	/** inserts the element at the end of the semisequent
-	 * @param conForm SequentFormula to be inserted
+	 * @param sequentFormula {@link SequentFormula} to be inserted
 	 * @return semisequent change information object with new semisequent
-	 * with conForm at place idx 
+	 * with sequentFormula at place idx 
 	 */	
-	public SemisequentChangeInfo insertLast(SequentFormula conForm) {
-	    return insertFirst(conForm);
+	public SemisequentChangeInfo insertLast(SequentFormula sequentFormula) {
+	    return insertFirst(sequentFormula);
 	}
 
 
@@ -525,16 +521,16 @@ public class Semisequent implements Iterable<SequentFormula> {
 	    return true;
 	}
 
-	/** replaces the element at place idx with conForm
+	/** replaces the element at place idx with sequentFormula
 	 * @param idx an int specifying the index of the element that
 	 * has to be replaced 
-	 * @param conForm the SequentFormula replacing the old
+	 * @param sequentFormula the {@link SequentFormula} replacing the old
 	 * element at index idx
 	 * @return semisequent change information object with new semisequent
-	 * with conForm at place idx 
+	 * with sequentFormula at place idx 
 	 */
-	public SemisequentChangeInfo replace(int idx, SequentFormula conForm) {
-	    return insertFirst(conForm);
+	public SemisequentChangeInfo replace(int idx, SequentFormula sequentFormula) {
+	    return insertFirst(sequentFormula);
 	}
 
 	/** @return int counting the elements of this semisequent */ 
@@ -552,19 +548,19 @@ public class Semisequent implements Iterable<SequentFormula> {
 	  return complete(new SemisequentChangeInfo(ImmutableSLList.<SequentFormula>nil()));
 	}
 
-	/** returns index of a SequentFormula 
-	 * @param conForm the SequentFormula the index want to be
+	/** returns index of a {@link SequentFormula} 
+	 * @param sequentFormula the {@link SequentFormula} the index want to be
 	 * determined 
-	 * @return index of conForm
+	 * @return index of sequentFormula
 	 */
-	public int indexOf(SequentFormula conForm) {
+	public int indexOf(SequentFormula sequentFormula) {
 	    return -1;
 	}
 
 	/** gets the element at a specific index
 	 * @param idx int representing the index of the element we
 	 * want to have
-	 * @return SequentFormula found at index idx
+	 * @return {@link SequentFormula} found at index idx
 	 */
 	public SequentFormula get(int idx) {
 	    return null;
@@ -576,12 +572,12 @@ public class Semisequent implements Iterable<SequentFormula> {
 	    return null;
 	}
         
-	/** checks if a SequentFormula is in this Semisequent
-	 * @param conForm the ConstraintForumla to look for
-	 * @return true iff. conForm has been found in this
+	/** checks if a {@link SequentFormula} is in this Semisequent
+	 * @param sequentFormula the {@link SequentFormula} to look for
+	 * @return true iff. sequentFormula has been found in this
 	 * Semisequent 
 	 */
-	public boolean contains(SequentFormula conForm) {
+	public boolean contains(SequentFormula sequentFormula) {
 	    return false;
 	}
 
