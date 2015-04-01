@@ -25,13 +25,14 @@ public class MatchSortDependingFunctionInstruction extends
     }
 
     /**
-     * tries to match sort <code>s1</code> to fit sort <code>s2</code>
-     * @param dependingSortToMatch concrete Sort 
-     * @param matchCond the MatchConditions up to now
+     * matches the depending sort of this instructions sort depending function against the given sort. If a match is possible 
+     * the resulting match conditions are returned otherwise {@code null} is returned.
+     * @param dependingSortToMatch the depending {@link Sort} of the concrete function to be matched   
+     * @param matchConditions the {@link MatchConditions} accumulated so far 
      * @return <code>null</code> if failed the resulting match conditions 
-     * otherwise 
+     * otherwise the resulting {@link MatchConditions} 
      */
-    private MatchConditions matchSorts(Sort dependingSortToMatch, MatchConditions matchCond, Services services) {
+    private MatchConditions matchSorts(Sort dependingSortToMatch, MatchConditions matchConditions, Services services) {
         // This restriction has been dropped for free generic sorts to prove taclets correct
         //         assert !(s2 instanceof GenericSort)
         //               : "Sort s2 is not allowed to be of type generic.";
@@ -41,33 +42,35 @@ public class MatchSortDependingFunctionInstruction extends
                 = GenericSortCondition.createIdentityCondition(genericSortOfOp, dependingSortToMatch);                                               
             if(c != null) {
                 try {                   
-                    result = matchCond.setInstantiations(matchCond.getInstantiations().add(c, services));
+                    result = matchConditions.setInstantiations(matchConditions.getInstantiations().add(c, services));
                 } catch(SortException e) {
                     result = null;
                 }
             }                  
         } else if (op.getSortDependingOn() == dependingSortToMatch) {
-            result = matchCond;
+            result = matchConditions;
         }               
         return result;
     }
     
     
     /**
-     * Taking this sortdepending function as template to be matched against <code>op</code>, 
-     * the necessary conditions are returned or null if not unifiable (matchable).
-     * A sortdepending function is matched successfully against another sortdepending function
-     * if the sorts can be matched and they are of same kind.      
+     * Tries to match the top level operator of the given term with this instruction's sort depending function symbol.
+     * It returns the resulting match conditions or {@code null} if no match is possible because the top level operator is
+     * not a sort depending function or the resulting constraints on the sorts are unsatisfiable.
+     * @param instantiationCandidate the {@link Term} to be matched
+     * @param matchConditions the {@link MatchConditions} specifying the constraints to be considered
+     * @param services the {@link Services} 
      */
     @Override    
-    public final MatchConditions match(Term subst, 
-                                       MatchConditions mc,
+    public final MatchConditions match(Term instantiationCandidate, 
+                                       MatchConditions matchConditions,
                                        Services services) {  
         MatchConditions result = null; 
-        if(subst.op() instanceof SortDependingFunction) {      
-            final SortDependingFunction sdp = (SortDependingFunction)subst.op();
+        if(instantiationCandidate.op() instanceof SortDependingFunction) {      
+            final SortDependingFunction sdp = (SortDependingFunction)instantiationCandidate.op();
             if(op.isSimilar(sdp)) {
-                result = matchSorts(sdp.getSortDependingOn(), mc, services);
+                result = matchSorts(sdp.getSortDependingOn(), matchConditions, services);
             }
         } 
         return result;

@@ -11,6 +11,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.TermLabelInstantiationEntry;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
+/**
+ * This match instruction implements the matching logic for term labels. 
+ */
 public class MatchTermLabelInstruction implements IMatchInstruction {
 
     private final ImmutableArray<TermLabel> labels;
@@ -46,6 +49,9 @@ public class MatchTermLabelInstruction implements IMatchInstruction {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions, Services services) {
         final Term term = termPosition.getCurrentSubterm();
