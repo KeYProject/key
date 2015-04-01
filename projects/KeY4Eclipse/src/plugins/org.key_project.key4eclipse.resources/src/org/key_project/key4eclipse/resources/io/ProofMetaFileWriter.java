@@ -14,10 +14,8 @@
 package org.key_project.key4eclipse.resources.io;
 
 import java.io.ByteArrayInputStream;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;
@@ -26,20 +24,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
-import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.XMLUtil;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.ClassTree;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.proof_references.reference.IProofReference;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
@@ -48,9 +36,7 @@ import de.uka.ilkd.key.util.LinkedHashMap;
  */
 public class ProofMetaFileWriter {
    public static final String TAG_PROOF_META_FILE = "proofMetaFile";
-   public static final String TAG_USED_TYPES = "usedTypes";
    public static final String TAG_TYPE = "type";
-   public static final String TAG_SUB_TYPE = "subType";
    public static final String TAG_USED_CONTRACTS = "usedContracts";
    public static final String TAG_USED_CONTRACT = "usedContract";
    public static final String TAG_ASSUMPTIONS = "assumptions";
@@ -125,9 +111,6 @@ public class ProofMetaFileWriter {
    }
    
    private static String toXml(ProofElement pe, String encoding) throws Exception {
-      Set<KeYJavaType> types = new LinkedHashSet<KeYJavaType>(); 
-      Set<IProofReference<?>> assumptions = new LinkedHashSet<IProofReference<?>>();
-      analyseDependencies(pe, types, assumptions);
       StringBuffer sb = new StringBuffer();
       XMLUtil.appendXmlHeader(encoding, sb);
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
@@ -136,28 +119,12 @@ public class ProofMetaFileWriter {
       attributeValues.put(ATTRIBUTE_PROOF_OUTDATED, String.valueOf(pe.getOutdated()));
       XMLUtil.appendStartTag(0, TAG_PROOF_META_FILE, attributeValues, sb);
       appendMarkerMessage(pe, 1, sb);
-      appendUsedTypes(pe, 1, types, sb);
       appendUsedContracts(pe, 1, sb);
       appendCalledMethods(pe, 1, sb);
-      appendAssumptions(pe, 1, assumptions, sb);
+      appendAssumptions(pe, 1, sb);
       appendReferences(pe.getProofMetaReferences(), 1, sb);
       XMLUtil.appendEndTag(0, TAG_PROOF_META_FILE, sb);
       return sb.toString();
-   }
-
-   private static void analyseDependencies(ProofElement pe, 
-                                           Set<KeYJavaType> typesToFill, 
-                                           Set<IProofReference<?>> assumptionsToFill) throws ProofReferenceException {
-      LinkedHashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
-      for (IProofReference<?> proofRef : proofReferences) {
-         KeYJavaType kjt = KeYResourcesUtil.getKeYJavaType(proofRef);
-         if (!KeYResourcesUtil.filterKeYJavaType(kjt)) {
-            typesToFill.add(kjt);
-         }
-         else {
-            assumptionsToFill.add(proofRef);
-         }
-      }
    }
    
 
@@ -166,26 +133,6 @@ public class ProofMetaFileWriter {
          XMLUtil.appendStartTag(level, TAG_MARKER_MESSAGE, null, sb);
          sb.append(XMLUtil.encodeText(pe.getMarkerMsg()));
          XMLUtil.appendEndTag(level, TAG_MARKER_MESSAGE, sb);
-      }
-   }
-
-   private static void appendUsedTypes(ProofElement pe, int level, Set<KeYJavaType> types, StringBuffer sb) {
-      if (!types.isEmpty()) {
-         XMLUtil.appendStartTag(level, TAG_USED_TYPES, null, sb);
-         for (KeYJavaType kjt : types) {
-            kjt = getKeYJavaTypeFromEnv(kjt, pe.getKeYEnvironment());
-            Map<String, String> attributeValues = new LinkedHashMap<String, String>();
-            attributeValues.put(ATTRIBUTE_NAME, kjt.getFullName());
-            XMLUtil.appendStartTag(level + 1, TAG_TYPE, attributeValues, sb);
-            ImmutableList<KeYJavaType> subTypes = pe.getKeYEnvironment().getServices().getJavaInfo().getAllSubtypes(kjt);
-            for (KeYJavaType subType : subTypes) {
-               Map<String, String> subAttributeValues = new LinkedHashMap<String, String>();
-               subAttributeValues.put(ATTRIBUTE_NAME, subType.getFullName());
-               XMLUtil.appendEmptyTag(level + 2, TAG_SUB_TYPE, subAttributeValues, sb);
-            }
-            XMLUtil.appendEndTag(level + 1, TAG_TYPE, sb);
-         }
-         XMLUtil.appendEndTag(level, TAG_USED_TYPES, sb);
       }
    }
    
@@ -215,52 +162,20 @@ public class ProofMetaFileWriter {
       }
    }
 
-   private static void appendAssumptions(ProofElement pe, int level, Set<IProofReference<?>> assumptions, StringBuffer sb) throws ProofReferenceException {
+   private static void appendAssumptions(ProofElement pe, int level, StringBuffer sb) throws ProofReferenceException {
+      List<ProofMetaFileAssumption> assumptions = pe.getAssumptions();
       if (!assumptions.isEmpty()) {
          XMLUtil.appendStartTag(level, TAG_ASSUMPTIONS, null, sb);
-         for (IProofReference<?> proofRef : assumptions) {
-            Object target = proofRef.getTarget();
-            if(IProofReference.USE_AXIOM.equals(proofRef.getKind())){
-               if(target instanceof ClassAxiom){
-                  ClassAxiom classAx = (ClassAxiom) target;
-                  Map<String, String> attributeValues = new LinkedHashMap<String, String>();
-                  attributeValues.put(ATTRIBUTE_KIND, proofRef.getKind());
-                  attributeValues.put(ATTRIBUTE_NAME, classAx.getDisplayName());
-                  attributeValues.put(ATTRIBUTE_TARGET, ClassTree.getDisplayName(pe.getKeYEnvironment().getServices(), classAx.getTarget()));
-                  attributeValues.put(ATTRIBUTE_TYPE, classAx.getKJT().getFullName());
-                  XMLUtil.appendEmptyTag(level + 1, TAG_ASSUMPTION, attributeValues, sb);
-               }
-               else {
-                  throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected ClassAxiom");
-               }
+         for (ProofMetaFileAssumption assumption : assumptions) {
+            Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+            attributeValues.put(ATTRIBUTE_KIND, assumption.getKind());
+            attributeValues.put(ATTRIBUTE_NAME, assumption.getName());
+            String target = assumption.getTarget();
+            if(target != null){
+               attributeValues.put(ATTRIBUTE_TARGET, target);
             }
-            else if(IProofReference.USE_CONTRACT.equals(proofRef.getKind())){
-               if(target instanceof Contract){
-                  Contract contract = (Contract) target;
-                  Map<String, String> attributeValues = new LinkedHashMap<String, String>();
-                  attributeValues.put(ATTRIBUTE_KIND, proofRef.getKind());
-                  attributeValues.put(ATTRIBUTE_NAME, contract.getDisplayName());
-                  attributeValues.put(ATTRIBUTE_TARGET, ClassTree.getDisplayName(pe.getKeYEnvironment().getServices(), contract.getTarget()));
-                  attributeValues.put(ATTRIBUTE_TYPE, contract.getKJT().getFullName());
-                  XMLUtil.appendEmptyTag(level + 1, TAG_ASSUMPTION, attributeValues, sb);
-               }
-               else {
-                  throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected Contract");
-               }
-            }
-            else if(IProofReference.USE_INVARIANT.equals(proofRef.getKind())){
-               if(target instanceof ClassInvariant){
-                  ClassInvariant classInv = (ClassInvariant) target;
-                  Map<String, String> attributeValues = new LinkedHashMap<String, String>();
-                  attributeValues.put(ATTRIBUTE_KIND, proofRef.getKind());
-                  attributeValues.put(ATTRIBUTE_NAME, classInv.getDisplayName());
-                  attributeValues.put(ATTRIBUTE_TYPE, classInv.getKJT().getFullName());
-                  XMLUtil.appendEmptyTag(level + 1, TAG_ASSUMPTION, attributeValues, sb);
-               }
-               else {
-                  throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected ClassInvariant");
-               }
-            }
+            attributeValues.put(ATTRIBUTE_TYPE, assumption.getType());
+            XMLUtil.appendEmptyTag(level + 1, TAG_ASSUMPTION, attributeValues, sb);
          }
          XMLUtil.appendEndTag(level, TAG_ASSUMPTIONS, sb);
       }
@@ -270,24 +185,37 @@ public class ProofMetaFileWriter {
    private static void appendReferences(ProofMetaReferences references, int level, StringBuffer sb){
       if(references != null){
          String contract = references.getContract();
-         List<ProofMetaReferenceAxiom> axioms = references.getAxioms();
-         List<ProofMetaReferenceInvariant> invariants = references.getInvariants();
-         List<ProofMetaReferenceAccess> accesses = references.getAccesses();
-         List<ProofMetaReferenceCallMethod> callMethods = references.getCallMethods();
-         List<ProofMetaReferenceMethod> inlineMethods = references.getInlineMethods();
-         List<ProofMetaReferenceContract> contracts = references.getContracts();
          if(contract != null){
             Map<String, String> attributeValues = new LinkedHashMap<String, String>();
             attributeValues.put(ATTRIBUTE_REP, contract);
             XMLUtil.appendStartTag(level, TAG_REFERENCES, attributeValues, sb);
-               appendAxiomReferences(axioms, level + 1, sb);
-               appendInvariantReferences(invariants, level + 1, sb);
-               appendAccessReferences(accesses, level + 1, sb);
-               appendCallMethodReferences(callMethods, level + 1, sb);
-               appendInlineMethodReferences(inlineMethods, level + 1, sb);
-               appendContractReferences(contracts, level + 1, sb);
+            appendCallMethodReferences(references.getCallMethods(), level + 1, sb);
+            for(Map.Entry<String, ProofMetaPerTypeReferences> entry : references.getPerTypeReferences().entrySet()){
+               String kjt = entry.getKey();
+               ProofMetaPerTypeReferences ptRefs = entry.getValue();
+               appendPerTypeReference(kjt, ptRefs, level+1, sb);
+            }
             XMLUtil.appendEndTag(level, TAG_REFERENCES, sb);
          }
+      }
+   }
+   
+   private static void appendPerTypeReference(String kjt, ProofMetaPerTypeReferences references, int level, StringBuffer sb){
+      if(references != null){
+         List<ProofMetaReferenceAxiom> axioms = references.getAxioms();
+         List<ProofMetaReferenceInvariant> invariants = references.getInvariants();
+         List<ProofMetaReferenceAccess> accesses = references.getAccesses();
+         List<ProofMetaReferenceMethod> inlineMethods = references.getInlineMethods();
+         List<ProofMetaReferenceContract> contracts = references.getContracts();
+         Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+         attributeValues.put(ATTRIBUTE_NAME, kjt);
+         XMLUtil.appendStartTag(level, TAG_TYPE, attributeValues, sb);
+         appendAxiomReferences(axioms, level + 1, sb);
+         appendInvariantReferences(invariants, level + 1, sb);
+         appendAccessReferences(accesses, level + 1, sb);
+         appendInlineMethodReferences(inlineMethods, level + 1, sb);
+         appendContractReferences(contracts, level + 1, sb);
+         XMLUtil.appendEndTag(level, TAG_TYPE, sb);
       }
    }
    
@@ -385,6 +313,7 @@ public class ProofMetaFileWriter {
          for(ProofMetaReferenceContract contract : contracts){
             if(contract != null){
                Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+               attributeValues.put(ATTRIBUTE_KJT, contract.getKjt());
                attributeValues.put(ATTRIBUTE_NAME, contract.getName());
                attributeValues.put(ATTRIBUTE_REP, contract.getContract());
                XMLUtil.appendEmptyTag(level + 1, TAG_CONTRACT_REFERENCE, attributeValues, sb);
@@ -392,22 +321,5 @@ public class ProofMetaFileWriter {
          }
          XMLUtil.appendEndTag(level, TAG_CONTRACT_REFERENCES, sb);
       }
-   }
-   
-   
-   /**
-    * Returns the equivalent {@link KeYJavaType} from the given {@link KeYEnvironment} for the given {@link KeYJavaType}.
-    * @param kjt - the {@link KeYJavaType} to use
-    * @param environment - the {@link KeYEnvironment} to use
-    * @return the {@link KeYJavaType} form the {@link KeYEnvironment}
-    */
-   private static KeYJavaType getKeYJavaTypeFromEnv(KeYJavaType kjt, KeYEnvironment<CustomUserInterface> environment){
-      Set<KeYJavaType> envKjts = environment.getJavaInfo().getAllKeYJavaTypes();
-      for(KeYJavaType envKjt : envKjts){
-         if(envKjt.getFullName().equals(kjt.getFullName())){
-            return envKjt;
-         }
-      }
-      return null;
    }
 }

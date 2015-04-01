@@ -3,6 +3,7 @@ package org.key_project.key4eclipse.resources.util.event;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 
 /**
  * Allows to observe changes made by {@link KeYResourcesUtil}.

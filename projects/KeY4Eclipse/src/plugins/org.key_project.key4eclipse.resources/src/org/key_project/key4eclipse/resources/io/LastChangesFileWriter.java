@@ -20,7 +20,6 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourceAttributes;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.util.java.XMLUtil;
@@ -78,14 +77,8 @@ public class LastChangesFileWriter {
                lastChangesFile.create(new ByteArrayInputStream(xml.getBytes(encoding)), true, null);
             }
             else {
-               ResourceAttributes resAttr = lastChangesFile.getResourceAttributes();
-               resAttr.setReadOnly(false);
-               lastChangesFile.setResourceAttributes(resAttr);
                lastChangesFile.setContents(new ByteArrayInputStream(xml.getBytes(encoding)), true, true, null);
             }
-            ResourceAttributes resAttr = lastChangesFile.getResourceAttributes();
-            resAttr.setReadOnly(true);
-            lastChangesFile.setResourceAttributes(resAttr);
          } catch (Exception e){
             LogUtil.getLogger().logError(e);
          }

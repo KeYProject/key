@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -14,10 +16,11 @@ import org.junit.Test;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileAssumption;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
-import org.key_project.key4eclipse.resources.io.ProofMetaFileTypeElement;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
+import org.key_project.key4eclipse.resources.io.ProofMetaPerTypeReferences;
 import org.key_project.key4eclipse.resources.io.ProofMetaReferences;
 import org.key_project.key4eclipse.resources.test.Activator;
+import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -204,11 +207,12 @@ public class ProofMetaFileWriterAndReaderTest extends TestCase {
                   }
                }
             }
-            pe.setProofReferences(proofReferences);
+            Set<IProofReference<?>> filteredProofReferences = new LinkedHashSet<IProofReference<?>>();
+            Set<IProofReference<?>> assumptions = new LinkedHashSet<IProofReference<?>>();
+            KeYResourcesUtil.filterProofReferences(proofReferences, filteredProofReferences, assumptions);
+            pe.setAssumptions(KeYResourcesUtil.computeProofMetaFileAssumtionList(pe.getKeYEnvironment().getServices(), assumptions));
             if(withProofMetaReferences){
-               ProofMetaReferences references = new ProofMetaReferences();
-               references.createFromProofElement(pe, env);
-               pe.setProofMetaReferences(references);
+               pe.setProofMetaReferences(new ProofMetaReferences(pe, filteredProofReferences));
             }
          }
          if (withContracts) {
@@ -233,21 +237,25 @@ public class ProofMetaFileWriterAndReaderTest extends TestCase {
          ProofMetaReferences refs = reader.getReferences();
          if (withProofMetaReferences) {
             assertEquals(pe.getContract().toString(), refs.getContract());
-            assertEquals(0, refs.getAxioms().size());
-            assertEquals(0, refs.getInvariants().size());
-            assertEquals(0, refs.getAccesses().size());
             assertEquals(1, refs.getCallMethods().size());
-            assertEquals(1, refs.getInlineMethods().size());
-            assertEquals(1, refs.getContracts().size());
+            Map<String, ProofMetaPerTypeReferences> ptRefs = refs.getPerTypeReferences();
+            assertEquals(2, ptRefs.size());
+            ProofMetaPerTypeReferences typeARefs = ptRefs.get("A");
+            assertEquals(0, typeARefs.getAxioms().size());
+            assertEquals(0, typeARefs.getInvariants().size());
+            assertEquals(0, typeARefs.getAccesses().size());
+            assertEquals(1, typeARefs.getInlineMethods().size());
+            assertEquals(1, typeARefs.getContracts().size());
+            ProofMetaPerTypeReferences typeMainRefs = ptRefs.get("Main");
+            assertEquals(0, typeMainRefs.getAxioms().size());
+            assertEquals(0, typeMainRefs.getInvariants().size());
+            assertEquals(0, typeMainRefs.getAccesses().size());
+            assertEquals(1, typeMainRefs.getInlineMethods().size());
+            assertEquals(0, typeMainRefs.getContracts().size());
          }
          else {
             assertEquals(null, refs.getContract());
-            assertEquals(0, refs.getAxioms().size());
-            assertEquals(0, refs.getInvariants().size());
-            assertEquals(0, refs.getAccesses().size());
-            assertEquals(0, refs.getCallMethods().size());
-            assertEquals(0, refs.getInlineMethods().size());
-            assertEquals(0, refs.getContracts().size());
+            assertEquals(0, refs.getPerTypeReferences().size());
          }
          LinkedList<IFile> contracts = reader.getUsedContracts();
          if (withContracts) {

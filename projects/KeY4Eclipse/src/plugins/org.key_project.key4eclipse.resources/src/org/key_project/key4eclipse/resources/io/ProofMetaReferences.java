@@ -3,6 +3,7 @@ package org.key_project.key4eclipse.resources.io;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
@@ -23,6 +24,8 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.CustomUserInterface;
+import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
  * Creates the representation of all references used by a particular {@link ProofElement}
@@ -31,32 +34,34 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 public class ProofMetaReferences {
 
    private String contract;
-   private List<ProofMetaReferenceAxiom> axioms;
-   private List<ProofMetaReferenceInvariant> invariants;
-   private List<ProofMetaReferenceAccess> accesses;
+   private Map<String, ProofMetaPerTypeReferences> perTypeReferences;
    private List<ProofMetaReferenceCallMethod> callMethods;
-   private List<ProofMetaReferenceMethod> inlineMethods;
-   private List<ProofMetaReferenceContract> contracts;
-   
+
+
    public ProofMetaReferences(){
       this.contract = null;
-      this.axioms = new LinkedList<ProofMetaReferenceAxiom>();
-      this.invariants = new LinkedList<ProofMetaReferenceInvariant>();
-      this.accesses = new LinkedList<ProofMetaReferenceAccess>();
+      this.perTypeReferences = new LinkedHashMap<String, ProofMetaPerTypeReferences>();
       this.callMethods = new LinkedList<ProofMetaReferenceCallMethod>();
-      this.inlineMethods = new LinkedList<ProofMetaReferenceMethod>();
-      this.contracts = new LinkedList<ProofMetaReferenceContract>();
    }
-      
+   
+   public ProofMetaReferences(ProofElement pe, Set<IProofReference<?>> proofReferences){
+      this.contract = null;
+      this.perTypeReferences = new LinkedHashMap<String, ProofMetaPerTypeReferences>();
+      this.callMethods = new LinkedList<ProofMetaReferenceCallMethod>();
+      createFromProofElement(pe, proofReferences);
+   }
+   
+   
    /**
     * Creates the {@link ProofMetaReferences} from a {@link ProofElement}
     * @param pe the {@link ProofElement} to use
     * @param env the {@link KeYEnvironment} to use
     */
-   public void createFromProofElement(ProofElement pe, KeYEnvironment<?> env) {
+   public void createFromProofElement(ProofElement pe, Set<IProofReference<?>> proofReferences) {
+      KeYEnvironment<CustomUserInterface> env = pe.getKeYEnvironment();
       contract = KeYResourcesUtil.contractToString(pe.getContract());
-      List<IProofReference<?>> references = KeYResourcesUtil.sortProofReferences(KeYResourcesUtil.filterProofReferences(pe.getProofReferences()), IProofReference.USE_AXIOM, IProofReference.USE_INVARIANT, IProofReference.ACCESS, IProofReference.CALL_METHOD, IProofReference.INLINE_METHOD, IProofReference.USE_CONTRACT);
-      for(IProofReference<?> proofRef : references){
+      List<IProofReference<?>> sortedReferences = KeYResourcesUtil.sortProofReferences(proofReferences, IProofReference.USE_AXIOM, IProofReference.USE_INVARIANT, IProofReference.ACCESS, IProofReference.CALL_METHOD, IProofReference.INLINE_METHOD, IProofReference.USE_CONTRACT);
+      for(IProofReference<?> proofRef : sortedReferences){
          if(IProofReference.USE_AXIOM.equals(proofRef.getKind())){
             createAxiom((ClassAxiom) proofRef.getTarget());
          }
@@ -80,25 +85,38 @@ public class ProofMetaReferences {
          }
          else if(IProofReference.USE_CONTRACT.equals(proofRef.getKind())){
             Contract c = (Contract) proofRef.getTarget();
+            String kjt = c.getKJT().getFullName();
             String name = c.getName();
-            if(!containsContract(name)){
-               contracts.add(new ProofMetaReferenceContract(name, KeYResourcesUtil.contractToString(c)));
+            ProofMetaPerTypeReferences ptRefs = perTypeReferences.get(kjt);
+            if(!containsContract(kjt, name, ptRefs)){
+               ptRefs.addContract(new ProofMetaReferenceContract(kjt, name, KeYResourcesUtil.contractToString(c)));
             }
          }
       }
+   }
+   
+   public ProofMetaPerTypeReferences getPerTypeReferences(String kjt){
+      ProofMetaPerTypeReferences ptRefs = perTypeReferences.get(kjt);
+      if(ptRefs == null){
+         ptRefs = new ProofMetaPerTypeReferences();
+         perTypeReferences.put(kjt, ptRefs);
+      }
+      return ptRefs;
    }
 
    private void createAxiom(ClassAxiom axiom) {
       if(axiom instanceof RepresentsAxiom){
          RepresentsAxiom repAxiom = (RepresentsAxiom) axiom;
-         KeYJavaType kjt = repAxiom.getKJT();
-         axioms.add(new ProofMetaReferenceAxiom(kjt.getFullName(), repAxiom.getName(), KeYResourcesUtil.repAxiomToString(repAxiom)));
+         String kjt = repAxiom.getKJT().getFullName();
+         ProofMetaPerTypeReferences ptRefs = getPerTypeReferences(kjt);
+         ptRefs.addAxiom(new ProofMetaReferenceAxiom(kjt, repAxiom.getName(), KeYResourcesUtil.repAxiomToString(repAxiom)));
       }
    }
 
    private void createInvariant(ClassInvariant invariant) {
-      KeYJavaType kjt = invariant.getKJT();
-      invariants.add(new ProofMetaReferenceInvariant(kjt.getFullName(), invariant.getName(), KeYResourcesUtil.invariantToString(invariant)));
+      String kjt = invariant.getKJT().getFullName();
+      ProofMetaPerTypeReferences ptRefs = getPerTypeReferences(kjt);
+      ptRefs.addInvariant(new ProofMetaReferenceInvariant(kjt, invariant.getName(), KeYResourcesUtil.invariantToString(invariant)));
    }
    
    private void createAccess(IProgramVariable variable, KeYEnvironment<?> env, IProgramMethod target) {
@@ -107,7 +125,8 @@ public class ProofMetaReferences {
       if(variable instanceof ProgramVariable) {
          ProgramVariable pv = (ProgramVariable) variable;
          kjt = pv.getContainerType();
-         if(kjt != null && !containsAccess(kjt.getFullName(), name)){
+         ProofMetaPerTypeReferences ptRefs = getPerTypeReferences(kjt.getFullName());
+         if(kjt != null && !containsAccess(kjt.getFullName(), name, ptRefs)){
             FieldDeclaration fieldDecl = KeYResourcesUtil.getFieldDeclFromKjt(kjt, name);
             if(fieldDecl != null) {
                String type = fieldDecl.getTypeReference().toString();
@@ -122,7 +141,7 @@ public class ProofMetaReferences {
                if(isFinal) {
                   initializer = fieldDecl.getFieldSpecifications().get(0).getInitializer().toString();
                }
-               accesses.add(new ProofMetaReferenceAccess(kjt.getFullName(), name, type, visibility, isStatic, isFinal, initializer));
+               ptRefs.addAccess(new ProofMetaReferenceAccess(kjt.getFullName(), name, type, visibility, isStatic, isFinal, initializer));
             }
          }
       }
@@ -150,64 +169,69 @@ public class ProofMetaReferences {
    }
 
    private void createInlineMethod(IProgramMethod programMethod){
-      KeYJavaType kjt = programMethod.getContainerType();
+      String kjt = programMethod.getContainerType().getFullName();
       MethodDeclaration methodDecl = programMethod.getMethodDeclaration();
       String name = methodDecl.getFullName();
       if(name.indexOf("<") == -1 || name.indexOf("<init>") >= 0){
          String methodParameters = KeYResourcesUtil.parametersToString(methodDecl.getParameters());
-         if(!containsMethod(kjt.getFullName(), name, methodParameters)){
+         ProofMetaPerTypeReferences ptRefs = getPerTypeReferences(kjt);
+         if(!containsMethod(kjt, name, methodParameters, ptRefs)){
             String src = KeYResourcesUtil.createSourceString(methodDecl);
-            inlineMethods.add(new ProofMetaReferenceMethod(kjt.getFullName(), name, methodParameters, src));
+            ptRefs.addInlineMethod(new ProofMetaReferenceMethod(kjt, name, methodParameters, src));
          }
       }
    }   
    
-   private List<IProgramMethod> findOverloads(IProgramMethod programMethod, KeYEnvironment<?> env){
-      List<IProgramMethod> overloads = new LinkedList<IProgramMethod>();
-      KeYJavaType kjt = programMethod.getContainerType();
-      if(kjt != null && kjt.getJavaType() instanceof TypeDeclaration) {
-         TypeDeclaration typeDecl = (TypeDeclaration) kjt.getJavaType();
-         for(MemberDeclaration memberDecl : typeDecl.getMembers()) {
-            if (memberDecl instanceof IProgramMethod) {
-               IProgramMethod pm = (IProgramMethod) memberDecl;
-               if (pm.getFullName().equals(programMethod.getFullName()) && isSubtypeOverloading(programMethod, pm, env)) {
-                  overloads.add(pm);
-               }
-            }
-         }
-      }
-      return overloads;
-   }
+//   private List<IProgramMethod> findOverloads(IProgramMethod programMethod, KeYEnvironment<?> env){
+//      List<IProgramMethod> overloads = new LinkedList<IProgramMethod>();
+//      KeYJavaType kjt = programMethod.getContainerType();
+//      if(kjt != null && kjt.getJavaType() instanceof TypeDeclaration) {
+//         TypeDeclaration typeDecl = (TypeDeclaration) kjt.getJavaType();
+//         for(MemberDeclaration memberDecl : typeDecl.getMembers()) {
+//            if (memberDecl instanceof IProgramMethod) {
+//               IProgramMethod pm = (IProgramMethod) memberDecl;
+//               if (pm.getFullName().equals(programMethod.getFullName()) && isSubtypeOverloading(programMethod, pm, env)) {
+//                  overloads.add(pm);
+//               }
+//            }
+//         }
+//      }
+//      return overloads;
+//   }
+//   
+//   private boolean isSubtypeOverloading(IProgramMethod base, IProgramMethod overload, KeYEnvironment<?> env){
+//      if(base.getParameterDeclarationCount() == overload.getParameterDeclarationCount()) {
+//         for(int i = 0; i < base.getParameterDeclarationCount(); i++) {
+//            ParameterDeclaration baseParameter = base.getParameterDeclarationAt(i);
+//            KeYJavaType baseType = baseParameter.getTypeReference().getKeYJavaType();
+//            ParameterDeclaration overloadParameter = overload.getParameterDeclarationAt(i);
+//            KeYJavaType overloadType = overloadParameter.getTypeReference().getKeYJavaType();
+//            if(!baseType.equals(overloadType) && !env.getJavaInfo().getAllSubtypes(baseType).contains(overloadType)){
+//               return false;
+//            }
+//         }
+//         return true;
+//      }
+//      return false;
+//   }
    
-   private boolean isSubtypeOverloading(IProgramMethod base, IProgramMethod overload, KeYEnvironment<?> env){
-      if(base.getParameterDeclarationCount() == overload.getParameterDeclarationCount()) {
-         for(int i = 0; i < base.getParameterDeclarationCount(); i++) {
-            ParameterDeclaration baseParameter = base.getParameterDeclarationAt(i);
-            KeYJavaType baseType = baseParameter.getTypeReference().getKeYJavaType();
-            ParameterDeclaration overloadParameter = overload.getParameterDeclarationAt(i);
-            KeYJavaType overloadType = overloadParameter.getTypeReference().getKeYJavaType();
-            if(!baseType.equals(overloadType) && !env.getJavaInfo().getAllSubtypes(baseType).contains(overloadType)){
-               return false;
+   private boolean containsAccess(String kjt, String name, ProofMetaPerTypeReferences ptRefs){
+      if(ptRefs != null){
+         for(ProofMetaReferenceAccess access : ptRefs.getAccesses()){
+            if(kjt.equals(access.getKjt()) && name.equals(access.getName())){
+               return true;
             }
          }
-         return true;
       }
       return false;
    }
    
-   private boolean containsAccess(String kjt, String name){
-      for(ProofMetaReferenceAccess access : accesses){
-         if(kjt.equals(access.getKjt()) && name.equals(access.getName())){
-            return true;
-         }
-      }
-      return false;
-   }
-   
-   private boolean containsMethod(String kjt, String methodName, String parameters){
-      for(ProofMetaReferenceMethod method : inlineMethods){
-         if(method.getKjt().equals(kjt) && method.getName().equals(methodName) && method.getParameters().equals(parameters)){
-            return true;
+   private boolean containsMethod(String kjt, String methodName, String parameters, ProofMetaPerTypeReferences ptRefs){
+      if(ptRefs != null){
+         for(ProofMetaReferenceMethod method : ptRefs.getInlineMethods()){
+            if(method.getKjt().equals(kjt) && method.getName().equals(methodName) && method.getParameters().equals(parameters)){
+               return true;
+            }
          }
       }
       return false;
@@ -222,10 +246,12 @@ public class ProofMetaReferences {
       return false;
    }
    
-   private boolean containsContract(String name){
-      for(ProofMetaReferenceContract contract : contracts){
-         if(name.equals(contract.getName())){
-            return true;
+   private boolean containsContract(String kjt, String name, ProofMetaPerTypeReferences ptRefs){
+      if(ptRefs != null){
+         for(ProofMetaReferenceContract contract : ptRefs.getContracts()){
+            if(kjt.equals(contract.getKjt()) && name.equals(contract.getName())){
+               return true;
+            }
          }
       }
       return false;
@@ -237,26 +263,9 @@ public class ProofMetaReferences {
    public void setContract(String contract) {
       this.contract = contract;
    }
-
-   public List<ProofMetaReferenceAxiom> getAxioms() {
-      return axioms;
-   }
-   public void addAxiom(ProofMetaReferenceAxiom axiom){
-      axioms.add(axiom);
-   }
-
-   public List<ProofMetaReferenceInvariant> getInvariants() {
-      return invariants;
-   }
-   public void addInvariant(ProofMetaReferenceInvariant invariant){
-      invariants.add(invariant);
-   }
-
-   public List<ProofMetaReferenceAccess> getAccesses() {
-      return accesses;
-   }
-   public void addAccess(ProofMetaReferenceAccess access){
-      accesses.add(access);
+   
+   public Map<String, ProofMetaPerTypeReferences> getPerTypeReferences() {
+      return perTypeReferences;
    }
 
    public List<ProofMetaReferenceCallMethod> getCallMethods() {
@@ -265,19 +274,4 @@ public class ProofMetaReferences {
    public void addCallMethod(ProofMetaReferenceCallMethod callMethod) {
       callMethods.add(callMethod);
    }
-
-   public List<ProofMetaReferenceMethod> getInlineMethods() {
-      return inlineMethods;
-   }
-   public void addInlineMethod(ProofMetaReferenceMethod inlineMethod) {
-      inlineMethods.add(inlineMethod);
-   }
-
-   public List<ProofMetaReferenceContract> getContracts() {
-      return contracts;
-   }
-   public void addContract(ProofMetaReferenceContract contract) {
-     contracts.add(contract);
-   }
-   
 }

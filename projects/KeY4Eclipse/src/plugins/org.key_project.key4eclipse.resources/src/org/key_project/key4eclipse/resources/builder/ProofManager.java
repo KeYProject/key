@@ -14,6 +14,7 @@
 package org.key_project.key4eclipse.resources.builder;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;

@@ -6,17 +6,22 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.key_project.key4eclipse.resources.io.ProofMetaReferences;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.StringUtil;
+
+import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.proof.Goal;
@@ -27,6 +32,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
+import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
@@ -73,14 +79,16 @@ public class ProofRunnable implements Runnable {
                long proofDuration = System.currentTimeMillis()-proofStart;
                if(proof != null){
                   pe.setProofClosed(proof.closed());
-                  pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
-                  Pair<List<IFile>, List<String>> usedElementsPair = KeYResourcesUtil.computeUsedProofElements(pe, proofElements);
+                  LinkedHashSet<IProofReference<?>> proofReferences = ProofReferenceUtil.computeProofReferences(proof);
+                  Pair<List<IFile>, List<String>> usedElementsPair = KeYResourcesUtil.computeUsedProofElements(pe, proofReferences, proofElements);
                   pe.setUsedContracts(usedElementsPair.first);
                   pe.setCalledMethods(usedElementsPair.second);
                   pe.setMarkerMsg(generateProofMarkerMessage(pe, proof, proofDuration));
-                  ProofMetaReferences references = new ProofMetaReferences();
-                  references.createFromProofElement(pe, environment);
-                  pe.setProofMetaReferences(references);
+                  Set<IProofReference<?>> filteredProofReferences = new LinkedHashSet<IProofReference<?>>();
+                  Set<IProofReference<?>> assumptions = new LinkedHashSet<IProofReference<?>>();
+                  KeYResourcesUtil.filterProofReferences(proofReferences, filteredProofReferences, assumptions);
+                  pe.setAssumptions(KeYResourcesUtil.computeProofMetaFileAssumtionList(pe.getKeYEnvironment().getServices(), assumptions));
+                  pe.setProofMetaReferences(new ProofMetaReferences(pe, filteredProofReferences));
                   pe.setOutdated(false);
                   synchronized (ProofManager.proofsToSave) {
                      ProofManager.proofsToSave.add(new Pair<ProofElement, InputStream>(pe, generateSaveProof(proof, pe.getProofFile())));
@@ -92,6 +100,12 @@ public class ProofRunnable implements Runnable {
          }
          environment.dispose();
    }
+   
+   //TODO:
+   // - add assumptions to pe
+   // - compute used Types
+   // - remove filtering from proofmetaref computation
+   // - 
 
 
    /**

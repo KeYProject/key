@@ -6,12 +6,18 @@ package org.key_project.key4eclipse.resources.io;
  */
 public class ProofMetaReferenceContract {
    
+   private String kjt;
    private String name;
    private String contract;
    
-   public ProofMetaReferenceContract(String name, String contract) {
+   public ProofMetaReferenceContract(String kjt, String name, String contract) {
+      this.kjt = kjt;
       this.name = name;
       this.contract = contract;
+   }
+   
+   public String getKjt(){
+      return kjt;
    }
 
    public String getName() {

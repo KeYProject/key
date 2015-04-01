@@ -35,6 +35,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -55,6 +56,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuildJob;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.decorator.ProofFileLightweightLabelDecorator;
+import org.key_project.key4eclipse.resources.io.ProofMetaFileAssumption;
 import org.key_project.key4eclipse.resources.io.ProofMetaReferencesPrettyPrinter;
 import org.key_project.key4eclipse.resources.io.ProofReferenceException;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
@@ -71,6 +73,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
@@ -84,6 +87,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.ClassAxiom;
@@ -209,26 +213,27 @@ public class KeYResourcesUtil {
       return kjt;
    }
    
-   
+   //TODO: fix javadoc
    /**
-    * Filters a {@link Set} of {@link IProofReference}s in order to exclude external resources
+    * Filters a {@link Set} of {@link IProofReference}s in order to exclude external resources. 
     * @param proofReferences {@link Set} of {@link IProofReference}s
     * @return {@link Set} of filtered {@link IProofReference}s 
     */
-   public static Set<IProofReference<?>> filterProofReferences(Set<IProofReference<?>> proofReferences) {
-      Set<IProofReference<?>> filteredReferences = new HashSet<IProofReference<?>>();
+   public static void filterProofReferences(Set<IProofReference<?>> proofReferences, Set<IProofReference<?>> filteredProofReferences, Set<IProofReference<?>> assumptions) {
       for(IProofReference<?> proofReference : proofReferences){
          try {
             KeYJavaType kjt = getKeYJavaType(proofReference);
             if(!filterKeYJavaType(kjt)){
-               filteredReferences.add(proofReference);
+               filteredProofReferences.add(proofReference);
+            }
+            else {
+               assumptions.add(proofReference);
             }
          }
          catch (ProofReferenceException e) {
             LogUtil.getLogger().logError(e);
          }
       }
-      return filteredReferences;
    }
    
    /**
@@ -310,10 +315,9 @@ public class KeYResourcesUtil {
     * @param proofElements The {@link List} of all available {@link ProofElement}s.
     * @return A {@link Pair} of the used contracts and the called methods.
     */
-   public static Pair<List<IFile>, List<String>> computeUsedProofElements(ProofElement pe, List<ProofElement> proofElements){
+   public static Pair<List<IFile>, List<String>> computeUsedProofElements(ProofElement pe, HashSet<IProofReference<?>> proofReferences, List<ProofElement> proofElements){
       List<IFile> usedContracts = new LinkedList<IFile>();
       List<String> calledMethods = new LinkedList<String>();
-      HashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       if(proofReferences != null && !proofReferences.isEmpty()){
          for(IProofReference<?> proofRef : proofReferences){
             Object target = proofRef.getTarget();
@@ -1103,5 +1107,47 @@ public class KeYResourcesUtil {
     */
    public static String invariantToString(ClassInvariant invariant){
       return invariant.getOriginalInv().toString();
+   }
+
+
+   public static List<ProofMetaFileAssumption> computeProofMetaFileAssumtionList(Services services, Set<IProofReference<?>> assumptions) {
+      List<ProofMetaFileAssumption> assumptionList = new LinkedList<ProofMetaFileAssumption>();
+      for (IProofReference<?> proofRef : assumptions) {
+         String kind = null;
+         String name = null;
+         String targetStr = null;
+         String type = null;
+         Object target = proofRef.getTarget();
+         if(IProofReference.USE_AXIOM.equals(proofRef.getKind())){
+            if(target instanceof ClassAxiom){
+               ClassAxiom classAx = (ClassAxiom) target;
+               kind = proofRef.getKind();
+               name = classAx.getDisplayName();
+               targetStr = ClassTree.getDisplayName(services, classAx.getTarget());
+               type = classAx.getKJT().getFullName();
+            }
+         }
+         else if(IProofReference.USE_CONTRACT.equals(proofRef.getKind())){
+            if(target instanceof Contract){
+               Contract contract = (Contract) target;
+               kind = proofRef.getKind();
+               name = contract.getDisplayName();
+               targetStr = ClassTree.getDisplayName(services, contract.getTarget());
+               type = contract.getKJT().getFullName();
+            }
+         }
+         else if(IProofReference.USE_INVARIANT.equals(proofRef.getKind())){
+            if(target instanceof ClassInvariant){
+               ClassInvariant classInv = (ClassInvariant) target;
+               kind = proofRef.getKind();
+               name = classInv.getDisplayName();
+               type = classInv.getKJT().getFullName();
+            }
+         }
+         if(kind != null){
+            assumptionList.add(new ProofMetaFileAssumption(kind, name, targetStr, type));
+         }
+      }
+      return assumptionList;
    }
 }
