@@ -6,7 +6,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
-public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<T> {
+public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<T> implements MatchOperatorInstruction {
 
     public MatchOpIdentityInstruction(T op) {
         super(op);
@@ -16,9 +16,9 @@ public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<
      * {@inheritDoc}
      */
     @Override
-    public final MatchConditions match(Term instantiationCandidate, MatchConditions matchCond, Services services) {
+    public final MatchConditions match(Term instantiationCandidate, MatchConditions matchConditions, Services services) {
         if(instantiationCandidate.op() == op) {
-            return matchCond;
+            return matchConditions;
         }
         return null;
     }
@@ -27,12 +27,25 @@ public class MatchOpIdentityInstruction<T extends Operator> extends Instruction<
      * {@inheritDoc}
      */
     @Override
-    public MatchConditions match(TermNavigator termPosition, MatchConditions mc,
+    public MatchConditions match(Operator instantiationCandidate,
+            MatchConditions matchConditions, Services services) {
+        if(instantiationCandidate == op) {
+            return matchConditions;
+        }
+        return null;    
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
             Services services) {        
-        MatchConditions result = match(termPosition.getCurrentSubterm(), mc, services);
+        MatchConditions result = match(termPosition.getCurrentSubterm(), matchConditions, services);
         if (result != null) {
             termPosition.gotoNext();
         }
         return result;
     }
+
 }

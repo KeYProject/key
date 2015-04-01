@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -126,6 +127,10 @@ public class TacletMatchProgram {
         else if (op instanceof SortDependingFunction) {
             program.add(Instruction
                     .matchSortDependingFunction((SortDependingFunction) op));
+        }
+        else if (op instanceof ElementaryUpdate) {
+            program.add(Instruction
+                    .matchElementaryUpdate((ElementaryUpdate) op));
         }
         else {
             program.add(Instruction.matchOp(op));

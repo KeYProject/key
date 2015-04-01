@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -22,7 +23,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 public abstract class Instruction<OP extends Operator> implements IMatchInstruction {
 
     public static Instruction<Operator> matchOp(Operator op) {
-        return new MatchOpIdentityInstruction(op);
+        return new MatchOpIdentityInstruction<Operator>(op);
     }
 
     public static Instruction<SortDependingFunction> matchSortDependingFunction(
@@ -70,7 +71,10 @@ public abstract class Instruction<OP extends Operator> implements IMatchInstruct
     public static IMatchInstruction unbindVariables(ImmutableArray<QuantifiableVariable> boundVars) {
         return new UnbindVariablesInstruction();
     }
-
+    
+    public static IMatchInstruction matchElementaryUpdate(ElementaryUpdate elementaryUpdate) {
+        return new MatchElementaryUpdateInstruction(elementaryUpdate);
+    }
 
     protected final OP op;
 
@@ -87,6 +91,4 @@ public abstract class Instruction<OP extends Operator> implements IMatchInstruct
      * @return {@code null} if no matches have been found or the new {@link MatchConditions} with the pair {@link (sv, instantiationCandidate)} added
      */
     public abstract MatchConditions match(Term instantiationCandidate, MatchConditions matchCond, Services services);
-
-
 }
