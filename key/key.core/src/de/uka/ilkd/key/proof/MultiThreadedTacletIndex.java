@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 
 import org.key_project.util.collection.ImmutableList;
@@ -33,8 +33,7 @@ import de.uka.ilkd.key.rule.Taclet;
  */
 final class MultiThreadedTacletIndex extends TacletIndex {
 
-    private static int parallelism       = Runtime.getRuntime().availableProcessors();
-    private static ExecutorService execs = Executors.newWorkStealingPool(parallelism);
+    private static ForkJoinPool execs = ForkJoinPool.commonPool();
 
     MultiThreadedTacletIndex(Iterable<Taclet> tacletSet) {
         super(tacletSet);
@@ -78,9 +77,9 @@ final class MultiThreadedTacletIndex extends TacletIndex {
             return result;
         }
 
-        if (tacletApps.size() > 300) {
+        if (tacletApps.size() > 256) {
             NoPosTacletApp[] toMatch = tacletApps.toArray(NoPosTacletApp.class);                        
-            final int localParallelism = (toMatch.length >> 6 > parallelism ? parallelism : toMatch.length >> 6);
+            final int localParallelism = (toMatch.length >> 5 > execs.getParallelism() ?  execs.getParallelism() : toMatch.length >> 5);
             final int partitionSize = toMatch.length/localParallelism;
 
             List<TacletSetMatchTask> forks = new ArrayList<>();
@@ -90,14 +89,18 @@ final class MultiThreadedTacletIndex extends TacletIndex {
                 upper = upper <= toMatch.length ? upper : toMatch.length;
                 forks.add(new TacletSetMatchTask(toMatch, lower, upper, pos, p_filter, services));
             }
+            
+            List<NoPosTacletApp> matchedRules = new LinkedList<NoPosTacletApp>();
+            
             try {
                 for (Future<List<NoPosTacletApp>> res : execs.invokeAll(forks)) {
-                    result = result.prepend(res.get());
+                    matchedRules.addAll(res.get());
                 }
             }
             catch (InterruptedException | ExecutionException e) {
                 throw (IllegalStateException) new IllegalStateException().initCause(e);
             }
+            result = result.prepend(matchedRules);
         } else {
             for (final NoPosTacletApp tacletApp : tacletApps) {
                 if ( !p_filter.filter(tacletApp.taclet()) ) {
