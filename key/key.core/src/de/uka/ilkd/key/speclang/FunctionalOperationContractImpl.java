@@ -1456,18 +1456,21 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public String toString() {
+        final LocationVariable heap = ((Services)services).getTypeConverter().getHeapLDT().getHeap();
         return
                 (globalDefs == null? "": "defs: "+ globalDefs +"; ")
                 + "pre: "
                 + originalPres
-                + "free pre: "
-                + originalFreePres
+                + (originalFreePres.get(heap) != null
+                    && !originalFreePres.get(heap).equalsModRenaming(TB.tt()) ?
+                            "free pre: " + originalFreePres : "")
                 + "; mby: "
                 + originalMby
                 + "; post: "
                 + originalPosts
-                + "; free post: "
-                + originalFreePosts
+                + (originalFreePosts.get(heap) != null
+                    && !originalFreePosts.get(heap).equalsModRenaming(TB.tt()) ?
+                            "free post: " + originalFreePosts : "")
                 + "; mods: "
                 + originalMods
                 + "; hasMod: "

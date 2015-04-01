@@ -211,7 +211,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                           Services services) {
         final Term freePre = contract.getFreePre(modHeaps, selfVar, paramVars, atPreVars, services);
         final Term pre = contract.getPre(modHeaps, selfVar, paramVars, atPreVars, services);
-        return services.getTermBuilder().and(pre, freePre);
+        return freePre != null ? services.getTermBuilder().and(pre, freePre) : pre;
     }
 
     /**
