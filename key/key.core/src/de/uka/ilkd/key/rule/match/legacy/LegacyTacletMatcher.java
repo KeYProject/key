@@ -248,32 +248,32 @@ public final class LegacyTacletMatcher implements TacletMatcher {
 
 
     /**
-     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(java.lang.Iterable, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
+     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(java.lang.Iterable, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)    
      */
     @Override
     public final MatchConditions matchIf ( Iterable<IfFormulaInstantiation> p_toMatch,
             MatchConditions                  p_matchCond,
             Services                         p_services ) {
-
         final Iterator<SequentFormula>     itIfSequent   = assumesSequent .iterator ();
 
         ImmutableList<MatchConditions>            newMC;   
 
         for (final IfFormulaInstantiation candidateInst: p_toMatch) {
-            while ( itIfSequent.hasNext () ) {
-                newMC = matchIf ( ImmutableSLList.<IfFormulaInstantiation>nil()
-                        .prepend ( candidateInst ),
-                        itIfSequent.next ().formula (),
-                        p_matchCond,
-                        p_services ).getMatchConditions ();
+            assert itIfSequent.hasNext() : "p_toMatch and assumes sequent must have same number of elements";
+            newMC = matchIf ( ImmutableSLList.<IfFormulaInstantiation>nil()
+                    .prepend ( candidateInst ),
+                    itIfSequent.next ().formula (),
+                    p_matchCond,
+                    p_services ).getMatchConditions ();
 
-                if ( newMC.isEmpty() )
-                    return null;
+            if ( newMC.isEmpty() )
+                return null;
 
-                p_matchCond = newMC.head ();
-            }
+            p_matchCond = newMC.head ();
         }
 
+        assert !itIfSequent.hasNext() : "p_toMatch and assumes sequent must have same number of elements";
+        
         return p_matchCond;
     }
 

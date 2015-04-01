@@ -180,19 +180,19 @@ public class VMTacletMatcher implements TacletMatcher {
         ImmutableList<MatchConditions>            newMC;   
 
         for (final IfFormulaInstantiation candidateInst: p_toMatch) {
-            while ( itIfSequent.hasNext () ) {
-                newMC = matchIf ( ImmutableSLList.<IfFormulaInstantiation>nil()
-                        .prepend ( candidateInst ),
-                        itIfSequent.next ().formula (),
-                        p_matchCond,
-                        p_services ).getMatchConditions ();
+            assert itIfSequent.hasNext() : "p_toMatch and assumes sequent must have same number of elements";
+            newMC = matchIf ( ImmutableSLList.<IfFormulaInstantiation>nil()
+                    .prepend ( candidateInst ),
+                    itIfSequent.next ().formula (),
+                    p_matchCond,
+                    p_services ).getMatchConditions ();
 
-                if ( newMC.isEmpty() )
-                    return null;
+            if ( newMC.isEmpty() )
+                return null;
 
-                p_matchCond = newMC.head ();
-            }
+            p_matchCond = newMC.head ();
         }
+        assert !itIfSequent.hasNext() : "p_toMatch and assumes sequent must have same number of elements";
 
         return p_matchCond;
     }
