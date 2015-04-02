@@ -38,6 +38,10 @@ public abstract class TacletMatcherKit {
         }
     }
 
+    /**
+     * sets up the concrete factory to use depending on the provided system property or the given default if no
+     * property is set
+     */
     private static final String TACLET_MATCHER_SELECTION_VALUE = System.getProperty("taclet.match", "legacy");    
     private static final TacletMatcherKit ACTIVE_TACLET_MATCHER_KIT; 
     static {    
@@ -59,7 +63,7 @@ public abstract class TacletMatcherKit {
     /**
      * the creator method returning the matcher for the specified taclet 
      * @param taclet the {@link Taclet} for which to create a matcher
-     * @return the matcher for the taclet
+     * @return the matcher for the given taclet
      */
     public abstract TacletMatcher createTacletMatcher(Taclet taclet);
 }

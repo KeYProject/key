@@ -18,16 +18,31 @@ public abstract class TacletIndexKit {
         }
     }
     
+    /**
+     * return the currently used factory for the {@link TacletIndex}
+     * @return the concrete taclet index factory
+     */
     public static TacletIndexKit getKit() {
         return ACTIVE_TACLET_INDEX_KIT;
     }
     
+    /**
+     * abstract factory method to create an empty {@link TacletIndex}
+     * @return the created {@link TacletIndex}
+     */
     public abstract TacletIndex createTacletIndex();
 
+    /**
+     * abstract factory method to create a {@link TacletIndex} containing the provided taclets
+     * 
+     * @return the created {@link TacletIndex}
+     */
     public abstract TacletIndex createTacletIndex(Iterable<Taclet> tacletSet);
+    
 
-    
-    
+    /**
+     * Concrete factory creating the single threaded version of the {@link TacletIndex} 
+     */
     private static class SingleThreadedTacletIndexKit extends TacletIndexKit {
         
         public TacletIndex createTacletIndex() {
@@ -39,6 +54,10 @@ public abstract class TacletIndexKit {
         }
     }
     
+    /**
+     * Concrete factory creating the multi threaded version of the {@link TacletIndex}
+     * (performs matching using multiple threads) 
+     */
     private static class MultiThreadedTacletIndexKit extends TacletIndexKit {
         
         public TacletIndex createTacletIndex() {
