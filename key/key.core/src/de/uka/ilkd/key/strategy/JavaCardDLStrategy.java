@@ -1446,7 +1446,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "inEqSimp_propagation", -2400 );
         bindRuleSet ( d, "inEqSimp_pullOutGcd", -2150);
         bindRuleSet ( d, "inEqSimp_saturate", -1900 );
-        bindRuleSet ( d, "inEqSimp_forNormalisation", -1000);
+        bindRuleSet ( d, "inEqSimp_forNormalisation", -1100);
         bindRuleSet ( d, "inEqSimp_special_nonLin", -1400);
         
         if ( arithNonLinInferences () )

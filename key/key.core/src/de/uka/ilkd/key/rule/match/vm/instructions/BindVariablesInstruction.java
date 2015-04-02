@@ -75,7 +75,7 @@ public class BindVariablesInstruction implements IMatchInstruction {
             final Object foundMapping = matchCond.getInstantiations().getInstantiation(op);
             if(foundMapping == null) {
                 final Term substTerm = services.getTermBuilder().var(instantiationCandidate);
-                matchCond =  addInstantiation(substTerm, matchCond, services);
+                matchCond = addInstantiation(substTerm, matchCond, services);
             } else if (((Term)foundMapping).op() != instantiationCandidate) {
                 matchCond = null;        
             }
