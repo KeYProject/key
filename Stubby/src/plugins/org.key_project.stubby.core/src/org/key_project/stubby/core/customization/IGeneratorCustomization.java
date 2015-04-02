@@ -55,6 +55,14 @@ public interface IGeneratorCustomization {
    public String getIgnoreReason(IJavaProject javaProject, 
                                  String stubFolderPath, 
                                  Type Type) throws CoreException;
+
+   /**
+    * Checks if generics are supported or not.
+    * @param javaProject The {@link IJavaProject} to generate stubs for.
+    * @param dependencyModel The created {@link DependencyModel}.
+    * @return {@code true} generics are supported, {@code false} generics are not supported.
+    */
+   public boolean canSupportGenerics(IJavaProject javaProject, DependencyModel dependencyModel);
    
    /**
     * Is called by {@link StubGeneratorUtil#generateStubs(IJavaProject, String, org.eclipse.core.runtime.IProgressMonitor, IGeneratorCustomization...)}

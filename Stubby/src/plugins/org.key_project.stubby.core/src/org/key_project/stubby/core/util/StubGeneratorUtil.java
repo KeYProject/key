@@ -206,6 +206,15 @@ public final class StubGeneratorUtil {
             customization.stubFolderCreated(stubFolder);
          }
       }
+      // Check if generics should be included
+      boolean genericFree = false;
+      int i = 0;
+      while (!genericFree && i < customizations.length) {
+         if (!customizations[i].canSupportGenerics(javaProject, dependencyModel)) {
+            genericFree = true;
+         }
+         i++;
+      }
       // Generate files
       List<IgnoredType> ignoredTypes = new LinkedList<IgnoredType>();
       if (dependencyModel != null && JDTUtil.isJavaProject(javaProject)) {
@@ -214,11 +223,11 @@ public final class StubGeneratorUtil {
             SWTUtil.checkCanceled(monitor);
             if (!type.isSource()) {
                String ignoreReason = null;
-               for (int i = 0; ignoreReason == null && i < customizations.length; i++) {
-                  ignoreReason = customizations[i].getIgnoreReason(javaProject, stubFolderPath, type);
+               for (int j = 0; ignoreReason == null && j < customizations.length; j++) {
+                  ignoreReason = customizations[j].getIgnoreReason(javaProject, stubFolderPath, type);
                }
                if (ignoreReason == null) {
-                  generateType(type, javaProject.getProject(), stubFolderPath);
+                  generateType(type, genericFree, javaProject.getProject(), stubFolderPath);
                }
                else {
                   ignoredTypes.add(new IgnoredType(type, ignoreReason));
@@ -234,16 +243,18 @@ public final class StubGeneratorUtil {
    /**
     * Generates the stub file for the given {@link Type}.
     * @param type The {@link Type} to generate its stub file.
+    * @param genericFree If {@code true} generated stubs are generic free, otherwise generics might be contained.
     * @param stubProject The target {@link IJavaProject}.
     * @param stubFolderPath The path to the stub folder.
     * @return The created or updated {@link IFile}.
     * @throws CoreException Occurred Exception.
     */
    public static IFile generateType(Type type, 
+                                    boolean genericFree,
                                     IProject stubProject, 
                                     String stubFolderPath) throws CoreException {
       // Create new content
-      String content = generateContent(type);
+      String content = generateContent(type, genericFree);
       // Save file
       String[] res = type.getPackage().split("\\.");
       String projectSimpleName = type.getSimpleName() + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT;  
@@ -280,10 +291,11 @@ public final class StubGeneratorUtil {
    /**
     * Generates the java stub source code of the given {@link Type}.
     * @param type The {@link Type}.
+    * @param genericFree If {@code true} generated stubs are generic free, otherwise generics might be contained.
     * @return The generated java stub source code.
     */
-   public static String generateContent(Type type) {
-      TypeTemplate template = new TypeTemplate();
+   public static String generateContent(Type type, boolean genericFree) {
+      TypeTemplate template = new TypeTemplate(genericFree);
       return template.generate(type);
    }
 

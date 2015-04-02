@@ -554,6 +554,15 @@ public class DependencymodelPackageImpl extends EPackageImpl implements Dependen
     * <!-- end-user-doc -->
     * @generated
     */
+   public EAttribute getTypeUsage_GenericFreeType() {
+      return (EAttribute)typeUsageEClass.getEStructuralFeatures().get(1);
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
    public EEnum getTypeKind() {
       return typeKindEEnum;
    }
@@ -653,6 +662,7 @@ public class DependencymodelPackageImpl extends EPackageImpl implements Dependen
 
       typeUsageEClass = createEClass(TYPE_USAGE);
       createEAttribute(typeUsageEClass, TYPE_USAGE__TYPE);
+      createEAttribute(typeUsageEClass, TYPE_USAGE__GENERIC_FREE_TYPE);
 
       // Create enums
       typeKindEEnum = createEEnum(TYPE_KIND);
@@ -748,6 +758,7 @@ public class DependencymodelPackageImpl extends EPackageImpl implements Dependen
 
       initEClass(typeUsageEClass, TypeUsage.class, "TypeUsage", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
       initEAttribute(getTypeUsage_Type(), ecorePackage.getEString(), "type", null, 0, 1, TypeUsage.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+      initEAttribute(getTypeUsage_GenericFreeType(), ecorePackage.getEString(), "genericFreeType", null, 0, 1, TypeUsage.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
       // Initialize enums and add enum literals
       initEEnum(typeKindEEnum, TypeKind.class, "TypeKind");

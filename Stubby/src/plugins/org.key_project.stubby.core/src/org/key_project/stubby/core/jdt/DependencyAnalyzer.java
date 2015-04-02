@@ -378,6 +378,13 @@ public class DependencyAnalyzer extends ASTVisitor {
       // Create type usage.
       TypeUsage tu = DependencymodelFactory.eINSTANCE.createTypeUsage();
       tu.setType(computeTypeUsage(typeBinding));
+      ITypeBinding erasure = typeBinding.getErasure();
+      if (erasure != null) {
+         tu.setGenericFreeType(typeBinding.getErasure().getQualifiedName());
+      }
+      else {
+         tu.setGenericFreeType(tu.getType());
+      }
       return tu;
    }
    

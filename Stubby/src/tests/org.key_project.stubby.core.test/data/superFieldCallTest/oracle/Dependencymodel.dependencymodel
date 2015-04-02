@@ -3,17 +3,17 @@
   <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
   <types package="" name="SuperFieldCall" source="true" simpleName="SuperFieldCall">
     <fields name="integerfieldA" visibility="DEFAULT">
-      <type type="int"/>
+      <type type="int" genericFreeType="int"/>
     </fields>
-    <extends type="java.lang.Object"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
   <types visibility="DEFAULT" package="" name="SuperFieldB" source="true" simpleName="SuperFieldB">
     <methods name="superFieldBAccess" visibility="DEFAULT">
-      <returnType type="void"/>
+      <returnType type="void" genericFreeType="void"/>
     </methods>
     <fields name="integerfieldA" visibility="PROTECTED">
-      <type type="int"/>
+      <type type="int" genericFreeType="int"/>
     </fields>
-    <extends type="SuperFieldCall"/>
+    <extends type="SuperFieldCall" genericFreeType="SuperFieldCall"/>
   </types>
 </dependencymodel:DependencyModel>

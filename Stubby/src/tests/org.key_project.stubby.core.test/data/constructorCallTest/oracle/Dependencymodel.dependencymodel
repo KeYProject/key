@@ -5,30 +5,30 @@
   <types kind="INTERFACE" package="java.lang" name="java.lang.Cloneable" simpleName="Cloneable"/>
   <types kind="INTERFACE" package="java.lang" name="java.lang.Comparable" simpleName="Comparable">
     <typeVariables name="T">
-      <type type="java.lang.Object"/>
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
     </typeVariables>
   </types>
   <types package="java.util" name="java.util.Date" simpleName="Date">
     <methods name="Date" constructor="true">
-      <returnType type="void"/>
-      <parameterTypes type="java.lang.String"/>
+      <returnType type="void" genericFreeType="void"/>
+      <parameterTypes type="java.lang.String" genericFreeType="java.lang.String"/>
     </methods>
-    <implements type="java.io.Serializable"/>
-    <implements type="java.lang.Cloneable"/>
-    <implements type="java.lang.Comparable&lt;java.util.Date>"/>
-    <extends type="java.lang.Object"/>
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <implements type="java.lang.Cloneable" genericFreeType="java.lang.Cloneable"/>
+    <implements type="java.lang.Comparable&lt;java.util.Date>" genericFreeType="java.lang.Comparable"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
   <types package="" name="ConstructorCallTest" source="true" simpleName="ConstructorCallTest">
     <fields name="testDate" visibility="DEFAULT">
-      <type type="java.util.Date"/>
+      <type type="java.util.Date" genericFreeType="java.util.Date"/>
     </fields>
-    <extends type="java.lang.Object"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
   <types kind="INTERFACE" package="java.lang" name="java.lang.CharSequence" simpleName="CharSequence"/>
   <types final="true" package="java.lang" name="java.lang.String" simpleName="String">
-    <implements type="java.io.Serializable"/>
-    <implements type="java.lang.Comparable&lt;java.lang.String>"/>
-    <implements type="java.lang.CharSequence"/>
-    <extends type="java.lang.Object"/>
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <implements type="java.lang.Comparable&lt;java.lang.String>" genericFreeType="java.lang.Comparable"/>
+    <implements type="java.lang.CharSequence" genericFreeType="java.lang.CharSequence"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
 </dependencymodel:DependencyModel>

@@ -3,13 +3,13 @@
   <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
   <types package="" name="SameParamTest" source="true" simpleName="SameParamTest">
     <methods name="main" static="true">
-      <returnType type="void"/>
+      <returnType type="void" genericFreeType="void"/>
     </methods>
     <methods name="magic" static="true">
-      <returnType type="int"/>
-      <parameterTypes type="int"/>
-      <parameterTypes type="int"/>
+      <returnType type="int" genericFreeType="int"/>
+      <parameterTypes type="int" genericFreeType="int"/>
+      <parameterTypes type="int" genericFreeType="int"/>
     </methods>
-    <extends type="java.lang.Object"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
 </dependencymodel:DependencyModel>

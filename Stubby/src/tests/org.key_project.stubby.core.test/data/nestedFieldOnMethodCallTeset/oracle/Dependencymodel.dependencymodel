@@ -3,17 +3,17 @@
   <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
   <types package="" name="NestedFieldOnMethodCallTeset" source="true" simpleName="NestedFieldOnMethodCallTeset">
     <methods name="main">
-      <returnType type="int"/>
+      <returnType type="int" genericFreeType="int"/>
     </methods>
     <methods name="anotherNext">
-      <returnType type="NestedFieldOnMethodCallTeset"/>
+      <returnType type="NestedFieldOnMethodCallTeset" genericFreeType="NestedFieldOnMethodCallTeset"/>
     </methods>
     <methods name="next">
-      <returnType type="NestedFieldOnMethodCallTeset"/>
+      <returnType type="NestedFieldOnMethodCallTeset" genericFreeType="NestedFieldOnMethodCallTeset"/>
     </methods>
     <fields name="value" visibility="PRIVATE">
-      <type type="int"/>
+      <type type="int" genericFreeType="int"/>
     </fields>
-    <extends type="java.lang.Object"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
 </dependencymodel:DependencyModel>

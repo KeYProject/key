@@ -28,9 +28,9 @@ public abstract class AbstractSWTBotGenerateStubsTest extends TestCase {
     * @throws Exception Occurred Exception.
     */
    protected void doGenerationTest(String projectName,
-                                    String bundleId,
-                                    String pathToSourceFiles,
-                                    IGeneratorTestSteps steps) throws Exception {
+                                   String bundleId,
+                                   String pathToSourceFiles,
+                                   IGeneratorTestSteps steps) throws Exception {
       // Create java project and fill it with source and expected oracle files
       IJavaProject javaProject = TestUtilsUtil.createJavaProject(projectName);
       if (pathToSourceFiles != null) {

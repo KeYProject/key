@@ -3,6 +3,7 @@ package org.key_project.stubby.core.template;
 import java.util.List;
 
 import org.key_project.stubby.model.dependencymodel.Field;
+import org.key_project.stubby.model.dependencymodel.ITypeVariableContainer;
 import org.key_project.stubby.model.dependencymodel.Method;
 import org.key_project.stubby.model.dependencymodel.Type;
 import org.key_project.stubby.model.dependencymodel.TypeUsage;
@@ -19,6 +20,11 @@ public class TypeTemplate {
     * The new line separator.
     */
    protected static String nl;
+   
+   /**
+    * If {@code true} generated stubs are generic free, otherwise generics might be contained.
+    */
+   private final boolean genericFree;
 
    /**
     * Creates a new {@link TypeTemplate}.
@@ -27,9 +33,17 @@ public class TypeTemplate {
     */
    public static synchronized TypeTemplate create(String lineSeparator) {
       nl = lineSeparator;
-      TypeTemplate result = new TypeTemplate();
+      TypeTemplate result = new TypeTemplate(false);
       nl = null;
       return result;
+   }
+   
+   /**
+    * Constructor.
+    * @param genericFree If {@code true} generated stubs are generic free, otherwise generics might be contained.
+    */
+   public TypeTemplate(boolean genericFree) {
+      this.genericFree = genericFree;
    }
 
    /**
@@ -39,12 +53,11 @@ public class TypeTemplate {
 
    /**
     * Generates the Java file content.
-    * @param argument The argument.
+    * @param type The {@link Type} to generate stub file for.
     * @return The created Java file.
     */
-   public String generate(Object argument) {
+   public String generate(Type type) {
       final StringBuffer sb = new StringBuffer();
-      Type type = (Type) argument;
       if (type.getPackage() != null) {
          sb.append("package ");
          sb.append(type.getPackage());
@@ -80,22 +93,7 @@ public class TypeTemplate {
       sb.append(type.getKind().toJavaKindKeyword());
       sb.append(" ");
       sb.append(type.getSimpleName());
-      if (!type.getTypeVariables().isEmpty()) {
-         sb.append("<");
-         boolean afterFirst = false;
-         for (TypeVariable var : type.getTypeVariables()) {
-            if (afterFirst) {
-               sb.append(", ");
-            }
-            else {
-               afterFirst = true;
-            }
-            sb.append(var.getName());
-            sb.append(" extends ");
-            sb.append(var.getType().getType());
-         }
-         sb.append(">");
-      }
+      appendTypeVariables(type, sb);
       if (!type.getExtends().isEmpty()) {
          sb.append(" extends ");
          boolean afterFirst = false;
@@ -106,7 +104,7 @@ public class TypeTemplate {
             else {
                afterFirst = true;
             }
-            sb.append(extendType.getType());
+            appendTypeUsage(extendType, sb);
          }
       }
       if (!type.getImplements().isEmpty()) {
@@ -119,7 +117,7 @@ public class TypeTemplate {
             else {
                afterFirst = true;
             }
-            sb.append(implementsType.getType());
+            appendTypeUsage(implementsType, sb);
          }
       }
       sb.append(" {" + NL);
@@ -148,6 +146,44 @@ public class TypeTemplate {
    }
 
    /**
+    * Appends the {@link TypeVariable}s.
+    * @param container The {@link ITypeVariableContainer} which provides the {@link TypeVariable}s to append.
+    * @param sb The {@link StringBuffer} to write to.
+    */
+   protected void appendTypeVariables(ITypeVariableContainer container, StringBuffer sb) {
+      if (!genericFree && !container.getTypeVariables().isEmpty()) {
+         sb.append("<");
+         boolean afterFirst = false;
+         for (TypeVariable var : container.getTypeVariables()) {
+            if (afterFirst) {
+               sb.append(", ");
+            }
+            else {
+               afterFirst = true;
+            }
+            sb.append(var.getName());
+            sb.append(" extends ");
+            appendTypeUsage(var.getType(), sb);
+         }
+         sb.append(">");
+      }
+   }
+
+   /**
+    * Appends the {@link TypeUsage} to the given {@link StringBuffer}.
+    * @param typeUsage The {@link TypeUsage} to append.
+    * @param sb The {@link StringBuffer} to write to.
+    */
+   protected void appendTypeUsage(TypeUsage typeUsage, StringBuffer sb) {
+      if (genericFree) {
+         sb.append(typeUsage.getGenericFreeType());
+      }
+      else {
+         sb.append(typeUsage.getType());
+      }
+   }
+
+   /**
     * Appends the {@link Method}.
     * @param method The {@link Method} to append.
     * @param sb The {@link StringBuffer} to append to.
@@ -164,17 +200,19 @@ public class TypeTemplate {
       sb.append(INDENT + "  @ assignable \\everything;" + NL);
       sb.append(INDENT + "  @*/" + NL);
       sb.append(INDENT + method.getVisibility().toJavaKeyword() + " ");
-      if (method.isAbstract()) {
-         sb.append("abstract ");
-      }
       if (method.isStatic()) {
          sb.append("static ");
+      }
+      if (method.isAbstract()) {
+         sb.append("abstract ");
       }
       if (method.isFinal()) {
          sb.append("final ");
       }
+      appendTypeVariables(method, sb);
       if (!method.isConstructor()) {
-         sb.append(method.getReturnType().getType() + " ");
+         appendTypeUsage(method.getReturnType(), sb);
+         sb.append(" ");
       }
       sb.append(method.getName() + "(");
       int paramCount = 0;
@@ -186,7 +224,7 @@ public class TypeTemplate {
          else {
             afterFirst = true;
          }
-         sb.append(paramType.getType());
+         appendTypeUsage(paramType, sb);
          sb.append(" param");
          sb.append(paramCount++);
       }
@@ -201,7 +239,7 @@ public class TypeTemplate {
             else {
                afterFirst = true;
             }
-            sb.append(thrownType.getType());
+            appendTypeUsage(thrownType, sb);
          }
       }
       sb.append(";");
@@ -225,7 +263,9 @@ public class TypeTemplate {
       if (field.isFinal()) {
          sb.append( "final ");
       }
-      sb.append(field.getType().getType() + " " + field.getName());
+      appendTypeUsage(field.getType(), sb);
+      sb.append(" ");
+      sb.append(field.getName());
       if (!StringUtil.isTrimmedEmpty(field.getConstantValue())) {
          sb.append("= ");
          sb.append(field.getConstantValue());

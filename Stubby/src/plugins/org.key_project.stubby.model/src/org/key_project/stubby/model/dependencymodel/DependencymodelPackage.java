@@ -580,13 +580,22 @@ public interface DependencymodelPackage extends EPackage {
    int TYPE_USAGE__TYPE = 0;
 
    /**
+    * The feature id for the '<em><b>Generic Free Type</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int TYPE_USAGE__GENERIC_FREE_TYPE = 1;
+
+   /**
     * The number of structural features of the '<em>Type Usage</em>' class.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int TYPE_USAGE_FEATURE_COUNT = 1;
+   int TYPE_USAGE_FEATURE_COUNT = 2;
 
    /**
     * The number of operations of the '<em>Type Usage</em>' class.
@@ -1093,6 +1102,17 @@ public interface DependencymodelPackage extends EPackage {
    EAttribute getTypeUsage_Type();
 
    /**
+    * Returns the meta object for the attribute '{@link org.key_project.stubby.model.dependencymodel.TypeUsage#getGenericFreeType <em>Generic Free Type</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the attribute '<em>Generic Free Type</em>'.
+    * @see org.key_project.stubby.model.dependencymodel.TypeUsage#getGenericFreeType()
+    * @see #getTypeUsage()
+    * @generated
+    */
+   EAttribute getTypeUsage_GenericFreeType();
+
+   /**
     * Returns the meta object for enum '{@link org.key_project.stubby.model.dependencymodel.TypeKind <em>Type Kind</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -1502,6 +1522,14 @@ public interface DependencymodelPackage extends EPackage {
        * @generated
        */
       EAttribute TYPE_USAGE__TYPE = eINSTANCE.getTypeUsage_Type();
+
+      /**
+       * The meta object literal for the '<em><b>Generic Free Type</b></em>' attribute feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EAttribute TYPE_USAGE__GENERIC_FREE_TYPE = eINSTANCE.getTypeUsage_GenericFreeType();
 
       /**
        * The meta object literal for the '{@link org.key_project.stubby.model.dependencymodel.TypeKind <em>Type Kind</em>}' enum.

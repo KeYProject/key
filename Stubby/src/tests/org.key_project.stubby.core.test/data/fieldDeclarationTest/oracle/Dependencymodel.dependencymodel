@@ -3,43 +3,43 @@
   <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
   <types kind="INTERFACE" package="java.awt" name="java.awt.Transparency" simpleName="Transparency"/>
   <types kind="INTERFACE" package="java.awt" name="java.awt.Paint" simpleName="Paint">
-    <extends type="java.awt.Transparency"/>
+    <extends type="java.awt.Transparency" genericFreeType="java.awt.Transparency"/>
   </types>
   <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>
   <types package="java.awt" name="java.awt.Color" simpleName="Color">
     <fields name="BLACK" final="true" static="true">
-      <type type="java.awt.Color"/>
+      <type type="java.awt.Color" genericFreeType="java.awt.Color"/>
     </fields>
-    <implements type="java.awt.Paint"/>
-    <implements type="java.io.Serializable"/>
-    <extends type="java.lang.Object"/>
+    <implements type="java.awt.Paint" genericFreeType="java.awt.Paint"/>
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
   <types package="" name="FieldDeclarationTest" source="true" simpleName="FieldDeclarationTest">
     <fields name="x" visibility="PRIVATE">
-      <type type="int"/>
+      <type type="int" genericFreeType="int"/>
     </fields>
     <fields name="CONST" final="true" static="true" constantValue="42">
-      <type type="int"/>
+      <type type="int" genericFreeType="int"/>
     </fields>
     <fields name="color" visibility="PRIVATE" static="true">
-      <type type="java.awt.Color"/>
+      <type type="java.awt.Color" genericFreeType="java.awt.Color"/>
     </fields>
     <fields name="CONST_AGAIN" visibility="PRIVATE" final="true" static="true">
-      <type type="int"/>
+      <type type="int" genericFreeType="int"/>
     </fields>
-    <extends type="java.lang.Object"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
   <types package="java.lang" name="java.lang.Throwable" simpleName="Throwable">
-    <implements type="java.io.Serializable"/>
-    <extends type="java.lang.Object"/>
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
   <types package="java.lang" name="java.lang.Exception" simpleName="Exception">
-    <extends type="java.lang.Throwable"/>
+    <extends type="java.lang.Throwable" genericFreeType="java.lang.Throwable"/>
   </types>
   <types package="java.lang" name="java.lang.RuntimeException" simpleName="RuntimeException">
     <methods name="RuntimeException" constructor="true">
-      <returnType type="void"/>
+      <returnType type="void" genericFreeType="void"/>
     </methods>
-    <extends type="java.lang.Exception"/>
+    <extends type="java.lang.Exception" genericFreeType="java.lang.Exception"/>
   </types>
 </dependencymodel:DependencyModel>

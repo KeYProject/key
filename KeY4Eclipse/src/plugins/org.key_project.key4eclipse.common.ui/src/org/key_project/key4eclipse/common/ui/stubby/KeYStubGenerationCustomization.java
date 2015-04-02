@@ -119,14 +119,16 @@ public class KeYStubGenerationCustomization extends AbstractStubGenerationCustom
    protected void updateExplanation() {
       if (classPathButton.getSelection()) {
          explanationLabel.setText("Stub folder is part of KeY's class path.\n\n" + 
-                                  "No stubs will be generated for types contained in KeY's boot class path.");
+                                  "- No stubs will be generated for types contained in KeY's boot class path.\n" +
+                                  "- Stubs will not contain any generics.");
       }
       else if (bootClassPathButton.getSelection()) {
          explanationLabel.setText("Stub folder is the boot class path of KeY.\n\n" + 
-                                  "General Java types and methods required for verification with KeY are included.");
+                                  "- General Java types and methods required for verification with KeY are included.\n" +
+                                  "- Stubs will not contain any generics.");
       }
       else {
-         explanationLabel.setText("Stub folder is not used by KeY.\n\n ");
+         explanationLabel.setText("Stub folder is not used by KeY.\n\n\n ");
       }
    }
 

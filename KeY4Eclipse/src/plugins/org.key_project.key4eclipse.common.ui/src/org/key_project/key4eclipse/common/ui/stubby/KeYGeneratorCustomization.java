@@ -341,6 +341,7 @@ public class KeYGeneratorCustomization implements IGeneratorCustomization {
                while (parent != null && !(parent instanceof CompilationUnit)) {
                   sb.insert(0, ".");
                   sb.insert(0, node.getName());
+                  parent = parent.getParent();
                }
                if (parent instanceof CompilationUnit) {
                   PackageDeclaration pd = ((CompilationUnit) parent).getPackage();
@@ -393,6 +394,14 @@ public class KeYGeneratorCustomization implements IGeneratorCustomization {
       else {
          return null;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean canSupportGenerics(IJavaProject javaProject, DependencyModel dependencyModel) {
+      return !classPath && !bootClassPath;
    }
 
    /**

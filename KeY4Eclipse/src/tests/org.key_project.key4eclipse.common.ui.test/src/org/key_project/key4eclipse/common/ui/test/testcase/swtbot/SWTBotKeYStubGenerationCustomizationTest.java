@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
@@ -26,6 +27,7 @@ import org.key_project.stubby.core.test.testcase.StubGeneratorUtilTest;
 import org.key_project.stubby.core.util.StubGeneratorUtil;
 import org.key_project.stubby.ui.test.testcase.swtbot.AbstractSWTBotGenerateStubsTest;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -34,6 +36,98 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGenerateStubsTest {
+   /**
+    * Tests the removing of generics in the boot class path.
+    * @throws Exception Occurred Exception
+    */
+   @Test
+   public void testWithoutGenerics_BootClassPath() throws Exception {
+      doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testWithoutGenerics_BootClassPath", 
+                       Activator.PLUGIN_ID, 
+                       "data/stubbyGenericsExample/src", 
+                       new GenericsTestSteps(false, true));
+   }
+   
+   /**
+    * Tests the removing of generics in the class path.
+    * @throws Exception Occurred Exception
+    */
+   @Test
+   public void testWithoutGenerics_ClassPath() throws Exception {
+      doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testWithoutGenerics_ClassPath", 
+                       Activator.PLUGIN_ID, 
+                       "data/stubbyGenericsExample/src", 
+                       new GenericsTestSteps(true, false));
+   }
+   
+   /**
+    * Tests the including of generics.
+    * @throws Exception Occurred Exception
+    */
+   @Test
+   public void testWithGenerics() throws Exception {
+      doGenerationTest("SWTBotKeYStubGenerationCustomizationTest_testWithGenerics", 
+                       Activator.PLUGIN_ID, 
+                       "data/stubbyGenericsExample/src", 
+                       new GenericsTestSteps(false, false));
+   }
+   
+   /**
+    * Test steps to test that generics are included or removed.
+    * @author Martin Hentschel
+    */
+   private static class GenericsTestSteps extends PathGeneratorTestSteps {
+      /**
+       * Stubs are part of class path?
+       */
+      private final boolean classPath;
+
+      /**
+       * Stubs are part of boot class path?
+       */
+      private final boolean bootClassPath;
+      
+      /**
+       * Constructor.
+       */
+      public GenericsTestSteps(boolean classPath, boolean bootClassPath) {
+         super(false, classPath, false, bootClassPath);
+         this.classPath = classPath;
+         this.bootClassPath = bootClassPath;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void wizardFinished(SWTBotShell shell) {
+         if (classPath) {
+            SWTBotShell informationShell = shell.bot().shell("Information");
+            informationShell.close();
+         }
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void testResults(IJavaProject javaProject) throws Exception {
+         super.testResults(javaProject);
+         IFolder stubFolder = javaProject.getProject().getFolder(new Path(StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH));
+         IFile linkedListFile = stubFolder.getFile(new Path("java/util/LinkedList.java"));
+         assertTrue(linkedListFile.exists());
+         String content = ResourceUtil.readFrom(linkedListFile);
+         if (classPath || bootClassPath) {
+            assertFalse(content.contains("<"));
+            assertFalse(content.contains(">"));
+         }
+         else {
+            assertTrue(content.contains("<"));
+            assertTrue(content.contains(">"));
+         }
+      }
+   }
+   
    /**
     * Tests the preservation of the boot class path.
     * @throws Exception Occurred Exception

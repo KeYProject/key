@@ -5,14 +5,14 @@
   <types package="" name="SimpleGenericMethodArgument" source="true" simpleName="SimpleGenericMethodArgument">
     <methods name="magic" static="true">
       <typeVariables name="T">
-        <type type="java.io.Serializable"/>
+        <type type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
       </typeVariables>
       <typeVariables name="X">
-        <type type="java.lang.Object"/>
+        <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
       </typeVariables>
-      <returnType type="X"/>
-      <parameterTypes type="T"/>
+      <returnType type="X" genericFreeType="java.lang.Object"/>
+      <parameterTypes type="T" genericFreeType="java.io.Serializable"/>
     </methods>
-    <extends type="java.lang.Object"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
 </dependencymodel:DependencyModel>

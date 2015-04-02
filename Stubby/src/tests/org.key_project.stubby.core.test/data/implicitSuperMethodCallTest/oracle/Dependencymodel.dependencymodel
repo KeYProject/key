@@ -3,14 +3,14 @@
   <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
   <types package="" name="superMethodA" source="true" simpleName="superMethodA">
     <methods name="testMethodSuper">
-      <returnType type="void"/>
+      <returnType type="void" genericFreeType="void"/>
     </methods>
-    <extends type="java.lang.Object"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
   <types visibility="DEFAULT" package="" name="SuperMethodB" source="true" simpleName="SuperMethodB">
     <methods name="testMethod">
-      <returnType type="void"/>
+      <returnType type="void" genericFreeType="void"/>
     </methods>
-    <extends type="superMethodA"/>
+    <extends type="superMethodA" genericFreeType="superMethodA"/>
   </types>
 </dependencymodel:DependencyModel>

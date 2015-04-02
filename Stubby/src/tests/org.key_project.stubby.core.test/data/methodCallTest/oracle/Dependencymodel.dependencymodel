@@ -5,24 +5,24 @@
   <types kind="INTERFACE" package="java.lang" name="java.lang.Cloneable" simpleName="Cloneable"/>
   <types kind="INTERFACE" package="java.lang" name="java.lang.Comparable" simpleName="Comparable">
     <typeVariables name="T">
-      <type type="java.lang.Object"/>
+      <type type="java.lang.Object" genericFreeType="java.lang.Object"/>
     </typeVariables>
   </types>
   <types package="java.util" name="java.util.Date" simpleName="Date">
     <methods name="after">
-      <returnType type="boolean"/>
-      <parameterTypes type="java.util.Date"/>
+      <returnType type="boolean" genericFreeType="boolean"/>
+      <parameterTypes type="java.util.Date" genericFreeType="java.util.Date"/>
     </methods>
-    <implements type="java.io.Serializable"/>
-    <implements type="java.lang.Cloneable"/>
-    <implements type="java.lang.Comparable&lt;java.util.Date>"/>
-    <extends type="java.lang.Object"/>
+    <implements type="java.io.Serializable" genericFreeType="java.io.Serializable"/>
+    <implements type="java.lang.Cloneable" genericFreeType="java.lang.Cloneable"/>
+    <implements type="java.lang.Comparable&lt;java.util.Date>" genericFreeType="java.lang.Comparable"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
   <types package="" name="MethodCallTest" source="true" simpleName="MethodCallTest">
     <methods name="testmethod1">
-      <returnType type="void"/>
-      <parameterTypes type="java.util.Date"/>
+      <returnType type="void" genericFreeType="void"/>
+      <parameterTypes type="java.util.Date" genericFreeType="java.util.Date"/>
     </methods>
-    <extends type="java.lang.Object"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
 </dependencymodel:DependencyModel>

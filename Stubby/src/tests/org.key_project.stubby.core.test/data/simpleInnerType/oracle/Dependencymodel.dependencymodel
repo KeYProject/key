@@ -3,8 +3,8 @@
   <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
   <types package="" name="OuterClass" source="true" simpleName="OuterClass">
     <innerTypes package="" name="OuterClass.InnerClass" source="true" simpleName="InnerClass">
-      <extends type="java.lang.Object"/>
+      <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
     </innerTypes>
-    <extends type="java.lang.Object"/>
+    <extends type="java.lang.Object" genericFreeType="java.lang.Object"/>
   </types>
 </dependencymodel:DependencyModel>

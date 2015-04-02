@@ -1008,6 +1008,7 @@ public class StubGeneratorUtilTest extends TestCase {
     */
    protected void assertTypeUsage(TypeUsage expected,
                                   TypeUsage current) {
+      assertEquals(expected.getGenericFreeType(), current.getGenericFreeType());
       assertEquals(expected.getType(), current.getType());
    }
 
