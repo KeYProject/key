@@ -225,7 +225,7 @@ public class SemisequentTacletAppIndex {
         this.antec = antec;
         this.ruleFilter = ruleFilter;
         this.indexCaches = indexCaches;
-        addTermIndices ( ( antec ? s.antecedent () : s.succedent () ).toList (),
+        addTermIndices ( ( antec ? s.antecedent () : s.succedent () ).asList (),
                          s, services, tacletIndex, listener );
     }
 

@@ -39,10 +39,13 @@ public class Semisequent implements Iterable<SequentFormula> {
     }
 
 
-    /** creates a new Semisequent with the Semisequent elements in
-     * seqList
+    /** 
+     * creates a new Semisequent with the Semisequent elements in
+     * seqList; the provided list must be redundance free, i.e.,
+     * the created sequent must be exactly the same as when creating the sequent
+     * by subsequently inserting all formulas
      */ 
-    private Semisequent(ImmutableList<SequentFormula> seqList) {
+    Semisequent(ImmutableList<SequentFormula> seqList) {
         assert !seqList.isEmpty();
         this.seqList = seqList;
     }
@@ -315,19 +318,11 @@ public class Semisequent implements Iterable<SequentFormula> {
     /** 
      * creates a semisequent out of the semisequent change info (semiCI)
      * object and hands it over to semiCI 
+     * @deprecated Use {@link de.uka.ilkd.key.logic.SemisequentChangeInfo#complete(de.uka.ilkd.key.logic.Semisequent)} instead
      */
-    protected SemisequentChangeInfo complete(SemisequentChangeInfo semiCI)
+    private SemisequentChangeInfo complete(SemisequentChangeInfo semiCI)
     {
-        
-      final ImmutableList<SequentFormula> formulaList = semiCI.getFormulaList();
-      if (formulaList.isEmpty()) {
-          semiCI.setSemisequent(EMPTY_SEMISEQUENT);
-      } else {
-          final Semisequent result = formulaList == seqList ? 
-                  this : new Semisequent(formulaList);
-          semiCI.setSemisequent(result);
-      }
-      return semiCI;
+        return semiCI;
     }
 
       
@@ -442,7 +437,7 @@ public class Semisequent implements Iterable<SequentFormula> {
 	return seqList.iterator();
     }
 
-    public ImmutableList<SequentFormula> toList () {
+    public ImmutableList<SequentFormula> asList () {
 	return seqList;
     }
 
@@ -492,7 +487,7 @@ public class Semisequent implements Iterable<SequentFormula> {
 	  final SemisequentChangeInfo sci = new SemisequentChangeInfo
 	  (ImmutableSLList.<SequentFormula>nil().prepend(sequentFormula));
 	  sci.addedFormula(0, sequentFormula);
-	  return complete(sci);
+	  return sci;
 	}
 
 	/** inserts the element at the end of the semisequent
@@ -537,7 +532,7 @@ public class Semisequent implements Iterable<SequentFormula> {
 	 * semisequent as result
 	 */
 	public SemisequentChangeInfo remove(int idx) {
-	  return complete(new SemisequentChangeInfo(ImmutableSLList.<SequentFormula>nil()));
+	  return new SemisequentChangeInfo(ImmutableSLList.<SequentFormula>nil());
 	}
 
 	/** returns index of a {@link SequentFormula} 

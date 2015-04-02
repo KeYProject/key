@@ -156,7 +156,7 @@ public class ProofSaver {
               strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
                                      StrategyProperties.INF_FLOW_CHECK_TRUE);
               strategySettings.setActiveStrategyProperties(strategyProperties);
-              for (SequentFormula s: proof.root().sequent().succedent().toList()) {
+              for (SequentFormula s: proof.root().sequent().succedent().asList()) {
                   ((InfFlowProof)proof).addLabeledTotalTerm(s.formula());
               }
           } else {
