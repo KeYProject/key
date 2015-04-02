@@ -100,23 +100,30 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      */
     public static ImmutableList<RuleAppContainer> createAppContainers(ImmutableList<? extends RuleApp> rules, 
             PosInOccurrence pos, Goal goal, Strategy strategy) {
-
-        ImmutableList<NoPosTacletApp> tacletApplications = ImmutableSLList.<NoPosTacletApp>nil();
-        ImmutableList<IBuiltInRuleApp> builtInRuleApplications = ImmutableSLList.<IBuiltInRuleApp>nil();
-
-        for (RuleApp rule : rules) {
-            if (rule instanceof NoPosTacletApp) {
-                tacletApplications = tacletApplications.prepend((NoPosTacletApp) rule);
-            } else {
-                builtInRuleApplications = builtInRuleApplications.prepend((IBuiltInRuleApp) rule);
-            }
-        }
-
         ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
-        if (!builtInRuleApplications.isEmpty()) {
-            result = result.append(BuiltInRuleAppContainer.createInitialAppContainers(builtInRuleApplications, pos, goal, strategy));
-        }        
-        return result.prepend(TacletAppContainer.createInitialAppContainers(tacletApplications, pos, goal, strategy));
+
+        if (rules.size() == 1) {
+            result = result.prepend( createAppContainer(rules.head(), pos, goal, strategy));
+        } else if (rules.size() > 1) {
+            ImmutableList<NoPosTacletApp> tacletApplications = ImmutableSLList.<NoPosTacletApp>nil();
+            ImmutableList<IBuiltInRuleApp> builtInRuleApplications = ImmutableSLList.<IBuiltInRuleApp>nil();
+
+            for (RuleApp rule : rules) {
+                if (rule instanceof NoPosTacletApp) {
+                    tacletApplications = tacletApplications.prepend((NoPosTacletApp) rule);
+                } else {
+                    builtInRuleApplications = builtInRuleApplications.prepend((IBuiltInRuleApp) rule);
+                }
+            }
+
+            if ( !builtInRuleApplications.isEmpty() ) {
+                result = result.append( BuiltInRuleAppContainer.createInitialAppContainers
+                        ( builtInRuleApplications, pos, goal, strategy ) );
+            }        
+            result = result.prepend( TacletAppContainer.createInitialAppContainers
+                    ( tacletApplications, pos, goal, strategy ) );
+        }
+        return result;
     }
 
 }
