@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.rule.match.legacy;
 
-import java.util.HashMap;
-
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -18,6 +16,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
@@ -38,6 +37,50 @@ import de.uka.ilkd.key.util.Debug;
 
 public abstract class ElementMatcher<T extends Operator> {
 
+    @SuppressWarnings("unchecked")
+    static <T extends Operator> ElementMatcher<? super T> getElementMatcherFor(T o) {
+        if (o instanceof SchemaVariable) {
+            if (o instanceof TermSV) {
+                return (ElementMatcher<? super T>) termSVMatcher;
+            } else if (o instanceof FormulaSV) {
+                return (ElementMatcher<? super T>) formulaSVMatcher;
+            } else if (o instanceof ProgramSV) {
+                return (ElementMatcher<? super T>) programSVMatcher;
+            } else if (o instanceof UpdateSV) {
+                return (ElementMatcher<? super T>) updateSVMatcher;
+            } else if (o instanceof ModalOperatorSV) {
+                return (ElementMatcher<? super T>) modalSVMatcher;
+            } else if (o instanceof VariableSV) {
+                return (ElementMatcher<? super T>) variableSVMatcher;
+            } else if (o instanceof SkolemTermSV) {
+                return (ElementMatcher<? super T>) skolemSVMatcher;
+            } else if (o instanceof TermLabelSV) {
+                return (ElementMatcher<? super T>) termLabelSVMatcher;
+            }            
+        } else if (o instanceof ElementaryUpdate) {
+            return (ElementMatcher<? super T>) elUpMatcher;
+        } else if (o instanceof SortDependingFunction) {
+            return (ElementMatcher<? super T>) sortDependingFctMatcher;
+        } else if (o instanceof LogicVariable) {
+            return (ElementMatcher<? super T>) logicVarMatcher;
+        }
+        return IDENTITY_MATCHER;
+    }
+
+    private final static IdentityOperatorMatcher IDENTITY_MATCHER = new IdentityOperatorMatcher();
+    private final static ElementaryUpdateMatcher elUpMatcher = new ElementaryUpdateMatcher();
+    private final static SortDependingFunctionMatcher sortDependingFctMatcher = new SortDependingFunctionMatcher();
+    private final static LogicVariableMatcher logicVarMatcher = new LogicVariableMatcher();    
+    private final static TermSVMatcher termSVMatcher = new TermSVMatcher();
+    private final static FormulaSVMatcher formulaSVMatcher = new FormulaSVMatcher();
+    private final static ProgramSVMatcher programSVMatcher = new ProgramSVMatcher();
+    private final static ModalOperatorSVMatcher modalSVMatcher = new ModalOperatorSVMatcher();
+    private final static UpdateSVMatcher updateSVMatcher = new UpdateSVMatcher();
+    private final static SkolemTermSVMatcher skolemSVMatcher = new SkolemTermSVMatcher();
+    private final static TermLabelSVMatcher termLabelSVMatcher = new TermLabelSVMatcher();
+    private final static VariableSVMatcher variableSVMatcher = new VariableSVMatcher();
+    
+    
     private static abstract class AbstractSVMatcher<S extends AbstractSV> extends ElementMatcher<S> {
 
         /**
@@ -83,7 +126,6 @@ public abstract class ElementMatcher<T extends Operator> {
             Debug.out("FAILED. Illegal Instantiation.", op, pe);
             return null;
         }
-
 
         /**
          * Tries to add the pair <tt>(op,term)</tt> to the match conditions. If
@@ -456,33 +498,6 @@ public abstract class ElementMatcher<T extends Operator> {
 
     }
 
-    public static <T extends Operator> ElementMatcher<? super T> getElementMatcherFor(T o) {
-        @SuppressWarnings("unchecked")
-        ElementMatcher<? super T> matcher = (ElementMatcher<? super T>) matchers.get(o.getClass());
-        if (matcher == null) {
-            matcher = IDENTITY_MATCHER;
-        }
-        return matcher;
-    }
-    private static HashMap<Class<?>, ElementMatcher<?>> matchers = new HashMap<>();
-
-
-    private static IdentityOperatorMatcher IDENTITY_MATCHER = new IdentityOperatorMatcher();
-
-
-    static {
-        matchers.put(ElementaryUpdate.class, new ElementaryUpdateMatcher());
-        matchers.put(FormulaSV.class, new FormulaSVMatcher());
-        matchers.put(LogicVariable.class, new LogicVariableMatcher());
-        matchers.put(ModalOperatorSV.class, new ModalOperatorSVMatcher());
-        matchers.put(ProgramSV.class, new ProgramSVMatcher());
-        matchers.put(SkolemTermSV.class, new SkolemTermSVMatcher());
-        matchers.put(SortDependingFunction.class, new SortDependingFunctionMatcher());
-        matchers.put(TermLabelSV.class, new TermLabelSVMatcher());
-        matchers.put(TermSV.class, new TermSVMatcher());
-        matchers.put(UpdateSV.class, new UpdateSVMatcher());
-        matchers.put(VariableSV.class, new VariableSVMatcher());
-    }
 
     public abstract MatchConditions match(T op, SVSubstitute subst, MatchConditions mc, Services services);
 
