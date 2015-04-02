@@ -3,6 +3,7 @@ package org.key_project.key4eclipse.common.ui.stubby;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,9 +11,12 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -77,6 +81,31 @@ public class KeYGeneratorCustomization implements IGeneratorCustomization {
    public KeYGeneratorCustomization(boolean classPath, boolean bootClassPath) {
       this.classPath = classPath;
       this.bootClassPath = bootClassPath;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public List<? extends IJavaElement> defineSources(IJavaProject javaProject) throws CoreException {
+      if (classPath || bootClassPath) {
+         IResource sourceResource = KeYResourceProperties.getSourceClassPathResource(javaProject.getProject());
+         if (sourceResource != null && sourceResource.exists()) {
+            IJavaElement javaElement = JavaCore.create(sourceResource);
+            if (javaElement != null) {
+               return Collections.singletonList(javaElement);
+            }
+            else {
+               return null;
+            }
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
+      }
    }
 
    /**

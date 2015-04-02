@@ -1,7 +1,10 @@
 package org.key_project.stubby.core.customization;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.key_project.stubby.core.jdt.DependencyAnalyzer;
 import org.key_project.stubby.core.util.StubGeneratorUtil;
@@ -14,6 +17,15 @@ import org.key_project.stubby.model.dependencymodel.Type;
  * @author Martin Hentschel
  */
 public interface IGeneratorCustomization {
+   /**
+    * Is called by {@link StubGeneratorUtil#createDependencyModel(IJavaProject, org.eclipse.core.runtime.IProgressMonitor, IGeneratorCustomization...)}
+    * to optionally define the {@link IJavaElement}s of interest.
+    * @param javaProject The {@link IJavaProject} to generate stubs for.
+    * @return The {@link IJavaElement}s of interest or {@code null} to consider all.
+    * @throws CoreException Occurred Exception.
+    */
+   public List<? extends IJavaElement> defineSources(IJavaProject javaProject) throws CoreException;
+   
    /**
     * Is called by {@link StubGeneratorUtil#createDependencyModel(IJavaProject, org.eclipse.core.runtime.IProgressMonitor, IGeneratorCustomization...)}
     * before the {@link DependencyModel} is created to add additional content to the {@link DependencyAnalyzer}.

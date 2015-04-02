@@ -1062,15 +1062,15 @@ public class JDTUtil {
    }
    
    /**
-    * Lists all {@link ICompilationUnit}s recursively within given {@link IPackageFragmentRoot}s
-    * @param sourceFolders The {@link IPackageFragmentRoot}s to list its contained {@link ICompilationUnit}s.
+    * Lists all {@link ICompilationUnit}s recursively within given {@link IJavaElement}s
+    * @param javaElements The {@link IJavaElement}s to list its contained {@link ICompilationUnit}s.
     * @return The recursively found {@link ICompilationUnit}s.
     * @throws JavaModelException Occurred Exception.
     */
-   public static List<ICompilationUnit> listCompilationUnit(List<IPackageFragmentRoot> sourceFolders) throws JavaModelException{
+   public static List<ICompilationUnit> listCompilationUnit(List<? extends IJavaElement> javaElements) throws JavaModelException{
       List<ICompilationUnit> result = new LinkedList<ICompilationUnit>();
-      if (sourceFolders != null) {
-         for (IPackageFragmentRoot root : sourceFolders) {
+      if (javaElements != null) {
+         for (IJavaElement root : javaElements) {
             findCompilationUnitsRecursively(root, result);
          }
       }

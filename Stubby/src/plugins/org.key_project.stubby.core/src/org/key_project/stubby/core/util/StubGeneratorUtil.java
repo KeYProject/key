@@ -29,8 +29,8 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.key_project.stubby.core.Activator;
 import org.key_project.stubby.core.customization.IGeneratorCustomization;
@@ -139,9 +139,18 @@ public final class StubGeneratorUtil {
             monitor = new NullProgressMonitor();
          }
          if (project != null) {
+            // Check if specific IJavaElements are given.
+            List<? extends IJavaElement> sourceFolders = null;
+            int i = 0;
+            while (sourceFolders == null && i < customizations.length) {
+               sourceFolders = customizations[i].defineSources(project);
+               i++;
+            }
+            if (sourceFolders == null) {
+               sourceFolders = JDTUtil.getSourceFolders(project);
+            }
             // Find compilation units in source folders
             monitor.beginTask("Listing source files", IProgressMonitor.UNKNOWN);
-            List<IPackageFragmentRoot> sourceFolders = JDTUtil.getSourceFolders(project);
             List<ICompilationUnit> compilationUnits = JDTUtil.listCompilationUnit(sourceFolders);
             monitor.done();
             // Analyze dependencies of found source files
