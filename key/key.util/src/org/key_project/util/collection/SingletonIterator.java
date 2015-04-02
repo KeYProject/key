@@ -18,6 +18,9 @@ public class SingletonIterator<T> implements Iterator<T> {
     }
     
     @Override
+    public void remove() {}
+    
+    @Override
     public boolean hasNext() {
         return element != null;
     }
