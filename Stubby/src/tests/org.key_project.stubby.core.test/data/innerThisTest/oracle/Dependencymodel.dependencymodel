@@ -80,4 +80,8 @@
   <types package="java.awt" name="java.awt.HeadlessException" simpleName="HeadlessException">
     <extends type="java.lang.UnsupportedOperationException"/>
   </types>
+  <types kind="INTERFACE" package="java.lang.annotation" name="java.lang.annotation.Annotation" simpleName="Annotation"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Override" simpleName="Override">
+    <extends type="java.lang.annotation.Annotation"/>
+  </types>
 </dependencymodel:DependencyModel>

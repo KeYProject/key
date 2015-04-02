@@ -77,6 +77,13 @@ public class StubGeneratorUtilTest extends TestCase {
    }
 
    @Test
+   public void testExtractReferences_javaLangUser() throws Exception{
+      doDependencyModelTest("JDTUtilTest_testExtractReferences_javaLangUser", 
+                            "data/javaLangUser/test",
+                            "data/javaLangUser/oracle/Dependencymodel.dependencymodel");
+   }
+
+   @Test
    public void testExtractReferences_typeSetByDeclaringMethod() throws Exception{
       doDependencyModelTest("JDTUtilTest_testExtractReferences_typeSetByDeclaringMethod", 
                             "data/typeSetByDeclaringMethod/test",
@@ -434,6 +441,13 @@ public class StubGeneratorUtilTest extends TestCase {
       doTestStubs("StubGeneratorUtil_testStubs_genericsTest",
                   "data/genericsTest/test",
                   "data/genericsTest/oracleStubs");
+   }
+   
+   @Test
+   public void testStubs_javaLangUser() throws Exception {
+      doTestStubs("StubGeneratorUtil_testStubs_javaLangUser",
+                  "data/javaLangUser/test",
+                  "data/javaLangUser/oracleStubs");
    }
    
    @Test

@@ -45,4 +45,21 @@
     </methods>
     <extends type="java.lang.Object"/>
   </types>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Comparable" simpleName="Comparable">
+    <typeVariables name="T">
+      <type type="java.lang.Object"/>
+    </typeVariables>
+  </types>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.CharSequence" simpleName="CharSequence"/>
+  <types final="true" package="java.lang" name="java.lang.String" simpleName="String">
+    <implements type="java.io.Serializable"/>
+    <implements type="java.lang.Comparable&lt;java.lang.String>"/>
+    <implements type="java.lang.CharSequence"/>
+    <extends type="java.lang.Object"/>
+  </types>
+  <types final="true" package="java.lang" name="java.lang.Boolean" simpleName="Boolean">
+    <implements type="java.io.Serializable"/>
+    <implements type="java.lang.Comparable&lt;java.lang.Boolean>"/>
+    <extends type="java.lang.Object"/>
+  </types>
 </dependencymodel:DependencyModel>

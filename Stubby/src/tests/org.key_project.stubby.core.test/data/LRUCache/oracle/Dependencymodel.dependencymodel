@@ -75,9 +75,16 @@
       <returnType type="boolean"/>
       <parameterTypes type="java.util.Map.Entry&lt;K,V>"/>
     </methods>
+    <fields name="serialVersionUID" visibility="PRIVATE" final="true" static="true" constantValue="4962274836567079680">
+      <type type="long"/>
+    </fields>
     <fields name="maxEntries" visibility="PRIVATE" final="true">
       <type type="int"/>
     </fields>
     <extends type="java.util.LinkedHashMap&lt;K,V>"/>
+  </types>
+  <types kind="INTERFACE" package="java.lang.annotation" name="java.lang.annotation.Annotation" simpleName="Annotation"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.Override" simpleName="Override">
+    <extends type="java.lang.annotation.Annotation"/>
   </types>
 </dependencymodel:DependencyModel>

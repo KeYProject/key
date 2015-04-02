@@ -15,6 +15,18 @@
     <extends type="java.lang.Object"/>
   </types>
   <types package="" name="FieldDeclarationTest" source="true" simpleName="FieldDeclarationTest">
+    <fields name="x" visibility="PRIVATE">
+      <type type="int"/>
+    </fields>
+    <fields name="CONST" final="true" static="true" constantValue="42">
+      <type type="int"/>
+    </fields>
+    <fields name="color" visibility="PRIVATE" static="true">
+      <type type="java.awt.Color"/>
+    </fields>
+    <fields name="CONST_AGAIN" visibility="PRIVATE" final="true" static="true">
+      <type type="int"/>
+    </fields>
     <extends type="java.lang.Object"/>
   </types>
   <types package="java.lang" name="java.lang.Throwable" simpleName="Throwable">

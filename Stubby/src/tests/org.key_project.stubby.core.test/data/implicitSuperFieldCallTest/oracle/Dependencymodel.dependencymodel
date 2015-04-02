@@ -2,6 +2,9 @@
 <dependencymodel:DependencyModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:dependencymodel="http://key-project.org/dependencymodel">
   <types package="java.lang" name="java.lang.Object" simpleName="Object"/>
   <types package="" name="SuperFieldA" source="true" simpleName="SuperFieldA">
+    <fields name="integerfieldA" visibility="DEFAULT">
+      <type type="int"/>
+    </fields>
     <extends type="java.lang.Object"/>
   </types>
   <types visibility="DEFAULT" package="" name="SuperFieldB" source="true" simpleName="SuperFieldB">

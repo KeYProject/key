@@ -5,6 +5,9 @@
     <methods name="callStringField">
       <returnType type="void"/>
     </methods>
+    <fields name="intField" visibility="DEFAULT">
+      <type type="int"/>
+    </fields>
     <extends type="java.lang.Object"/>
   </types>
 </dependencymodel:DependencyModel>

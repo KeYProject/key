@@ -29,6 +29,9 @@
       <returnType type="void"/>
       <throws type="S"/>
     </methods>
+    <fields name="cloneable" visibility="PRIVATE">
+      <type type="T"/>
+    </fields>
     <extends type="java.lang.Object"/>
   </types>
   <types kind="INTERFACE" package="java.io" name="java.io.Serializable" simpleName="Serializable"/>

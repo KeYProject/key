@@ -42,4 +42,8 @@
     <implements type="ImmutableHeap&lt;T>"/>
     <extends type="java.lang.Object"/>
   </types>
+  <types kind="INTERFACE" package="java.lang.annotation" name="java.lang.annotation.Annotation" simpleName="Annotation"/>
+  <types kind="INTERFACE" package="java.lang" name="java.lang.SuppressWarnings" simpleName="SuppressWarnings">
+    <extends type="java.lang.annotation.Annotation"/>
+  </types>
 </dependencymodel:DependencyModel>

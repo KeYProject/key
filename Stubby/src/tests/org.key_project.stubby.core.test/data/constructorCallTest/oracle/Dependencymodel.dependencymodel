@@ -19,6 +19,9 @@
     <extends type="java.lang.Object"/>
   </types>
   <types package="" name="ConstructorCallTest" source="true" simpleName="ConstructorCallTest">
+    <fields name="testDate" visibility="DEFAULT">
+      <type type="java.util.Date"/>
+    </fields>
     <extends type="java.lang.Object"/>
   </types>
   <types kind="INTERFACE" package="java.lang" name="java.lang.CharSequence" simpleName="CharSequence"/>

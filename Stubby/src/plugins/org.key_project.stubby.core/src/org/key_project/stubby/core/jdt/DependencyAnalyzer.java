@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.QualifiedName;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
@@ -46,13 +47,20 @@ public class DependencyAnalyzer extends ASTVisitor {
     */
    private final List<Type> outerTypes = new LinkedList<Type>();
 
-   // TODO: Do we need SimpleName to support used classes in java.lang?
-   
    /**
     * {@inheritDoc}
     */
    @Override
    public boolean visit(QualifiedName node) {
+      ensureMembersExist(node.resolveBinding());
+      return true;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean visit(SimpleName node) {
       ensureMembersExist(node.resolveBinding());
       return true;
    }
