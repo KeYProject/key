@@ -1,9 +1,12 @@
-JML Editing
-===========
+		*******************************
+		*         JML Editing         *
+		*******************************
+
 This folder contains all content of the Java Editor extension to support JML.
 
-For more details about this project feel free to contact the following persons:
-- Martin Hentschel (hentschel@cs.tu-darmstadt.de)
+Fore more details about this project visit 
+http://www.key-project.org/eclipse/JMLEditing
+or contact Martin Hentschel (hentschel@cs.tu-darmstadt.de).
 
 
 (1) Project Description
@@ -11,8 +14,8 @@ For more details about this project feel free to contact the following persons:
 The aim of this project is to extend the Java Editor to support editing of JML.
 
 
-(2) File Structure
-------------------
+(2) Repository File Structure
+-----------------------------
 It provides the following file structure:
 - src: Contains the whole source code
   - features: Contains the eclipse features
@@ -21,38 +24,29 @@ It provides the following file structure:
 - Readme.txt: This file
 
 
-(3) Provided Eclipse features and plug-ins
-------------------------------------------
-- org.key_project.jmlediting.feature
-  - org.key_project.javaeditor // General functionality to extend the Java Editor at runtime
-  - org.key_project.jmlediting.core // JML support
-  - org.key_project.jmlediting.ui // UI Integration of JML support
-  - org.key_project.jmlediting.product.ui // Minimal Eclipse product
-
-
-(4) Setup development IDE
+(3) Setup Development IDE
 -------------------------
-1. Download Eclipse 4.4 Luna as bundle 
-   "Eclipse Modeling Tools" from
-   https://eclipse.org/downloads/packages/eclipse-modeling-tools/lunar
-2. Install find bugs
-   => Help -> Eclipse Marketplace...
-   => Type in Field "Find:" the value "findbugs" and press enter.
-   => Install "FindBugs Eclipse Plugin" with all features.
-3. Install SWTBot
-   => Help -> Eclipse Marketplace...
-   => Type in Field "Find:" the value "swtbot" and press enter.
-   => Install "SWTBot" with all features.
-4. Install SWTBot IDE
-   => Help -> Install New Software...
-   => Select "--All Available Sites--" in field "Work with:"
-   => Select "SWTBot IDE Support (incubation)/SWTBot IDE Features (incubation)" 
-      (Version 2.0.4...)
-   => Install it by finishing the wizard 
-   
-   
-(5) Start the product from development IDE
-------------------------------------------
-1. Open file org.key_project.jmlediting.product.ui/JMLEditing.product
-2. Click on "Launch an Eclipse application" in tab "Overview" of the
-   opened "Product Configuration Editor"
+Follow the steps in the sub sections precisely. Notice that you have to use
+the mentioned Eclipse version!
+
+
+(3.1) Setup required KeY-Based Eclipse Projects
+-----------------------------------------------
+1. KeY4Eclipse - Follow the instructions of Section (3) in 
+   '../KeY4Eclipse/Readme.txt' carefully
+
+
+(3.2) Import Eclipse Projects from GIT Repository
+-------------------------------------------------
+1. Select main menu item 'File, Import...'
+2. Select 'General, Existing Projects into Workspace' and press 'Next >'
+3. Set root directory to '<root>/GIT/KeY/JMLEditing/src'
+4. Ensure that 'Copy projects into workspace' is NOT selected.
+5. Finish the wizard
+
+
+(4) Start JML Editing as Eclipse Product
+----------------------------------------
+1. Open 'org.key_project.jmlediting.product.ui/JMLEditing.product'
+2. Click on 'Launch an Eclipse application'
+   (From now on the created launch configuration can be used)
