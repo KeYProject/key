@@ -2388,30 +2388,28 @@ public final class JMLTranslator {
 
             Term[] args;
             if (list == null) {
-                // empty parameter list
-                args = new Term[0];
+                list = ImmutableSLList.<SLExpression>nil();
+            }
+
+            Term heap = tb.getBaseHeap();
+
+            // special casing "implicit heap" arguments:
+            // omitting one argument means first argument is "heap"
+            int i = 0;
+            if (function.arity() == list.size() + 1
+                    && function.argSort(0) == heap.sort()) {
+                args = new Term[list.size() + 1];
+                args[i++] = heap;
             } else {
+                args = new Term[list.size()];
+            }
 
-                Term heap = tb.getBaseHeap();
-
-                        // special casing "implicit heap" arguments:
-                // omitting one argument means first argument is "heap"
-                int i = 0;
-                if (function.arity() == list.size() + 1
-                        && function.argSort(0) == heap.sort()) {
-                    args = new Term[list.size() + 1];
-                    args[i++] = heap;
-                } else {
-                    args = new Term[list.size()];
+            for (SLExpression expr : list) {
+                if (!expr.isTerm()) {
+                    throw new SLTranslationException("Expecting a term here, not: "
+                            + expr);
                 }
-
-                for (SLExpression expr : list) {
-                    if (!expr.isTerm()) {
-                        throw new SLTranslationException("Expecting a term here, not: "
-                                + expr);
-                    }
-                    args[i++] = expr.getTerm();
-                }
+                args[i++] = expr.getTerm();
             }
 
             try {
