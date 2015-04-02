@@ -510,4 +510,23 @@ public final class WorkbenchUtil {
          }
       });
    }
+
+   /**
+    * Gets the current active {@link IProject} for a given {@link IEditorPart}
+    *
+    * @param editorPart
+    *           The {@link IEditorPart} for which the {@link IProject} is
+    *           requested.
+    * @return IProject The {@link IProject} for the given {@link IEditorPart}
+    */
+   public static IProject getProject(final IEditorPart editorPart) {
+      if (editorPart == null) {
+         return null;
+      }
+      final IResource resource = (IResource) editorPart.getEditorInput().getAdapter(IResource.class);
+      if (resource != null) {
+         return resource.getProject();
+      }
+      return null;
+   }
 }
