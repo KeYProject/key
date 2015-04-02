@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -106,9 +107,17 @@ public class KeYStubGenerationCustomization extends AbstractStubGenerationCustom
          bootClassPathButton.setSelection(false);
       }
       else {
-         doNotUseButton.setSelection(true);
-         classPathButton.setSelection(false);         
-         bootClassPathButton.setSelection(false);
+         if (hasDefaultBootClassPath() &&
+             getProject().findMember(new Path(stubFolderPath)) == null) {
+            doNotUseButton.setSelection(false);
+            classPathButton.setSelection(false);         
+            bootClassPathButton.setSelection(true);
+         }
+         else {
+            doNotUseButton.setSelection(true);
+            classPathButton.setSelection(false);         
+            bootClassPathButton.setSelection(false);
+         }
       }
       updateExplanation();
    }
@@ -144,6 +153,20 @@ public class KeYStubGenerationCustomization extends AbstractStubGenerationCustom
          return KeYResourceProperties.searchClassPathEntry(entries, 
                                                            KeYClassPathEntryKind.WORKSPACE, 
                                                            fullPath) != null;
+      }
+      catch (CoreException e) {
+         LogUtil.getLogger().logError(e);
+         return false;
+      }
+   }
+   
+   /**
+    * Checks if the default boot class path option is used.
+    * @return {@code true} default boot class path, {@code false} other boot class path.
+    */
+   protected boolean hasDefaultBootClassPath() {
+      try {
+         return UseBootClassPathKind.KEY_DEFAULT.equals(KeYResourceProperties.getUseBootClassPathKind(getProject()));
       }
       catch (CoreException e) {
          LogUtil.getLogger().logError(e);

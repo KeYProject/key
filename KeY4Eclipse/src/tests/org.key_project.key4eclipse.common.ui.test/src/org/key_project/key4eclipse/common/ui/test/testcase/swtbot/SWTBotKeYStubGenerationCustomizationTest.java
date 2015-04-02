@@ -8,6 +8,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
@@ -441,6 +442,11 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
        * Should be after generation part of the boot class path?
        */
       private final boolean afterBootClassPath;
+      
+      /**
+       * The full path to the stub folder.
+       */
+      private String stubFolderfullPath;
 
       /**
        * Constructor
@@ -465,14 +471,14 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
       @Override
       public void initProject(IJavaProject javaProject) throws Exception {
          IProject project = javaProject.getProject();
-         String fullPath = KeYStubGenerationCustomization.computeFullPath(project, StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH);
+         stubFolderfullPath = KeYStubGenerationCustomization.computeFullPath(project, StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH);
          if (beforeClassPath) {
             List<KeYClassPathEntry> entries = KeYResourceProperties.getClassPathEntries(project);
-            entries.add(new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, fullPath));
+            entries.add(new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, stubFolderfullPath));
             KeYResourceProperties.setClassPathEntries(project, entries);
          }
          if (beforeBootClassPath) {
-            KeYResourceProperties.setBootClassPath(project, UseBootClassPathKind.WORKSPACE, fullPath);
+            KeYResourceProperties.setBootClassPath(project, UseBootClassPathKind.WORKSPACE, stubFolderfullPath);
          }
       }
 
@@ -496,9 +502,16 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
             assertFalse(bootClassPath.isSelected());
          }
          else {
-            assertTrue(notUsed.isSelected());
-            assertFalse(classPath.isSelected());            
-            assertFalse(bootClassPath.isSelected());
+            if (ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(stubFolderfullPath)) == null) {
+               assertFalse(notUsed.isSelected());
+               assertFalse(classPath.isSelected());
+               assertTrue(bootClassPath.isSelected());
+            }
+            else {
+               assertTrue(notUsed.isSelected());
+               assertFalse(classPath.isSelected());            
+               assertFalse(bootClassPath.isSelected());
+            }
          }
          // Set values to test
          if (afterBootClassPath) {
