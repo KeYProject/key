@@ -1289,7 +1289,8 @@ postfixexpr returns [SLExpression result=null] throws SLTranslationException
 	    }
 	    result = expr; //.getTerm();
 	}
-
+  |
+    expr=jmlprimary { result = expr; }
 ;
 
 primaryexpr returns [SLExpression result=null] throws SLTranslationException
@@ -1304,7 +1305,7 @@ primaryexpr returns [SLExpression result=null] throws SLTranslationException
     |   TRUE         { result = new SLExpression(tb.tt()); }
     |   FALSE        { result = new SLExpression(tb.ff()); }
     |   NULL         { result = new SLExpression(tb.NULL()); }
-    |   result=jmlprimary
+    // has been moved // |   result=jmlprimary
     |   THIS
         {
             if(selfVar == null) {
@@ -1611,7 +1612,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	        selfVar, resultVar, paramVars, atPres == null ? null : atPres.get(getBaseHeap()));
 	}
 
-    |   escape:DL_ESCAPE LPAREN ( list=expressionlist )? RPAREN
+    |   escape:DL_ESCAPE ( LPAREN ( list=expressionlist )? RPAREN )?
         {
             result = translator.translate("\\dl_", SLExpression.class, escape, list, services);
         }

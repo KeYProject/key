@@ -1405,6 +1405,10 @@ public final class JMLTranslator {
                 Token escape = (Token) params[0];
                 ImmutableList<SLExpression> list =
                         (ImmutableList<SLExpression>) params[1];
+                if(list == null) {
+                    // it may be that there were no arguments and the list is null
+                    list = ImmutableSLList.<SLExpression>nil();
+                }
                 Services services = (Services) params[2];
 
                 // strip leading "\dl_"
