@@ -105,7 +105,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
                             matchCond = matchCond.addRenaming(templateQVar, qVar);
                         }
                     }
-                    matchCond = templateQVar.match(qVar, matchCond, services);               
+                    matchCond = ElementMatcher.getElementMatcherFor(templateQVar).match(templateQVar, qVar, matchCond, services);               
                 }
             } else {
                 matchCond = null;
@@ -183,7 +183,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
                 if (l instanceof SchemaVariable) {
                     final SchemaVariable schemaLabel = (SchemaVariable) l;
                     final MatchConditions cond =
-                            schemaLabel.match(term, matchCond, services);
+                            ElementMatcher.getElementMatcherFor(schemaLabel).match(schemaLabel, term, matchCond, services);
                     if (cond == null) {
                         return null;
                     }
@@ -192,11 +192,12 @@ public final class LegacyTacletMatcher implements TacletMatcher {
             }
         }
 
-        if (templateOp instanceof SchemaVariable && templateOp.arity() == 0) {
-            return templateOp.match(term, matchCond, services);
+        if (templateOp instanceof SchemaVariable && templateOp.arity() == 0) {            
+            matchCond = ElementMatcher.getElementMatcherFor(templateOp).match(templateOp, term, matchCond, services);
+            return matchCond;
         }
 
-        matchCond = templateOp.match (sourceOp, matchCond, services);
+        matchCond = ElementMatcher.getElementMatcherFor(templateOp).match (templateOp, sourceOp, matchCond, services);
         if(matchCond != null) {
             //match java blocks:
             matchCond = matchJavaBlock(term, template, matchCond, services);
@@ -402,7 +403,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
                 term = resultUpdateMatch.first;
                 matchCond = resultUpdateMatch.second;
             }
-            matchCond = checkConditions(match(term, findExp, matchCond, services), services); 
+            matchCond = checkConditions(match(term, findExp, matchCond, services), services);
         } else {
             matchCond = null;
         }
@@ -420,9 +421,9 @@ public final class LegacyTacletMatcher implements TacletMatcher {
         MatchConditions cond = matchCond;
 
         if (sv.arity() == 0) {
-            cond = sv.match(term, cond, services);
+            cond = ElementMatcher.getElementMatcherFor(sv).match(sv, term, cond, services);
         } else {
-            cond = sv.match(term.op(), cond, services);
+            cond = ElementMatcher.getElementMatcherFor(sv).match(sv, term.op(), cond, services);
         }
 
         if (cond != null) {
@@ -439,7 +440,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
     @Override
     public MatchConditions matchSV(SchemaVariable sv, ProgramElement pe,
             MatchConditions matchCond, Services services) {        
-        matchCond = sv.match(pe, matchCond, services);
+        matchCond = ElementMatcher.getElementMatcherFor(sv).match(sv, pe, matchCond, services);
         
         if (matchCond != null) {
             matchCond = checkConditions(matchCond, services);

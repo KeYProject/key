@@ -23,11 +23,9 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
@@ -122,11 +120,6 @@ public abstract class SuperTermGenerator implements TermGenerator {
                 	       && term.sub(1).sort().extendsTrans(numbers.getNumberSymbol ().sort ());
                     }
 
-                    public MatchConditions match(SVSubstitute subst, 
-                	    			 MatchConditions mc, 
-                	    			 Services services) {
-                	return subst == this ? mc : null;
-                    }    
                 };
                 
 //                binFunc = new Function
