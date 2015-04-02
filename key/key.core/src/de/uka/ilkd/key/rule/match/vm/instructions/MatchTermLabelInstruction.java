@@ -29,24 +29,16 @@ public class MatchTermLabelInstruction implements IMatchInstruction {
         final TermLabelInstantiationEntry inst =
                 (TermLabelInstantiationEntry) svInsts.getInstantiation(sv);
         
-        final MatchConditions result;
         if (inst == null) {
-            result = matchCond.setInstantiations(svInsts.add(sv, instantiationCandidate.getLabels(), services));
+            return matchCond.setInstantiations(svInsts.add(sv, instantiationCandidate.getLabels(), services));
         } else {
-            boolean matched = false;
             for (Object o: (ImmutableArray<?>)inst.getInstantiation()) {
-                matched = instantiationCandidate.containsLabel((TermLabel)o);
-                if (!matched) {
+                if (!instantiationCandidate.containsLabel((TermLabel)o)) {
                     return null;
                 }
             }
-            if (matched) {
-                result = matchCond;
-            } else {
-                result = null;
-            }
+            return matchCond;
         }
-        return result;
     }
 
     /**
