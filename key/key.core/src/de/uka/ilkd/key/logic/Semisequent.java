@@ -40,7 +40,8 @@ public class Semisequent implements Iterable<SequentFormula> {
 
 
     /** creates a new Semisequent with the Semisequent elements in
-     * seqList */ 
+     * seqList
+     */ 
     private Semisequent(ImmutableList<SequentFormula> seqList) {
         assert !seqList.isEmpty();
         this.seqList = seqList;
@@ -393,12 +394,14 @@ public class Semisequent implements Iterable<SequentFormula> {
      */
     public int indexOf(SequentFormula sequentFormula) {
         ImmutableList<SequentFormula> searchList = seqList;  
+        int index = 0;
         while (!searchList.isEmpty())
         { 
             if (searchList.head() == sequentFormula) {
-                return seqList.size() - searchList.size();
-            }
+                return index;
+            }            
             searchList = searchList.tail();
+            index++;
         } 
         return -1;
     }

@@ -61,7 +61,7 @@ public class SumFeature implements Feature {
                             "Cannot compute the sum of zero features" );
 
        if (fs.length == 1) {
-            return fs[0];
+           return fs[0];
        }
        LinkedHashSet<Feature> featureSet = new LinkedHashSet<>();
        flatten(fs, featureSet);

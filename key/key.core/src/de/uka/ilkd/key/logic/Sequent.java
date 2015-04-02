@@ -141,7 +141,7 @@ public class Sequent implements Iterable<SequentFormula> {
 	final SemisequentChangeInfo semiCI = seq.insert(seq.indexOf(p.constrainedFormula()),cf);
 	
 	return SequentChangeInfo.createSequentChangeInfo
-	    (p.isInAntec(), semiCI, composeSequent(p, semiCI.semisequent()), this);
+	    (p.isInAntec(), semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
     }
 
     /** 
@@ -162,13 +162,12 @@ public class Sequent implements Iterable<SequentFormula> {
     public SequentChangeInfo addFormula(ImmutableList<SequentFormula> insertions,
 					boolean antec, boolean first) {
 
-	final Semisequent seq = antec ? antecedent : succedent;
-	
-	final SemisequentChangeInfo semiCI = first ? seq.insertFirst(insertions) :
-	    seq.insertLast(insertions);	
+        final Semisequent seq = antec ? antecedent : succedent;
 
-	return SequentChangeInfo.createSequentChangeInfo
-	    (antec, semiCI, composeSequent(antec, semiCI.semisequent()), this);	
+        final SemisequentChangeInfo semiCI = first ? seq.insertFirst(insertions) : seq.insertLast(insertions);
+
+        return SequentChangeInfo.createSequentChangeInfo
+                (antec, semiCI, composeSequent(antec, semiCI.semisequent()), this);
     }
 
     /** adds the formulas of list insertions to the sequent starting at
@@ -188,7 +187,7 @@ public class Sequent implements Iterable<SequentFormula> {
 	    seq.insert(seq.indexOf(p.constrainedFormula()), insertions);
 
 	return SequentChangeInfo.createSequentChangeInfo
-	    (p.isInAntec(), semiCI, composeSequent(p, semiCI.semisequent()), this);
+	    (p.isInAntec(), semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
     }
 
     /** returns semisequent of the antecedent to work with */
@@ -211,7 +210,7 @@ public class Sequent implements Iterable<SequentFormula> {
             getSemisequent(p).replace(p, newCF);
 
 	return SequentChangeInfo.createSequentChangeInfo
-	    (p.isInAntec(), semiCI, composeSequent(p, semiCI.semisequent()), this);
+	    (p.isInAntec(), semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
     }
 
     /** 
@@ -235,43 +234,41 @@ public class Sequent implements Iterable<SequentFormula> {
 
 	final SequentChangeInfo sci = 
             SequentChangeInfo.createSequentChangeInfo
-            (p.isInAntec(), semiCI, composeSequent(p, semiCI.semisequent()), this);
+            (p.isInAntec(), semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
 
 	return sci;
     }
 
-    /** returns creates a new sequent out of the current sequent with a
-     * replaced antecedent if antec is true, otherwise the succedent is
-     * replaced by the given semisequent seq. 
+    /** 
+     * replaces the antecedent ({@code antec} is true) of this sequent by the given {@link Semisequent} 
+     * similar for the succedent if {@code antec} is false.
+     * @param antec if the antecedent or succedent shall be replaced 
+     * @param semiSeq the {@link Semisequent} to use
+     * @return the resulting sequent 
      */
-    private Sequent composeSequent(boolean antec, Semisequent seq) {
-	if (seq.isEmpty()) {
-	    if (!antec && antecedent().isEmpty()) {
-	        return EMPTY_SEQUENT;
-            } else if (antec && succedent().isEmpty()){
+    private Sequent composeSequent(boolean antec, Semisequent semiSeq) {
+        if (semiSeq.isEmpty()) {
+            if (!antec && antecedent.isEmpty()) {
+                return EMPTY_SEQUENT;
+            } else if (antec && succedent.isEmpty()){
                 return EMPTY_SEQUENT;
             }
         }
-        return new Sequent(antec ? seq : antecedent(), 
-			   antec ? succedent() : seq);
+
+        if ((antec && semiSeq == antecedent) || (!antec && semiSeq == succedent)) {  
+            return this;
+        }	
+
+        return new Sequent(antec ? semiSeq : antecedent, antec ? succedent : semiSeq);
     }
 
-    /** returns new Sequent with replaced antecedent if
-     * PosInOccurrence describes a SequentFormula in the antecedent, 
-     * the succedent is replaced otherwise. 
-     * The new semisequent is seq.
-     */
-    private Sequent composeSequent(PosInOccurrence p, Semisequent seq) {
-	return composeSequent(p.isInAntec(), seq);
-    }
-    
     /**
      * determines if the sequent is empty.
      * @return true iff the sequent consists of two instances of
      * Semisequent.EMPTY_SEMISEQUENT
      */
     public boolean isEmpty() {
-	return antecedent().isEmpty() && succedent().isEmpty();
+        return antecedent.isEmpty() && succedent.isEmpty();
     }
 
 
@@ -279,8 +276,8 @@ public class Sequent implements Iterable<SequentFormula> {
  	if ( ! ( o instanceof Sequent ) ) 
 	    return false;
 	final Sequent o1 = (Sequent) o;
-	return antecedent.equals(o1.antecedent())
-	    && succedent.equals(o1.succedent());
+	return antecedent.equals(o1.antecedent)
+	    && succedent.equals(o1.succedent);
     }
 
     public int formulaNumberInSequent(boolean inAntec,
@@ -345,7 +342,7 @@ public class Sequent implements Iterable<SequentFormula> {
 	    seq.remove(seq.indexOf(p.constrainedFormula()));
 
 	final SequentChangeInfo sci = SequentChangeInfo.createSequentChangeInfo
-	    (p.isInAntec(), semiCI, composeSequent(p, semiCI.semisequent()), this);
+	    (p.isInAntec(), semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
 
 	return sci;
     }

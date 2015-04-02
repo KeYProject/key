@@ -231,8 +231,8 @@ public class SemisequentChangeInfo {
      * returns the semisequent that is the result of the change
      * operation
      */
-    public Semisequent semisequent() {
-	return semisequent;
+    public Semisequent semisequent() {        
+        return semisequent;
     }
 
 
