@@ -104,7 +104,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
          thread.start();
       }
       // Wait for threads
-      waitForThreads(threads, 60 * 1000);
+      waitForThreads(threads, 20 * 1000);
       // Check result
       for (SiteProofThread<?> thread : threads) {
          // Make sure that no exception is thrown.
