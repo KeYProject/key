@@ -16,6 +16,8 @@ package de.uka.ilkd.key.strategy;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -247,6 +249,25 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     static RuleAppContainer createAppContainers
         ( NoPosTacletApp p_app, Goal p_goal, Strategy  p_strategy ) {
 	return createAppContainers ( p_app, null, p_goal, p_strategy );
+    }
+    
+    protected static ImmutableList<RuleAppContainer> createInitialAppContainers(ImmutableList<NoPosTacletApp> p_app, 
+            PosInOccurrence p_pio, Goal p_goal, Strategy p_strategy) {
+        
+        List<RuleAppCost> costs = new LinkedList<>();
+        
+        for (TacletApp app : p_app) {
+            costs.add(p_strategy.computeCost ( app, p_pio, p_goal ));
+        }
+        
+        ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
+        for (RuleAppCost cost : costs) {
+            final TacletAppContainer container = 
+                    createContainer ( p_app.head(), p_pio, p_goal, cost, true );
+            if (container != null) { result = result.prepend(container); }
+            p_app = p_app.tail();
+        }
+        return result;    
     }
 
     /**

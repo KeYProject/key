@@ -128,6 +128,26 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         return container;
     }    
     
+    /**
+     * Create container for RuleApp.
+     * @return container for the currently applicable BuiltInRuleApp,
+     * the cost may be an instance of <code>TopRuleAppCost</code>.
+     */
+    static ImmutableList<RuleAppContainer> createInitialAppContainers( 
+                            ImmutableList<IBuiltInRuleApp> birs,
+                            PosInOccurrence pio,
+                            Goal goal,
+                            Strategy strategy ) {
+        ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
+        
+        for (IBuiltInRuleApp bir : birs) {
+            result = result.prepend(createAppContainer(bir, pio, goal, strategy));
+        }
+        
+        return result;
+    }    
+    
+    
 
     @Override
     public ImmutableList<RuleAppContainer> createFurtherApps(
