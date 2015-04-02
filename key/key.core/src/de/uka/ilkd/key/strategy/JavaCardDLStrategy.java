@@ -513,7 +513,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         }
 
         if (classAxiomApplicationEnabled()) {
-            bindRuleSet ( d, "classAxiom", add ( longConst(-250) ) );
+            bindRuleSet ( d, "classAxiom", longConst(-250) );
         } else {
             bindRuleSet(d, "classAxiom", inftyConst());
         }
@@ -852,8 +852,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		ifZero ( MatchedIfFeature.INSTANCE,
                 DiffFindAndIfFeature.INSTANCE ) );
 
-	bindRuleSet ( d, "stringsExpandDefNormalOp", 
-        	SumFeature.createSum ( new Feature[] { longConst(500) } ));
+	bindRuleSet ( d, "stringsExpandDefNormalOp", longConst(500) );
 	
 	bindRuleSet ( d, "stringsContainsDefInline", 
         	SumFeature.createSum ( new Feature[] {
