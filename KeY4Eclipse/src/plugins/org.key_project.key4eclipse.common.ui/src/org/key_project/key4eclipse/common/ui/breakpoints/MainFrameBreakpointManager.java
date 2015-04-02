@@ -115,9 +115,9 @@ public final class MainFrameBreakpointManager {
        */
       protected BreakpointEnabledMainWindowAction(MainWindow mainWindow) {
          super(mainWindow);
-         setName("Skip Breakpoints");
-         setTooltip("Skip all Breakpoints.");
-         setIcon(new ImageIcon(KeYImages.getURL(KeYImages.SUSPEND_AT_BREAKPOINTS)));
+         setName("Stop at Breakpoints");
+         setTooltip("Stop when a breakpoint is hit.");
+         setIcon(new ImageIcon(KeYImages.getURL(KeYImages.STOP_AT_BREAKPOINTS)));
          setSelected(Boolean.FALSE);
       }
 

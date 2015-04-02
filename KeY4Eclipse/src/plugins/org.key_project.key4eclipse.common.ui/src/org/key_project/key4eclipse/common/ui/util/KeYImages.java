@@ -63,7 +63,7 @@ public final class KeYImages {
     /**
      * The key for suspend at breakpoints icon.
      */
-    public static final String SUSPEND_AT_BREAKPOINTS = "org.key_project.key4eclipse.common.ui.suspendAtbreakpoints";
+    public static final String STOP_AT_BREAKPOINTS = "org.key_project.key4eclipse.common.ui.suspendAtbreakpoints";
     
     /**
      * Forbid instances.
@@ -184,8 +184,8 @@ public final class KeYImages {
        else if (NEW_KEY_JAVA_PROJECT_WIZARD.equals(key)) {
           path = "icons/new_key_java_wizard.png";
        }
-       else if (SUSPEND_AT_BREAKPOINTS.equals(key)) {
-          path = "icons/suspendAtBreakpoints.gif";
+       else if (STOP_AT_BREAKPOINTS.equals(key)) {
+          path = "icons/stopAtBreakpoints.gif";
        }
        return path;
     }
@@ -206,7 +206,7 @@ public final class KeYImages {
                registry.remove(INTERACTIVE_WIZARD);
                registry.remove(NEW_KEY_JAVA_PROJECT_WIZARD);
                registry.remove(STARTER_WIZARD);
-               registry.remove(SUSPEND_AT_BREAKPOINTS);
+               registry.remove(STOP_AT_BREAKPOINTS);
                registry.remove(TEST_GENERATION);
             }
          });
