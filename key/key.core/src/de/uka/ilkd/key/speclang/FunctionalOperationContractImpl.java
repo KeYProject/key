@@ -524,9 +524,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         Term result = null;
         for(LocationVariable heap : heapContext) {
             final Term p = getFreePre(heap, selfVar, paramVars, atPreVars, services);
-            if(result == null) {
+            if (result == null) {
                 result = p;
-            }else{
+            } else if (p != null) {
                 result = TB.and(result, p);
             }
         }

@@ -734,7 +734,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                            tb.var(excVar),
                                            atPres,
                                            services);
-        final Term originalFreePost = contract.getFreePost(heapContext,
+        Term originalFreePost = contract.getFreePost(heapContext,
                                                            heapTerms,
                                                            contractSelf,
                                                            contractParams,
@@ -742,6 +742,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                            tb.var(excVar),
                                                            atPres,
                                                            services);
+        originalFreePost = originalFreePost != null ? originalFreePost : tb.tt();
         final Term post = globalDefs==null? originalPost: tb.apply(globalDefs, originalPost);
         final Term freeSpecPost = globalDefs==null? originalFreePost: tb.apply(globalDefs, originalFreePost);
         final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
