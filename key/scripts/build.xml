@@ -12,6 +12,10 @@
 		<isset property="taclet.match"/>
 	</condition>
 
+		<condition property="tacletindex.threading.enabled" value="${tacletindex.threading.enabled}" else="false">
+		<isset property="tacletindex.threading.enabled"/>
+	</condition>
+
 	 <!-- The following tasks are for KeY -->
 	<target name="start" depends="compileAll" description="Starts KeY.">
 		<ant antfile="${key.dir}/key.ui/build.xml" target="start" dir="${key.dir}/key.ui" inheritall="false"/>
