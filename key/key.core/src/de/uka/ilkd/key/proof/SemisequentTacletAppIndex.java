@@ -214,13 +214,13 @@ public class SemisequentTacletAppIndex {
      * @param antec iff true create an index for the antecedent of
      * <code>s</code>, otherwise for the succedent
      */
-    public SemisequentTacletAppIndex ( Sequent         s,
-                                       boolean         antec,
-                                       Services        services,
-                                       TacletIndex     tacletIndex,
-                                       NewRuleListener listener,
-                                       RuleFilter      ruleFilter,
-                                       TermTacletAppIndexCacheSet indexCaches) {
+    SemisequentTacletAppIndex ( Sequent         s,
+                                boolean         antec,
+                                Services        services,
+                                TacletIndex     tacletIndex,
+                                NewRuleListener listener,
+                                RuleFilter      ruleFilter,
+                                TermTacletAppIndexCacheSet indexCaches) {
         this.seq = s;
         this.antec = antec;
         this.ruleFilter = ruleFilter;
@@ -329,7 +329,7 @@ public class SemisequentTacletAppIndex {
         }
     }
     
-    public void setIndexCache(TermTacletAppIndexCacheSet indexCaches) {
+    void setIndexCache(TermTacletAppIndexCacheSet indexCaches) {
         this.indexCaches = indexCaches;
     }
 }

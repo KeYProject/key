@@ -199,8 +199,7 @@ public class TermTacletAppIndex {
                                             RuleFilter      filter,
                                             TermTacletAppIndexCacheSet indexCaches) {
         Debug.assertTrue ( pos.isTopLevel (),
-                           "Someone tried to create a term index for a real " +
-                           "subterm" );
+                           "Someone tried to create a term index for a real subterm" );
 
         final ITermTacletAppIndexCache indexCache =
             determineIndexCache ( pos, indexCaches );
