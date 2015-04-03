@@ -523,11 +523,11 @@ public class TermTacletAppIndex {
      * @param pos Pointer to the term/formula where a change occurred
      * @return the updated index object
      */
-    public TermTacletAppIndex update ( PosInOccurrence pos,
-                                       Services        services,
-                                       TacletIndex     tacletIndex,
-                                       NewRuleListener listener,	
-                                       TermTacletAppIndexCacheSet indexCaches ) {       
+    TermTacletAppIndex update ( PosInOccurrence pos,
+                                Services        services,
+                                TacletIndex     tacletIndex,
+                                NewRuleListener listener,	
+                                TermTacletAppIndexCacheSet indexCaches ) {       
         
         final ITermTacletAppIndexCache indexCache =
             determineIndexCache ( pos, indexCaches );
@@ -624,8 +624,8 @@ public class TermTacletAppIndex {
      *            The listener to which the taclet apps found are supposed to be
      *            reported
      */
-    public void reportTacletApps ( PosInOccurrence pos,
-                                   NewRuleListener listener ) {
+    void reportTacletApps ( PosInOccurrence pos,
+                            NewRuleListener listener ) {
         final ImmutableList<Pair<ImmutableList<NoPosTacletApp>, PosInOccurrence>> result = 
                 ImmutableSLList.<Pair<ImmutableList<NoPosTacletApp>, PosInOccurrence>>nil();
         for (Pair<ImmutableList<NoPosTacletApp>, PosInOccurrence> pair : collectAllTacletAppsHereAndBelow( pos, result )) {

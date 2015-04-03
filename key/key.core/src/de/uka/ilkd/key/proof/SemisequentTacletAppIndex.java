@@ -314,7 +314,7 @@ public class SemisequentTacletAppIndex {
      * Calls ruleAdded on the given NewRuleListener for
      * every cached taclet app.
      */
-    public void reportRuleApps ( NewRuleListener l ) {
+    void reportRuleApps ( NewRuleListener l ) {
         final Iterator<ImmutableMapEntry<SequentFormula,TermTacletAppIndex>> it =
             termIndices.entryIterator();
         
