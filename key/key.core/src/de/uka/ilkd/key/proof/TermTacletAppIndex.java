@@ -14,6 +14,8 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -31,6 +33,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Class whose objects represent an index of taclet apps for one particular
@@ -642,14 +645,35 @@ public class TermTacletAppIndex {
      */
     public void reportTacletApps ( PosInOccurrence pos,
                                    NewRuleListener listener ) {
-        fireRulesAdded ( listener, localTacletApps, pos );
+        final List<Pair<ImmutableList<NoPosTacletApp>, PosInOccurrence>> result = new LinkedList<Pair<ImmutableList<NoPosTacletApp>, PosInOccurrence>>();
+        for (Pair<ImmutableList<NoPosTacletApp>, PosInOccurrence> pair : collectAllTacletAppsHereAndBelow( pos, result )) {
+            fireRulesAdded ( listener, pair.first, pair.second );
+        }
+    }
         
+    /**
+     * Collect all <code>NoPosTacletApp</code> s that are stored by
+     * <code>this</code> (and by the sub-indices of <code>this</code>).
+     * 
+     * @param pos
+     *            The position of this index
+     * @param resultList
+     *            The {@link List} where to add the found taclet applications (attention teh content of this list will be changed)
+     * @return 
+     * @return the same list object given as second argument
+     */
+    private List<Pair<ImmutableList<NoPosTacletApp>,PosInOccurrence>> collectAllTacletAppsHereAndBelow ( PosInOccurrence pos,
+            List<Pair<ImmutableList<NoPosTacletApp>, PosInOccurrence>> resultList ) {
+    
+        resultList.add(new Pair<>(localTacletApps,pos));
+
         int subterm = 0;
         for (final TermTacletAppIndex appIndex : subtermIndices) {
-            appIndex.reportTacletApps ( pos.down ( subterm ),
-                                          listener );
+            appIndex.collectAllTacletAppsHereAndBelow ( pos.down ( subterm ), resultList );
             ++subterm;
         }
+        
+        return resultList;
     }
 
     /**
@@ -660,26 +684,47 @@ public class TermTacletAppIndex {
      */
     private void reportTacletApps ( PIOPathIterator pathToModification,
                                     NewRuleListener listener ) {
-        final PosInOccurrence pos = pathToModification.getPosInOccurrence ();
-        if ( !pathToModification.hasNext () ) {
-            reportTacletApps ( pos, listener );
-            return;
+        List<Pair<ImmutableList<NoPosTacletApp>, PosInOccurrence>> result =
+                new LinkedList<Pair<ImmutableList<NoPosTacletApp>, PosInOccurrence>>();        
+        for (Pair<ImmutableList<NoPosTacletApp>, PosInOccurrence> pair : collectAllTacletAppsAffectedByModification ( pathToModification, result ) ) {
+            fireRulesAdded ( listener, pair.first, pair.second );
+        }
+    }
+    
+    /**
+     * Collects all taclet apps that are affected by a modification of the term
+     * under consideration at place <code>pathToModification</code>. These are
+     * the taclet above and below the place of modification, and the taclets
+     * whose update context has changed.
+     * @return 
+     */
+    private  List<Pair<ImmutableList<NoPosTacletApp>,PosInOccurrence>> collectAllTacletAppsAffectedByModification 
+            ( PIOPathIterator pathToModification, List<Pair<ImmutableList<NoPosTacletApp>, PosInOccurrence>> result ) {
+        
+        TermTacletAppIndex index = this;        
+        PosInOccurrence pos = pathToModification.getPosInOccurrence ();
+        
+        while ( pathToModification.hasNext () ) {
+            result.add(new Pair<>(index.localTacletApps, pos));
+
+            final Term subTerm = pos.subTerm ();
+            final int nextSubtermIndex = pathToModification.getChild ();
+
+            if ( subTerm.op () instanceof UpdateApplication ) {
+                final int targetPos = UpdateApplication.targetPos ();
+                if ( nextSubtermIndex != targetPos )
+                    index.getSubIndex ( targetPos )
+                    .collectAllTacletAppsHereAndBelow ( pos.down ( targetPos ), result );
+            }
+
+            index = index.getSubIndex ( nextSubtermIndex );
+            pathToModification.next ();
+            pos = pathToModification.getPosInOccurrence ();
         }
         
-        fireRulesAdded ( listener, localTacletApps, pos );
-        final Term subTerm = pos.subTerm ();
-        final int nextSubtermIndex = pathToModification.getChild ();
+        index.collectAllTacletAppsHereAndBelow ( pos, result );
         
-        if ( subTerm.op () instanceof UpdateApplication ) {
-            final int targetPos = UpdateApplication.targetPos ();
-            if ( nextSubtermIndex != targetPos )
-                getSubIndex ( targetPos )
-                    .reportTacletApps ( pos.down ( targetPos ), listener );
-        }
-        
-        pathToModification.next ();
-        getSubIndex ( nextSubtermIndex )
-            .reportTacletApps ( pathToModification, listener );
+        return result;
     }
     
     private static void fireRulesAdded(NewRuleListener listener,
