@@ -458,11 +458,11 @@ public abstract class TacletIndex  {
     }
 
    /** get all Taclets for the antecedent.
- * @param pos the PosOfOccurrence describing the formula for which to look 
-* for top level taclets    
- * @param filter Only return taclets the filter selects
- * @param services the Services object encapsulating information
-* about the java datastructures like (static)types etc.
+    * @param pos the PosOfOccurrence describing the formula for which to look 
+    * for top level taclets    
+    * @param filter Only return taclets the filter selects
+    * @param services the Services object encapsulating information
+    * about the java datastructures like (static)types etc.
     * @return IList<NoPosTacletApp> containing all applicable rules
     * and the corresponding instantiations to get the rule fit.
     */

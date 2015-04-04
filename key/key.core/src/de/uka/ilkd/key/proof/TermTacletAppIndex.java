@@ -638,23 +638,23 @@ public class TermTacletAppIndex {
      * 
      * @param pos
      *            The position of this index
-     * @param resultList
-     *            The {@link List} where to add the found taclet applications (attention teh content of this list will be changed)
-     * @return 
-     * @return the same list object given as second argument
+     * @param collectedApps
+     *            the {@link List} to which to add the found taclet applications
+     * @return the resulting list of taclet applications from this and all subterm taclet indices
      */
-    private ImmutableList<Pair<ImmutableList<NoPosTacletApp>,PosInOccurrence>> collectAllTacletAppsHereAndBelow ( PosInOccurrence pos,
-            ImmutableList<Pair<ImmutableList<NoPosTacletApp>, PosInOccurrence>> resultList ) {
+    private ImmutableList<Pair<ImmutableList<NoPosTacletApp>,PosInOccurrence>> collectAllTacletAppsHereAndBelow 
+        ( PosInOccurrence pos,
+                ImmutableList<Pair<ImmutableList<NoPosTacletApp>, PosInOccurrence>> collectedApps ) {
     
-        resultList = resultList.prepend(new Pair<>(localTacletApps,pos));
+        collectedApps = collectedApps.prepend(new Pair<>(localTacletApps,pos));
 
         int subterm = 0;
         for (final TermTacletAppIndex appIndex : subtermIndices) {
-            resultList = appIndex.collectAllTacletAppsHereAndBelow ( pos.down ( subterm ), resultList );
+            collectedApps = appIndex.collectAllTacletAppsHereAndBelow ( pos.down ( subterm ), collectedApps );
             ++subterm;
         }
         
-        return resultList;
+        return collectedApps;
     }
 
     /**
@@ -677,7 +677,7 @@ public class TermTacletAppIndex {
      * under consideration at place <code>pathToModification</code>. These are
      * the taclet above and below the place of modification, and the taclets
      * whose update context has changed.
-     * @return 
+     * @return all affected taclet apps grouped by the corresponding {@link PosInOccurrence}
      */
     private  ImmutableList<Pair<ImmutableList<NoPosTacletApp>,PosInOccurrence>> collectAllTacletAppsAffectedByModification 
             ( PIOPathIterator pathToModification, ImmutableList<Pair<ImmutableList<NoPosTacletApp>, PosInOccurrence>> result ) {
