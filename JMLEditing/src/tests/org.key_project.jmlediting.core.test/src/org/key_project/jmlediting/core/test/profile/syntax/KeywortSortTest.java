@@ -7,6 +7,10 @@ import org.junit.Test;
 import org.key_project.jmlediting.core.profile.syntax.AbstractKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.MalformedKeywortSortException;
+import org.key_project.jmlediting.core.test.utilities.sort.NotAccessableInstanceSort;
+import org.key_project.jmlediting.core.test.utilities.sort.SortWithoutInstance;
+import org.key_project.jmlediting.core.test.utilities.sort.WrongInstanceObjectSort;
+import org.key_project.jmlediting.core.test.utilities.sort.WrongInstanceTypeSort;
 
 public class KeywortSortTest {
 
@@ -112,7 +116,7 @@ public class KeywortSortTest {
 
          @Override
          public IKeywordSort getSort() {
-            return NotAccessableInstanceSort.INSTANCE;
+            return new NotAccessableInstanceSort();
          }
       });
 

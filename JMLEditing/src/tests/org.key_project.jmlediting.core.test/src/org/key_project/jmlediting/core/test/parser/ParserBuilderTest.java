@@ -2,7 +2,7 @@ package org.key_project.jmlediting.core.test.parser;
 
 import static org.key_project.jmlediting.core.dom.Nodes.*;
 import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
-import static org.key_project.jmlediting.core.test.parser.ParserTestUtils.*;
+import static org.key_project.jmlediting.core.test.utilities.ParserTestUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collections;

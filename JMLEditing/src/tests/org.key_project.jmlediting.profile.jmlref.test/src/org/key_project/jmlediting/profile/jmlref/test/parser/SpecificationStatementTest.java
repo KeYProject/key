@@ -1,6 +1,6 @@
 package org.key_project.jmlediting.profile.jmlref.test.parser;
 
-import static org.key_project.jmlediting.profile.jmlref.test.parser.JMLRefParserTestUtils.testParseComplete;
+import static org.key_project.jmlediting.profile.jmlref.test.utilities.JMLRefParserTestUtils.testParseComplete;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.parser.ParserException;

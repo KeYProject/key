@@ -18,7 +18,7 @@ import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqDefKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqTypeKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqPrimitiveKeywordSort;
-import org.key_project.jmlediting.profile.key.test.KeyProfileTestUtils;
+import org.key_project.jmlediting.profile.key.test.utilities.JMLEditingKeYProfileTestUtils;
 
 public class SeqExprTest {
 
@@ -37,7 +37,7 @@ public class SeqExprTest {
 
    @Test
    public void parseAllSeqKeywords() throws ParserException {
-      final IJMLProfile keyProfile = KeyProfileTestUtils.keyProfile();
+      final IJMLProfile keyProfile = JMLEditingKeYProfileTestUtils.keyProfile();
       final IJMLParser parser = keyProfile.createParser();
       final IASTNode node = parser.parse(this.textComment, 0,
             this.textComment.length());

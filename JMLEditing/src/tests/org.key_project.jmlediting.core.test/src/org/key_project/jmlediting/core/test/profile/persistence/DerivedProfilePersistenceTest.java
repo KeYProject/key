@@ -23,6 +23,7 @@ import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.core.profile.syntax.user.UserDefinedKeyword;
+import org.key_project.jmlediting.core.test.utilities.profile.PersistenceParentProfile;
 
 public class DerivedProfilePersistenceTest {
 

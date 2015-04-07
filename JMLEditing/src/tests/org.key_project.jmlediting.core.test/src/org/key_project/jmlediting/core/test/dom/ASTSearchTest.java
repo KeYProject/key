@@ -2,12 +2,7 @@ package org.key_project.jmlediting.core.test.dom;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T0;
-import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T1;
-import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T3;
-import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T4;
-import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T5;
-import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T6;
+import static org.key_project.jmlediting.core.test.utilities.ASTTestUtils.*;
 
 import java.util.List;
 
@@ -15,6 +10,7 @@ import org.junit.Test;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.INodeSearcher;
 import org.key_project.jmlediting.core.dom.Nodes;
+import org.key_project.jmlediting.core.test.utilities.ASTTestUtils;
 
 public class ASTSearchTest {
 

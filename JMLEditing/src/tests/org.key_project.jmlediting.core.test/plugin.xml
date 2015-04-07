@@ -10,7 +10,7 @@
             class="org.key_project.jmlediting.core.test.profile.JMLProfileManagementTest$DummyJMLProfile2">
       </profile>
       <profile
-            class="org.key_project.jmlediting.core.test.profile.persistence.PersistenceParentProfile">
+            class="org.key_project.jmlediting.core.test.utilities.profile.PersistenceParentProfile">
       </profile>
    </extension>
 

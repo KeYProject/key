@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Contains all MonKeY Tests
+Bundle-Name: All MonKeY Tests
 Bundle-SymbolicName: org.key_project.monkey.all.test
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.monkey.all.test.Activator

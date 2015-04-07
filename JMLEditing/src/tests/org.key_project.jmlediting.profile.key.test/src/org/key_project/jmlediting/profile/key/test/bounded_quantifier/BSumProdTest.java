@@ -1,6 +1,6 @@
 package org.key_project.jmlediting.profile.key.test.bounded_quantifier;
 
-import static org.key_project.jmlediting.profile.key.test.KeyProfileTestUtils.testParseComplete;
+import static org.key_project.jmlediting.profile.key.test.utilities.JMLEditingKeYProfileTestUtils.testParseComplete;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.parser.ParserException;

@@ -4,10 +4,10 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.test.parser.ParserTestUtils;
+import org.key_project.jmlediting.core.test.utilities.ParserTestUtils;
 import org.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
 import org.key_project.jmlediting.profile.key.other.DynamicLogicPrimary;
-import org.key_project.jmlediting.profile.key.test.KeyProfileTestUtils;
+import org.key_project.jmlediting.profile.key.test.utilities.JMLEditingKeYProfileTestUtils;
 
 public class DynamicLogicPrimaryTest {
 
@@ -47,7 +47,7 @@ public class DynamicLogicPrimaryTest {
 
    private void testParse(final String text) {
       try {
-         final JMLReferenceProfile profile = KeyProfileTestUtils.keyProfile();
+         final JMLReferenceProfile profile = JMLEditingKeYProfileTestUtils.keyProfile();
          final DynamicLogicPrimary primary = new DynamicLogicPrimary();
          primary.setProfile(profile);
          ParserTestUtils.testParseComplete(text, primary);
@@ -59,7 +59,7 @@ public class DynamicLogicPrimaryTest {
 
    private void testParse(final String text, final String expectedResult) {
       try {
-         final JMLReferenceProfile profile = KeyProfileTestUtils.keyProfile();
+         final JMLReferenceProfile profile = JMLEditingKeYProfileTestUtils.keyProfile();
          final DynamicLogicPrimary primary = new DynamicLogicPrimary();
          primary.setProfile(profile);
          ParserTestUtils.testParseComplete(text, primary, expectedResult);

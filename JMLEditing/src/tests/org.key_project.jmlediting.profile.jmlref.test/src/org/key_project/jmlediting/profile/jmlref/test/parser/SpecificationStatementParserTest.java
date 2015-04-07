@@ -2,7 +2,7 @@ package org.key_project.jmlediting.profile.jmlref.test.parser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.key_project.jmlediting.profile.jmlref.test.parser.JMLRefParserTestUtils.testParseFail;
+import static org.key_project.jmlediting.profile.jmlref.test.utilities.JMLRefParserTestUtils.testParseFail;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.dom.IASTNode;
@@ -10,6 +10,7 @@ import org.key_project.jmlediting.core.dom.IKeywordNode;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserException;
+import org.key_project.jmlediting.profile.jmlref.test.utilities.ProfileWrapper;
 
 public class SpecificationStatementParserTest {
 

@@ -3,13 +3,13 @@ package org.key_project.jmlediting.profile.key.test.other;
 import org.junit.Test;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.profile.jmlref.test.parser.InvariantForTest;
-import org.key_project.jmlediting.profile.key.test.KeyProfileTestUtils;
+import org.key_project.jmlediting.profile.key.test.utilities.JMLEditingKeYProfileTestUtils;
 
-public class KeyInvariantTest extends InvariantForTest {
+public class KeYInvariantTest extends InvariantForTest {
 
    @Override
    protected ParseFunction createParser() {
-      return KeyProfileTestUtils.keyProfile().createParser();
+      return JMLEditingKeYProfileTestUtils.keyProfile().createParser();
    }
 
    @Test

@@ -3,12 +3,13 @@ package org.key_project.jmlediting.core.test.parser;
 import static org.junit.Assert.*;
 import static org.key_project.jmlediting.core.dom.Nodes.createString;
 import static org.key_project.jmlediting.core.parser.util.Lexicals.*;
-import static org.key_project.jmlediting.core.test.parser.ParserTestUtils.*;
+import static org.key_project.jmlediting.core.test.utilities.ParserTestUtils.*;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserBuilder;
 import org.key_project.jmlediting.core.parser.ParserException;
+import org.key_project.jmlediting.core.test.utilities.ParserTestUtils;
 
 public class LexicalHelperTest {
 

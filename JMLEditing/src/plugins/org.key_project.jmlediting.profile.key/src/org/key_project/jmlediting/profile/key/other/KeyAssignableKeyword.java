@@ -16,7 +16,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefK
  * @author Moritz Lichter
  *
  */
-public class KeyAssignableKeyword extends AssignableKeyword {
+public class KeYAssignableKeyword extends AssignableKeyword {
 
    @Override
    public IKeywordParser createParser() {

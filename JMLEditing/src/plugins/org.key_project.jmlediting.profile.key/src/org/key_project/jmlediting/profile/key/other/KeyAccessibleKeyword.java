@@ -18,7 +18,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefK
  * @author Moritz Lichter
  *
  */
-public class KeyAccessibleKeyword extends AccessibleKeyword {
+public class KeYAccessibleKeyword extends AccessibleKeyword {
 
    @Override
    public IKeywordParser createParser() {

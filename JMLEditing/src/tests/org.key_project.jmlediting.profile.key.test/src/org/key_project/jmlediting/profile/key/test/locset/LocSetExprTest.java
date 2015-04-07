@@ -5,14 +5,14 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.test.parser.ParserTestUtils;
+import org.key_project.jmlediting.core.test.utilities.ParserTestUtils;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.ExpressionParser;
-import org.key_project.jmlediting.profile.key.test.KeyProfileTestUtils;
+import org.key_project.jmlediting.profile.key.test.utilities.JMLEditingKeYProfileTestUtils;
 
 public class LocSetExprTest {
 
    protected ParseFunction createParser(final boolean allowInformal) {
-      return new ExpressionParser(KeyProfileTestUtils.keyProfile()).exprList();
+      return new ExpressionParser(JMLEditingKeYProfileTestUtils.keyProfile()).exprList();
    }
 
    @Test

@@ -4,10 +4,10 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.test.parser.ParserTestUtils;
-import org.key_project.jmlediting.profile.key.test.KeyProfileTestUtils;
+import org.key_project.jmlediting.core.test.utilities.ParserTestUtils;
+import org.key_project.jmlediting.profile.key.test.utilities.JMLEditingKeYProfileTestUtils;
 
-public class KeyAccessibleTest {
+public class KeYAccessibleTest {
 
    @Test
    public void parseDefaultAccessible1() {
@@ -51,7 +51,7 @@ public class KeyAccessibleTest {
 
    private void testParse(final String text) {
       try {
-         ParserTestUtils.testParseComplete(text, KeyProfileTestUtils
+         ParserTestUtils.testParseComplete(text, JMLEditingKeYProfileTestUtils
                .keyProfile().createParser());
       }
       catch (final ParserException e) {

@@ -3,7 +3,7 @@ package org.key_project.jmlediting.profile.jmlref.test.parser;
 import org.junit.Test;
 import org.key_project.jmlediting.core.parser.ParserException;
 
-import static org.key_project.jmlediting.profile.jmlref.test.parser.JMLRefParserTestUtils.*;
+import static org.key_project.jmlediting.profile.jmlref.test.utilities.JMLRefParserTestUtils.*;
 
 public class MeasuredByTest {
 

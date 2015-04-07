@@ -1,6 +1,6 @@
 package org.key_project.jmlediting.profile.jmlref.test.profile;
 
-import static org.key_project.jmlediting.core.test.parser.ParserTestUtils.testParseComplete;
+import static org.key_project.jmlediting.core.test.utilities.ParserTestUtils.testParseComplete;
 
 import java.util.Collections;
 
@@ -17,7 +17,7 @@ import org.key_project.jmlediting.profile.jmlref.parser.SpecExpressionContentPar
 import org.key_project.jmlediting.profile.jmlref.quantifier.MinQuantifierKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.EnsuresKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefKeywordSort;
-import org.key_project.jmlediting.profile.jmlref.test.parser.ProfileWrapper;
+import org.key_project.jmlediting.profile.jmlref.test.utilities.ProfileWrapper;
 
 public class JMLRefDerivedProfileTest {
 

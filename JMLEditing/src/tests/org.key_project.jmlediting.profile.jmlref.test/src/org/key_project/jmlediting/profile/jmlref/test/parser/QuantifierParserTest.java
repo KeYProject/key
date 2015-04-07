@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.key_project.jmlediting.core.parser.ParserBuilder;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.profile.jmlref.quantifier.QuantifierPrimary;
+import org.key_project.jmlediting.profile.jmlref.test.utilities.ProfileWrapper;
 
 public class QuantifierParserTest {
 

@@ -15,7 +15,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Ex
  * @author Moritz Lichter
  *
  */
-public class KeyReachKeyword extends ReachKeyword {
+public class KeYReachKeyword extends ReachKeyword {
 
    @Override
    public IKeywordParser createParser() {

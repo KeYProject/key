@@ -7,13 +7,13 @@ import org.key_project.jmlediting.core.profile.syntax.EmptyKeywordParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 import org.key_project.jmlediting.profile.jmlref.primary.AbstractJMLPrimaryKeyword;
-import org.key_project.jmlediting.profile.key.KeyProfile;
+import org.key_project.jmlediting.profile.key.KeYProfile;
 
 /**
  * Partial implementation of the inv keyword. This class registers inv as a
  * primitive, so requires \inv; is valid now. It does not support inv as in a
  * access sequence like ensures o.\inv; This is implemented in the
- * {@link KeyProfile} itself.
+ * {@link KeYProfile} itself.
  *
  * @author Moritz Lichter
  *

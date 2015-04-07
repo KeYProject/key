@@ -7,7 +7,7 @@ import org.key_project.jmlediting.profile.jmlref.loop.DecreasingKeyword;
 import org.key_project.jmlediting.profile.jmlref.parser.SemicolonClosedKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.SpecExpressionParser;
 
-public class KeyDecreasingKeyword extends DecreasingKeyword {
+public class KeYDecreasingKeyword extends DecreasingKeyword {
 
    @Override
    public IKeywordParser createParser() {

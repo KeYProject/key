@@ -4,11 +4,11 @@ import static org.key_project.jmlediting.profile.jmlref.parser.JMLRefParseFuncti
 
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AbstractGenericSpecificationKeyword;
-import org.key_project.jmlediting.profile.key.parser.KeyTargetLabelPredicateParser;
+import org.key_project.jmlediting.profile.key.parser.KeYTargetLabelPredicateParser;
 
-public class KeyBreaksClauseKeyword extends AbstractGenericSpecificationKeyword {
+public class KeYBreaksClauseKeyword extends AbstractGenericSpecificationKeyword {
 
-   public KeyBreaksClauseKeyword() {
+   public KeYBreaksClauseKeyword() {
       super("breaks");
    }
 
@@ -19,7 +19,7 @@ public class KeyBreaksClauseKeyword extends AbstractGenericSpecificationKeyword 
 
    @Override
    public IKeywordParser createParser() {
-      return semicolonClosed(new KeyTargetLabelPredicateParser());
+      return semicolonClosed(new KeYTargetLabelPredicateParser());
    }
 
 }

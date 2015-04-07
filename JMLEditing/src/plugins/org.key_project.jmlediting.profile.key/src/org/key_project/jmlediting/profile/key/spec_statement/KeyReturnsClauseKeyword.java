@@ -4,12 +4,12 @@ import static org.key_project.jmlediting.profile.jmlref.parser.JMLRefParseFuncti
 
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AbstractGenericSpecificationKeyword;
-import org.key_project.jmlediting.profile.key.parser.KeyTargetLabelPredicateParser;
+import org.key_project.jmlediting.profile.key.parser.KeYTargetLabelPredicateParser;
 
-public class KeyReturnsClauseKeyword extends
+public class KeYReturnsClauseKeyword extends
       AbstractGenericSpecificationKeyword {
 
-   public KeyReturnsClauseKeyword() {
+   public KeYReturnsClauseKeyword() {
       super("returns");
    }
 
@@ -20,7 +20,7 @@ public class KeyReturnsClauseKeyword extends
 
    @Override
    public IKeywordParser createParser() {
-      return semicolonClosed(new KeyTargetLabelPredicateParser());
+      return semicolonClosed(new KeYTargetLabelPredicateParser());
    }
 
 }

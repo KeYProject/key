@@ -8,7 +8,7 @@ import org.key_project.jmlediting.profile.jmlref.IJMLExpressionProfile;
 import org.key_project.jmlediting.profile.jmlref.parser.JMLRefUserParseFunctionKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.PredicateParser;
 
-public class KeyTargetLabelPredicateParser extends
+public class KeYTargetLabelPredicateParser extends
       JMLRefUserParseFunctionKeywordParser {
 
    @Override

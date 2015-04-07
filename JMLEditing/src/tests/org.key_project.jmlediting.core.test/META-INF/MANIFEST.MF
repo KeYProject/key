@@ -20,4 +20,5 @@ Export-Package: org.key_project.jmlediting.core.test,
  org.key_project.jmlediting.core.test.dom,
  org.key_project.jmlediting.core.test.parser,
  org.key_project.jmlediting.core.test.profile,
+ org.key_project.jmlediting.core.test.suite,
  org.key_project.jmlediting.core.test.utilities

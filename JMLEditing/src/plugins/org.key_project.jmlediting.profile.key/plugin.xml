@@ -4,7 +4,7 @@
    <extension
          point="org.key_project.jmlediting.core.profiles">
       <profile
-            class="org.key_project.jmlediting.profile.key.KeyProfile">
+            class="org.key_project.jmlediting.profile.key.KeYProfile">
       </profile>
    </extension>
 

@@ -44,15 +44,15 @@ import org.key_project.jmlediting.profile.key.locset.SubsetKeyword;
 import org.key_project.jmlediting.profile.key.other.AccessibleMeasuredByKeyword;
 import org.key_project.jmlediting.profile.key.other.DynamicLogicPrimary;
 import org.key_project.jmlediting.profile.key.other.InvKeyword;
-import org.key_project.jmlediting.profile.key.other.KeyAccessibleKeyword;
-import org.key_project.jmlediting.profile.key.other.KeyAssignableKeyword;
-import org.key_project.jmlediting.profile.key.other.KeyDecreasingKeyword;
-import org.key_project.jmlediting.profile.key.other.KeyMeasuredByKeyword;
-import org.key_project.jmlediting.profile.key.other.KeyReachKeyword;
+import org.key_project.jmlediting.profile.key.other.KeYAccessibleKeyword;
+import org.key_project.jmlediting.profile.key.other.KeYAssignableKeyword;
+import org.key_project.jmlediting.profile.key.other.KeYDecreasingKeyword;
+import org.key_project.jmlediting.profile.key.other.KeYMeasuredByKeyword;
+import org.key_project.jmlediting.profile.key.other.KeYReachKeyword;
 import org.key_project.jmlediting.profile.key.other.LessThanNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyPureKeyword;
-import org.key_project.jmlediting.profile.key.parser.KeyTargetLabelPredicateParser;
+import org.key_project.jmlediting.profile.key.parser.KeYTargetLabelPredicateParser;
 import org.key_project.jmlediting.profile.key.primary.NewElemsFreshKeyword;
 import org.key_project.jmlediting.profile.key.primary.NonNullElementsKeyword;
 import org.key_project.jmlediting.profile.key.seq.ContainsKeyword;
@@ -72,15 +72,15 @@ import org.key_project.jmlediting.profile.key.seq.SeqSubKeyword;
 import org.key_project.jmlediting.profile.key.seq.SeqTypeKeyword;
 import org.key_project.jmlediting.profile.key.seq.SingletonKeyword;
 import org.key_project.jmlediting.profile.key.seq.ValuesKeyword;
-import org.key_project.jmlediting.profile.key.spec_statement.KeyBreaksClauseKeyword;
-import org.key_project.jmlediting.profile.key.spec_statement.KeyContinuesClauseKeyword;
-import org.key_project.jmlediting.profile.key.spec_statement.KeyReturnsClauseKeyword;
+import org.key_project.jmlediting.profile.key.spec_statement.KeYBreaksClauseKeyword;
+import org.key_project.jmlediting.profile.key.spec_statement.KeYContinuesClauseKeyword;
+import org.key_project.jmlediting.profile.key.spec_statement.KeYReturnsClauseKeyword;
 
-public class KeyProfile extends JMLReferenceProfile {
+public class KeYProfile extends JMLReferenceProfile {
 
    private final Set<ParseFunction> additionalPrimarySuffixes;
 
-   public KeyProfile() {
+   public KeYProfile() {
       super(KeywordLocale.AMERICAN);
 
       final Set<IKeyword> supportedKeywords = this
@@ -95,17 +95,17 @@ public class KeyProfile extends JMLReferenceProfile {
       supportedKeywords.add(new StrictlyNothingKeyword());
       // Disable informal descriptions in Assignable/Accessible keywords
       replace(supportedKeywords, AssignableKeyword.class,
-            new KeyAssignableKeyword());
+            new KeYAssignableKeyword());
       replace(supportedKeywords, AccessibleKeyword.class,
-            new KeyAccessibleKeyword());
+            new KeYAccessibleKeyword());
       supportedKeywords.addAll(Arrays.asList(new AccessibleMeasuredByKeyword(),
             new LessThanNothingKeyword()));
 
       replace(supportedKeywords, MeasuredByKeyword.class,
-            new KeyMeasuredByKeyword());
-      replace(supportedKeywords, ReachKeyword.class, new KeyReachKeyword());
+            new KeYMeasuredByKeyword());
+      replace(supportedKeywords, ReachKeyword.class, new KeYReachKeyword());
       replace(supportedKeywords, DecreasingKeyword.class,
-            new KeyDecreasingKeyword());
+            new KeYDecreasingKeyword());
 
       // Key specific behaviors
       supportedKeywords.addAll(Arrays.asList(new BreakBehaviorKeyword(),
@@ -146,21 +146,21 @@ public class KeyProfile extends JMLReferenceProfile {
       supportedPrimaries.add(new BoundedQuantifierPrimary());
 
       replace(supportedKeywords, BreakClauseKeyword.class,
-            new KeyBreaksClauseKeyword());
+            new KeYBreaksClauseKeyword());
       replace(supportedKeywords, ContinuesClauseKeyword.class,
-            new KeyContinuesClauseKeyword());
+            new KeYContinuesClauseKeyword());
       replace(supportedKeywords, ReturnsClauseKeyword.class,
-            new KeyReturnsClauseKeyword());
+            new KeYReturnsClauseKeyword());
 
       // Support for other keyword contents to the user
       final Set<IUserDefinedKeywordContentDescription> contents = this
             .getSupportedContentDescriptionsInternal();
-      contents.add(new KeyTargetLabelPredicateParser());
+      contents.add(new KeYTargetLabelPredicateParser());
 
       this.getAvailableKeywordSortsInternal().addAll(
             Arrays.asList(SeqPrimitiveKeywordSort.INSTANCE));
       this.getSupportedContentDescriptionsInternal().addAll(
-            Arrays.asList(new KeyTargetLabelPredicateParser()));
+            Arrays.asList(new KeYTargetLabelPredicateParser()));
    }
 
    private static void replace(final Set<IKeyword> keywords,

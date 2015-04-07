@@ -14,7 +14,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.Sp
  * @author Moritz Lichter
  *
  */
-public class KeyMeasuredByKeyword extends MeasuredByKeyword {
+public class KeYMeasuredByKeyword extends MeasuredByKeyword {
 
    @Override
    public IKeywordParser createParser() {
