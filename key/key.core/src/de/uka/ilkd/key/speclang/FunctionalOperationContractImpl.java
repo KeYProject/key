@@ -874,8 +874,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         String freePres = "";
         for (LocationVariable h : heapLDT.getAllHeaps()) {
-            if (originalFreePres.get(h) != null && !originalFreePres.get(h).equals(tb.tt())) {
-                String printFreePres = LogicPrinter.quickPrintTerm(originalFreePres.get(h), services,
+            Term freePre = originalFreePres.get(h);
+            if (freePre != null && !freePre.equals(tb.tt())) {
+                String printFreePres = LogicPrinter.quickPrintTerm(freePre, services,
                                                                    usePrettyPrinting, useUnicodeSymbols);
                 freePres = freePres
                         + (includeHtmlMarkup ? "<br><b>" : "\n")
@@ -901,8 +902,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         String freePosts = "";
         for (LocationVariable h : heapLDT.getAllHeaps()) {
-            if (originalFreePosts.get(h) != null && !originalFreePres.get(h).equals(tb.tt())) {
-                String printFreePosts = LogicPrinter.quickPrintTerm(originalFreePosts.get(h), services,
+            Term freePost = originalFreePosts.get(h);
+            if (freePost != null && !freePost.equals(tb.tt())) {
+                String printFreePosts = LogicPrinter.quickPrintTerm(freePost, services,
                                                                     usePrettyPrinting, useUnicodeSymbols);
                 freePosts = freePosts
                         + (includeHtmlMarkup ? "<br><b>" : "\n")
