@@ -5,19 +5,20 @@ import static org.junit.Assert.assertEquals;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.key_project.jmlediting.ui.test.UITestUtils;
-import org.key_project.jmlediting.ui.test.UITestUtils.TestProject;
-import org.key_project.jmlediting.ui.test.UITestUtils.TestProject.SaveGuarantee;
+import org.key_project.jmlediting.ui.test.util.UITestUtils;
+import org.key_project.jmlediting.ui.test.util.UITestUtils.TestProject;
+import org.key_project.jmlediting.ui.test.util.UITestUtils.TestProject.SaveGuarantee;
 
 public class MultilineCommentEditingTest {
 
    private static SWTWorkbenchBot bot;
    private static TestProject testProject;
 
-   private SWTBotEclipseEditor editor;
+   private static SWTBotEclipseEditor editor;
 
    @BeforeClass
    public static void initializeProject() throws CoreException,
@@ -31,7 +32,12 @@ public class MultilineCommentEditingTest {
    @Before
    public void refreshEditor() throws CoreException {
       testProject.restoreClassAndOpen();
-      this.editor = testProject.getOpenedEditor();
+      editor = testProject.getOpenedEditor();
+   }
+   
+   @AfterClass
+   public static void closeEditor() {
+      editor.close();
    }
 
    @Test
@@ -60,12 +66,12 @@ public class MultilineCommentEditingTest {
 
    @Test
    public void testCreateJMLComment() {
-      this.editor.insertText(24, 3, "/*@");
-      this.editor.typeText(24, 6, "\n");
-      final String nextLine = this.editor.getTextOnLine(25);
+      editor.insertText(24, 3, "/*@");
+      editor.typeText(24, 6, "\n");
+      final String nextLine = editor.getTextOnLine(25);
       assertEquals("Next line when opening new JML comment is wrong",
             "     @ ", nextLine);
-      final String closingLine = this.editor.getTextOnLine(26);
+      final String closingLine = editor.getTextOnLine(26);
       assertEquals("Closing line of opened JML commend is wrong", "     @*/",
             closingLine);
    }
@@ -90,8 +96,8 @@ public class MultilineCommentEditingTest {
 
    private void typeTextAndCheckNextLine(final int line, final int column,
          final String text, final String message, final String requiredNextLine) {
-      this.editor.typeText(line, column, text);
-      final String nextLine = this.editor.getTextOnLine(line + 1);
+      editor.typeText(line, column, text);
+      final String nextLine = editor.getTextOnLine(line + 1);
       assertEquals(message, requiredNextLine, nextLine);
    }
 

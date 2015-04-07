@@ -1,21 +1,24 @@
 package org.key_project.jmlediting.ui.test.preferencepages;
 
+import static org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable.syncExec;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.swt.finder.results.Result;
+import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.ui.preferencepages.JMLColorPreferencePage;
-import org.key_project.jmlediting.ui.test.UITestUtils;
+import org.key_project.jmlediting.ui.test.util.UITestUtils;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper.ColorProperty;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Testingplan:
@@ -39,16 +42,13 @@ public class JMLColorPreferencePageTest {
 
    @BeforeClass
    public static void init() {
-      UITestUtils.prepareWorkbench(bot);
+      TestUtilsUtil.closeWelcomeView();
    }
 
    @Before
    public void openGlobalJMLColorSettings() {
-      UITestUtils.openGlobalSettings(bot);
-      bot.sleep(100);
-      this.navigateToJMLColorSettings();
+      UITestUtils.openJMLColorsPreferencePage(bot);
       this.setCommentColorButton();
-      bot.sleep(1000);
    }
 
    @AfterClass
@@ -60,50 +60,46 @@ public class JMLColorPreferencePageTest {
     * needed for setting the Color.
     */
    private void setCommentColorButton() {
-      this.commentColorButton = bot.buttonWithId(
-            JMLColorPreferencePage.TEST_KEY,
-            ColorProperty.COMMENT.getPropertyName());
-   }
-
-   private void navigateToJMLColorSettings() {
-      bot.tree().getTreeItem("JML").select().expand().getNode("Colors")
-            .select();
+      this.commentColorButton = bot.buttonWithId(JMLColorPreferencePage.TEST_KEY, ColorProperty.COMMENT.getPropertyName());
    }
 
    /*
     * hack needed, because native Dialogs can't be testet with SWTBot
     */
-   private void setColor(final RGB commentColor) {
-      Display.getDefault().syncExec(new Runnable() {
+   private void setCommentRGB(final RGB commentColor) {
+      syncExec(new VoidResult() {
          @Override
          public void run() {
-            final Object oSelector = JMLColorPreferencePageTest.this.commentColorButton.widget
-                  .getData();
-            assertTrue(oSelector instanceof ColorSelector);
-            final ColorSelector selector = (ColorSelector) oSelector;
-            selector.setColorValue(commentColor);
-
+            final Object oSelector = JMLColorPreferencePageTest.this.commentColorButton.widget.getData();
+            if (oSelector instanceof ColorSelector) {
+               ((ColorSelector) oSelector).setColorValue(commentColor);
+            }
          }
       });
-      bot.sleep(500);
    }
 
+   private void checkCommentRGB(final RGB expectedRGB) {
+      RGB actualRGB = getCommentRGB();
+      assertNotNull(actualRGB);
+      assertEquals("ColorSelector doesn't show the right color", expectedRGB, actualRGB);
+   }
+   
    /*
     * hack needed, because native Dialogs can't be testet with SWTBot
     */
-   private void checkColor(final RGB colorToCheck) {
-      Display.getDefault().syncExec(new Runnable() {
+   public RGB getCommentRGB() {
+      return syncExec(new Result<RGB>() {
          @Override
-         public void run() {
-            final Object oSelector = JMLColorPreferencePageTest.this.commentColorButton.widget
-                  .getData();
-            assertTrue(oSelector instanceof ColorSelector);
-            final ColorSelector selector = (ColorSelector) oSelector;
-            assertEquals("ColorSelector doesn't show the right color",
-                  colorToCheck, selector.getColorValue());
+         public RGB run() {
+            final Object oSelector = JMLColorPreferencePageTest.this.commentColorButton.widget.getData();
+            if (oSelector instanceof ColorSelector) {
+               return ((ColorSelector) oSelector).getColorValue();
+            }
+            else {
+               return null;
+            }
          }
       });
-      bot.sleep(500);
    }
 
    /*
@@ -111,35 +107,28 @@ public class JMLColorPreferencePageTest {
     */
    @Test
    public void testColorSettings() {
-      // first check whether the ColorSelector shows the right color at the
-      // beginning.
-      this.checkColor(JMLUiPreferencesHelper
-            .getWorkspaceJMLColor(ColorProperty.COMMENT));
+      // first check whether the ColorSelector shows the right color at the beginning.
+      this.checkCommentRGB(JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.COMMENT));
 
       RGB testColor = new RGB(255, 0, 0);
-      this.setColor(testColor);
+      this.setCommentRGB(testColor);
       bot.button("Apply").click();
       // Need to wait until the UI events has been processed
-      bot.sleep(1000);
-      assertEquals("Not the right JML-Color was set.", testColor,
-            JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.COMMENT));
+      assertEquals("Not the right JML-Color was set.", 
+                   testColor,
+                   JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.COMMENT));
       bot.button("Restore Defaults").click();
       bot.button("Apply").click();
-      bot.sleep(1000);
       assertEquals("Restore Default JML Color did not work.",
-            ColorProperty.COMMENT.getDefaultColor(),
-            JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.COMMENT));
-
+                   ColorProperty.COMMENT.getDefaultColor(),
+                   JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.COMMENT));
       // final test
       testColor = new RGB(0, 255, 0);
-      this.setColor(testColor);
+      this.setCommentRGB(testColor);
       bot.button("OK").click();
-      bot.sleep(100);
       this.openGlobalJMLColorSettings();
-      this.checkColor(JMLUiPreferencesHelper
-            .getWorkspaceJMLColor(ColorProperty.COMMENT));
-      this.checkColor(testColor);
-
+      this.checkCommentRGB(JMLUiPreferencesHelper .getWorkspaceJMLColor(ColorProperty.COMMENT));
+      this.checkCommentRGB(testColor);
       bot.button("OK").click();
    }
 }

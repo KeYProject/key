@@ -15,6 +15,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.utils.Position;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -26,9 +27,9 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.core.utilities.CommentRange;
-import org.key_project.jmlediting.ui.test.UITestUtils;
-import org.key_project.jmlediting.ui.test.UITestUtils.TestProject;
-import org.key_project.jmlediting.ui.test.UITestUtils.TestProject.SaveGuarantee;
+import org.key_project.jmlediting.ui.test.util.UITestUtils;
+import org.key_project.jmlediting.ui.test.util.UITestUtils.TestProject;
+import org.key_project.jmlediting.ui.test.util.UITestUtils.TestProject.SaveGuarantee;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper.ColorProperty;
 
@@ -39,7 +40,7 @@ public class AllKeywordsHighlightingTest {
 
    private static TestProject project;
 
-   private SWTBotEclipseEditor editor;
+   private static SWTBotEclipseEditor editor;
 
    @BeforeClass
    public static void createProject() throws CoreException,
@@ -54,7 +55,12 @@ public class AllKeywordsHighlightingTest {
    @Before
    public void resetEditor() throws CoreException {
       project.restoreClassAndOpen();
-      this.editor = project.getOpenedEditor();
+      editor = project.getOpenedEditor();
+   }
+   
+   @AfterClass
+   public static void closeEditor() {
+      editor.close();
    }
 
    @Test
@@ -94,8 +100,8 @@ public class AllKeywordsHighlightingTest {
                      .covers(keyword.getSort()) ? ColorProperty.TOPLEVEL_KEYWORD
                      : ColorProperty.KEYWORD);
          final Position startInEditor = UITestUtils.getLineAndColumn(start,
-               this.editor);
-         final StyleRange[] styles = this.editor.getStyles(startInEditor.line,
+               editor);
+         final StyleRange[] styles = editor.getStyles(startInEditor.line,
                startInEditor.column, end - start);
          for (final StyleRange style : styles) {
             assertEquals("Wrong color of keyword "
@@ -111,9 +117,9 @@ public class AllKeywordsHighlightingTest {
          throws ParserException {
       final List<IKeywordNode> nodes = new ArrayList<IKeywordNode>();
       for (final CommentRange comment : UITestUtils
-            .getAllJMLCommentsInEditor(this.editor)) {
+            .getAllJMLCommentsInEditor(editor)) {
          nodes.addAll(Nodes.getAllKeywords(profile.createParser().parse(
-               this.editor.getText(), comment)));
+               editor.getText(), comment)));
       }
       return nodes;
    }

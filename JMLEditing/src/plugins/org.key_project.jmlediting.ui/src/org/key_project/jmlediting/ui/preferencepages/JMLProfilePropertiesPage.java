@@ -1,8 +1,6 @@
 package org.key_project.jmlediting.ui.preferencepages;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collections;
@@ -46,6 +44,7 @@ import org.key_project.jmlediting.ui.Activator;
 import org.key_project.jmlediting.ui.preferencepages.RebuildHelper.UserMessage;
 import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLProfileDialog;
 import org.key_project.util.eclipse.Logger;
+import org.key_project.util.java.IOUtil;
 
 /**
  * The {@link JMLProfilePropertiesPage} implements a properties and preferences
@@ -232,14 +231,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
             final String file = dialog.open();
             if (file != null) {
                try {
-                  final BufferedReader reader = new BufferedReader(
-                        new FileReader(new File(file)));
-                  String content = "";
-                  String line;
-                  while ((line = reader.readLine()) != null) {
-                     content += line;
-                  }
-                  reader.close();
+                  String content = IOUtil.readFrom(new File(file));
                   final IDerivedProfile profile = ProfilePersistenceFactory
                         .createDerivedProfilePersistence().read(content);
                   JMLProfileManagement.instance()

@@ -14,7 +14,8 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.utils.Position;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
-import org.junit.Before;
+import org.eclipse.ui.IEditorPart;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
@@ -23,8 +24,9 @@ import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.ToplevelKeywordSort;
 import org.key_project.jmlediting.ui.test.Activator;
-import org.key_project.jmlediting.ui.test.UITestUtils;
+import org.key_project.jmlediting.ui.test.util.UITestUtils;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
@@ -56,9 +58,9 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class JMLCompletionProposalComputerTest {
 
-   static SWTWorkbenchBot bot = new SWTWorkbenchBot();
+   private static final SWTWorkbenchBot bot = new SWTWorkbenchBot();
 
-   private SWTBotEclipseEditor editor = null;
+   private static SWTBotEclipseEditor editor = null;
 
    private static final String PROJECT_NAME = "TestCompletion";
    private static final String PACKAGE_NAME = "test";
@@ -83,6 +85,8 @@ public class JMLCompletionProposalComputerTest {
    private static final String INSERTTEXT_MAINTAINING = "mainta";
 
    private static int MAX_KEYWORDS = 0;
+   
+   private static IEditorPart editorPart;
 
    /*
     * Initialize a new Project and load the template class from data/template
@@ -90,44 +94,35 @@ public class JMLCompletionProposalComputerTest {
     */
    @BeforeClass
    public static void initProject() throws CoreException, InterruptedException {
-      final IJavaProject project = TestUtilsUtil
-            .createJavaProject(PROJECT_NAME);
+      TestUtilsUtil.closeWelcomeView();
+      final IJavaProject project = TestUtilsUtil.createJavaProject(PROJECT_NAME);
       final IFolder srcFolder = project.getProject().getFolder("src");
-      final IFolder testFolder = TestUtilsUtil.createFolder(srcFolder,
-            PACKAGE_NAME);
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
-            "data/template", testFolder);
-      bot.tree().getTreeItem(PROJECT_NAME).select().expand().getNode("src")
-            .select().expand().getNode(PACKAGE_NAME).select().expand()
-            .getNode(CLASS_NAME + ".java").select().doubleClick();
-      bot.sleep(1000);
+      final IFolder testFolder = TestUtilsUtil.createFolder(srcFolder, PACKAGE_NAME);
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/template", testFolder);
+      editorPart = TestUtilsUtil.openEditor(testFolder.getFile(CLASS_NAME + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
+      editor = bot.activeEditor().toTextEditor();
 
       final IJMLProfile profile = UITestUtils.findReferenceProfile();
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(), profile);
 
       // count MAX_KEYWORDS
-      final Set<IKeyword> keywordSet = JMLProfileHelper.filterKeywords(profile,
-            ToplevelKeywordSort.INSTANCE);
+      final Set<IKeyword> keywordSet = JMLProfileHelper.filterKeywords(profile, ToplevelKeywordSort.INSTANCE);
       for (final IKeyword iKeyword : keywordSet) {
          MAX_KEYWORDS += iKeyword.getKeywords().size();
       }
    }
-
-   /*
-    * just make sure the global variable editor is set
-    */
-   @Before
-   public void initEditor() {
-      this.editor = bot.activeEditor().toTextEditor();
+   
+   @AfterClass
+   public static void closeEditor() {
+      TestUtilsUtil.closeEditor(editorPart, false);
    }
 
    /*
     * removes the text with given length at Position pos
     */
    private void removeText(final Position pos, final int length) {
-      this.editor.selectRange(pos.line, pos.column, length);
-      bot.sleep(100);
-      this.editor.pressShortcut(Keystrokes.DELETE);
+      editor.selectRange(pos.line, pos.column, length);
+      editor.pressShortcut(Keystrokes.DELETE);
    }
 
    /*
@@ -135,8 +130,8 @@ public class JMLCompletionProposalComputerTest {
     */
    private List<String> getCompletion(final Position pos,
          final String insertText) {
-      this.editor.navigateTo(pos);
-      final List<String> proposals = this.editor
+      editor.navigateTo(pos);
+      final List<String> proposals = editor
             .getAutoCompleteProposals(insertText);
       if (!insertText.isEmpty()) {
          this.removeText(pos, insertText.length());
@@ -204,7 +199,7 @@ public class JMLCompletionProposalComputerTest {
       this.testWithTimeout(PosJMLCommentSingle, INSERTTEXT_MAINTAINING);
       assertTrue(
             "Not the correct amount of proposals in JML-single-line-comment get maintaining proposal",
-            this.editor.getTextOnCurrentLine().contains(KEYWORD_MAINTAINING));
+            editor.getTextOnCurrentLine().contains(KEYWORD_MAINTAINING));
       this.removeText(PosJMLCommentSingle, KEYWORD_MAINTAINING.length());
    }
 
@@ -231,7 +226,7 @@ public class JMLCompletionProposalComputerTest {
    @Test
    public void testCompletionJMLCommentMultiMaintaining() {
       this.testWithTimeout(PosJMLCommentMulti, INSERTTEXT_MAINTAINING);
-      assertTrue("Not the correct amount of Proposals", this.editor
+      assertTrue("Not the correct amount of Proposals", editor
             .getTextOnCurrentLine().contains(KEYWORD_MAINTAINING));
       this.removeText(PosJMLCommentMulti, KEYWORD_MAINTAINING.length());
    }

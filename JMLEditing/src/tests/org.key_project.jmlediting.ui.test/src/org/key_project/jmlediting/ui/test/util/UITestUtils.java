@@ -1,121 +1,71 @@
-package org.key_project.jmlediting.ui.test;
+package org.key_project.jmlediting.ui.test.util;
 
-import static org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses;
-import static org.eclipse.swtbot.swt.finder.waits.Conditions.waitForMenu;
+import static org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable.syncExec;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.help.ui.internal.ExecuteCommandAction;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.matchers.AbstractMatcher;
+import org.eclipse.swtbot.swt.finder.results.BoolResult;
 import org.eclipse.swtbot.swt.finder.utils.Position;
-import org.eclipse.swtbot.swt.finder.utils.TableRow;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.waits.WaitForObjectCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.hamcrest.Description;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
-import org.key_project.jmlediting.ui.test.UITestUtils.TestProject.SaveGuarantee;
+import org.key_project.jmlediting.core.utilities.ErrorTypes;
+import org.key_project.jmlediting.ui.test.Activator;
+import org.key_project.jmlediting.ui.test.util.UITestUtils.TestProject.SaveGuarantee;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
+import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-@SuppressWarnings("restriction")
 public class UITestUtils {
-
-   public static IProject getProjectWithName(final String name) {
-      final IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
-            .getProjects();
-      for (final IProject p : projects) {
-         if (p.getName().equals(name)) {
-            return p;
-         }
-      }
-      return null;
+   public static void openJMLProfileProperties(final SWTWorkbenchBot bot, final IProject project) {
+      TestUtilsUtil.openPropertiesPage(bot, project, "JML", "Profile");
    }
 
-   public static void prepareWorkbench(final SWTWorkbenchBot bot) {
-      // bot.resetWorkbench();
-
-      try {
-         // In the case that the welcome page opens, close it
-         bot.viewByTitle("Welcome").close();
-      }
-      catch (final WidgetNotFoundException e) {
-      }
-
-      bot.waitUntil(waitForMenu(bot.activeShell(),
-            WidgetMatcherFactory.<MenuItem> withMnemonic("File")));
+   public static void openJMLPreferencePage(final SWTWorkbenchBot bot) {
+      TestUtilsUtil.openPreferencePage(bot, "JML");
    }
 
-   public static IProject createEmptyJavaProject(final SWTWorkbenchBot bot,
-         final String name) {
-      bot.menu("File").menu("New").menu("Java Project").click();
-      bot.textWithLabel("&Project name:").setText(name);
-      final SWTBotShell activeShell = bot.activeShell();
-      bot.button("Finish").click();
-      bot.waitUntil(shellCloses(activeShell));
-      return getProjectWithName(name);
+   public static void openJMLProfilePreferencePage(final SWTWorkbenchBot bot) {
+      TestUtilsUtil.openPreferencePage(bot, "JML", "Profile");
    }
 
-   public static void createEmptyPackage(final SWTWorkbenchBot bot,
-         final String name) {
-      bot.menu("File").menu("New").menu("Package").click();
-      bot.textWithLabel("&Name:").setText(name);
-      final SWTBotShell activeShell = bot.activeShell();
-      bot.sleep(500);
-      bot.button("Finish").click();
-      bot.waitUntil(shellCloses(activeShell));
-   }
-
-   public static void createEmptyClass(final SWTWorkbenchBot bot,
-         final String packageName, final String className) {
-      try {
-         bot.activeShell().setFocus();
-         bot.menu("File").setFocus();
-         bot.menu("File").menu("New").menu("Class").click();
-      }
-      catch (final Exception e) {
-         e.printStackTrace();
-      }
-      bot.sleep(2000);
-   }
-
-   public static void openJMLProfileProperties(final SWTWorkbenchBot bot,
-         final String projectName) {
-      bot.tree().getTreeItem(projectName).contextMenu("Properties").click(); // .select();
-
-      bot.sleep(100);
-
-      bot.tree().getTreeItem("JML").select();
-      bot.sleep(100);
-      bot.tree().getTreeItem("JML").expand().getNode("Profile").select();
-   }
-
-   public static void openJMLProperties(final SWTWorkbenchBot bot,
-         final String projectName) {
-      openGlobalSettings(bot);
-      bot.sleep(500);
-      bot.tree().getTreeItem("JML").doubleClick();
-      bot.sleep(1000);
+   public static void openJMLColorsPreferencePage(final SWTWorkbenchBot bot) {
+      TestUtilsUtil.openPreferencePage(bot, "JML", "Colors");
    }
 
    public static void validateProfileListSelection(
@@ -134,33 +84,67 @@ public class UITestUtils {
             selectedProfiles.get(0).equals(expectedProfile.getName()));
    }
 
-   public static void selectFileInProject(final SWTWorkbenchBot bot,
-         final String projectName, final String nodePath) {
-      final String[] nodeHierachy = nodePath.split("/");
-      SWTBotTreeItem item = bot.tree().getTreeItem(projectName).select()
-            .expand();
-      bot.sleep(1000);
-      for (int i = 0; i < nodeHierachy.length - 1; i++) {
-         item = item.getNode(nodeHierachy[i]).select().expand();
-         bot.sleep(1000);
-      }
-      item.getNode(nodeHierachy[nodeHierachy.length - 1]).select()
-            .doubleClick();
-      bot.sleep(1000);
-   }
-
-   public static String getHoverAtPosition(final SWTWorkbenchBot bot,
-         final SWTBotEclipseEditor editor, final int line, final int column) {
-      editor.navigateTo(line, column);
-      bot.sleep(200);
-      editor.pressShortcut(KeyStroke.getInstance(SWT.F2));
+   public static String getHoverAtPosition(final SWTWorkbenchBot bot, final SWTBotEclipseEditor editor, final int line, final int column) {
+      long originalTimeout = SWTBotPreferences.TIMEOUT;
       try {
-         bot.waitUntil(new ShellIsActiveWithEmptyText(""));
-         return bot.styledText().getText();
+         // Open hover
+         editor.navigateTo(line, column);
+         editor.pressShortcut(KeyStroke.getInstance(SWT.F2));
+         // Set short timeout as information hover might not be shown
+         SWTBotPreferences.TIMEOUT = 1000;
+         // Search information shell which shows the hover
+         WaitForObjectCondition<Shell> shell = Conditions.waitForShell(new AbstractMatcher<Shell>() {
+            @Override
+            public void describeTo(Description description) {
+            }
+
+            @Override
+            protected boolean doMatch(final Object item) {
+               if (item instanceof Shell) {
+                  return syncExec(new BoolResult() {
+                     @Override
+                     public Boolean run() {
+                        Shell shell = (Shell) item;
+                        if (StringUtil.isEmpty(shell.getText())) {
+                           Control[] children = shell.getChildren();
+                           if (!ArrayUtil.isEmpty(children) &&
+                               children[0] instanceof Composite) {
+                              Control[] childChildren = ((Composite) children[0]).getChildren();
+                              if (!ArrayUtil.isEmpty(childChildren) &&
+                                  childChildren[0] instanceof StyledText) {
+                                 return Boolean.TRUE;
+                              }
+                              else {
+                                 return Boolean.FALSE;
+                              }
+                           }
+                           else {
+                              return Boolean.FALSE;
+                           }
+                        }
+                        else {
+                           return Boolean.FALSE;
+                        }
+                     }
+                  });
+               }
+               else {
+                  return Boolean.FALSE;
+               }
+            }
+         });
+         bot.waitUntilWidgetAppears(shell);
+         SWTBotShell botShell = new SWTBotShell(shell.get(0));
+         // Return shown hover text
+         return botShell.bot().styledText().getText();
       }
-      catch (final TimeoutException e) {
-         // No hover
+      catch (WidgetNotFoundException e) {
+         // Information shell not available, so no hover is shown
          return null;
+      }
+      finally {
+         // Restore timeout
+         SWTBotPreferences.TIMEOUT = originalTimeout;
       }
    }
 
@@ -229,8 +213,7 @@ public class UITestUtils {
 
       public void copyData() throws CoreException {
          // Copy the class
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
-               this.classLocation, this.testFolder);
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, this.classLocation, this.testFolder);
       }
 
       public void restoreClassAndOpen() throws CoreException {
@@ -264,12 +247,13 @@ public class UITestUtils {
             }
             this.copyData();
             // Open the editor
-            this.bot.tree().getTreeItem(this.projectName).select().expand()
-                  .getNode("src").select().expand().getNode(this.packageName)
-                  .select().expand().getNode(this.className + ".java").select()
-                  .doubleClick();
+            TestUtilsUtil.openEditor(getFile());
             this.openedEditor = this.bot.activeEditor().toTextEditor();
          }
+      }
+      
+      public IFile getFile() {
+         return testFolder.getFile(this.className + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT);
       }
 
       public IJavaProject getProject() {
@@ -305,7 +289,7 @@ public class UITestUtils {
          final String className, final SaveGuarantee guarantee)
          throws CoreException, InterruptedException {
       return createProjectWithFile(bot, projectName, packageName, className,
-            "data/template/" + className + ".java", guarantee);
+            "data/template/" + className + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT, guarantee);
    }
 
    public static TestProject createProjectWithFile(final SWTWorkbenchBot bot,
@@ -390,31 +374,23 @@ public class UITestUtils {
    }
 
    /**
-    * Returns all line number, for which an error marker is available and which
-    * belongs to the given file.
-    *
-    * @param bot
-    *           the bot to use
-    * @param file
-    *           the file name, not its path
-    * @return a list of all line numbers, may contain duplicates if there are
-    *         multiple markers for a line
+    * Returns all lines annotated with an error marker specified by {@link ErrorTypes}.
+    * @param file The {@link IFile} to get its error lines.
+    * @return The found error lines.
+    * @throws CoreException Occurred Exception.
     */
-   public static List<Integer> getAllErrorLines(final SWTWorkbenchBot bot,
-         final String file) {
-      final List<Integer> lines = new ArrayList<Integer>();
-      final SWTBotTreeItem[] errorItems = getAllErrorItems(bot);
-      for (final SWTBotTreeItem item : errorItems) {
-         final TableRow row = item.row();
-         final String line = row.get(3);
-         final String resource = row.get(1);
-         // Remove the "line " prefix and convert to int
-         final int lineNumber = Integer.parseInt(line.substring(5));
-         if (file.equals(resource)) {
-            lines.add(lineNumber);
+   public static List<Integer> getAllErrorLines(final IFile file) throws CoreException {
+      List<Integer> result = new LinkedList<Integer>();
+      for (ErrorTypes type : ErrorTypes.values()) {
+         IMarker[] markers = file.findMarkers(type.getId(), true, IResource.DEPTH_INFINITE);
+         if (!ArrayUtil.isEmpty(markers)) {
+            for (IMarker marker : markers) {
+               String line = ObjectUtil.toString(marker.getAttribute(IMarker.LINE_NUMBER)); 
+               result.add(Integer.valueOf(line));
+            }
          }
       }
-      return lines;
+      return result;
    }
 
    public static Position getLineAndColumn(final int offset,
@@ -443,37 +419,7 @@ public class UITestUtils {
       throw new IndexOutOfBoundsException("Offset not in text");
    }
 
-   public static List<CommentRange> getAllJMLCommentsInEditor(
-         final SWTBotEclipseEditor editor) {
+   public static List<CommentRange> getAllJMLCommentsInEditor(final SWTBotEclipseEditor editor) {
       return new CommentLocator(editor.getText()).findJMLCommentRanges();
-
-   }
-
-   public static void openGlobalSettings(final SWTWorkbenchBot bot) {
-      // We need to do something special on mac
-      if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-         // Cannot access the menu item for preferences on mac because it is
-         // located in a native menu, which even prohibits the key shortcut to
-         // work using SWT bot.
-         // Therefore, I use the following action to open the preferences window
-         // which makes use of nun public UI
-         // I took the code from here, where the same problem was solved:
-         // https://code.google.com/p/swordfish-tooling/source/diff?spec=svn843&r=843&format=side&path=/trunk/org.eclipse.swordfish.tooling.systemtest/src/org/eclipse/swordfish/tooling/target/platform/test/ide/MacEclipseIDE.java
-         // This code needs the dependency on help.ui
-         final Thread t = new Thread() {
-            @Override
-            public void run() {
-               final ExecuteCommandAction action = new ExecuteCommandAction();
-               action.setInitializationString("org.eclipse.ui.window.preferences");
-               action.run();
-            }
-         };
-         t.start();
-      }
-      else {
-         // On windows and other linux/unix implementations beside mac this
-         // command should work
-         bot.menu("Window").menu("Preferences").click();
-      }
    }
 }

@@ -1009,7 +1009,7 @@ public class JDTUtil {
     * @param project The {@link IProject} to build in background.
     */
    public static void buildInBackground(IProject project) {
-      CoreUtility.startBuildInBackground(project.getProject());
+      CoreUtility.startBuildInBackground(project);
    }
 
    /**

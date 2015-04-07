@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
@@ -12,7 +13,8 @@ import org.junit.Test;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
-import org.key_project.jmlediting.ui.test.UITestUtils;
+import org.key_project.jmlediting.ui.test.util.UITestUtils;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 public class ProfilePropertiesTest {
 
@@ -24,12 +26,11 @@ public class ProfilePropertiesTest {
          .instance().getAvailableProfilesSortedByName();
 
    @Test
-   public void testBasics() {
+   public void testBasics() throws CoreException, InterruptedException {
 
-      UITestUtils.prepareWorkbench(bot);
+      TestUtilsUtil.closeWelcomeView();
 
-      final IProject project = UITestUtils.createEmptyJavaProject(bot,
-            PROJECT_NAME);
+      final IProject project = TestUtilsUtil.createJavaProject(PROJECT_NAME).getProject();
 
       // Set the first one as global default
       final int gloablDefaultIndex = 0;
@@ -37,7 +38,7 @@ public class ProfilePropertiesTest {
       JMLPreferencesHelper.setDefaultJMLProfile(globalDefault);
 
       // Open the JML properties page for the project
-      UITestUtils.openJMLProfileProperties(bot, PROJECT_NAME);
+      UITestUtils.openJMLProfileProperties(bot, project);
 
       final SWTBotCheckBox enableProjectSettingsBox = bot.checkBox();
       final SWTBotTable profileList = bot.table();
@@ -73,13 +74,10 @@ public class ProfilePropertiesTest {
       final int newIndex = ALL_PROFILES.size() - 1;
       profileList.getTableItem(newIndex).check();
 
-      bot.sleep(500);
-
       // Apply the properties
       bot.button("OK").click();
 
       // Want to do the rebuild
-      bot.sleep(50);
       bot.activeShell().bot().button("Yes").click();
 
       // Now check that this is ok

@@ -56,16 +56,6 @@ public interface IJMLValidationContext {
    ASTNode getNodeForLeadingComment(Comment c);
 
    /**
-    * Returns the Node for the given trailing Comment c.
-    *
-    * @param c
-    *           the trailing Comment
-    *
-    * @return the Node
-    */
-   ASTNode getNodeForTrailingComment(Comment c);
-
-   /**
     * Returns the JDTComment that represents the given jmlComment.
     *
     * @param jmlComment

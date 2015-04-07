@@ -23,11 +23,6 @@ public class JMLValidationContext implements IJMLValidationContext {
    private final Map<Comment, ASTNode> leadingCommentToNodeMap;
 
    /**
-    * the Map from Trailing Comments to ASTNodes.
-    */
-   private final Map<Comment, ASTNode> trailingCommentToNodeMap;
-
-   /**
     * the Map from JML Comments to leading comments.
     */
    private final Map<CommentRange, Comment> jmlCommentToCommentMap;
@@ -77,13 +72,11 @@ public class JMLValidationContext implements IJMLValidationContext {
     */
    public JMLValidationContext(
          final Map<Comment, ASTNode> assignedLeadingComments,
-         final Map<Comment, ASTNode> assignedTrailingComments,
          final Map<CommentRange, Comment> jmlCommentsToComments,
          final String src, final List<CommentRange> jmlComments,
          final CompilationUnit javaAST, final IJMLParser jmlParser) {
       super();
       this.leadingCommentToNodeMap = assignedLeadingComments;
-      this.trailingCommentToNodeMap = assignedTrailingComments;
       this.jmlCommentToCommentMap = jmlCommentsToComments;
       this.src = src;
       this.jmlComments = jmlComments;
@@ -114,11 +107,6 @@ public class JMLValidationContext implements IJMLValidationContext {
    @Override
    public ASTNode getNodeForLeadingComment(final Comment c) {
       return this.leadingCommentToNodeMap.get(c);
-   }
-
-   @Override
-   public ASTNode getNodeForTrailingComment(final Comment c) {
-      return this.trailingCommentToNodeMap.get(c);
    }
 
    @Override

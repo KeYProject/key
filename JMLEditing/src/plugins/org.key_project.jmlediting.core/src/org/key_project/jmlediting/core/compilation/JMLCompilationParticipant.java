@@ -214,11 +214,8 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          final IResource res, final String src) {
       @SuppressWarnings("unchecked")
       final List<Comment> commentList = jdtAST.getCommentList();
-      final Map<Comment, ASTNode> inverse = new HashMap<Comment, ASTNode>();
-      final Map<Comment, ASTNode> inverseTrailing = new HashMap<Comment, ASTNode>();
-      final Map<CommentRange, Comment> jmlCommentToComment = new HashMap<CommentRange, Comment>();
-
       // Map JMLComments to JDTComments
+      final Map<CommentRange, Comment> jmlCommentToComment = new HashMap<CommentRange, Comment>();
       for (final CommentRange c : jmlComments) {
          for (final Comment jdtComment : commentList) {
             if (c.getBeginOffset() == jdtComment.getStartPosition()) {
@@ -227,43 +224,30 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          }
 
       }
+      final Map<Comment, ASTNode> inverse = new HashMap<Comment, ASTNode>();
       jdtAST.accept(new GenericVisitor() {
          @Override
          protected boolean visitNode(final ASTNode node) {
             // Maps All Leading Comments to its node
             // Also Maps JML comments to Comments, which are mapped to nodes
             final int start = jdtAST.firstLeadingCommentIndex(node);
-            final int end = jdtAST.lastTrailingCommentIndex(node);
-
             if (start != -1) {
                int pos = start;
-               while (pos < commentList.size()
-                     && commentList.get(pos).getStartPosition() < node
-                           .getStartPosition()) {
-                  assert !inverse.containsKey(commentList.get(pos));
-                  inverse.put(commentList.get(pos), node);
+               while (pos < commentList.size() && 
+                      commentList.get(pos).getStartPosition() < node.getStartPosition()) {
+                  Comment comment = commentList.get(pos);
+                  assert !inverse.containsKey(comment);
+                  inverse.put(comment, node);
                   pos++;
 
                }
 
             }
-            // Same as above for Trailing Comments
-            if (end != -1) {
-               int pos = end;
-               while (pos >= 0
-                     && commentList.get(pos).getStartPosition() > node
-                           .getStartPosition()) {
-                  assert !inverseTrailing.containsKey(commentList.get(pos));
-                  inverseTrailing.put(commentList.get(pos), node);
-                  pos--;
-               }
-            }
-
             return super.visitNode(node);
          }
       });
       final JMLValidationContext jmlContext = new JMLValidationContext(inverse,
-            inverseTrailing, jmlCommentToComment, src, jmlComments, jdtAST,
+            jmlCommentToComment, src, jmlComments, jdtAST,
             jmlParser);
       return new JMLValidationEngine(
             JMLPreferencesHelper.getProjectActiveJMLProfile(res.getProject()),

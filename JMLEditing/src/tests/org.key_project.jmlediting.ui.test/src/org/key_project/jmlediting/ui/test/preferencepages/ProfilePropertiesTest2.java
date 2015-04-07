@@ -13,7 +13,8 @@ import org.junit.Test;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
-import org.key_project.jmlediting.ui.test.UITestUtils;
+import org.key_project.jmlediting.ui.test.util.UITestUtils;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 public class ProfilePropertiesTest2 {
 
@@ -25,11 +26,10 @@ public class ProfilePropertiesTest2 {
          .instance().getAvailableProfilesSortedByName();
 
    @Test
-   public void testShowProjectSpecificProfileAndResetIt() throws CoreException {
-      UITestUtils.prepareWorkbench(bot);
+   public void testShowProjectSpecificProfileAndResetIt() throws CoreException, InterruptedException {
+      TestUtilsUtil.closeWelcomeView();
 
-      final IProject project = UITestUtils.createEmptyJavaProject(bot,
-            PROJECT_NAME);
+      final IProject project = TestUtilsUtil.createJavaProject(PROJECT_NAME).getProject();
       final int projectProfileIndex = 0;
       JMLPreferencesHelper.setProjectJMLProfile(project,
             ALL_PROFILES.get(projectProfileIndex));
@@ -37,12 +37,10 @@ public class ProfilePropertiesTest2 {
       JMLPreferencesHelper.setDefaultJMLProfile(ALL_PROFILES
             .get(defaultProfileIndex));
 
-      UITestUtils.openJMLProfileProperties(bot, PROJECT_NAME);
+      UITestUtils.openJMLProfileProperties(bot, project);
 
       final SWTBotCheckBox enableProjectSettingsBox = bot.checkBox();
       final SWTBotTable profileList = bot.table();
-
-      bot.sleep(100);
 
       assertTrue("Enable specific settings checkbox is not checked",
             enableProjectSettingsBox.isChecked());
@@ -54,10 +52,7 @@ public class ProfilePropertiesTest2 {
       bot.button("Apply").click();
 
       // Want to do rebuild
-      bot.sleep(50);
       bot.activeShell().bot().button("Yes").click();
-
-      bot.sleep(100);
 
       assertTrue("List is enabled when project specific settings are disabled",
             !profileList.isEnabled());

@@ -2,6 +2,7 @@ package org.key_project.jmlediting.ui.test.completion;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -17,6 +18,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.utils.Position;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -24,9 +28,11 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefKeywordSort;
-import org.key_project.jmlediting.ui.test.UITestUtils;
-import org.key_project.jmlediting.ui.test.UITestUtils.TestProject;
-import org.key_project.jmlediting.ui.test.UITestUtils.TestProject.SaveGuarantee;
+import org.key_project.jmlediting.ui.test.util.UITestUtils;
+import org.key_project.jmlediting.ui.test.util.UITestUtils.TestProject;
+import org.key_project.jmlediting.ui.test.util.UITestUtils.TestProject.SaveGuarantee;
+import org.key_project.util.jdt.JDTUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 public class StoreRefKeywordProposalsTest {
 
@@ -37,14 +43,15 @@ public class StoreRefKeywordProposalsTest {
    private static List<Integer> testPositions;
 
    @BeforeClass
-   public static void createProject() throws CoreException,
-         InterruptedException, IOException {
-      project = UITestUtils.createProjectWithFile(bot,
-            "StoreRefKeywordProposals", StoreRefKeywordProposalsTest.class
-                  .getPackage().getName(), "VectorTest",
-            "data/template/storerefproposals/", SaveGuarantee.NO_SAVE);
-      JMLPreferencesHelper.setProjectJMLProfile(project.getProject()
-            .getProject(), UITestUtils.findReferenceProfile());
+   public static void createProject() throws CoreException, InterruptedException, IOException {
+      TestUtilsUtil.closeWelcomeView();
+      project = UITestUtils.createProjectWithFile(bot, 
+                                                  "StoreRefKeywordProposals", 
+                                                  StoreRefKeywordProposalsTest.class.getPackage().getName(), 
+                                                  "VectorTest", 
+                                                  "data/template/storerefproposals/", 
+                                                  SaveGuarantee.NO_SAVE);
+      JMLPreferencesHelper.setProjectJMLProfile(project.getProject().getProject(), UITestUtils.findReferenceProfile());
       project.restoreClassAndOpen();
       // Preprocess file
       // There are markers following the template [[<num>]] in the text with
@@ -55,7 +62,7 @@ public class StoreRefKeywordProposalsTest {
             .getProject()
             .getFile(
                   "src/" + project.getPackageName().replace('.', '/') + "/"
-                        + project.getClassName() + ".java");
+                        + project.getClassName() + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT);
 
       // Read the file
       final BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -92,6 +99,11 @@ public class StoreRefKeywordProposalsTest {
    public void cleanEditor() throws CoreException {
       project.restoreClassAndOpen();
       editor = project.getOpenedEditor();
+   }
+   
+   @AfterClass
+   public static void closeEditor() {
+      editor.close();
    }
 
    @Test
@@ -140,7 +152,6 @@ public class StoreRefKeywordProposalsTest {
    public void testOpenProposalsWithParameter() {
       goToTestOffset(4);
       List<String> proposals = editor.getAutoCompleteProposals("");
-      bot.sleep(1000);
       proposals = editor.getAutoCompleteProposals("");
       assertEquals(
             "Proposals with parameters not correct",
@@ -149,7 +160,6 @@ public class StoreRefKeywordProposalsTest {
                   "vectors1", "vectors2"), proposals);
       editor.autoCompleteProposal("", "newVector");
       editor.typeText(".");
-      bot.sleep(10000);
       this.checkVector2Proposals();
    }
 
@@ -158,9 +168,7 @@ public class StoreRefKeywordProposalsTest {
       goToTestOffset(5);
       this.checkConsProposals();
       editor.autoCompleteProposal("", "elem");
-      bot.sleep(2000);
       editor.typeText(".");
-      bot.sleep(2000);
       this.checkVector2Proposals();
    }
 
@@ -176,11 +184,23 @@ public class StoreRefKeywordProposalsTest {
    public void testStarAfterReferenceType() {
       goToTestOffset(7);
       final Position pos = editor.cursorPosition();
-      editor.getAutoCompleteProposals("");
+      long originalTimeout = SWTBotPreferences.TIMEOUT;
+      try {
+         SWTBotPreferences.TIMEOUT = 1000; // Set short timeout as information hover might not be shown
+         editor.autoCompleteProposal("", "");
+         fail("Auto Completion list opened.");
+      }
+      catch (TimeoutException e) {
+         // Nothing to do as auto completion is performed without opening the selection list.
+      }
+      finally {
+         // Restore timeout
+         SWTBotPreferences.TIMEOUT = originalTimeout;
+      }
       // Only one proposal, is inserted by default
-      assertEquals("Wrong proposals after reference type with no field", editor
-            .getTextOnLine(pos.line).subSequence(pos.column, pos.column + 1),
-            "*");
+      assertEquals("Wrong proposals after reference type with no field", 
+                   "*",
+                   editor.getTextOnLine(pos.line).subSequence(pos.column, pos.column + 1));
    }
 
    @Test

@@ -19,6 +19,7 @@ import org.key_project.jmlediting.core.test.Activator;
 import org.key_project.jmlediting.core.utilities.JMLJavaVisibleFieldsComputer;
 import org.key_project.jmlediting.core.utilities.TypeDeclarationFinder;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 public class JMLJavaVisibleFieldsComputerTest {
@@ -46,7 +47,7 @@ public class JMLJavaVisibleFieldsComputerTest {
 
    public static ITypeBinding getTypeBinding(final String file, final int num) {
       final ICompilationUnit cu = (ICompilationUnit) JavaCore.create(project
-            .getProject().getFile(file + ".java"));
+            .getProject().getFile(file + JDTUtil.JAVA_FILE_EXTENSION_WITH_DOT));
 
       final ASTParser parser = ASTParser.newParser(AST.JLS8);
       parser.setKind(ASTParser.K_COMPILATION_UNIT);

@@ -129,4 +129,14 @@ public class CommentRange {
    public CommentType getType() {
       return this.type;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String toString() {
+      return getType() + 
+             " (offset = " + getBeginOffset() + " to " + getEndOffset() +
+             ", content offset = " + getContentBeginOffset() + " to " + getContentEndOffset() + ")";
+   }
 }

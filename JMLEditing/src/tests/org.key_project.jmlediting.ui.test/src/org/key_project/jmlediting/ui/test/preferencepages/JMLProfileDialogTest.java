@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
@@ -17,7 +19,8 @@ import org.junit.Test;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
-import org.key_project.jmlediting.ui.test.UITestUtils;
+import org.key_project.jmlediting.ui.test.util.UITestUtils;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 public class JMLProfileDialogTest {
    static SWTWorkbenchBot bot = new SWTWorkbenchBot();
@@ -49,15 +52,12 @@ public class JMLProfileDialogTest {
 
    @BeforeClass
    public static void init() {
-      UITestUtils.prepareWorkbench(bot);
+      TestUtilsUtil.closeWelcomeView();
    }
 
    @Before
    public void openGlobalProfileSettings() {
-      UITestUtils.openGlobalSettings(bot);
-      bot.sleep(100);
-      this.navigateToJMLProfileSettings();
-      bot.sleep(1000);
+      UITestUtils.openJMLProfilePreferencePage(bot);
    }
 
    @After
@@ -71,11 +71,6 @@ public class JMLProfileDialogTest {
       catch (final Exception e) {
          // close all dialogs, not clear how much, max 4.
       }
-   }
-
-   private void navigateToJMLProfileSettings() {
-      bot.tree().getTreeItem("JML").select().expand().getNode("Profile")
-            .select();
    }
 
    @Test
@@ -103,9 +98,7 @@ public class JMLProfileDialogTest {
       newProfileItem.check();
       bot.button("Apply").click();
       try {
-         bot.sleep(100);
          bot.button("Yes").click();
-         bot.sleep(500);
       }
       catch (final WidgetNotFoundException wnfe) {
          // when run single no dialog appears, in suite it does...
@@ -118,9 +111,7 @@ public class JMLProfileDialogTest {
             .check();
       bot.button("Apply").click();
       try {
-         bot.sleep(100);
          bot.button("Yes").click();
-         bot.sleep(500);
       }
       catch (final WidgetNotFoundException wnfe) {
          // when run single no dialog appears, in suite it does...
@@ -156,16 +147,13 @@ public class JMLProfileDialogTest {
    }
 
    @Test
-   public void testDeleteUsedProfile() {
-      System.out.println("testNew");
+   public void testDeleteUsedProfile() throws CoreException, InterruptedException {
       this.testNewProfileAndSave(THIRD_NEW_PROFILE_NAME);
-      System.out.println("close");
       this.closeProfileSettings();
 
-      UITestUtils.createEmptyJavaProject(bot, PROJECT_NAME);
+      IJavaProject project = TestUtilsUtil.createJavaProject(PROJECT_NAME);
 
-      System.out.println("open");
-      UITestUtils.openJMLProfileProperties(bot, PROJECT_NAME);
+      UITestUtils.openJMLProfileProperties(bot, project.getProject());
       bot.checkBox(PROJECT_SETTINGS_LABEL).click();
 
       bot.tableWithLabel(PROFILETABLE_LABEL)
@@ -175,7 +163,6 @@ public class JMLProfileDialogTest {
       bot.button("Yes").click();
 
       this.openGlobalProfileSettings();
-      this.navigateToJMLProfileSettings();
 
       bot.tableWithLabel(PROFILETABLE_LABEL)
             .getTableItem(THIRD_NEW_PROFILE_NAME).select();

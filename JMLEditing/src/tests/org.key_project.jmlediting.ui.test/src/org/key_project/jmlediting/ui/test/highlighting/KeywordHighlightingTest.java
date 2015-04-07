@@ -9,11 +9,12 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.utils.Position;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
-import org.key_project.jmlediting.ui.test.UITestUtils;
-import org.key_project.jmlediting.ui.test.UITestUtils.TestProject.SaveGuarantee;
+import org.key_project.jmlediting.ui.test.util.UITestUtils;
+import org.key_project.jmlediting.ui.test.util.UITestUtils.TestProject.SaveGuarantee;
 
 /**
  *
@@ -107,11 +108,14 @@ public class KeywordHighlightingTest {
       result.restoreClassAndOpen();
       editor = result.getOpenedEditor();
    }
+   
+   @AfterClass
+   public static void closeEditor() {
+      editor.close();
+   }
 
-   private static void removeText(final int line, final int column,
-         final int length) {
+   private static void removeText(final int line, final int column, final int length) {
       editor.selectRange(line, column, length);
-      bot.sleep(100);
       editor.pressShortcut(Keystrokes.DELETE);
    }
 

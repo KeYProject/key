@@ -35,6 +35,7 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
@@ -451,6 +452,42 @@ public class TestUtilsUtil {
       });
       // Open preference page
       SWTBotShell shell = bot.shell("Preferences");
+      TestUtilsUtil.selectInTree(shell.bot().tree(), preferencePagePath);
+      return shell;
+   }
+
+   /**
+    * Opens the properties page in the properties dialog of the given {@link IResource}.
+    * @param bot The {@link SWTBot} to use.
+    * @param resource The {@link IResource} to open its properties page.
+    * @param preferencePagePath The path to the preference page to open.
+    * @return The opened preference dialog shell.
+    */
+   public static SWTBotShell openPropertiesPage(SWTWorkbenchBot bot, final IResource resource, String... preferencePagePath) {
+      assertNotNull(resource);
+      return openPropertiesPage(bot, resource, resource.getName(), preferencePagePath);
+   }
+
+   /**
+    * Opens the properties page in the properties dialog of the given {@link IAdaptable}.
+    * @param bot The {@link SWTBot} to use.
+    * @param element The {@link IAdaptable} to open its properties page.
+    * @param elementName The name of the element.
+    * @param preferencePagePath The path to the preference page to open.
+    * @return The opened preference dialog shell.
+    */
+   public static SWTBotShell openPropertiesPage(SWTWorkbenchBot bot, final IAdaptable element, String elementName, String... preferencePagePath) {
+      // Open preference dialog
+      Display.getDefault().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+            Shell shell = WorkbenchUtil.getActiveShell();
+            PreferenceDialog dialog = PreferencesUtil.createPropertyDialogOn(shell, element, null, null, null);
+            dialog.open();
+         }
+      });
+      // Open preference page
+      SWTBotShell shell = bot.shell("Properties for " + elementName);
       TestUtilsUtil.selectInTree(shell.bot().tree(), preferencePagePath);
       return shell;
    }

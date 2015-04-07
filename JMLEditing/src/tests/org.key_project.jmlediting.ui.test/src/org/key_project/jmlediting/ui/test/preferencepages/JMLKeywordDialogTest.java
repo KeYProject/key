@@ -14,7 +14,8 @@ import org.junit.Test;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.ui.test.UITestUtils;
+import org.key_project.jmlediting.ui.test.util.UITestUtils;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 public class JMLKeywordDialogTest {
    static SWTWorkbenchBot bot = new SWTWorkbenchBot();
@@ -33,11 +34,8 @@ public class JMLKeywordDialogTest {
 
    @BeforeClass
    public static void init() {
-      UITestUtils.prepareWorkbench(bot);
-      bot.sleep(100);
-      UITestUtils.openGlobalSettings(bot);
-      bot.sleep(100);
-      navigateToJMLProfileSettings();
+      TestUtilsUtil.closeWelcomeView();
+      UITestUtils.openJMLProfilePreferencePage(bot);
       createNewProfileAndOpen();
    }
 
@@ -51,7 +49,6 @@ public class JMLKeywordDialogTest {
       bot.button("New...").click();
       bot.textWithLabel(PROFILE_NAME).setText(NEW_PROFILE_NAME);
       bot.comboBoxWithLabel(DERIVED_FROM).setSelection(PROFILENAME_TO_SELECT);
-      bot.sleep(100);
       clickOK();
       bot.tableWithLabel(PROFILETABLE_LABEL).getTableItem(NEW_PROFILE_NAME)
             .select();
@@ -81,7 +78,6 @@ public class JMLKeywordDialogTest {
       keywordText = bot.textWithLabel(KEYWORD_LABEL);
       keywordText.setText(SECOND_KEYWORD);
       clickOK();
-      bot.sleep(100);
       assertEquals("New Keyword is not Saved!", 1,
             customKeywordsTable.rowCount());
       assertEquals("New Keyword has wrong Name!", SECOND_KEYWORD,
@@ -114,11 +110,6 @@ public class JMLKeywordDialogTest {
          }
       }
       return false;
-   }
-
-   private static void navigateToJMLProfileSettings() {
-      bot.tree().getTreeItem("JML").select().expand().getNode("Profile")
-            .select();
    }
 
    private static void clickOK() {
