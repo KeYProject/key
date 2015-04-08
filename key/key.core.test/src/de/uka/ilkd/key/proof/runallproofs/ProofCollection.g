@@ -15,38 +15,48 @@ import java.util.HashMap;
  * Section for parser rules. Parser rules start with lowercase letters.
  */
 
-parserEntryPoint returns [List<ProofCollectionUnit> units, Map<Token, Token> settingsMap]
-@init{
+parserEntryPoint returns [List<ProofCollectionUnit> units, ProofCollectionSettings settings]
+@init {
     $units = new ArrayList<>();
-    $settingsMap = new HashMap<Token, Token>();
+    Map<String, String> settingsMap = new HashMap<>();
 }
     : (g=group {$units.add(g);}
       | t=testDeclaration {$units.add(new SingletonProofCollectionUnit(t));} 
-      | settingAssignment[$settingsMap])*
+      | settingAssignment[settingsMap])*
+      
+      /*
+       * Parsing is finished at this point. We can now convert our
+       * mutable settingsMap object into an immutable settings object.
+       */
+      {$settings = new ProofCollectionSettings(settingsMap, getTokenStream().getSourceName());}
 ;
 
 group returns [ProofCollectionUnit unit]
 @init{
-    Map<Token, Token> settingsMap = new HashMap<Token, Token>();
+    Map<String, String> localSettingsMap = new HashMap<>();
     List<FileWithTestProperty> files = new ArrayList<>();
 }
     : 'group' nameToken=Identifier
       '{'
-          (settingAssignment[settingsMap] | t=testDeclaration {files.add(t);} )*
+          (settingAssignment[localSettingsMap] | t=testDeclaration {files.add(t);} )*
       '}'
-      {unit = new GroupedProofCollectionUnit(nameToken, settingsMap, files);}
+      {unit = new GroupedProofCollectionUnit(nameToken.getText(), localSettingsMap, files);}
 ;
 
-settingAssignment[Map<Token, Token> settingsMap]
+settingAssignment[Map<String, String> settingsMap]
     : key=Identifier '=' value=(Identifier | PathString | QuotedString | Number)
-      {settingsMap.put(key, value);}
+      {settingsMap.put(key.getText(), value.getText());}
 ;
 
 testDeclaration returns [FileWithTestProperty file]
 @init{TestProperty testProperty = null;}
-    : ('provable' {testProperty=TestProperty.PROVABLE;}
+    : 
+      ('provable' {testProperty=TestProperty.PROVABLE;}
       | 'notprovable' {testProperty=TestProperty.NOTPROVABLE;}
-      | 'loadable' {testProperty=TestProperty.LOADABLE;}) ':'?
+      | 'loadable' {testProperty=TestProperty.LOADABLE;})
+      
+      ':'? // double colon is optional (doesn't hurt if omitted)
+       
       pathToken=(PathString | Identifier | Number)
       {
         assert testProperty != null: "Parser should have assigned a value other that null to variable testProperty at this point.";

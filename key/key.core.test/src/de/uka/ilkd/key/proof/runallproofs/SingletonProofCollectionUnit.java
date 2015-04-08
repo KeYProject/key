@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
-//import de.uka.ilkd.key.ui.ConsoleUserInterfaceControl;
+import java.io.IOException;
 
 /**
  *
@@ -15,7 +15,9 @@ public class SingletonProofCollectionUnit extends ProofCollectionUnit {
    }
 
    @Override
-   public boolean processProofObligations() {
+   public boolean processProofObligations(ProofCollectionSettings settings) throws IOException {
+      System.out.println(file.getFile(settings));
+      System.out.println();
       return true;
    }
 

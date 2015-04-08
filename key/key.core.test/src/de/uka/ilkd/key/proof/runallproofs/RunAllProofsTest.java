@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
@@ -52,8 +52,7 @@ import static org.junit.Assert.*;
  * 
  * <p>
  * The files to test are listed in: <br />
- * $KEY_HOME/key.core.test/resources/testcase/runallproofs/automaticJAVADL.txt <br />
- * The paths specified in this file are treated relative to path $KEY_HOME/key.ui/examples
+ * $KEY_HOME/key.core.test/resources/testcase/runallproofs/automaticJAVADL.txt
  * </p>
  * 
  * <p>
@@ -104,6 +103,7 @@ public class RunAllProofsTest {
     
     private final String defaultHeader;
     private final ProofCollectionUnit unit;
+    private final ProofCollectionSettings settings;
 
     /**
      * Constructor.
@@ -111,9 +111,10 @@ public class RunAllProofsTest {
      * @param defaultHeader The default header to use.
      * @param successExpected The expected result.
      */
-    public RunAllProofsTest(ProofCollectionUnit unit, String defaultHeader, Map<String, Object> settings) {
+    public RunAllProofsTest(ProofCollectionUnit unit, String defaultHeader, ProofCollectionSettings settings) {
        this.unit = unit;
        this.defaultHeader = defaultHeader;
+       this.settings = settings;
     }
 
     /**
@@ -131,7 +132,7 @@ public class RunAllProofsTest {
       }
       Path tmpFile = Files.createTempFile(tmpFolder.toPath(), null, null);
       tmpFile.toFile().deleteOnExit(); // deletes the temporary file when JVM terminates
-      Files.write(tmpFile, convertToByteArray(unit));
+      Files.write(tmpFile, convertToByteArray(new Object[]{settings, unit}));
       ProcessBuilder pb = new ProcessBuilder("java", "-classpath",
             System.getProperty("java.class.path"),
             this.getClass().getName(),
@@ -156,9 +157,11 @@ public class RunAllProofsTest {
        return byteArrayOutputStream.toByteArray();
     }
     
-    public static void main(String[] args) throws Exception{
-        ProofCollectionUnit unit = (ProofCollectionUnit)convertToObject(Files.readAllBytes(new File(args[0]).toPath()));
-        unit.processProofObligations();
+    public static void main(String[] args) throws Exception {
+       Object[] tmp = (Object[])convertToObject(Files.readAllBytes(new File(args[0]).toPath()));
+       ProofCollectionSettings settings = (ProofCollectionSettings)tmp[0];
+        ProofCollectionUnit unit = (ProofCollectionUnit)tmp[1];
+       unit.processProofObligations(settings);
     }
     
     /**
@@ -201,23 +204,16 @@ public class RunAllProofsTest {
         File automaticJAVADL = new File(EXAMPLE_DIR, "index/automaticJAVADL_new.txt");
         parserEntryPoint_return parseResult= parseFile(automaticJAVADL);
         
-        Map<String, Object> settings = getSettings();
-        
         // create list of constructor parameters that will be returned by this method
         Collection<Object[]> data = new LinkedList<Object[]>();
         for(ProofCollectionUnit unit : parseResult.units){
-           data.add(new Object[]{unit, defaultHeader, settings});
+           data.add(new Object[]{unit, defaultHeader, parseResult.settings});
         }
         return data;
     }
-    
-    private static Map<String, Object> getSettings() {
-      Map<String, Object> ret = new HashMap<>();
-      return ret;
-   }
 
    private static parserEntryPoint_return parseFile(File file) throws IOException, RecognitionException {
-       CharStream charStream = new ANTLRStringStream(IOUtil.readFrom(file));
+       CharStream charStream = new ANTLRFileStream(file.getAbsolutePath());
        ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
        TokenStream tokenStream = new CommonTokenStream(lexer);
        ProofCollectionParser parser = new ProofCollectionParser(tokenStream);
