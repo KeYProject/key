@@ -42,7 +42,7 @@ public abstract class TacletMatcherKit {
      * sets up the concrete factory to use depending on the provided system property or the given default if no
      * property is set
      */
-    private static final String TACLET_MATCHER_SELECTION_VALUE = System.getProperty("taclet.match", "legacy");    
+    private static final String TACLET_MATCHER_SELECTION_VALUE = System.getProperty("taclet.match", "vm");    
     private static final TacletMatcherKit ACTIVE_TACLET_MATCHER_KIT; 
     static {    
         if ("legacy".equals(TACLET_MATCHER_SELECTION_VALUE)) {
