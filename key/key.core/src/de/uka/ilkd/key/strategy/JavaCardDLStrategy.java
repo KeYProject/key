@@ -179,7 +179,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
     }    
     
-    
     protected Feature setupGlobalF(Feature dispatcher) {//        
         final Feature ifMatchedF = ifZero ( MatchedIfFeature.INSTANCE,
                                             longConst ( +1 ) );
@@ -212,8 +211,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         } else {
                 queryF = null;
                 assert false;
-        }
-        
+        }    
 
         final Feature depSpecF;
         final String depProp
