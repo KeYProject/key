@@ -33,7 +33,6 @@ import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  * Class whose objects represent an index of taclet apps for one particular
@@ -199,8 +198,7 @@ public class TermTacletAppIndex {
                                             NewRuleListener listener,
                                             RuleFilter      filter,
                                             TermTacletAppIndexCacheSet indexCaches) {
-        Debug.assertTrue ( pos.isTopLevel (),
-                           "Someone tried to create a term index for a real subterm" );
+        assert pos.isTopLevel () : "Someone tried to create a term index for a real subterm";
 
         final ITermTacletAppIndexCache indexCache =
             determineIndexCache ( pos, indexCaches );
