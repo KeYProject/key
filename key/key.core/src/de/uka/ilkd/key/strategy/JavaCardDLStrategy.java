@@ -2439,8 +2439,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             setupMultiplyInequations ( d, inftyConst () );
 
         // these taclets are not supposed to be applied with metavariable
-        // instantiations
-        bindRuleSet ( d, "inEqSimp_pullOutGcd", isInstantiated ( "elimGcd" ) );
+        // instantiations 
+        // I'll keep it here for the moment as documentation, but comment it out
+        // as meta variables are no longer part of KeY 2.x
+        /* bindRuleSet ( d, "inEqSimp_pullOutGcd", isInstantiated ( "elimGcd" ) );
         bindRuleSet ( d, "polySimp_pullOutGcd", isInstantiated ( "elimGcd" ) );
 
         bindRuleSet ( d, "inEqSimp_nonNegSquares", isInstantiated ( "squareFac" ) );
@@ -2449,6 +2451,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "inEqSimp_nonLin_neg", isInstantiated ( "divY" ) );
 
         bindRuleSet ( d, "inEqSimp_signCases", isInstantiated ( "signCasesLeft" ) );
+        */
 
         setupNewSymApproval ( d, numbers );
 
@@ -2512,8 +2515,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                        the outer 'not' then ensures that the costs are infinite
                        in the first and 0 in the latter case */
                     not ( sum(tb, HeapGenerator.INSTANCE, 
-                            not ( eq(instOf("sv_heap"), tb) ) ) ),
-                    longConst(0));            
+                            not ( eq(instOf("sv_heap"), tb) ) ) ) );            
             
             if (classAxiomDelayedApplication()) {
                 bindRuleSet (d, "classAxiom", add(sequentContainsNoPrograms(), 
