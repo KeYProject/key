@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableList;
@@ -646,7 +645,8 @@ public class TermTacletAppIndex {
      * @param pos
      *            The position of this index
      * @param collectedApps
-     *            the {@link List} to which to add the found taclet applications; it must not contain 
+     *            the {@link ImmutableMap<PosInOccurrence, ImmutableList<NoPosTacletApp>>} to which to 
+     *            add the found taclet applications; it must not contain 
      *            {@code pos} or any position below pos as key 
      * @return the resulting list of taclet applications from this and all subterm taclet indices
      */
@@ -706,9 +706,13 @@ public class TermTacletAppIndex {
 
             if ( subTerm.op () instanceof UpdateApplication ) {
                 final int targetPos = UpdateApplication.targetPos ();
-                if ( nextSubtermIndex != targetPos )
+                if ( nextSubtermIndex != targetPos ) {
+                    // the path to modification leads to a place inside an update
+                    // i.e., we have to collect all taclets matching behind the update
+                    // as their update context has changed
                     collectedApps = index.getSubIndex ( targetPos )
                     .collectAllTacletAppsHereAndBelow ( pos.down ( targetPos ), collectedApps );
+                }
             }
 
             index = index.getSubIndex ( nextSubtermIndex );
