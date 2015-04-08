@@ -35,7 +35,6 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * Class whose objects represent an index of taclet apps for one particular
