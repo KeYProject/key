@@ -16,10 +16,10 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.jdt.internal.ui.preferences.PropertyAndPreferencePage;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -42,7 +42,7 @@ import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceExc
 import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceFactory;
 import org.key_project.jmlediting.ui.Activator;
 import org.key_project.jmlediting.ui.preferencepages.RebuildHelper.UserMessage;
-import org.key_project.jmlediting.ui.preferencepages.profileDialog.JMLProfileDialog;
+import org.key_project.jmlediting.ui.wizard.JMLProfileWizard;
 import org.key_project.util.eclipse.Logger;
 import org.key_project.util.java.IOUtil;
 
@@ -173,185 +173,172 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
       this.updateSelection();
 
-      this.exportButton.addSelectionListener(new SelectionListener() {
+      this.exportButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-
-            final IJMLProfile profile = JMLProfilePropertiesPage.this
-                  .getSelectedProfile();
-            if (!(profile instanceof IDerivedProfile)) {
-               // Cannot occur because button is disabled, but prevent cast
-               // exception altough
-               return;
-            }
-            final FileDialog dialog = new FileDialog(
-                  JMLProfilePropertiesPage.this.getShell(), SWT.SAVE);
-            final String[] filterNames = new String[] { "XML File" };
-            final String[] filterExtensions = new String[] { "*.xml" };
-            dialog.setFilterNames(filterNames);
-            dialog.setFilterExtensions(filterExtensions);
-            final String file = dialog.open();
-            if (file != null) {
-               try {
-                  final String xmlFileContent = ProfilePersistenceFactory
-                        .createDerivedProfilePersistence().persist(
-                              (IDerivedProfile) profile);
-                  final FileWriter writer = new FileWriter(new File(file));
-                  writer.write(xmlFileContent);
-                  writer.flush();
-                  writer.close();
-               }
-               catch (final ProfilePersistenceException e1) {
-                  new Logger(Activator.getDefault(), Activator.PLUGIN_ID)
-                        .logError(e1);
-               }
-               catch (final IOException e1) {
-                  ErrorDialog.openError(JMLProfilePropertiesPage.this
-                        .getShell(), "Failed to write the exported file",
-                        "Due to an error: " + e1.getMessage(), new Status(
-                              IStatus.ERROR, Activator.PLUGIN_ID,
-                              "IO Exception", e1));
-               }
-            }
-         }
-
-         @Override
-         public void widgetDefaultSelected(final SelectionEvent e) {
+            exportProfile();
          }
       });
-      this.importButton.addSelectionListener(new SelectionListener() {
+      this.importButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            final FileDialog dialog = new FileDialog(
-                  JMLProfilePropertiesPage.this.getShell(), SWT.OPEN);
-            final String[] filterNames = new String[] { "XML File" };
-            final String[] filterExtensions = new String[] { "*.xml" };
-            dialog.setFilterNames(filterNames);
-            dialog.setFilterExtensions(filterExtensions);
-            final String file = dialog.open();
-            if (file != null) {
-               try {
-                  String content = IOUtil.readFrom(new File(file));
-                  final IDerivedProfile profile = ProfilePersistenceFactory
-                        .createDerivedProfilePersistence().read(content);
-                  JMLProfileManagement.instance()
-                        .addUserDefinedProfile(profile);
-                  JMLProfilePropertiesPage.this.fillTable();
-               }
-               catch (final ProfilePersistenceException e1) {
-                  ErrorDialog.openError(
-                        JMLProfilePropertiesPage.this.getShell(),
-                        "Failed to load the profile",
-                        "The given profile cannot be loaded.",
-                        new Status(IStatus.ERROR, Activator.PLUGIN_ID, e1
-                              .getMessage(), e1));
-               }
-               catch (final IOException e1) {
-                  ErrorDialog.openError(
-                        JMLProfilePropertiesPage.this.getShell(),
-                        "Failed to read the file",
-                        "The selected file cannot be read to load the profile.",
-                        new Status(IStatus.ERROR, Activator.PLUGIN_ID, e1
-                              .getMessage(), e1));
-               }
-               catch (final InvalidProfileException e1) {
-                  ErrorDialog.openError(
-                        JMLProfilePropertiesPage.this.getShell(),
-                        "Cannot import the profile",
-                        "Failed to add the read profile to the list of available profiles in the workspace.",
-                        new Status(IStatus.ERROR, Activator.PLUGIN_ID, e1
-                              .getMessage(), e1));
-               }
-            }
-         }
-
-         @Override
-         public void widgetDefaultSelected(final SelectionEvent e) {
+            importProfile();
          }
       });
-      this.deleteButton.addSelectionListener(new SelectionListener() {
+      this.deleteButton.addSelectionListener(new SelectionAdapter() {
 
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            final IJMLProfile profile = JMLProfilePropertiesPage.this
-                  .getSelectedProfile();
-            if (!(profile instanceof IDerivedProfile)
-                  || !JMLProfileManagement.instance().isUserDefinedProfile(
-                        (IDerivedProfile) profile)) {
-               // Cannot occur because button is disabled, but prevent cast
-               // exception altough
-               return;
-            }
-            if (!JMLProfileHelper.getProjectsUsingProfile(profile).isEmpty()) {
-               MessageDialog.openError(
-                     JMLProfilePropertiesPage.this.getShell(),
-                     "Cannot delete profile",
-                     "Cannot delete the profile \""
-                           + profile.getName()
-                           + "\" because some projects in the workspace are using it.");
-            }
-            else {
-               try {
-                  JMLProfileManagement.instance().removeUserDefinedProfile(
-                        (IDerivedProfile) profile);
-                  JMLProfilePropertiesPage.this.fillTable();
-               }
-               catch (final InvalidProfileException ie) {
-                  // Should not occur here, but in the case that, handle it
-                  new Logger(Activator.getDefault(), Activator.PLUGIN_ID)
-                        .logError(ie);
-                  MessageDialog.openError(
-                        JMLProfilePropertiesPage.this.getShell(),
-                        "Failed to write profiles", ie.getMessage());
-               }
-            }
-         }
-
-         @Override
-         public void widgetDefaultSelected(final SelectionEvent e) {
-            // TODO Auto-generated method stub
-
+            deleteProfile();
          }
       });
-      newButton.addSelectionListener(new SelectionListener() {
+      newButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            final JMLProfileDialog dialog = new JMLProfileDialog(
-                  JMLProfilePropertiesPage.this.getShell(), null);
-            dialog.open();
-            if (dialog.getReturnCode() == Window.OK) {
-               JMLProfilePropertiesPage.this.fillTable();
-            }
-         }
-
-         @Override
-         public void widgetDefaultSelected(final SelectionEvent e) {
+            createNewProfile();
          }
       });
-      this.editViewButton.addSelectionListener(new SelectionListener() {
+      this.editViewButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            if (JMLProfilePropertiesPage.this.profile2EditView == null) {
-               JMLProfilePropertiesPage.this.profile2EditView = JMLProfilePropertiesPage.this
-                     .getCheckedProfile();
-            }
-
-            final JMLProfileDialog dialog = new JMLProfileDialog(
-                  JMLProfilePropertiesPage.this.getShell(),
-                  JMLProfilePropertiesPage.this.profile2EditView);
-            dialog.open();
-            // updates the table after closing editDialog with OK
-            if (dialog.getReturnCode() == Window.OK) {
-               JMLProfilePropertiesPage.this.fillTable();
-            }
-         }
-
-         @Override
-         public void widgetDefaultSelected(final SelectionEvent e) {
+            editProfile();
          }
       });
 
       return myComposite;
+   }
+   
+   protected void exportProfile() {
+      final IJMLProfile profile = JMLProfilePropertiesPage.this
+            .getSelectedProfile();
+      if (!(profile instanceof IDerivedProfile)) {
+         // Cannot occur because button is disabled, but prevent cast
+         // exception altough
+         return;
+      }
+      final FileDialog dialog = new FileDialog(
+            JMLProfilePropertiesPage.this.getShell(), SWT.SAVE);
+      final String[] filterNames = new String[] { "XML File" };
+      final String[] filterExtensions = new String[] { "*.xml" };
+      dialog.setFilterNames(filterNames);
+      dialog.setFilterExtensions(filterExtensions);
+      final String file = dialog.open();
+      if (file != null) {
+         try {
+            final String xmlFileContent = ProfilePersistenceFactory
+                  .createDerivedProfilePersistence().persist(
+                        (IDerivedProfile) profile);
+            final FileWriter writer = new FileWriter(new File(file));
+            writer.write(xmlFileContent);
+            writer.flush();
+            writer.close();
+         }
+         catch (final ProfilePersistenceException e1) {
+            new Logger(Activator.getDefault(), Activator.PLUGIN_ID)
+                  .logError(e1);
+         }
+         catch (final IOException e1) {
+            ErrorDialog.openError(JMLProfilePropertiesPage.this
+                  .getShell(), "Failed to write the exported file",
+                  "Due to an error: " + e1.getMessage(), new Status(
+                        IStatus.ERROR, Activator.PLUGIN_ID,
+                        "IO Exception", e1));
+         }
+      }
+   }
+
+   protected void importProfile() {
+      final FileDialog dialog = new FileDialog(
+            JMLProfilePropertiesPage.this.getShell(), SWT.OPEN);
+      final String[] filterNames = new String[] { "XML File" };
+      final String[] filterExtensions = new String[] { "*.xml" };
+      dialog.setFilterNames(filterNames);
+      dialog.setFilterExtensions(filterExtensions);
+      final String file = dialog.open();
+      if (file != null) {
+         try {
+            String content = IOUtil.readFrom(new File(file));
+            final IDerivedProfile profile = ProfilePersistenceFactory
+                  .createDerivedProfilePersistence().read(content);
+            JMLProfileManagement.instance()
+                  .addUserDefinedProfile(profile);
+            JMLProfilePropertiesPage.this.fillTable();
+         }
+         catch (final ProfilePersistenceException e1) {
+            ErrorDialog.openError(
+                  JMLProfilePropertiesPage.this.getShell(),
+                  "Failed to load the profile",
+                  "The given profile cannot be loaded.",
+                  new Status(IStatus.ERROR, Activator.PLUGIN_ID, e1
+                        .getMessage(), e1));
+         }
+         catch (final IOException e1) {
+            ErrorDialog.openError(
+                  JMLProfilePropertiesPage.this.getShell(),
+                  "Failed to read the file",
+                  "The selected file cannot be read to load the profile.",
+                  new Status(IStatus.ERROR, Activator.PLUGIN_ID, e1
+                        .getMessage(), e1));
+         }
+         catch (final InvalidProfileException e1) {
+            ErrorDialog.openError(
+                  JMLProfilePropertiesPage.this.getShell(),
+                  "Cannot import the profile",
+                  "Failed to add the read profile to the list of available profiles in the workspace.",
+                  new Status(IStatus.ERROR, Activator.PLUGIN_ID, e1
+                        .getMessage(), e1));
+         }
+      }
+   }
+
+   protected void deleteProfile() {
+      final IJMLProfile profile = JMLProfilePropertiesPage.this
+            .getSelectedProfile();
+      if (!(profile instanceof IDerivedProfile)
+            || !JMLProfileManagement.instance().isUserDefinedProfile(
+                  (IDerivedProfile) profile)) {
+         // Cannot occur because button is disabled, but prevent cast
+         // exception altough
+         return;
+      }
+      if (!JMLProfileHelper.getProjectsUsingProfile(profile).isEmpty()) {
+         MessageDialog.openError(
+               JMLProfilePropertiesPage.this.getShell(),
+               "Cannot delete profile",
+               "Cannot delete the profile \""
+                     + profile.getName()
+                     + "\" because some projects in the workspace are using it.");
+      }
+      else {
+         try {
+            JMLProfileManagement.instance().removeUserDefinedProfile(
+                  (IDerivedProfile) profile);
+            JMLProfilePropertiesPage.this.fillTable();
+         }
+         catch (final InvalidProfileException ie) {
+            // Should not occur here, but in the case that, handle it
+            new Logger(Activator.getDefault(), Activator.PLUGIN_ID)
+                  .logError(ie);
+            MessageDialog.openError(
+                  JMLProfilePropertiesPage.this.getShell(),
+                  "Failed to write profiles", ie.getMessage());
+         }
+      }
+   }
+   
+   protected void createNewProfile() {
+      if (JMLProfileWizard.openWizard(getShell(), null) == WizardDialog.OK) {
+         JMLProfilePropertiesPage.this.fillTable();
+      }
+   }
+   
+   protected void editProfile() {
+      if (JMLProfilePropertiesPage.this.profile2EditView == null) {
+         JMLProfilePropertiesPage.this.profile2EditView = JMLProfilePropertiesPage.this.getCheckedProfile();
+      }
+      if (JMLProfileWizard.openWizard(getShell(), JMLProfilePropertiesPage.this.profile2EditView) == WizardDialog.OK) {
+         JMLProfilePropertiesPage.this.fillTable();
+      }
    }
 
    private Button createTableSideButton(final Composite myComposite,

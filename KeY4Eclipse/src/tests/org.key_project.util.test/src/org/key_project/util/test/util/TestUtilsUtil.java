@@ -70,6 +70,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.results.ArrayResult;
 import org.eclipse.swtbot.swt.finder.results.BoolResult;
+import org.eclipse.swtbot.swt.finder.results.IntResult;
 import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.results.WidgetResult;
@@ -86,6 +87,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarPushButton;
@@ -1756,5 +1758,21 @@ public class TestUtilsUtil {
       if (!StringUtil.equalIgnoreWhiteSpace(expected, actual)) {
          TestCase.assertEquals(expected, actual);
       }
+   }
+
+   /**
+    * Checks if the given {@link SWTBotText} is editable or not.
+    * @param text The {@link SWTBotText} to check.
+    * @return {@code true} editable, {@code false} read-only.
+    */
+   public static boolean isEditable(final SWTBotText text) {
+      assertNotNull(text);
+      int style = syncExec(new IntResult() {
+         @Override
+         public Integer run() {
+            return text.widget.getStyle();
+         }
+      });
+      return (style & SWT.READ_ONLY) != SWT.READ_ONLY;
    }
 }

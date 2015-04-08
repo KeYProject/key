@@ -52,16 +52,18 @@ import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 public class JMLEditingUITestUtils {
-   public static void openJMLProfileProperties(final SWTWorkbenchBot bot, final IProject project) {
+   public static SWTBotShell openJMLProfileProperties(final SWTWorkbenchBot bot, final IProject project) {
       TestUtilsUtil.openPropertiesPage(bot, project, "JML", "Profile");
+      return bot.shell("Properties for " + project.getName());
    }
 
    public static void openJMLPreferencePage(final SWTWorkbenchBot bot) {
       TestUtilsUtil.openPreferencePage(bot, "JML");
    }
 
-   public static void openJMLProfilePreferencePage(final SWTWorkbenchBot bot) {
+   public static SWTBotShell openJMLProfilePreferencePage(final SWTWorkbenchBot bot) {
       TestUtilsUtil.openPreferencePage(bot, "JML", "Profile");
+      return bot.shell("Preferences");
    }
 
    public static void openJMLColorsPreferencePage(final SWTWorkbenchBot bot) {

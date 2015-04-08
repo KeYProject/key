@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.ui.preferencepages.profileDialog;
+package org.key_project.jmlediting.ui.wizard.page;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,10 +8,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -19,24 +18,24 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.key_project.jmlediting.core.profile.IEditableDerivedProfile;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.core.profile.syntax.user.UserDefinedKeyword;
+import org.key_project.jmlediting.ui.wizard.JMLKeywordWizard;
+import org.key_project.util.java.StringUtil;
 
 /**
- * A Dialog to define custom Keywords.
- *
- * @author Thomas Glaser
- *
+ * The {@link WizardPage} to edit {@link IUserDefinedKeyword}s.
+ * @author Martin Hentschel
+ * @see JMLKeywordWizard
  */
-public class JMLKeywordDialog extends TitleAreaDialog {
+public class JMLKeywordWizardPage extends WizardPage {
    public static final String CLOSING_CHARACTER_ID = "ClosingCharacter";
+   
    /**
     * the Profile to define the keyword for.
     */
@@ -77,37 +76,53 @@ public class JMLKeywordDialog extends TitleAreaDialog {
     */
    private ControlDecoration keywordTextError;
 
-   /**
-    * the only Constructor.
-    *
-    * @param parent
-    *           the parent Shell for the dialog
-    * @param derivedProfile
-    *           the profile to define the keyword for
-    * @param keyword
-    *           the keyword to edit (null when new keyword)
-    */
-   public JMLKeywordDialog(final Shell parent,
-         final IEditableDerivedProfile derivedProfile,
-         final IUserDefinedKeyword keyword) {
-      super(parent);
+   public JMLKeywordWizardPage(String pageName, final IEditableDerivedProfile derivedProfile, final IUserDefinedKeyword keyword) {
+      super(pageName);
       this.derivedProfile = derivedProfile;
       this.keyword = keyword;
-      this.setHelpAvailable(false);
-   }
-
-   @Override
-   public void create() {
-      super.create();
       if (this.keyword != null) {
          this.setTitle("Edit Keyword");
+         setDescription("Edit the content of the existing keyword.");
       }
       else {
          this.setTitle("Create New Keyword");
+         setDescription("Define the content of the new keyword.");
       }
-      this.setMessage("", IMessageProvider.NONE);
    }
 
+   @Override
+   public void createControl(Composite parent) {
+      final Composite myComposite = new Composite(parent, SWT.NONE);
+      setControl(parent);
+      myComposite.setLayout(new GridLayout(3, false));
+
+      this.addLabel(myComposite, "Keyword:", 1, 0, 0);
+
+      this.addLabel(myComposite, "Content:", 1, 20, 0);
+
+      this.addLabel(myComposite, "", 1, 20, 0);
+
+      this.addKeywordText(myComposite);
+
+      this.addContentCombo(myComposite);
+
+      this.addEndingCharacterCombo(myComposite);
+
+      this.addLabel(myComposite, "Keyword Sort:", 3, 0, 20);
+
+      this.addSortCombo(myComposite);
+
+      this.addLabel(myComposite, "Description:", 3, 0, 20);
+
+      this.addDescriptionText(myComposite);
+
+      this.fillCombos();
+
+      if (this.keyword != null) {
+         this.fillView();
+      }
+   }
+   
    /**
     * fill the view to edit the given keyword.
     */
@@ -159,43 +174,6 @@ public class JMLKeywordDialog extends TitleAreaDialog {
       this.descriptionText.setText(this.keyword.getDescription());
    }
 
-   @Override
-   protected Control createDialogArea(final Composite parent) {
-      final Composite composite = (Composite) super.createDialogArea(parent);
-      final GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-      final Composite myComposite = new Composite(composite, SWT.NONE);
-      myComposite.setLayoutData(data);
-      myComposite.setLayout(new GridLayout(3, false));
-
-      this.addLabel(myComposite, "Keyword:", 1, 0, 0);
-
-      this.addLabel(myComposite, "Content:", 1, 20, 0);
-
-      this.addLabel(myComposite, "", 1, 20, 0);
-
-      this.addKeywordText(myComposite);
-
-      this.addContentCombo(myComposite);
-
-      this.addEndingCharacterCombo(myComposite);
-
-      this.addLabel(myComposite, "Keyword Sort:", 3, 0, 20);
-
-      this.addSortCombo(myComposite);
-
-      this.addLabel(myComposite, "Description:", 3, 0, 20);
-
-      this.addDescriptionText(myComposite);
-
-      this.fillCombos();
-
-      if (this.keyword != null) {
-         this.fillView();
-      }
-
-      return composite;
-   }
-
    /**
     * fill the comboboxes with the available values and select by default the
     * first item.
@@ -237,13 +215,15 @@ public class JMLKeywordDialog extends TitleAreaDialog {
       this.closingCharacterCombo.add("");
       this.closingCharacterCombo.add(";");
       this.closingCharacterCombo.select(0);
+      
+      updatePageCompleted();
    }
 
    private void addDescriptionText(final Composite myComposite) {
-      final GridData data = new GridData(SWT.FILL, SWT.TOP, true, true, 3, 1);
-      data.heightHint = 100;
-      this.descriptionText = new Text(myComposite, SWT.MULTI | SWT.BORDER
-            | SWT.V_SCROLL | SWT.WRAP);
+      final GridData data = new GridData(GridData.FILL_BOTH);
+      data.horizontalSpan = 3;
+      data.heightHint = 200;
+      this.descriptionText = new Text(myComposite, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
       this.descriptionText.setLayoutData(data);
    }
 
@@ -296,34 +276,31 @@ public class JMLKeywordDialog extends TitleAreaDialog {
       this.keywordText.addModifyListener(new ModifyListener() {
          @Override
          public void modifyText(final ModifyEvent e) {
-            final String text = JMLKeywordDialog.this.keywordText.getText();
-            if (!text.isEmpty()
-                  && JMLKeywordDialog.this.checkNoWhitespace(text)) {
-               JMLKeywordDialog.this.keywordTextError.hide();
-            }
-            else {
-               JMLKeywordDialog.this.keywordTextError.show();
-            }
+            updatePageCompleted();
+            
          }
       });
    }
 
-   @Override
-   protected void okPressed() {
-      final String formattedKeyword = this.keywordText.getText();
-      final Set<String> keywords = new HashSet<String>();
-      for (final String kw : formattedKeyword.split(",\\s")) {
-         if (!kw.isEmpty() && this.checkNoWhitespace(kw)) {
-            keywords.add(kw);
-         }
-      }
-
-      if (keywords.size() == 0) {
-         this.setMessage("Keyword may not be empty!", IMessageProvider.ERROR);
-         return;
+   protected void updatePageCompleted() {
+      String errorMessage = null;
+      // Validate text
+      if (!computeKeywords().isEmpty()) {
+         JMLKeywordWizardPage.this.keywordTextError.hide();
       }
       else {
-         this.setMessage(null);
+         JMLKeywordWizardPage.this.keywordTextError.show();
+         errorMessage = keywordTextError.getDescriptionText();
+      }
+      // Update page completed
+      setPageComplete(errorMessage == null);
+      setErrorMessage(errorMessage);
+   }
+   
+   public IUserDefinedKeyword performFinish() {
+      Set<String> keywords = computeKeywords();
+      if (keywords.isEmpty()) {
+         return null;
       }
 
       final IKeywordSort sort = (IKeywordSort) this.sortCombo
@@ -344,23 +321,18 @@ public class JMLKeywordDialog extends TitleAreaDialog {
                this.closingCharacterCombo.getSelectionIndex()).charAt(0);
       }
 
-      if (this.keyword != null) {
-         this.derivedProfile.removeKeyword(this.keyword);
-      }
-      final IUserDefinedKeyword keyword2Save = new UserDefinedKeyword(keywords,
-            sort, contentDescription, description, closingCharacter);
-
-      this.derivedProfile.addKeyword(keyword2Save);
-
-      super.okPressed();
+      final IUserDefinedKeyword keyword2Save = new UserDefinedKeyword(keywords, sort, contentDescription, description, closingCharacter);
+      return keyword2Save;
    }
-
-   private boolean checkNoWhitespace(final String kw) {
-      for (int i = 0; i < kw.length(); i++) {
-         if (Character.isWhitespace(kw.charAt(i))) {
-            return false;
+   
+   protected Set<String> computeKeywords() {
+      final String formattedKeyword = this.keywordText.getText();
+      final Set<String> keywords = new HashSet<String>();
+      for (final String kw : formattedKeyword.split(",")) {
+         if (!StringUtil.isTrimmedEmpty(kw)) {
+            keywords.add(kw.trim());
          }
       }
-      return true;
+      return keywords;
    }
 }

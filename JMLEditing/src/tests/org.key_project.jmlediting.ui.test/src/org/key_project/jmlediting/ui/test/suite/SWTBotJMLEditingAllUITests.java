@@ -15,8 +15,8 @@ import org.key_project.jmlediting.ui.test.marker.SWTBotParseErrorMarkerTest;
 import org.key_project.jmlediting.ui.test.marker.SWTBotValidationErrorMarkerTest;
 import org.key_project.jmlediting.ui.test.miscellaneous.SWTBotEnableDisableTest;
 import org.key_project.jmlediting.ui.test.preferencepages.SWTBotJMLColorPreferencePageTest;
-import org.key_project.jmlediting.ui.test.preferencepages.SWTBotJMLKeywordDialogTest;
-import org.key_project.jmlediting.ui.test.preferencepages.SWTBotJMLProfileDialogTest;
+import org.key_project.jmlediting.ui.test.preferencepages.SWTBotJMLKeywordWizardTest;
+import org.key_project.jmlediting.ui.test.preferencepages.SWTBotJMLProfileWizardTest;
 import org.key_project.jmlediting.ui.test.preferencepages.SWTBotProfilePropertiesTest;
 import org.key_project.jmlediting.ui.test.preferencepages.SWTBotProfilePropertiesTest2;
 
@@ -41,8 +41,8 @@ import org.key_project.jmlediting.ui.test.preferencepages.SWTBotProfilePropertie
    SWTBotEnableDisableTest.class,
    // preferencepages
    SWTBotJMLColorPreferencePageTest.class,
-   SWTBotJMLKeywordDialogTest.class,
-   SWTBotJMLProfileDialogTest.class,
+   SWTBotJMLKeywordWizardTest.class,
+   SWTBotJMLProfileWizardTest.class,
    SWTBotProfilePropertiesTest.class,
    SWTBotProfilePropertiesTest2.class
 })
