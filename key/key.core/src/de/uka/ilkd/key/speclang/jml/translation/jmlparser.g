@@ -966,12 +966,15 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
     Function f = null;
     KeYJavaType type = null;
     SLExpression right = null;
+    SLExpression right2 = null;
     Token opToken = null;
 }
 :
 	result=shiftexpr
 	(
-	    lt:LT right=shiftexpr
+	    lt:LT right=shiftexpr 
+	    // allow range predicates of the shape 0 < x < 23 (JML extension)
+	    ( LT right2=shiftexpr )?
 	    {
 		f = intLDT.getLessThan();
 		opToken = lt;
@@ -984,6 +987,8 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
 	    }
 	|
 	    leq:LEQ right=shiftexpr
+	    // allow range predicates of the shape 0 <= x < 23 (JML extension)
+	    ( LT right2=shiftexpr )?
 	    {
 		f = intLDT.getLessOrEquals();
 		opToken = leq;
@@ -1071,6 +1076,15 @@ relationalexpr returns [SLExpression result=null] throws SLTranslationException
 
 			    result = new SLExpression(
 				tb.func(f,result.getTerm(),right.getTerm()));
+			} 
+			if (right2 != null) { // range expressions like 0 <= x < 23
+			    if (right2.isType()) {
+			    raiseError("Cannot build relational expression from type " +
+				right2.getType().getName() + ".", opToken);
+			    }
+			    assert right2.isTerm();
+			    final Term upperBound = tb.func(intLDT.getLessThan(),right.getTerm(),right2.getTerm());
+			    result = new SLExpression(tb.and(result.getTerm(),upperBound));
 			}
 		} catch (TermCreationException e) {
 		    raiseError("Error in relational expression: " + e.getMessage());
