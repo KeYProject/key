@@ -6,7 +6,7 @@ import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
-public class MatchProgramInstruction implements IMatchInstruction {
+public class MatchProgramInstruction implements MatchInstruction {
 
     private final ProgramElement pe;
 

@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 /** enum encoding the instructions of the matching vm */
-public abstract class Instruction<OP extends Operator> implements IMatchInstruction {
+public abstract class Instruction<OP extends Operator> implements MatchInstruction {
 
     public static Instruction<Operator> matchOp(Operator op) {
         return new MatchOpIdentityInstruction<Operator>(op);
@@ -56,23 +56,23 @@ public abstract class Instruction<OP extends Operator> implements IMatchInstruct
         return new MatchUpdateSVInstruction(sv);
     }
 
-    public static IMatchInstruction matchTermLabelSV(ImmutableArray<TermLabel> labels) {
+    public static MatchInstruction matchTermLabelSV(ImmutableArray<TermLabel> labels) {
         return new MatchTermLabelInstruction(labels);
     }
 
-    public static IMatchInstruction matchProgram(JavaProgramElement prg) {
+    public static MatchInstruction matchProgram(JavaProgramElement prg) {
         return new MatchProgramInstruction(prg);
     }
 
-    public static IMatchInstruction matchAndBindVariables(ImmutableArray<QuantifiableVariable> boundVars) {
+    public static MatchInstruction matchAndBindVariables(ImmutableArray<QuantifiableVariable> boundVars) {
         return new BindVariablesInstruction(boundVars);
     }
 
-    public static IMatchInstruction unbindVariables(ImmutableArray<QuantifiableVariable> boundVars) {
+    public static MatchInstruction unbindVariables(ImmutableArray<QuantifiableVariable> boundVars) {
         return new UnbindVariablesInstruction();
     }
     
-    public static IMatchInstruction matchElementaryUpdate(ElementaryUpdate elementaryUpdate) {
+    public static MatchInstruction matchElementaryUpdate(ElementaryUpdate elementaryUpdate) {
         return new MatchElementaryUpdateInstruction(elementaryUpdate);
     }
 

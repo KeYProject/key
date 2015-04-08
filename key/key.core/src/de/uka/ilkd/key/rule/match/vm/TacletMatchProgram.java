@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.match.vm.instructions.IMatchInstruction;
+import de.uka.ilkd.key.rule.match.vm.instructions.MatchInstruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.Instruction;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
 
@@ -42,19 +42,19 @@ public class TacletMatchProgram {
      * @return the specialized matcher for the given pattern
      */
     public static TacletMatchProgram createProgram(Term pattern) {
-        ArrayList<IMatchInstruction> program = new ArrayList<>();
+        ArrayList<MatchInstruction> program = new ArrayList<>();
         createProgram(pattern, program);
-        return new TacletMatchProgram(program.toArray(new IMatchInstruction[program.size()]));
+        return new TacletMatchProgram(program.toArray(new MatchInstruction[program.size()]));
     }
     
     /** the skip program (matches anything) */
-    public static final TacletMatchProgram EMPTY_PROGRAM = new TacletMatchProgram(new IMatchInstruction[0]);
+    public static final TacletMatchProgram EMPTY_PROGRAM = new TacletMatchProgram(new MatchInstruction[0]);
     
     /** the instructions of the program */
-    private final IMatchInstruction[] instruction;
+    private final MatchInstruction[] instruction;
     
     /** creates an instance of the matcher consisting of the instruction */
-    private TacletMatchProgram(IMatchInstruction[] instruction) {
+    private TacletMatchProgram(MatchInstruction[] instruction) {
         this.instruction = instruction;
     }
     
@@ -97,10 +97,10 @@ public class TacletMatchProgram {
      * creates a matching program for the given pattern. It appends the necessary match instruction
      * to the given list of instructions
      * @param pattern the Term used as pattern for which to create a matcher
-     * @param program the list of {@link IMatchInstruction} to which the instructions for matching 
+     * @param program the list of {@link MatchInstruction} to which the instructions for matching 
      * {@code pattern} are added.
      */
-    private static void createProgram(Term pattern, ArrayList<IMatchInstruction> program) {
+    private static void createProgram(Term pattern, ArrayList<MatchInstruction> program) {
         final Operator op = pattern.op();
 
         final JavaProgramElement patternPrg = pattern.javaBlock().program();

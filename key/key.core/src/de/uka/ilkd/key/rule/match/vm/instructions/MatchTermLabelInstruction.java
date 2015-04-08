@@ -14,7 +14,7 @@ import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 /**
  * This match instruction implements the matching logic for term labels. 
  */
-public class MatchTermLabelInstruction implements IMatchInstruction {
+public class MatchTermLabelInstruction implements MatchInstruction {
 
     private final ImmutableArray<TermLabel> labels;
 

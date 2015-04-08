@@ -14,7 +14,7 @@ import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 /**
  * This instructions matches the variable below a binder (e.g. a quantifier). 
  */
-public class BindVariablesInstruction implements IMatchInstruction {
+public class BindVariablesInstruction implements MatchInstruction {
 
     private final VariableBinderSubinstruction[] boundVarBinders;
 

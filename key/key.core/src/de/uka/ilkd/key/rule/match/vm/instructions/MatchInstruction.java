@@ -4,7 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.match.vm.TermNavigator;
 
-public interface IMatchInstruction {
+public interface MatchInstruction {
 
     public MatchConditions match(TermNavigator termPosition,
             MatchConditions matchConditions, Services services);
