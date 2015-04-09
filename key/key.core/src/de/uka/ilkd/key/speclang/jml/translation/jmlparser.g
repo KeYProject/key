@@ -810,7 +810,7 @@ equivalenceexpr returns [SLExpression result=null] throws SLTranslationException
     ;
 
 /*
- * Note: According to JML Manual §12.6.3 forward implication has to be parsed right-associatively
+ * Note: According to JML Manual 12.6.3 forward implication has to be parsed right-associatively
  * and backward implication left-associatively.
  */
 impliesexpr returns [SLExpression result=null] throws SLTranslationException
