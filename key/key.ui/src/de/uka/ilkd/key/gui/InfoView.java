@@ -46,7 +46,7 @@ public class InfoView extends JSplitPane {
         xmlResources = new XMLResources();
         this.mainWindow = mainWindow;
         this.mediator = mediator;
-        mediator.addKeYSelectionListener(new InfoViewSelectionLitsener());
+        mediator.addKeYSelectionListener(new InfoViewSelectionListener());
 
         // initial placement of the divider
         setDividerLocation(300);
@@ -76,7 +76,7 @@ public class InfoView extends JSplitPane {
         setVisible(true);
     }
 
-    private class InfoViewSelectionLitsener implements KeYSelectionListener {
+    private class InfoViewSelectionListener implements KeYSelectionListener {
 
         /**
          * focused node has changed
@@ -93,7 +93,7 @@ public class InfoView extends JSplitPane {
             Runnable action = new Runnable() {
                 @Override
                 public void run() {
-                    if (mediator.getSelectedProof() != null) {
+                    if (mediator.getSelectedProof() != null && mediator.getSelectedGoal() != null) {
                         infoTree.setModel(new InfoTreeModel(mediator.getSelectedGoal(),
                                 xmlResources, mainWindow));
                     }

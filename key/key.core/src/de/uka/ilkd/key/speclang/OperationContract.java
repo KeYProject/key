@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.List;
+import java.util.Map;
+
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
@@ -49,5 +52,23 @@ public interface OperationContract extends Contract {
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Services services);
+
+    public Term getFreePre(LocationVariable heap,
+                           ProgramVariable selfVar,
+                           ImmutableList<ProgramVariable> paramVars,
+                           Map<LocationVariable,? extends ProgramVariable> atPreVars,
+                           Services services);
+
+    public Term getFreePre(List<LocationVariable> heapContext,
+                           ProgramVariable selfVar,
+                           ImmutableList<ProgramVariable> paramVars,
+                           Map<LocationVariable,? extends ProgramVariable> atPreVars,
+                           Services services);
     
+    public Term getFreePre(LocationVariable heap,
+                           Term heapTerm,
+                           Term selfTerm,
+                           ImmutableList<Term> paramTerms,
+                           Map<LocationVariable,Term> atPres,
+                           Services services);
 }

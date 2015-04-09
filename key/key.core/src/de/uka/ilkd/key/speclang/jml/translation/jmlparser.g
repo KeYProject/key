@@ -361,9 +361,11 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = continuesclause
     |   result = dependsclause
     |   result = ensuresclause
+    |   result = ensuresfreeclause
     |   result = representsclause
     |   result = axiomsclause
     |   result = requiresclause
+    |   result = requiresfreeclause
     |   result = decreasesclause
     |   result = separatesclause  // old information flow syntax
     |   result = determinesclause // new information flow syntax
@@ -376,7 +378,6 @@ top returns [Object result = null] throws  SLTranslationException
     )
     (SEMI)? EOF
     ;
-
 
 accessibleclause returns [Term result = null] throws SLTranslationException
 :
@@ -424,10 +425,22 @@ requiresclause returns [Term result = null] throws SLTranslationException
             { result = translator.translate(req.getText(), Term.class, result, services); }
     ;
 
+requiresfreeclause returns [Term result = null] throws SLTranslationException
+:
+    req:REQUIRES_FREE result=predornot
+            { result = translator.translate(req.getText(), Term.class, result, services); }
+    ;
+
 
 ensuresclause returns [Term result = null] throws SLTranslationException
 :
     ens:ENSURES result=predornot
+            { result = translator.translate(ens.getText(), Term.class, result, services); }
+    ;
+
+ensuresfreeclause returns [Term result = null] throws SLTranslationException
+:
+    ens:ENSURES_FREE result=predornot
             { result = translator.translate(ens.getText(), Term.class, result, services); }
     ;
 
@@ -1276,7 +1289,6 @@ postfixexpr returns [SLExpression result=null] throws SLTranslationException
 	    }
 	    result = expr; //.getTerm();
 	}
-
 ;
 
 primaryexpr returns [SLExpression result=null] throws SLTranslationException
@@ -1598,7 +1610,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	        selfVar, resultVar, paramVars, atPres == null ? null : atPres.get(getBaseHeap()));
 	}
 
-    |   escape:DL_ESCAPE LPAREN ( list=expressionlist )? RPAREN
+    |   escape:DL_ESCAPE ( (LPAREN) => LPAREN ( list=expressionlist )? RPAREN )?
         {
             result = translator.translate("\\dl_", SLExpression.class, escape, list, services);
         }

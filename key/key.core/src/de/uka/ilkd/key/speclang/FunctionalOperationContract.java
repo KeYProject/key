@@ -67,21 +67,47 @@ public interface FunctionalOperationContract extends OperationContract {
      */
     public Term getPost(LocationVariable heap,
                         Term heapTerm,
-	                Term selfTerm, 
-	    	        ImmutableList<Term> paramTerms, 
-	    	        Term resultTerm, 
-	    	        Term excTerm,
+                        Term selfTerm,
+                        ImmutableList<Term> paramTerms,
+                        Term resultTerm,
+                        Term excTerm,
 	    	        Map<LocationVariable,Term> atPres,
 	    	        Services services);
 
     public Term getPost(List<LocationVariable> heapContext,
                         Map<LocationVariable,Term> heapTerms,
-	                Term selfTerm, 
-	    	        ImmutableList<Term> paramTerms, 
-	    	        Term resultTerm, 
+                        Term selfTerm,
+                        ImmutableList<Term> paramTerms,
+                        Term resultTerm,
 	    	        Term excTerm,
 	    	        Map<LocationVariable,Term> atPres,
 	    	        Services services);
+
+    public Term getFreePost(LocationVariable heap,
+                            ProgramVariable selfVar,
+                            ImmutableList<ProgramVariable> paramVars,
+                            ProgramVariable resultVar,
+                            ProgramVariable excVar,
+                            Map<LocationVariable,? extends ProgramVariable> atPreVars,
+                            Services services);
+
+    public Term getFreePost(LocationVariable heap,
+                            Term heapTerm,
+                            Term selfTerm,
+                            ImmutableList<Term> paramTerms,
+                            Term resultTerm,
+                            Term excTerm,
+                            Map<LocationVariable,Term> atPres,
+                            Services services);
+
+    public Term getFreePost(List<LocationVariable> heapContext,
+                            Map<LocationVariable,Term> heapTerms,
+                            Term selfTerm,
+                            ImmutableList<Term> paramTerms,
+                            Term resultTerm,
+                            Term excTerm,
+                            Map<LocationVariable,Term> atPres,
+                            Services services);
 
     /**
       * Returns the model method definition for model method contracts

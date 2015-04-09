@@ -122,9 +122,11 @@ public final class JMLTranslator {
         ASSIGNABLE ("assignable"),
         DEPENDS ("depends"),
         ENSURES ("ensures"),
+        ENSURES_FREE ("ensures_free"),
         MODEL_METHOD_AXIOM ("model_method_axiom"),
         REPRESENTS ("represents"),
         REQUIRES ("requires"),
+        REQUIRES_FREE ("requires_free"),
         SIGNALS ("signals"),
         SIGNALS_ONLY ("signals_only"),
 
@@ -307,29 +309,21 @@ public final class JMLTranslator {
                         mby == null ? null : mby.getTerm());
             }
         });
-        translationMethods.put(JMLKeyWord.ENSURES, new JMLTranslationMethod() {
+        JMLTranslationMethod termTranslationMethod = new JMLTranslationMethod() {
 
             @Override
             public Term translate(SLTranslationExceptionManager excManager,
                                   Object... params)
                     throws SLTranslationException {
                 checkParameters(params, Term.class, Services.class);
-                Term ensuresTerm = (Term) params[0];
-                TermServices services = (TermServices) params[1];
-                return tb.convertToFormula(ensuresTerm);
-            }
-        });
-        translationMethods.put(JMLKeyWord.MODEL_METHOD_AXIOM, new JMLTranslationMethod() {
-
-        	@Override
-        	public Term translate(SLTranslationExceptionManager excManager, Object... params)
-        	              throws SLTranslationException {
-        	    checkParameters(params, Term.class, Services.class);
-        	    Term axiomsTerm = (Term) params[0];
+                Term term = (Term) params[0];
         	    TermServices services = (TermServices) params[1];
-        	    return tb.convertToFormula(axiomsTerm);
+                return tb.convertToFormula(term);
         	}
-       });
+        };
+        translationMethods.put(JMLKeyWord.ENSURES, termTranslationMethod);
+        translationMethods.put(JMLKeyWord.ENSURES_FREE, termTranslationMethod);
+        translationMethods.put(JMLKeyWord.MODEL_METHOD_AXIOM, termTranslationMethod);
        translationMethods.put(JMLKeyWord.REPRESENTS,
                                new JMLTranslationMethod() {
 
@@ -347,18 +341,9 @@ public final class JMLTranslator {
                         t);
             }
         });
-        translationMethods.put(JMLKeyWord.REQUIRES, new JMLTranslationMethod() {
+        translationMethods.put(JMLKeyWord.REQUIRES, termTranslationMethod);
+        translationMethods.put(JMLKeyWord.REQUIRES_FREE, termTranslationMethod);
 
-            @Override
-            public Term translate(SLTranslationExceptionManager excManager,
-                                  Object... params)
-                    throws SLTranslationException {
-                checkParameters(params, Term.class, Services.class);
-                Term requiresTerm = (Term) params[0];
-                TermServices services = (TermServices) params[1];
-                return tb.convertToFormula(requiresTerm);
-            }
-        });
         translationMethods.put(JMLKeyWord.SIGNALS, new JMLTranslationMethod() {
 
             @Override
@@ -1420,6 +1405,10 @@ public final class JMLTranslator {
                 Token escape = (Token) params[0];
                 ImmutableList<SLExpression> list =
                         (ImmutableList<SLExpression>) params[1];
+                if(list == null) {
+                    // it may be that there were no arguments and the list is null
+                    list = ImmutableSLList.<SLExpression>nil();
+                }
                 Services services = (Services) params[2];
 
                 // strip leading "\dl_"
@@ -2403,30 +2392,28 @@ public final class JMLTranslator {
 
             Term[] args;
             if (list == null) {
-                // empty parameter list
-                args = new Term[0];
+                list = ImmutableSLList.<SLExpression>nil();
+            }
+
+            Term heap = tb.getBaseHeap();
+
+            // special casing "implicit heap" arguments:
+            // omitting one argument means first argument is "heap"
+            int i = 0;
+            if (function.arity() == list.size() + 1
+                    && function.argSort(0) == heap.sort()) {
+                args = new Term[list.size() + 1];
+                args[i++] = heap;
             } else {
+                args = new Term[list.size()];
+            }
 
-                Term heap = tb.getBaseHeap();
-
-                        // special casing "implicit heap" arguments:
-                // omitting one argument means first argument is "heap"
-                int i = 0;
-                if (function.arity() == list.size() + 1
-                        && function.argSort(0) == heap.sort()) {
-                    args = new Term[list.size() + 1];
-                    args[i++] = heap;
-                } else {
-                    args = new Term[list.size()];
+            for (SLExpression expr : list) {
+                if (!expr.isTerm()) {
+                    throw new SLTranslationException("Expecting a term here, not: "
+                            + expr);
                 }
-
-                for (SLExpression expr : list) {
-                    if (!expr.isTerm()) {
-                        throw new SLTranslationException("Expecting a term here, not: "
-                                + expr);
-                    }
-                    args[i++] = expr.getTerm();
-                }
+                args[i++] = expr.getTerm();
             }
 
             try {
