@@ -85,15 +85,21 @@ public class FileWithTestProperty implements Serializable {
          Proof loadedProof = env.getLoadedProof();
 
          if (testProperty == TestProperty.LOADABLE) {
+            loadedProof.dispose();
             return new SuccessReport("success "
                   + testProperty.toString().toLowerCase() + " "
                   + getFile(settings), true);
          }
 
-         env.getProofControl().startAndWaitForAutoMode(loadedProof);
-         boolean success = (testProperty == TestProperty.PROVABLE) == loadedProof
-               .closed();
-         loadedProof.dispose();
+         boolean success;
+         try {
+            env.getProofControl().startAndWaitForAutoMode(loadedProof);
+            success = (testProperty == TestProperty.PROVABLE) == loadedProof
+                  .closed();
+         }
+         finally {
+            loadedProof.dispose();
+         }
 
          return new SuccessReport((success ? "success " : "FAILED ")
                + testProperty.toString().toLowerCase() + " "
