@@ -329,47 +329,50 @@ public class LogicPrinter {
 	    		    SVInstantiations sv,
                             boolean showWholeTaclet,
                             boolean declareSchemaVars) {
-	instantiations = sv;
+        instantiations = sv;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
-	try {
-	    Debug.log4jDebug(taclet.name().toString(),
-		    	     LogicPrinter.class.getName());
-	    if (showWholeTaclet) {
-		layouter.beginC(2).print(taclet.name().toString()).print(" {");
-	    } else {
-		layouter.beginC();
-	    }
-	    if (declareSchemaVars) {
-		Set<SchemaVariable> schemaVars = taclet.collectSchemaVars();
-		layouter.brk();
-		for(SchemaVariable schemaVar : schemaVars) {
+        try {
+            Debug.log4jDebug(taclet.name().toString(),
+                             LogicPrinter.class.getName());
+            if (showWholeTaclet) {
+                layouter.beginC(2).print(taclet.name().toString()).print(" {");
+            } else {
+                layouter.beginC();
+            }
+            if (declareSchemaVars) {
+                Set<SchemaVariable> schemaVars = taclet.collectSchemaVars();
+                layouter.brk();
+                for(SchemaVariable schemaVar : schemaVars) {
                     layouter.print(schemaVar.proofToString() + "  ");
-		}
-	    }
-	    if (!(taclet.ifSequent().isEmpty())) {
-		printTextSequent(taclet.ifSequent(), "\\assumes", true);
-	    }
-	    if (showWholeTaclet) {
-		printFind(taclet);
-		if (taclet instanceof RewriteTaclet) {
-		    printRewriteAttributes((RewriteTaclet)taclet);
-		}
-		printVarCond(taclet);
-	    }
-	    printGoalTemplates(taclet);
-	    if (showWholeTaclet) {
-		printHeuristics(taclet);
-	    }
-	    printAttribs(taclet);
-	    if (showWholeTaclet) {
-		layouter.brk(1, -2).print("}");
-	    }
-	    layouter.end();
-	} catch (java.io.IOException e) {
-	    Debug.log4jWarn("xxx exception occurred during printTaclet",
-		    	    LogicPrinter.class.getName());
-	}
-	instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+                }
+            }
+            if (!(taclet.ifSequent().isEmpty())) {
+                printTextSequent(taclet.ifSequent(), "\\assumes", true);
+            }
+            if (showWholeTaclet) {
+                printFind(taclet);
+                if (taclet instanceof RewriteTaclet) {
+                    printRewriteAttributes((RewriteTaclet)taclet);
+                }
+                printVarCond(taclet);
+            }
+            printGoalTemplates(taclet);
+            if (showWholeTaclet) {
+                printHeuristics(taclet);
+            }
+            printAttribs(taclet);
+            if (showWholeTaclet) {
+                printDisplayName(taclet);
+            }
+            if (showWholeTaclet) {
+                layouter.brk(1, -2).print("}");
+            }
+            layouter.end();
+        } catch (java.io.IOException e) {
+            Debug.log4jWarn("xxx exception occurred during printTaclet",
+                            LogicPrinter.class.getName());
+        }
+        instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.NORMAL;
     }
 
@@ -387,6 +390,17 @@ public class LogicPrinter {
 
     protected void printAttribs(Taclet taclet) throws IOException{
         // no attributes exist for non-rewrite taclets at the moment
+    }
+
+    protected void printDisplayName(Taclet taclet) throws IOException {
+        final String displayName = taclet.displayName();
+        if (displayName.equals(taclet.name().toString())) {
+            // this means there is no special display name
+            return;
+        }
+        layouter.brk().beginC(2).print("\\displayname " + '\"');
+        layouter.print(displayName);
+        layouter.print("" + '\"').end();
     }
 
     protected void printRewriteAttributes(RewriteTaclet taclet) throws IOException{
