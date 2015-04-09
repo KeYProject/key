@@ -14,7 +14,7 @@
 # It is used by bin/runAllProofs.pl.
 #
 
-initialDirectory = ../
+baseDirectory = ../
 
 # Examples used in the new book
 group newBook {

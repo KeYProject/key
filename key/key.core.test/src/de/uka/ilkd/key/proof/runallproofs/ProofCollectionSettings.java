@@ -7,8 +7,8 @@ import static de.uka.ilkd.key.proof.runallproofs.FileWithTestProperty.getAbsolut
 
 public class ProofCollectionSettings implements Serializable {
 
-   public final File initialDirectory;
-   private static final String INITIAL_DIRECTORY_KEY = "initialDirectory";
+   public final File baseDirectory;
+   private static final String BASE_DIRECTORY_KEY = "baseDirectory";
 
    public ProofCollectionSettings(Map<String, String> settingsMap,
          String sourceFileName) {
@@ -17,7 +17,7 @@ public class ProofCollectionSettings implements Serializable {
       assert sourceFileDir.isAbsolute() : "Expecting antlr to provide absolute path to source "
             + "file, but found" + sourceFileName;
 
-      initialDirectory = settingsMap.containsKey(INITIAL_DIRECTORY_KEY) ? getAbsoluteFile(
-            sourceFileDir, settingsMap.get(INITIAL_DIRECTORY_KEY)) : sourceFileDir;
+      baseDirectory = settingsMap.containsKey(BASE_DIRECTORY_KEY) ? getAbsoluteFile(
+            sourceFileDir, settingsMap.get(BASE_DIRECTORY_KEY)) : sourceFileDir;
    }
 }

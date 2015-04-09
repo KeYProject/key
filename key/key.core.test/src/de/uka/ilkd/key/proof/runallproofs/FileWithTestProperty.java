@@ -57,7 +57,7 @@ public class FileWithTestProperty implements Serializable {
    }
 
    public File getFile(ProofCollectionSettings settings) throws IOException {
-      File initialDirectory = settings.initialDirectory;
+      File initialDirectory = settings.baseDirectory;
 
       if (keyFile == null) {
          keyFile = getAbsoluteFile(initialDirectory, path);
