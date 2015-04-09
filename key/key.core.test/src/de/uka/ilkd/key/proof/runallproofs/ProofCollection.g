@@ -24,6 +24,8 @@ parserEntryPoint returns [List<ProofCollectionUnit> units, ProofCollectionSettin
       | t=testDeclaration {$units.add(new SingletonProofCollectionUnit(t));} 
       | settingAssignment[settingsMap])*
       
+      EOF
+      
       /*
        * Parsing is finished at this point. We can now convert our
        * mutable settingsMap object into an immutable settings object.
