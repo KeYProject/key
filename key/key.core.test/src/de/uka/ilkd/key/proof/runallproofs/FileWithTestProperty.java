@@ -10,7 +10,6 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
  *
@@ -79,25 +78,32 @@ public class FileWithTestProperty implements Serializable {
    }
 
    public SuccessReport verifyTestProperty(ProofCollectionSettings settings)
-         throws ProblemLoaderException, IOException {
-      KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(
-            new JavaProfile(), getFile(settings), null, null, false);
-      Proof loadedProof = env.getLoadedProof();
+         throws Exception {
+      try {
+         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(
+               new JavaProfile(), getFile(settings), null, null, false);
+         Proof loadedProof = env.getLoadedProof();
 
-      if (testProperty == TestProperty.LOADABLE) {
-         return new SuccessReport("success "
+         if (testProperty == TestProperty.LOADABLE) {
+            return new SuccessReport("success "
+                  + testProperty.toString().toLowerCase() + " "
+                  + getFile(settings), true);
+         }
+
+         env.getProofControl().startAndWaitForAutoMode(loadedProof);
+         boolean success = (testProperty == TestProperty.PROVABLE) == loadedProof
+               .closed();
+         loadedProof.dispose();
+
+         return new SuccessReport((success ? "success " : "FAILED ")
                + testProperty.toString().toLowerCase() + " "
-               + getFile(settings), true);
+               + getFile(settings), success);
       }
-
-      env.getProofControl().startAndWaitForAutoMode(loadedProof);
-      boolean success = (testProperty == TestProperty.PROVABLE) == loadedProof
-            .closed();
-      loadedProof.dispose();
-
-      return new SuccessReport((success ? "success " : "FAILED ")
-            + testProperty.toString().toLowerCase() + " " + getFile(settings),
-            success);
+      catch (Throwable t) {
+         throw new Exception(
+               "Exception while attempting to prove file (see cause for details): "
+                     + getFile(settings), t);
+      }
    }
 
 }

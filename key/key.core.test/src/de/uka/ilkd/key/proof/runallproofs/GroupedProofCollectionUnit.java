@@ -28,8 +28,8 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
    }
 
    @Override
-   public SuccessReport processProofObligations(ProofCollectionSettings parentSettings)
-         throws Exception {
+   public SuccessReport processProofObligations(
+         ProofCollectionSettings parentSettings) throws Exception {
       ProofCollectionSettings settings = parentSettings;
 
       boolean success = true;

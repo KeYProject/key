@@ -14,6 +14,8 @@
 # It is used by bin/runAllProofs.pl.
 #
 
+initialDirectory = ../
+
 # Examples used in the new book
 provable: ./newBook/09.list_modelfield/ArrayList.add.key
 provable: ./newBook/09.list_modelfield/ArrayList.remFirst.key

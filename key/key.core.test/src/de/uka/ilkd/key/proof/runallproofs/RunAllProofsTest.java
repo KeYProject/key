@@ -125,7 +125,11 @@ public class RunAllProofsTest {
      */
    @Test
    public void testWithKeYAutoMode() throws Exception {
-      ProofCollectionSubProcess.executeRunAllProofsTest(this);
+      // ProofCollectionSubProcess.executeRunAllProofsTest(this);
+      SuccessReport report = unit.processProofObligations(settings);
+      System.out.println(report.message);
+      System.gc(); System.out.println("Memory " + Runtime.getRuntime().totalMemory());
+      System.out.println("Time " + System.currentTimeMillis());
    }
     
     /**
