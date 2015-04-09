@@ -172,7 +172,7 @@ public class RunAllProofsTest {
         String defaultHeader = IOUtil.readFrom(new FileInputStream(new File(EXAMPLE_DIR, "index/headerJavaDL.txt")));
         
         // parse index file containing declarations for proof obligations
-        File automaticJAVADL = new File(EXAMPLE_DIR, "index/automaticJAVADL_new.txt");
+        File automaticJAVADL = new File(EXAMPLE_DIR, "index/automaticJAVADL.txt");
         parserEntryPoint_return parseResult= parseFile(automaticJAVADL);
         
         // create list of constructor parameters that will be returned by this method
