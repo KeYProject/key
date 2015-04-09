@@ -93,14 +93,6 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
     */
    public abstract void loadProblem(File file);
 
-   protected ProblemLoader getProblemLoader(File file, List<File> classPath,
-                                            File bootClassPath, KeYMediator mediator) {
-       final ProblemLoader pl =
-               new ProblemLoader(file, classPath, bootClassPath,
-                                 AbstractProfile.getDefaultProfile(), false, mediator, true, null, this);
-       return pl;
-   }
-
    public boolean applyMacro() {
       assert macroChosen();
       final ProofMacro macro = getMacro();

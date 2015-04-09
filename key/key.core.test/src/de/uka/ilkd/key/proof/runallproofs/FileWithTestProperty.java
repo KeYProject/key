@@ -6,6 +6,12 @@ import java.io.Serializable;
 
 import org.antlr.runtime.Token;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+
 /**
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
@@ -70,6 +76,28 @@ public class FileWithTestProperty implements Serializable {
          throw new IOException(exceptionMessage);
       }
       return keyFile;
+   }
+
+   public SuccessReport verifyTestProperty(ProofCollectionSettings settings)
+         throws ProblemLoaderException, IOException {
+      KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(
+            new JavaProfile(), getFile(settings), null, null, false);
+      Proof loadedProof = env.getLoadedProof();
+
+      if (testProperty == TestProperty.LOADABLE) {
+         return new SuccessReport("success "
+               + testProperty.toString().toLowerCase() + " "
+               + getFile(settings), true);
+      }
+
+      env.getProofControl().startAndWaitForAutoMode(loadedProof);
+      boolean success = (testProperty == TestProperty.PROVABLE) == loadedProof
+            .closed();
+      loadedProof.dispose();
+
+      return new SuccessReport((success ? "success " : "FAILED ")
+            + testProperty.toString().toLowerCase() + " " + getFile(settings),
+            success);
    }
 
 }

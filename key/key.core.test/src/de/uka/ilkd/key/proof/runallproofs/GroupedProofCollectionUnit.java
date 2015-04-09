@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -18,26 +17,34 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
          Map<String, String> settingsMap, List<FileWithTestProperty> files) {
       this.groupName = groupName;
       this.settingsMap = settingsMap;
-      
-      if(this.settingsMap.size() > 0){
+
+      if (this.settingsMap.size() > 0) {
          // TODO decide whether local settings map is really necessary
-         throw new UnsupportedOperationException("Local settings map not supported at the moment.");
+         throw new UnsupportedOperationException(
+               "Local settings map not supported at the moment.");
       }
-      
+
       this.files = files;
    }
 
    @Override
-   public boolean processProofObligations(ProofCollectionSettings parentSettings)
-         throws IOException {
+   public SuccessReport processProofObligations(ProofCollectionSettings parentSettings)
+         throws Exception {
       ProofCollectionSettings settings = parentSettings;
-      
-      System.out.println("group " + groupName);
+
+      boolean success = true;
+      String message = "group " + groupName + "\n";
       for (FileWithTestProperty file : files) {
-         System.out.println(file.testProperty + " " + file.getFile(settings));
+         SuccessReport report = file.verifyTestProperty(settings);
+         success &= report.success;
+         message += report.message + "\n";
       }
-      System.out.println();
-      return true;
+      return new SuccessReport(message, success);
+   }
+
+   @Override
+   public String getTempDirectoryPrefix() {
+      return groupName + "-";
    }
 
 }

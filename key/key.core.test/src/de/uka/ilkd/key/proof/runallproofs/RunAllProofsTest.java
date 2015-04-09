@@ -13,21 +13,12 @@
 
 package de.uka.ilkd.key.proof.runallproofs;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CharStream;
@@ -36,13 +27,13 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized.Parameters;
 import org.junit.runners.Parameterized;
-
-import de.uka.ilkd.key.proof.runallproofs.ProofCollectionParser.parserEntryPoint_return;
-
+import org.junit.runners.Parameterized.Parameters;
 import org.key_project.util.java.IOUtil;
-import static org.junit.Assert.*;
+
+import de.uka.ilkd.key.proof.runallproofs.CustomParameterized.CustomParameters;
+import de.uka.ilkd.key.proof.runallproofs.ProofCollectionParser.parserEntryPoint_return;
+import de.uka.ilkd.key.util.removegenerics.Main;
 
 /**
  * <p>
@@ -84,26 +75,36 @@ public class RunAllProofsTest {
      * The path to the KeY repository. 
      * Configurable via system property {@code key.home}.
      */
-    private static final String KEY_HOME;
+    public static final File KEY_HOME;
     
-    static final File EXAMPLE_DIR;
+    public static final File EXAMPLE_DIR;
+    
+    public static final File KEY_CORE_TEST;
     
     /**
      * Computes the constant values.
      */
     static {
-        KEY_HOME = System.getenv("KEY_HOME");
-        if (KEY_HOME == null) {
+        String keyHome = System.getenv("KEY_HOME");
+        if (keyHome == null) {
             throw new RuntimeException("Environment variable KEY_HOME not set. "
                     + "Cannot test proofs.");
         }
         
+        KEY_HOME = new File(keyHome);
         EXAMPLE_DIR = new File(KEY_HOME, "key.ui" + File.separator + "examples");
+        KEY_CORE_TEST = new File(KEY_HOME, "key.core.test");
     }
     
-    private final String defaultHeader;
-    private final ProofCollectionUnit unit;
-    private final ProofCollectionSettings settings;
+   private static void assertDirectoryExists(File dir) {
+      if (!dir.exists()) {
+         throw new RuntimeException("Cannot run tests, directory " + dir + " does not exist.");
+      }
+   }
+    
+    public final String defaultHeader;
+    public final ProofCollectionUnit unit;
+    public final ProofCollectionSettings settings;
 
     /**
      * Constructor.
@@ -124,45 +125,8 @@ public class RunAllProofsTest {
      */
    @Test
    public void testWithKeYAutoMode() throws Exception {
-      File tmpFolder = new File(KEY_HOME + File.separator + "key.core.test" + File.separator + "tmp_runallproofs");
-      if(!tmpFolder.exists()){
-         System.out.println("Creating directory for temporary files: " + tmpFolder);
-         Files.createDirectory(tmpFolder.toPath());
-         tmpFolder.deleteOnExit();
-      }
-      Path tmpFile = Files.createTempFile(tmpFolder.toPath(), null, null);
-      tmpFile.toFile().deleteOnExit(); // deletes the temporary file when JVM terminates
-      Files.write(tmpFile, convertToByteArray(new Object[]{settings, unit}));
-      ProcessBuilder pb = new ProcessBuilder("java", "-classpath",
-            System.getProperty("java.class.path"),
-            this.getClass().getName(),
-            tmpFile.toString());
-//      System.out.println("Starting process: " + pb.command());
-      Process process = pb.inheritIO().start();
-      process.waitFor();
-      assertEquals("Executed process terminated with non-zero exit value.", process.exitValue(),0);
+      ProofCollectionSubProcess.executeRunAllProofsTest(this);
    }
-    
-   private static Object convertToObject(byte[] bytes) throws IOException, ClassNotFoundException {
-      ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-      ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-      return objectInputStream.readObject();
-   }
-
-    private static byte[] convertToByteArray(Serializable o) throws IOException {
-       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-       ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-       objectOutputStream.writeObject(o);
-       objectOutputStream.flush();
-       return byteArrayOutputStream.toByteArray();
-    }
-    
-    public static void main(String[] args) throws Exception {
-       Object[] tmp = (Object[])convertToObject(Files.readAllBytes(new File(args[0]).toPath()));
-       ProofCollectionSettings settings = (ProofCollectionSettings)tmp[0];
-        ProofCollectionUnit unit = (ProofCollectionUnit)tmp[1];
-       unit.processProofObligations(settings);
-    }
     
     /**
      * Utility method to create a copy of the given file with file extension
@@ -196,6 +160,9 @@ public class RunAllProofsTest {
      */
     @Parameters
     public static Collection<Object[]> data() throws IOException, RecognitionException {
+       assertDirectoryExists(KEY_HOME);
+       assertDirectoryExists(KEY_CORE_TEST);
+       assertDirectoryExists(EXAMPLE_DIR);
         
         // Read default header
         String defaultHeader = IOUtil.readFrom(new FileInputStream(new File(EXAMPLE_DIR, "index/headerJavaDL.txt")));
