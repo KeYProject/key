@@ -226,7 +226,7 @@
                               <variable name="StaticInstanceFieldChanged::instance" isArrayIndex="false">
                                  <value name="StaticInstanceFieldChanged::instance {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     <variable name="value" isArrayIndex="false">
-                                       <value name="value {true}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       <value name="value {not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),d_3))}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),d_3))">
                                        </value>
                                     </variable>
                                  </value>
@@ -257,7 +257,7 @@
                                  <variable name="StaticInstanceFieldChanged::instance" isArrayIndex="false">
                                     <value name="StaticInstanceFieldChanged::instance {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                        <variable name="value" isArrayIndex="false">
-                                          <value name="value {true}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                          <value name="value {not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),d_3))}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),d_3))">
                                           </value>
                                        </variable>
                                     </value>
@@ -282,7 +282,7 @@
                                     <variable name="StaticInstanceFieldChanged::instance" isArrayIndex="false">
                                        <value name="StaticInstanceFieldChanged::instance {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                           <variable name="value" isArrayIndex="false">
-                                             <value name="value {true}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                             <value name="value {not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),d_3))}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),d_3))">
                                              </value>
                                           </variable>
                                        </value>
