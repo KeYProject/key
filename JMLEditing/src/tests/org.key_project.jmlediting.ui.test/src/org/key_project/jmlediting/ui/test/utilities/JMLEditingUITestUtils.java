@@ -57,8 +57,8 @@ public class JMLEditingUITestUtils {
       return bot.shell("Properties for " + project.getName());
    }
 
-   public static void openJMLPreferencePage(final SWTWorkbenchBot bot) {
-      TestUtilsUtil.openPreferencePage(bot, "JML");
+   public static SWTBotShell openJMLPreferencePage(final SWTWorkbenchBot bot) {
+      return TestUtilsUtil.openPreferencePage(bot, "JML");
    }
 
    public static SWTBotShell openJMLProfilePreferencePage(final SWTWorkbenchBot bot) {

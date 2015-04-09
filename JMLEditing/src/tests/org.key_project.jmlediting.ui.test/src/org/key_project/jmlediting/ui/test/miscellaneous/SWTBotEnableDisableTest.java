@@ -12,11 +12,13 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,6 +45,7 @@ public class SWTBotEnableDisableTest {
 
    @BeforeClass
    public static void initializeProjectAndOpenEditor() throws CoreException, InterruptedException {
+      TestUtilsUtil.closeWelcomeView();
       final TestProject result = JMLEditingUITestUtils.createProjectWithFile(bot, PROJECT_NAME, PACKAGE_NAME, CLASS_NAME, SaveGuarantee.SAVE_BUT_NO_CHANGES_LATER);
       testProject = result.getProject().getProject();
       JMLPreferencesHelper.setProjectJMLProfile(testProject, JMLEditingUITestUtils.findReferenceProfile());
@@ -53,70 +56,55 @@ public class SWTBotEnableDisableTest {
 
    @Test
    public void testBasics() throws CoreException {
-
-      TestUtilsUtil.closeWelcomeView();
-
-      this.jmlColors = new HashSet<RGB>(Arrays.asList(JMLUiPreferencesHelper
-            .getWorkspaceJMLColor(ColorProperty.COMMENT),
-            JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.KEYWORD),
-            JMLUiPreferencesHelper
-                  .getWorkspaceJMLColor(ColorProperty.TOPLEVEL_KEYWORD)));
+      this.jmlColors = new HashSet<RGB>(Arrays.asList(JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.COMMENT), 
+                                                      JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.KEYWORD),
+                                                      JMLUiPreferencesHelper.getWorkspaceJMLColor(ColorProperty.TOPLEVEL_KEYWORD)));
       // Open the JML properties page for the project
-      JMLEditingUITestUtils.openJMLPreferencePage(bot);
+      SWTBotShell preferenceShell = JMLEditingUITestUtils.openJMLPreferencePage(bot);
 
-      SWTBotCheckBox enableDisableJMLFeature = bot
-            .checkBox("Enable JML Integration");
+      SWTBotCheckBox enableDisableJMLFeature = preferenceShell.bot().checkBox("Enable JML Integration");
 
       // Now we are in a profile properties page
       // Because this project is null, we require that there are no project
       // specific settings
-      assertTrue("JML Feature was disabled at start",
-            enableDisableJMLFeature.isChecked());
+      assertTrue("JML Feature was disabled at start",enableDisableJMLFeature.isChecked());
 
-      bot.button("Cancel").click();
+      preferenceShell.bot().button(IDialogConstants.CANCEL_LABEL).click();
 
       List<Integer> errorLines = JMLEditingUITestUtils.getAllErrorLines(testFile);
       assertTrue(errorLines.contains(8));
       assertTrue(errorLines.contains(11));
-      this.checkColors(6, 5, 10, this.jmlColors,
-            "Colors did not match JMLColors.");
+      this.checkColors(6, 5, 10, this.jmlColors, "Colors did not match JMLColors.");
 
-      JMLEditingUITestUtils.openJMLPreferencePage(bot);
+      preferenceShell = JMLEditingUITestUtils.openJMLPreferencePage(bot);
 
-      enableDisableJMLFeature = bot.checkBox("Enable JML Integration");
+      enableDisableJMLFeature = preferenceShell.bot().checkBox("Enable JML Integration");
       // Disable JML Features
       enableDisableJMLFeature.deselect();
 
       // Apply the properties
-      bot.button("Apply").click();
+      preferenceShell.bot().button("Apply").click();
 
       // Want to do the rebuild
-      bot.activeShell().bot().button("Yes").click();
+      SWTBotShell confirmationShell = preferenceShell.bot().shell("JML Editing Turned On or Off");
+      confirmationShell.bot().button(IDialogConstants.YES_LABEL).click();
 
       // Rebuild should be done by now.
       errorLines = JMLEditingUITestUtils.getAllErrorLines(testFile);
       assertFalse(errorLines.contains(8));
       assertFalse(errorLines.contains(11));
-      this.checkColors(6, 5, 10, this.javaCommentRGB,
-            "Color did not match JavaCommentColor");
-
+      this.checkColors(6, 5, 10, this.javaCommentRGB, "Color did not match JavaCommentColor");
    }
 
-   private void checkColors(final int line, final int column, final int length,
-         final Set<RGB> colors, final String message) {
-      final StyleRange[] textColors = openEditor
-            .getStyles(line, column, length);
+   private void checkColors(final int line, final int column, final int length, final Set<RGB> colors, final String message) {
+      final StyleRange[] textColors = openEditor.getStyles(line, column, length);
       for (final StyleRange r : textColors) {
-         assertTrue(message + " at " + r.start + " with length " + r.length,
-               colors.contains(r.foreground.getRGB()));
-
+         assertTrue(message + " at " + r.start + " with length " + r.length, colors.contains(r.foreground.getRGB()));
       }
    }
 
-   private void checkColors(final int line, final int column, final int length,
-         final RGB color, final String message) {
-      this.checkColors(line, column, length, Collections.singleton(color),
-            message);
+   private void checkColors(final int line, final int column, final int length, final RGB color, final String message) {
+      this.checkColors(line, column, length, Collections.singleton(color), message);
    }
    
    @AfterClass
