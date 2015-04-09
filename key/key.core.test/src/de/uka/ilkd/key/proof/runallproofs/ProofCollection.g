@@ -20,9 +20,10 @@ parserEntryPoint returns [List<ProofCollectionUnit> units, ProofCollectionSettin
     $units = new ArrayList<>();
     Map<String, String> settingsMap = new HashMap<>();
 }
-    : (g=group {$units.add(g);}
-      | t=testDeclaration {$units.add(new SingletonProofCollectionUnit(t));} 
-      | settingAssignment[settingsMap])*
+    : settingAssignment[settingsMap]*
+    
+      ( g=group {$units.add(g);}
+      | t=testDeclaration {$units.add(new SingletonProofCollectionUnit(t));} )*
       
       EOF
       
@@ -40,7 +41,8 @@ group returns [ProofCollectionUnit unit]
 }
     : 'group' nameToken=Identifier
       '{'
-          (settingAssignment[localSettingsMap] | t=testDeclaration {files.add(t);} )*
+          settingAssignment[localSettingsMap]*
+          (t=testDeclaration {files.add(t);} )*
       '}'
       {unit = new GroupedProofCollectionUnit(nameToken.getText(), localSettingsMap, files);}
 ;
