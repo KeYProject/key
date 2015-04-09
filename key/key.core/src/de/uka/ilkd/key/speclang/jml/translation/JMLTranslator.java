@@ -317,7 +317,8 @@ public final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Term.class, Services.class);
                 Term term = (Term) params[0];
-        	    TermServices services = (TermServices) params[1];
+        	    @SuppressWarnings("unused")// please keep it for documentation purposes
+                TermServices services = (TermServices) params[1];
                 return tb.convertToFormula(term);
         	}
         };
