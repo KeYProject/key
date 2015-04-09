@@ -101,8 +101,7 @@ public final class RebuildHelper {
 
       final MessageDialog dialog = new MessageDialog(shell, message.getTitle(),
             null, message.getMessage(), MessageDialog.QUESTION, new String[] {
-                  IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL,
-                  IDialogConstants.CANCEL_LABEL }, 2);
+                  IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL}, 2);
       final int res = dialog.open();
       if (res == 0) {
          doBuild = true;

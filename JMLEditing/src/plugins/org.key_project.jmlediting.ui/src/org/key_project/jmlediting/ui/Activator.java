@@ -12,7 +12,6 @@ public class Activator extends AbstractUIPlugin {
 
    // The plug-in ID
    public static final String PLUGIN_ID = "org.key_project.jmlediting.ui"; //$NON-NLS-1$
-   public static final String EDITOR_EXTENSION_ID = "org.key_project.jmlediting.ui.extension.JMLSourceViewerConfigurationExtension";
 
    // The shared instance
    private static Activator plugin;

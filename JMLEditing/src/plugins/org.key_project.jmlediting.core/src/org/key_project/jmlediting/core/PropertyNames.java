@@ -9,27 +9,19 @@ import org.eclipse.core.runtime.QualifiedName;
  *
  */
 public final class PropertyNames {
-
    /**
     * The name of the JML profile property of a project.
     */
-   public static final QualifiedName PROFILE = new QualifiedName(
-         "org.key_project.jmleiditing.ui", "profile");
+   public static final QualifiedName PROFILE = new QualifiedName("org.key_project.jmleiditing.ui", "profile");
 
    /**
     * The name of the global preference for the default JML profile.
     */
    public static final String DEFAULT_JML_PROFILE = "default_jml_profile";
-   /**
-    * Key to store whether the extension is enabled.
-    */
-   public static final String JML_EDITING_ENABLED = "enabled";
 
    /**
     * No instantiations.
     */
    private PropertyNames() {
-
    }
-
 }

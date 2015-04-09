@@ -13,6 +13,14 @@
 
 package org.key_project.javaeditor.util;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.key_project.javaeditor.Activator;
 
@@ -31,6 +39,11 @@ public final class PreferenceUtil {
     */
    public static final String PROP_EXTENSION_ENABLED_PREFIX = "org.key_project.javaeditor.extensionEnabled_";
 
+   /**
+    * The extension point providing {@link IPreferenceListener}.
+    */
+   public static final String LISTENER_EXTENSION_POINT = "org.key_project.javaeditor.javaEditorPreferenceListener";
+   
    /**
     * Forbid instances.
     */
@@ -111,5 +124,42 @@ public final class PreferenceUtil {
     */
    public static void setDefaultExtensionEnabled(String id, boolean enabled) {
       getStore().setDefault(PROP_EXTENSION_ENABLED_PREFIX + id, enabled);
+   }
+   
+   /**
+    * Creates all registered {@link IPreferenceListener}.
+    * @return The registered {@link IPreferenceListener}.
+    */
+   public static List<IPreferenceListener> createListener() {
+      // Create result list
+      List<IPreferenceListener> result = new LinkedList<IPreferenceListener>();
+      // Add results registered by the extension point
+      IExtensionRegistry registry = Platform.getExtensionRegistry();
+      if (registry != null) {
+         IExtensionPoint point = registry.getExtensionPoint(LISTENER_EXTENSION_POINT);
+         if (point != null) {
+            // Analyze the extension point
+            IExtension[] extensions = point.getExtensions();
+            for (IExtension extension : extensions) {
+               IConfigurationElement[] configElements = extension.getConfigurationElements();
+               for (IConfigurationElement configElement : configElements) {
+                  try {
+                     IPreferenceListener listener = (IPreferenceListener)configElement.createExecutableExtension("class");
+                     result.add(listener);
+                  }
+                  catch (Exception e) {
+                     LogUtil.getLogger().logError(e);
+                  }
+               }
+            }
+         }
+         else {
+            LogUtil.getLogger().logError("Extension point \"" + LISTENER_EXTENSION_POINT + "\" doesn't exist.");
+         }
+      }
+      else {
+         LogUtil.getLogger().logError("Extension point registry is not loaded.");
+      }
+      return result;
    }
 }

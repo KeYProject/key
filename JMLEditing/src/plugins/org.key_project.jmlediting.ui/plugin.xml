@@ -11,6 +11,12 @@
       </javaConfigurationExtensions>
    </extension>
    <extension
+         point="org.key_project.javaeditor.javaEditorPreferenceListener">
+      <listener
+            class="org.key_project.jmlediting.ui.listener.RebuildPreferenceListener">
+      </listener>
+   </extension>
+   <extension
          id="org.key_project.jmlediting.ui.JMLcompletion"
          point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
       <javaCompletionProposalComputer
@@ -74,5 +80,4 @@
             name="Colors">
       </page>
    </extension>
-
 </plugin>

@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.key_project.javaeditor.util.PreferenceUtil;
 import org.key_project.jmlediting.core.Activator;
 import org.key_project.jmlediting.core.PropertyNames;
 
@@ -21,6 +22,10 @@ import org.key_project.jmlediting.core.PropertyNames;
  *
  */
 public final class JMLPreferencesHelper {
+   /**
+    * The ID of the JML Java Editor extension.
+    */
+   public static final String JML_EDITOR_EXTENSION_ID = "org.key_project.jmlediting.ui.extension.JMLSourceViewerConfigurationExtension";
 
    /**
     * List of associated listener.
@@ -251,24 +256,12 @@ public final class JMLPreferencesHelper {
    }
 
    /**
-    * Sets the JML Editing extension enabled or not.
-    *
-    * @param enabled
-    *           whether to enable JML Editing
-    */
-   public static void setExtensionEnabled(final boolean enabled) {
-      InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put(
-            PropertyNames.JML_EDITING_ENABLED, Boolean.toString(enabled));
-   }
-
-   /**
     * Returns whether JML Editing is enabled. True is the default
     *
     * @return whether JML Editing is enabled
     */
    public static boolean isExtensionEnabled() {
-      final String enabledString = InstanceScope.INSTANCE.getNode(
-            Activator.PLUGIN_ID).get(PropertyNames.JML_EDITING_ENABLED, "true");
-      return Boolean.parseBoolean(enabledString);
+      return PreferenceUtil.isExtensionsEnabled() &&
+             PreferenceUtil.isExtensionEnabled(JML_EDITOR_EXTENSION_ID);
    }
 }

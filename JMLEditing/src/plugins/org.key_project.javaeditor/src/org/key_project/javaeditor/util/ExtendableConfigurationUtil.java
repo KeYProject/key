@@ -22,6 +22,9 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.key_project.javaeditor.extension.IJavaSourceViewerConfigurationExtension;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * Provides utility methods to work with available {@link IJavaSourceViewerConfigurationExtension}s.
@@ -80,8 +83,23 @@ public final class ExtendableConfigurationUtil {
    }
 
    /**
-    * Returns the names of the available extensions.
-    * @return The names of the available extensions.
+    * Returns the {@link ExtensionDescription} with the given ID.
+    * @param id The ID of the requested {@link ExtensionDescription}.
+    * @return The found {@link ExtensionDescription} or {@code null} if not available.
+    */
+   public static ExtensionDescription getExtensionDescription(final String id) {
+      ExtensionDescription[] descriptions = getExtensionDescriptions();
+      return ArrayUtil.search(descriptions, new IFilter<ExtensionDescription>() {
+         @Override
+         public boolean select(ExtensionDescription element) {
+            return ObjectUtil.equals(element.getId(), id);
+         }
+      });
+   }
+
+   /**
+    * Returns the available {@link ExtensionDescription}s.
+    * @return The available {@link ExtensionDescription}s.
     */
    public static ExtensionDescription[] getExtensionDescriptions() {
       // Create result list
@@ -162,6 +180,29 @@ public final class ExtendableConfigurationUtil {
        */
       public boolean isDefaultEnabled() {
          return defaultEnabled;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public int hashCode() {
+         return ObjectUtil.hashCode(getId());
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean equals(Object obj) {
+         if(obj == this) {
+            return true;
+         }
+         if (obj == null || obj.getClass() != getClass() || hashCode() != obj.hashCode()) {
+            return false; 
+         }
+         final ExtensionDescription description = (ExtensionDescription) obj;
+         return ObjectUtil.equals(getId(), description.getId());
       }
    }
 }
