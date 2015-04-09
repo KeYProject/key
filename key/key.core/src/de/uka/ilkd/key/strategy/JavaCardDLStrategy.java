@@ -349,6 +349,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // always give infinite cost to obsolete rules
         bindRuleSet (d, "obsolete", inftyConst());
 
+        // taclets for special invariant handling
+        bindRuleSet (d, "loopInvariant", -20000 );
 
         setupSelectSimplification(d);
 
