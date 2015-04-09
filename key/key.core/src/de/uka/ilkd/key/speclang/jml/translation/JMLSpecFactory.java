@@ -405,10 +405,11 @@ public class JMLSpecFactory {
             } else {
                 clauses.ensuresFree.put(
                         heap,
-                        translateEnsures(pm, progVars.selfVar,
+                        translateAndClauses(
+                                pm, progVars.selfVar,
                                 progVars.paramVars, progVars.resultVar,
                                 progVars.excVar, progVars.atPres,
-                                originalBehavior, textualSpecCase
+                                textualSpecCase
                                         .getEnsuresFree(heap.name().toString())));
             }
 
