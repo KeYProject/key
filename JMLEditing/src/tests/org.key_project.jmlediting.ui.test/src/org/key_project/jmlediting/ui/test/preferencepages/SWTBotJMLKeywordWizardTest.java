@@ -22,7 +22,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
 public class SWTBotJMLKeywordWizardTest {
    private static final String PROFILE_NAME = "Profile Name:";
    private static final String DERIVED_FROM = "Derived from:";
-   private static final String NEW_PROFILE_NAME = "TestProfile123";
+   private static final String NEW_PROFILE_NAME = "KeywordTestProfile";
    private static final String PROFILENAME_TO_SELECT = "KeY Profile";
    private static final String PROFILETABLE_LABEL = "Choose active JML Profile from available ones:";
 

@@ -216,6 +216,7 @@ public class JMLEditingUITestUtils {
       public void copyData() throws CoreException {
          // Copy the class
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, this.classLocation, this.testFolder);
+         TestUtilsUtil.waitForBuild();
       }
 
       public void restoreClassAndOpen() throws CoreException {

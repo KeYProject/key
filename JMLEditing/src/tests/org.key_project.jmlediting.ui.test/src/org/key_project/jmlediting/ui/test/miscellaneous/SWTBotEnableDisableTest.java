@@ -28,6 +28,7 @@ import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils.TestPr
 import org.key_project.jmlediting.ui.test.utilities.JMLEditingUITestUtils.TestProject.SaveGuarantee;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper.ColorProperty;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 public class SWTBotEnableDisableTest {
@@ -72,8 +73,8 @@ public class SWTBotEnableDisableTest {
       preferenceShell.bot().button(IDialogConstants.CANCEL_LABEL).click();
 
       List<Integer> errorLines = JMLEditingUITestUtils.getAllErrorLines(testFile);
-      assertTrue(errorLines.contains(8));
-      assertTrue(errorLines.contains(11));
+      assertTrue("Error lines are: " + CollectionUtil.toString(errorLines), errorLines.contains(8));
+      assertTrue("Error lines are: " + CollectionUtil.toString(errorLines), errorLines.contains(11));
       this.checkColors(6, 5, 10, this.jmlColors, "Colors did not match JMLColors.");
 
       preferenceShell = JMLEditingUITestUtils.openJMLPreferencePage(bot);
