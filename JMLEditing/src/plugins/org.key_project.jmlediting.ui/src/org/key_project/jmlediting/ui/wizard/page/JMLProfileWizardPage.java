@@ -44,6 +44,7 @@ import org.key_project.jmlediting.ui.preferencepages.RebuildHelper;
 import org.key_project.jmlediting.ui.preferencepages.RebuildHelper.UserMessage;
 import org.key_project.jmlediting.ui.provider.KeywordLabelProvider;
 import org.key_project.jmlediting.ui.provider.UserDefinedKeywordLabelProvider;
+import org.key_project.jmlediting.ui.util.JMLEditingImages;
 import org.key_project.jmlediting.ui.util.JMLSWTUtil;
 import org.key_project.jmlediting.ui.wizard.JMLKeywordWizard;
 import org.key_project.jmlediting.ui.wizard.JMLProfileWizard;
@@ -139,6 +140,7 @@ public class JMLProfileWizardPage extends WizardPage {
    public JMLProfileWizardPage(String pageName, final IJMLProfile profile) {
       super(pageName);
       this.parentProfile = profile;
+      setImageDescriptor(JMLEditingImages.getImageDescriptor(JMLEditingImages.JML_WIZARD));
       if (profile != null && profile instanceof IEditableDerivedProfile) {
          this.profileToEdit = (IEditableDerivedProfile) profile;
       }

@@ -38,7 +38,12 @@ public final class JMLEditingImages {
     /**
      * The key for the image with the JML logo.
      */
-    public static final String JML_LOGO = "org.key_project.key4eclipse.common.ui.keyLogo";
+    public static final String JML_LOGO = "org.key_project.jmlediting.ui.jmlLogo";
+    
+    /**
+     * The key for the image with the JML wizard.
+     */
+    public static final String JML_WIZARD = "org.key_project.jmlediting.ui.jmlWizard";
     
     /**
      * Forbid instances.
@@ -101,7 +106,10 @@ public final class JMLEditingImages {
         // Compute path to image in bundle.
         String path = null;
         if (JML_LOGO.equals(key)) {
-           path = "icons/jml.png";
+           path = "icons/jml-writing-16x16.png";
+        }
+        else if (JML_WIZARD.equals(key)) {
+           path = "icons/jml_wizard.png";
         }
         // Load image if possible
         if (path != null) {
@@ -143,6 +151,7 @@ public final class JMLEditingImages {
             public void run() {
                ImageRegistry registry = Activator.getDefault().getImageRegistry();
                registry.remove(JML_LOGO);
+               registry.remove(JML_WIZARD);
             }
          });
        }

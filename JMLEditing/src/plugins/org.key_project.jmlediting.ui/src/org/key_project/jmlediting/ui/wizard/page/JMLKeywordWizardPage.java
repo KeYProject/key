@@ -25,6 +25,7 @@ import org.key_project.jmlediting.core.profile.syntax.IKeywordSort;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeyword;
 import org.key_project.jmlediting.core.profile.syntax.user.IUserDefinedKeywordContentDescription;
 import org.key_project.jmlediting.core.profile.syntax.user.UserDefinedKeyword;
+import org.key_project.jmlediting.ui.util.JMLEditingImages;
 import org.key_project.jmlediting.ui.wizard.JMLKeywordWizard;
 import org.key_project.util.java.StringUtil;
 
@@ -80,6 +81,7 @@ public class JMLKeywordWizardPage extends WizardPage {
       super(pageName);
       this.derivedProfile = derivedProfile;
       this.keyword = keyword;
+      setImageDescriptor(JMLEditingImages.getImageDescriptor(JMLEditingImages.JML_WIZARD));
       if (this.keyword != null) {
          this.setTitle("Edit Keyword");
          setDescription("Edit the content of the existing keyword.");
