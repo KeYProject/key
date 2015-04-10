@@ -29,7 +29,7 @@ public final class JMLPreferencesHelper {
    /**
     * The ID of the default profile.
     */
-   private static final String DEFAULT_PROFILE_IDENTIFIER = "org.key_project.jmlediting.profile.jmlref.ae";
+   private static final String DEFAULT_PROFILE_IDENTIFIER = "org.key_project.jmlediting.profile.key";
 
    /**
     * List of associated listener.
