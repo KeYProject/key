@@ -612,7 +612,7 @@ public class JMLProfileWizardPage extends WizardPage {
       }
    }
 
-   public boolean performFinish() {
+   public IEditableDerivedProfile performFinish() {
       IEditableDerivedProfile profileToSave;
       if (this.parentProfile == null) {
          profileToSave = deriveProfile();
@@ -627,7 +627,7 @@ public class JMLProfileWizardPage extends WizardPage {
       if (profileToSave != null) {
          this.triggerRebuild(profileToSave);
       }
-      return true;
+      return profileToSave;
    }
 
    private void triggerRebuild(final IEditableDerivedProfile profileToSave) {

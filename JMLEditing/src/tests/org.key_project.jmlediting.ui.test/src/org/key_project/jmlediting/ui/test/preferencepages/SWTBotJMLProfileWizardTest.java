@@ -139,6 +139,8 @@ public class SWTBotJMLProfileWizardTest {
    public void testViewProfile() {
       SWTBotShell preferenceShell = JMLEditingUITestUtils.openJMLProfilePreferencePage(bot);
       final IJMLProfile profile = JMLPreferencesHelper.getDefaultJMLProfile();
+      SWTBotTable profileTable = preferenceShell.bot().tableWithLabel(PROFILETABLE_LABEL);
+      profileTable.select(profile.getName());
       preferenceShell.bot().button("View...").click();
       
       SWTBotShell viewShell = preferenceShell.bot().shell("View Profile");

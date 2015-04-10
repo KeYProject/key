@@ -13,7 +13,7 @@ import org.eclipse.jface.text.formatter.IFormattingStrategy;
 import org.eclipse.jface.text.formatter.IFormattingStrategyExtension;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
-import org.key_project.jmlediting.ui.Activator;
+import org.key_project.jmlediting.ui.util.LogUtil;
 
 /**
  * The {@link JMLFormattingStrategy} is a wrapper for another
@@ -203,8 +203,7 @@ public class JMLFormattingStrategy<T extends IFormattingStrategy & IFormattingSt
          }
          catch (final BadLocationException ex) {
             // Mhm, unable to process because something unexpected has happened
-            Activator.createLogger().logError(
-                  "JML Formatter is unable to reintegrate JML comments", ex);
+            LogUtil.getLogger().logError("JML Formatter is unable to reintegrate JML comments", ex);
             // Reset the document because otherwise JML comments get lost
             task.doc.set(task.originalText);
          }

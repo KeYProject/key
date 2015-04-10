@@ -23,7 +23,6 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 import org.eclipse.jdt.internal.compiler.problem.ProblemSeverities;
 import org.eclipse.jdt.internal.corext.dom.GenericVisitor;
-import org.key_project.jmlediting.core.Activator;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserError;
@@ -34,9 +33,9 @@ import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.core.utilities.ErrorMarkerUpdater;
 import org.key_project.jmlediting.core.utilities.ErrorTypes;
 import org.key_project.jmlediting.core.utilities.JMLError;
+import org.key_project.jmlediting.core.utilities.LogUtil;
 import org.key_project.jmlediting.core.validation.JMLValidationContext;
 import org.key_project.jmlediting.core.validation.JMLValidationEngine;
-import org.key_project.util.eclipse.Logger;
 
 /**
  * This class takes part in the compilation process of the JDT to validate the
@@ -74,10 +73,8 @@ public class JMLCompilationParticipant extends CompilationParticipant {
          });
       }
       catch (final CoreException e) {
-         // If this occurs, something really strange happened (
-         final Logger logger = new Logger(Activator.getDefault(),
-               Activator.PLUGIN_ID);
-         logger.logError("Unexpected exception when cleaning JML", e);
+         // If this occurs, something really strange happened!
+         LogUtil.getLogger().logError("Unexpected exception when cleaning JML", e);
       }
    }
 
@@ -134,9 +131,7 @@ public class JMLCompilationParticipant extends CompilationParticipant {
       }
       catch (final JavaModelException e) {
          // If this occurs, something really strange happened
-         final Logger logger = new Logger(Activator.getDefault(),
-               Activator.PLUGIN_ID);
-         logger.logError("Unexpected exception when reconciling JML", e);
+         LogUtil.getLogger().logError("Unexpected exception when reconciling JML", e);
       }
 
    }

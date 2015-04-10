@@ -4,19 +4,26 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.NoSuchElementException;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jdt.internal.ui.preferences.PropertyAndPreferencePage;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ICheckStateProvider;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -25,13 +32,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
+import org.key_project.javaeditor.util.LogUtil;
 import org.key_project.jmlediting.core.profile.IDerivedProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.InvalidProfileException;
@@ -42,9 +45,12 @@ import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceExc
 import org.key_project.jmlediting.core.profile.persistence.ProfilePersistenceFactory;
 import org.key_project.jmlediting.ui.Activator;
 import org.key_project.jmlediting.ui.preferencepages.RebuildHelper.UserMessage;
+import org.key_project.jmlediting.ui.provider.JMLProfileLabelProvider;
 import org.key_project.jmlediting.ui.wizard.JMLProfileWizard;
-import org.key_project.util.eclipse.Logger;
+import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * The {@link JMLProfilePropertiesPage} implements a properties and preferences
@@ -53,7 +59,6 @@ import org.key_project.util.java.IOUtil;
  * global default.
  *
  * @author Moritz Lichter
- *
  */
 @SuppressWarnings("restriction")
 public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
@@ -65,31 +70,14 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    /**
     * The ID of the page when acting as properties page.
     */
-   public static final String JML_PROFILE_PROP_ID = "org.key_project.jmlediting.ui.propertypages.profile";
+   public static final String JML_PROFILE_PROP_ID = "org.key_project.jmlediting.ui.properties.profile";
 
    /**
     * The list which shows all profile names to the user.
     */
-   private Table profilesListTable;
-   /**
-    * The list of the profiles, in the same order as shown in the list.
-    */
-   private java.util.List<IJMLProfile> allProfiles;
+   private CheckboxTableViewer profilesViewer;
 
-   /**
-    * keep the difference between the selected (checked) Profile and the
-    * selected (highlighted) profile to view/edit.
-    */
-   private IJMLProfile profile2EditView;
-
-   private IJMLProfile newCheckedProfile;
-
-   /**
-    * The {@link IPreferenceChangeListener} which listens to changes of the
-    * profile property for properties. This is used to change the selection in
-    * the properies page when global settings are used and they change.
-    */
-   private IPreferenceChangeListener currentPreferenceListener;
+   private IJMLProfile checkedProfile;
 
    /**
     * needs to be global to change label-text.
@@ -99,43 +87,10 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    private Button importButton;
    private Button deleteButton;
 
-   /**
-    * Creates a new {@link JMLProfilePropertiesPage}.
-    */
-   public JMLProfilePropertiesPage() {
-   }
-
-   private void uninstallListener() {
-      JMLPreferencesHelper
-            .removeDefaultProfilePreferencesListener(this.currentPreferenceListener);
-   }
-
-   private void installListener() {
-      this.currentPreferenceListener = JMLPreferencesHelper
-            .buildDefaultProfilePreferencesListener(new IPreferenceChangeListener() {
-               @Override
-               public void preferenceChange(final PreferenceChangeEvent event) {
-                  if (!JMLProfilePropertiesPage.this.profilesListTable
-                        .isDisposed()) {
-                     JMLProfilePropertiesPage.this.updateSelection();
-                  }
-               }
-            });
-   }
-
-   @Override
-   public void setVisible(final boolean visible) {
-      // Register the preference listener if the dialog is visible
-      // do not generate memory leaks, listener are removed in
-      // performOK and performCancel, here is too late
-      if (visible) {
-         this.installListener();
-      }
-      super.setVisible(visible);
-   }
-
    @Override
    protected Control createPreferenceContent(final Composite parent) {
+      // Compute initially checked profile
+      checkedProfile = getCurrentProfile();
       // Initialize the UI
       // Create a list for the profile with a label
       final Composite myComposite = new Composite(parent, SWT.NONE);
@@ -143,9 +98,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       layout.numColumns = 2;
       myComposite.setLayout(layout);
 
-      GridData data;
-
-      data = new GridData();
+      GridData data = new GridData();
       data.horizontalSpan = 2;
       final Label label = new Label(myComposite, SWT.NONE);
       label.setText("Choose active JML Profile from available ones:");
@@ -156,22 +109,56 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       data.verticalSpan = 5;
       data.heightHint = 300;
 
-      this.profilesListTable = new Table(myComposite, SWT.H_SCROLL
-            | SWT.V_SCROLL | SWT.BORDER | SWT.CHECK | SWT.FULL_SELECTION);
-      this.profilesListTable.setLayoutData(data);
-      this.profilesListTable.setLinesVisible(true);
-      this.profilesListTable.setHeaderVisible(true);
+      Composite tableComposite = new Composite(myComposite, SWT.NONE);
+      tableComposite.setLayoutData(data);
+      TableColumnLayout tableLayout = new TableColumnLayout();
+      tableComposite.setLayout(tableLayout);
+      
+      this.profilesViewer = CheckboxTableViewer.newCheckList(tableComposite, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
+      this.profilesViewer.getTable().setLinesVisible(true);
+      this.profilesViewer.getTable().setHeaderVisible(true);
 
-      this.initUI();
+      final TableViewerColumn nameColumn = new TableViewerColumn(this.profilesViewer, SWT.LEFT);
+      nameColumn.getColumn().setMoveable(false);
+      nameColumn.getColumn().setText("Profile Name");
+      tableLayout.setColumnData(nameColumn.getColumn(), new ColumnWeightData(50));
+      final TableViewerColumn typeColumn = new TableViewerColumn(this.profilesViewer, SWT.LEFT);
+      typeColumn.getColumn().setMoveable(false);
+      typeColumn.getColumn().setText("Profile Type");
+      tableLayout.setColumnData(typeColumn.getColumn(), new ColumnWeightData(50));
+      
+      profilesViewer.setContentProvider(ArrayContentProvider.getInstance());
+      profilesViewer.setLabelProvider(new JMLProfileLabelProvider());
+      profilesViewer.setCheckStateProvider(new ICheckStateProvider() {
+         @Override
+         public boolean isChecked(Object element) {
+            return ObjectUtil.equals(checkedProfile, element);
+         }
+         
+         @Override
+         public boolean isGrayed(Object element) {
+            return false;
+         }
+      });
+      updateProfileViewer();
+      profilesViewer.addCheckStateListener(new ICheckStateListener() {
+         @Override
+         public void checkStateChanged(CheckStateChangedEvent event) {
+            handleProfileCheckStateChanged(event);
+         }
+      });
+      profilesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+         @Override
+         public void selectionChanged(SelectionChangedEvent event) {
+            handleProfileSelectionChanged(event);
+         }
+      });
 
-      final Button newButton = this
-            .createTableSideButton(myComposite, "New...");
+      final Button newButton = this.createTableSideButton(myComposite, "New...");
       this.editViewButton = this.createTableSideButton(myComposite, "Edit...");
       this.deleteButton = this.createTableSideButton(myComposite, "Delete");
       this.exportButton = this.createTableSideButton(myComposite, "Export...");
       this.importButton = this.createTableSideButton(myComposite, "Import...");
-
-      this.updateSelection();
 
       this.exportButton.addSelectionListener(new SelectionAdapter() {
          @Override
@@ -204,10 +191,32 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
             editProfile();
          }
       });
-
+      updateButtonsEnabledState();
       return myComposite;
    }
+
+   protected void handleProfileCheckStateChanged(CheckStateChangedEvent event) {
+      if (!event.getChecked()) {
+         // Forbid deselection
+         profilesViewer.setChecked(event.getElement(), true);
+      }
+      else {
+         checkedProfile = (IJMLProfile) event.getElement();
+         updatePageCompleted();
+         // Ensure that only one element is selected
+         Object[] checkedElements = profilesViewer.getCheckedElements();
+         for (Object element : checkedElements) {
+            if (element != event.getElement()) {
+               profilesViewer.setChecked(element, false);
+            }
+         }
+      }
+   }
    
+   protected void handleProfileSelectionChanged(SelectionChangedEvent event) {
+      updateButtonsEnabledState();
+   }
+
    protected void exportProfile() {
       final IJMLProfile profile = JMLProfilePropertiesPage.this
             .getSelectedProfile();
@@ -234,15 +243,14 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
             writer.close();
          }
          catch (final ProfilePersistenceException e1) {
-            new Logger(Activator.getDefault(), Activator.PLUGIN_ID)
-                  .logError(e1);
+            LogUtil.getLogger().logError(e1);
          }
          catch (final IOException e1) {
-            ErrorDialog.openError(JMLProfilePropertiesPage.this
-                  .getShell(), "Failed to write the exported file",
-                  "Due to an error: " + e1.getMessage(), new Status(
-                        IStatus.ERROR, Activator.PLUGIN_ID,
-                        "IO Exception", e1));
+            LogUtil.getLogger().logError(e1);
+            LogUtil.getLogger().openErrorDialog(getShell(), 
+                                                "Failed to write the exported file",
+                                                "Due to an error: " + e1.getMessage(),
+                                                e1);
          }
       }
    }
@@ -262,7 +270,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
                   .createDerivedProfilePersistence().read(content);
             JMLProfileManagement.instance()
                   .addUserDefinedProfile(profile);
-            JMLProfilePropertiesPage.this.fillTable();
+            JMLProfilePropertiesPage.this.updateProfileViewer();
          }
          catch (final ProfilePersistenceException e1) {
             ErrorDialog.openError(
@@ -292,181 +300,99 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    }
 
    protected void deleteProfile() {
-      final IJMLProfile profile = JMLProfilePropertiesPage.this
-            .getSelectedProfile();
-      if (!(profile instanceof IDerivedProfile)
-            || !JMLProfileManagement.instance().isUserDefinedProfile(
-                  (IDerivedProfile) profile)) {
-         // Cannot occur because button is disabled, but prevent cast
-         // exception altough
+      final IJMLProfile selectedProfile = getSelectedProfile();
+      if (!(selectedProfile instanceof IDerivedProfile) || 
+          !JMLProfileManagement.instance().isUserDefinedProfile((IDerivedProfile) selectedProfile)) {
+         // Cannot occur because button is disabled, but prevent cast exception altough
          return;
       }
-      if (!JMLProfileHelper.getProjectsUsingProfile(profile).isEmpty()) {
-         MessageDialog.openError(
-               JMLProfilePropertiesPage.this.getShell(),
-               "Cannot delete profile",
-               "Cannot delete the profile \""
-                     + profile.getName()
-                     + "\" because some projects in the workspace are using it.");
+      if (!JMLProfileHelper.getProjectsUsingProfile(selectedProfile).isEmpty()) {
+         MessageDialog.openError(getShell(),
+                                 "Cannot delete profile",
+                                 "Cannot delete the profile \"" + selectedProfile.getName() + "\" because some projects in the workspace are using it.");
       }
       else {
          try {
-            JMLProfileManagement.instance().removeUserDefinedProfile(
-                  (IDerivedProfile) profile);
-            JMLProfilePropertiesPage.this.fillTable();
+            JMLProfileManagement.instance().removeUserDefinedProfile((IDerivedProfile) selectedProfile);
+            JMLProfilePropertiesPage.this.updateProfileViewer();
          }
          catch (final InvalidProfileException ie) {
             // Should not occur here, but in the case that, handle it
-            new Logger(Activator.getDefault(), Activator.PLUGIN_ID)
-                  .logError(ie);
-            MessageDialog.openError(
-                  JMLProfilePropertiesPage.this.getShell(),
-                  "Failed to write profiles", ie.getMessage());
+            LogUtil.getLogger().logError(ie);
+            LogUtil.getLogger().openErrorDialog(getShell(), "Failed to write profiles", null, ie);
          }
       }
    }
    
    protected void createNewProfile() {
-      if (JMLProfileWizard.openWizard(getShell(), null) == WizardDialog.OK) {
-         JMLProfilePropertiesPage.this.fillTable();
+      IJMLProfile newProfile = JMLProfileWizard.openWizard(getShell(), null);
+      if (newProfile != null) {
+         updateProfileViewer();
+         profilesViewer.setSelection(SWTUtil.createSelection(newProfile));
       }
    }
    
    protected void editProfile() {
-      if (JMLProfilePropertiesPage.this.profile2EditView == null) {
-         JMLProfilePropertiesPage.this.profile2EditView = JMLProfilePropertiesPage.this.getCheckedProfile();
-      }
-      if (JMLProfileWizard.openWizard(getShell(), JMLProfilePropertiesPage.this.profile2EditView) == WizardDialog.OK) {
-         JMLProfilePropertiesPage.this.fillTable();
+      IJMLProfile modifiedProfile = JMLProfileWizard.openWizard(getShell(), getSelectedProfile());
+      if (modifiedProfile != null) {
+         JMLProfilePropertiesPage.this.updateProfileViewer();
       }
    }
 
-   private Button createTableSideButton(final Composite myComposite,
-         final String name) {
+   private Button createTableSideButton(final Composite myComposite, final String name) {
       final Button button = new Button(myComposite, SWT.PUSH);
       button.setText(name);
       button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1));
-
       return button;
    }
 
-   /**
-    * Initlializes the content of the UI. This method brings all available
-    * profiles in the list and selects the current profile.
-    */
-   private void initUI() {
-      final TableColumn nameColumn = new TableColumn(this.profilesListTable,
-            SWT.LEFT);
-      nameColumn.setMoveable(false);
-      nameColumn.setWidth(175);
-      nameColumn.setText("Profile Name");
-      final TableColumn typeColumn = new TableColumn(this.profilesListTable,
-            SWT.LEFT);
-      typeColumn.setMoveable(false);
-      typeColumn.setWidth(175);
-      typeColumn.setText("Profile Type");
-      this.fillTable();
-
-      // Make sure that only one profile is available at a single time
-      this.profilesListTable.addListener(SWT.Selection, new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
-            final TableItem item = (TableItem) event.item;
-            final IJMLProfile profile = (IJMLProfile) item.getData();
-            if (event.detail == SWT.CHECK) {
-               if (item.getChecked()) {
-                  JMLProfilePropertiesPage.this.newCheckedProfile = profile;
-                  for (final TableItem item2 : JMLProfilePropertiesPage.this.profilesListTable
-                        .getItems()) {
-                     if (item != item2) {
-                        item2.setChecked(false);
-                     }
-                  }
-                  JMLProfilePropertiesPage.this.setErrorMessage(null);
-               }
-               else {
-                  boolean nothingChecked = true;
-                  for (final TableItem item2 : JMLProfilePropertiesPage.this.profilesListTable
-                        .getItems()) {
-                     if (item2.getChecked()) {
-                        nothingChecked = false;
-                        break;
-                     }
-                  }
-                  if (nothingChecked) {
-                     JMLProfilePropertiesPage.this
-                           .setErrorMessage("Please select an active profile");
-                  }
-               }
-
-            }
-            else {
-               JMLProfilePropertiesPage.this.updateButtons(profile);
-               JMLProfilePropertiesPage.this.profile2EditView = profile;
-            }
-         }
-
-      });
-
-   }
-
    private IJMLProfile getSelectedProfile() {
-      final int index = JMLProfilePropertiesPage.this.profilesListTable
-            .getSelectionIndex();
-      return JMLProfilePropertiesPage.this.allProfiles.get(index);
+      return (IJMLProfile)SWTUtil.getFirstElement(profilesViewer.getSelection());
    }
 
-   private void fillTable() {
-      // Get all profiles and set them to the list
-      this.allProfiles = JMLProfileManagement.instance()
-            .getAvailableProfilesSortedByName();
-      this.profilesListTable.removeAll();
-      for (final IJMLProfile profile : this.allProfiles) {
-         final TableItem item = new TableItem(this.profilesListTable, 0);
-         final String type;
-         if (isProfileDerived(profile)) {
-            type = "derived from "
-                  + ((IDerivedProfile) profile).getParentProfile().getName();
-         }
-         else {
-            type = "standalone";
-         }
-         item.setText(new String[] { profile.getName(), type });
-         item.setData(profile);
-      }
-      this.updateSelection();
+   private void updateProfileViewer() {
+      List<IJMLProfile> allProfiles = JMLProfileManagement.instance().getAvailableProfilesSortedByName();
+      profilesViewer.setInput(allProfiles);
+      updatePageCompleted();
    }
-
-   private static boolean isProfileDerived(final IJMLProfile profile) {
-      return profile instanceof IDerivedProfile;
-   }
-
-   private void updateButtons(final IJMLProfile profile) {
-      if (this.editViewButton == null) {
-         return;
-      }
-
-      final boolean profileDerived = isProfileDerived(profile);
-      if (profileDerived) {
-         JMLProfilePropertiesPage.this.editViewButton.setText("Edit...");
+   
+   protected void updatePageCompleted() {
+      if (checkedProfile != null && ((List<?>) profilesViewer.getInput()).contains(checkedProfile)) {
+         setValid(true);
+         setErrorMessage(null);
       }
       else {
-         JMLProfilePropertiesPage.this.editViewButton.setText("View...");
+         setValid(false);
+         setErrorMessage("Default profile is not defined.");
       }
-      this.exportButton.setEnabled(profileDerived);
-      this.deleteButton.setEnabled(profileDerived
-            && JMLProfileManagement.instance().isUserDefinedProfile(
-                  (IDerivedProfile) profile));
+   }
+
+   private void updateButtonsEnabledState() {
+      IJMLProfile selectedProfile = getSelectedProfile();
+      if (selectedProfile != null) {
+         final boolean profileDerived = (selectedProfile instanceof IDerivedProfile);
+         if (profileDerived) {
+            editViewButton.setText("Edit...");
+         }
+         else {
+            editViewButton.setText("View...");
+         }
+         editViewButton.setEnabled(true);
+         exportButton.setEnabled(profileDerived);
+         deleteButton.setEnabled(profileDerived && JMLProfileManagement.instance().isUserDefinedProfile((IDerivedProfile) selectedProfile));
+      }
+      else {
+         editViewButton.setEnabled(false);
+         exportButton.setEnabled(false);
+         deleteButton.setEnabled(false);
+      }
    }
 
    @Override
    protected void doStatusChanged() {
       // Enable the list in preferences always and in project if project
       // specific settings are allowed
-      this.setListEnabled(!this.isProjectPreferencePage()
-            || this.useProjectSettings());
-
-      this.updateSelection();
+      this.setProvileViewerEnabled(!this.isProjectPreferencePage() || this.useProjectSettings());
    }
 
    /**
@@ -475,25 +401,20 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     * @param enabled
     *           whether to enable the list or not
     */
-   private void setListEnabled(final boolean enabled) {
-      this.profilesListTable.setEnabled(enabled);
+   private void setProvileViewerEnabled(final boolean enabled) {
+      this.profilesViewer.getTable().setEnabled(enabled);
    }
 
    @Override
    protected boolean hasProjectSpecificOptions(final IProject project) {
       // We have project specific options if a property is set on the project
-      return JMLPreferencesHelper.hasProjectJMLProfile(project);
+      return project != null && JMLPreferencesHelper.hasProjectJMLProfile(project);
    }
 
    @Override
-   protected void enableProjectSpecificSettings(
-         final boolean useProjectSpecificSettings) {
+   protected void enableProjectSpecificSettings(final boolean useProjectSpecificSettings) {
       super.enableProjectSpecificSettings(useProjectSpecificSettings);
-      if (!useProjectSpecificSettings) {
-         // Reset selection to default if no project settings
-         this.updateSelection();
-      }
-      this.setListEnabled(useProjectSpecificSettings);
+      this.setProvileViewerEnabled(useProjectSpecificSettings);
    }
 
    @Override
@@ -506,76 +427,9 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       return JML_PROFILE_PROP_ID;
    }
 
-   /**
-    * Updates the selected profile in the list of profiles to match the profile
-    * in the properties or preferences (with respect whether the pane is used
-    * for preferences or properties).
-    */
-   private void updateSelection() {
-      IJMLProfile currentProfile = null;
-      if (this.newCheckedProfile != null) {
-         currentProfile = this.newCheckedProfile;
-      }
-      if (currentProfile == null
-            && (this.isProjectPreferencePage() && this.useProjectSettings())) {
-         // Read local project properties if we are in a properties pane and
-         // project specific settings are enabled
-         currentProfile = JMLPreferencesHelper.getProjectJMLProfile(this
-               .getProject());
-      }
-      // Read from global preferences if no project specific profile is set
-      if (currentProfile == null) {
-         // Gobal preferences
-         try {
-            currentProfile = JMLPreferencesHelper.getDefaultJMLProfile();
-         }
-         catch (final NoSuchElementException e) {
-            this.setErrorMessage("No JML Profile available");
-            return;
-         }
-
-         if (currentProfile == null) {
-            this.setErrorMessage("Default JML Profile not available");
-            return;
-         }
-
-      }
-      assert currentProfile != null;
-
-      // Select profile in the list
-      for (final TableItem item : this.profilesListTable.getItems()) {
-         item.setChecked(false);
-      }
-      final int index = this.allProfiles.indexOf(currentProfile);
-      if (index != -1) {
-         this.profilesListTable.getItem(index).setChecked(true);
-      }
-      else {
-
-         this.setErrorMessage("Profile \"" + currentProfile.getName()
-               + "\" is not available.");
-      }
-
-      this.updateButtons(currentProfile);
-
-      // Redraw the list because selection is otherwise not always cleared
-      this.profilesListTable.redraw();
-   }
-
-   @Override
-   public boolean performCancel() {
-      final boolean cancel = super.performCancel();
-      if (cancel) {
-         // Remove preferences listener
-         this.uninstallListener();
-      }
-      return cancel;
-   }
-
    private IJMLProfile getCurrentProfile() {
-      if (this.isProjectPreferencePage()) {
-         return JMLPreferencesHelper.getProjectActiveJMLProfile(this
-               .getProject());
+      if (hasProjectSpecificOptions(getProject())) {
+         return JMLPreferencesHelper.getProjectActiveJMLProfile(getProject());
       }
       else {
          return JMLPreferencesHelper.getDefaultJMLProfile();
@@ -583,91 +437,20 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    }
 
    private IJMLProfile getCheckedProfile() {
-      for (int i = 0; i < this.profilesListTable.getItemCount(); i++) {
-         // Can only have one selection
-         if (this.profilesListTable.getItem(i).getChecked()) {
-            final IJMLProfile result = this.allProfiles.get(i);
-            return result;
-         }
-      }
-      return null;
-   }
-
-   private boolean updatePreferences() {
-
-      final IJMLProfile selectedProfile = this.getCheckedProfile();
-
-      // Only write into properties if a selection is available (user is forced
-      // to),
-      if (selectedProfile == null && !this.useProjectSettings()) {
-
-         return false;
-      }
-
-      // Create a runnable which applies to changes to the preferences
-      final Runnable preferencesUpdater;
-      Set<IProject> affectedProjects = null;
-
-      // Check whether the affective profile has changed
-      if (selectedProfile == this.getCurrentProfile()) {
-         // Then we do not need to do a rebuild
-         affectedProjects = Collections.emptySet();
-      }
-
-      if (this.isProjectPreferencePage()) {
-         // Only write into properties if a selection is available (user
-         // is forced
-         // to)
-         if (this.useProjectSettings() && selectedProfile == null) {
-            return false;
-         }
-         // Project preferences
-         final IProject project = this.getProject();
-         // Check whether the effective profile for the project changed
-         if (affectedProjects == null) {
-            affectedProjects = Collections.singleton(project);
-         }
-         preferencesUpdater = new Runnable() {
-
-            @Override
-            public void run() {
-               try {
-                  if (JMLProfilePropertiesPage.this.useProjectSettings()) {
-                     // Set property
-                     JMLPreferencesHelper.setProjectJMLProfile(project,
-                           selectedProfile);
-                  }
-                  else {
-                     // Remove property
-                     JMLPreferencesHelper.setProjectJMLProfile(project, null);
-                  }
-
-               }
-               catch (final CoreException e) {
-                  new Logger(Activator.getDefault(), Activator.PLUGIN_ID)
-                        .logError("Failed to store preferences", e);
-               }
-            }
-         };
+      Object[] checked = profilesViewer.getCheckedElements();
+      if (!ArrayUtil.isEmpty(checked)) {
+         return (IJMLProfile) checked[0];
       }
       else {
-         if (affectedProjects == null) {
-            affectedProjects = JMLProfileHelper
-                  .getProjectsUsingWorkspaceProfile();
-         }
-         preferencesUpdater = new Runnable() {
-            @Override
-            public void run() {
-
-               JMLPreferencesHelper
-
-               .setDefaultJMLProfile(selectedProfile);
-            }
-         };
+         return null;
       }
-      // Now trigger a rebuild for these projects and update the preferences
-      return RebuildHelper.triggerRebuild(affectedProjects, this.getShell(),
-            UserMessage.ACTIVE_PROFILE_CHANGED, preferencesUpdater);
+   }
+
+   @Override
+   protected void performDefaults() {
+      checkedProfile = JMLPreferencesHelper.getDefaultDefaultJMLProfile();
+      updateProfileViewer();
+      super.performDefaults();
    }
 
    @Override
@@ -677,11 +460,78 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
    @Override
    public boolean performOk() {
-      final boolean ok = this.updatePreferences();
-      if (ok) {
-         // Window is closed, remove listener
-         this.uninstallListener();
+      return super.performOk() && this.updatePreferences();
+   }
+
+   private boolean updatePreferences() {
+
+      final IJMLProfile checkedProfile = this.getCheckedProfile();
+
+      // Only write into properties if a selection is available (user is forced to),
+      if (checkedProfile == null && !this.useProjectSettings()) {
+         return false;
       }
-      return ok;
+
+      // Create a runnable which applies to changes to the preferences
+      Set<IProject> affectedProjects = null;
+      final Runnable preferencesUpdater;
+      if (this.isProjectPreferencePage()) {
+         // Only write into properties if a selection is available (user
+         // is forced
+         // to)
+         if (this.useProjectSettings() && checkedProfile == null) {
+            return false;
+         }
+         // Project preferences
+         final IProject project = this.getProject();
+         // Check whether the effective profile for the project changed
+         if (useProjectSettings() ?
+             checkedProfile == getCurrentProfile() :
+             JMLPreferencesHelper.getDefaultJMLProfile() == getCurrentProfile()) {
+            affectedProjects = Collections.emptySet();
+         }
+         else {
+            affectedProjects = Collections.singleton(project);
+         }
+         preferencesUpdater = new Runnable() {
+            @Override
+            public void run() {
+               try {
+                  if (JMLProfilePropertiesPage.this.useProjectSettings()) {
+                     // Set property
+                     JMLPreferencesHelper.setProjectJMLProfile(project, checkedProfile);
+                  }
+                  else {
+                     // Remove property
+                     JMLPreferencesHelper.setProjectJMLProfile(project, null);
+                  }
+               }
+               catch (final CoreException e) {
+                  LogUtil.getLogger().logError("Failed to store preferences", e);
+               }
+            }
+         };
+      }
+      else {
+         // Check whether the affective profile has changed
+         if (checkedProfile == getCurrentProfile()) {
+            // Then we do not need to do a rebuild
+            affectedProjects = Collections.emptySet();
+         }
+         else {
+            affectedProjects = JMLProfileHelper.getProjectsUsingWorkspaceProfile();
+         }
+         preferencesUpdater = new Runnable() {
+            @Override
+            public void run() {
+               JMLPreferencesHelper.setDefaultJMLProfile(checkedProfile);
+            }
+         };
+      }
+      // Now trigger a rebuild for these projects and update the preferences
+      return RebuildHelper.triggerRebuild(affectedProjects, 
+                                          getShell(), 
+                                          UserMessage.ACTIVE_PROFILE_CHANGED, 
+                                          preferencesUpdater);
    }
 }

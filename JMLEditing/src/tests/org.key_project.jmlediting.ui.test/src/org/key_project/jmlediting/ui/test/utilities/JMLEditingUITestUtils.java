@@ -66,8 +66,9 @@ public class JMLEditingUITestUtils {
       return bot.shell("Preferences");
    }
 
-   public static void openJMLColorsPreferencePage(final SWTWorkbenchBot bot) {
+   public static SWTBotShell openJMLColorsPreferencePage(final SWTWorkbenchBot bot) {
       TestUtilsUtil.openPreferencePage(bot, "JML", "Colors");
+      return bot.shell("Preferences");
    }
 
    public static void validateProfileListSelection(
@@ -151,10 +152,8 @@ public class JMLEditingUITestUtils {
    }
 
    public static IJMLProfile findReferenceProfile() {
-      for (final IJMLProfile profile : JMLProfileManagement.instance()
-            .getAvailableProfiles()) {
-         if (profile.getIdentifier().equals(
-               "org.key_project.jmlediting.profile.jmlref")) {
+      for (final IJMLProfile profile : JMLProfileManagement.instance().getAvailableProfiles()) {
+         if (profile.getIdentifier().equals("org.key_project.jmlediting.profile.jmlref")) {
             return profile;
          }
       }

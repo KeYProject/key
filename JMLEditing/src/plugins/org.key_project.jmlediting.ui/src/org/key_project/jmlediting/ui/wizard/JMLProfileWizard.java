@@ -18,6 +18,11 @@ public class JMLProfileWizard extends Wizard {
     * The shown {@link JMLProfileWizardPage}.
     */
    private final JMLProfileWizardPage profilePage;
+   
+   /**
+    * The modified or created profile.
+    */
+   private IEditableDerivedProfile modifiedProfile;
 
    /**
     * Constructor.
@@ -42,22 +47,37 @@ public class JMLProfileWizard extends Wizard {
     */
    @Override
    public boolean performFinish() {
-      return profilePage.performFinish();
+      modifiedProfile = profilePage.performFinish();
+      return modifiedProfile != null;
    }
    
+   /**
+    * Returns the modified or created profile.
+    * @return The modified or created profile.
+    */
+   public IEditableDerivedProfile getModifiedProfile() {
+      return modifiedProfile;
+   }
+
    /**
     * Opens the {@link JMLProfileWizard} in a {@link WizardDialog}.
     * @param parentShell The parent {@link Shell}.
     * @param profile The {@link IJMLProfile} to edit.
-    * @return The dialog result.
+    * @return The modified or created profile.
     */
-   public static int openWizard(Shell parentShell, 
-                                final IJMLProfile profile) {
+   public static IEditableDerivedProfile openWizard(Shell parentShell, 
+                                                    IJMLProfile profile) {
+      JMLProfileWizard wizard = new JMLProfileWizard(profile);
       WizardDialog dialog = new CustomWizardDialog(parentShell, 
-                                                   new JMLProfileWizard(profile), 
+                                                   wizard, 
                                                    IDialogConstants.OK_LABEL, 
                                                    profile == null || profile instanceof IEditableDerivedProfile);
       dialog.setHelpAvailable(false);
-      return dialog.open();
+      if (dialog.open() == WizardDialog.OK) {
+         return wizard.getModifiedProfile();
+      }
+      else {
+         return null;
+      }
    }
 }

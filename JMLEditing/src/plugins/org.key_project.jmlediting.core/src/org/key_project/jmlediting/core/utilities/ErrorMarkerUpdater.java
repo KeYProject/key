@@ -6,8 +6,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.key_project.jmlediting.core.Activator;
-import org.key_project.util.eclipse.Logger;
 
 /**
  * Class responsible for updating the ErrorMarkers in a Resource.
@@ -76,8 +74,7 @@ public class ErrorMarkerUpdater {
             }
          }
          catch (final CoreException exception) {
-            new Logger(Activator.getDefault(), Activator.PLUGIN_ID)
-            .createErrorStatus(exception);
+            LogUtil.getLogger().createErrorStatus(exception);
          }
       }
    }
@@ -108,8 +105,7 @@ public class ErrorMarkerUpdater {
 
          }
          catch (final CoreException exception) {
-            new Logger(Activator.getDefault(), Activator.PLUGIN_ID)
-            .createErrorStatus(exception);
+            LogUtil.getLogger().createErrorStatus(exception);
          }
       }
    }

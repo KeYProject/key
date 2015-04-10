@@ -8,7 +8,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.key_project.javaeditor.util.PreferenceUtil;
 import org.key_project.jmlediting.core.Activator;
@@ -26,6 +25,11 @@ public final class JMLPreferencesHelper {
     * The ID of the JML Java Editor extension.
     */
    public static final String JML_EDITOR_EXTENSION_ID = "org.key_project.jmlediting.ui.extension.JMLSourceViewerConfigurationExtension";
+
+   /**
+    * The ID of the default profile.
+    */
+   private static final String DEFAULT_PROFILE_IDENTIFIER = "org.key_project.jmlediting.profile.jmlref.ae";
 
    /**
     * List of associated listener.
@@ -52,6 +56,14 @@ public final class JMLPreferencesHelper {
    }
 
    /**
+    * Returns the default default profile.
+    * @return The default default profile.
+    */
+   public static IJMLProfile getDefaultDefaultJMLProfile() {
+      return JMLProfileManagement.instance().getProfileFromIdentifier(DEFAULT_PROFILE_IDENTIFIER);
+   }
+
+   /**
     * Returns the default profile from the eclipse preferences. If no profile is
     * set for the workspace, this methods tries to set the JML Reference
     * profile, if not found, it takes the first one. If there is no profile
@@ -61,24 +73,19 @@ public final class JMLPreferencesHelper {
     */
    public static IJMLProfile getDefaultJMLProfile() {
       String currentProfileIdentifier;
-      final IEclipsePreferences preferences = InstanceScope.INSTANCE
-            .getNode(Activator.PLUGIN_ID);
-      currentProfileIdentifier = preferences.get(
-            PropertyNames.DEFAULT_JML_PROFILE, null);
+      final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+      currentProfileIdentifier = preferences.get(PropertyNames.DEFAULT_JML_PROFILE, null);
       if (currentProfileIdentifier == null) {
          // No workspace default is set
          // Try to find the reference profile, it is not required to be
          // installed
          IJMLProfile profile = null;
-         final List<IJMLProfile> allProfiles = JMLProfileManagement.instance()
-               .getAvailableProfilesSortedByName();
+         final List<IJMLProfile> allProfiles = JMLProfileManagement.instance().getAvailableProfilesSortedByName();
          if (allProfiles.isEmpty()) {
-
             throw new NoSuchElementException("No JML Profile installed!");
          }
          for (final IJMLProfile p : allProfiles) {
-            if (p.getIdentifier().equals(
-                  "org.key_project.jmlediting.profile.jmlref.ae")) {
+            if (p.getIdentifier().equals(DEFAULT_PROFILE_IDENTIFIER)) {
                profile = p;
             }
          }
@@ -90,8 +97,7 @@ public final class JMLPreferencesHelper {
          setDefaultJMLProfile(profile);
          return profile;
       }
-      return JMLProfileManagement.instance().getProfileFromIdentifier(
-            currentProfileIdentifier);
+      return JMLProfileManagement.instance().getProfileFromIdentifier(currentProfileIdentifier);
    }
 
    /**
@@ -104,11 +110,9 @@ public final class JMLPreferencesHelper {
       if (profile == null) {
          throw new NullPointerException("Cannot set a null default profile");
       }
-      final IEclipsePreferences preferences = InstanceScope.INSTANCE
-            .getNode(Activator.PLUGIN_ID);
+      final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
       // global properties
-      preferences.put(PropertyNames.DEFAULT_JML_PROFILE,
-            profile.getIdentifier());
+      preferences.put(PropertyNames.DEFAULT_JML_PROFILE, profile.getIdentifier());
    }
 
    /**
@@ -166,35 +170,6 @@ public final class JMLPreferencesHelper {
       for (final IProjectProfileListener profileListener : projectListener) {
          profileListener.profileChanged(project, profile);
       }
-   }
-
-   /**
-    * Creates a {@link IPreferenceChangeListener} which is added to the correct
-    * namespace to listen to changes of the default profile. The given listener
-    * is wrapped and the created one returned. The returned one needs to be
-    * removed with the
-    * {@link #removeDefaultProfilePreferencesListener(IPreferenceChangeListener)}
-    * method.
-    *
-    * @param listener
-    *           the listener to add
-    * @return the created listener
-    */
-   public static IPreferenceChangeListener buildDefaultProfilePreferencesListener(
-         final IPreferenceChangeListener listener) {
-      final IPreferenceChangeListener filteredlistener = new IPreferenceChangeListener() {
-
-         @Override
-         public void preferenceChange(final PreferenceChangeEvent event) {
-            if (event.getKey().equals(PropertyNames.DEFAULT_JML_PROFILE)) {
-               listener.preferenceChange(event);
-            }
-         }
-      };
-      InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID)
-            .addPreferenceChangeListener(filteredlistener);
-
-      return listener;
    }
 
    /**

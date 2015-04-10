@@ -25,11 +25,11 @@ import org.key_project.javaeditor.extension.DefaultJavaSourceViewerConfiguration
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.IProjectProfileListener;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
-import org.key_project.jmlediting.ui.Activator;
 import org.key_project.jmlediting.ui.format.JMLContentFormatter;
 import org.key_project.jmlediting.ui.format.JavaJMLMultilineCommentAutoIndentStrategy;
 import org.key_project.jmlediting.ui.format.UnableToInitializeJMLFormatterException;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
+import org.key_project.jmlediting.ui.util.LogUtil;
 
 /**
  * An {@link DefaultJavaSourceViewerConfigurationExtension} to support JML.
@@ -182,11 +182,7 @@ public class JMLSourceViewerConfigurationExtension extends
          }
       }
       // Could not initialize the formatter, just use the current one
-      Activator
-            .createLogger()
-            .logError(
-                  "JMLContentFormatter could not be initialized, JML may be modified incorrectly",
-                  exception);
+      LogUtil.getLogger().logError("JMLContentFormatter could not be initialized, JML may be modified incorrectly", exception);
       return currentResult;
    }
 }
