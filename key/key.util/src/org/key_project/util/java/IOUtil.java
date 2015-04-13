@@ -31,6 +31,7 @@ import java.nio.charset.Charset;
 import java.security.CodeSource;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -766,5 +767,33 @@ public final class IOUtil {
     */
    public static File getTempDirectory() {
       return new File(System.getProperty("java.io.tmpdir"));
+   }
+   
+   /**
+    * Ensures that the segment is a valid OS independent path segment meaning
+    * that it is a valid file/folder name. Each invalid sign will be replaced
+    * by {@code '_'}.
+    * @param segment The segment to validate.
+    * @return The validated OS independent path segment in which each invalid sign is replaced.
+    */
+   public static String validateOSIndependentFileName(String name) {
+      if (name != null) {
+         char[] latinBig = StringUtil.LATIN_ALPHABET_BIG.toCharArray();
+         char[] latinSmall = StringUtil.LATIN_ALPHABET_SMALL.toCharArray();
+         char[] numerals = StringUtil.NUMERALS.toCharArray();
+         char[] content = name.toCharArray();
+         for (int i = 0; i < content.length; i++) {
+            if (Arrays.binarySearch(latinBig, content[i]) < 0 &&
+                Arrays.binarySearch(latinSmall, content[i]) < 0 &&
+                Arrays.binarySearch(numerals, content[i]) < 0 &&
+                Arrays.binarySearch(StringUtil.ADDITIONAL_ALLOWED_FILE_NAME_SYSTEM_CHARACTERS, content[i]) < 0) {
+               content[i] = '_';
+            }
+         }
+         return new String(content);
+      }
+      else {
+         return name;
+      }
    }
 }

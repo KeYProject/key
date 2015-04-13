@@ -16,6 +16,8 @@ package org.key_project.util.java;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import javax.swing.JFileChooser;
+
 /**
  * Provides static methods to work with strings.
  * @author Martin Hentschel
@@ -42,6 +44,13 @@ public final class StringUtil {
    public static final String LATIN_ALPHABET_SMALL = LATIN_ALPHABET_BIG.toLowerCase();
    
    /**
+    * Additional characters allowed in file systems.
+    * <p>
+    * It is important that {@code ':'} is not contained because {@code "::"} is replaced with a {@code '/'} by the {@link JFileChooser} under Mac OS.
+    */
+   public static final char[] ADDITIONAL_ALLOWED_FILE_NAME_SYSTEM_CHARACTERS = {'(', ')', '[', ']', '-', '+', '_', '$', ',', '%'};
+ 
+   /**
     * The numerals.
     */
    public static final String NUMERALS = "0123456789";
@@ -50,6 +59,13 @@ public final class StringUtil {
     * All characters representing whitespace.
     */
    public static final String WHITESPACE = " \n\r\t";
+   
+   /**
+    * Static constructor.
+    */
+   static {
+      Arrays.sort(ADDITIONAL_ALLOWED_FILE_NAME_SYSTEM_CHARACTERS);
+   }
    
    /**
     * Forbid instances by this private constructor.

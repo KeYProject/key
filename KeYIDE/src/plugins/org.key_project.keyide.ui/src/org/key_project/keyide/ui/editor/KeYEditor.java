@@ -69,6 +69,7 @@ import org.key_project.keyide.ui.views.StrategySettingsPage;
 import org.key_project.util.bean.IBean;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -516,7 +517,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
          IPath methodPath = method.getPath();
          methodPath = methodPath.removeLastSegments(1);
          String name = getCurrentProof().name().toString();
-         name = ResourceUtil.validateWorkspaceFileName(name);
+         name = IOUtil.validateOSIndependentFileName(name);
          name = name + "." + KeYUtil.PROOF_FILE_EXTENSION;
          methodPath = methodPath.append(name);
          IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(methodPath);
