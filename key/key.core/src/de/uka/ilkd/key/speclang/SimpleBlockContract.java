@@ -465,7 +465,7 @@ public final class SimpleBlockContract implements BlockContract {
     }
 
     // TODO Implement equals and hashCode properly.
-    /*@Override
+    /* @Override
     public boolean equals(final Object object)
     {
         if (object == null) {

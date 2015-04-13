@@ -24,8 +24,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.key_project.stubby.core;bundle-version="1.0.0";resolution:=optional,
  org.key_project.stubby.ui;bundle-version="1.0.0";resolution:=optional,
  org.eclipse.debug.core;bundle-version="3.9.1",
- org.eclipse.jdt.debug;bundle-version="3.8.102",
- org.eclipse.debug.ui;bundle-version="3.10.2"
+ org.eclipse.jdt.debug,
+ org.eclipse.debug.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
