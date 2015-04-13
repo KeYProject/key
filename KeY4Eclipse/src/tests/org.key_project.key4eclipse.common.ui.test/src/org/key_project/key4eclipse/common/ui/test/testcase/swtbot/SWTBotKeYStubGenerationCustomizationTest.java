@@ -24,7 +24,6 @@ import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
-import org.key_project.stubby.core.test.testcase.StubGeneratorUtilTest;
 import org.key_project.stubby.core.util.StubGeneratorUtil;
 import org.key_project.stubby.ui.test.testcase.swtbot.AbstractSWTBotGenerateStubsTest;
 import org.key_project.util.eclipse.BundleUtil;
@@ -283,7 +282,7 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/stubbyExample/classPathStubs", oracleFolder);
          // Compare generated stubs with oracle stubs
          IFolder stubFolder = javaProject.getProject().getFolder(new Path(StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH));
-         StubGeneratorUtilTest.assertResources(oracleFolder.members(), stubFolder.members());
+         TestUtilsUtil.assertResources(oracleFolder.members(), stubFolder.members());
       }
       
       /**

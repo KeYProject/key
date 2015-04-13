@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Test
+Bundle-SymbolicName: org.key_project.removegenerics.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.removegenerics.test.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.junit;bundle-version="4.11.0",
+ org.key_project.util;bundle-version="1.0.0",
+ org.key_project.core;bundle-version="1.0.0",
+ org.key_project.removegenerics;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Export-Package: de.uka.ilkd.key.util.removegenerics

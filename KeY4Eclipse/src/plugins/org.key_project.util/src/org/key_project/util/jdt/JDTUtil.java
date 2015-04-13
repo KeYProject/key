@@ -787,7 +787,7 @@ public class JDTUtil {
     * @return The found locations.
     * @throws JavaModelException 
     */
-   private static List<File> getLocationFor(IJavaProject javaProject, 
+   public static List<File> getLocationFor(IJavaProject javaProject, 
                                             IClasspathEntry entry,
                                             int expectedKind,
                                             Set<IProject> alreadyHandledProjects) throws JavaModelException {

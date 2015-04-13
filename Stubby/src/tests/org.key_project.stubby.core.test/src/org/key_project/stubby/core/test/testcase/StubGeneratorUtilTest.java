@@ -8,9 +8,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -805,7 +803,7 @@ public class StubGeneratorUtilTest extends TestCase {
       createOracleFiles(project, pathToOracleStubsFileInPlugin);
       // Compare generated stubs with oracle stubs
       IFolder stubFolder = project.getProject().getFolder(StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH);
-      assertResources(oracleFolder.members(), stubFolder.members());
+      TestUtilsUtil.assertResources(oracleFolder.members(), stubFolder.members());
    }
 
    /**
@@ -837,53 +835,7 @@ public class StubGeneratorUtilTest extends TestCase {
       // Create new oracle stubs if requested
       createOracleFiles(project, pathToOracleStubsFileInPlugin);
       // Compare generated stubs with oracle stubs
-      assertResources(oracleFolder.members(), stubFolder.members());
-   }
-   
-   /**
-    * Ensures that the given {@link IResource}s have the same content.
-    * @param expected The expected {@link IResource}s.
-    * @param current The current {@link IResource}s.
-    * @throws Exception Occurred Exception.
-    */
-   public static void assertResources(IResource[] expected, IResource[] current) throws Exception {
-      if (expected != null) {
-         assertNotNull(current);
-         assertEquals(expected.length, current.length);
-         for (int i = 0; i < expected.length; i++) {
-            assertResource(expected[i], current[i]);
-         }
-      }
-      else {
-         assertNull(current);
-      }
-   }
-  
-   /**
-    * Ensures the same content of the given {@link IResource}s.
-    * @param expected The expected {@link IResource}.
-    * @param current The current {@link IResource}.
-    * @throws Exception Occurred Exception.
-    */
-   public static void assertResource(IResource expected, IResource current) throws Exception {
-      assertEquals(expected.getName(), current.getName());
-      assertEquals(expected.getType(), current.getType());
-      if (expected instanceof IFolder) {
-         assertTrue(current instanceof IFolder);
-         assertResources(((IFolder) expected).members(), ((IFolder) current).members());
-      }
-      else {
-         assertFalse(current instanceof IFolder);
-      }
-      if (expected instanceof IFile) {
-         assertTrue(current instanceof IFile);
-         String expectedContent = IOUtil.readFrom(((IFile) expected).getContents());
-         String currentContent = IOUtil.readFrom(((IFile) current).getContents());
-         assertEquals(expectedContent, currentContent);
-      }
-      else {
-         assertFalse(current instanceof IFile);
-      }
+      TestUtilsUtil.assertResources(oracleFolder.members(), stubFolder.members());
    }
    
    /**

@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KeY RemoveGenerics
+Bundle-SymbolicName: org.key_project.removegenerics
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.removegenerics.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.key_project.util;bundle-version="1.0.0",
+ org.key_project.core;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: KeY Project
+Export-Package: de.uka.ilkd.key.util.removegenerics,
+ de.uka.ilkd.key.util.removegenerics.monitor

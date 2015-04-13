@@ -1775,4 +1775,50 @@ public class TestUtilsUtil {
       });
       return (style & SWT.READ_ONLY) != SWT.READ_ONLY;
    }
+   
+   /**
+    * Ensures that the given {@link IResource}s have the same content.
+    * @param expected The expected {@link IResource}s.
+    * @param current The current {@link IResource}s.
+    * @throws Exception Occurred Exception.
+    */
+   public static void assertResources(IResource[] expected, IResource[] current) throws Exception {
+      if (expected != null) {
+         assertNotNull(current);
+         assertEquals(expected.length, current.length);
+         for (int i = 0; i < expected.length; i++) {
+            assertResource(expected[i], current[i]);
+         }
+      }
+      else {
+         assertNull(current);
+      }
+   }
+  
+   /**
+    * Ensures the same content of the given {@link IResource}s.
+    * @param expected The expected {@link IResource}.
+    * @param current The current {@link IResource}.
+    * @throws Exception Occurred Exception.
+    */
+   public static void assertResource(IResource expected, IResource current) throws Exception {
+      assertEquals(expected.getName(), current.getName());
+      assertEquals(expected.getType(), current.getType());
+      if (expected instanceof IFolder) {
+         TestCase.assertTrue(current instanceof IFolder);
+         assertResources(((IFolder) expected).members(), ((IFolder) current).members());
+      }
+      else {
+         TestCase.assertFalse(current instanceof IFolder);
+      }
+      if (expected instanceof IFile) {
+         TestCase.assertTrue(current instanceof IFile);
+         String expectedContent = IOUtil.readFrom(((IFile) expected).getContents());
+         String currentContent = IOUtil.readFrom(((IFile) current).getContents());
+         assertEquals(expectedContent, currentContent);
+      }
+      else {
+         TestCase.assertFalse(current instanceof IFile);
+      }
+   }
 }

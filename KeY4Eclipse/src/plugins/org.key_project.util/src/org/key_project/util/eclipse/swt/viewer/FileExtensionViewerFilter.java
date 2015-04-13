@@ -48,7 +48,7 @@ public class FileExtensionViewerFilter extends ViewerFilter {
      * @param caseSensitive Case sensitive file extension matching?
      * @param acceptedExtensions The allowed file extensions.
      */
-    public FileExtensionViewerFilter(boolean caseSensitive, String[] acceptedExtensions) {
+    public FileExtensionViewerFilter(boolean caseSensitive, String... acceptedExtensions) {
         this.caseSensitive = caseSensitive;
         // Convert all file extension into lower case.
         if (acceptedExtensions != null) {
