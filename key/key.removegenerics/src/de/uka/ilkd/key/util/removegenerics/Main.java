@@ -48,7 +48,7 @@ import recoder.java.reference.PackageReference;
  * <dd>be verbose with the output. lots of internal information will pop up.</dd>
  * <dt><i>file name</i></dt>
  * <dd>add a .java-file to examine</dd>
- * <dt><i>firectory name</i></dt>
+ * <dt><i>directory name</i></dt>
  * <dd>add a directory to examine. every .java within the named directory tree
  * will be considered</dd>
  * <dt>@<i>filename</i></dt>
