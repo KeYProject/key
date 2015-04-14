@@ -16,8 +16,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry.KeYPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
 import org.key_project.stubby.core.customization.IGeneratorCustomization;
@@ -151,9 +151,9 @@ public class KeYStubGenerationCustomization extends AbstractStubGenerationCustom
    protected boolean isPartOfClassPath(String stubFolderPath) {
       try {
          String fullPath = computeFullPath(stubFolderPath);
-         List<KeYClassPathEntry> entries = KeYResourceProperties.getClassPathEntries(getProject());
+         List<KeYPathEntry> entries = KeYResourceProperties.getClassPathEntries(getProject());
          return KeYResourceProperties.searchClassPathEntry(entries, 
-                                                           KeYClassPathEntryKind.WORKSPACE, 
+                                                           KeYPathEntryKind.WORKSPACE, 
                                                            fullPath) != null;
       }
       catch (CoreException e) {

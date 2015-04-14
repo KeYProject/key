@@ -23,15 +23,15 @@ import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
 /**
- * Represents a class path entry for KeY.
+ * Represents a path entry for KeY.
  * @author Martin Hentschel
  */
-public class KeYClassPathEntry {
+public class KeYPathEntry {
     /**
      * The possible kinds.
      * @author Martin Hentschel
      */
-    public static enum KeYClassPathEntryKind {
+    public static enum KeYPathEntryKind {
         /**
          * Entry in workspace.
          */
@@ -46,7 +46,7 @@ public class KeYClassPathEntry {
     /**
      * The kind.
      */
-    private KeYClassPathEntryKind kind;
+    private KeYPathEntryKind kind;
     
     /**
      * The path.
@@ -58,7 +58,7 @@ public class KeYClassPathEntry {
      * @param kind The kind.
      * @param path The path.
      */
-    public KeYClassPathEntry(KeYClassPathEntryKind kind, String path) {
+    public KeYPathEntry(KeYPathEntryKind kind, String path) {
         this.kind = kind;
         this.path = path;
     }
@@ -67,7 +67,7 @@ public class KeYClassPathEntry {
      * Returns the kind.
      * @return The kind.
      */
-    public KeYClassPathEntryKind getKind() {
+    public KeYPathEntryKind getKind() {
         return kind;
     }
 
@@ -80,11 +80,11 @@ public class KeYClassPathEntry {
     }
     
     /**
-     * Returns the {@link IResource} represented by this {@link KeYClassPathEntry}.
+     * Returns the {@link IResource} represented by this {@link KeYPathEntry}.
      * @return The {@link IResource} or {@code null} if no {@link IResource} is represented.
      */
     public IResource getResource() {
-        if (KeYClassPathEntryKind.WORKSPACE.equals(getKind())) {
+        if (KeYPathEntryKind.WORKSPACE.equals(getKind())) {
             return ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(path));
         }
         else {
@@ -112,11 +112,11 @@ public class KeYClassPathEntry {
      */
     public boolean isValid() {
         if (!StringUtil.isTrimmedEmpty(getPath())) {
-            if (KeYClassPathEntryKind.WORKSPACE.equals(getKind())) {
+            if (KeYPathEntryKind.WORKSPACE.equals(getKind())) {
                 IResource resource = getResource();
                 return resource != null && resource.exists();
             }
-            else if (KeYClassPathEntryKind.EXTERNAL_IN_FILE_SYSTEM.equals(getKind())) {
+            else if (KeYPathEntryKind.EXTERNAL_IN_FILE_SYSTEM.equals(getKind())) {
                 File file = getLocation();
                 return file.exists();
             }
@@ -134,8 +134,8 @@ public class KeYClassPathEntry {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof KeYClassPathEntry) {
-            KeYClassPathEntry other = (KeYClassPathEntry)obj;
+        if (obj instanceof KeYPathEntry) {
+            KeYPathEntry other = (KeYPathEntry)obj;
             return ObjectUtil.equals(getKind(), other.getKind()) &&
                    ObjectUtil.equals(getPath(), other.getPath());
         }

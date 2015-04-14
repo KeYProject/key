@@ -1533,8 +1533,8 @@ public final class MainWindow extends JFrame  {
         getUserInterface().loadProblem(file);
     }
 
-   public void loadProblem(File file, List<File> classPath, File bootClassPath) {
-      getUserInterface().loadProblem(file, classPath, bootClassPath);
+   public void loadProblem(File file, List<File> classPath, File bootClassPath, List<File> includes) {
+      getUserInterface().loadProblem(file, classPath, bootClassPath, includes);
    }
 
     /*

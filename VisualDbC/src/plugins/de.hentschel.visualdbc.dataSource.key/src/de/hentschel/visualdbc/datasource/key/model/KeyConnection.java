@@ -278,6 +278,7 @@ public class KeyConnection extends MemoryConnection {
          final File location = getLocation(connectionSettings);
          final List<File> classPathEntries = getClassPathEntries(connectionSettings);
          final File bootClassPath = getBootClassPath(connectionSettings);
+         final List<File> includes = getIncludes(connectionSettings);
          if (location == null || !location.exists()) {
             throw new DSException("The location \"" + location + "\" doesn't exist.");
          }
@@ -286,11 +287,11 @@ public class KeyConnection extends MemoryConnection {
          
          // Establish connection
          if (interactive) {
-            environment = WindowUserInterfaceControl.loadInMainWindow(location, classPathEntries, bootClassPath, true);
+            environment = WindowUserInterfaceControl.loadInMainWindow(location, classPathEntries, bootClassPath, includes, true);
             getMediator().addGUIListener(mainGuiListener);
          }
          else {
-            environment = KeYEnvironment.load(location, classPathEntries, bootClassPath);
+            environment = KeYEnvironment.load(location, classPathEntries, bootClassPath, includes);
          }
          initConfig = environment.getInitConfig();
          // Analyze classes, interfaces, enums and packages
@@ -1470,6 +1471,29 @@ public class KeyConnection extends MemoryConnection {
          IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember((IPath)object);
          if (resource != null) {
             return KeYResourceProperties.getKeYBootClassPathLocation(resource.getProject());
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Returns the includes in the {@link IProject} to consider.
+    * @param settings The connection settings.
+    * @return The found includes or {@code null} if not available.
+    * @throws CoreException Occurred Exception.
+    */
+   protected List<File> getIncludes(Map<String, Object> settings) throws CoreException {
+      Assert.isNotNull(settings);
+      Object object = settings.get(KeyDriver.SETTING_LOCATION);
+      if (object instanceof IPath) {
+         IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember((IPath)object);
+         if (resource != null) {
+            return KeYResourceProperties.getKeYIncludes(resource.getProject());
          }
          else {
             return null;

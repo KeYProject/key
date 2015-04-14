@@ -28,8 +28,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.key_project.key4eclipse.common.ui.wizard.AbstractNewJavaExampleProjectWizard;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry.KeYPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.sed.key.example.ui.Activator;
 import org.key_project.sed.key.example.ui.util.KeYSEDExampleImages;
@@ -108,7 +108,7 @@ public class SEDExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
          libSpecsFolder.create(true, true, null);
       }
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/lib_specs", libSpecsFolder);
-      KeYResourceProperties.setClassPathEntries(project, Collections.singletonList(new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, libSpecsFolder.getFullPath().toString())));
+      KeYResourceProperties.setClassPathEntries(project, Collections.singletonList(new KeYPathEntry(KeYPathEntryKind.WORKSPACE, libSpecsFolder.getFullPath().toString())));
       // Add examples to src folder
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/src", sourceDirectory);
       // Add readme file

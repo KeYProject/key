@@ -330,7 +330,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = HelperClassForTests.setDefaultTacletOptionsForTarget(javaFile, containerTypeName, targetName);
          // Load java file
-         environment = KeYEnvironment.load(javaFile, null, null);
+         environment = KeYEnvironment.load(javaFile, null, null, null);
          // Search type
          KeYJavaType containerKJT = environment.getJavaInfo().getTypeByClassName(containerTypeName, null);
          assertNotNull(containerKJT);
@@ -397,7 +397,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = HelperClassForTests.setDefaultTacletOptions(baseDir, javaPathInBaseDir);
          // Load java file
-         environment = KeYEnvironment.load(javaFile, null, null);
+         environment = KeYEnvironment.load(javaFile, null, null, null);
          // Search method to proof
          IProgramMethod pm = HelperClassForTests.searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
          // Find first contract.

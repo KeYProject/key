@@ -44,13 +44,14 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
    public ProblemLoader(File file, 
                         List<File> classPath, 
                         File bootClassPath,
+                        List<File> includes,
                         Profile profileOfNewProofs, 
                         boolean forceNewProfileOfNewProofs,
                         KeYMediator mediator,
                         boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
                         Properties poPropertiesToForce, 
                         ProverTaskListener ptl) {
-      super(file, classPath, bootClassPath, profileOfNewProofs, forceNewProfileOfNewProofs, mediator.getUI(),
+      super(file, classPath, bootClassPath, includes, profileOfNewProofs, forceNewProfileOfNewProofs, mediator.getUI(),
             askUiToSelectAProofObligationIfNotDefinedByLoadedFile, poPropertiesToForce);
       this.mediator = mediator;
       this.ptl = ptl;

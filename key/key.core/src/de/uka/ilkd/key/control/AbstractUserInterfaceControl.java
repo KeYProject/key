@@ -202,11 +202,12 @@ public abstract class AbstractUserInterfaceControl implements UserInterfaceContr
                                      File file,
                                      List<File> classPath,
                                      File bootClassPath,
+                                     List<File> includes,
                                      Properties poPropertiesToForce,
                                      boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
        AbstractProblemLoader loader = null;
        try {
-          loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, profile, forceNewProfileOfNewProofs,
+          loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, includes, profile, forceNewProfileOfNewProofs,
                                                  this, false, poPropertiesToForce);
           loader.load();
           return loader;

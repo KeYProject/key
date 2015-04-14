@@ -20,8 +20,8 @@ import org.junit.Test;
 import org.key_project.key4eclipse.common.ui.stubby.KeYGeneratorCustomization;
 import org.key_project.key4eclipse.common.ui.stubby.KeYStubGenerationCustomization;
 import org.key_project.key4eclipse.common.ui.test.Activator;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry.KeYPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
 import org.key_project.stubby.core.util.StubGeneratorUtil;
@@ -472,8 +472,8 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
          IProject project = javaProject.getProject();
          stubFolderfullPath = KeYStubGenerationCustomization.computeFullPath(project, StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH);
          if (beforeClassPath) {
-            List<KeYClassPathEntry> entries = KeYResourceProperties.getClassPathEntries(project);
-            entries.add(new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, stubFolderfullPath));
+            List<KeYPathEntry> entries = KeYResourceProperties.getClassPathEntries(project);
+            entries.add(new KeYPathEntry(KeYPathEntryKind.WORKSPACE, stubFolderfullPath));
             KeYResourceProperties.setClassPathEntries(project, entries);
          }
          if (beforeBootClassPath) {
@@ -534,9 +534,9 @@ public class SWTBotKeYStubGenerationCustomizationTest extends AbstractSWTBotGene
       @Override
       public void testResults(IJavaProject javaProject) throws Exception {
          IProject project = javaProject.getProject();
-         List<KeYClassPathEntry> entries = KeYResourceProperties.getClassPathEntries(project);
+         List<KeYPathEntry> entries = KeYResourceProperties.getClassPathEntries(project);
          String fullPath = KeYStubGenerationCustomization.computeFullPath(project, StubGeneratorUtil.DEFAULT_STUB_FOLDER_PATH);
-         KeYClassPathEntry entry = KeYResourceProperties.searchClassPathEntry(entries, KeYClassPathEntryKind.WORKSPACE, fullPath);
+         KeYPathEntry entry = KeYResourceProperties.searchClassPathEntry(entries, KeYPathEntryKind.WORKSPACE, fullPath);
          if (afterClassPath) {
             assertNotNull(entry);
          }

@@ -59,7 +59,7 @@ public class TestTestgen extends TestCommons{
 	public void testMiddle() throws Exception {
 		File file = new File(testFile + "middle.key");
 		assertTrue(file.exists());
-		KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file, null, null);
+		KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file, null, null, null);
 		try {
 		   Proof proof = env.getLoadedProof();
 		   assertNotNull(proof);

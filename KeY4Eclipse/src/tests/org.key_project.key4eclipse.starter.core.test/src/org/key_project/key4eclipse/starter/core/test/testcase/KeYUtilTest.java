@@ -73,7 +73,7 @@ public class KeYUtilTest extends AbstractSetupTestCase {
       IMethod run = innerType.getMethods()[0];
       assertEquals("run", run.getElementName());
       // Open project in KeY
-      KeYEnvironment<?> environment = KeYEnvironment.load(ResourceUtil.getLocation(project.getResource()), null, null);
+      KeYEnvironment<?> environment = KeYEnvironment.load(ResourceUtil.getLocation(project.getResource()), null, null, null);
       try {
          JavaInfo javaInfo = environment.getJavaInfo();
          // Test conversion of doSomething

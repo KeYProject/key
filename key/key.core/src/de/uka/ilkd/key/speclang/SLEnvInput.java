@@ -63,17 +63,18 @@ public final class SLEnvInput extends AbstractEnvInput {
     public SLEnvInput(String javaPath,
   	      	      List<File> classPath,
   	      	      File bootClassPath,
-  	      	      Profile profile) {
+  	      	      Profile profile,
+  	      	     List<File> includes) {
 	super(getLanguage() + " specifications", 
 	      javaPath, 
 	      classPath, 
-	      bootClassPath, profile);
+	      bootClassPath, profile, includes);
     }
     
     
     public SLEnvInput(String javaPath,
-                     Profile profile) {
-	this(javaPath, null, null, profile);
+                      Profile profile) {
+	this(javaPath, null, null, profile, null);
     }    
     
 

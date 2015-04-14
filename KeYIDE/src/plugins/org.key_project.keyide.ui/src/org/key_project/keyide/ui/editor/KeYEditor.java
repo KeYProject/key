@@ -399,7 +399,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
                Assert.isTrue(file != null, "File \"" + fileInput.getFile() + "\" is not local.");
                File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(eclipseFile.getProject());
                List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(eclipseFile.getProject());
-               this.environment = KeYEnvironment.load(file, classPaths, bootClassPath, EclipseUserInterfaceCustomization.getInstance());
+               List<File> includes = KeYResourceProperties.getKeYIncludes(eclipseFile.getProject());
+               this.environment = KeYEnvironment.load(file, classPaths, bootClassPath, includes, EclipseUserInterfaceCustomization.getInstance());
                Assert.isTrue(getEnvironment().getLoadedProof() != null, "No proof loaded.");
                this.currentProof = getEnvironment().getLoadedProof();
             }

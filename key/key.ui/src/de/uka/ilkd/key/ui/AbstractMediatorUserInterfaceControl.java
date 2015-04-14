@@ -94,9 +94,9 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
    public abstract void loadProblem(File file);
 
    protected ProblemLoader getProblemLoader(File file, List<File> classPath,
-                                            File bootClassPath, KeYMediator mediator) {
+                                            File bootClassPath, List<File> includes,KeYMediator mediator) {
        final ProblemLoader pl =
-               new ProblemLoader(file, classPath, bootClassPath,
+               new ProblemLoader(file, classPath, bootClassPath, includes,
                                  AbstractProfile.getDefaultProfile(), false, mediator, true, null, this);
        return pl;
    }

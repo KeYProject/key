@@ -48,7 +48,7 @@ public class KeYExampleUtilTest extends AbstractSetupTestCase {
        assertTrue(file.exists());
        assertTrue(file.isFile());
        // Load file
-       KeYEnvironment<?> env = KeYEnvironment.load(file, null, null);
+       KeYEnvironment<?> env = KeYEnvironment.load(file, null, null, null);
        env.dispose();
     }
 

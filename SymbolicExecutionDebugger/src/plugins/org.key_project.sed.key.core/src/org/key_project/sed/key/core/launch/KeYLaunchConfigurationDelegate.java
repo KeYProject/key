@@ -104,6 +104,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           File location = null;
           List<File> classPaths = null;
           File bootClassPath = null;
+          List<File> includes = null;
           if (newDebugSession) {
              // make sure that the method has a resource
              Assert.isNotNull(method.getResource(), "Method \"" + method + "\" is not part of a workspace resource.");
@@ -113,6 +114,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
              // Get KeY project settings
              bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
              classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
+             includes = KeYResourceProperties.getKeYIncludes(project);
              // Get local file for the eclipse resource
              location = KeYResourceProperties.getSourceClassPathLocation(project);
              Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
@@ -144,6 +146,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                              location, 
                                                              classPaths, 
                                                              bootClassPath, 
+                                                             includes,
                                                              useUnicode,
                                                              usePrettyPrinting,
                                                              showSignatureOnMethodReturnNodes,
@@ -250,7 +253,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                                String launchConfigurationName, 
                                                                KeYLaunchSettings settings) throws Exception {
        // Load location
-       AbstractProblemLoader loader = ui.load(SymbolicExecutionJavaProfile.getDefaultInstance(settings.isTruthValueEvaluationEnabled()), settings.getLocation(), settings.getClassPaths(), settings.getBootClassPath(), SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), true);
+       AbstractProblemLoader loader = ui.load(SymbolicExecutionJavaProfile.getDefaultInstance(settings.isTruthValueEvaluationEnabled()), settings.getLocation(), settings.getClassPaths(), settings.getBootClassPath(), settings.getIncludes(), SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), true);
        InitConfig initConfig = loader.getInitConfig();
        // Try to reuse already instantiated proof
        Proof proof = loader.getProof();

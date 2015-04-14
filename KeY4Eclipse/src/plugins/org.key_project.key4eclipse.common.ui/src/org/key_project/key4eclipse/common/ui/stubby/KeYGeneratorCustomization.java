@@ -26,8 +26,8 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry.KeYPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
 import org.key_project.stubby.core.customization.IGeneratorCustomization;
@@ -115,7 +115,7 @@ public class KeYGeneratorCustomization implements IGeneratorCustomization {
    public void addAdditionalContent(IJavaProject javaProject, DependencyAnalyzer analyzer) throws CoreException {
       try {
          if (bootClassPath) {
-            KeYEnvironment<?> environment = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null);
+            KeYEnvironment<?> environment = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null, null);
             try {
                // Add KeYJavaType from the original boot class path to the DependencyAnalyzer
                for (KeYJavaType kjt : environment.getJavaInfo().getAllKeYJavaTypes()) {
@@ -441,11 +441,11 @@ public class KeYGeneratorCustomization implements IGeneratorCustomization {
       IProject project = javaProject.getProject();
       final String fullPath = KeYStubGenerationCustomization.computeFullPath(project, stubFolderPath);
       // Ensure that class path is correct according to classPath.
-      List<KeYClassPathEntry> entries = KeYResourceProperties.getClassPathEntries(project);
-      KeYClassPathEntry entry = KeYResourceProperties.searchClassPathEntry(entries, KeYClassPathEntryKind.WORKSPACE, fullPath);
+      List<KeYPathEntry> entries = KeYResourceProperties.getClassPathEntries(project);
+      KeYPathEntry entry = KeYResourceProperties.searchClassPathEntry(entries, KeYPathEntryKind.WORKSPACE, fullPath);
       if (classPath) {
          if (entry == null) {
-            entry = new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, fullPath);
+            entry = new KeYPathEntry(KeYPathEntryKind.WORKSPACE, fullPath);
             entries.add(entry);
             KeYResourceProperties.setClassPathEntries(project, entries);
          }

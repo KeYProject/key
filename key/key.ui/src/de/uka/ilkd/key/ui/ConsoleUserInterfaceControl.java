@@ -200,7 +200,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
          * in which proofs will be written.
          */
         keyProblemFile = file;
-        getProblemLoader(file, null, null, mediator).runSynchronously();
+        getProblemLoader(file, null, null, null, mediator).runSynchronously();
     }
 
     @Override

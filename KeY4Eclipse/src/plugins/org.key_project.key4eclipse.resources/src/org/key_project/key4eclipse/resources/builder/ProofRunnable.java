@@ -159,7 +159,7 @@ public class ProofRunnable implements Runnable {
       KeYEnvironment<DefaultUserInterfaceControl> loadEnv = null;
       boolean error = false;
       try{
-         loadEnv = KeYEnvironment.load(profile, file, null, null, false);
+         loadEnv = KeYEnvironment.load(profile, file, null, null, null, false);
       } catch(ProblemLoaderException e){
          error = true;
       }

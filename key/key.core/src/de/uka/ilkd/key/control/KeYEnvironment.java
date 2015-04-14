@@ -165,13 +165,15 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     * @param location The location to load.
     * @param classPaths The class path entries to use.
     * @param bootClassPath The boot class path to use.
+    * @param includes Optional includes to consider.
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
    public static KeYEnvironment<DefaultUserInterfaceControl> load(File location,
-                                                          List<File> classPaths,
-                                                          File bootClassPath) throws ProblemLoaderException {
-      return load(null, location, classPaths, bootClassPath, false);
+                                                                  List<File> classPaths,
+                                                                  File bootClassPath,
+                                                                  List<File> includes) throws ProblemLoaderException {
+      return load(null, location, classPaths, bootClassPath, includes, false);
    }
    
    /**
@@ -180,15 +182,17 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     * @param location The location to load.
     * @param classPaths The class path entries to use.
     * @param bootClassPath The boot class path to use.
+    * @param includes Optional includes to consider.
     * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
    public static KeYEnvironment<DefaultUserInterfaceControl> load(File location,
-                                                          List<File> classPaths,
-                                                          File bootClassPath,
-                                                          RuleCompletionHandler ruleCompletionHandler) throws ProblemLoaderException {
-      return load(null, location, classPaths, bootClassPath, null, ruleCompletionHandler, false);
+                                                                  List<File> classPaths,
+                                                                  File bootClassPath,
+                                                                  List<File> includes,
+                                                                  RuleCompletionHandler ruleCompletionHandler) throws ProblemLoaderException {
+      return load(null, location, classPaths, bootClassPath, includes, null, ruleCompletionHandler, false);
    }
    
    /**
@@ -198,16 +202,18 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     * @param location The location to load.
     * @param classPaths The class path entries to use.
     * @param bootClassPath The boot class path to use.
+    * @param includes Optional includes to consider.
     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile,
-                                                          File location,
-                                                          List<File> classPaths,
-                                                          File bootClassPath,
-                                                          boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
-      return load(profile, location, classPaths, bootClassPath, null, null, forceNewProfileOfNewProofs);
+                                                                  File location,
+                                                                  List<File> classPaths,
+                                                                  File bootClassPath,
+                                                                  List<File> includes, 
+                                                                  boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
+      return load(profile, location, classPaths, bootClassPath, includes, null, null, forceNewProfileOfNewProofs);
    }
    
    /**
@@ -217,6 +223,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     * @param location The location to load.
     * @param classPaths The class path entries to use.
     * @param bootClassPath The boot class path to use.
+    * @param includes Optional includes to consider.
     * @param poPropertiesToForce Some optional PO {@link Properties} to force.
     * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
@@ -224,14 +231,15 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
     * @throws ProblemLoaderException Occurred Exception
     */
    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile,
-                                                          File location,
-                                                          List<File> classPaths,
-                                                          File bootClassPath,
-                                                          Properties poPropertiesToForce,
-                                                          RuleCompletionHandler ruleCompletionHandler,
-                                                          boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
+                                                                  File location,
+                                                                  List<File> classPaths,
+                                                                  File bootClassPath,
+                                                                  List<File> includes,
+                                                                  Properties poPropertiesToForce,
+                                                                  RuleCompletionHandler ruleCompletionHandler,
+                                                                  boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
       DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(ruleCompletionHandler);
-      AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, poPropertiesToForce, forceNewProfileOfNewProofs); 
+      AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, includes, poPropertiesToForce, forceNewProfileOfNewProofs); 
       InitConfig initConfig = loader.getInitConfig();
       return new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig, loader.getProof(), loader.getResult());
    }

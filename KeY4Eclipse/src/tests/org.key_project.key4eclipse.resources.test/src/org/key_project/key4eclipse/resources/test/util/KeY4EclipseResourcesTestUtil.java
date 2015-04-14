@@ -182,24 +182,6 @@ public class KeY4EclipseResourcesTestUtil {
    
    
    /**
-    * Loads a given proof{@linkIFile} and returns the loaded {@link Proof}.
-    * @param file - the {@link IFile} to load
-    * @param project - the {@link IProject} to use
-    * @return the loaded {@link Proof}
-    * @throws CoreException
-    * @throws ProblemLoaderException
-    */
-   public static Proof loadProofFile(File file, IProject project) throws CoreException, ProblemLoaderException{
-      File location = ResourceUtil.getLocation(project);
-      File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
-      List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
-      KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
-      environment = KeYEnvironment.load(file, null, null);
-      return environment.getLoadedProof();
-   }
-   
-   
-   /**
     * Returns the proof{@link IFolder} for the given {@link IProject}.
     * @param project - the {@link IProject} to use
     * @return the proof{@link IFolder}

@@ -35,8 +35,8 @@ import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.WorkspaceSourceContainer;
 import org.eclipse.jdt.core.IMethod;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
-import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry;
+import org.key_project.key4eclipse.starter.core.property.KeYPathEntry.KeYPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
 import org.key_project.sed.key.core.util.KeySEDUtil;
@@ -80,13 +80,13 @@ public class KeYSourcePathComputerDelegate implements ISourcePathComputerDelegat
               result.add(createSourceContainer(file));
            }
            // Add class path entries
-           List<KeYClassPathEntry> entries = KeYResourceProperties.getClassPathEntries(project);
-           for (KeYClassPathEntry entry : entries) {
-              if (KeYClassPathEntryKind.WORKSPACE.equals(entry.getKind())) {
+           List<KeYPathEntry> entries = KeYResourceProperties.getClassPathEntries(project);
+           for (KeYPathEntry entry : entries) {
+              if (KeYPathEntryKind.WORKSPACE.equals(entry.getKind())) {
                  IResource resource = entry.getResource();
                  result.add(createSourceContainer(resource));
               }
-              else if (KeYClassPathEntryKind.EXTERNAL_IN_FILE_SYSTEM.equals(entry.getKind())) {
+              else if (KeYPathEntryKind.EXTERNAL_IN_FILE_SYSTEM.equals(entry.getKind())) {
                  File file = entry.getLocation();
                  result.add(createSourceContainer(file));
               }

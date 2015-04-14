@@ -16,6 +16,7 @@ package org.key_project.key4eclipse.common.ui.test.suite.swtbot;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotKeYExampleNewWizardTest;
+import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotKeYIncludesPropertyPageTest;
 import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotKeYStubGenerationCustomizationTest;
 import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotNodeCounterExampleGeneratorJobTest;
 import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotProofFileGenerateTestsJobTest;
@@ -30,6 +31,7 @@ import org.key_project.key4eclipse.common.ui.test.testcase.swtbot.SWTBotTacletOp
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
    SWTBotKeYExampleNewWizardTest.class,
+   SWTBotKeYIncludesPropertyPageTest.class,
    SWTBotKeYStubGenerationCustomizationTest.class,
    SWTBotNodeCounterExampleGeneratorJobTest.class,
    SWTBotProofFileGenerateTestsJobTest.class,

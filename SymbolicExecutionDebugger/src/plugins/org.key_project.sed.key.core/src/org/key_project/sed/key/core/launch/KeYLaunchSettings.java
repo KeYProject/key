@@ -121,6 +121,11 @@ public class KeYLaunchSettings {
     * The used boot class path.
     */
    private final File bootClassPath;
+   
+   /**
+    * The includes to consider.
+    */
+   private final List<File> includes;
 
    /**
     * {@code true} use unicode characters, {@code false} do not use unicode characters.
@@ -175,6 +180,7 @@ public class KeYLaunchSettings {
     * @param location The launched location.
     * @param classPaths The used class path entries.
     * @param bootClassPath The used boot class path.
+    * @param includes The includes to consider.
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
@@ -199,6 +205,7 @@ public class KeYLaunchSettings {
                             File location,
                             List<File> classPaths,
                             File bootClassPath,
+                            List<File> includes,
                             boolean useUnicode,
                             boolean usePrettyPrinting,
                             boolean showSignatureOnMethodReturnNodes,
@@ -223,6 +230,7 @@ public class KeYLaunchSettings {
       this.location = location;
       this.classPaths = classPaths;
       this.bootClassPath = bootClassPath;
+      this.includes = includes;
       this.useUnicode = useUnicode;
       this.usePrettyPrinting = usePrettyPrinting;
       this.showSignatureOnMethodReturnNodes = showSignatureOnMethodReturnNodes;
@@ -366,6 +374,14 @@ public class KeYLaunchSettings {
     */
    public File getBootClassPath() {
       return bootClassPath;
+   }
+
+   /**
+    * Returns the includes to consider.
+    * @return The includes to consider.
+    */
+   public List<File> getIncludes() {
+      return includes;
    }
 
    /**

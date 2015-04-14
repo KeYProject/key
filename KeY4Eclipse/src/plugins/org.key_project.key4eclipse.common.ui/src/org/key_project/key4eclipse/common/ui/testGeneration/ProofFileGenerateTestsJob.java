@@ -40,7 +40,8 @@ public class ProofFileGenerateTestsJob extends AbstractGenerateTestsJob {
       try {
          env = KeYEnvironment.load(ResourceUtil.getLocation(proofFile), 
                                    KeYResourceProperties.getKeYClassPathEntries(proofFile.getProject()),
-                                   KeYResourceProperties.getKeYBootClassPathLocation(proofFile.getProject()));
+                                   KeYResourceProperties.getKeYBootClassPathLocation(proofFile.getProject()),
+                                   KeYResourceProperties.getKeYIncludes(proofFile.getProject()));
          generateTests(proofFile.getProject(), 
                        ResourceUtil.getFileNameWithoutExtension(proofFile), 
                        env.getLoadedProof(), 
